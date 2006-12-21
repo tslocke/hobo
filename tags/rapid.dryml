@@ -1,0 +1,375 @@
+<taglib module="Hobo::Rapid"/>
+
+<def tag="clearer"><div class='clearer'>&nbsp;</div></def>
+
+
+<def tag="submit" attrs="label"><input type="submit" value="<%= label %>" xattrs="" class="button_input"/></def>
+
+
+<def tag="object_table" attrs="fields, associations">
+  <% fields = fields.nil? ? (this.class.content_columns.every(:name) - %w{created_at updated_at}) : comma_split(fields)
+     add_classes(options, "object_table", ('new_record' if this.new_record?))
+  %>
+  <table xattrs="">
+    <% for field in fields.select{|f| can_view?(this, f)} %>
+      <tr>
+        <td class="field_label"><%= no_break(field.titleize) %>:</td>
+        <td><edit attr="#field" /></td>
+      </tr>
+    <% end %>
+
+    <% associations = if associations == '*'
+                        this.class.reflections.values.every(:name)
+                      elsif associations == 'belongs_to'
+                        this.class.reflections.values.oselect{macro == :belongs_to}.every(:name)
+                      else
+                        comma_split(associations)
+                      end
+    %>
+    <% for assoc in associations %>
+      <tr>
+        <td class="field_label"><%= no_break(assoc.to_s.titleize) %>:</td>
+        <td><edit attr="#assoc"/></td>
+      </tr>
+    <% end %>
+
+  </table>
+</def>
+
+
+<def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
+  <% refl = this_type
+     if refl && refl.macro == :belongs_to
+       completer_model ||= refl.klass
+       completer_attr ||= refl.klass.id_name_column
+     else
+       completer_model = completer_model.constantize if completer_model.is_a? String
+     end
+     id ||= this_field_dom_id + "_completer"
+     url = object_url(completer_model, "completions",
+                      { :for => completer_attr },
+                      options.select_hash {|k,v| k.to_s.starts_with? "where_"})
+  %>
+  <% if name and value %>
+    <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
+           autocomplete_url="<%= url %>" value="<%= value %>"
+           xattrs=""/>
+  <% else %>
+    <edit id="#id" class="autocomplete_bhv" autocomplete_url="#url" xattrs=""/>
+  <% end %>
+  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
+</def>
+
+
+<def tag="has_many_table" attrs="part_id">
+  <table xattrs="">
+    <repeat>
+      <tr id="<%= dom_id this %>">
+        <tagbody/>
+      </tr>
+    </repeat>
+  </table>
+  <if_can_create>
+    <div>
+      <create_button in="#this" update="#part_id"/>
+    </div>
+  </if_can_create>
+</def>
+
+
+<def tag="ul_for">
+  <ul xattrs="">
+    <repeat>
+      <li class="<%= cycle('even', 'odd') %>">
+        <%= tagbody.nil? ? object_link : tagbody.call %>
+      </li>
+    </repeat>
+  </ul>
+</def>
+
+<def tag="table_for">
+  <table xattrs="">
+    <repeat>
+      <tr class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id(this) %>">
+        <%= tagbody.nil? ? object_link : tagbody.call %>
+      </tr>
+    </repeat>
+  </table>
+</def>
+
+<def tag="add_by_name" attrs="action_name, add_text, update, part_id">
+  <% refl = this_type
+     joiner = this_parent.send(refl.through_reflection.name).new
+     add_name = refl.klass.name.titleize
+     action_name ||= "Add #{add_name}"
+     add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
+                  "enter its name"
+     source = refl.source_reflection.name
+  %>
+  <tagbody/>
+  <object_form obj="#joiner" update="#[update, part_id]" message="#action_name" hidden_fields="*">
+    <p>
+      <%= add_text %>:
+      <autocompleter attr="#source" completer_model="#refl.klass" where_not_in="#dom_id(this)" />
+      <submit_tag label="#action_name" class="text"/>
+    </p>
+  </object_form>
+</def>
+
+
+<def tag="spinner">
+  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" xattrs=""/>
+</def>
+
+
+<def tag="submit_button" attrs="label">
+  <input type='submit' value='<%= label %>'/>
+</def>
+
+
+<def tag="theme_img" attrs="src">
+  <img src="<%= theme_asset('images/' + src)%>" xattrs=""/>
+</def>
+
+
+<def tag="name_or_me">
+  <%= current_user == this ? tagbody.call : this.name %>
+</def>
+
+
+<def tag="you_have">
+  <%= current_user == this ? "You have" : this.name + " has" %>
+</def>
+
+
+<def tag="search_result">
+  <div class='search_result'>
+    <human_type/>: <object_link/>
+  </div>
+</def>
+
+
+<def tag="object_small">
+  <div class="object_small">
+    <object_link/>
+  </div>
+</def>
+
+<def tag="previous_page_link">
+  <%= link_to (tagbody ? tagbody.call : 'Previous page'), { :page => @pages.current.previous } if
+        @pages and @pages.current.previous %>
+</def>
+
+
+<def tag="next_page_link">
+  <%= link_to (tagbody ? tagbody.call : 'Next page'), { :page => @pages.current.next } if
+        @pages and @pages.current.next %>
+</def>
+
+
+<!-- It is expected that the theme will overwrite these tags, but they have to be defined here, otherwise
+     they appear to the parser as non-hobo tags -->
+<def tag="page"/>
+<def tag="area"/>
+<def tag="panel"/>
+<def tag="section"/>
+<def tag="navbar"/>
+
+
+<def tag="index_page">
+  <% model_name = @model.name.titleize %>
+  <page title='#"All #{model_name.pluralize}"'>
+
+    <h1><%= model_name.pluralize %></h1>
+
+    <panel>
+      <h1><count label="#model_name"/></h1>
+      <section>
+        <table_for>
+          <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
+        </table_for>
+        <div class="page_links">
+          <previous_page_link/>
+          <next_page_link/>
+        </div>
+      </section>
+      <section>
+        <p><new_object_link for="#@model"/></p>
+      </section>
+    </panel>
+  </page>
+</def>
+
+
+<def tag="new_page">
+  <page title='#"New #{human_type}"'>
+    <h1>New <human_type/></h1>
+    <if q="#@owner">
+      <h2>For: <object_link obj="#@owner" /></h2>
+    </if>
+
+    <panel>
+      <h1>Details</h1>
+      <section>
+        <%= error_messages_for 'this' %>
+
+        <object_form hidden_fields="*">
+          <object_table associations="belongs_to"/>
+          <submit label="Create"/>
+        </object_form>
+      </section>
+    </panel>
+
+  </page>
+</def>
+
+
+<def tag="show_page">
+  <% has_many_assocs = this.class.reflections.values.map do |refl|
+       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
+     end.compact
+  %>
+  <page>
+    <h1><human_type/><if q="#this.respond_to? :name">: <edit attr="name"/></if></h1>
+    <panel>
+      <h1>Details</h1>
+      <section>
+        <object_table fields="#this.class.content_columns.every(:name) - ['name']" associations="*"/>
+      </section>
+
+      <section>
+        <repeat obj="#has_many_assocs">
+          <p><new_object_link/></p>
+        </repeat>
+      </section>
+    </panel>
+
+  </page>
+</def>
+
+
+<def tag="new_in_collection_page">
+  <page title='#"New #{human_type}"'>
+    <h1>New <human_type/></h1>
+    <h2>For: <object_link obj="#@owner" /></h2>
+
+    <panel>
+      <h1>Details</h1>
+      <section>
+        <%= error_messages_for 'this' %>
+
+        <object_form hidden_fields="*">
+          <object_table/>
+          <submit label='#"Add to #{display_name(:obj => @owner)}"'/>
+        </object_form>
+      </section>
+
+    </panel>
+
+  </page>
+</def>
+
+
+<def tag="show_collection_page">
+  <% type_name = @controller.class.name.sub("Controller", "")
+     collection_name = @association.proxy_reflection.name
+     title = "#{collection_name.to_s.titleize} for #{display_name(:obj => @owner)}"
+  %>
+  <page title='#title'>
+
+    <h1><%= title %></h1>
+    <h2>Back to <object_link obj="#@owner"/></h2>
+    <panel>
+      <h1><count label="#@association.proxy_reflection.klass.name.titleize"/></h1>
+      <section>
+        <table_for>
+          <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
+        </table_for>
+        <repeat><p><object_link/></p></repeat>
+        <previous_page_link/>
+        <next_page_link/>
+      </section>
+      <section>
+        <new_object_link for="#@association"/>
+      </section>
+    </panel>
+  </page>
+</def>
+
+
+<def tag="application_nav">
+  <% items = [['Home', urlb + '/']] +
+             Hobo.models[0..2].map{|m| [m.name.pluralize.titlecase, object_url(m)]} +
+             [['Search', (search_url rescue "")]] %>
+  <navbar items="#items"/>
+</def>
+
+<def tag="application_logo">
+  <theme_img src="logo.gif"/>
+</def>
+
+<def tag="form_edit_for_belongs_to"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  #Todo: switch to autocompleter for id_name when too many records, and id_name supported
+  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
+  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
+  %>
+  <select name="<%= param_name_for_this(true) %>">
+    <%= options_for_select(select_options, this ? this.id : "") %>
+  </select>
+</def>
+
+
+<def tag="in_place_edit_for_belongs_to"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  link_id = "#{this_field_dom_id}_editor" %>
+  <span id="#link_id" part_id="rapid_belongs_to_edit">
+    <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
+       select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
+       link_id = "#{this_field_dom_id}_editor"
+       f = ajax_updater(object_url(this_parent),
+                        "Change #{this_field.to_s.titleize}", [link_id],
+                        :method => "put",
+                        :params => { this_parent.class.name.underscore => {
+                            this_type.association_foreign_key => Hobo.raw_js('this.value')
+                          } })
+    %>
+    <select onchange="<%= f %>" id="#link_id">
+      <%= options_for_select(select_options, this ? this.id : "") %>
+    </select>
+    <if_this><object_link>View</object_link></if_this>
+  </span>
+</def>
+
+
+<def tag="in_place_edit_for_boolean"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  f = ajax_updater(object_url(this_parent),
+                   "Change #{this_field.to_s.titleize}", [],
+                   :method => "put",
+                   :params => { this_parent.class.name.underscore => {
+                       this_field => Hobo.raw_js('this.checked')
+                    } })
+%>
+  <%=  check_box_tag "x", "1", this, :onchange => f %>
+</def>
+
+
+<def tag="account_nav">
+  <if q="#login_url rescue false">
+    <div class="account_nav">
+      <if q="#logged_in?">
+        <div class='nav_item'>Logged in as <%= h current_user.login %></div>
+        <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
+      </if>
+      <else>
+        <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
+        <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+    </else>
+    </div>
+  </if>
+</def>
+
+<div class='search_result'>
+  <human_type/>: <object_link/>
+</div>

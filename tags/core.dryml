@@ -1,0 +1,6 @@
+<taglib module="Hobo::Core"/>
+
+<def tag="theme_stylesheet">
+  <link href="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
+        media="screen" rel="Stylesheet" type="text/css" />
+</def>

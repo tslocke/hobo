@@ -1,0 +1,88 @@
+<taglib src="plugins/hobo/tags/rapid"/>
+
+<def tag="page" attrs="title_prefix, title, onload, logo, footer, nav">
+  <% title ||= human_type + ": " + display_name %>
+  <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
+  <html>
+    <head>
+      <title><%= title_prefix %><%= title %></title>
+      <%= stylesheet_link_tag 'application' %>
+      <theme_stylesheet/>
+      <%= javascript_include_tag :defaults %>
+      <hobo_rapid_javascripts/>
+    </head>
+    <body onload="Hobo.applyEvents(); <%= onload %>">
+
+      <div id='ajax_progress'>
+        <div>
+          <span id="ajax_progress_text"></span><theme_img src="spinner.gif"/>
+        </div>
+      </div>
+
+      <div id="page">
+
+        <div id="page_top">
+        <div id="page_right">
+        <div id="page_bottom">
+        <div id="page_left">
+        <div id="page_corner02">
+        <div id="page_corner04">
+        <div id="page_corner03">
+        <div id="page_corner01">
+        <div id="page_inner_top">
+
+          <div id='header'>
+
+            <div class="logo"><%= logo || application_logo %></div>
+
+            <div class="nav_bars">
+              <div class="nav"><%= nav || application_nav %></div>
+              <account_nav/>
+            </div>
+
+            <clearer/>
+          </div>
+
+          <if q="#flash[:notice]">
+            <div class="flash"><%= flash[:notice] %></div>
+          </if>
+
+          <tagbody/>
+
+          <clearer/>
+
+        </div></div></div></div></div></div></div></div></div>
+      </div>
+      <div id="footer"><%= footer %></div>
+
+    </body>
+  </html>
+</def>
+
+<def tag="panel">
+  <div class="panel" xattrs="">
+    <div class="panel_top"><div class="panel_right">
+    <div class="panel_bottom"><div class="panel_left">
+    <div class="panel_corner02"><div class="panel_corner04">
+    <div class="panel_corner03"><div class="panel_corner01">
+
+        <tagbody/>
+
+    </div></div></div></div></div></div></div></div>
+  </div>
+</def>
+
+<def tag="section">
+  <div class="section" xattrs=""><tagbody/></div>
+</def>
+
+<def tag="area">
+  <div xattrs=""><tagbody/></div>
+</def>
+
+<def tag="navbar" attrs="items,current">
+  <repeat obj="#items">
+    <div class='nav_item <%= "current" if current == this[0] %>'><%= link_to this[0].upcase, this[1] %></div>
+  </repeat>
+  <clearer/>
+</def>
