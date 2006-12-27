@@ -134,16 +134,22 @@ module Hobo::Rapid
       elsif this_type.macro == :has_many
         raise NotImplementedError.new("editor for has_many associations not implemented")
       end
-    elsif this_type == :string
+      
+    elsif this_type.is_in? [:integer, :float, :decimal, :string]
       tag :input, options.merge(:type => 'text', :name => name, :value => this)
+      
     elsif this_type == :text
       content_tag :textarea, this, options.merge(:name => name)
+      
     elsif this_type == :boolean
       check_box_tag(name, '1', this, options)
+      
     elsif this_type == :datetime
       select_datetime this, :name => name
+      
     else
-      raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{attr} (#{this.inspect}:#{type})")
+      raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{attr} " +
+                          "(#{this.inspect}:#{type})")
     end
   end
 

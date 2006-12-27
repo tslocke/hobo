@@ -134,10 +134,7 @@ module Hobo
             this.to_s
           end
 
-        when :text
-          h(this).gsub("\n", "<br/>")
-
-        when :string
+        when :integer, :float, :decimal, :string, :text
           h(this).gsub("\n", "<br/>")
 
         when :html
