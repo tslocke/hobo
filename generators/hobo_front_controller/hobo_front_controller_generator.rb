@@ -81,7 +81,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
       opt.on("--add-routes",
              "Modify config/routes.rb to support the front controller") { |v| options[:add_routes] = true }
       opt.on("--no-user",
-             "Don't create the user model") { |v| options[:no_user] = true }
+             "Don't create the login and signup pages") { |v| options[:no_user] = true }
       opt.on("--delete-index",
              "Delete public/index.html") { |v| options[:delete_index] = true }
     end
