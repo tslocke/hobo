@@ -89,9 +89,9 @@ module Hobo
             where = cols.map {|c| "(#{c} like ?)"}.join(' or ')
             type = model.column_names.include?("type") ? "type" : "'#{model.name}'"
             ActiveRecord::Base.send(:sanitize_sql,
-                                    ["(select #{type} as type, id " +
+                                    ["select #{type} as type, id " +
                                      "from #{model.table_name} " +
-                                     "where #{where})"] +
+                                     "where #{where}"] +
                                     ["%#{query}%"] * cols.length)
           end
         end
