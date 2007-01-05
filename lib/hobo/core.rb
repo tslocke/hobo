@@ -74,12 +74,14 @@ module Hobo
 
 
     def can_view_this?
-      if this.is_a? ActiveRecord::Base
+      if this.respond_to?(:can_view)
         can_view?(this)
-      else
-        raise HoboError.new("cannot check view permission -- no field-name for context") unless
-          this_parent && this_field
+      elsif this_parent && this_field
         can_view?(this_parent, this_field)
+      else
+        # Default to true. This is only a safety net. If the template is trying to show something
+        # we assume the programmer knows best
+        true
       end
     end
 
@@ -98,8 +100,7 @@ module Hobo
       opts = {}.update(options)
       opts.delete(:name)
 
-      m  = "#{name}_for_#{this_type}"
-      if respond_to?(m)
+      if this_type and m = "#{name}_for_#{this_type.name.underscore}" and respond_to?(m)
         send(m, opts)
       else
         send(name, opts)
@@ -109,9 +110,14 @@ module Hobo
 
     def_tag :show do
       raise HoboError.new("attempted to show non-viewable field") unless can_view_this?
+      
+      type = this_type == String ? :string : this_type
 
       if this.nil?
-        "(Not Available)"
+        case type
+          when  :string, :text; ""
+          else; "(Not Available)"
+        end
       elsif this_type.respond_to?(:macro)
         if this_type.macro == :belongs_to
           object_link
@@ -119,7 +125,7 @@ module Hobo
           map_this { object_link }.join(", ")
         end
       else
-        case this_type
+        case type
         when :date
           if respond_to?(:show_date)
             show_date
@@ -133,7 +139,7 @@ module Hobo
           else
             this.to_s
           end
-
+          
         when :integer, :float, :decimal, :string, :text
           h(this).gsub("\n", "<br/>")
 
@@ -150,7 +156,7 @@ module Hobo
           this ? "Yes" : "No"
 
         else
-          raise HoboError.new("Cannot show: #{this.inspect} (field is #{this_field})")
+          raise HoboError.new("Cannot show: #{this.inspect} (field is #{this_field}, type is #{this_type.inspect})")
         end
       end
     end
@@ -229,7 +235,7 @@ module Hobo
       if even_odd
         map_this do
           klass = [options[:class], cycle("even", "odd")].compact.join(' ')
-          content_tag(even_odd, tagbody.call, options.merge(:class => klass))
+          content_tag(even_odd, tagbody.call, options.merge(:class => klass, :model_id => dom_id(this)))
         end
       else
         map_this { tagbody.call }
@@ -293,10 +299,20 @@ module Hobo
     def_tag :unless, :q do
       if_(:q => !q) { tagbody.call }
     end
+    
+    
+    def_tag :unless_blank do
+      if_(:q => !this.blank?) { tagbody.call }
+    end
 
 
     def_tag :if_empty do
       if_(:q => this.empty?) { tagbody.call }
+    end
+    
+
+    def_tag :unless_empty do
+      if_(:q => !this.empty?) { tagbody.call }
     end
 
 

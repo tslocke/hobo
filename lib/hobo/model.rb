@@ -26,7 +26,7 @@ module Hobo
 
 
       def never_show?(field)
-        @hobo_never_show and field.to_sym.is_in?(@hobo_never_show)
+        @hobo_never_show and field.to_sym.in?(@hobo_never_show)
       end
 
 
@@ -36,7 +36,16 @@ module Hobo
           def creator=(x); self.#{attr} = x; end
         END
       end
-
+          
+          
+      def set_search_columns(*columns)
+        class_eval <<-END
+          def self.search_columns
+            %w{#{columns.omap{to_s} * ' '}}
+          end
+        END
+      end
+        
 
       def id_name(*args)
         underscore = args.delete(:underscore)
@@ -121,7 +130,7 @@ module Hobo
 
       def search_columns
         cols = columns.omap{name}
-        %w{name title body content}.select{|c| c.is_in?(cols) }
+        %w{name title body content}.select{|c| c.in?(cols) }
       end
 
     end

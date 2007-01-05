@@ -63,7 +63,7 @@ module Hobo::Dryml
       method_src = ("def render_page(__page_this__, __local_assigns__); " +
                     "#{locals} new_object_context(__page_this__) do " +
                     src +
-                    "; end + _part_contexts_js(true); end")
+                    "; end + part_contexts_js; end")
 
       @environment.class_eval(method_src, template_path, 1)
       @environment.compiled_local_names = local_names

@@ -27,7 +27,7 @@
         </if>
         <else>
           <repeat obj="#this.find(:all, :limit => 3)">
-            <if_can_view><object_small/></if_can_view>
+            <if_can_view><object_card/></if_can_view>
           </repeat>
           <p><object_link>More</object_link> (<count/>)</p>
         </else>

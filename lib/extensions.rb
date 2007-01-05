@@ -25,7 +25,7 @@ class Object
 #    ret
 #  end
 
-  def is_in?(array)
+  def in?(array)
     array.include?(self)
   end
 

@@ -4,6 +4,12 @@ module ActiveRecord::Associations
 
     alias_method :new, :build
 
+    def new_without_appending(attributes = {})
+      record = @reflection.klass.new(attributes)
+      set_belongs_to_association_for(record)
+      record
+    end
+    
     def include?(record)
       if loaded?
         target.include?(record)
@@ -11,6 +17,7 @@ module ActiveRecord::Associations
         find(record.id) && true rescue false
       end
     end
+
 
   end
 

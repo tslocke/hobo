@@ -37,9 +37,11 @@ module Hobo::Dryml
 
     attr_accessor :erb_binding, :part_contexts, :view_name
 
-    attr_reader :this, :this_parent, :this_field, :this_type, :form_field_path, :form_this
+    attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this
+    
+    def this; @_this; end
 
-
+    
     def this_field_dom_id
       Hobo.dom_id(this_parent, this_field)
     end
@@ -77,24 +79,24 @@ module Hobo::Dryml
 
 
     def new_context
-      ctx = @output, @this, @this_parent, @this_field, @this_type, @form_field_path
+      ctx = @output, @_this, @this_parent, @this_field, @this_type, @form_field_path
       @output = ""
       yield
       output = @output
-      @output, @this, @this_parent, @this_field, @this_type, @form_field_path = ctx
+      @output, @_this, @this_parent, @this_field, @this_type, @form_field_path = ctx
       output
     end
 
 
     def new_object_context(new_this)
       new_context do
-        @this_parent, @this_field, @this_type = if new_this.respond_to?(:proxy_reflection)
-                                                  refl = new_this.proxy_reflection
-                                                  [new_this.proxy_owner, refl.name, refl]
-                                                else
-                                                  [nil, nil, (this.class if this.is_a?(ActiveRecord::Base))]
-                                                end
-        @this = new_this
+        @this_parent,@this_field,@this_type = if new_this.respond_to?(:proxy_reflection)
+                                                refl = new_this.proxy_reflection
+                                                [new_this.proxy_owner, refl.name, refl]
+                                              else
+                                                [nil, nil, (new_this.class if new_this.is_a?(ActiveRecord::Base))]
+                                              end
+        @_this = new_this
         yield
       end
     end
@@ -126,7 +128,7 @@ module Hobo::Dryml
                  obj.class
                end
 
-        @this, @this_parent, @this_field, @this_type = obj, parent, field, type
+        @_this, @this_parent, @this_field, @this_type = obj, parent, field, type
         @form_field_path += path if @form_field_path
         yield
       end
@@ -167,7 +169,7 @@ module Hobo::Dryml
     end
 
 
-    def _part_contexts_js(initialise)
+    def part_contexts_js
       return "" if part_contexts.empty?
 
       assigns = part_contexts.map do |dom_id, p|
@@ -175,7 +177,7 @@ module Hobo::Dryml
         "hoboParts.#{dom_id} = ['#{part_id}', '#{model_id}']\n"
       end
 
-      "<script>\n" + (if initialise then "var hoboParts = {}\n" end) + assigns.join + "</script>\n"
+      "<script>\nvar hoboParts = {}\n" + assigns.join + "</script>\n"
     end
 
 
@@ -193,10 +195,10 @@ module Hobo::Dryml
 
 
     def render_tag(tag_name, options)
-      (send(tag_name, options) + _part_contexts_js(true)).strip
+      (send(tag_name, options) + part_contexts_js).strip
     end
-
-
+    
+    
     def method_missing(name, *args)
       @view.send(name, *args)
     end

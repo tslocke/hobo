@@ -4,10 +4,10 @@ module Hobo::ControllerHelpers
 
   def current_user
     # simple one-hit-per-request cache
-    return @current_user if  @hobo_current_user
+    return @hobo_current_user if @hobo_current_user
     if Hobo.user_model
       id = session && session[:user]
-      return @current_user = Hobo.user_model.find(id) if id
+      return @hobo_current_user = Hobo.user_model.find(id) if id
     end
 
     return Hobo.guest_user

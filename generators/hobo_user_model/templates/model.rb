@@ -3,10 +3,10 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_model
 
   include Hobo::AuthenticatedUser
-
-  def display_name
-    login
-  end
+  
+  set_login_attr :username
+  
+  alias_attribute :display_name, :username
 
   # --- Hobo Permissions --- #
 

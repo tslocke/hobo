@@ -50,70 +50,86 @@
                       { :for => completer_attr },
                       options.select_hash {|k,v| k.to_s.starts_with? "where_"})
   %>
-  <% if name and value %>
-    <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
-           autocomplete_url="<%= url %>" value="<%= value %>"
-           xattrs=""/>
-  <% else %>
-    <edit id="#id" class="autocomplete_bhv" autocomplete_url="#url" xattrs=""/>
-  <% end %>
+  <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
+         autocomplete_url="<%= url %>" value="<%= value %>"
+         xattrs=""/>
   <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
 
-<def tag="has_many_table" attrs="part_id">
-  <table xattrs="">
-    <repeat>
-      <tr id="<%= dom_id this %>">
-        <tagbody/>
-      </tr>
-    </repeat>
-  </table>
-  <if_can_create>
-    <div>
-      <create_button in="#this" update="#part_id"/>
-    </div>
-  </if_can_create>
+<def tag="has_many_table" attrs="part_id, delete_buttons, headings">
+  <if_empty>
+    <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
+  </if_empty>
+  <else>
+    <table_for headings="#headings" xattrs="">
+      <tagbody/>
+      <if q="#delete_buttons != false and can_delete?(this)">
+        <td><delete_button/></td>
+      </if>
+    </table_for>
+  </else>
+  <div>
+    <create_button update="#part_id"/>
+  </div>
 </def>
 
 
-<def tag="ul_for">
-  <ul xattrs="">
-    <repeat>
-      <li class="<%= cycle('even', 'odd') %>">
-        <%= tagbody.nil? ? object_link : tagbody.call %>
-      </li>
-    </repeat>
-  </ul>
+<def tag="ul_for" attrs="empty">
+  <if q="#this.empty? and empty">
+    <%= empty %>
+  </if>
+  <else>
+    <ul xattrs="">
+      <repeat>
+        <li class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id this %>">
+          <%= tagbody.nil? ? object_link : tagbody.call %>
+        </li>
+      </repeat>
+    </ul>
+  </else>
 </def>
 
-<def tag="table_for">
-  <table xattrs="">
-    <repeat>
-      <tr class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id(this) %>">
-        <%= tagbody.nil? ? object_link : tagbody.call %>
-      </tr>
-    </repeat>
-  </table>
+
+<def tag="table_for" attrs="headings, empty">
+  <if q="#this.empty? and empty">
+    <%= empty %>
+  </if>
+  <else>
+    <table xattrs="">
+      <if q="#headings"><tr><%= headings %></tr></if>
+      <repeat>
+        <tr class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id(this) %>">
+          <%= tagbody.nil? ? object_link : tagbody.call %>
+        </tr>
+      </repeat>
+    </table>
+  </else>
 </def>
+
 
 <def tag="add_by_name" attrs="action_name, add_text, update, part_id">
-  <% refl = this_type
-     joiner = this_parent.send(refl.through_reflection.name).new
+  <% add_to = this
+     refl = this_type
+     joins = this_parent.send(refl.through_reflection.name)
      add_name = refl.klass.name.titleize
      action_name ||= "Add #{add_name}"
      add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
                   "enter its name"
      source = refl.source_reflection.name
   %>
-  <tagbody/>
-  <object_form obj="#joiner" update="#[update, part_id]" message="#action_name" hidden_fields="*">
-    <p>
-      <%= add_text %>:
-      <autocompleter attr="#source" completer_model="#refl.klass" where_not_in="#dom_id(this)" />
-      <submit_tag label="#action_name" class="text"/>
-    </p>
-  </object_form>
+  <tagbody obj="#joins"/>
+  <with obj="#joins.new">
+    <if_can_create>
+       <object_form update="#[update, part_id]" message="#action_name" hidden_fields="*">
+         <p>
+           <%= add_text %>:
+           <belongs_to_autocompleting_field attr="#source" where_not_in="#dom_id(add_to)" />
+           <submit_tag label="#action_name" class="text"/>
+         </p>
+       </object_form>
+    </if_can_create>
+  </with>
 </def>
 
 
@@ -127,18 +143,13 @@
 </def>
 
 
+<def tag="image" attrs="src">
+  <img src="<%= urlb %>/images/<%= src %>" xattrs=""/>
+</def>
+
+
 <def tag="theme_img" attrs="src">
   <img src="<%= theme_asset('images/' + src)%>" xattrs=""/>
-</def>
-
-
-<def tag="name_or_me">
-  <%= current_user == this ? tagbody.call : this.name %>
-</def>
-
-
-<def tag="you_have">
-  <%= current_user == this ? "You have" : this.name + " has" %>
 </def>
 
 
@@ -149,20 +160,21 @@
 </def>
 
 
-<def tag="object_small">
-  <div class="object_small">
+<def tag="object_card">
+  <div class="object_card">
     <object_link/>
   </div>
 </def>
 
+
 <def tag="previous_page_link">
-  <%= link_to (tagbody ? tagbody.call : 'Previous page'), { :page => @pages.current.previous } if
+  <%= link_to (tagbody ? tagbody.call : '&laquo; Previous page'), { :page => @pages.current.previous } if
         @pages and @pages.current.previous %>
 </def>
 
 
 <def tag="next_page_link">
-  <%= link_to (tagbody ? tagbody.call : 'Next page'), { :page => @pages.current.next } if
+  <%= link_to (tagbody ? tagbody.call : 'Next page &raquo;'), { :page => @pages.current.next } if
         @pages and @pages.current.next %>
 </def>
 
@@ -285,7 +297,6 @@
         <table_for>
           <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
         </table_for>
-        <repeat><p><object_link/></p></repeat>
         <previous_page_link/>
         <next_page_link/>
       </section>
@@ -304,11 +315,13 @@
   <navbar items="#items"/>
 </def>
 
+
 <def tag="application_logo">
   <theme_img src="logo.gif"/>
 </def>
 
-<def tag="form_edit_for_belongs_to"><%
+
+<def tag="belongs_to_menu_field"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
@@ -320,7 +333,7 @@
 </def>
 
 
-<def tag="in_place_edit_for_belongs_to"><%
+<def tag="belongs_to_menu_editor"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="#link_id" part_id="rapid_belongs_to_edit">
@@ -342,10 +355,26 @@
 </def>
 
 
-<def tag="in_place_edit_for_boolean"><%
+<def tag="belongs_to_autocompleting_field">
+<% refl = this_type
+   completer_model ||= refl.klass
+   completer_attr ||= refl.klass.id_name_column
+   id ||= this_field_dom_id + "_completer"
+   url = object_url(completer_model, "completions",
+                    { :for => completer_attr },
+                    options.select_hash {|k,v| k.to_s.starts_with? "where_"})
+  %>
+
+  <input type="text" id="<%= id %>" class="autocomplete_bhv" autocomplete_url="<%= url %>"
+         name="<%= param_name_for_this %>" xattrs=""/>
+  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
+</def>
+
+
+<def tag="boolean_checkbox_editor" attrs="update"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   f = ajax_updater(object_url(this_parent),
-                   "Change #{this_field.to_s.titleize}", [],
+                   "Change #{this_field.to_s.titleize}", update,
                    :method => "put",
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
@@ -355,21 +384,24 @@
 </def>
 
 
-<def tag="account_nav">
-  <if q="#login_url rescue false">
-    <div class="account_nav">
-      <if q="#logged_in?">
-        <div class='nav_item'>Logged in as <%= h current_user.login %></div>
-        <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
-      </if>
-      <else>
-        <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
-        <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
-    </else>
-    </div>
+<def tag="application_account_nav">
+  <if q="#logged_in?">
+    <div class='nav_item'>Logged in as <%= h current_user.login %></div>
+    <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
   </if>
+  <else>
+    <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
+    <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+  </else>
 </def>
 
-<div class='search_result'>
-  <human_type/>: <object_link/>
-</div>
+
+<def tag="link" attrs="href">
+  <%= link_to tagbody.call, href, options %>
+</def>
+
+
+<def tag="page_n_of_count">
+  Page <%= @pages.current_page.number %> of <%= @pages.length %>
+</def>
+

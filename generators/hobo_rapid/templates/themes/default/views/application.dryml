@@ -1,6 +1,6 @@
 <taglib src="plugins/hobo/tags/rapid"/>
 
-<def tag="page" attrs="title_prefix, title, onload, logo, footer, nav">
+<def tag="page" attrs="title_prefix, title, onload, logo, footer, nav, account_nav, class">
   <% title ||= human_type + ": " + display_name %>
   <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
   <html>
@@ -11,7 +11,7 @@
       <%= javascript_include_tag :defaults %>
       <hobo_rapid_javascripts/>
     </head>
-    <body onload="Hobo.applyEvents(); <%= onload %>">
+    <body onload="Hobo.applyEvents(); <%= onload %>" class="<%= class_ %>">
 
       <div id='ajax_progress'>
         <div>
@@ -37,7 +37,9 @@
 
             <div class="nav_bars">
               <div class="nav"><%= nav || application_nav %></div>
-              <account_nav/>
+              <if q="#login_url rescue false">
+                <div class="account_nav"><%= account_nav || application_account_nav %></div>
+              </if>
             </div>
 
             <clearer/>

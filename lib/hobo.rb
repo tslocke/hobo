@@ -102,28 +102,41 @@ module Hobo
       for row in rows
         records[row['type']] << row['id']
       end
-      result = []
+      results = []
       for type, ids in records
-        result.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
+        results.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
       end
-      result
+      
+      results
     end
 
     def add_routes(map)
       for model in Hobo.models
-        controller = model.name.underscore.pluralize
-        map.resources controller, :collection => { :completions => :get }
-        for refl in model.reflections.values.select {|r| r.macro == :has_many}
-          map.named_route("#{controller.singularize}_#{refl.name}",
-                          "#{controller}/:id/#{refl.name}",
-                          :controller => controller,
-                          :action => "show_#{refl.name}",
-                          :conditions => { :method => :get })
+        web_name = model.name.underscore.pluralize
+        controller = "#{model.name.pluralize}Controller".constantize rescue nil
+        require "app/controllers/application"
+        if controller
+          map.resources web_name, :collection => { :completions => :get }
+          for refl in model.reflections.values.select {|r| r.macro == :has_many}
+            map.named_route("#{web_name.singularize}_#{refl.name}",
+                            "#{web_name}/:id/#{refl.name}",
+                            :controller => web_name,
+                            :action => "show_#{refl.name}",
+                            :conditions => { :method => :get })
 
-          map.named_route("new_#{controller.singularize}_#{refl.name.to_s.singularize}",
-                          "#{controller}/:id/#{refl.name}/new",
-                          :controller => controller,
-                          :action => "new_#{refl.name.to_s.singularize}")
+            map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
+                            "#{web_name}/:id/#{refl.name}/new",
+                            :controller => web_name,
+                            :action => "new_#{refl.name.to_s.singularize}")
+            
+            for method in controller.web_methods
+              map.named_route("#{web_name.singularize}_#{method}",
+                              "#{web_name}/:id/#{method}",
+                              :controller => web_name,
+                              :action => method.to_s,
+                              :conditions => { :method => :post })
+            end
+          end
         end
       end
     end
@@ -136,6 +149,7 @@ module Hobo
 
     def simple_has_many_association?(array_or_reflection)
       refl = array_or_reflection.is_a?(Array) ? array_or_reflection.proxy_reflection : array_or_reflection
+      return false unless refl.is_a?(ActiveRecord::Reflection::AssociationReflection)
       refl.macro == :has_many and
         (not refl.through_reflection) and
         (not refl.options[:conditions])
@@ -143,8 +157,11 @@ module Hobo
 
 
     def can_create?(person, object)
-      if object.is_a?(Class) and object < ActiveRecord::Base
+      if (object.is_a?(Class) and object < ActiveRecord::Base)
         object = object.new
+        object.created_by(person)
+      elsif Hobo.simple_has_many_association?(object)
+        object = object.new_without_appending
         object.created_by(person)
       end
       check_persmission(:create, person, object)
@@ -162,8 +179,8 @@ module Hobo
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
 
       x = if refl
-            # has_many associations are not editable
-            return false if refl.macro == :has_many
+            # has_many and polymorphic associations are not editable (for now)
+            return false if refl.macro == :has_many || refl.options[:polymorphic]
 
             Hobo::Undefined.new(refl.klass)
           else
@@ -192,9 +209,22 @@ module Hobo
 
     def can_view?(person, object, field)
       return false if field and object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+      if (object.is_a?(Class) and object < ActiveRecord::Base) or
+          (object.is_a?(Array) and object.respond_to?(:new_without_appending))
+        object = object.new_without_appending
+      end
       check_persmission(:view, person, object, field && field.to_sym)
     end
+    
+    
+    def can_call?(person, object, method)
+      return true if person.respond_to?(:super_user?) and person.super_user?
 
+      m = "can_call_#{method}?"
+      object.respond_to?(m) and object.send(m, current_user)
+    end 
+
+    
     private
 
 
