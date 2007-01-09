@@ -8,7 +8,7 @@ form.button-to { margin: 0; padding: 0; }
 
 body, td {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     color: #677077;
 }
 
@@ -33,7 +33,7 @@ a:hover.no_hover { background: transparent; }
     padding: 65px 0 15px 20px;
     color: white;
     font-family: Palatino, Garamond, Times, Serif;
-     }
+}
 
 /* Main Page Body Window */
 
@@ -57,8 +57,8 @@ a:hover.no_hover { background: transparent; }
     margin-right:auto;
 }
 
-h2 { margin: 0 0 20px 20px; font-size: 14px; } /* Main page heading (i.e. not in a panel) */
-h1 { margin: 20px 0 20px 10px; font-size: 20px; } /* Main page heading (i.e. not in a panel) */
+h2 { margin: 0 0 20px 20px; font-size: 110%; } /* Main page heading (i.e. not in a panel) */
+h1 { margin: 20px 0 20px 10px; font-size: 150%; } /* Main page heading (i.e. not in a panel) */
 
 p { margin-left: 10px; }
 
@@ -89,9 +89,9 @@ p { margin-left: 10px; }
 
 .panel h1 {
     margin: 0px; padding: 8px 0 4px 4px; height: 16px;
-    font-size: 14px; }
+    font-size: 120%; }
 .panel h2 {
-    font-size: 14px; line-height:14px; font-weight:bold;
+    font-size: 110%; line-height:14px; font-weight:bold;
     margin: 0; padding: 6px 0;}
 .panel h3 { line-height:13px; font-weight:bold; color:#000000; margin: 8px 0 2px 0;}
 
