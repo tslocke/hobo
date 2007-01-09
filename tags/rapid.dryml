@@ -3,7 +3,9 @@
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
 
-<def tag="submit" attrs="label"><input type="submit" value="<%= label %>" xattrs="" class="button_input"/></def>
+<def tag="submit" attrs="label">
+  <input type="submit" value="<%= label %>" xattrs="" class="button_input"/>
+</def>
 
 
 <def tag="object_table" attrs="fields, associations">
@@ -198,13 +200,18 @@
       <h1><count label="#model_name"/></h1>
       <section>
         <table_for>
-          <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
+          <td><object_link/></td><td><delete_button class='text'/></td>
         </table_for>
-        <div class="page_links">
-          <previous_page_link/>
-          <next_page_link/>
-        </div>
       </section>
+      
+      <if q="#@pages.length > 1">
+        <section>
+          <div class="page_links">
+            <page_nav/>
+          </div>
+        </section>
+      </if>
+
       <section>
         <p><new_object_link for="#@model"/></p>
       </section>
@@ -371,6 +378,29 @@
 </def>
 
 
+<def tag="belongs_to_autocompleting_editor"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  f = ajax_updater(object_url(this_parent),
+                   "Change #{this_field.to_s.titleize}", update,
+                   :method => "put",
+                   :params => { this_parent.class.name.underscore => {
+                       this_field => Hobo.raw_js('this.value')
+                    } })
+  refl = this_type
+  completer_model ||= refl.klass
+  completer_attr ||= refl.klass.id_name_column
+  id ||= this_field_dom_id + "_completer"
+  url = object_url(completer_model, "completions",
+                   { :for => completer_attr },
+                   options.select_hash {|k,v| k.to_s.starts_with? "where_"})
+  %>
+
+  <input type="text" class="autocomplete_bhv" autocomplete_url="<%= url %>"
+         onchange="<%= f %>" xattrs=""/>
+  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
+</def>
+
+
 <def tag="boolean_checkbox_editor" attrs="update"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   f = ajax_updater(object_url(this_parent),
@@ -405,3 +435,9 @@
   Page <%= @pages.current_page.number %> of <%= @pages.length %>
 </def>
 
+
+<def tag="page_nav">
+  <if q="#@pages.length > 1">
+    <p><page_n_of_count/> - <previous_page_link/> <next_page_link/></p>
+  </if>
+</def>

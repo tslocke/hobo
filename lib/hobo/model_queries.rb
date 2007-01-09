@@ -14,12 +14,18 @@ module Hobo
     end
 
 
-    def in_collection(association)
+    def is_in(association)
+      association = Hobo.object_from_dom_id(association) if association.is_a? String
       refl = association.proxy_reflection
       raise HoboError.new("association #{refl.name} is not a collection of #{model.name.pluralize}") unless
         refl.klass == model and refl.macro == :has_many
 
       WhereFragment.new(_association_finder_sql(association))
+    end
+    
+    
+    def not_in(association)
+      not_(is_in(association))
     end
 
 
@@ -41,7 +47,7 @@ module Hobo
         return WhereFragment.new("#{field} like ?", "%#{args[0]}%")
       end
 
-      super(name, *args)
+      return WhereFragment.new(@model.send(name, *args))
     end
 
     def _association_finder_sql(assoc)

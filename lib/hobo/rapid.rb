@@ -45,7 +45,7 @@ module Hobo::Rapid
     
     func = "Hobo.ajaxRequest(#{args * ', '})"
     if confirm
-      "if confirm(#{js_str(confirm)}) { #{func} }"
+      "if (confirm(#{js_str(confirm)})) { #{func} }"
     else
       func
     end
@@ -157,9 +157,12 @@ module Hobo::Rapid
     elsif this_type == :datetime
       select_datetime this, :prefix => name
       
+    elsif this_type == :password
+      password_field_tag(name, this)
+      
     else
-      raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{attr} " +
-                          "(#{this.inspect}:#{type})")
+      raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{this_field} " +
+                          "(#{this.inspect}:#{this_type})")
     end
   end
 
@@ -169,7 +172,7 @@ module Hobo::Rapid
 
     if this_type.respond_to?(:macro)
       if this_type.macro == :belongs_to
-        belongs_to_menu_editor(options)
+        belongs_to_editor(options)
       else
         # In place edit for has_many not implemented
         object_link(options)
@@ -187,6 +190,11 @@ module Hobo::Rapid
     elsif this_type == :boolean
       boolean_checkbox_editor(options)
     end
+  end
+  
+  
+  def_tag :belongs_to_editor do
+    belongs_to_menu_editor
   end
   
 

@@ -19,6 +19,8 @@ module Hobo
         
         never_show :salt, :crypted_password, :remember_token, :remember_token_expires_at
         
+        set_field_type :password => :password, :password_confirmation => :password
+        
         password_validations
       end
     end

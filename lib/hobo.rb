@@ -111,24 +111,29 @@ module Hobo
     end
 
     def add_routes(map)
+      require "#{RAILS_ROOT}/app/controllers/application"
       for model in Hobo.models
         web_name = model.name.underscore.pluralize
-        controller = "#{model.name.pluralize}Controller".constantize rescue nil
-        require "app/controllers/application"
-        if controller
-          map.resources web_name, :collection => { :completions => :get }
-          for refl in model.reflections.values.select {|r| r.macro == :has_many}
-            map.named_route("#{web_name.singularize}_#{refl.name}",
-                            "#{web_name}/:id/#{refl.name}",
-                            :controller => web_name,
-                            :action => "show_#{refl.name}",
-                            :conditions => { :method => :get })
+        controller_name = "#{model.name.underscore.pluralize.downcase}_controller"
+        if File.exists?(controller_name + ".rb")
+          require "#{RAILS_ROOT}/app/controllers/#{controller_name}"
+          controller = "#{model.name.pluralize}Controller".constantize
+        end
 
-            map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
-                            "#{web_name}/:id/#{refl.name}/new",
-                            :controller => web_name,
-                            :action => "new_#{refl.name.to_s.singularize}")
+        map.resources web_name, :collection => { :completions => :get }
+        for refl in model.reflections.values.select {|r| r.macro == :has_many}
+          map.named_route("#{web_name.singularize}_#{refl.name}",
+                          "#{web_name}/:id/#{refl.name}",
+                          :controller => web_name,
+                          :action => "show_#{refl.name}",
+                          :conditions => { :method => :get })
+
+          map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
+                          "#{web_name}/:id/#{refl.name}/new",
+                          :controller => web_name,
+                          :action => "new_#{refl.name.to_s.singularize}")
             
+          if controller
             for method in controller.web_methods
               map.named_route("#{web_name.singularize}_#{method}",
                               "#{web_name}/:id/#{method}",
@@ -207,7 +212,7 @@ module Hobo
     end
 
 
-    def can_view?(person, object, field)
+    def can_view?(person, object, field=nil)
       return false if field and object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
       if (object.is_a?(Class) and object < ActiveRecord::Base) or
           (object.is_a?(Array) and object.respond_to?(:new_without_appending))

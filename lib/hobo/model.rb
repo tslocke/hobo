@@ -9,13 +9,14 @@ module Hobo
           # alias_method :rails_original_has_many, :has_many
       end
       base.extend(ClassMethods)
-      base.set_field_types({})
+      base.set_field_type({})
     end
 
     module ClassMethods
 
-      def set_field_types(types)
-        @hobo_field_types = types
+      def set_field_type(types)
+        @hobo_field_types ||= {}
+        @hobo_field_types.update(types)
       end
 
 

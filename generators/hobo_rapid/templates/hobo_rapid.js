@@ -159,7 +159,7 @@ var Hobo = {
             Hobo.showSpinner('Removing');
             function complete() {
                 Hobo.hideSpinner();
-                new Effect.Fade(objEl);
+                new Effect.Fade(objEl, {duration: 0.5});
             }
             new Ajax.Request(url, {asynchronous:true, evalScripts:true, method:'delete', onComplete: complete});
         }

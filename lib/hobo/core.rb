@@ -48,8 +48,8 @@ module Hobo
     end
 
 
-    def can_update?(object, changes)
-      Hobo.can_update?(current_user, object)
+    def can_update?(object, new)
+      Hobo.can_update?(current_user, object, new)
     end
 
 
@@ -87,7 +87,7 @@ module Hobo
 
 
     def logged_in?
-      current_user != Hobo.guest_user
+      not current_user.guest?
     end
 
 
@@ -111,8 +111,7 @@ module Hobo
     def_tag :show do
       raise HoboError.new("attempted to show non-viewable field") unless can_view_this?
       
-      type = this_type == String ? :string : this_type
-
+      type = this_type
       if this.nil?
         case type
           when  :string, :text; ""
@@ -329,10 +328,15 @@ module Hobo
     def_tag :if_can_create do
       if_(:q => can_create?(this)) { tagbody.call }
     end
+    
 
     def_tag :if_can_view do
       if_(:q => can_view?(this)) { tagbody.call }
     end
 
+    def_tag :if_can_edit do
+      if_(:q => can_edit_this?) { tagbody.call }
+    end
+    
   end
 end

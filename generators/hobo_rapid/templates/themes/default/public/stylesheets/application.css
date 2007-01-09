@@ -1,3 +1,5 @@
+form.button-to { margin: 0; padding: 0; }
+
 .object_card { padding: 5px; margin: 5px; border: 1px dashed #ddd; background: #fbfbfb; }
 
 /* Todo: Big cleanup of this stylesheet */
@@ -218,8 +220,8 @@ th { text-align: left; padding: 5px; }
 .object_table textarea { width: 100%; margin: 0; }
 
 td span.in_place_edit_bhv {
-    display: block; border: 1px dashed #999;
-    padding: 5px; background: #fafafa;
+    display: block; border: 1px solid #ddd;
+    padding: 4px; background: #fafafa;
 }
 
 .login_table td.field_label { vertical-align: middle; }
@@ -240,7 +242,7 @@ input.button_input {
     border-bottom-color: #ccc;
     border-right-color: #ccc;
     background: #e5e5e5;
-    padding: 3px; 
+    padding: 2px; 
 }
 
 input.button_input.text {

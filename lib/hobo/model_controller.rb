@@ -151,7 +151,11 @@ module Hobo
     def show
       @this = find_instance
       if @this
-        hobo_render
+        if Hobo.can_view?(current_user, @this)
+          hobo_render
+        else
+          permission_denied
+        end
       else
         render :text => "Can't find #{model.name.titleize}: #{params[:id]}", :status => 404
       end
