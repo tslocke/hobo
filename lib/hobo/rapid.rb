@@ -33,12 +33,13 @@ module Hobo::Rapid
 
 
   def ajax_updater(url_or_form, message, update, options={})
+    options ||= {}
     target = if url_or_form == :post_form
                target = "this"
              else
                js_str(url_or_form)
              end
-    js_options = options_for_hobo_ajax(options || {})
+    js_options = options_for_hobo_ajax(options)
     args = [target, js_str(message || "..."), js_updates(update), js_options].compact
     
     confirm = options.delete(:confirm)

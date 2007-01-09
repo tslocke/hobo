@@ -117,24 +117,22 @@ module Hobo
         controller_name = "#{model.name.underscore.pluralize.downcase}_controller"
         if File.exists?(controller_name + ".rb")
           require "#{RAILS_ROOT}/app/controllers/#{controller_name}"
-          controller = "#{model.name.pluralize}Controller".constantize
-        end
+          controller = "#{model.name.pluralize}Controller".constantize rescue nil
 
-        map.resources web_name, :collection => { :completions => :get }
-        for refl in model.reflections.values.select {|r| r.macro == :has_many}
-          map.named_route("#{web_name.singularize}_#{refl.name}",
-                          "#{web_name}/:id/#{refl.name}",
-                          :controller => web_name,
-                          :action => "show_#{refl.name}",
-                          :conditions => { :method => :get })
-
-          map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
-                          "#{web_name}/:id/#{refl.name}/new",
-                          :controller => web_name,
-                          :action => "new_#{refl.name.to_s.singularize}")
-            
           if controller
-            for method in controller.web_methods
+            map.resources web_name, :collection => { :completions => :get }
+            for refl in model.reflections.values.select {|r| r.macro == :has_many}
+              map.named_route("#{web_name.singularize}_#{refl.name}",
+                              "#{web_name}/:id/#{refl.name}",
+                              :controller => web_name,
+                              :action => "show_#{refl.name}",
+                              :conditions => { :method => :get })
+
+              map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
+                              "#{web_name}/:id/#{refl.name}/new",
+                              :controller => web_name,
+                              :action => "new_#{refl.name.to_s.singularize}")
+            
               map.named_route("#{web_name.singularize}_#{method}",
                               "#{web_name}/:id/#{method}",
                               :controller => web_name,

@@ -18,7 +18,6 @@ module ActiveRecord::Associations
       end
     end
 
-
   end
 
 end

@@ -89,8 +89,6 @@ module Hobo
     def render_tags(objects, tag, options={})
       add_variables_to_assigns
       dryml_renderer = Hobo::Dryml.empty_page_renderer(@template)
-      #render(:locals => { :objects => objects, :tag => tag, :options => options, :dryml_renderer = dryml_renderer },
-      #       :inline => "<%=  %>")
       render :text => objects.map {|o| dryml_renderer.send(tag, options.merge(:obj => o))}.join +
                       dryml_renderer.part_contexts_js
     end
