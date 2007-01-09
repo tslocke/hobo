@@ -214,7 +214,7 @@ module Hobo::Dryml
         alias_of = el.attributes['alias_of']
         if alias_of
           old = @tags[alias_of]
-          dryml_exception("no tag #{alias_of} to alias", el) unless old
+          dryml_exception("no tag '#{alias_of}' to alias", el) unless old
           @tags[name] = Hobo::Dryml::TagDef.new(name, old.attrs)
         else
           attrspec = el.attributes["attrs"]

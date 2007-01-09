@@ -239,7 +239,6 @@ module Hobo::Rapid
       params[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
       new = this.new
     end
-    puts new.inspect
     if can_create?(new)
       label2 = label || "New #{new.class.name.titleize}"
       message2 = message || label2

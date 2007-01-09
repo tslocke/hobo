@@ -69,7 +69,6 @@ module Hobo
         self.current_user = user
         cookies[:auth_token] = { :value => self.current_user.remember_token ,
                                  :expires => self.current_user.remember_token_expires_at }
-        flash[:notice] = "Logged in successfully"
       end
     end
 
