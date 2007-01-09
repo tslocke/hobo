@@ -113,10 +113,10 @@ module Hobo
     def add_routes(map)
       require "#{RAILS_ROOT}/app/controllers/application"
       for model in Hobo.models
-        web_name = model.name.underscore.pluralize
-        controller_name = "#{model.name.underscore.pluralize.downcase}_controller"
-        if File.exists?(controller_name + ".rb")
-          require "#{RAILS_ROOT}/app/controllers/#{controller_name}"
+        web_name = model.name.underscore.pluralize.downcase
+        controller_file = "#{RAILS_ROOT}/app/controllers/#{web_name}_controller"
+        if File.exists?("#{controller_file}.rb")
+          require controller_file
           controller = "#{model.name.pluralize}Controller".constantize rescue nil
 
           if controller
@@ -133,11 +133,13 @@ module Hobo
                               :controller => web_name,
                               :action => "new_#{refl.name.to_s.singularize}")
             
-              map.named_route("#{web_name.singularize}_#{method}",
-                              "#{web_name}/:id/#{method}",
-                              :controller => web_name,
-                              :action => method.to_s,
-                              :conditions => { :method => :post })
+              for method in controller.web_methods
+                map.named_route("#{web_name.singularize}_#{method}",
+                                "#{web_name}/:id/#{method}",
+                                :controller => web_name,
+                                :action => method.to_s,
+                                :conditions => { :method => :post })
+              end
             end
           end
         end
