@@ -48,7 +48,7 @@ module Hobo::ControllerHelpers
             elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
               owner = obj.proxy_owner
               new_model = obj.proxy_reflection.klass
-              [urlb, object_url(owner), obj.proxy_reflection.name]
+              [object_url(owner), obj.proxy_reflection.name]
             else
               raise HoboError.new("cannot create url for #{obj.inspect}")
             end
