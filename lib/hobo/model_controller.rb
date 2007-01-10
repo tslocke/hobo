@@ -178,22 +178,25 @@ module Hobo
 
       if @this.save
         respond_to do |wants|
-          wants.html { create_response }
+          wants.html do
+            create_response
+            redirect_to object_url(@this) unless performed?
+          end
+
           wants.js   { hobo_ajax_response(@this) or render :text => "" }
         end
       else
         # Validation errors
         respond_to do |wants|
           wants.html do
-            render :action => :new
+            invalid_create_response
+            render :action => :new unless performed?
           end
 
           wants.js do
-            # Temporary hack
-            render :update do |page|
-              page.alert("There was a problem creating that #{model.name}.\n" +
-                         @this.errors.full_messages.join("\n"))
-            end
+            render(:status => 500,
+                   :text => "There was a problem creating that #{model.name}.\n" +
+                            @this.errors.full_messages.join("\n"))
           end
         end
       end
@@ -216,6 +219,7 @@ module Hobo
         respond_to do |wants|
           wants.html do
             update_response
+            redirect_to object_url(@this) unless performed?
           end
 
           wants.js   do
@@ -236,15 +240,15 @@ module Hobo
         # Validation errors
         respond_to do |wants|
           wants.html do
-            render :action => :edit
+            invalid_update_response
+            render :action => :edit unless performed?
           end
 
           wants.js do
             # Temporary hack
-            render :update do |page|
-              page.alert("There was a problem updating that record.\n" +
-                         @this.errors.full_messages.join("\n"))
-            end
+            render(:status => 500,
+                   :text => ("There was a problem with that update.\n" +
+                             @this.errors.full_messages.join("\n")))
           end
         end
       end
@@ -258,7 +262,10 @@ module Hobo
       @this.destroy
 
       respond_to do |wants|
-        wants.html { destroy_response }
+        wants.html do
+          destroy_response
+          redirect_to :action => "index" unless performed?
+        end
         wants.js { hobo_ajax_response(@this) or render :text => "" }
       end
     end
@@ -285,19 +292,15 @@ module Hobo
     
     # --- hooks --- #
     
-    def create_response
-      redirect_to object_url(@this)
-    end
+    def create_response; end
     
+    def invalid_create_response; end
     
-    def update_response
-      redirect_to :id => @this.id
-    end
+    def update_response; end
     
+    def invalid_update_response; end
     
-    def destroy_response
-      redirect_to :action => "index"
-    end 
+    def destroy_response; end 
     
     # --- end hooks --- #
     

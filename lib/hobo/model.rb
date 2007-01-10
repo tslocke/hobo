@@ -49,6 +49,8 @@ module Hobo
         
 
       def id_name(*args)
+        @id_name_options = []
+        @id_name_options.concat(args)
         underscore = args.delete(:underscore)
         insenstive = args.delete(:case_insensitive)
         id_name_field = args.first || :name
@@ -153,8 +155,7 @@ module Hobo
     def same_fields?(other, *fields)
       fields.all?{|f| self.send(f) == other.send(f)}
     end
-
-
+    
   end
 end
 

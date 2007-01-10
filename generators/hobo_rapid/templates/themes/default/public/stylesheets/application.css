@@ -93,7 +93,7 @@ p { margin-left: 10px; }
 .panel h2 {
     font-size: 110%; line-height:14px; font-weight:bold;
     margin: 0; padding: 6px 0;}
-.panel h3 { line-height:13px; font-weight:bold; color:#000000; margin: 8px 0 2px 0;}
+.panel h3 { line-height:13px; font-weight:bold; color:#000000; margin: 8px 0 2px 0; font-size: 100%; }
 
 .panel.green { background-color:#edf4e3; } /* light grey + green */
 .panel.green  h1 { background:url(../images/header_green.gif) repeat-x top; background-color:#87b841; color:#ffffff; }

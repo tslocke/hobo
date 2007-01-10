@@ -210,7 +210,7 @@ module Hobo::Rapid
   end
 
 
-  def_tag :delete_button, :label, :message, :update, :ajax do
+  def_tag :delete_button, :label, :message, :update, :ajax, :else do
     if can_delete?(this)
       lab = label || "Remove"
       url = object_url(this, "destroy")
@@ -226,11 +226,13 @@ module Hobo::Rapid
         opts[:disabled] = true unless can_delete?(this)
         tag :input, opts
       end
+    else
+      else_
     end
   end
   
   
-  def_tag :create_button, :model, :update, :attrs, :label, :message do
+  def_tag :create_button, :model, :update, :attrs, :label, :message, :else do
     raise HoboError.new("no update specified") unless update
     params = attrs || {}
     if model
@@ -246,6 +248,8 @@ module Hobo::Rapid
       func = ajax_updater(object_url(new.class), message2, update,
                           ({:params => { new.class.name.underscore => params }} unless params.empty?))
       tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2), "button_input")
+    else
+      else_
     end
   end
   

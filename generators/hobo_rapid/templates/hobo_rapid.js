@@ -92,15 +92,18 @@ var Hobo = {
         }
 
         select(".in_place_edit_bhv").each(function (el) {
+            var old
             var spec = Hobo.parseFieldId(el)
             options = {okButton: false,
                        cancelLink: false,
                        submitOnBlur: true,
                        callback: function(form, val) {
+                           old = val
                            return spec.name + '[' + spec.field + ']=' + val
                        },
                        highlightcolor: '#ffffff',
-                       highlightendcolor: Hobo.backgroundColor(el)
+                       highlightendcolor: Hobo.backgroundColor(el),
+                       onFailure: function(t) { alert(t.responseText); el.innerHTML = old }
                       }
             if (el.hasClassName("textarea_editor")) {
                 options.rows = 2
@@ -109,8 +112,12 @@ var Hobo = {
         });
 
         select(".autocomplete_bhv").each(function (el) {
+            options = {paramName: "query", minChars: 3, method: 'get' }
+            if (el.hasClassName("autosubmit")) {
+                options.afterUpdateElement = function(el, item) { el.form.onsubmit(); }
+            }
             new Ajax.Autocompleter(el, el.id + "_completions", el.getAttribute("autocomplete_url"),
-                                   {paramName: "query", minChars: 3, method: 'get'});
+                                   options);
         });
 
         select(".search_bhv").each(function(el) {
