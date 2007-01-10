@@ -93,7 +93,7 @@
 </def>
 
 
-<def tag="table_for" attrs="headings, empty">
+<def tag="table_for" attrs="headings, empty, row_class">
   <if q="#this.empty? and empty">
     <%= empty %>
   </if>
@@ -101,7 +101,7 @@
     <table xattrs="">
       <if q="#headings"><tr><%= headings %></tr></if>
       <repeat>
-        <tr class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id(this) %>">
+        <tr class="<%= cycle('even', 'odd') %> <%= row_class %>" model_id="<%= dom_id(this) %>">
           <%= tagbody.nil? ? object_link : tagbody.call %>
         </tr>
       </repeat>
@@ -378,8 +378,10 @@
 </def>
 
 
-<def tag="belongs_to_autocompleting_editor" attrs="update"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+<def tag="belongs_to_autocompleting_editor" attrs="update">
+  <if_can_edit><%
+  return object_link unless can_edit_this?
+
   id ||= this_field_dom_id + "_completer"
   f = ajax_updater(object_url(this_parent),
                    "Change #{this_field.to_s.titleize}", update,
@@ -394,12 +396,15 @@
                    { :for => completer_attr },
                    options.select_hash {|k,v| k.to_s.starts_with? "where_"})
   %>
-
-  <form onsubmit="<%= f %>; $('<%= id %>').blur(); return false">
-    <input type="text" class="autocomplete_bhv autosubmit" id="<%= id %>" autocomplete_url="<%= url %>"
-           value="<%= this && this.id_name %>" xattrs="" />
-    <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
-  </form>
+    <form onsubmit="<%= f %>; $('<%= id %>').blur(); return false">
+      <input type="text" class="autocomplete_bhv autosubmit" id="<%= id %>" autocomplete_url="<%= url %>"
+             value="<%= this && this.id_name %>" xattrs="" />
+      <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
+    </form>
+  </if_can_edit>
+  <else>
+    <object_link/>
+  </else>
 </def>
 
 
