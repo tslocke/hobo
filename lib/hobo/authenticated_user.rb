@@ -34,7 +34,7 @@ module Hobo
       def set_login_attr(attr)
         @login_attr = attr = attr.to_sym
         validates_presence_of     attr
-        validates_length_of       attr, :within => 3..40
+        validates_length_of       attr, :within => 3..100
         validates_uniqueness_of   attr, :case_sensitive => false
         
         alias_attribute(:login, attr) unless attr == :login

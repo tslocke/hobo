@@ -448,3 +448,9 @@
     <p><page_n_of_count/> - <previous_page_link/> <next_page_link/></p>
   </if>
 </def>
+
+
+<def tag="section_if"><%
+  tagbody and section{tagbody.call}
+%></def>
+  
