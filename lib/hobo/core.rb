@@ -220,7 +220,7 @@ module Hobo
         res = if this.is_a? Array
                 this.proxy_reflection.klass.name.pluralize
               elsif this.is_a? Class
-                this.name.pluralize
+                this.name
               else
                 this.class.name
               end

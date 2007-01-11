@@ -450,7 +450,8 @@
 </def>
 
 
-<def tag="section_if"><%
-  tagbody and section{tagbody.call}
-%></def>
+<def tag="section_if">
+  <% body = tagbody.call %>
+  <%= !body.blank? and section{body} %>
+</def>
   
