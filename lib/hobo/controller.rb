@@ -112,7 +112,7 @@ module Hobo
 
 
     def logged_in?
-      current_user != Hobo.guest_user
+      not current_user.guest?
     end
 
 

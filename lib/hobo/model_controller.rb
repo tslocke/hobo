@@ -142,7 +142,7 @@ module Hobo
     def index
       @model = model
       @pages = ::ActionController::Pagination::Paginator.new(self, model.count, 20, params[:page])
-      options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
+      options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset, :order => :default }
       @this = find_by_data_filter(options) || model.find(:all, options)
       hobo_render
     end

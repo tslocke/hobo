@@ -74,14 +74,10 @@ module Hobo
 
 
     def can_view_this?
-      if this.respond_to?(:can_view)
-        can_view?(this)
-      elsif this_parent && this_field
+      if this_parent && this_field
         can_view?(this_parent, this_field)
       else
-        # Default to true. This is only a safety net. If the template is trying to show something
-        # we assume the programmer knows best
-        true
+        can_view?(this)
       end
     end
 
@@ -219,9 +215,17 @@ module Hobo
       end
     end
 
-    def_tag :human_type do
-      c = this.is_a?(Class) ? this : this.class
-      c.name.titleize
+    def_tag :human_type, :style do
+      if can_view_this?
+        res = if this.is_a? Array
+                this.proxy_reflection.klass.name.pluralize
+              elsif this.is_a? Class
+                this.name.pluralize
+              else
+                this.class.name
+              end
+        res.underscore.humanize.send(style || :titleize)
+      end
     end
 
 

@@ -115,11 +115,7 @@ module Hobo::Dryml
         obj = this
         for field in path
           parent = obj
-          obj = if parent.is_a? Array
-                  obj = parent[field.to_i]
-                else
-                  parent.send(field)
-                end
+          obj = Hobo.get_field(parent, field)
         end
 
         type = if parent.class.respond_to?(:field_type) and col_type = parent.class.field_type(field)

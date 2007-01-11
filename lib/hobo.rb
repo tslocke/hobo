@@ -8,7 +8,7 @@ module Hobo
 
   class << self
 
-    attr_accessor :current_theme, :guest_user
+    attr_accessor :current_theme
     attr_writer :developer_features
 
     def developer_features?
@@ -25,18 +25,28 @@ module Hobo
       @user_model = model && model.name
     end
 
+    
     def user_model
       @user_model && @user_model.constantize
     end
 
+    
     def models=(models)
       @models = models.every(:name)
     end
 
+    
     def models
-      @models.every(:constantize)
+      unless @models_loaded
+        Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
+          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize rescue nil
+        end
+        @models_loaded = true
+      end
+      @models.omap{constantize}
     end
 
+    
     def register_model(model)
       @models << model.name unless @models.include? model.name
     end
@@ -165,6 +175,15 @@ module Hobo
         (not refl.through_reflection) and
         (not refl.options[:conditions])
     end
+    
+    
+    def get_field(object, field)
+      if field.to_s =~ /\d+/
+        object[field.to_i]
+      else
+        object.send(field)
+      end
+    end
 
 
     def can_create?(person, object)
@@ -220,11 +239,27 @@ module Hobo
 
     def can_view?(person, object, field=nil)
       return false if field and object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
-      if (object.is_a?(Class) and object < ActiveRecord::Base) or
-          (object.is_a?(Array) and object.respond_to?(:new_without_appending))
-        object = object.new_without_appending
+      
+      check = if field
+                object
+              elsif object.is_a?(Class) and object < ActiveRecord::Base
+                object.new
+              elsif object.is_a?(Array)
+                if object.respond_to?(:new_without_appending)
+                  object.new_without_appending
+                elsif object.respond_to?(:member_class)
+                  object.member_class.new
+                end
+              else
+                object
+              end
+      viewable = check_persmission(:view, person, check, field && field.to_sym)
+      if viewable and field
+        # also ask the current value if it is viewable
+        can_view?(person, get_field(object, field))
+      else
+        viewable
       end
-      check_persmission(:view, person, object, field && field.to_sym)
     end
     
     
@@ -258,6 +293,7 @@ module Hobo
           elsif person.respond_to?(person_method)
             person.send(person_method, object, *args)
           else
+            # The object does not define permissions - you can only view it
             permission == :view
           end
     end

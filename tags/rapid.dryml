@@ -121,7 +121,7 @@
      source = refl.source_reflection.name
   %>
   <tagbody obj="#joins"/>
-  <with obj="#joins.new">
+  <with obj="#joins.new_without_appending">
     <if_can_create>
        <object_form update="#[update, part_id]" message="#action_name" hidden_fields="*">
          <p>

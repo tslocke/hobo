@@ -1,29 +1,4 @@
-################################################################
-# instance_exec (coming to Ruby in 1.9)
-# Like instance_eval but supports block arguments
-# From http://eigenclass.org/hiki.rb?bounded+space+instance_exec
-# With thanks to Mauricio Fernandez
-################################################################
 class Object
-
-#  module InstanceExecHelper; end
-#  include InstanceExecHelper
-#  def instance_exec(*args, &block)
-#    begin
-#      old_critical, Thread.critical = Thread.critical, true
-#      n = 0
-#      n += 1 while respond_to?(mname="__instance_exec#{n}")
-#      InstanceExecHelper.module_eval{ define_method(mname, &block) }
-#    ensure
-#      Thread.critical = old_critical
-#    end
-#    begin
-#      ret = send(mname, *args)
-#    ensure
-#      InstanceExecHelper.module_eval{ remove_method(mname) } rescue nil
-#    end
-#    ret
-#  end
 
   def in?(array)
     array.include?(self)
@@ -32,6 +7,25 @@ class Object
   def not_in?(array)
     not array.include?(self)
   end
+end
+
+
+class Module
+  
+  def inheriting_attr_accessor(*names)
+    for name in names
+      class_eval %{
+        def #{name}
+          if defined? @#{name}
+            @#{name}
+          elsif superclass.respond_to?('#{name}')
+            superclass.#{name}
+          end
+        end
+      }
+    end
+  end
+
 end
 
 module Enumerable
