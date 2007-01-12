@@ -129,7 +129,7 @@ p { margin-left: 10px; }
 
 .panel li { margin: 6pt 0; }
 
-.section { border-top: 6px solid white; padding: 0 20px 0 6px; }
+.section { border-top: 6px solid white; padding: 5px 20px 5px 6px; }
 
 ul.purple li { background-image: url(../images/txt_list_img_purple.gif); }
 ul.green li { background-image: url(../images/txt_list_img_green.gif); }
@@ -250,6 +250,18 @@ input.button_input.text {
     padding: 0 0 0 0; margin: -2px 0 0 0;
     color: #677077; text-decoration: underline; cursor:pointer;
 }
+
+input.image_button_input {
+    border: none;
+    background: transparent;
+    padding: 0; margin: 0;
+}
+
+input.create_button {
+    padding-left: 20px;
+    background:url(../../../images/plus.png) no-repeat center left;
+}
+    
 
 .search_result { border: 1px dashed grey; margin: 15px 10px; padding: 5px; background: white; }
 

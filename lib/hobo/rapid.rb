@@ -206,24 +206,30 @@ module Hobo::Rapid
     raise HoboError.new("no update specified") unless update
     message2 = message || label
     func = ajax_updater(object_url(this), message2, update, :params => { this.class.name.underscore => attrs })
-    tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label), "button_input")
+    tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
+                            "button_input update_button")
   end
 
 
-  def_tag :delete_button, :label, :message, :update, :ajax, :else do
+  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image do
     if can_delete?(this)
-      lab = label || "Remove"
+      opts = options.merge(if image
+                             { :type => "image", :src => "#{urlb}/images/#{image}" }
+                           else
+                             { :type => "button" }
+                           end)
+      opts[:value] = label || "Remove"
+      add_classes!(opts, image ? "image_button_input" : "button_input", "delete_button")
+
       url = object_url(this, "destroy")
       if ajax == false
-        button_to label, url, add_classes(options, "button_input").merge(:confirm => "Are you sure?")
+        button_to lab, url, opts.merge(:confirm => "Are you sure?")
       else
-        if update
-          func = ajax_updater(url, message || "Removing", update)
-        else
-          func = "Hobo.removeButton(this, '#{url}')"
-        end
-        opts = add_classes(options.merge(:type => 'button', :onclick => func, :value => lab), "button_input")
-        opts[:disabled] = true unless can_delete?(this)
+        opts[:onclick] = if update
+                           ajax_updater(url, message || "Removing", update)
+                         else
+                           "Hobo.removeButton(this, '#{url}')"
+                         end
         tag :input, opts
       end
     else
@@ -247,7 +253,8 @@ module Hobo::Rapid
       message2 = message || label2
       func = ajax_updater(object_url(new.class), message2, update,
                           ({:params => { new.class.name.underscore => params }} unless params.empty?))
-      tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2), "button_input")
+      tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2),
+                              "button_input create_button")
     else
       else_
     end
@@ -260,7 +267,8 @@ module Hobo::Rapid
     message2 = message || method.titleize
     func = ajax_updater(object_url(this) + "/#{method}", message2, update,
                         ajax_options.merge(:params => params, :result_update => result_update))
-    tag :input, add_classes(html_options.merge(:type =>'button', :onclick => func, :value => label), "button_input")
+    tag :input, add_classes(html_options.merge(:type =>'button', :onclick => func, :value => label),
+                            "button_input remote_method_button")
   end
   
 

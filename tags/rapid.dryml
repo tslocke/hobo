@@ -10,7 +10,7 @@
 
 <def tag="object_table" attrs="fields, associations">
   <% fields = fields.nil? ? (this.class.content_columns.every(:name) - %w{created_at updated_at}) : comma_split(fields)
-     add_classes(options, "object_table", ('new_record' if this.new_record?))
+     options = add_classes(options, "object_table", ("new_record" if this.new_record?))
   %>
   <table xattrs="">
     <% for field in fields.select{|f| can_view?(this, f)} %>
@@ -234,7 +234,7 @@
 
         <object_form hidden_fields="*">
           <object_table associations="belongs_to"/>
-          <submit label="Create"/>
+          <submit label="Create" class="create_button"/>
         </object_form>
       </section>
     </panel>
@@ -307,9 +307,9 @@
         <previous_page_link/>
         <next_page_link/>
       </section>
-      <section>
+      <section_if>
         <new_object_link for="#@association"/>
-      </section>
+      </section_if>
     </panel>
   </page>
 </def>
@@ -452,6 +452,6 @@
 
 <def tag="section_if">
   <% body = tagbody.call %>
-  <%= !body.blank? and section{body} %>
+  <%= body.blank? ? "" : section{body} %>
 </def>
   

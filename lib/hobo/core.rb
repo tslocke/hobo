@@ -15,12 +15,17 @@ module Hobo
     end
 
 
-    def add_classes(options, *classes)
+    def add_classes!(options, *classes)
       options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
       options
     end
 
 
+    def add_classes(options, *classes)
+      options.merge(:class => ([options[:class]] + classes).select{|x|x}.join(' '))
+    end
+    
+    
     def map_this
       res = []
       this.each_index {|i| new_field_context(i) { res << yield } }
@@ -48,7 +53,7 @@ module Hobo
     end
 
 
-    def can_update?(object, new)
+    def can_update?(object, new=nil)
       Hobo.can_update?(current_user, object, new)
     end
 
