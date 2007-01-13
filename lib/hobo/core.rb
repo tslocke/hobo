@@ -213,11 +213,13 @@ module Hobo
 
     def param_name_for_this(association_foreign_key=false)
       return "" unless form_this
-      if association_foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
-        param_name_for(form_this, form_field_path[0..-2] + [this_type.primary_key_name])
-      else
-        param_name_for(form_this, form_field_path)
-      end
+      name = if association_foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
+               param_name_for(form_this, form_field_path[0..-2] + [this_type.primary_key_name])
+             else
+               param_name_for(form_this, form_field_path)
+             end
+      register_form_field(name)
+      name
     end
 
     def_tag :human_type, :style do

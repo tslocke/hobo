@@ -37,7 +37,7 @@ module Hobo::Dryml
 
     attr_accessor :erb_binding, :part_contexts, :view_name
 
-    attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this
+    attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
     
     def this; @_this; end
 
@@ -158,10 +158,16 @@ module Hobo::Dryml
     def with_form_context
       @form_this = this
       @form_field_path = []
+      @form_field_names = []
       res = yield
-      @form_this = nil
-      @form_field_path = nil
-      res
+      field_names = @form_field_names
+      @form_this = @form_field_path = @form_field_names = nil
+      [res, field_names]
+    end
+    
+    
+    def register_form_field(name)
+      @form_field_names << name
     end
 
 

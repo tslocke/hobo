@@ -190,7 +190,7 @@ module Hobo
         respond_to do |wants|
           wants.html do
             invalid_create_response
-            render :action => :new unless performed?
+            hobo_render :new unless performed?
           end
 
           wants.js do

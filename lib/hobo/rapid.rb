@@ -211,7 +211,7 @@ module Hobo::Rapid
   end
 
 
-  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image do
+  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm do
     if can_delete?(this)
       opts = options.merge(if image
                              { :type => "image", :src => "#{urlb}/images/#{image}" }
@@ -223,7 +223,7 @@ module Hobo::Rapid
 
       url = object_url(this, "destroy")
       if ajax == false
-        button_to lab, url, opts.merge(:confirm => "Are you sure?")
+        button_to opts[:value], url, opts.merge(:confirm => "Are you sure?" || confirm)
       else
         opts[:onclick] = if update
                            ajax_updater(url, message || "Removing", update)
@@ -296,6 +296,8 @@ module Hobo::Rapid
                                  "#{function}; return false;"].compact.join("; ")
     end
 
+    body, field_names = with_form_context { tagbody.call }
+
     hiddens = case hidden_fields
               when nil
                 []
@@ -307,15 +309,14 @@ module Hobo::Rapid
     pname = this.class.name.underscore
     hidden_tags = hiddens.map do |h|
       val = this.send(h)
-      hidden_field_tag("#{pname}[#{h}]", val.to_s) if val
+      name = "#{pname}[#{h}]"
+      hidden_field_tag(name, val.to_s) if val and name.not_in?(field_names)
     end
     hidden_tags << hidden_field_tag("_method", "PUT") unless this.new_record?
 
     html_options[:method] = "post"
-    body = ( hidden_tags.compact.join("\n") +
-             (tagbody ? with_form_context { tagbody.call } : "") )
-
-    content_tag("form", body, html_options.merge(:action => url))
+    body_with_hiddens = hidden_tags.compact.join("\n") + body
+    content_tag("form", body_with_hiddens, html_options.merge(:action => url))
   end
 
   

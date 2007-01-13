@@ -335,7 +335,7 @@
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
   %>
   <select name="<%= param_name_for_this(true) %>">
-    <%= options_for_select(select_options, this ? this.id : "") %>
+    <%= options_for_select(select_options.sort, this ? this.id : "") %>
   </select>
 </def>
 
@@ -355,7 +355,7 @@
                           } })
     %>
     <select onchange="<%= f %>" id="#link_id">
-      <%= options_for_select(select_options, this ? this.id : "") %>
+      <%= options_for_select(select_options.sort, this ? this.id : "") %>
     </select>
     <if_this><object_link>View</object_link></if_this>
   </span>

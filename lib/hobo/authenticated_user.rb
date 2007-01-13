@@ -88,7 +88,7 @@ module Hobo
     end
 
     def password_required?
-      crypted_password.blank? || !password.blank?
+      (crypted_password.blank? && password != nil) || !password.blank?
     end
 
   end
