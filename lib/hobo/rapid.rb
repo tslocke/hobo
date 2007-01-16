@@ -296,7 +296,8 @@ module Hobo::Rapid
                                  "#{function}; return false;"].compact.join("; ")
     end
 
-    body, field_names = with_form_context { tagbody.call }
+    body, field_names = with_form_context{ tagbody.call }
+    body = body.to_s
 
     hiddens = case hidden_fields
               when nil

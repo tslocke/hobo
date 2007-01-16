@@ -410,7 +410,7 @@ module Hobo
                      # primitive field
                      value
                    end
-        object.send(:"#{field}=", ar_value)
+        object.send("#{field}=".to_sym, ar_value)
       end
     end
 

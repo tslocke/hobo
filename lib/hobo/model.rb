@@ -117,18 +117,16 @@ module Hobo
 
       def find(*args, &b)
         if args.first.in?([:all, :first])
-          options = if args.length == 1
-                      {}
-                    elsif args.length == 2
-                      args[1]
-                    else
-                      raise HoboError.new("find with block: too many parameters (#{args.length})")
-                    end
+          if args.last.is_a? Hash
+            options = args.last
+            args[-1] = options = options.merge(:order => default_order) if options[:order] == :default
+          else
+            options = {}
+          end
+          
           if b
             sql = ModelQueries.new(self).instance_eval(&b).to_sql
-            super(args[0], options.merge(:conditions => sql))
-          elsif options[:order] == :default
-            super(args[0], options.merge(:order => default_order))
+            super(args.first, options.merge(:conditions => sql))
           else
             super(*args)
           end

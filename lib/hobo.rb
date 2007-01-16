@@ -129,33 +129,26 @@ module Hobo
       for model in Hobo.models
         web_name = model.name.underscore.pluralize.downcase
         controller = "#{model.name.pluralize}Controller".constantize rescue nil
-        
-        #controller_file = "#{RAILS_ROOT}/app/controllers/#{web_name}_controller"
-        if controller # File.exists?("#{controller_file}.rb")
-          # require controller_file
-          
+        if controller
+          map.resources web_name, :collection => { :completions => :get }
+          for refl in model.reflections.values.select {|r| r.macro == :has_many}
+            map.named_route("#{web_name.singularize}_#{refl.name}",
+                            "#{web_name}/:id/#{refl.name}",
+                            :controller => web_name,
+                            :action => "show_#{refl.name}",
+                            :conditions => { :method => :get })
 
-          if controller or true
-            map.resources web_name, :collection => { :completions => :get }
-            for refl in model.reflections.values.select {|r| r.macro == :has_many}
-              map.named_route("#{web_name.singularize}_#{refl.name}",
-                              "#{web_name}/:id/#{refl.name}",
-                              :controller => web_name,
-                              :action => "show_#{refl.name}",
-                              :conditions => { :method => :get })
-
-              map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
-                              "#{web_name}/:id/#{refl.name}/new",
-                              :controller => web_name,
-                              :action => "new_#{refl.name.to_s.singularize}")
+            map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
+                            "#{web_name}/:id/#{refl.name}/new",
+                            :controller => web_name,
+                            :action => "new_#{refl.name.to_s.singularize}")
             
-              for method in controller.web_methods
-                map.named_route("#{web_name.singularize}_#{method}",
-                                "#{web_name}/:id/#{method}",
-                                :controller => web_name,
-                                :action => method.to_s,
-                                :conditions => { :method => :post })
-              end if controller
+            for method in controller.web_methods
+              map.named_route("#{web_name.singularize}_#{method}",
+                              "#{web_name}/:id/#{method}",
+                              :controller => web_name,
+                              :action => method.to_s,
+                              :conditions => { :method => :post })
             end
           end
         end
@@ -187,7 +180,7 @@ module Hobo
 
 
     def can_create?(person, object)
-      if (object.is_a?(Class) and object < ActiveRecord::Base)
+      if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
         object.created_by(person)
       elsif Hobo.simple_has_many_association?(object)
@@ -218,7 +211,7 @@ module Hobo
           end
 
       new = object.duplicate
-      new.send(:"#{field}=", x)
+      new.send("#{field}=".to_sym, x)
 
       begin
         if object.new_record?
@@ -238,22 +231,24 @@ module Hobo
 
 
     def can_view?(person, object, field=nil)
-      return false if field and object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+     
       
-      check = if field
-                object
-              elsif object.is_a?(Class) and object < ActiveRecord::Base
-                object.new
-              elsif object.is_a?(Array)
-                if object.respond_to?(:new_without_appending)
-                  object.new_without_appending
-                elsif object.respond_to?(:member_class)
-                  object.member_class.new
-                end
-              else
-                object
-              end
-      viewable = check_persmission(:view, person, check, field && field.to_sym)
+      if field
+        field = field.to_sym if field
+        return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+      else
+        # Special support for classes (can view instances?) and associations (can view members?)
+        object = if object.is_a?(Class) and object < ActiveRecord::Base
+                   object.new
+                 elsif object.is_a?(Array)
+                   if object.respond_to?(:new_without_appending)
+                     object.new_without_appending
+                   elsif object.respond_to?(:member_class)
+                     object.member_class.new
+                   end
+                 end
+      end
+      viewable = check_persmission(:view, person, object, field)
       if viewable and field
         # also ask the current value if it is viewable
         can_view?(person, get_field(object, field))

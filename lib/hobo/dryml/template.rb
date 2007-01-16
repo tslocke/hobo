@@ -234,7 +234,7 @@ module Hobo::Dryml
       require_toplevel(el)
 
       if el.attributes['alias_of']
-        @environment.send(:alias_method, :"#{el.attributes['tag']}", :"#{el.attributes['alias_of']}")
+        @environment.send(:alias_method, "#{el.attributes['tag']}".to_sym, "#{el.attributes['alias_of']}".to_sym)
         "<% #{tag_newlines(el)} %>"
       else
         create_tag_method(el)

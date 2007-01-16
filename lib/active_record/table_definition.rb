@@ -4,7 +4,7 @@ module ActiveRecord::ConnectionAdapters
 
     def fkey(*args)
       options = take_options!(args)
-      args.each {|col| column(:"#{col}_id", :integer, options)}
+      args.each {|col| column("#{col}_id".to_sym, :integer, options)}
     end
 
     def auto_dates

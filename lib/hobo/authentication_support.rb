@@ -17,8 +17,10 @@ module Hobo
     #   skip_before_filter :login_required
     #
     def login_required
-      username, passwd = get_auth_data
-      self.current_user ||= Hobo.user_model.authenticate(username, passwd) || :false if username && passwd
+      if current_user.guest?
+        username, passwd = get_auth_data
+        self.current_user = Hobo.user_model.authenticate(username, passwd) || :false if username && passwd
+      end
       logged_in? && authorized? ? true : access_denied
     end
 

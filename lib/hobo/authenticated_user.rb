@@ -43,7 +43,13 @@ module Hobo
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
         u = find(:first, :conditions => ["#{@login_attr} = ?", login]) # need to get the salt
-        u && u.authenticated?(password) ? u : nil
+        
+        if u && u.authenticated?(password)
+          u.last_login_at = Time.now and u.save if u.respond_to?(:last_login_at)
+          u
+        else
+          nil
+        end
       end
 
       # Encrypts some data with the salt.
