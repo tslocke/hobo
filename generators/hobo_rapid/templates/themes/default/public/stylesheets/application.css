@@ -1,6 +1,6 @@
-.object_small { padding: 5px; margin: 5px; border: 1px dashed #ddd; background: #fbfbfb; }
+form.button-to { margin: 0; padding: 0; }
 
-
+.object_card { padding: 5px; margin: 5px; border: 1px dashed #ddd; background: #fbfbfb; }
 
 /* Todo: Big cleanup of this stylesheet */
 
@@ -8,7 +8,7 @@
 
 body, td {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     color: #677077;
 }
 
@@ -33,7 +33,7 @@ a:hover.no_hover { background: transparent; }
     padding: 65px 0 15px 20px;
     color: white;
     font-family: Palatino, Garamond, Times, Serif;
-     }
+}
 
 /* Main Page Body Window */
 
@@ -57,8 +57,8 @@ a:hover.no_hover { background: transparent; }
     margin-right:auto;
 }
 
-h2 { margin: 0 0 20px 20px; font-size: 14px; } /* Main page heading (i.e. not in a panel) */
-h1 { margin: 20px 0 20px 20px; font-size: 18px; } /* Main page heading (i.e. not in a panel) */
+h2 { margin: 0 0 20px 20px; font-size: 110%; } /* Main page heading (i.e. not in a panel) */
+h1 { margin: 20px 0 20px 10px; font-size: 150%; } /* Main page heading (i.e. not in a panel) */
 
 p { margin-left: 10px; }
 
@@ -89,11 +89,11 @@ p { margin-left: 10px; }
 
 .panel h1 {
     margin: 0px; padding: 8px 0 4px 4px; height: 16px;
-    font-size: 14px; }
+    font-size: 120%; }
 .panel h2 {
-    font-size: 14px; line-height:14px; font-weight:bold;
+    font-size: 110%; line-height:14px; font-weight:bold;
     margin: 0; padding: 6px 0;}
-.panel h3 { line-height:13px; font-weight:bold; color:#000000; margin: 8px 0 2px 0;}
+.panel h3 { line-height:13px; font-weight:bold; color:#666; margin: 8px 0 2px 0; font-size: 100%; }
 
 .panel.green { background-color:#edf4e3; } /* light grey + green */
 .panel.green  h1 { background:url(../images/header_green.gif) repeat-x top; background-color:#87b841; color:#ffffff; }
@@ -129,7 +129,7 @@ p { margin-left: 10px; }
 
 .panel li { margin: 6pt 0; }
 
-.section { border-top: 6px solid white; padding: 0 6px; }
+.section { border-top: 6px solid white; padding: 5px 20px 5px 6px; }
 
 ul.purple li { background-image: url(../images/txt_list_img_purple.gif); }
 ul.green li { background-image: url(../images/txt_list_img_green.gif); }
@@ -140,7 +140,7 @@ ul.dblue li { background-image: url(../images/txt_list_img_dblue.gif); }
 
 .main    { float: left; width: 438px; }
 .main .panel { width: 100%; }
-.sidebar { float: right; width: 210px; margin-right: 0px;}
+.sidebar { float: right; width: 230px; margin-right: 0px;}
 .sidebar .panel { width: 100%; }
 
 /* Nav Styles */
@@ -207,20 +207,21 @@ div.completions_popup ul li {
     cursor:pointer;
 }
 
+th { text-align: left; padding: 5px; }
 
 .object_table { width:95%; }
 .object_table td { padding: 5px; vertical-align: middle; }
 .object_table td.field_label {
-    text-align: right; width: 1px; white-space: nowrap; vertical-align: top;
+    text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
 .object_table input[type=text] { width: 100%; }
 .object_table input, .object_table textarea { margin: -2px 0 0 0; }
 .object_table textarea { width: 100%; margin: 0; }
 
-.object_table td span.in_place_edit_bhv {
-    display: block; border: 1px dashed #999;
-    padding: 5px; background: #fafafa;
+td span.in_place_edit_bhv {
+    display: block; border: 1px solid #ddd;
+    padding: 4px; background: #fafafa;
 }
 
 .login_table td.field_label { vertical-align: middle; }
@@ -234,11 +235,33 @@ textarea.tall { height: 350px; }
 
 /* MESSY LOAD OF JUNK BELOW HERE---------------------------------------- */
 
-input.button_input.text, input.button_input.text {
+input.button_input {
+    border: 1px solid black;
+    border-top-color: #fff;
+    border-left-color: #fff;
+    border-bottom-color: #ccc;
+    border-right-color: #ccc;
+    background: #e5e5e5;
+    padding: 2px; 
+}
+
+input.button_input.text {
     background: transparent; border: none;
     padding: 0 0 0 0; margin: -2px 0 0 0;
     color: #677077; text-decoration: underline; cursor:pointer;
 }
+
+input.image_button_input {
+    border: none;
+    background: transparent;
+    padding: 0; margin: 0;
+}
+
+input.create_button {
+    padding-left: 20px;
+    background:url(../../../images/plus.png) no-repeat center left;
+}
+    
 
 .search_result { border: 1px dashed grey; margin: 15px 10px; padding: 5px; background: white; }
 

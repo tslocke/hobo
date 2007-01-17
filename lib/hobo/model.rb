@@ -9,14 +9,22 @@ module Hobo
           # alias_method :rails_original_has_many, :has_many
       end
       base.extend(ClassMethods)
-      base.set_field_types({})
+      base.set_field_type({})
     end
 
     module ClassMethods
 
-      def set_field_types(types)
-        @hobo_field_types = types
+      def set_field_type(types)
+        @hobo_field_types ||= {}
+        @hobo_field_types.update(types)
       end
+      
+      
+      def set_default_order(order)
+        @default_order = order
+      end
+      
+      inheriting_attr_accessor :default_order, :id_name_options
 
 
       def never_show(*fields)
@@ -26,7 +34,7 @@ module Hobo
 
 
       def never_show?(field)
-        @hobo_never_show and field.to_sym.is_in?(@hobo_never_show)
+        @hobo_never_show and field.to_sym.in?(@hobo_never_show)
       end
 
 
@@ -36,19 +44,38 @@ module Hobo
           def creator=(x); self.#{attr} = x; end
         END
       end
-
+          
+          
+      def set_search_columns(*columns)
+        class_eval <<-END
+          def self.search_columns
+            %w{#{columns.omap{to_s} * ' '}}
+          end
+        END
+      end
+        
 
       def id_name(*args)
+        @id_name_options = [] + args
+        
         underscore = args.delete(:underscore)
         insenstive = args.delete(:case_insensitive)
         id_name_field = args.first || :name
         @id_name_column = id_name_field.to_s
 
-        class_eval %{
-          def id_name
-            #{id_name_field}#{if underscore; ".gsub(' ', '_')"; end}
-          end
-        }
+        if underscore
+          class_eval %{
+            def id_name(underscore=false)
+              underscore ? #{id_name_field}.gsub(' ', '_') : #{id_name_field}
+            end
+          }
+        else
+          class_eval %{
+            def id_name
+              #{id_name_field}
+            end
+          }
+        end
 
         key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
         finder = if insenstive
@@ -89,16 +116,20 @@ module Hobo
 
 
       def find(*args, &b)
-        if b and [:all, :first].include?(args.first)
-          options = if args.length == 1
-                      {}
-                    elsif args.length == 2
-                      args[1]
-                    else
-                      raise HoboError.new("find with block: too many parameters (#{args.length})")
-                    end
-          sql = ModelQueries.new(self).instance_eval(&b).to_sql
-          super(args[0], options.merge(:conditions => sql))
+        if args.first.in?([:all, :first])
+          if args.last.is_a? Hash
+            options = args.last
+            args[-1] = options = options.merge(:order => default_order) if options[:order] == :default
+          else
+            options = {}
+          end
+          
+          if b
+            sql = ModelQueries.new(self).instance_eval(&b).to_sql
+            super(args.first, options.merge(:conditions => sql))
+          else
+            super(*args)
+          end
         else
           super(*args)
         end
@@ -121,14 +152,14 @@ module Hobo
 
       def search_columns
         cols = columns.omap{name}
-        %w{name title body content}.select{|c| c.is_in?(cols) }
+        %w{name title body content}.select{|c| c.in?(cols) }
       end
 
     end
 
 
     def created_by(user)
-      self.creator ||= user if self.class.has_creator? and user != Hobo.guest_user
+      self.creator ||= user if self.class.has_creator? and not user.guest?
     end
 
 
@@ -143,8 +174,7 @@ module Hobo
     def same_fields?(other, *fields)
       fields.all?{|f| self.send(f) == other.send(f)}
     end
-
-
+    
   end
 end
 

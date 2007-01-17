@@ -37,6 +37,13 @@ var Hobo = {
             params.push("part_page=" + hoboPartPage)
         }
 
+        if (options.resultUpdate) {
+            options.resultUpdate.each(function (result_update) {
+                params.push("render[][id]=" + result_update[0] +
+                            "&render[][result]=" + result_update[1])
+            })
+        }
+
         if (options.params) {
             params.push(options.params)
             delete options.params
@@ -55,7 +62,7 @@ var Hobo = {
                 options.onComplete.apply(this, arguments)
             if (form) Form.focusFirstElement(form)
         }
-        if (options.method.toLowerCase() == "put") {
+        if (options.method && options.method.toLowerCase() == "put") {
             delete options.method
             params.push("_method=PUT")
         }
@@ -79,20 +86,24 @@ var Hobo = {
     },
 
     applyEvents: function(root) {
+        root = $(root)
         function select(p) {
             return new Selector(p).findElements(root)
         }
 
         select(".in_place_edit_bhv").each(function (el) {
+            var old
             var spec = Hobo.parseFieldId(el)
             options = {okButton: false,
                        cancelLink: false,
                        submitOnBlur: true,
                        callback: function(form, val) {
+                           old = val
                            return spec.name + '[' + spec.field + ']=' + val
                        },
                        highlightcolor: '#ffffff',
-                       highlightendcolor: Hobo.backgroundColor(el)
+                       highlightendcolor: Hobo.backgroundColor(el),
+                       onFailure: function(t) { alert(t.responseText); el.innerHTML = old }
                       }
             if (el.hasClassName("textarea_editor")) {
                 options.rows = 2
@@ -101,8 +112,12 @@ var Hobo = {
         });
 
         select(".autocomplete_bhv").each(function (el) {
+            options = {paramName: "query", minChars: 3, method: 'get' }
+            if (el.hasClassName("autosubmit")) {
+                options.afterUpdateElement = function(el, item) { el.form.onsubmit(); }
+            }
             new Ajax.Autocompleter(el, el.id + "_completions", el.getAttribute("autocomplete_url"),
-                                   {paramName: "query", minChars: 3, method: 'get'});
+                                   options);
         });
 
         select(".search_bhv").each(function(el) {
@@ -151,7 +166,7 @@ var Hobo = {
             Hobo.showSpinner('Removing');
             function complete() {
                 Hobo.hideSpinner();
-                new Effect.Fade(objEl);
+                new Effect.Fade(objEl, {duration: 0.5});
             }
             new Ajax.Request(url, {asynchronous:true, evalScripts:true, method:'delete', onComplete: complete});
         }
@@ -175,7 +190,7 @@ var Hobo = {
 
     objectElementFor: function(el) {
         var m
-        while(el) {
+        while(el.getAttribute) {
             id = el.getAttribute("model_id") || el.getAttribute("id");
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
@@ -198,7 +213,7 @@ var Hobo = {
 
     updateElement: function(id, content) {
         Element.update(id, content)
-        //Hobo.applyEvents(id)
+        Hobo.applyEvents(id)
     },
 
     rgbColorToHex: function(color) {

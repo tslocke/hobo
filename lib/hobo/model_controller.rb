@@ -14,7 +14,7 @@ module Hobo
         base.extend(ClassMethods)
         base.helper_method(:find_partial, :model, :current_user)
 
-        Hobo::ControllerHelpers.instance_methods.each {|m| base.hide_action(m)}
+        Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
 
         add_collection_actions(base)
 
@@ -53,27 +53,28 @@ module Hobo
         for refl in controller_class.model.reflections.values.oselect{macro == :has_many}
           show_method = "show_#{refl.name}"
           if show_method.not_in?(controller_class.instance_methods)
-            controller_class.class_eval %{
+            controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{show_method}
                 @owner = find_instance
                 @association = @owner.#{refl.name}
                 @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
                 options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
                 @this = @association.find(:all, options)
+                @this = @this.uniq if @association.proxy_reflection.options[:uniq]
                 hobo_render(:show_collection)
               end
-            }
+            END
           end
           new_method = "new_#{refl.name.to_s.singularize}"
           if Hobo.simple_has_many_association?(refl) and new_method.not_in?(controller_class.instance_methods)
-            controller_class.class_eval %{
+            controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{new_method}
                 @owner = find_instance
                 @this = @owner.#{refl.name}.new
                 @this.created_by(current_user)
-                hobo_render(:new_in_collection)
+                hobo_render(:new_in_collection, @this.class)
               end
-            }
+            END
           end
         end
       end
@@ -84,6 +85,10 @@ module Hobo
     module ClassMethods
 
       attr_writer :model
+      
+      def web_methods
+        @web_methods ||= []
+      end 
 
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
@@ -107,6 +112,13 @@ module Hobo
         @data_filters ||= {}
         @data_filters[name] = b
       end
+      
+      
+      def web_method(web_name, method_name=nil)
+        method_name ||= web_name
+        web_methods << web_name.to_sym
+        before_filter(:only => [web_name]) {|controller| controller.send(:prepare_web_method, method_name)}
+      end
 
 
       def data_filter(name)
@@ -125,12 +137,12 @@ module Hobo
 
     end
 
-    ###### ACTIONS ######
+    # --- ACTIONS --- #
 
     def index
       @model = model
       @pages = ::ActionController::Pagination::Paginator.new(self, model.count, 20, params[:page])
-      options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
+      options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset, :order => :default }
       @this = find_by_data_filter(options) || model.find(:all, options)
       hobo_render
     end
@@ -139,7 +151,11 @@ module Hobo
     def show
       @this = find_instance
       if @this
-        hobo_render
+        if Hobo.can_view?(current_user, @this)
+          hobo_render
+        else
+          permission_denied
+        end
       else
         render :text => "Can't find #{model.name.titleize}: #{params[:id]}", :status => 404
       end
@@ -162,22 +178,25 @@ module Hobo
 
       if @this.save
         respond_to do |wants|
-          wants.html { redirect_to object_url(@this) }
-          wants.js   { hobo_ajax_response(@this) }
+          wants.html do
+            create_response
+            redirect_to object_url(@this) unless performed?
+          end
+
+          wants.js   { hobo_ajax_response(@this) or render :text => "" }
         end
       else
         # Validation errors
         respond_to do |wants|
           wants.html do
-            render :action => :new
+            invalid_create_response
+            hobo_render :new unless performed?
           end
 
           wants.js do
-            # Temporary hack
-            render :update do |page|
-              page.alert("There was a problem creating that #{model.name}.\n" +
-                         @this.errors.full_messages.join("\n"))
-            end
+            render(:status => 500,
+                   :text => "There was a problem creating that #{model.name}.\n" +
+                            @this.errors.full_messages.join("\n"))
           end
         end
       end
@@ -199,7 +218,8 @@ module Hobo
       if @this.save
         respond_to do |wants|
           wants.html do
-            redirect_to :id => @this.id
+            update_response
+            redirect_to object_url(@this) unless performed?
           end
 
           wants.js   do
@@ -220,15 +240,15 @@ module Hobo
         # Validation errors
         respond_to do |wants|
           wants.html do
-            render :action => :edit
+            invalid_update_response
+            render :action => :edit unless performed?
           end
 
           wants.js do
             # Temporary hack
-            render :update do |page|
-              page.alert("There was a problem updating that record.\n" +
-                         @this.errors.full_messages.join("\n"))
-            end
+            render(:status => 500,
+                   :text => ("There was a problem with that update.\n" +
+                             @this.errors.full_messages.join("\n")))
           end
         end
       end
@@ -242,8 +262,11 @@ module Hobo
       @this.destroy
 
       respond_to do |wants|
-        wants.html {redirect_to :action => "index" }
-        wants.js { hobo_ajax_response(@this) }
+        wants.html do
+          destroy_response
+          redirect_to :action => "index" unless performed?
+        end
+        wants.js { hobo_ajax_response(@this) or render :text => "" }
       end
     end
 
@@ -265,7 +288,31 @@ module Hobo
 
     ###### END OF ACTIONS ######
 
-    private
+    protected
+    
+    # --- hooks --- #
+    
+    def create_response; end
+    
+    def invalid_create_response; end
+    
+    def update_response; end
+    
+    def invalid_update_response; end
+    
+    def destroy_response; end 
+    
+    # --- end hooks --- #
+    
+    # --- filters --- #
+    
+    def prepare_web_method(method)
+      @this = find_instance
+      permission_denied unless Hobo.can_call?(current_user, @this, method)
+    end
+    
+    # --- end filters --- #
+    
 
     def set_no_cache_headers
       headers["Pragma"] = "no-cache"
@@ -286,12 +333,16 @@ module Hobo
     end
 
 
-    def hobo_render(page_kind = nil)
-      template = find_template
+    def hobo_render(page_kind = nil, model=nil)
+      template = if page_kind and model
+                   Hobo::ModelController.find_model_template(model, page_kind)
+                 else
+                   find_template
+                 end
       if template
         render :template => template
       else
-        page_kind ||= params[:action] if params[:action].is_in? %w{index show new edit}
+        page_kind ||= params[:action] if params[:action].in? %w{index show new edit}
         render_tag("#{page_kind}_page", :obj => @this) if page_kind
       end
     end
@@ -359,7 +410,7 @@ module Hobo
                      # primitive field
                      value
                    end
-        object.send(:"#{field}=", ar_value)
+        object.send("#{field}=".to_sym, ar_value)
       end
     end
 

@@ -8,7 +8,7 @@ module Hobo
 
   class << self
 
-    attr_accessor :current_theme, :guest_user
+    attr_accessor :current_theme
     attr_writer :developer_features
 
     def developer_features?
@@ -25,18 +25,28 @@ module Hobo
       @user_model = model && model.name
     end
 
+    
     def user_model
       @user_model && @user_model.constantize
     end
 
+    
     def models=(models)
       @models = models.every(:name)
     end
 
+    
     def models
-      @models.every(:constantize)
+      unless @models_loaded
+        Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
+          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize rescue nil
+        end
+        @models_loaded = true
+      end
+      @models.omap{constantize}
     end
 
+    
     def register_model(model)
       @models << model.name unless @models.include? model.name
     end
@@ -102,28 +112,45 @@ module Hobo
       for row in rows
         records[row['type']] << row['id']
       end
-      result = []
+      results = []
       for type, ids in records
-        result.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
+        results.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
       end
-      result
+      
+      results
     end
 
     def add_routes(map)
+      begin
+        ApplicationController
+      rescue
+        require "#{RAILS_ROOT}/app/controllers/application"
+      end
       for model in Hobo.models
-        controller = model.name.underscore.pluralize
-        map.resources controller, :collection => { :completions => :get }
-        for refl in model.reflections.values.select {|r| r.macro == :has_many}
-          map.named_route("#{controller.singularize}_#{refl.name}",
-                          "#{controller}/:id/#{refl.name}",
-                          :controller => controller,
-                          :action => "show_#{refl.name}",
-                          :conditions => { :method => :get })
+        web_name = model.name.underscore.pluralize.downcase
+        controller = "#{model.name.pluralize}Controller".constantize rescue nil
+        if controller
+          map.resources web_name, :collection => { :completions => :get }
+          for refl in model.reflections.values.select {|r| r.macro == :has_many}
+            map.named_route("#{web_name.singularize}_#{refl.name}",
+                            "#{web_name}/:id/#{refl.name}",
+                            :controller => web_name,
+                            :action => "show_#{refl.name}",
+                            :conditions => { :method => :get })
 
-          map.named_route("new_#{controller.singularize}_#{refl.name.to_s.singularize}",
-                          "#{controller}/:id/#{refl.name}/new",
-                          :controller => controller,
-                          :action => "new_#{refl.name.to_s.singularize}")
+            map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
+                            "#{web_name}/:id/#{refl.name}/new",
+                            :controller => web_name,
+                            :action => "new_#{refl.name.to_s.singularize}")
+            
+            for method in controller.web_methods
+              map.named_route("#{web_name.singularize}_#{method}",
+                              "#{web_name}/:id/#{method}",
+                              :controller => web_name,
+                              :action => method.to_s,
+                              :conditions => { :method => :post })
+            end
+          end
         end
       end
     end
@@ -136,15 +163,28 @@ module Hobo
 
     def simple_has_many_association?(array_or_reflection)
       refl = array_or_reflection.is_a?(Array) ? array_or_reflection.proxy_reflection : array_or_reflection
+      return false unless refl.is_a?(ActiveRecord::Reflection::AssociationReflection)
       refl.macro == :has_many and
         (not refl.through_reflection) and
         (not refl.options[:conditions])
+    end
+    
+    
+    def get_field(object, field)
+      if field.to_s =~ /\d+/
+        object[field.to_i]
+      else
+        object.send(field)
+      end
     end
 
 
     def can_create?(person, object)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
+        object.created_by(person)
+      elsif Hobo.simple_has_many_association?(object)
+        object = object.new_without_appending
         object.created_by(person)
       end
       check_persmission(:create, person, object)
@@ -162,8 +202,8 @@ module Hobo
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
 
       x = if refl
-            # has_many associations are not editable
-            return false if refl.macro == :has_many
+            # has_many and polymorphic associations are not editable (for now)
+            return false if refl.macro == :has_many || refl.options[:polymorphic]
 
             Hobo::Undefined.new(refl.klass)
           else
@@ -171,7 +211,7 @@ module Hobo
           end
 
       new = object.duplicate
-      new.send(:"#{field}=", x)
+      new.send("#{field}=".to_sym, x)
 
       begin
         if object.new_record?
@@ -190,11 +230,42 @@ module Hobo
     end
 
 
-    def can_view?(person, object, field)
-      return false if field and object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
-      check_persmission(:view, person, object, field && field.to_sym)
+    def can_view?(person, object, field=nil)
+     
+      
+      if field
+        field = field.to_sym if field
+        return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+      else
+        # Special support for classes (can view instances?) and associations (can view members?)
+        object = if object.is_a?(Class) and object < ActiveRecord::Base
+                   object.new
+                 elsif object.is_a?(Array)
+                   if object.respond_to?(:new_without_appending)
+                     object.new_without_appending
+                   elsif object.respond_to?(:member_class)
+                     object.member_class.new
+                   end
+                 end
+      end
+      viewable = check_persmission(:view, person, object, field)
+      if viewable and field
+        # also ask the current value if it is viewable
+        can_view?(person, get_field(object, field))
+      else
+        viewable
+      end
     end
+    
+    
+    def can_call?(person, object, method)
+      return true if person.respond_to?(:super_user?) and person.super_user?
 
+      m = "can_call_#{method}?"
+      object.respond_to?(m) and object.send(m, current_user)
+    end 
+
+    
     private
 
 
@@ -217,6 +288,7 @@ module Hobo
           elsif person.respond_to?(person_method)
             person.send(person_method, object, *args)
           else
+            # The object does not define permissions - you can only view it
             permission == :view
           end
     end

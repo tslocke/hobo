@@ -63,7 +63,7 @@ module Hobo::Dryml
       method_src = ("def render_page(__page_this__, __local_assigns__); " +
                     "#{locals} new_object_context(__page_this__) do " +
                     src +
-                    "; end + _part_contexts_js(true); end")
+                    "; end + part_contexts_js; end")
 
       @environment.class_eval(method_src, template_path, 1)
       @environment.compiled_local_names = local_names
@@ -214,7 +214,7 @@ module Hobo::Dryml
         alias_of = el.attributes['alias_of']
         if alias_of
           old = @tags[alias_of]
-          dryml_exception("no tag #{alias_of} to alias", el) unless old
+          dryml_exception("no tag '#{alias_of}' to alias", el) unless old
           @tags[name] = Hobo::Dryml::TagDef.new(name, old.attrs)
         else
           attrspec = el.attributes["attrs"]
@@ -234,7 +234,7 @@ module Hobo::Dryml
       require_toplevel(el)
 
       if el.attributes['alias_of']
-        @environment.send(:alias_method, :"#{el.attributes['tag']}", :"#{el.attributes['alias_of']}")
+        @environment.send(:alias_method, "#{el.attributes['tag']}".to_sym, "#{el.attributes['alias_of']}".to_sym)
         "<% #{tag_newlines(el)} %>"
       else
         create_tag_method(el)

@@ -9,6 +9,10 @@ module ActiveRecord::Associations
         find(record.id) && true rescue false
       end
     end
+    
+    def member_class
+      proxy_reflection.klass
+    end
 
   end
 

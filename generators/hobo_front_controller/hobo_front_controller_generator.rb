@@ -49,7 +49,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     name = full_class_path
 
     route = ("  map.search  'search', :controller => '#{name}', :action => 'search'\n" +
-             "  map.connect '', :controller => '#{name}', :action => 'index'")
+             "  map.homepage '', :controller => '#{name}', :action => 'index'")
     unless options[:no_user]
       route += ("\n  map.login   'login',  :controller => '#{name}', :action => 'login'\n" +
                 "  map.logout  'logout',  :controller => '#{name}', :action => 'logout'\n" +

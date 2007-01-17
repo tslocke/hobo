@@ -4,7 +4,7 @@ module ActiveRecord::ConnectionAdapters
 
     def fkey(*args)
       options = take_options!(args)
-      args.each {|col| column(:"#{col}_id", :integer, options)}
+      args.each {|col| column("#{col}_id".to_sym, :integer, options)}
     end
 
     def auto_dates
@@ -13,7 +13,7 @@ module ActiveRecord::ConnectionAdapters
     end
 
     def method_missing(name, *args)
-      if name.is_in? [:integer, :float, :decimal, :datetime, :date, :timestamp,
+      if name.in? [:integer, :float, :decimal, :datetime, :date, :timestamp,
                       :time, :text, :string, :binary, :boolean ]
         options = take_options!(args)
         args.each {|col| column(col, name, options)}

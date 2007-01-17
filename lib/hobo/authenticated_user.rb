@@ -5,29 +5,51 @@ module Hobo
   module AuthenticatedUser
 
     def self.included(base)
+      base.extend(ClassMethods)
+
       base.class_eval do
         # Virtual attribute for the unencrypted password
         attr_accessor :password
 
-        validates_presence_of     :login
         validates_presence_of     :password,                   :if => :password_required?
         validates_presence_of     :password_confirmation,      :if => :password_required?
-        validates_length_of       :password, :within => 4..40, :if => :password_required?
         validates_confirmation_of :password,                   :if => :password_required?
-        validates_length_of       :login,    :within => 3..40
-        validates_uniqueness_of   :login, :case_sensitive => false
+      
         before_save :encrypt_password
+        
         never_show :salt, :crypted_password, :remember_token, :remember_token_expires_at
+        
+        set_field_type :password => :password, :password_confirmation => :password
+        
+        password_validations
       end
-      base.extend(ClassMethods)
     end
 
     module ClassMethods
+      
+      def password_validations
+        validates_length_of :password, :within => 4..40, :if => :password_required?
+      end
+      
+      def set_login_attr(attr)
+        @login_attr = attr = attr.to_sym
+        validates_presence_of     attr
+        validates_length_of       attr, :within => 3..100
+        validates_uniqueness_of   attr, :case_sensitive => false
+        
+        alias_attribute(:login, attr) unless attr == :login
+      end
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
-        u = find_by_login(login) # need to get the salt
-        u && u.authenticated?(password) ? u : nil
+        u = find(:first, :conditions => ["#{@login_attr} = ?", login]) # need to get the salt
+        
+        if u && u.authenticated?(password)
+          u.last_login_at = Time.now and u.save if u.respond_to?(:last_login_at)
+          u
+        else
+          nil
+        end
       end
 
       # Encrypts some data with the salt.
@@ -72,7 +94,7 @@ module Hobo
     end
 
     def password_required?
-      crypted_password.blank? || !password.blank?
+      (crypted_password.blank? && password != nil) || !password.blank?
     end
 
   end
