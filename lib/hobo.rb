@@ -231,10 +231,8 @@ module Hobo
 
 
     def can_view?(person, object, field=nil)
-     
-      
       if field
-        field = field.to_sym if field
+        field = field.to_sym if field.is_a? String
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
       else
         # Special support for classes (can view instances?) and associations (can view members?)
@@ -251,6 +249,7 @@ module Hobo
       viewable = check_persmission(:view, person, object, field)
       if viewable and field
         # also ask the current value if it is viewable
+        puts 999, field.inspect
         can_view?(person, get_field(object, field))
       else
         viewable
