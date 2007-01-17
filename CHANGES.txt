@@ -1,3 +1,7 @@
+=== Release 0.4.2 ===
+
+Fix in permission system
+
 === Release 0.4.1 ===
 
 New feature: "web-methods" -- RPC style actions in model-controllers. Including
