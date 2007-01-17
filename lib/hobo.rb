@@ -249,7 +249,6 @@ module Hobo
       viewable = check_persmission(:view, person, object, field)
       if viewable and field
         # also ask the current value if it is viewable
-        puts 999, field.inspect
         can_view?(person, get_field(object, field))
       else
         viewable
