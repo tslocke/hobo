@@ -1,6 +1,6 @@
 === Release 0.4.1 ===
 
-New feature: "web-methods" -- RPC style actions in model-controllers.  Including
+New feature: "web-methods" -- RPC style actions in model-controllers. Including
 support for ajax responses.
 
 New named route "home" to FrontController#index
@@ -11,14 +11,14 @@ Hobo Rapid:
 
   Added support for ajax responses to web-methods
 
-  Removed <possesive> (too app specific)
+  Removed <possessive> (too app specific)
 
   <object_link> now passes extra options to the generated <a> tag
   (e.g. class, id)
 
   Extra options to <edit> are now passed on to the delegate.
 
-  Naming of edit controlls reworked. <editor> is an ajax editor,
+  Naming of edit controls reworked. <editor> is an ajax editor,
   <form_field> is a non-ajax form field, <edit> chooses automatically
   between the two. Other tags renamed too -
   e.g. <in_place_edit_for_boolean> renamed to
@@ -30,9 +30,9 @@ Hobo Rapid:
   as an option is selected.
 
   Added confirm option to ajax_updater (wraps call in a JS confirm
-  dialog)
+  dialogue)
 
-  More data types supported by <editor> (formelly in_place_edit)
+  More data types supported by <editor> (formerly in_place_edit)
 
   New tag <belongs_to_editor>. Currently just delegates to
   <belongs_to_menu_editor> but is intended to switch to an
@@ -42,7 +42,7 @@ Hobo Rapid:
   button tags.
 
   Image attribute for delete_button for <input type="image">
-  buttons. Needs implemeting on the other buttons (or maybe we should
+  buttons. Needs implementing on the other buttons (or maybe we should
   be using css styling only!)
 
   New tag: <remote_method_button>
@@ -92,7 +92,7 @@ hobo_user_model generator
 
 Plugin initialiser (init.rb)
 
-  Fixed probem with ordering of requires
+  Fixed problem with ordering of requires
 
   Eliminated code to load all models at startup (now done on demand in Hobo module)
   This reduces the footprint of Hobo, e.g. for apps that want only DRYML.
@@ -196,7 +196,7 @@ DRYML
   Renamed method _part_context_js to part_context_js
 
 
-Model Extentions (hobo_model)
+Model Extensions (hobo_model)
 
   Renamed set_fields_types to set_field_type
 
@@ -219,7 +219,7 @@ Model Extentions (hobo_model)
       set_default_order "name"
     end 
 
-    To use: User.find(:all, :oeder => :default). Default order is used
+    To use: User.find(:all, :order => :default). Default order is used
     by the hobo_model_controller
 
 Model Controller
@@ -260,7 +260,7 @@ Model Controller
 
 Model Queries
 
-  Renames predicate in_association to is_in
+  Renamed predicate in_association to is_in
 
   Added predicate not_in
 
@@ -275,7 +275,7 @@ Hobo module
   is called.
 
   Removed parentheses from query in find_by_search (SQLite
-  compatability)
+  compatibility)
 
   add_routes now adds routes for web methods
 
