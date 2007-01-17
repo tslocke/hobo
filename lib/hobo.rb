@@ -215,9 +215,9 @@ module Hobo
 
       begin
         if object.new_record?
-          check_persmission(:create, person, new)
+          check_permission(:create, person, new)
         else
-          check_persmission(:update, person, object, new)
+          check_permission(:update, person, object, new)
         end
       rescue UndefinedAccessError
         false
@@ -226,7 +226,7 @@ module Hobo
 
 
     def can_delete?(person, object)
-      check_persmission(:delete, person, object)
+      check_permission(:delete, person, object)
     end
 
 
@@ -236,17 +236,17 @@ module Hobo
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
       else
         # Special support for classes (can view instances?) and associations (can view members?)
-        object = if object.is_a?(Class) and object < ActiveRecord::Base
-                   object.new
-                 elsif object.is_a?(Array)
-                   if object.respond_to?(:new_without_appending)
-                     object.new_without_appending
-                   elsif object.respond_to?(:member_class)
-                     object.member_class.new
-                   end
-                 end
+        if object.is_a?(Class) and object < ActiveRecord::Base
+          object = object.new
+        elsif object.is_a?(Array)
+          if object.respond_to?(:new_without_appending)
+            object = object.new_without_appending
+          elsif object.respond_to?(:member_class)
+            object = object.member_class.new
+          end
+        end
       end
-      viewable = check_persmission(:view, person, object, field)
+      viewable = check_permission(:view, person, object, field)
       if viewable and field
         # also ask the current value if it is viewable
         can_view?(person, get_field(object, field))
@@ -267,7 +267,7 @@ module Hobo
     private
 
 
-    def check_persmission(permission, person, object, *args)
+    def check_permission(permission, person, object, *args)
       return true if person.respond_to?(:super_user?) and person.super_user?
 
       obj_method = case permission
