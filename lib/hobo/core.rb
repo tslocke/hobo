@@ -112,7 +112,7 @@ module Hobo
     def_tag :show do
       raise HoboError.new("attempted to show non-viewable field '#{this_field}'") unless can_view_this?
       
-      type = this_type
+      type = this_type || (this.is_a?(String) && :string)
       if this.nil?
         case type
           when  :string, :text; ""
