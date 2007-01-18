@@ -187,12 +187,12 @@ module Hobo
         object = object.new_without_appending
         object.created_by(person)
       end
-      check_persmission(:create, person, object)
+      check_permission(:create, person, object)
     end
 
 
     def can_update?(person, object, new)
-      check_persmission(:update, person, object, new)
+      check_permission(:update, person, object, new)
     end
 
 
