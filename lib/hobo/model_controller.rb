@@ -61,7 +61,7 @@ module Hobo
                 options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
                 @this = @association.find(:all, options)
                 @this = @this.uniq if @association.proxy_reflection.options[:uniq]
-                hobo_render(:show_collection)
+                hobo_render(:show_collection, @association.member_class)
               end
             END
           end
@@ -333,9 +333,9 @@ module Hobo
     end
 
 
-    def hobo_render(page_kind = nil, model=nil)
-      template = if page_kind and model
-                   Hobo::ModelController.find_model_template(model, page_kind)
+    def hobo_render(page_kind = nil, page_model=nil)
+      template = if page_kind
+                   Hobo::ModelController.find_model_template(page_model || model, page_kind)
                  else
                    find_template
                  end
