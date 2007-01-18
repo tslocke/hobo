@@ -282,7 +282,7 @@
         <%= error_messages_for 'this' %>
 
         <object_form hidden_fields="*">
-          <object_table/>
+          <object_table associations="belongs_to"/>
           <submit label='#"Add to #{display_name(:obj => @owner)}"'/>
         </object_form>
       </section>
