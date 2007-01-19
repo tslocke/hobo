@@ -134,6 +134,16 @@ module Hobo
           super(*args)
         end
       end
+      
+      
+      def count(options={}, &b)
+        super(if b
+                sql = ModelQueries.new(self).instance_eval(&b).to_sql
+                options.merge(:conditions => sql)
+              else
+                options
+              end)
+      end
 
 
       def subclass_associations(association, *subclass_associations)

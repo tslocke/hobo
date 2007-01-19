@@ -88,7 +88,11 @@ module Hobo
       
       def web_methods
         @web_methods ||= []
-      end 
+      end
+      
+      def show_methods
+        @show_methods ||= []
+      end
 
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
@@ -119,8 +123,16 @@ module Hobo
         web_methods << web_name.to_sym
         before_filter(:only => [web_name]) {|controller| controller.send(:prepare_web_method, method_name)}
       end
-
-
+      
+      
+      def show_method(*names)
+        show_methods.concat(names)
+        for name in names
+          class_eval "def #{name}; show; end"
+        end
+      end
+      
+      
       def data_filter(name)
         (@data_filters && @data_filters[name]) ||
           (superclass.respond_to?(:data_filter) && superclass.data_filter(name))
@@ -141,9 +153,10 @@ module Hobo
 
     def index
       @model = model
-      @pages = ::ActionController::Pagination::Paginator.new(self, model.count, 20, params[:page])
+      count = count_with_data_filter
+      @pages = ::ActionController::Pagination::Paginator.new(self, count, 20, params[:page])
       options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset, :order => :default }
-      @this = find_by_data_filter(options) || model.find(:all, options)
+      @this = find_with_data_filter(options)
       hobo_render
     end
 
@@ -227,9 +240,7 @@ module Hobo
               # ok we're done then
             elsif changes.size == 1
               # Slightly hacky support for the scriptaculous in-place-editor
-              val = @this.send(changes.keys.first)
-              val = CGI::escapeHTML(val).gsub("\n", "<br/>") if val.is_a?(String)
-              render(:text => val.to_s, :layout => false)
+              render_tag("show", :obj => @this, :attr => changes.keys.first)
             else
               # we don't expect this, but it's not really an error
               render :text => ""
@@ -276,8 +287,7 @@ module Hobo
       opts = attr && self.class.autocompleter(attr.to_sym)
       if opts
         q = params[:query]
-        filtered = find_by_data_filter(opts) { send("#{attr}_contains", q) }
-        items = filtered || model.find(:all) { send("#{attr}_contains", q) }
+        items = find_with_data_filter(opts) { send("#{attr}_contains", q) }
 
         render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
       else
@@ -358,24 +368,38 @@ module Hobo
     end
 
 
-    def find_by_data_filter(opts={}, &block)
+    def with_data_filter(operation, *args, &block)
       filter_param = params.keys.ofind {starts_with? "where_"}
       proc = filter_param && self.class.data_filter(filter_param[6..-1].to_sym)
       if proc
-        args = params[filter_param]
-        args = [args] unless args.is_a? Array
-        model.find(:all, opts) do
+        filter_args = params[filter_param]
+        filter_args = [filter_args] unless filter_args.is_a? Array
+        model.send(operation, *args) do
           if block
-            instance_eval(&block) & instance_exec(*args, &proc)
+            instance_eval(&block) & instance_exec(*filter_args, &proc)
           else
-            instance_exec(*args, &proc)
+            instance_exec(*filter_args, &proc)
           end
         end
       else
-        nil
+        if block
+          model.send(operation, *args) { instance_eval(&block) }
+        else
+          model.send(operation, *args)
+        end
       end
     end
-
+    
+    
+    def find_with_data_filter(opts={}, &b)
+      with_data_filter(:find, :all, opts, &b)
+    end
+    
+    
+    def count_with_data_filter(opts={}, &b)
+      with_data_filter(:count, opts, &b)
+    end
+    
 
     def new_from_params(model, params)
       obj = model.new
@@ -390,7 +414,8 @@ module Hobo
       return unless params
 
       params.each_pair do |field,value|
-        refl = object.class.reflections[field.to_sym]
+        field = field.to_sym
+        refl = object.class.reflections[field]
         ar_value = if refl
                      if refl.macro == :belongs_to
                        param_to_record(refl.klass, value)
@@ -407,13 +432,41 @@ module Hobo
                        raise HoboError.new("association #{refl.name} is not settable via parameters")
                      end
                    else
-                     # primitive field
-                     value
+                     param_to_value(object.class.field_type(field), value)
                    end
         object.send("#{field}=".to_sym, ar_value)
       end
     end
 
+    
+    def parse_datetime(s)
+      defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
+    end
+
+
+    def param_to_value(field_type, value)
+      case field_type
+      when :date
+        x = if value.is_a? Hash
+          Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          dt = parse_datetime(value)
+          puts 444123, dt.inspect
+          dt && dt.to_date
+        end
+        puts 123, x.inspect
+        x
+      when :datetime
+        if value.is_a? Hash
+          Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          parse_datetime(value)
+        end
+      else
+        # primitive field
+        value
+      end
+    end
 
     def param_to_record(klass, value)
       if value.is_a? String

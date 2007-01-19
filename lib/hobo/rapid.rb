@@ -94,7 +94,7 @@ module Hobo::Rapid
   end
 
 
-  def_tag :object_link do
+  def_tag :object_link, :view do
     if can_view_this?
       if this.nil?
         "(Not Available)"
@@ -102,7 +102,7 @@ module Hobo::Rapid
         raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
         v = this.is_a?(String) ? this.singularize.classify.constantize : this
         content = tagbody ? tagbody.call : display_name(:obj => v)
-        link_to content, object_url(v), options
+        link_to content, object_url(v, view), options
       end
     end
   end
@@ -153,10 +153,10 @@ module Hobo::Rapid
       check_box_tag(name, '1', this, options)
       
     elsif this_type == :date
-      date_select "", this_field
+      select_date(this || Time.now, :prefix => name)
       
     elsif this_type == :datetime
-      select_datetime this, :prefix => name
+      select_datetime(this || Time.now, :prefix => name)
       
     elsif this_type == :password
       password_field_tag(name, this)

@@ -51,14 +51,14 @@ a:hover.no_hover { background: transparent; }
 .flash { margin: 10px 30px; background: white; border: 2px solid #aaf; padding: 10px; text-align: center; }
 
 #page {
-    width:720px;
+    width:800px;
     background-color:#FFFFFF;
     margin-left:auto;
     margin-right:auto;
 }
 
 h2 { margin: 0 0 20px 20px; font-size: 110%; } /* Main page heading (i.e. not in a panel) */
-h1 { margin: 20px 0 20px 10px; font-size: 150%; } /* Main page heading (i.e. not in a panel) */
+h1 { margin: 20px 0 20px 20px; font-size: 150%; } /* Main page heading (i.e. not in a panel) */
 
 p { margin-left: 10px; }
 
@@ -138,9 +138,9 @@ ul.dblue li { background-image: url(../images/txt_list_img_dblue.gif); }
 
 /* main section and sidebar */
 
-.main    { float: left; width: 438px; }
+.main    { float: left; width: 488px; }
 .main .panel { width: 100%; }
-.sidebar { float: right; width: 230px; margin-right: 0px;}
+.sidebar { float: right; width: 260px; margin-right: 0px;}
 .sidebar .panel { width: 100%; }
 
 /* Nav Styles */
@@ -241,7 +241,7 @@ input.button_input {
     border-left-color: #fff;
     border-bottom-color: #ccc;
     border-right-color: #ccc;
-    background: #e5e5e5;
+    background-color: #e5e5e5;
     padding: 2px; 
 }
 
@@ -260,6 +260,7 @@ input.image_button_input {
 input.create_button {
     padding-left: 20px;
     background:url(../../../images/plus.png) no-repeat center left;
+    background-color: #e5e5e5;
 }
     
 

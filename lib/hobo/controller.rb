@@ -82,7 +82,7 @@ module Hobo
 
     def render_tag(tag, options={})
       add_variables_to_assigns
-      render :text => Hobo::Dryml.render_tag(@template, tag, options)
+      render :text => Hobo::Dryml.render_tag(@template, tag, options), :layout => false
     end
 
 

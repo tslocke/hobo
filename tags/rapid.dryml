@@ -63,20 +63,20 @@
 </def>
 
 
-<def tag="has_many_table" attrs="part_id, delete_buttons, headings">
-  <if_empty>
-    <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
-  </if_empty>
-  <else>
-    <table_for headings="#headings" xattrs="">
-      <tagbody/>
-      <if q="#delete_buttons != false and can_delete?(this)">
-        <td><delete_button/></td>
-      </if>
-    </table_for>
-  </else>
+<def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
+  <table_for headings="#headings" xattrs="">
+    <:empty>
+      <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
+    </:empty>
+
+    <tagbody/>
+
+    <if q="#delete_buttons != false and can_delete?(this)">
+      <td><delete_button/></td>
+    </if>
+  </table_for>
   <div>
-    <create_button update="#part_id"/>
+    <create_button update="#id || part_id"/>
   </div>
 </def>
 
@@ -88,9 +88,11 @@
   <else>
     <ul xattrs="">
       <repeat>
-        <li class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id this %>">
-          <%= tagbody.nil? ? object_link : tagbody.call %>
-        </li>
+        <if_can_view>
+          <li class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id this %>">
+            <%= tagbody.nil? ? object_link : tagbody.call %>
+          </li>
+        </if_can_view>
       </repeat>
     </ul>
   </else>
@@ -104,10 +106,14 @@
   <else>
     <table xattrs="">
       <if q="#headings"><tr><%= headings %></tr></if>
+      <% even_odd = "odd" %>
       <repeat>
-        <tr class="<%= cycle('even', 'odd') %> <%= row_class %>" model_id="<%= dom_id(this) %>">
-          <%= tagbody.nil? ? object_link : tagbody.call %>
-        </tr>
+        <if_can_view>
+          <tr class="<%= even_odd %> <%= row_class %>" model_id="<%= dom_id(this) %>">
+            <%= tagbody.nil? ? object_link : tagbody.call %>
+          </tr>
+        <% even_odd = even_odd == "even" ? "odd" : "even" %>
+        </if_can_view>
       </repeat>
     </table>
   </else>
@@ -173,15 +179,15 @@
 </def>
 
 
-<def tag="previous_page_link">
-  <%= link_to (tagbody ? tagbody.call : '&laquo; Previous page'), { :page => @pages.current.previous } if
-        @pages and @pages.current.previous %>
+<def tag="previous_page_link" attrs="query_params">
+  <% opts = { :page => @pages.current.previous }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : '&laquo; Previous page', opts) if @pages and @pages.current.previous %>
 </def>
 
 
-<def tag="next_page_link">
-  <%= link_to (tagbody ? tagbody.call : 'Next page &raquo;'), { :page => @pages.current.next } if
-        @pages and @pages.current.next %>
+<def tag="next_page_link" attrs="query_params">
+  <% opts = { :page => @pages.current.next }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : 'Next page &raquo;', opts) if @pages and @pages.current.next %>
 </def>
 
 
@@ -312,7 +318,9 @@
         <next_page_link/>
       </section>
       <section_if>
-        <new_object_link for="#@association"/>
+        <if q="#Hobo.simple_has_many_association?(@association)">
+          <new_object_link for="#@association"/>
+        </if>
       </section_if>
     </panel>
   </page>
@@ -447,9 +455,13 @@
 </def>
 
 
-<def tag="page_nav">
+<def tag="page_nav" attrs="query_params">
   <if q="#@pages.length > 1">
-    <p><page_n_of_count/> - <previous_page_link/> <next_page_link/></p>
+    <p>
+      <page_n_of_count/> - 
+      <previous_page_link query_params="#query_params"/>
+      <next_page_link query_params="#query_params"/>
+    </p>
   </if>
 </def>
 
