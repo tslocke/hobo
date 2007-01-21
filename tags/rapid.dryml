@@ -87,12 +87,14 @@
   </if>
   <else>
     <ul xattrs="">
+      <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <li class="<%= cycle('even', 'odd') %>" model_id="<%= dom_id this %>">
+          <li class="<%= even_odd %>" model_id="<%= dom_id this %>">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </li>
         </if_can_view>
+        <% even_odd = even_odd == "even" ? "odd" : "even" %>
       </repeat>
     </ul>
   </else>

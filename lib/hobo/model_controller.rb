@@ -454,15 +454,12 @@ module Hobo
     def param_to_value(field_type, value)
       case field_type
       when :date
-        x = if value.is_a? Hash
+        if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           dt = parse_datetime(value)
-          puts 444123, dt.inspect
           dt && dt.to_date
         end
-        puts 123, x.inspect
-        x
       when :datetime
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
