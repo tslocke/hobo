@@ -7,6 +7,8 @@ module Hobo
     class PermissionDeniedError < RuntimeError; end
 
     VIEWLIB_DIR = "hobolib"
+    
+    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
 
     class << self
 
@@ -61,7 +63,7 @@ module Hobo
                 options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
                 @this = @association.find(:all, options)
                 @this = @this.uniq if @association.proxy_reflection.options[:uniq]
-                hobo_render(:show_collection, @association.member_class)
+                hobo_render(:#{show_method}) or hobo_render(:show_collection, @association.member_class)
               end
             END
           end
@@ -70,9 +72,9 @@ module Hobo
             controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{new_method}
                 @owner = find_instance
-                @this = @owner.#{refl.name}.new
+                @this = @owner.#{refl.name}.new_without_appending
                 @this.created_by(current_user)
-                hobo_render(:new_in_collection, @this.class)
+                hobo_render(:#{new_method}) or hobo_render(:new_in_collection, @this.class)
               end
             END
           end
@@ -344,16 +346,21 @@ module Hobo
 
 
     def hobo_render(page_kind = nil, page_model=nil)
-      template = if page_kind
-                   Hobo::ModelController.find_model_template(page_model || model, page_kind)
-                 else
-                   find_template
-                 end
+      page_kind ||= params[:action].to_sym
+      page_model ||= model
+      
+      template = Hobo::ModelController.find_model_template(page_model, page_kind)
+
       if template
         render :template => template
+        true
       else
-        page_kind ||= params[:action] if params[:action].in? %w{index show new edit}
-        render_tag("#{page_kind}_page", :obj => @this) if page_kind
+        if page_kind.in? GENERIC_PAGE_TAGS
+          render_tag("#{page_kind}_page", :obj => @this)
+          true
+        else
+          false
+        end
       end
     end
 
