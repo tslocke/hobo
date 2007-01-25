@@ -53,7 +53,7 @@ module Hobo
     end
 
 
-    def can_update?(object, new=nil)
+    def can_update?(object, new)
       Hobo.can_update?(current_user, object, new)
     end
 
