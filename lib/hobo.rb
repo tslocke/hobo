@@ -82,9 +82,12 @@ module Hobo
       if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
         attr = obj.proxy_reflection.name
         obj = obj.proxy_owner
-      else
-        raise Exception.new("Can't create dom id for #{obj.inspect}") unless
-          obj.is_a?(ActiveRecord::Base)
+      elsif !obj.is_a?(ActiveRecord::Base)
+        if attr
+          dom_id(get_field(obj, attr))
+        else
+          raise Exception.new("Can't create dom id for #{obj.inspect}")
+        end
       end
       [obj.class.name.underscore, obj.id, attr].compact.join('_')
     end
@@ -129,7 +132,7 @@ module Hobo
       for model in Hobo.models
         web_name = model.name.underscore.pluralize.downcase
         controller = "#{model.name.pluralize}Controller".constantize rescue nil
-        if controller
+        if controller and controller < Hobo::ModelController
           map.resources web_name, :collection => { :completions => :get }
           for refl in model.reflections.values.select {|r| r.macro == :has_many}
             map.named_route("#{web_name.singularize}_#{refl.name}",
@@ -150,6 +153,15 @@ module Hobo
                               :action => method.to_s,
                               :conditions => { :method => :post })
             end
+            
+            for method in controller.show_methods
+              map.named_route("#{web_name.singularize}_#{method}",
+                              "#{web_name}/:id;#{method}",
+                              :controller => web_name,
+                              :action => method.to_s,
+                              :conditions => { :method => :get })
+            end
+            
           end
         end
       end
@@ -200,18 +212,11 @@ module Hobo
       return false unless can_view?(person, object, field)
 
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
+      
+      # has_many and polymorphic associations are not editable (for now)
+      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
 
-      x = if refl
-            # has_many and polymorphic associations are not editable (for now)
-            return false if refl.macro == :has_many || refl.options[:polymorphic]
-
-            Hobo::Undefined.new(refl.klass)
-          else
-            Hobo::Undefined.new
-          end
-
-      new = object.duplicate
-      new.send("#{field}=".to_sym, x)
+      new = Hobo::FieldUndefiner.new(object, field)
 
       begin
         if object.new_record?
@@ -219,7 +224,7 @@ module Hobo
         else
           check_permission(:update, person, object, new)
         end
-      rescue UndefinedAccessError
+      rescue Hobo::UndefinedAccessError
         false
       end
     end
@@ -235,7 +240,7 @@ module Hobo
         field = field.to_sym if field.is_a? String
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
       else
-        # Special support for classes (can view instances?) and associations (can view members?)
+        # Special support for classes (can view instances?)
         if object.is_a?(Class) and object < ActiveRecord::Base
           object = object.new
         elsif object.is_a?(Array)
@@ -243,13 +248,13 @@ module Hobo
             object = object.new_without_appending
           elsif object.respond_to?(:member_class)
             object = object.member_class.new
-          end
+          end          
         end
       end
       viewable = check_permission(:view, person, object, field)
-      if viewable and field
+      if viewable and field and (field_val = get_field(object, field)).is_a? ActiveRecord::Base
         # also ask the current value if it is viewable
-        can_view?(person, get_field(object, field))
+        can_view?(person, field_val)
       else
         viewable
       end
@@ -283,6 +288,8 @@ module Hobo
             rescue Hobo::UndefinedAccessError
               false
             end
+          elsif object.class.respond_to?(obj_method)
+            object.class.send(obj_method, person, *args)
           elsif person.respond_to?(person_method)
             person.send(person_method, object, *args)
           else

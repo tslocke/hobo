@@ -38,13 +38,29 @@ module Hobo
       m, field = *name.to_s.match(/^(.*)_is$/)
       if m
         check_column[field]
-        return WhereFragment.new("#{field} = ?", args[0])
+        return (if args[0].nil?
+                  WhereFragment.new("#{field} IS NULL")
+                else
+                  WhereFragment.new("#{field} = ?", args[0])
+                end)
       end
 
       m, field = *name.to_s.match(/^(.*)_contains$/)
       if m
         check_column[field]
         return WhereFragment.new("#{field} like ?", "%#{args[0]}%")
+      end
+
+      m, field = *name.to_s.match(/^(.*)_starts$/)
+      if m
+        check_column[field]
+        return WhereFragment.new("#{field} like ?", "#{args[0]}%")
+      end
+
+      m, field = *name.to_s.match(/^(.*)_ends$/)
+      if m
+        check_column[field]
+        return WhereFragment.new("#{field} like ?", "%#{args[0]}")
       end
 
       return WhereFragment.new(@model.send(name, *args))

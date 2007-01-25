@@ -48,7 +48,7 @@ module Hobo::Dryml
 
 
     def part_context_model_id
-      if this_parent and this_field
+      if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
         this_field_dom_id
       else
         Hobo.dom_id(this)
@@ -102,7 +102,7 @@ module Hobo::Dryml
     end
 
 
-    def new_field_context(field_path)
+    def new_field_context(field_path, tag_this=nil)
       new_context do
         path = if field_path.is_a? Array
                  field_path
@@ -112,7 +112,7 @@ module Hobo::Dryml
                  [field_path]
                end
 
-        obj = this
+        obj = tag_this || this
         for field in path
           parent = obj
           obj = Hobo.get_field(parent, field)
@@ -144,11 +144,13 @@ module Hobo::Dryml
         end
         res
       end
+      
+      obj = options[:obj] == "page" ? @this : options[:obj]
 
-      if options.has_key?(:obj)
-        new_object_context(options[:obj]) { yield tagbody }
-      elsif options.has_key?(:attr)
-        new_field_context(options[:attr]) { yield tagbody }
+      if options.has_key?(:attr)
+        new_field_context(options[:attr], obj) { yield tagbody }
+      elsif options.has_key?(:obj)
+        new_object_context(obj) { yield tagbody }
       else
         new_context { yield tagbody }
       end

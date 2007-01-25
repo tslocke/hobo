@@ -15,6 +15,8 @@ require 'hobo/dryml/taglib'
 require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
+require 'extensions/test_case' if RAILS_ENV == "test"
+
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
 

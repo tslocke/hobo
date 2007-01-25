@@ -1,6 +1,8 @@
 class <%= class_name %>Controller < ApplicationController
 
   hobo_controller
+  
+  filter_parameter_logging "password"
 
   def index; end
 

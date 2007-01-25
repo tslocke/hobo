@@ -7,6 +7,8 @@ module Hobo
     class PermissionDeniedError < RuntimeError; end
 
     VIEWLIB_DIR = "hobolib"
+    
+    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
 
     class << self
 
@@ -61,7 +63,7 @@ module Hobo
                 options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
                 @this = @association.find(:all, options)
                 @this = @this.uniq if @association.proxy_reflection.options[:uniq]
-                hobo_render(:show_collection, @association.member_class)
+                hobo_render(:#{show_method}) or hobo_render(:show_collection, @association.member_class)
               end
             END
           end
@@ -70,9 +72,9 @@ module Hobo
             controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{new_method}
                 @owner = find_instance
-                @this = @owner.#{refl.name}.new
+                @this = @owner.#{refl.name}.new_without_appending
                 @this.created_by(current_user)
-                hobo_render(:new_in_collection, @this.class)
+                hobo_render(:#{new_method}) or hobo_render(:new_in_collection, @this.class)
               end
             END
           end
@@ -88,7 +90,11 @@ module Hobo
       
       def web_methods
         @web_methods ||= []
-      end 
+      end
+      
+      def show_methods
+        @show_methods ||= []
+      end
 
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
@@ -119,8 +125,16 @@ module Hobo
         web_methods << web_name.to_sym
         before_filter(:only => [web_name]) {|controller| controller.send(:prepare_web_method, method_name)}
       end
-
-
+      
+      
+      def show_method(*names)
+        show_methods.concat(names)
+        for name in names
+          class_eval "def #{name}; show; end"
+        end
+      end
+      
+      
       def data_filter(name)
         (@data_filters && @data_filters[name]) ||
           (superclass.respond_to?(:data_filter) && superclass.data_filter(name))
@@ -141,9 +155,10 @@ module Hobo
 
     def index
       @model = model
-      @pages = ::ActionController::Pagination::Paginator.new(self, model.count, 20, params[:page])
+      count = count_with_data_filter
+      @pages = ::ActionController::Pagination::Paginator.new(self, count, 20, params[:page])
       options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset, :order => :default }
-      @this = find_by_data_filter(options) || model.find(:all, options)
+      @this = find_with_data_filter(options)
       hobo_render
     end
 
@@ -165,17 +180,23 @@ module Hobo
     def new
       @this = model.new
       @this.created_by(current_user)
-      hobo_render
+      if Hobo.can_create?(current_user, @this)
+        hobo_render
+      else
+        permission_denied
+      end
     end
 
 
     def create
-      begin
-        @this = new_from_params(model, params[model.name.underscore])
-      rescue PermissionDeniedError
-        permission_denied and return
+      @this = model.new
+      @check_create_permission = [@this]
+      initialize_from_params(@this, params[model.name.underscore])
+      for obj in @check_create_permission
+        permission_denied and return unless Hobo.can_create?(current_user, obj)
       end
-
+      @check_create_permission = nil
+      
       if @this.save
         respond_to do |wants|
           wants.html do
@@ -227,9 +248,7 @@ module Hobo
               # ok we're done then
             elsif changes.size == 1
               # Slightly hacky support for the scriptaculous in-place-editor
-              val = @this.send(changes.keys.first)
-              val = CGI::escapeHTML(val).gsub("\n", "<br/>") if val.is_a?(String)
-              render(:text => val.to_s, :layout => false)
+              render_tag("show", :obj => @this, :attr => changes.keys.first)
             else
               # we don't expect this, but it's not really an error
               render :text => ""
@@ -276,8 +295,7 @@ module Hobo
       opts = attr && self.class.autocompleter(attr.to_sym)
       if opts
         q = params[:query]
-        filtered = find_by_data_filter(opts) { send("#{attr}_contains", q) }
-        items = filtered || model.find(:all) { send("#{attr}_contains", q) }
+        items = find_with_data_filter(opts) { send("#{attr}_contains", q) }
 
         render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
       else
@@ -334,16 +352,21 @@ module Hobo
 
 
     def hobo_render(page_kind = nil, page_model=nil)
-      template = if page_kind
-                   Hobo::ModelController.find_model_template(page_model || model, page_kind)
-                 else
-                   find_template
-                 end
+      page_kind ||= params[:action].to_sym
+      page_model ||= model
+      
+      template = Hobo::ModelController.find_model_template(page_model, page_kind)
+
       if template
         render :template => template
+        true
       else
-        page_kind ||= params[:action] if params[:action].in? %w{index show new edit}
-        render_tag("#{page_kind}_page", :obj => @this) if page_kind
+        if page_kind.in? GENERIC_PAGE_TAGS
+          render_tag("#{page_kind}_page", :obj => @this)
+          true
+        else
+          false
+        end
       end
     end
 
@@ -358,30 +381,43 @@ module Hobo
     end
 
 
-    def find_by_data_filter(opts={}, &block)
+    def with_data_filter(operation, *args, &block)
       filter_param = params.keys.ofind {starts_with? "where_"}
       proc = filter_param && self.class.data_filter(filter_param[6..-1].to_sym)
       if proc
-        args = params[filter_param]
-        args = [args] unless args.is_a? Array
-        model.find(:all, opts) do
+        filter_args = params[filter_param]
+        filter_args = [filter_args] unless filter_args.is_a? Array
+        model.send(operation, *args) do
           if block
-            instance_eval(&block) & instance_exec(*args, &proc)
+            instance_eval(&block) & instance_exec(*filter_args, &proc)
           else
-            instance_exec(*args, &proc)
+            instance_exec(*filter_args, &proc)
           end
         end
       else
-        nil
+        if block
+          model.send(operation, *args) { instance_eval(&block) }
+        else
+          model.send(operation, *args)
+        end
       end
     end
+    
+    
+    def find_with_data_filter(opts={}, &b)
+      with_data_filter(:find, :all, opts, &b)
+    end
+    
+    
+    def count_with_data_filter(opts={}, &b)
+      with_data_filter(:count, opts, &b)
+    end
+    
 
-
-    def new_from_params(model, params)
-      obj = model.new
+    def initialize_from_params(obj, params)
       update_with_params(obj, params)
       obj.created_by(current_user)
-      raise PermissionDeniedError.new unless Hobo.can_create?(current_user, obj)
+      (@check_create_permission ||= []) << obj
       obj
     end
 
@@ -390,42 +426,74 @@ module Hobo
       return unless params
 
       params.each_pair do |field,value|
-        refl = object.class.reflections[field.to_sym]
+        field = field.to_sym
+        refl = object.class.reflections[field]
         ar_value = if refl
                      if refl.macro == :belongs_to
-                       param_to_record(refl.klass, value)
+                       associated_record(object, refl, value)
 
                      elsif Hobo.simple_has_many_association?(refl) and object.new_record?
                        # only populate has_many relationships for new records. For existing
                        # records, AR updates the DB immediately, bypassing Hobo's permission check
                        if value.is_a? Array
-                         value.map {|x| param_to_record(refl.klass, x) }
+                         value.map {|x| associated_record(object, refl, x) }
                        else
-                         value.keys.every(:to_i).sort.map{|i| param_to_record(refl.klass, value[i.to_s]) }
+                         value.keys.every(:to_i).sort.map{|i| associated_record(object, refl, value[i.to_s]) }
                        end
                      else
                        raise HoboError.new("association #{refl.name} is not settable via parameters")
                      end
                    else
-                     # primitive field
-                     value
+                     param_to_value(object.class.field_type(field), value)
                    end
         object.send("#{field}=".to_sym, ar_value)
       end
     end
 
+    
+    def parse_datetime(s)
+      defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
+    end
 
-    def param_to_record(klass, value)
+
+    def param_to_value(field_type, value)
+      case field_type
+      when :date
+        if value.is_a? Hash
+          Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          dt = parse_datetime(value)
+          dt && dt.to_date
+        end
+      when :datetime
+        if value.is_a? Hash
+          Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          parse_datetime(value)
+        end
+      else
+        # primitive field
+        value
+      end
+    end
+
+    def associated_record(owner, refl, value)
       if value.is_a? String
         if value.starts_with?('@')
           Hobo.object_from_dom_id(value[1..-1])
-        elsif klass.id_name?
-          klass.find_by_id_name(value)
+        elsif refl.klass.id_name?
+          refl.klass.find_by_id_name(value)
         else
           nil
         end
       else
-        new_from_params(klass, value)
+        if refl.macro == :belongs_to
+          new_from_params(refl.klass, value)
+        else
+          obj = owner.send(refl.name).new
+          initialize_from_params(obj, value)
+          obj
+        end
       end
     end
 

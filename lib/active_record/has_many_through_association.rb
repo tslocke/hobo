@@ -3,6 +3,8 @@ module ActiveRecord::Associations
   class HasManyThroughAssociation
 
     def include?(record)
+      return false unless record.is_a? ActiveRecord::Base
+      
       if loaded?
         target.include?(record)
       else

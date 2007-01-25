@@ -59,7 +59,11 @@ module Hobo
 
 
     def can_edit?(object, field)
-      Hobo.can_edit?(current_user, object, field)
+      if !field and object.respond_to?(:proxy_reflection)
+        Hobo.can_edit?(current_user, object.proxy_owner, object.proxy_reflection.name)
+      else
+        Hobo.can_edit?(current_user, object, field)
+      end
     end
 
 
@@ -74,7 +78,11 @@ module Hobo
 
 
     def can_view?(object, field=nil)
-      Hobo.can_view?(current_user, object, field)
+      if !field and object.respond_to?(:proxy_reflection)
+        Hobo.can_view?(current_user, object.proxy_owner, object.proxy_reflection.name)
+      else
+        Hobo.can_view?(current_user, object, field)
+      end
     end
 
 
@@ -84,6 +92,11 @@ module Hobo
       else
         can_view?(this)
       end
+    end
+    
+    
+    def viewable(collection)
+      collection.select {|x| can_view?(x)}
     end
 
 

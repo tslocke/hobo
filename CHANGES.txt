@@ -1,6 +1,162 @@
+=== Release 0.4.3 ===
+
+Front-controller now filters parameter logging so that passwords are
+not logged.
+
+Check if a controller is a Hobo model-controller before installing
+Hobo routes.
+
+DRYML
+
+  Can now use obj= and attr= on the same tag, so you can e.g.
+
+    <edit obj="#@this" attr="name"/>
+
+  (The alternative, <edit obj="@this.name"> would not work as
+  <edit> needs this_field which would be nil)
+
+  Shorthand obj="page" for obj="#@this"
+
+Various fixes and enhancements to the permission system. Things are somewhat
+experimental and subject to change!
+
+Core tags/helpers
+
+  `viewable` method filters a collection down to objects that are
+  viewable.
+
+
+Hobo Rapid:
+
+  <new_in_collection_page> now includes belongs_to associations in the
+  form.
+
+  Cleanup of form field / editor tags
+
+  <ul_for> and <table_for> now skip non-viewable objects
+
+  Fix: even/odd cycle in table_for and ul_for was broken with nested lists/tables.
+
+  Page navigation enhanced to allow URL query parameters to be
+  maintained from page to page.
+
+  <show_collection_page> now only includes a "New Whatever" link if
+  the collection is a "simple" has_many collection (no conditions, not
+  :through)
+
+  <object_link> now has a view attribute to link to alternate views of
+  the object (see below: alternate show pages)
+
+  <object_table>
+
+    Now allows additional rows to be added by giving a tag-body.
+
+    skip_fields attribute to remove fields from the table
+
+  Better support for confirmation dialogues in <delete_button>
+
+
+Tabla theme:
+
+  Increased width to 800px;
+
+  Small style enhancements
+
+
+Hobo Module
+
+  Fix to dom_id for objects in an array that is not an AR association
+  (e.g. an array returned by find(:all))
+
+Support for alternative "show" pages. E.g. to add a "profile" page to a User, add
+
+    show_method :profile
+
+  To the UsersController and create
+  app/views/people/profile.dryml. You also get a named route
+  "user_profile" (e.g. you can call user_profile_url(fred) )
+
+  (Using Hobo Rapid you can link to these with <object_link view="profile"/>)
+
+Fix to template lookup for association pages (e.g. posts/12/comments
+and posts/12/comments/new)
+
+Support for permission class methods (experimental). If you can define
+permission without access to the object state, you can now do so on
+the class:
+
+  def self.viewable_by(viewer, field)
+    false
+  end
+
+  This helps Hobo in places where there is no object. e.g. in deciding
+  whether or not to present a "New Whatsit" link
+
+Fix: pagination was broken on index pages with data-filters.
+
+
+Hobo::ModelController
+
+  Enhanced to allow updating of date and datetime fields. Dates and
+  date-times can be provided either as strings (Hobo will use Chronic
+  for parsing if it's installed) or hashes with :year, :month, :day
+  etc. keys (as used by the select_date helper).
+
+  find_by_data_filter renamed to find_with_data_filter and now does a
+  non-filtered find if no filters were given in the request.
+
+  Added count_with_data_filter
+
+  Fixes to checking create permission when the post parameters
+  contains related sub-objects.
+
+  Access to the new page is forbidden if the current user does not
+  have create permission.
+
+
+Hobo::Model
+
+  New model queries <field>_starts and <field>_ends
+
+  The <field>_is query will now use an "IS NULL" query if you pass
+  nil.
+
+  Added support for counts with queries, e.g:
+
+    User.count { name_starts 't' }
+
+  Calling `new` on a has_many association (e.g. post.comments.new) has
+  enhanced behaviour for new records (those not in the db). Hobo will
+  try to set up the reciprocal belongs_to association on the created
+  object. This is needed by the permission system when testing
+  can_create?
+
+  #reverse_reflection will attempt to find the reciprocal belongs_to
+  association from a has_many association.
+
+
+Ajax mechanism
+
+  Fix when using multiple instances of the same part on the same page
+  (i.e. when a part_id attribute appears in a loop).
+
+  Fix when the this_field for the part context is an array index.
+
+
+Chronic fix to handle dates like "11th Jan" (it can handle "Jan 11th"
+and "11 Jan" but not "11th Jan")
+
+
+New feature - Integration testing DSL. Adds an easy to use DSL for
+integration tests.
+
+
+
 === Release 0.4.2 ===
 
 Fix in permission system
+
+
 
 === Release 0.4.1 ===
 

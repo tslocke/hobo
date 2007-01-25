@@ -94,7 +94,7 @@ module Hobo::Rapid
   end
 
 
-  def_tag :object_link do
+  def_tag :object_link, :view do
     if can_view_this?
       if this.nil?
         "(Not Available)"
@@ -102,7 +102,7 @@ module Hobo::Rapid
         raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
         v = this.is_a?(String) ? this.singularize.classify.constantize : this
         content = tagbody ? tagbody.call : display_name(:obj => v)
-        link_to content, object_url(v), options
+        link_to content, object_url(v, view), options
       end
     end
   end
@@ -143,28 +143,41 @@ module Hobo::Rapid
         raise NotImplementedError.new("editor for has_many associations not implemented")
       end
       
-    elsif this_type.in? [:integer, :float, :decimal, :string]
-      tag :input, options.merge(:type => 'text', :name => name, :value => this)
-      
-    elsif this_type == :text
-      content_tag :textarea, this, options.merge(:name => name)
-      
-    elsif this_type == :boolean
-      check_box_tag(name, '1', this, options)
-      
-    elsif this_type == :date
-      date_select "", this_field
-      
-    elsif this_type == :datetime
-      select_datetime this, :prefix => name
-      
-    elsif this_type == :password
-      password_field_tag(name, this)
-      
     else
-      raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{this_field} " +
-                          "(#{this.inspect}:#{this_type})")
+      case this_type
+        when :integer, :float, :decimal, :string
+        text_field_tag(name, this, options)
+      
+      when :text
+        text_area_tag(name, this, options)
+      
+      when :boolean
+        check_box_tag(name, '1', this, options)
+      
+      when :date
+        date_field(options)
+      
+      when :datetime
+        datetime_field(options)
+      
+      when :password
+        password_field_tag(name, this)
+      
+      else
+        raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{this_field} " +
+                            "(#{this.inspect}:#{this_type})")
+      end
     end
+  end
+  
+  
+  def_tag :date_field do
+    select_date(this || Time.now, :prefix => param_name_for_this)
+  end
+
+
+  def_tag :datetime_field do
+    select_datetime(this || Time.now, :prefix => param_name_for_this)
   end
 
 
@@ -178,24 +191,61 @@ module Hobo::Rapid
         # In place edit for has_many not implemented
         object_link(options)
       end
-    elsif this_type.in? [:integer, :float, :decimal, :datetime,
-                            :date, :timestamp, :time, :text, :string]
-      disp = show
-      disp = "(click to edit)" if disp.blank?
+    else
+      case this_type
+      when :string
+        text_field_editor(options)
 
-      class_ = [options[:class],
-                "in_place_edit_bhv",
-                ("textarea_editor" if this_type == :text)].compact.join(' ')
+      when :text
+        text_area_editor(options)
+        
+      when :integer, :float, :decimal, :timestamp, :time, :date, :datetime
+        if respond_to?("#{this_type}_editor")
+          send("#{this_type}_editor", options)
+        else
+          text_field_editor(options)
+        end
+        
+      when :datetime
+        datetime_editor(options)
+        
+      when :date
+        date_editor(options)
+        
+      when :boolean
+        boolean_checkbox_editor(options)
 
-      content_tag(:span, disp, options.merge(:class => class_, :model_id => this_field_dom_id))
-    elsif this_type == :boolean
-      boolean_checkbox_editor(options)
+      else
+        raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
+                            "(#{this.inspect}:#{this_type})")
+      end
     end
+  end
+    
+  def_tag :text_field_editor do
+    disp = show
+    disp = "(click to edit)" if disp.blank?
+    opts = add_classes(options, "in_place_edit_bhv").merge(:model_id => this_field_dom_id)
+    content_tag(:span, disp, opts)
+  end
+  
+  def_tag :text_area_editor do
+    text_field_editor(add_classes(options, "textarea_editor"))
   end
   
   
   def_tag :belongs_to_editor do
-    belongs_to_menu_editor
+    belongs_to_menu_editor(options)
+  end
+  
+  
+  def_tag :datetime_editor do
+    text_field_editor(options)
+  end
+  
+  
+  def_tag :date_editor do
+    text_field_editor(options)
   end
   
 
@@ -218,19 +268,22 @@ module Hobo::Rapid
                            else
                              { :type => "button" }
                            end)
-      opts[:value] = label || "Remove"
+      label2 = label || "Remove"
+      confirm2 = confirm || "Are you sure?"
+      
       add_classes!(opts, image ? "image_button_input" : "button_input", "delete_button")
-
       url = object_url(this, "destroy")
       if ajax == false
-        button_to opts[:value], url, opts.merge(:confirm => "Are you sure?" || confirm)
+        opts[:confirm] = confirm2
+        button_to(label2, url, opts)
       else
+        opts[:value] = label2
         opts[:onclick] = if update
-                           ajax_updater(url, message || "Removing", update)
+                           ajax_updater(url, message || "Removing", update, :confirm => confirm2)
                          else
                            "Hobo.removeButton(this, '#{url}')"
                          end
-        tag :input, opts
+        tag(:input, opts)
       end
     else
       else_

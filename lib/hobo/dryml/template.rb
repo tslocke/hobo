@@ -10,7 +10,7 @@ module Hobo::Dryml
 
     def initialize(src, environment, template_path)
       @src = src
-      @environment = environment # a class or a module("hoboParts.p = 'person_2'")
+      @environment = environment # a class or a module
 
       @template_path = if template_path.starts_with?(RAILS_ROOT)
                          template_path[RAILS_ROOT.length+1..-1]
@@ -290,11 +290,6 @@ module Hobo::Dryml
     end
 
 
-    #def part_name_prefix
-    #  is_taglib? ? template_path.sub(/\.dryml$/, '').underscore.gsub("/", "_") : nil
-    #end
-
-
     def part_element(el, content)
       require_attribute(el, "part_id", /^#{DRYML_NAME}$/)
       part_name  = el.attributes['part_id']
@@ -346,7 +341,8 @@ module Hobo::Dryml
       else
         children = children_to_erb(el)
         if part_id
-          "<span id='#{part_id}'>" +
+          id = el.attributes['id'] || part_id
+          "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
             part_element(el, "<% _erbout.concat(#{call} do %>#{children}<% end) %>") +
             "</span>"
         else
