@@ -155,7 +155,7 @@ module Hobo::Rapid
         check_box_tag(name, '1', this, options)
       
       when :date
-        date_fied(options)
+        date_field(options)
       
       when :datetime
         datetime_field(options)
@@ -268,19 +268,22 @@ module Hobo::Rapid
                            else
                              { :type => "button" }
                            end)
-      opts[:value] = label || "Remove"
+      label2 = label || "Remove"
+      confirm2 = confirm || "Are you sure?"
+      
       add_classes!(opts, image ? "image_button_input" : "button_input", "delete_button")
-
       url = object_url(this, "destroy")
       if ajax == false
-        button_to opts[:value], url, opts.merge(:confirm => "Are you sure?" || confirm)
+        opts[:confirm] = confirm2
+        button_to(label2, url, opts)
       else
+        opts[:value] = label2
         opts[:onclick] = if update
-                           ajax_updater(url, message || "Removing", update)
+                           ajax_updater(url, message || "Removing", update, :confirm => confirm2)
                          else
                            "Hobo.removeButton(this, '#{url}')"
                          end
-        tag :input, opts
+        tag(:input, opts)
       end
     else
       else_

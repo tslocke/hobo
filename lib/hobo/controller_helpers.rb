@@ -28,6 +28,7 @@ module Hobo::ControllerHelpers
 
 
   def object_url(obj, action=nil, *param_hashes)
+    action &&= action.to_s
     parts = if obj.is_a? Class
               [urlb, controller_for(obj)]
             elsif obj.is_a? ActiveRecord::Base

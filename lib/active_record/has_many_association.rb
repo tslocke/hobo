@@ -2,7 +2,16 @@ module ActiveRecord::Associations
 
   class HasManyAssociation
 
-    alias_method :new, :build
+    def new
+      res = build
+      refl = @owner.class.reverse_reflection(@reflection.name)
+      if refl
+        bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
+        bta.replace(@owner)
+        res.instance_variable_set("@#{refl.name}", bta)
+      end
+      res
+    end
 
     def new_without_appending(attributes = {})
       record = @reflection.klass.new(attributes)

@@ -8,12 +8,13 @@
 </def>
 
 
-<def tag="object_table" attrs="fields, associations">
+<def tag="object_table" attrs="fields, skip_fields, associations">
   <% fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
               else
                 comma_split(fields)
               end
+     fields -= comma_split(skip_fields) if skip_fields
      options = add_classes(options, "object_table", ("new_record" if this.new_record?))
   %>
   <table xattrs="">
@@ -38,6 +39,8 @@
         <td><edit attr="#assoc"/></td>
       </tr>
     <% end %>
+
+    <tagbody/>
 
   </table>
 </def>
@@ -235,9 +238,6 @@
 <def tag="new_page">
   <page title='#"New #{human_type}"'>
     <h1>New <human_type/></h1>
-    <if q="#@owner">
-      <h2>For: <object_link obj="#@owner" /></h2>
-    </if>
 
     <panel>
       <h1>Details</h1>

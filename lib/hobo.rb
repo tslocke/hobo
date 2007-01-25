@@ -132,7 +132,7 @@ module Hobo
       for model in Hobo.models
         web_name = model.name.underscore.pluralize.downcase
         controller = "#{model.name.pluralize}Controller".constantize rescue nil
-        if controller
+        if controller and controller < Hobo::ModelController
           map.resources web_name, :collection => { :completions => :get }
           for refl in model.reflections.values.select {|r| r.macro == :has_many}
             map.named_route("#{web_name.singularize}_#{refl.name}",
@@ -231,7 +231,7 @@ module Hobo
         else
           check_permission(:update, person, object, new)
         end
-      rescue UndefinedAccessError
+      rescue Hobo::UndefinedAccessError
         false
       end
     end
@@ -243,6 +243,9 @@ module Hobo
 
 
     def can_view?(person, object, field=nil)
+      # New records are always viewable - they can't contain sensitive DB data
+      # return true if object.respond_to?(:new_record?) and object.new_record?
+        
       if field
         field = field.to_sym if field.is_a? String
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)

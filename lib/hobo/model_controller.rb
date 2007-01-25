@@ -180,17 +180,23 @@ module Hobo
     def new
       @this = model.new
       @this.created_by(current_user)
-      hobo_render
+      if Hobo.can_create?(current_user, @this)
+        hobo_render
+      else
+        permission_denied
+      end
     end
 
 
     def create
-      begin
-        @this = new_from_params(model, params[model.name.underscore])
-      rescue PermissionDeniedError
-        permission_denied and return
+      @this = model.new
+      @check_create_permission = [@this]
+      initialize_from_params(@this, params[model.name.underscore])
+      for obj in @check_create_permission
+        permission_denied and return unless Hobo.can_create?(current_user, obj)
       end
-
+      @check_create_permission = nil
+      
       if @this.save
         respond_to do |wants|
           wants.html do
@@ -408,11 +414,10 @@ module Hobo
     end
     
 
-    def new_from_params(model, params)
-      obj = model.new
+    def initialize_from_params(obj, params)
       update_with_params(obj, params)
       obj.created_by(current_user)
-      raise PermissionDeniedError.new unless Hobo.can_create?(current_user, obj)
+      @check_create_permission << obj
       obj
     end
 
@@ -425,15 +430,15 @@ module Hobo
         refl = object.class.reflections[field]
         ar_value = if refl
                      if refl.macro == :belongs_to
-                       param_to_record(refl.klass, value)
+                       associated_record(object, refl, value)
 
                      elsif Hobo.simple_has_many_association?(refl) and object.new_record?
                        # only populate has_many relationships for new records. For existing
                        # records, AR updates the DB immediately, bypassing Hobo's permission check
                        if value.is_a? Array
-                         value.map {|x| param_to_record(refl.klass, x) }
+                         value.map {|x| associated_record(object, refl, x) }
                        else
-                         value.keys.every(:to_i).sort.map{|i| param_to_record(refl.klass, value[i.to_s]) }
+                         value.keys.every(:to_i).sort.map{|i| associated_record(object, refl, value[i.to_s]) }
                        end
                      else
                        raise HoboError.new("association #{refl.name} is not settable via parameters")
@@ -472,17 +477,23 @@ module Hobo
       end
     end
 
-    def param_to_record(klass, value)
+    def associated_record(owner, refl, value)
       if value.is_a? String
         if value.starts_with?('@')
           Hobo.object_from_dom_id(value[1..-1])
-        elsif klass.id_name?
-          klass.find_by_id_name(value)
+        elsif refl.klass.id_name?
+          refl.klass.find_by_id_name(value)
         else
           nil
         end
       else
-        new_from_params(klass, value)
+        if refl.macro == :belongs_to
+          new_from_params(refl.klass, value)
+        else
+          obj = owner.send(refl.name).new
+          initialize_from_params(obj, value)
+          obj
+        end
       end
     end
 
