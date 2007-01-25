@@ -197,6 +197,15 @@ module Hobo
       res = self.class.new
       res.instance_variable_set("@attributes", @attributes.dup)
       res.instance_variable_set("@new_record", nil) unless new_record?
+      
+      # Shallow copy of belongs_to associations
+      for refl in self.class.reflections.values
+        if refl.macro == :belongs_to and (target = self.send(refl.name))
+          bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
+          bta.replace(target)
+          res.instance_variable_set("@#{refl.name}", bta)
+        end
+      end
       res
     end
 
