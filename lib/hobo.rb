@@ -257,7 +257,8 @@ module Hobo
         end
       end
       viewable = check_permission(:view, person, object, field)
-      if viewable and field and (field_val = get_field(object, field)).is_a? ActiveRecord::Base
+      if viewable and field and
+          ( (field_val = get_field(object, field)).is_a?(ActiveRecord::Base) or field_val.is_a?(Array) )
         # also ask the current value if it is viewable
         can_view?(person, field_val)
       else
