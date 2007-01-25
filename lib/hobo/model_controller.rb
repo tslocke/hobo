@@ -417,7 +417,7 @@ module Hobo
     def initialize_from_params(obj, params)
       update_with_params(obj, params)
       obj.created_by(current_user)
-      @check_create_permission << obj
+      (@check_create_permission ||= []) << obj
       obj
     end
 

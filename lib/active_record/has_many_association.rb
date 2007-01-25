@@ -4,11 +4,13 @@ module ActiveRecord::Associations
 
     def new
       res = build
-      refl = @owner.class.reverse_reflection(@reflection.name)
-      if refl
-        bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
-        bta.replace(@owner)
-        res.instance_variable_set("@#{refl.name}", bta)
+      if @owner.new_record?
+        refl = @owner.class.reverse_reflection(@reflection.name)
+        if refl
+          bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
+          bta.replace(@owner)
+          res.instance_variable_set("@#{refl.name}", bta)
+        end
       end
       res
     end

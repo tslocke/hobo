@@ -212,18 +212,11 @@ module Hobo
       return false unless can_view?(person, object, field)
 
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
+      
+      # has_many and polymorphic associations are not editable (for now)
+      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
 
-      x = if refl
-            # has_many and polymorphic associations are not editable (for now)
-            return false if refl.macro == :has_many || refl.options[:polymorphic]
-
-            Hobo::Undefined.new(refl.klass)
-          else
-            Hobo::Undefined.new
-          end
-
-      new = object.duplicate
-      new.send("#{field}=".to_sym, x)
+      new = Hobo::FieldUndefiner.new(object, field)
 
       begin
         if object.new_record?
@@ -243,9 +236,6 @@ module Hobo
 
 
     def can_view?(person, object, field=nil)
-      # New records are always viewable - they can't contain sensitive DB data
-      # return true if object.respond_to?(:new_record?) and object.new_record?
-        
       if field
         field = field.to_sym if field.is_a? String
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)

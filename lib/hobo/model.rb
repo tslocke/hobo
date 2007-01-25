@@ -37,34 +37,36 @@ module Hobo
         @hobo_never_show and field.to_sym.in?(@hobo_never_show)
       end
 
-
       def set_creator_attr(attr)
-        class_eval <<-END
-          def creator; #{attr}; end
-            def creator=(x); self.#{attr} = x; end
-                END
-            end
-            
-            
-            def set_search_columns(*columns)
-              class_eval <<-END
+        class_eval %{
+          def creator
+            #{attr};
+          end
+          def creator=(x)
+            self.#{attr} = x;
+          end
+        }
+      end 
+
+      def set_search_columns(*columns)
+        class_eval %{
           def self.search_columns
             %w{#{columns.omap{to_s} * ' '}}
           end
-          END
-        end
+        }
+      end
+      
+
+      def id_name(*args)
+        @id_name_options = [] + args
         
+        underscore = args.delete(:underscore)
+        insenstive = args.delete(:case_insensitive)
+        id_name_field = args.first || :name
+        @id_name_column = id_name_field.to_s
 
-        def id_name(*args)
-          @id_name_options = [] + args
-          
-          underscore = args.delete(:underscore)
-          insenstive = args.delete(:case_insensitive)
-          id_name_field = args.first || :name
-          @id_name_column = id_name_field.to_s
-
-          if underscore
-            class_eval %{
+        if underscore
+          class_eval %{
             def id_name(underscore=false)
               underscore ? #{id_name_field}.gsub(' ', '_') : #{id_name_field}
             end
@@ -195,14 +197,6 @@ module Hobo
       res = self.class.new
       res.instance_variable_set("@attributes", @attributes.dup)
       res.instance_variable_set("@new_record", nil) unless new_record?
-      
-      for refl in self.class.reflections.values
-        if refl.macro == :belongs_to and (target = self.send(refl.name))
-          bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
-          bta.replace(target.duplicate)
-          res.instance_variable_set("@#{refl.name}", bta)
-        end
-      end
       res
     end
 
