@@ -127,10 +127,10 @@ var Hobo = {
 
     doSearch: function(el) {
         el = $(el)
-        spinner = $(el.getAttribute("search_spinner") || "search_spinner")
-        search_results = $(el.getAttribute("search_results") || "search_results")
-        search_results_panel = $(el.getAttribute("search_results_panel") || "search_results_panel")
-        url = el.getAttribute("search_url") || (urlBase + "/search")
+        var spinner = $(el.getAttribute("search_spinner") || "search_spinner")
+        var search_results = $(el.getAttribute("search_results") || "search_results")
+        var search_results_panel = $(el.getAttribute("search_results_panel") || "search_results_panel")
+        var url = el.getAttribute("search_url") || (urlBase + "/search")
 
         el.focus();
         var value = $F(el)
