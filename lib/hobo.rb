@@ -216,7 +216,12 @@ module Hobo
       # has_many and polymorphic associations are not editable (for now)
       return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
 
-      new = Hobo::FieldUndefiner.new(object, field)
+      new = object.duplicate
+      new.send("#{field}=", if refl and refl.macro == :belongs_to
+                              Hobo::Undefined.new(refl.klass)
+                            else
+                              Hobo::Undefined.new
+                            end)
 
       begin
         if object.new_record?
