@@ -150,6 +150,8 @@ and "11 Jan" but not "11th Jan")
 New feature - Integration testing DSL. Adds an easy to use DSL for
 integration tests.
 
+Fix: search page in IE
+
 
 
 === Release 0.4.2 ===
