@@ -268,11 +268,11 @@
         <object_table fields="#this.class.content_columns.every(:name) - ['name']" associations="*"/>
       </section>
 
-      <section>
+      <section_if>
         <repeat obj="#has_many_assocs">
           <p><new_object_link/></p>
         </repeat>
-      </section>
+      </section_if>
     </panel>
 
   </page>

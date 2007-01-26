@@ -33,7 +33,7 @@ class Test::Unit::TestCase
     def logs_in_as(user, password)
       @current_user = user
       post login_url, :login => user.login, :password => password
-      assert_response :redirect, "#{user.name} failed to log in"
+      assert_response :redirect, "#{user.login} failed to log in"
       get homepage_url
       assert_response :success
     end
@@ -82,7 +82,7 @@ class Test::Unit::TestCase
     end
     
     def current_should(s)
-      "#{current_user.name} should #{s}"
+      "#{current_user.login} should #{s}"
     end
     
     def object_url(obj, action=nil)
