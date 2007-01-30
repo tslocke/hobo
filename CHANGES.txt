@@ -68,6 +68,7 @@ Hobo Module
   Fix to dom_id for objects in an array that is not an AR association
   (e.g. an array returned by find(:all))
 
+
 Support for alternative "show" pages. E.g. to add a "profile" page to a User, add
 
     show_method :profile

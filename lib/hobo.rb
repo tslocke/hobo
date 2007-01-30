@@ -145,23 +145,22 @@ module Hobo
                             "#{web_name}/:id/#{refl.name}/new",
                             :controller => web_name,
                             :action => "new_#{refl.name.to_s.singularize}")
-            
-            for method in controller.web_methods
-              map.named_route("#{web_name.singularize}_#{method}",
-                              "#{web_name}/:id/#{method}",
-                              :controller => web_name,
-                              :action => method.to_s,
-                              :conditions => { :method => :post })
-            end
-            
-            for method in controller.show_methods
-              map.named_route("#{web_name.singularize}_#{method}",
-                              "#{web_name}/:id;#{method}",
-                              :controller => web_name,
-                              :action => method.to_s,
-                              :conditions => { :method => :get })
-            end
-            
+          end
+          
+          for method in controller.web_methods
+            map.named_route("#{web_name.singularize}_#{method}",
+                            "#{web_name}/:id/#{method}",
+                            :controller => web_name,
+                            :action => method.to_s,
+                            :conditions => { :method => :post })
+          end
+          
+          for method in controller.show_methods
+            map.named_route("#{web_name.singularize}_#{method}",
+                            "#{web_name}/:id;#{method}",
+                            :controller => web_name,
+                            :action => method.to_s,
+                            :conditions => { :method => :get })
           end
         end
       end
