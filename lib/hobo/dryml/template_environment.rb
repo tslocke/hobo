@@ -196,6 +196,18 @@ module Hobo::Dryml
       attrs.each {|a| stripped_options.delete(a.to_sym) }
       attrs.map {|a| options[a.to_sym]} + [stripped_options]
     end
+    
+    
+    def call_inner_tag(name, options, external_param)
+      options.delete(:inner)
+      if external_param.blank?
+        send(name, options)
+      elsif external_param.is_a? Hash
+        send(name, options.merge(external_param))
+      else
+        external_param
+      end
+    end
 
 
     def render_tag(tag_name, options)

@@ -313,6 +313,8 @@ module Hobo::Dryml
     end
 
     def tag_call(tag, el)
+      require_attribute(el, "inner", /#{DRYML_NAME}/, true)
+      
       # find out if it's empty before removing any <:param_tags>
       empty_el = el.size == 0
 
@@ -322,14 +324,28 @@ module Hobo::Dryml
       el.elements.each do |e|
         if e.name.starts_with?(":")
           e.remove
-          param_elems[e.name[1..-1]] = "(capture do %>#{children_to_erb(e)}<%; end)"
+          
+          param_value = if e.size == 0
+                          # childless param tag, e.g. <:foo x="y"/>, becomes a hash { :x => 'y' }
+                          hash = Hash.build(e.attributes.keys) {|n| [n, attribute_to_ruby(e.attributes[n])]}
+                          hash_to_ruby(hash)
+                        else
+                          "(capture do %>#{children_to_erb(e)}<%; end)"
+                        end
+          
+          param_elems[e.name[1..-1]] = param_value
         end
       end
 
       name = Hobo::Dryml.unreserve(el.name)
       options = tag_options(el, param_elems)
       newlines = tag_newlines(el)
-      call = options.blank? ? name : "#{name}(#{options})"
+      inner = el.attributes["inner"]
+      call = if inner.blank? 
+               "#{name}(#{options})"
+             else
+               "call_inner_tag(:#{name}, #{options}, options[:#{inner}])"
+             end
 
       part_id = el.attributes['part_id']
       if empty_el
@@ -358,9 +374,8 @@ module Hobo::Dryml
       # ensure no param given as both attribute and <:tag>
       dryml_exception("duplicate attribute/parameter-tag #{param}", el) unless
         (param_elems.keys & attributes.keys).empty?
-
-      option_names = attributes.keys + param_elems.keys
-      options = option_names.map {|name| ":#{name} => #{tag_parameter(name, attributes, param_elems)}"}
+      
+      options = hash_to_ruby(all_options(attributes, param_elems))
 
       xattrs = el.attributes['xattrs']
       if xattrs
@@ -371,36 +386,57 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid xattrs", el)
                         end
-        "{#{options * ', '}}.update(#{extra_options})"
+        "#{options}.update(#{extra_options})"
       else
-        options.join(', ')
+        options
       end
     end
 
 
-    def DELETE_ME_this_expr(attributes, allow_attr)
-      if attributes["obj"]
-        attribute_to_ruby(attributes["obj"])
-      elsif attributes["attr"] and allow_attr
-        if is_code_attribute?(attributes["attr"])
-          "this.send(#{attribute_to_ruby(attributes['attr'])})"
-        else
-          "get_attribute(this, '#{attributes['attr']}')"
+    def all_options(attributes, param_elems)
+      opts = {}
+      (attributes.keys + param_elems.keys).each do |name|
+        value = if param_elems.include?(name)
+                  param_elems[name]
+                else
+                  attribute_to_ruby(attributes[name])
+                end
+        begin
+          add_option(opts, name.split('.'), value)
+        rescue DrymlExcpetion
+          dryml_exception("inner-attribute conflict for {name}")
         end
-      else
-        "this"
+      end
+      opts
+    end
+    
+    def hash_to_ruby(hash)
+      pairs = hash.map do |k, v|
+        val = v.is_a?(Hash) ? hash_to_ruby(v) : v
+        ":#{k} => #{val}"
+      end
+      "{ #{pairs * ', '} }"
+    end
+    
+    def add_option(options, names, value)
+      if names.length == 1
+        options[names.first] = value
+      elsif names.length > 1
+        v = options[names.first]
+        if v.is_a? Hash
+          # it's ready for the inner-attribute - do nothing
+        elsif v.nil?
+          options[names.first] = v = {}
+        else
+          # Conflict, i.e. a = "ping" and a.b = "pong"
+          # Rescued by caller (all_options)
+          raise DrymlExcpetion.new
+        end
+        add_option(v, names[1..-1], value)
       end
     end
 
-
-    def tag_parameter(name, attributes, param_elems)
-      if param_elems.include?(name)
-        param_elems[name]
-      else
-        attribute_to_ruby(attributes[name])
-      end
-    end
-
+    
     def html_element_to_erb(el)
       start_tag_src = el.instance_variable_get("@start_tag_source").
         gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
