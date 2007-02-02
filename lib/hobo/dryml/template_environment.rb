@@ -40,7 +40,7 @@ module Hobo::Dryml
     attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
     
     def this; @_this; end
-
+    
     
     def this_field_dom_id
       Hobo.dom_id(this_parent, this_field)
@@ -198,12 +198,12 @@ module Hobo::Dryml
     end
     
     
-    def call_inner_tag(name, options, external_param)
+    def call_inner_tag(name, options, external_param, &b)
       options.delete(:inner)
       if external_param.blank?
-        send(name, options)
+        send(name, options, &b)
       elsif external_param.is_a? Hash
-        send(name, options.merge(external_param))
+        send(name, options.merge(external_param), &b)
       else
         external_param
       end

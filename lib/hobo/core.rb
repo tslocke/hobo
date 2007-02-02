@@ -224,6 +224,7 @@ module Hobo
       "#{object.class.name.underscore}#{attrs}"
     end
 
+    
     def param_name_for_this(association_foreign_key=false)
       return "" unless form_this
       name = if association_foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
@@ -234,6 +235,16 @@ module Hobo
       register_form_field(name)
       name
     end
+    
+    
+    def selector_type
+      if this.is_a? ActiveRecord::Base
+        this.classs
+      elsif this.respond_to? :member_class
+        this.member_class
+      end
+    end
+    
 
     def_tag :human_type, :style do
       if can_view_this?
@@ -360,6 +371,21 @@ module Hobo
 
     def_tag :if_can_edit do
       if_(:q => can_edit_this?) { tagbody.call }
+    end
+    
+    #def_tag :intro { content_tag 'div', tagbody.call, :class => "intro" }
+    
+    mapping_tags do
+      map intro   { div.intro }
+      map maincol { div.maincol }
+      map sidecol { div.sidecol }
+      map panel   { div.panel }
+      map section { div.section }
+
+      map fields { table.fields }
+      map field  { tr.field }
+      map fl     { td.field_label }
+      map fd     { td.field_data  } 
     end
     
   end

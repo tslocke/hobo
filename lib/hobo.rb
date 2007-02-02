@@ -188,6 +188,9 @@ module Hobo
         object.send(field)
       end
     end
+    
+    
+    # --- Permissions --- #
 
 
     def can_create?(person, object)
@@ -272,6 +275,16 @@ module Hobo
       m = "can_call_#{method}?"
       object.respond_to?(m) and object.send(m, current_user)
     end 
+    
+    # --- end permissions -- #
+    
+    
+    def static_tags
+      @static_tags ||= begin
+                         path = File.join(File.dirname(__FILE__), "hobo/static_tags")
+                         File.readlines(path).omap{chop} 
+                       end
+    end
 
     
     private

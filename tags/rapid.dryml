@@ -310,7 +310,7 @@
 
     <h1><%= title %></h1>
     <h2>Back to <object_link obj="#@owner"/></h2>
-    <panel>
+    <panel inner="panel">
       <h1><count label="#@association.proxy_reflection.klass.name.titleize"/></h1>
       <section>
         <table_for>
