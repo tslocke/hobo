@@ -44,21 +44,20 @@ module Hobo
 
         src = <<-END
           #{def_line}
-            res = ''
             _tag_context(options, block) do |tagbody|
               locals = _tag_locals(options, #{tag.attrs.inspect})
               locals_hash = { :tagbody => tagbody };
               #{locals.inspect}.each_with_index{|a, i| locals_hash[a] = locals[i]}
-              res = Hobo::ProcBinding.new(self, locals_hash).instance_eval(&#{self.name}.hobo_tag_blocks['#{name}'])
+              Hobo::ProcBinding.new(self, locals_hash).instance_eval(&#{self.name}.hobo_tag_blocks['#{name}'])
             end
-            res.to_s
           end
         END
         class_eval src, __FILE__, __LINE__
       end
     
       def mapping_tags(&b)
-        d = MappingTags::PatternBinding.new
+        d = MappingTags::MappingDSL.new
+        
         d.instance_eval(&b)
         mappings = d._mappings
         mappings.each {|m| MappingTags.define_mapping_tag(m, self) }

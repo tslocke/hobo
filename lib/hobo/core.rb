@@ -376,16 +376,16 @@ module Hobo
     #def_tag :intro { content_tag 'div', tagbody.call, :class => "intro" }
     
     mapping_tags do
-      map intro   { div.intro }
-      map maincol { div.maincol }
-      map sidecol { div.sidecol }
-      map panel   { div.panel }
-      map section { div.section }
-
-      map fields { table.fields }
-      map field  { tr.field }
-      map fl     { td.field_label }
-      map fd     { td.field_data  } 
+      intro   >> div.intro
+      maincol >> div.maincol
+      sidecol >> div.sidecol
+      panel   >> div.panel
+      section >> div.section.foo
+       
+      fields >> table.fields
+      field  >> tr.field
+      fl     >> td.field_label
+      fd     >> td.field_data  
     end
     
   end

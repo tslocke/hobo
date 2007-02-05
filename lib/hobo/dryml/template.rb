@@ -88,8 +88,6 @@ module Hobo::Dryml
 
       @doc = REXML::Document.new(RexSource.new(@xmlsrc))
 
-      define_tags(@doc.root)
-
       erb_src = restore_erb_scriptlets(children_to_erb(@doc.root))
 
       erb_src
@@ -149,6 +147,8 @@ module Hobo::Dryml
         tag = @tags[el.name]
         if tag
           tag_call(tag, el)
+        elsif el.name.not_in?(Hobo.static_tags)
+          tag_call(tag, el)
         else
           html_element_to_erb(el)
         end
@@ -202,48 +202,52 @@ module Hobo::Dryml
 
     def define_tags(root)
       root.elements.oselect{name == "def"}.each do |el|
-        require_attribute(el, "tag", /^#{DRYML_NAME}$/)
-        require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
-        require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
-
-        dryml_exception("def with alias_of must be empty", el) if
-          el.attributes['alias_of'] and el.size > 0
-
-        name = el.attributes["tag"]
-
-        alias_of = el.attributes['alias_of']
-        if alias_of
-          old = @tags[alias_of]
-          dryml_exception("no tag '#{alias_of}' to alias", el) unless old
-          @tags[name] = Hobo::Dryml::TagDef.new(name, old.attrs)
-        else
-          attrspec = el.attributes["attrs"]
-          attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
-
-          invalids = attr_names & %w{obj attr this}
-          dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
-
-          @tags[name] = Hobo::Dryml::TagDef.new(name.to_sym, attr_names.omap{to_sym})
-        end
       end
     end
 
 
     def def_element(el)
-      # define_tags only picks up top-level tags, so better check:
       require_toplevel(el)
+      require_attribute(el, "tag", /^#{DRYML_NAME}$/)
+      require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
+      require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
+      require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
 
-      if el.attributes['alias_of']
-        @environment.send(:alias_method, "#{el.attributes['tag']}".to_sym, "#{el.attributes['alias_of']}".to_sym)
+      name = el.attributes["tag"]
+
+      alias_of = el.attributes['alias_of']
+      alias_current = el.attributes['alias_current']
+
+      dryml_exception("def cannot have both alias_of and alias_current", el) if alias_of && alias_current
+      dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
+
+      if alias_of || alias_current
+        old_name = alias_current ? name : alias_of
+        new_name = alias_current ? alias_current : name
+        old = @tags[old_name]
+        dryml_exception("no tag '#{old_name}' to alias", el) unless old
+
+        @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
+      end
+        
+      if alias_of
+        @tags[name] = Hobo::Dryml::TagDef.new(name.to_sym, old.attrs)
         "<% #{tag_newlines(el)} %>"
       else
-        create_tag_method(el)
+        attrspec = el.attributes["attrs"]
+        attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
+
+        invalids = attr_names & %w{obj attr this}
+        dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
+
+        tag = @tags[name] = Hobo::Dryml::TagDef.new(name.to_sym, attr_names.omap{to_sym})
+
+        create_tag_method(el, tag)
       end
     end
 
 
-    def create_tag_method(el)
-      tag = @tags[el.attributes['tag']]
+    def create_tag_method(el, tag)
       name = Hobo::Dryml.unreserve(tag.name)
 
       # A statement to assign values to local variables named after the tag's attrs.
@@ -258,8 +262,8 @@ module Hobo::Dryml
                      # reproduce any line breaks in the start-tag so that line numbers are preserved
                      tag_newlines(el) + "%>" +
                      children_to_erb(el) +
-                     "<% end; end %>" )
-
+                     "<% @output; end; end %>" )
+      
       src = erb_process(method_src)
       @environment.class_eval(src, template_path, element_line_num(el))
 
@@ -486,7 +490,8 @@ module Hobo::Dryml
     end
 
     def attribute_to_ruby(attr)
-      if attr == nil
+      dryml_exception("erb scriptlet in attribute of defined tag") if attr && attr.index("[![HOBO-ERB")
+      if attr.nil?
         "nil"
       elsif is_code_attribute?(attr)
         "(#{attr[1..-1]})"

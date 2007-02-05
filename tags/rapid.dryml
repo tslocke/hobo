@@ -198,6 +198,7 @@
 
 <!-- It is expected that the theme will overwrite these tags, but they have to be defined here, otherwise
      they appear to the parser as non-hobo tags -->
+
 <def tag="page"/>
 <def tag="area"/>
 <def tag="panel"/>

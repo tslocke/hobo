@@ -1,21 +1,20 @@
 module Hobo::PredicateDispatch
   
   def self.included(base)
-    puts base
     base.extend(ClassMethods)
   end
   
   module ClassMethods
     
     def defp(name, predicate=nil, &block)
-      ivar = "@#{name}_predicates"
+      ivar = "@@#{name}_predicates"
       default_method_name = "_default_#{name}".to_sym
-      methods = instance_variable_get(ivar)
+      methods = ivar.in?(class_variables) && class_variable_get(ivar)
 
-      if methods.nil?
+      if !methods
         # It's the first defp for this name...
 
-        methods = instance_variable_set(ivar, [])
+        methods = class_variable_set(ivar, [])
         
         if name.to_s.in?(instance_methods) and predicate
           # There's already a normal method with this name - it
@@ -27,18 +26,20 @@ module Hobo::PredicateDispatch
       
       if predicate
         pname = "#{name}_p#{methods.length}"
-        methods << [predicate, pname, block.arity == 2]
+        methods << [pname, predicate.arity == 1, block.arity == 2]
         define_method(pname, block)
+        define_method(pname + "_predicate", &predicate)
       else
         # It's the default - if there's already one, overwrite it
         define_method(default_method_name, block)
       end
       
-      module_eval %{
+      module_eval <<-END, __FILE__, __LINE__+1
         def #{name}(options={}, &block)
-          methods = self.class.instance_variable_get('#{ivar}')
-          for predicate, method_name, wants_block in methods
-            if Hobo::ProcBinding.new(self, options).instance_eval(&predicate)
+          methods = #{ivar}
+          for method_name, predicate_wants_options, wants_block in methods
+            pred = method_name + "_predicate"
+            if (predicate_wants_options ? send(pred, options) : send(pred))
               return (if wants_block
                         send(method_name, options, block)
                       else
@@ -54,13 +55,13 @@ module Hobo::PredicateDispatch
             end
           end
         end
-      }
+      END
     end
     
     alias :p :proc
     
     def predicate_method?(method_name)
-      instance_variable_get("@#{method_name}_predicates") and true
+      "@@#{method_name}_predicates".in?(class_variables)
     end
     
   end

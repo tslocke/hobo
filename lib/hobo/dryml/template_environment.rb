@@ -81,10 +81,9 @@ module Hobo::Dryml
     def new_context
       ctx = @output, @_this, @this_parent, @this_field, @this_type, @form_field_path
       @output = ""
-      yield
-      output = @output
+      res = yield
       @output, @_this, @this_parent, @this_field, @this_type, @form_field_path = ctx
-      output
+      res.to_s
     end
 
 
