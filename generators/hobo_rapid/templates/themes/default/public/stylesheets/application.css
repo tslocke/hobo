@@ -32,7 +32,7 @@ a:hover.no_hover { background: transparent; }
     font-size: 28pt;
     padding: 65px 0 15px 20px;
     color: white;
-    font-family: Palatino, Garamond, Times, Serif;
+    font-family: "Trebuchet MS", Verdana, "Sans Serif";
 }
 
 /* Main Page Body Window */
@@ -138,10 +138,10 @@ ul.dblue li { background-image: url(../images/txt_list_img_dblue.gif); }
 
 /* main section and sidebar */
 
-.main    { float: left; width: 488px; }
-.main .panel { width: 100%; }
-.sidebar { float: right; width: 260px; margin-right: 0px;}
-.sidebar .panel { width: 100%; }
+.maincol    { float: left; width: 488px; }
+.maincol .panel { width: 100%; }
+.sidecol { float: right; width: 260px; margin-right: 0px;}
+.sidecol .panel { width: 100%; }
 
 /* Nav Styles */
 

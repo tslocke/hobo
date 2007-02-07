@@ -2,6 +2,9 @@ module Hobo::Dryml
 
   class TemplateEnvironment
 
+    APPLICATION_TAGLIB = "hobolib/application"
+    CORE_TAGLIB = "plugins/hobo/tags/core"
+
     extend TagModule # include as class methods
 
     class << self
@@ -197,15 +200,49 @@ module Hobo::Dryml
     end
     
     
-    def call_inner_tag(name, options, external_param, &b)
-      options.delete(:inner)
-      if external_param.blank?
-        send(name, options, &b)
-      elsif external_param.is_a? Hash
-        send(name, options.merge(external_param), &b)
-      else
-        external_param
+    def call_replaceable_tag(name, options, external_param, &b)
+      options.delete(:replace_option)
+      
+      if external_param.is_a? Hash
+        before = external_param.delete(:before_tag)
+        after = external_param.delete(:after_tag)
+        content = external_param.delete(:content)
+        options = options.merge_tag_options(external_param)
+      elsif !external_param.nil?
+        return external_param.to_s
       end
+
+      tag = if respond_to?(name)
+              body = content ? proc { content } : b
+              send(name, options, &body)
+            else
+              new_context { content_tag(name, content || (b && b.call), options) }
+            end
+      before.to_s + tag.to_s + after.to_s
+    end
+    
+    
+    def call_replaceable_content_tag(name, options, external_param, &b)
+      options.delete(:content_option)
+      
+      if external_param.is_a? Hash
+        content = external_param.delete(:content)
+        options = options.merge_tag_options(external_param)
+      elsif !external_param.nil?
+        content = external_param.to_s
+      end
+      
+      # If there's no body, and no content provided externally, remove
+      # the tag altogether
+      return if b.nil? and content.nil?
+
+      tag = if respond_to?(name)
+              body = content ? proc { content } : b
+              send(name, options, &body)
+            else
+              new_context { content_tag(name, content || (b && b.call), options) }
+            end
+      tag.to_s
     end
 
 
@@ -217,7 +254,9 @@ module Hobo::Dryml
     def method_missing(name, *args)
       @view.send(name, *args)
     end
+    
 
   end
+  
 
 end

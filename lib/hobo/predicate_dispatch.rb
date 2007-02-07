@@ -6,9 +6,13 @@ module Hobo::PredicateDispatch
   
   module ClassMethods
     
+    def default_method_for(method)
+      "_default_#{method}"
+    end
+    
     def defp(name, predicate=nil, &block)
       ivar = "@@#{name}_predicates"
-      default_method_name = "_default_#{name}".to_sym
+      default_method_name = default_method_for(name).to_sym
       methods = ivar.in?(class_variables) && class_variable_get(ivar)
 
       if !methods
@@ -62,6 +66,10 @@ module Hobo::PredicateDispatch
     
     def predicate_method?(method_name)
       "@@#{method_name}_predicates".in?(class_variables)
+    end
+    
+    def predicate_has_default?(method_name)
+      default_method_for(method_name).in?(instance_methods)
     end
     
   end

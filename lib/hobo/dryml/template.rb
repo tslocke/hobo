@@ -5,42 +5,23 @@ module Hobo::Dryml
   class Template
     DRYML_NAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
-    APPLICATION_TAGLIB = "hobolib/application"
-    CORE_TAGLIB = "plugins/hobo/tags/core"
-
     def initialize(src, environment, template_path)
       @src = src
       @environment = environment # a class or a module
 
-      @template_path = if template_path.starts_with?(RAILS_ROOT)
-                         template_path[RAILS_ROOT.length+1..-1]
-                       else
-                         template_path
-                       end
+      @environment.template_path = @template_path = template_path
+      template_path[0..RAILS_ROOT.length] = "" if template_path.starts_with?(RAILS_ROOT)
+
       @last_element = nil
-      @tags = {}
     end
+
+    attr_reader :tags, :template_path
 
     def compile(local_names=[], auto_taglibs=true)
       if auto_taglibs
-        auto_imports = if Hobo.current_theme
-                         [APPLICATION_TAGLIB,
-                          "hobolib/themes/#{Hobo.current_theme}/application",
-                          CORE_TAGLIB]
-                       else
-                         [APPLICATION_TAGLIB,
-                          CORE_TAGLIB]
-                       end
-
-        if template_path.starts_with?("app") or template_path == Hobo::Dryml::EMPTY_PAGE
-          # import whatever's next in the chain
-          found = nil
-          auto_imports.each_with_index {|x, i| found = i if template_path == expand_template_path(x)}
-          import_taglib(found ? auto_imports[found+1] : APPLICATION_TAGLIB)
-        else
-          # Everything outside app just implicitly gets core and that's it
-          import_taglib(CORE_TAGLIB)
-        end
+        import_taglib(CORE_TAGLIB)
+        import_taglib(APPLICATION_TAGLIB)
+        Hobo::MappingTags.apply_standard_mappings(@environment)
       end
 
       if is_taglib?
@@ -48,12 +29,9 @@ module Hobo::Dryml
       else
         create_render_page_method(local_names)
       end
-
-      @environment.tag_defs = @tags
     end
-
-    attr_reader :tags, :template_path
-
+      
+      
     def create_render_page_method(local_names)
       erb_src = process_src
       src = ERB.new(erb_src).src[("_erbout = '';").length..-1]
@@ -61,6 +39,7 @@ module Hobo::Dryml
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
 
       method_src = ("def render_page(__page_this__, __local_assigns__); " +
+                    "import_taglib(CORE_TAGLIB); import_taglib(APPLICATION_TAGLIB); " +
                     "#{locals} new_object_context(__page_this__) do " +
                     src +
                     "; end + part_contexts_js; end")
@@ -69,10 +48,12 @@ module Hobo::Dryml
       @environment.compiled_local_names = local_names
     end
 
+    
     def is_taglib?
       @environment.class == Module
     end
 
+    
     def process_src
       # Replace <%...%> scriptlets with xml-safe references into a hash of scriptlets
       @scriptlets = {}
@@ -136,6 +117,12 @@ module Hobo::Dryml
         taglib_element(el)
         # return nothing - the import has no presence in the erb source
         ""
+        
+      when "set_theme"
+        require_attribute(el, "name", /^#{DRYML_NAME}$/)
+        set_theme(el.attributes['name'])
+        # return nothing - set_theme has no presence in the erb source
+        ""
 
       when "def"
         def_element(el)
@@ -144,11 +131,9 @@ module Hobo::Dryml
         tagbody_element(el)
 
       else
-        tag = @tags[el.name]
-        if tag
-          tag_call(tag, el)
-        elsif el.name.not_in?(Hobo.static_tags)
-          tag_call(tag, el)
+        if el.name.not_in?(Hobo.static_tags) or
+            el.attributes['replace_option'] or el.attributes['content_option']
+          tag_call(el)
         else
           html_element_to_erb(el)
         end
@@ -165,46 +150,47 @@ module Hobo::Dryml
         import_module(el.attributes["module"].constantize, el.attributes["as"])
       end
     end
-
-
+    
+    
     def expand_template_path(path)
-      (if path.starts_with? "plugins"
-         "vendor/" + path
-       elsif path.include?("/")
-         "app/views/#{path}"
-       else
-         template_dir = File.dirname(template_path)
-         "#{template_dir}/#{path}"
-       end
-       ) + ".dryml"
+      base = if path.starts_with? "plugins"
+               "vendor/" + path
+             elsif path.include?("/")
+               "app/views/#{path}"
+             else
+               template_dir = File.dirname(self.class.template_path)
+               "#{template_dir}/#{path}"
+             end
+       base + ".dryml"
     end
 
 
     def import_taglib(src_path, as=nil)
       path = expand_template_path(src_path)
-      logger.info("import dryml: " + path)
       unless template_path == path
         taglib = Taglib.get(RAILS_ROOT + "/" + path)
-        tags = taglib.import_into(@environment, as)
-        # add imported tags, but don't overwrite tags defined locally
-        tags.each_pair {|k,v| @tags[k] = v unless @tags.has_key?(k) }
+        taglib.import_into(@environment, as)
       end
     end
 
 
     def import_module(mod, as=nil)
-      raise "not implemented!" if as
-      logger.info "import module: " + mod.inspect
+      raise NotImplementedError.new if as
       @environment.send(:include, mod)
-      @tags.update mod.hobo_tags if defined? mod.hobo_tags
     end
-
-
-    def define_tags(root)
-      root.elements.oselect{name == "def"}.each do |el|
+    
+    
+    def set_theme(name)
+      dryml_exception("theme already set") if Hobo.current_theme?
+      Hobo.current_theme = name
+      import_taglib("hobolib/themes/#{name}/application")
+      mapping_module = "#{name}_mapping"
+      if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
+        load(path)
+        Hobo::MappingTags.apply_mappings(@environment)
       end
     end
-
+      
 
     def def_element(el)
       require_toplevel(el)
@@ -224,14 +210,15 @@ module Hobo::Dryml
       if alias_of || alias_current
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
-        old = @tags[old_name]
-        dryml_exception("no tag '#{old_name}' to alias", el) unless old
 
-        @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
+        begin
+          @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
+        rescue
+          dryml_exception("cannot alias '#{old_name}' as '#{new name}", el)
+        end
       end
         
       if alias_of
-        @tags[name] = Hobo::Dryml::TagDef.new(name.to_sym, old.attrs)
         "<% #{tag_newlines(el)} %>"
       else
         attrspec = el.attributes["attrs"]
@@ -240,21 +227,19 @@ module Hobo::Dryml
         invalids = attr_names & %w{obj attr this}
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
 
-        tag = @tags[name] = Hobo::Dryml::TagDef.new(name.to_sym, attr_names.omap{to_sym})
-
-        create_tag_method(el, tag)
+        create_tag_method(el, name.to_sym, attrs.omap{to_sym})
       end
     end
 
 
-    def create_tag_method(el, tag)
-      name = Hobo::Dryml.unreserve(tag.name)
+    def create_tag_method(el, name, attrs)
+      name = Hobo::Dryml.unreserve(name)
 
       # A statement to assign values to local variables named after the tag's attrs.
       # Careful to unpack the list returned by _tag_locals even if there's only
       # a single var (options) on the lhs (hence the trailing ',' on options)
-      setup_locals = ( (tag.attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "} + ['options,']).join +
-                       " = _tag_locals(__options__, #{tag.attrs.inspect})" )
+      setup_locals = ( (attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "} + ['options,']).join +
+                       " = _tag_locals(__options__, #{attrs.inspect})" )
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
 
@@ -316,39 +301,28 @@ module Hobo::Dryml
       @environment.class_eval(src, template_path, line_num)
     end
 
-    def tag_call(tag, el)
+    
+    def tag_call(el)
       require_attribute(el, "inner", /#{DRYML_NAME}/, true)
       
       # find out if it's empty before removing any <:param_tags>
       empty_el = el.size == 0
 
       # gather <:param_tags>, and remove them from the dom
-      param_elems = {}
-      at_start = true
-      el.elements.each do |e|
-        if e.name.starts_with?(":")
-          e.remove
-          
-          param_value = if e.size == 0
-                          # childless param tag, e.g. <:foo x="y"/>, becomes a hash { :x => 'y' }
-                          hash = Hash.build(e.attributes.keys) {|n| [n, attribute_to_ruby(e.attributes[n])]}
-                          hash_to_ruby(hash)
-                        else
-                          "(capture do %>#{children_to_erb(e)}<%; end)"
-                        end
-          
-          param_elems[e.name[1..-1]] = param_value
-        end
-      end
-
+      param_tags = get_parameter_tags(el)
+        
       name = Hobo::Dryml.unreserve(el.name)
-      options = tag_options(el, param_elems)
+      options = tag_options(el, param_tags)
       newlines = tag_newlines(el)
-      inner = el.attributes["inner"]
-      call = if inner.blank? 
-               "#{name}(#{options})"
+      replace_option = el.attributes["replace_option"]
+      content_option = el.attributes["content_option"]
+      dryml_exception("both replace_option and content_option given") if replace_option && content_option
+      call = if replace_option
+               "call_replaceable_tag(:#{name}, #{options}, options[:#{replace_option}])"
+             elsif content_option
+               "call_replaceable_content_tag(:#{name}, #{options}, options[:#{content_option}])"
              else
-               "call_inner_tag(:#{name}, #{options}, options[:#{inner}])"
+               "#{name}(#{options})"
              end
 
       part_id = el.attributes['part_id']
@@ -370,16 +344,43 @@ module Hobo::Dryml
         end
       end
     end
+    
+    
+    def get_parameter_tags(el)
+      param_tags = {}
+      el.elements.each do |e|
+        if e.name.starts_with?(":")
+          e.remove
+          
+          param_value = if e.has_attributes?
+                          # A param tag with attributes becomes a hash, e.g. <:foo x="y"/>  =>  { :x => 'y' }
+                          hash = Hash.build(e.attributes.keys) {|n| [n, attribute_to_ruby(e.attributes[n])]}
+                          # If there is content to, that goes in the has under the key :content
+                          if e.size > 0
+                            hash[:content] = "(capture do %>#{children_to_erb(e)}<%; end)"
+                          end
+                          hash_to_ruby(hash)
+                        elsif e.size > 0
+                          "(capture do %>#{children_to_erb(e)}<%; end)"
+                        else
+                          dryml_exception("valueless parameter tag")
+                        end
+          
+          param_tags[e.name[1..-1]] = param_value
+        end
+      end
+      param_tags
+    end
 
 
-    def tag_options(el, param_elems)
+    def tag_options(el, param_tags)
       attributes = el.attributes
 
       # ensure no param given as both attribute and <:tag>
       dryml_exception("duplicate attribute/parameter-tag #{param}", el) unless
-        (param_elems.keys & attributes.keys).empty?
+        (param_tags.keys & attributes.keys).empty?
       
-      options = hash_to_ruby(all_options(attributes, param_elems))
+      options = hash_to_ruby(all_options(attributes, param_tags))
 
       xattrs = el.attributes['xattrs']
       if xattrs
@@ -397,11 +398,11 @@ module Hobo::Dryml
     end
 
 
-    def all_options(attributes, param_elems)
+    def all_options(attributes, param_tags)
       opts = {}
-      (attributes.keys + param_elems.keys).each do |name|
-        value = if param_elems.include?(name)
-                  param_elems[name]
+      (attributes.keys + param_tags.keys).each do |name|
+        value = if param_tags.include?(name)
+                  param_tags[name]
                 else
                   attribute_to_ruby(attributes[name])
                 end

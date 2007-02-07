@@ -239,13 +239,15 @@ module Hobo
     
     def selector_type
       if this.is_a? ActiveRecord::Base
-        this.classs
+        this.class
       elsif this.respond_to? :member_class
         this.member_class
+      elsif this == @this
+        @model
       end
     end
     
-
+    
     def_tag :human_type, :style do
       if can_view_this?
         res = if this.is_a? Array
@@ -371,21 +373,6 @@ module Hobo
 
     def_tag :if_can_edit do
       if_(:q => can_edit_this?) { tagbody.call }
-    end
-    
-    #def_tag :intro { content_tag 'div', tagbody.call, :class => "intro" }
-    
-    mapping_tags do
-      intro   >> div.intro
-      maincol >> div.maincol
-      sidecol >> div.sidecol
-      panel   >> div.panel
-      section >> div.section.foo
-       
-      fields >> table.fields
-      field  >> tr.field
-      fl     >> td.field_label
-      fd     >> td.field_data  
     end
     
   end

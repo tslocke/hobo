@@ -42,6 +42,4 @@ end
 
 Hobo.user_model ||= (User rescue (Person rescue nil))
 
-Hobo.current_theme ||= "default" if File.exists?("#{RAILS_ROOT}/app/views/hobolib/themes/default")
-
 Hobo.developer_features = ["development", "test"].include?(RAILS_ENV) if Hobo.developer_features? == nil

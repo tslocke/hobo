@@ -1,5 +1,7 @@
 <taglib module="Hobo::Rapid"/>
 
+<taglib src="rapid_pages"/>
+
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
 
@@ -196,153 +198,6 @@
 </def>
 
 
-<!-- It is expected that the theme will overwrite these tags, but they have to be defined here, otherwise
-     they appear to the parser as non-hobo tags -->
-
-<def tag="page"/>
-<def tag="area"/>
-<def tag="panel"/>
-<def tag="section"/>
-<def tag="navbar"/>
-
-
-<def tag="index_page">
-  <% model_name = @model.name.titleize %>
-  <page title='#"All #{model_name.pluralize}"'>
-
-    <h1><%= model_name.pluralize %></h1>
-
-    <panel>
-      <h1><count label="#model_name"/></h1>
-      <section>
-        <table_for>
-          <td><object_link/></td><td><delete_button class='text'/></td>
-        </table_for>
-      </section>
-      
-      <if q="#@pages.length > 1">
-        <section>
-          <div class="page_links">
-            <page_nav/>
-          </div>
-        </section>
-      </if>
-
-      <section>
-        <p><new_object_link for="#@model"/></p>
-      </section>
-    </panel>
-  </page>
-</def>
-
-
-<def tag="new_page">
-  <page title='#"New #{human_type}"'>
-    <h1>New <human_type/></h1>
-
-    <panel>
-      <h1>Details</h1>
-      <section>
-        <%= error_messages_for 'this' %>
-
-        <object_form hidden_fields="*">
-          <object_table associations="belongs_to"/>
-          <submit label="Create" class="create_button"/>
-        </object_form>
-      </section>
-    </panel>
-
-  </page>
-</def>
-
-
-<def tag="show_page">
-  <% has_many_assocs = this.class.reflections.values.map do |refl|
-       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
-     end.compact
-  %>
-  <page>
-    <h1><human_type/><if q="#this.respond_to? :name">: <edit attr="name"/></if></h1>
-    <panel>
-      <h1>Details</h1>
-      <section>
-        <object_table fields="#this.class.content_columns.every(:name) - ['name']" associations="*"/>
-      </section>
-
-      <section_if>
-        <repeat obj="#has_many_assocs">
-          <p><new_object_link/></p>
-        </repeat>
-      </section_if>
-    </panel>
-
-  </page>
-</def>
-
-
-<def tag="new_in_collection_page">
-  <page title='#"New #{human_type}"'>
-    <h1>New <human_type/></h1>
-    <h2>For: <object_link obj="#@owner" /></h2>
-
-    <panel>
-      <h1>Details</h1>
-      <section>
-        <%= error_messages_for 'this' %>
-
-        <object_form hidden_fields="*">
-          <object_table associations="belongs_to"/>
-          <submit label='#"Add to #{display_name(:obj => @owner)}"'/>
-        </object_form>
-      </section>
-
-    </panel>
-
-  </page>
-</def>
-
-
-<def tag="show_collection_page">
-  <% type_name = @controller.class.name.sub("Controller", "")
-     collection_name = @association.proxy_reflection.name
-     title = "#{collection_name.to_s.titleize} for #{display_name(:obj => @owner)}"
-  %>
-  <page title='#title'>
-
-    <h1><%= title %></h1>
-    <h2>Back to <object_link obj="#@owner"/></h2>
-    <panel inner="panel">
-      <h1><count label="#@association.proxy_reflection.klass.name.titleize"/></h1>
-      <section>
-        <table_for>
-          <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
-        </table_for>
-        <previous_page_link/>
-        <next_page_link/>
-      </section>
-      <section_if>
-        <if q="#Hobo.simple_has_many_association?(@association)">
-          <new_object_link for="#@association"/>
-        </if>
-      </section_if>
-    </panel>
-  </page>
-</def>
-
-
-<def tag="application_nav">
-  <% items = [['Home', urlb + '/']] +
-             Hobo.models[0..2].map{|m| [m.name.pluralize.titlecase, object_url(m)]} +
-             [['Search', (search_url rescue "")]] %>
-  <navbar items="#items"/>
-</def>
-
-
-<def tag="application_logo">
-  <theme_img src="logo.gif"/>
-</def>
-
-
 <def tag="belongs_to_menu_field"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
@@ -445,11 +300,6 @@
     <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
     <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
   </else>
-</def>
-
-
-<def tag="link" attrs="href">
-  <%= link_to tagbody.call, href, options %>
 </def>
 
 

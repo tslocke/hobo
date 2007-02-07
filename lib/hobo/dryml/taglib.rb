@@ -38,22 +38,17 @@ module Hobo::Dryml
       @module.extend(TagModule)
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)
-      template.compile
-      @tags = template.tags
+      template.compile([], false)
       @last_load_time = @file.mtime
     end
 
     def import_into(class_or_module, as)
       if as
-        raise "not implemented!"
+        raise NotImplementedError.new
         as_class = Class.new(TemplateEnvironment) { include @module }
         class_or_module.send(:define_method, as) { @module }
-        res = {}
-        @tags.each {|full_name, tag| @res["#{as}.#{full_name}"] = tag }
-        res
       else
         class_or_module.send(:include, @module)
-        @tags
       end
     end
 
