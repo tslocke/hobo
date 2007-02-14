@@ -2,6 +2,9 @@ require 'rexml/document'
 
 module Hobo::Dryml
 
+  APPLICATION_TAGLIB = "hobolib/application"
+  CORE_TAGLIB = "plugins/hobo/tags/core"
+
   class Template
     DRYML_NAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
@@ -9,8 +12,7 @@ module Hobo::Dryml
       @src = src
       @environment = environment # a class or a module
 
-      @environment.template_path = @template_path = template_path
-      template_path[0..RAILS_ROOT.length] = "" if template_path.starts_with?(RAILS_ROOT)
+      @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
 
       @last_element = nil
     end
@@ -18,6 +20,7 @@ module Hobo::Dryml
     attr_reader :tags, :template_path
 
     def compile(local_names=[], auto_taglibs=true)
+      now = Time.now
       if auto_taglibs
         import_taglib(CORE_TAGLIB)
         import_taglib(APPLICATION_TAGLIB)
@@ -29,6 +32,7 @@ module Hobo::Dryml
       else
         create_render_page_method(local_names)
       end
+      logger.info("DRYML: Compiled #{template_path} in %.2fs" % (Time.now - now))
     end
       
       
@@ -39,7 +43,6 @@ module Hobo::Dryml
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
 
       method_src = ("def render_page(__page_this__, __local_assigns__); " +
-                    "import_taglib(CORE_TAGLIB); import_taglib(APPLICATION_TAGLIB); " +
                     "#{locals} new_object_context(__page_this__) do " +
                     src +
                     "; end + part_contexts_js; end")
@@ -158,7 +161,7 @@ module Hobo::Dryml
              elsif path.include?("/")
                "app/views/#{path}"
              else
-               template_dir = File.dirname(self.class.template_path)
+               template_dir = File.dirname(template_path)
                "#{template_dir}/#{path}"
              end
        base + ".dryml"
@@ -168,7 +171,7 @@ module Hobo::Dryml
     def import_taglib(src_path, as=nil)
       path = expand_template_path(src_path)
       unless template_path == path
-        taglib = Taglib.get(RAILS_ROOT + "/" + path)
+        taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
         taglib.import_into(@environment, as)
       end
     end
@@ -181,13 +184,14 @@ module Hobo::Dryml
     
     
     def set_theme(name)
-      dryml_exception("theme already set") if Hobo.current_theme?
-      Hobo.current_theme = name
-      import_taglib("hobolib/themes/#{name}/application")
-      mapping_module = "#{name}_mapping"
-      if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
-        load(path)
-        Hobo::MappingTags.apply_mappings(@environment)
+      if Hobo.current_theme.nil? or Hobo.current_theme == name
+        Hobo.current_theme = name
+        import_taglib("hobolib/themes/#{name}/application")
+        mapping_module = "#{name}_mapping"
+        if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
+          load(path)
+          Hobo::MappingTags.apply_mappings(@environment)
+        end
       end
     end
       
@@ -217,7 +221,7 @@ module Hobo::Dryml
           dryml_exception("cannot alias '#{old_name}' as '#{new name}", el)
         end
       end
-        
+
       if alias_of
         "<% #{tag_newlines(el)} %>"
       else
@@ -227,7 +231,7 @@ module Hobo::Dryml
         invalids = attr_names & %w{obj attr this}
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
 
-        create_tag_method(el, name.to_sym, attrs.omap{to_sym})
+        create_tag_method(el, name.to_sym, attr_names.omap{to_sym})
       end
     end
 
@@ -366,9 +370,18 @@ module Hobo::Dryml
                           dryml_exception("valueless parameter tag")
                         end
           
-          param_tags[e.name[1..-1]] = param_value
+          param_name = e.name[1..-1]
+          current = param_tags[param_name]
+          param_tags[param_name] = if current.nil?
+                                     param_value
+                                   elsif current.is_a? Array
+                                     current + [param_value]
+                                   else
+                                     [current, param_value]
+                                   end
         end
       end
+      param_tags.each {|k, v| param_tags[k] = "[#{v * ', '}]" if v.is_a?(Array) }
       param_tags
     end
 

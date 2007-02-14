@@ -18,7 +18,9 @@ module Hobo
 
         Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
 
-        add_collection_actions(base)
+        for collection in base.collections
+          add_collection_actions(base, collection)
+        end
 
         base.before_filter :set_no_cache_headers
       end
@@ -46,33 +48,45 @@ module Hobo
         end
         nil
       end
-
-
-      private
-
-
-      def add_collection_actions(controller_class)
-        for refl in controller_class.model.reflections.values.oselect{macro == :has_many}
-          show_method = "show_#{refl.name}"
-          if show_method.not_in?(controller_class.instance_methods)
-            controller_class.class_eval <<-END, __FILE__, __LINE__+1
-              def #{show_method}
-                @owner = find_instance
-                @association = @owner.#{refl.name}
-                @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
-                options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
-                @this = @association.find(:all, options)
-                @this = @this.uniq if @association.proxy_reflection.options[:uniq]
-                hobo_render(:#{show_method}) or hobo_render(:show_collection, @association.member_class)
-              end
-            END
-          end
-          new_method = "new_#{refl.name.to_s.singularize}"
-          if Hobo.simple_has_many_association?(refl) and new_method.not_in?(controller_class.instance_methods)
+      
+      
+      def add_collection_actions(controller_class, name)
+        defined_methods = controller_class.instance_methods
+        
+        show_collection_method = "show_#{name}"
+        unless show_collection_method.in?(defined_methods)
+          controller_class.class_eval <<-END, __FILE__, __LINE__+1
+            def #{show_collection_method}
+              @owner = @#{controller_class.model.name.underscore} = find_instance
+              @association = @owner.#{name}
+              @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
+              options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
+              @this = @association.find(:all, options)
+              @this = @this.uniq if @association.proxy_reflection.options[:uniq]
+              hobo_render(:#{show_collection_method}) or hobo_render(:show_collection, @association.member_class)
+            end
+          END
+        end
+          
+        show_method = "show_#{name.to_s.singularize}"
+        unless show_collection_method.in?(defined_methods)
+          controller_class.class_eval <<-END, __FILE__, __LINE__+1
+            def #{show_method}
+              @owner = @#{controller_class.model.name.underscore} = find_instance(params[:owner_id])
+              @association = @owner.#{name}
+              @this = @association.member_class.find(params[:id])
+              hobo_render(:#{show_method}) or hobo_render(:show_in_collection, @association.member_class)
+            end
+          END
+        end
+          
+        if Hobo.simple_has_many_association?(controller_class.model.reflections[name.to_sym])
+          new_method = "new_#{name.to_s.singularize}"
+          if new_method.not_in?(defined_methods)
             controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{new_method}
                 @owner = find_instance
-                @this = @owner.#{refl.name}.new_without_appending
+                @this = @owner.#{name}.new_without_appending
                 @this.created_by(current_user)
                 hobo_render(:#{new_method}) or hobo_render(:new_in_collection, @this.class)
               end
@@ -80,7 +94,6 @@ module Hobo
           end
         end
       end
-
 
     end
 
@@ -92,8 +105,13 @@ module Hobo
         @web_methods ||= []
       end
       
-      def show_methods
-        @show_methods ||= []
+      def show_actions
+        @show_actions ||= []
+      end
+      
+      def collections
+        # By default, all has_many associations are published
+        @collections ||= model.reflections.values.map {|r| r.name if r.macro == :has_many}.compact
       end
 
       def model
@@ -127,11 +145,17 @@ module Hobo
       end
       
       
-      def show_method(*names)
-        show_methods.concat(names)
+      def show_action(*names)
+        show_actions.concat(names)
         for name in names
           class_eval "def #{name}; show; end"
         end
+      end
+      
+      
+      def publish_collection(*names)
+        collections.concat(names)
+        names.each {|n| ModelController.add_collection_actions(self, n)}
       end
       
       
@@ -189,9 +213,17 @@ module Hobo
 
 
     def create
-      @this = model.new
+      attributes = params[model.name.underscore]
+      type_attr = params['type']
+      create_model = if 'type'.in?(model.column_names) and 
+                         type_attr and type_attr.in?(model.send(:subclasses).omap{name})
+                       type_attr.constantize
+                     else
+                       model
+                     end
+      @this = create_model.new
       @check_create_permission = [@this]
-      initialize_from_params(@this, params[model.name.underscore])
+      initialize_from_params(@this, attributes)
       for obj in @check_create_permission
         permission_denied and return unless Hobo.can_create?(current_user, obj)
       end
@@ -216,7 +248,7 @@ module Hobo
 
           wants.js do
             render(:status => 500,
-                   :text => "There was a problem creating that #{model.name}.\n" +
+                   :text => "There was a problem creating that #{create_model.name}.\n" +
                             @this.errors.full_messages.join("\n"))
           end
         end
@@ -347,11 +379,18 @@ module Hobo
 
 
     def find_instance(id=nil)
-      self.class.find_instance(id || params[:id])
+      res = self.class.find_instance(id || params[:id])
+      instance_variable_set("@#{model.name.underscore}", res)
+      res
     end
 
 
     def hobo_render(page_kind = nil, page_model=nil)
+      if request_no_cache? and RAILS_ENV == "development"
+        Dryml.clear_cache
+        Dryml::Taglib.clear_cache
+      end
+      
       page_kind ||= params[:action].to_sym
       page_model ||= model
       

@@ -2,10 +2,7 @@ module Hobo::Dryml
 
   class TemplateEnvironment
 
-    APPLICATION_TAGLIB = "hobolib/application"
-    CORE_TAGLIB = "plugins/hobo/tags/core"
-
-    extend TagModule # include as class methods
+    # extend TagModule # include as class methods
 
     class << self
       def inherited(subclass)

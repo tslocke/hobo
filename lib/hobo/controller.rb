@@ -114,6 +114,11 @@ module Hobo
     def logged_in?
       not current_user.guest?
     end
+    
+    
+    def request_no_cache?
+      request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
+    end
 
 
     # Check if the user is authorized.

@@ -20,7 +20,7 @@ class HoboRapidGenerator < Hobo::Generator
   def import_tags
     path = File.join(RAILS_ROOT, "app/views/hobolib/application.dryml")
 
-    tag = "<taglib src=\"plugins/hobo/tags/rapid\">\n\n<set_theme name=\"default\"/>\n"
+    tag = "<taglib src=\"plugins/hobo/tags/rapid\"/>\n\n<set_theme name=\"default\"/>\n"
       
     src = File.read(path)
     return if src.include?(tag)

@@ -111,7 +111,7 @@ module Hobo
 
       def field_type(name)
         name = name.to_sym
-        @hobo_field_types[name] or
+        (@hobo_field_types && @hobo_field_types[name]) or
           reflections[name] or
           (col = columns.find {|c| c.name == name.to_s} and col.type)
       end

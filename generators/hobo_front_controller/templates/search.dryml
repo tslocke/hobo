@@ -1,16 +1,17 @@
 <page title="Search" onload="Hobo.doSearch('search_field')">
 
-  <panel class="red" style="margin-top: 40px">
-    <h1>Search</h1>
-    <div class='search' style='margin:10px'>
-      <input type='text' id="search_field" class="search_bhv" style="width: 90%"/>
-      <spinner id="search_spinner"/>
-    </div>
-  </panel>
+  <:main>
+    <panel class="red" style="margin-top: 40px">
+      <h2>Search</h2>
+      <div class='search' style='margin:10px'>
+        <input type='text' id="search_field" class="search_bhv" style="width: 90%"/>
+        <spinner id="search_spinner"/>
+      </div>
+    </panel>
 
-  <panel class="hidden" id="search_results_panel">
-    <h1>Results</h1>
-    <section id="search_results"></section>
-  </panel>
-
+    <panel class="hidden" id="search_results_panel">
+      <h2>Results</h2>
+      <section id="search_results"></section>
+    </panel>
+  </:main>
 </page>

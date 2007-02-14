@@ -1,14 +1,10 @@
 <taglib module="Hobo::Rapid"/>
 
 <taglib src="rapid_pages"/>
+<taglib src="rapid_editing"/>
+<taglib src="rapid_navigation"/>
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
-
-
-<def tag="submit" attrs="label">
-  <input type="submit" value="<%= label %>" xattrs="" class="button_input"/>
-</def>
-
 
 <def tag="object_table" attrs="fields, skip_fields, associations">
   <% fields = if fields.nil?
@@ -18,8 +14,18 @@
               end
      fields -= comma_split(skip_fields) if skip_fields
      options = add_classes(options, "object_table", ("new_record" if this.new_record?))
+     # force load
+     Hobo.models
   %>
   <table xattrs="">
+    <if q="#this.new_record? && 'type'.in?(this.class.column_names) && !this.class.send(:subclasses).empty?">
+      <tr>
+        <td class="field_label">Type:</td>
+        <td><sti_type_field/></td>
+      </tr>        
+    </if>
+
+
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label"><%= no_break(field.titleize) %>:</td>
@@ -45,26 +51,6 @@
     <tagbody/>
 
   </table>
-</def>
-
-
-<def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
-  <% refl = this_type
-     if refl && refl.macro == :belongs_to
-       completer_model ||= refl.klass
-       completer_attr ||= refl.klass.id_name_column
-     else
-       completer_model = completer_model.constantize if completer_model.is_a? String
-     end
-     id ||= this_field_dom_id + "_completer"
-     url = object_url(completer_model, "completions",
-                      { :for => completer_attr },
-                      options.select_hash {|k,v| k.to_s.starts_with? "where_"})
-  %>
-  <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
-         autocomplete_url="<%= url %>" value="<%= value %>"
-         xattrs=""/>
-  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
 
@@ -157,11 +143,6 @@
 </def>
 
 
-<def tag="submit_button" attrs="label">
-  <input type='submit' value='<%= label %>'/>
-</def>
-
-
 <def tag="image" attrs="src">
   <img src="<%= urlb %>/images/<%= src %>" xattrs=""/>
 </def>
@@ -186,141 +167,8 @@
 </def>
 
 
-<def tag="previous_page_link" attrs="query_params">
-  <% opts = { :page => @pages.current.previous }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : '&laquo; Previous page', opts) if @pages and @pages.current.previous %>
-</def>
-
-
-<def tag="next_page_link" attrs="query_params">
-  <% opts = { :page => @pages.current.next }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : 'Next page &raquo;', opts) if @pages and @pages.current.next %>
-</def>
-
-
-<def tag="belongs_to_menu_field"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
-  #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
-  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
-  %>
-  <select name="<%= param_name_for_this(true) %>">
-    <%= options_for_select(select_options.sort, this ? this.id : "") %>
-  </select>
-</def>
-
-
-<def tag="belongs_to_menu_editor"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
-  link_id = "#{this_field_dom_id}_editor" %>
-  <span id="#link_id" part_id="rapid_belongs_to_edit">
-    <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
-       select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
-       link_id = "#{this_field_dom_id}_editor"
-       f = ajax_updater(object_url(this_parent),
-                        "Change #{this_field.to_s.titleize}", [link_id],
-                        :method => "put",
-                        :params => { this_parent.class.name.underscore => {
-                            this_type.association_foreign_key => Hobo.raw_js('this.value')
-                          } })
-    %>
-    <select onchange="<%= f %>" id="#link_id">
-      <%= options_for_select(select_options.sort, this ? this.id : "") %>
-    </select>
-    <if_this><object_link>View</object_link></if_this>
-  </span>
-</def>
-
-
-<def tag="belongs_to_autocompleting_field">
-<% refl = this_type
-   completer_model ||= refl.klass
-   completer_attr ||= refl.klass.id_name_column
-   id ||= this_field_dom_id + "_completer"
-   url = object_url(completer_model, "completions",
-                    { :for => completer_attr },
-                    options.select_hash {|k,v| k.to_s.starts_with? "where_"})
-  %>
-
-  <input type="text" id="<%= id %>" class="autocomplete_bhv" autocomplete_url="<%= url %>"
-         name="<%= param_name_for_this %>" xattrs=""/>
-  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
-</def>
-
-
-<def tag="belongs_to_autocompleting_editor" attrs="update">
-  <if_can_edit><%
-  return object_link unless can_edit_this?
-
-  id ||= this_field_dom_id + "_completer"
-  f = ajax_updater(object_url(this_parent),
-                   "Change #{this_field.to_s.titleize}", update,
-                   :method => "put",
-                   :params => { this_parent.class.name.underscore => {
-                       this_field => Hobo.raw_js("$('#{id}').value")
-                    } })
-  refl = this_type
-  completer_model ||= refl.klass
-  completer_attr ||= refl.klass.id_name_column
-  url = object_url(completer_model, "completions",
-                   { :for => completer_attr },
-                   options.select_hash {|k,v| k.to_s.starts_with? "where_"})
-  %>
-    <form onsubmit="<%= f %>; $('<%= id %>').blur(); return false">
-      <input type="text" class="autocomplete_bhv autosubmit" id="<%= id %>" autocomplete_url="<%= url %>"
-             value="<%= this && this.id_name %>" xattrs="" />
-      <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
-    </form>
-  </if_can_edit>
-  <else>
-    <object_link/>
-  </else>
-</def>
-
-
-<def tag="boolean_checkbox_editor" attrs="update"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
-  f = ajax_updater(object_url(this_parent),
-                   "Change #{this_field.to_s.titleize}", update,
-                   :method => "put",
-                   :params => { this_parent.class.name.underscore => {
-                       this_field => Hobo.raw_js('this.checked')
-                    } })
-%>
-  <%=  check_box_tag "x", "1", this, :onchange => f %>
-</def>
-
-
-<def tag="application_account_nav">
-  <if q="#logged_in?">
-    <div class='nav_item'>Logged in as <%= h current_user.login %></div>
-    <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
-  </if>
-  <else>
-    <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
-    <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
-  </else>
-</def>
-
-
-<def tag="page_n_of_count">
-  Page <%= @pages.current_page.number %> of <%= @pages.length %>
-</def>
-
-
-<def tag="page_nav" attrs="query_params">
-  <if q="#@pages.length > 1">
-    <p>
-      <page_n_of_count/> - 
-      <previous_page_link query_params="#query_params"/>
-      <next_page_link query_params="#query_params"/>
-    </p>
-  </if>
-</def>
-
-
 <def tag="section_if">
   <% body = tagbody.call %>
   <%= body.blank? ? "" : section{body} %>
 </def>
-  
+

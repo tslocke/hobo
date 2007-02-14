@@ -27,8 +27,8 @@ module Hobo::ControllerHelpers
   end
 
 
-  def object_url(obj, action=nil, *param_hashes)
-    action &&= action.to_s
+  def object_url(obj, options={})
+    action = options[:action] && options[:action].to_s
     parts = if obj.is_a? Class
               [urlb, controller_for(obj)]
             elsif obj.is_a? ActiveRecord::Base
@@ -43,7 +43,9 @@ module Hobo::ControllerHelpers
                      else
                        obj.id
                      end
-                [urlb, controller_for(obj), id]
+                base = options[:owner] ? object_url(options[:owner]) : urlb
+                
+                [base, controller_for(obj), id]
               end
             elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
               owner = obj.proxy_owner
@@ -53,20 +55,21 @@ module Hobo::ControllerHelpers
               raise HoboError.new("cannot create url for #{obj.inspect}")
             end
     basic = parts.join("/")
-    url = case action
-          when "new"
-            basic + "/new"
-          when "destroy"
-            basic + "?_method=DELETE"
-          when "update"
-            basic + "?_method=PUT"
-          when nil
-            basic
-          else
-            basic + ";" + action
-          end
-    params = make_params(*param_hashes)
-    params.blank? ? url : url + "?" + params
+    path = case action
+           when "destroy"
+             basic + "?_method=DELETE"
+           when "update"
+             basic + "?_method=PUT"
+           when nil
+             basic
+           else
+             basic + ";" + action
+           end
+    if options[:params]
+      path + "?" + make_params(options[:params]) 
+    else
+      path
+    end
   end
 
 

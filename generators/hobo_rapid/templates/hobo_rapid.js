@@ -16,6 +16,17 @@ var Hobo = {
 
     searchRequest: null,
 
+    ajaxSetFieldForElement: function(el, val, options) {
+        var updates = el.getAttribute("hobo_update")
+        var updates = updates ? updates.split(/\s*,\s*/) : []
+        console.log(Hobo.fieldSetParam(el, val))
+        var opts = Object.merge(options || {}, { params: Hobo.fieldSetParam(el, val) })
+        Hobo.ajaxRequest(Hobo.putUrl(el),
+                         el.getAttribute("hobo_ajax_message") || "Changing...",
+                         updates,
+                         opts)
+    },
+
     ajaxRequest: function(url_or_form, message, updates, options) {
 
         options = Object.merge({ asynchronous:true,
@@ -29,6 +40,7 @@ var Hobo = {
         }
         var params = []
         if (updates.length > 0) {
+            console.log(updates)
             updates.each(function(dom_id) {
                 params.push("render[][part]=" + hoboParts[dom_id][0] +
                             "&render[][id]=" + dom_id +
@@ -85,32 +97,48 @@ var Hobo = {
         }
     },
 
+    _makeInPlaceEditor: function(el, options) {
+        var old
+        var spec = Hobo.parseFieldId(el)
+        opts = {okButton: false,
+                cancelLink: false,
+                submitOnBlur: true,
+                callback: function(form, val) {
+                    old = val
+                    return Hobo.fieldSetParam(el, val)
+                },
+                highlightcolor: '#ffffff',
+                highlightendcolor: Hobo.backgroundColor(el),
+                onFailure: function(t) { alert(t.responseText); el.innerHTML = old }
+               }
+        Object.extend(opts, options)
+        new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
+    },
+
     applyEvents: function(root) {
         root = $(root)
         function select(p) {
             return new Selector(p).findElements(root)
         }
 
-        select(".in_place_edit_bhv").each(function (el) {
-            var old
-            var spec = Hobo.parseFieldId(el)
-            options = {okButton: false,
-                       cancelLink: false,
-                       submitOnBlur: true,
-                       callback: function(form, val) {
-                           old = val
-                           return spec.name + '[' + spec.field + ']=' + val
-                       },
-                       highlightcolor: '#ffffff',
-                       highlightendcolor: Hobo.backgroundColor(el),
-                       onFailure: function(t) { alert(t.responseText); el.innerHTML = old }
-                      }
-            if (el.hasClassName("textarea_editor")) {
-                options.rows = 2
-            }
-            new Ajax.InPlaceEditor(el, Hobo.putUrl(el), options)
-        });
+        select(".in_place_textfield_bhv").each(function (el) {
+            Hobo._makeInPlaceEditor(el)
+        })
 
+        select(".in_place_textarea_bhv").each(function (el) {
+            Hobo._makeInPlaceEditor(el, {rows: 2})
+        })
+
+        select(".in_place_html_textarea_bhv").each(function (el) {
+            Hobo._makeInPlaceEditor(el, {rows: 2, handleLineBreaks: false})
+        })
+
+        select("select.number_editor_bhv").each(function(el) {
+            el.onchange = function() {
+                Hobo.ajaxSetFieldForElement(el, el.value)
+            }
+        })
+                                                
         select(".autocomplete_bhv").each(function (el) {
             options = {paramName: "query", minChars: 3, method: 'get' }
             if (el.hasClassName("autosubmit")) {
@@ -160,7 +188,14 @@ var Hobo = {
         return urlBase + "/" + controllerNames[spec.name] + "/" + spec.id + "?_method=PUT"
     },
 
-    removeButton: function(el, url) {
+        
+    fieldSetParam: function(el, val) {
+        spec = Hobo.parseFieldId(el)
+        return spec.name + '[' + spec.field + ']=' + val
+    },
+
+
+    removeButton: function(el, url, updates) {
         if (confirm("Are you sure?")) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
@@ -168,7 +203,13 @@ var Hobo = {
                 Hobo.hideSpinner();
                 new Effect.Fade(objEl, {duration: 0.5});
             }
-            new Ajax.Request(url, {asynchronous:true, evalScripts:true, method:'delete', onComplete: complete});
+            if (updates && updates.length > 0) {
+                new Hobo.ajaxRequest(url, "Removing", updates, { method:'delete',
+                                                                 onComplete: complete});
+            } else {
+                new Ajax.Request(url, {asynchronous:true, evalScripts:true, method:'delete',
+                                       onComplete: complete});
+            }
         }
     },
 
@@ -254,4 +295,9 @@ Element.findContaining = function(el, tag) {
         e = el.parentNode
     }
     return null;
+}
+
+// Fix scriptaculous - don't remove <p> tags please!
+Ajax.InPlaceEditor.prototype.convertHTMLLineBreaks = function(string) {
+    return string.replace(/<br>/gi, "\n").replace(/<br\/>/gi, "\n");
 }

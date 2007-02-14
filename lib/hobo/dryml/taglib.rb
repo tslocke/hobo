@@ -6,20 +6,22 @@ module Hobo::Dryml
 
     class << self
 
-      attr_accessor :cache
-
       def get(path)
         raise DrymlException.new("No such taglib: #{path}") unless File.exists?(path)
         file = File.new(path)
 
-        taglib = cache[file.path]
+        taglib = @cache[file.path]
         if taglib
           taglib.reload
         else
           taglib = Taglib.new(file)
-          cache[file.path] = taglib
+          @cache[file.path] = taglib
         end
         taglib
+      end
+      
+      def clear_cache
+        @cache = {}
       end
 
     end
@@ -30,7 +32,7 @@ module Hobo::Dryml
     end
 
     def reload
-      load if RAILS_ENV == "development" or  @file.mtime > @last_load_time
+      load if @file.mtime > @last_load_time
     end
 
     def load

@@ -39,7 +39,7 @@ module Hobo
     def models
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
-          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize rescue nil
+          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize
         end
         @models_loaded = true
       end
@@ -129,24 +129,21 @@ module Hobo
       rescue
         require "#{RAILS_ROOT}/app/controllers/application"
       end
-      for model in Hobo.models
-        web_name = model.name.underscore.pluralize.downcase
-        controller = "#{model.name.pluralize}Controller".constantize rescue nil
-        if controller and controller < Hobo::ModelController
-          map.resources web_name, :collection => { :completions => :get }
-          for refl in model.reflections.values.select {|r| r.macro == :has_many}
-            map.named_route("#{web_name.singularize}_#{refl.name}",
-                            "#{web_name}/:id/#{refl.name}",
-                            :controller => web_name,
-                            :action => "show_#{refl.name}",
-                            :conditions => { :method => :get })
 
-            map.named_route("new_#{web_name.singularize}_#{refl.name.to_s.singularize}",
-                            "#{web_name}/:id/#{refl.name}/new",
-                            :controller => web_name,
-                            :action => "new_#{refl.name.to_s.singularize}")
-          end
+      for model in Hobo.models
+        controller_name = "#{model.name.pluralize}Controller"
+        controller = controller_name.constantize if
+          File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
+        if controller and controller < Hobo::ModelController
           
+          web_name = model.name.underscore.pluralize.downcase
+          map.resources web_name, :collection => { :completions => :get }
+          
+          for collection in controller.collections
+            new_method = Hobo.simple_has_many_association?(model.reflections[collection])
+            Hobo.add_collection_routes(map, web_name, collection, new_method)
+          end
+            
           for method in controller.web_methods
             map.named_route("#{web_name.singularize}_#{method}",
                             "#{web_name}/:id/#{method}",
@@ -155,14 +152,32 @@ module Hobo
                             :conditions => { :method => :post })
           end
           
-          for method in controller.show_methods
-            map.named_route("#{web_name.singularize}_#{method}",
-                            "#{web_name}/:id;#{method}",
+          for view in controller.show_actions
+            map.named_route("#{web_name.singularize}_#{view}",
+                            "#{web_name}/:id;#{view}",
                             :controller => web_name,
-                            :action => method.to_s,
+                            :action => view.to_s,
                             :conditions => { :method => :get })
           end
         end
+      end
+    end
+    
+    
+    def add_collection_routes(map, controller_name, collection_name, new_method)
+      singular_name = collection_name.to_s.singularize
+      map.with_options :controller => controller_name, :conditions => { :method => :get } do |m|
+        m.named_route("#{controller_name.singularize}_#{collection_name}",
+                      "#{controller_name}/:id/#{collection_name}",
+                      :action => "show_#{collection_name}")
+
+        m.named_route("#{controller_name.singularize}_#{singular_name}",
+                      "#{controller_name}/:owner_id/#{collection_name}/:id",
+                      :action => "show_#{singular_name}")
+
+        m.named_route("new_#{controller_name.singularize}_#{singular_name}",
+                      "#{controller_name}/:id/#{collection_name};new",
+                      :action => "new_#{singular_name}") if new_method
       end
     end
 

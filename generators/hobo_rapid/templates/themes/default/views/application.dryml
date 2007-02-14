@@ -6,12 +6,11 @@
   <html>
     <head>
       <title><%= title_prefix %><%= title %></title>
-      <%= stylesheet_link_tag 'application' %>
       <theme_stylesheet/>
       <%= javascript_include_tag :defaults %>
       <hobo_rapid_javascripts/>
     </head>
-    <body content_option="body">
+    <body onload="Hobo.applyEvents()" content_option="body">
 
       <div id='ajax_progress'>
         <div>
@@ -47,7 +46,7 @@
             <div class="flash"><%= flash[:notice] %></div>
           </if>
 
-          <div content_option="intro">!</div>
+          <div content_option="intro"></div>
           <div content_option="main">
             <div class="maincol" content_option="maincol"/>
             <div class="sidecol" content_option="sidecol"/>

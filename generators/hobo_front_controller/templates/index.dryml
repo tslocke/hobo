@@ -2,12 +2,12 @@
 
   <:intro>
     <h1 class="front_page_title"><%= app_name %></h1>
-  <:/intro>
+  </:intro>
   
   <:main>
     <panel>
       <div style="margin-left: 40px; ">
-        <h2>Congratulations! Your Hobo Rails App is up and running</h2>
+        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
         <ul>
           <li>To customise this page: edit app/views/<%= file_name %>/index.dryml </li>
 
@@ -21,7 +21,7 @@
 
     <repeat obj="#Hobo.models">
       <panel>
-        <h1><%%= this.name.titlecase.pluralize %></h1>
+        <h2><%%= this.name.titlecase.pluralize %></h2>
         <section>
           <if q="#this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>

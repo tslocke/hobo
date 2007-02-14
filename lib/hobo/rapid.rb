@@ -77,49 +77,6 @@ module Hobo::Rapid
   end
 
 
-  def_tag :display_name do
-    name_tag = "display_name_for_#{this.class.name.underscore}"
-    if respond_to?(name_tag)
-      send(name_tag)
-    elsif this.is_a? Array
-      "(#{count})"
-    elsif this.is_a? Class and this < ActiveRecord::Base
-      this.name.pluralize.titleize
-    else
-      res = [:display_name, :name, :title].search do |m|
-        this.send(m) if this.respond_to?(m) and can_view?(this, m)
-      end
-      res || "#{this.class.name.humanize} #{this.id}"
-    end
-  end
-
-
-  def_tag :object_link, :view do
-    if can_view_this?
-      if this.nil?
-        "(Not Available)"
-      else
-        raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
-        v = this.is_a?(String) ? this.singularize.classify.constantize : this
-        content = tagbody ? tagbody.call : display_name(:obj => v)
-        link_to content, object_url(v, view), options
-      end
-    end
-  end
-
-
-  def_tag :new_object_link, :for do
-    f = for_ || this
-    new = f.new
-    new.created_by(current_user)
-    if can_create?(new)
-      default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
-      content = tagbody ? tagbody.call : default
-      link_to content, object_url(f, "new")
-    end
-  end
-
-
   def_tag :edit, :in_place do
     if can_view_this?
       if not can_edit_this?
@@ -198,6 +155,9 @@ module Hobo::Rapid
 
       when :text
         text_area_editor(options)
+
+      when :html
+        html_editor(options)
         
       when :integer, :float, :decimal, :timestamp, :time, :date, :datetime
         if respond_to?("#{this_type}_editor")
@@ -221,18 +181,28 @@ module Hobo::Rapid
       end
     end
   end
-    
-  def_tag :text_field_editor do
+  
+  
+  def in_place_editor(kind, options)
     disp = show
     disp = "(click to edit)" if disp.blank?
-    opts = add_classes(options, "in_place_edit_bhv").merge(:model_id => this_field_dom_id)
+    opts = add_classes(options, kind).merge(:model_id => this_field_dom_id)
     content_tag(:span, disp, opts)
+  end
+    
+  
+  def_tag :text_field_editor do
+    in_place_editor "in_place_textfield_bhv", options
   end
   
   def_tag :text_area_editor do
-    text_field_editor(add_classes(options, "textarea_editor"))
+    in_place_editor "in_place_textarea_bhv", options
   end
   
+  
+  def_tag :html_editor do
+    in_place_editor "in_place_html_textarea_bhv", options
+  end
   
   def_tag :belongs_to_editor do
     belongs_to_menu_editor(options)
@@ -278,11 +248,7 @@ module Hobo::Rapid
         button_to(label2, url, opts)
       else
         opts[:value] = label2
-        opts[:onclick] = if update
-                           ajax_updater(url, message || "Removing", update, :confirm => confirm2)
-                         else
-                           "Hobo.removeButton(this, '#{url}')"
-                         end
+        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)})"
         tag(:input, opts)
       end
     else
@@ -356,7 +322,7 @@ module Hobo::Rapid
               when nil
                 []
               when '*'
-                this.class.column_names
+                this.class.column_names - ['type']
               else
                 comma_split(hidden_fields)
               end

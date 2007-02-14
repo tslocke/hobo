@@ -8,11 +8,16 @@ module Hobo::Dryml
 
   EMPTY_PAGE = "[tag-page]"
 
-  @page_environments = {}
+  @renderer_classes = {}
 
   class << self
 
     attr_accessor :last_if
+    
+    def clear_cache
+      @renderer_classes = {}
+      @tag_page_renderer_class = nil
+    end
 
     def render_tag(view, tag, options={})
       renderer = empty_page_renderer(view)
@@ -27,25 +32,24 @@ module Hobo::Dryml
 
     def page_renderer(view, local_names=[], page=nil)
       prepare_view!(view)
-      if page === EMPTY_PAGE
+      if page == EMPTY_PAGE
         @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper]) if
-          @tag_page_renderer_class.nil? or RAILS_ENV == "development"
+          @tag_page_renderer_class.nil?
         @tag_page_renderer_class.new(page, view)
       else
         page ||= view.instance_variable_get('@hobo_template_path')
         template_path = "app/views/" + page + ".dryml"
         src_file = File.new(File.join(RAILS_ROOT, template_path))
-        renderer_class = @page_environments[page]
+        renderer_class = @renderer_classes[page]
 
         # do we need to recompile?
         if (!renderer_class or                                          # nothing cahced?
             (local_names - renderer_class.compiled_local_names).any? or # any new local names?
-            renderer_class.load_time < src_file.mtime or                # cache out of date?
-            RAILS_ENV == "development")                                 # always reload if in dev mode
+            renderer_class.load_time < src_file.mtime)                  # cache out of date?
           renderer_class = make_renderer_class(src_file.read, template_path, local_names,
                                                default_imports_for_view(view))
           renderer_class.load_time = src_file.mtime
-          @page_environments[page] = renderer_class
+          @renderer_classes[page] = renderer_class
         end
         renderer_class.new(page, view)
       end

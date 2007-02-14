@@ -108,6 +108,54 @@ module Hobo
     def theme_asset(path)
       "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
     end
+    
+    
+    def_tag :dynamic_tag, :name do
+      send(name, options)
+    end
+
+    
+    def_tag :display_name do
+      name_tag = "display_name_for_#{this.class.name.underscore}"
+      if respond_to?(name_tag)
+        send(name_tag)
+      elsif this.is_a? Array
+        "(#{count})"
+      elsif this.is_a? Class and this < ActiveRecord::Base
+        this.name.pluralize.titleize
+      else
+        res = [:display_name, :name, :title].search do |m|
+          this.send(m) if this.respond_to?(m) and can_view?(this, m)
+        end
+        res || "#{this.class.name.humanize} #{this.id}"
+      end
+    end
+
+
+    def_tag :object_link, :view, :owner do
+      if can_view_this?
+        if this.nil?
+          "(Not Available)"
+        else
+          raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
+          v = this.is_a?(String) ? this.singularize.classify.constantize : this
+          content = tagbody ? tagbody.call : display_name(:obj => v)
+          link_to content, object_url(v, options.merge(:action => view, :owner => owner))
+        end
+      end
+    end
+
+
+    def_tag :new_object_link, :for do
+      f = for_ || this
+      new = f.new
+      new.created_by(current_user)
+      if can_create?(new)
+        default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
+        content = tagbody ? tagbody.call : default
+        link_to content, object_url(f, :action => "new")
+      end
+    end
 
 
     def_tag :tag_for_object, :name do
@@ -125,7 +173,9 @@ module Hobo
     def_tag :show do
       raise HoboError.new("attempted to show non-viewable field '#{this_field}'") unless can_view_this?
       
-      type = this_type || (this.is_a?(String) && :string)
+      type = this_type || this.class
+      type = :string if type == String
+      type = :integer if type == Fixnum
       if this.nil?
         case type
           when  :string, :text; ""
@@ -134,8 +184,12 @@ module Hobo
       elsif this_type.respond_to?(:macro)
         if this_type.macro == :belongs_to
           object_link
-        else
-          map_this { object_link }.join(", ")
+        elsif this_type.macro == :has_many
+          if this.empty?
+            "(none)"
+          else
+            map_this { object_link }.join(", ")
+          end
         end
       else
         case type
@@ -213,6 +267,7 @@ module Hobo
         options[:class] = options[:class] ? (klass + ' ' + options[:class]) : klass
       end
       options.map do |n,v|
+        v = v.to_s
         val = v.include?("'") ? '"' + v + '"' : "'" + v + "'"
         "#{n}=#{val}"
       end.join(' ')
@@ -267,14 +322,18 @@ module Hobo
     end
 
 
-    def_tag :repeat, :even_odd do
-      if even_odd
-        map_this do
-          klass = [options[:class], cycle("even", "odd")].compact.join(' ')
-          content_tag(even_odd, tagbody.call, options.merge(:class => klass, :model_id => dom_id(this)))
-        end
+    def_tag :repeat, :even_odd, :else do
+      if this.empty?
+        else_
       else
-        map_this { tagbody.call }
+        if even_odd
+          map_this do
+            klass = [options[:class], cycle("even", "odd")].compact.join(' ')
+            content_tag(even_odd, tagbody.call, options.merge(:class => klass, :model_id => dom_id(this)))
+          end
+        else
+          map_this { tagbody.call }
+        end
       end
     end
 

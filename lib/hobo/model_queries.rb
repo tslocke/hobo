@@ -37,11 +37,18 @@ module Hobo
 
       m, field = *name.to_s.match(/^(.*)_is$/)
       if m
-        check_column[field]
-        return (if args[0].nil?
+        if (refl = model.reflections[field.to_sym]) and refl.macro == :belongs_to
+          field = refl.primary_key_name
+          val = args[0] && args[0].id
+          raise HoboError.new("don't use self in query blocks") if val == self
+        else 
+          check_column[field]
+          val = args[0]
+        end
+        return (if val.nil?
                   WhereFragment.new("#{field} IS NULL")
                 else
-                  WhereFragment.new("#{field} = ?", args[0])
+                  WhereFragment.new("#{field} = ?", val)
                 end)
       end
 
