@@ -1,0 +1,66 @@
+<!-- Navigation
+     Main nav bar, account nav bar (login, signup...), page nav
+  -->
+
+
+<def tag="navigation" attrs="current, item">
+  <nav_container xattrs="">
+    <repeat obj="#item">
+      <% c = this[:content] %>
+      <if q="#c == current">
+        <nav_item class="current" content_option="li"><%= c %></nav_item>
+      </if>
+      <else>
+        <nav_item content_option="item_el">
+          <a href="#this[:href]" content_option="link"><%= c %></a>
+        </nav_item>
+      </else>
+    </repeat>
+  </nav_container>
+</def>
+
+
+<def tag="nav_container"><ul xattrs=""><tagbody/></ul></def>
+
+                                                            
+<def tag="nav_item"><li xattrs=""><tagbody/></li></def>
+
+
+<def tag="application_account_nav">
+  <if q="#logged_in?">
+    <div class='nav_item'>Logged in as <%= h current_user.login %></div>
+    <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
+  </if>
+  <else>
+    <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
+    <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+  </else>
+</def>
+
+
+<def tag="previous_page_link" attrs="query_params">
+  <% opts = { :page => @pages.current.previous }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : '&laquo; Previous page', opts) if @pages and @pages.current.previous %>
+</def>
+
+
+<def tag="next_page_link" attrs="query_params">
+  <% opts = { :page => @pages.current.next }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : 'Next page &raquo;', opts) if @pages and @pages.current.next %>
+</def>
+
+
+<def tag="page_n_of_count">
+  Page <%= @pages.current_page.number %> of <%= @pages.length %>
+</def>
+
+
+<def tag="page_nav" attrs="query_params">
+  <if q="#@pages.length > 1">
+    <p>
+      <page_n_of_count/> - 
+      <previous_page_link query_params="#query_params"/>
+      <next_page_link query_params="#query_params"/>
+    </p>
+  </if>
+</def>

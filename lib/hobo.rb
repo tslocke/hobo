@@ -55,7 +55,7 @@ module Hobo
     def object_from_dom_id(dom_id)
       return nil if dom_id == 'nil'
 
-      _, name, id, attr = *dom_id.match(/^([a-z_]+)_([0-9]+)(_[a-z_]+)?$/)
+      _, name, id, attr = *dom_id.match(/^([a-z_]+)_([0-9]+(?:_[0-9]+)*)(_[a-z_]+)?$/)
       raise ArgumentError.new("invalid model-reference in dom id") unless name
       if name
         model_class = name.classify.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
@@ -75,21 +75,21 @@ module Hobo
 
     def dom_id(obj, attr=nil)
       if obj.nil?
-        raise HoboError.new("Tried to get field '#{attr}' of nil") if attr
+        raise HoboError.new("Tried to get attribute '#{attr}' of nil") if attr
         return 'nil'
       end
 
       if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
         attr = obj.proxy_reflection.name
         obj = obj.proxy_owner
-      elsif !obj.is_a?(ActiveRecord::Base)
+      elsif !obj.respond_to?(:typed_id)
         if attr
           dom_id(get_field(obj, attr))
         else
           raise Exception.new("Can't create dom id for #{obj.inspect}")
         end
       end
-      [obj.class.name.underscore, obj.id, attr].compact.join('_')
+      attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 
     def find_by_search(query)
@@ -134,30 +134,37 @@ module Hobo
         controller_name = "#{model.name.pluralize}Controller"
         controller = controller_name.constantize if
           File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
-        if controller and controller < Hobo::ModelController
-          
+        if controller
           web_name = model.name.underscore.pluralize.downcase
-          map.resources web_name, :collection => { :completions => :get }
-          
-          for collection in controller.collections
-            new_method = Hobo.simple_has_many_association?(model.reflections[collection])
-            Hobo.add_collection_routes(map, web_name, collection, new_method)
-          end
+
+          # Simple support for composite models, we might later need a CompositeModelController
+          if model < Hobo::CompositeModel
+            map.connect "#{web_name}/:id", :controller => web_name, :action => 'show'
+
+          elsif controller < Hobo::ModelController
             
-          for method in controller.web_methods
-            map.named_route("#{web_name.singularize}_#{method}",
-                            "#{web_name}/:id/#{method}",
-                            :controller => web_name,
-                            :action => method.to_s,
-                            :conditions => { :method => :post })
-          end
-          
-          for view in controller.show_actions
-            map.named_route("#{web_name.singularize}_#{view}",
-                            "#{web_name}/:id;#{view}",
-                            :controller => web_name,
-                            :action => view.to_s,
-                            :conditions => { :method => :get })
+            map.resources web_name, :collection => { :completions => :get }
+            
+            for collection in controller.collections
+              new_method = Hobo.simple_has_many_association?(model.reflections[collection])
+              Hobo.add_collection_routes(map, web_name, collection, new_method)
+            end
+            
+            for method in controller.web_methods
+              map.named_route("#{web_name.singularize}_#{method}",
+                              "#{web_name}/:id/#{method}",
+                              :controller => web_name,
+                              :action => method.to_s,
+                              :conditions => { :method => :post })
+            end
+            
+            for view in controller.show_actions
+              map.named_route("#{web_name.singularize}_#{view}",
+                              "#{web_name}/:id;#{view}",
+                              :controller => web_name,
+                              :action => view.to_s,
+                              :conditions => { :method => :get })
+            end
           end
         end
       end

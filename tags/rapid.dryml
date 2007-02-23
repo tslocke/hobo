@@ -72,9 +72,9 @@
 </def>
 
 
-<def tag="ul_for" attrs="empty">
-  <if q="#this.empty? and empty">
-    <%= empty %>
+<def tag="ul_for" attrs="else">
+  <if q="#this.empty? and else_">
+    <%= else_ %>
   </if>
   <else>
     <ul xattrs="">
@@ -92,7 +92,7 @@
 </def>
 
 
-<def tag="table_for" attrs="headings, empty, row_class">
+<def tag="table_for" attrs="headings, empty, row_class, footer">
   <if q="#this.empty? and empty">
     <%= empty %>
   </if>
@@ -108,6 +108,7 @@
         <% even_odd = even_odd == "even" ? "odd" : "even" %>
         </if_can_view>
       </repeat>
+      <%= footer %>
     </table>
   </else>
 </def>

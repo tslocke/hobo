@@ -19,8 +19,12 @@ var Hobo = {
     ajaxSetFieldForElement: function(el, val, options) {
         var updates = el.getAttribute("hobo_update")
         var updates = updates ? updates.split(/\s*,\s*/) : []
-        console.log(Hobo.fieldSetParam(el, val))
-        var opts = Object.merge(options || {}, { params: Hobo.fieldSetParam(el, val) })
+
+        var params = Hobo.fieldSetParam(el, val)
+        var p = el.getAttribute("hobo_ajax_params")
+        if (p) params = params + "&" + p
+
+        var opts = Object.merge(options || {}, { params: params})
         Hobo.ajaxRequest(Hobo.putUrl(el),
                          el.getAttribute("hobo_ajax_message") || "Changing...",
                          updates,
@@ -40,7 +44,6 @@ var Hobo = {
         }
         var params = []
         if (updates.length > 0) {
-            console.log(updates)
             updates.each(function(dom_id) {
                 params.push("render[][part]=" + hoboParts[dom_id][0] +
                             "&render[][id]=" + dom_id +

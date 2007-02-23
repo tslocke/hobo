@@ -71,17 +71,20 @@ module Hobo::Dryml
 
     end
 
+    
     def default_imports_for_view(view)
       [ApplicationHelper,
        view.controller.class.name.sub(/Controller$/, "Helper").constantize]
     end
 
+    
     def make_renderer_class(template_src, template_path, locals, imports)
       renderer_class = Class.new(TemplateEnvironment)
       compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
       renderer_class
     end
 
+    
     def compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
       template = Template.new(template_src, renderer_class, template_path)
       imports.each {|m| template.import_module(m)}
@@ -92,6 +95,7 @@ module Hobo::Dryml
       template.compile(all_local_names)
     end
 
+    
     def unreserve(word)
       word = word.to_s
       if RESERVED_WORDS.include?(word)
@@ -99,6 +103,35 @@ module Hobo::Dryml
       else
         word
       end
+    end
+    
+    
+    def hashify_options(options, merge_into=nil)
+      result = merge_into || options
+      
+      options.each_pair do |key, val|
+        if key.is_a? Array
+          result.delete(key)
+          k = key.first
+          
+          if key.length == 2 and key.last.is_a? Fixnum
+            hashify_options(val) if val.is_a?(Hash)
+            result[k] ||= []
+            result[k][key.last] = val
+          else
+            existing = options[k]
+            v = if key.length == 1
+                  val.is_a?(Hash) ? hashify_options(val, existing) : val
+                else
+                  hashify_options({key[1..-1] => val}, existing)
+                end
+            result[k] = v
+          end          
+        else
+          hashify_options(val) if val.is_a?(Hash)
+        end
+      end
+      result
     end
 
   end

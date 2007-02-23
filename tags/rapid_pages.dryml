@@ -1,0 +1,174 @@
+<def tag="page" attrs="title_prefix, title">
+  <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
+  <html>
+    <head>
+      <title><%= title_prefix %><%= title || human_type + ": " + display_name %></title>
+      <%= stylesheet_link_tag 'application' %>
+      <%= javascript_include_tag :defaults %>
+      <hobo_rapid_javascripts/>
+    </head>
+    <body onload="Hobo.applyEvents();" content_option="body">
+      <div content_option="header"/>
+      <div content_option="intro"/>
+      <div content_option="main"/>
+      <div content_option="footer"/>
+    </body>
+  </html>
+</def>
+
+
+<def tag="index_page">
+  <% model_name = @model.name.titleize %>
+  <page title="All #{model_name.pluralize}" xattrs="">
+
+    <:intro>
+      <h1><%= model_name.pluralize %></h1>
+    </:intro>
+
+    <:main>
+      <panel>
+        <h2 replace_option="panel_heading"><count label="#model_name"/></h2>
+        <section>
+          <table_for replace_option="table">
+            <td><object_link/></td><td><delete_button class='text'/></td>
+          </table_for>
+        </section>
+        
+        <if q="#@pages.length > 1">
+          <section replace_option="page_nav">
+            <div class="page_links">
+              <page_nav/>
+            </div>
+          </section>
+        </if>
+
+        <section_if replace_option="new_link">
+          <p><new_object_link for="#@model"/></p>
+        </section_if>
+      </panel>
+    </:main>
+  </page>
+</def>
+
+
+<def tag="new_page">
+  <page title="New #{human_type}" xattrs="">
+    <:intro>
+      <h1>New <human_type/></h1>
+    </:intro>
+
+    <:main>
+      <panel>
+        <h2 replace_option="pannel_heading">Details</h2>
+        <section>
+          <div class="error_messages" replace_option="error_messages">
+            <%= error_messages_for 'this' %>
+          </div>
+
+          <object_form hidden_fields="*">
+            <object_table associations="belongs_to" replace_option="fields"/>
+            <submit label="Create" class="create_button" replace_option="submit_button"/>
+          </object_form>
+        </section>
+      </panel>
+    </:main>
+
+  </page>
+</def>
+
+
+<def tag="show_page">
+  <% has_many_assocs = this.class.reflections.values.map do |refl|
+       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
+     end.compact
+  %>
+  <page xattrs="">
+
+    <:intro>
+      <h1><human_type/><if q="#this.respond_to? :name">: <edit attr="name"/></if></h1>
+      <p><delete_button ajax="#false"/></p>
+    </:intro>
+    
+    <:main>
+      <panel>
+        <h2 replace_option="panel_heading">Details</h2>
+        <section>
+          <object_table associations="*" skip_fields="name" replace_option="fields"/>
+        </section>
+
+        <section_if replace_option="new_links">
+          <repeat obj="#has_many_assocs">
+            <p><new_object_link/></p>
+          </repeat>
+        </section_if>
+      </panel>
+    </:main>
+
+  </page>
+</def>
+
+
+<def tag="new_in_collection_page">
+  <page title="New #{human_type}" xattrs="">
+
+    <:intro>
+      <h1>New <human_type/></h1>
+      <h2>For: <object_link obj="#@owner" /></h2>
+    </:intro>
+
+    <:main>
+      <panel>
+        <h2 replace_option="panel_heading">Details</h2>
+        <section>
+          <div class="error_messages" replace_option="error_messages">
+            <%= error_messages_for 'this' %>
+          </div>
+
+          <object_form hidden_fields="*">
+            <object_table associations="belongs_to" replace_option="fields"/>
+            <submit label='#"Add to #{display_name(:obj => @owner)}"' replace_option="submit_button"/>
+          </object_form>
+        </section>
+
+      </panel>
+    </:main>
+
+  </page>
+</def>
+
+
+<def tag="show_collection_page">
+  <% title = "#{@association.proxy_reflection.name.to_s.titleize} for #{display_name(:obj => @owner)}" %>
+  <page title="#title" xattrs="">
+
+    <:intro>
+      <h1><%= title %></h1>
+      <h2>Back to <object_link obj="#@owner"/></h2>
+    </:intro>
+
+    <:main>
+      <panel>
+        <h2 replace_option="panel_heading"><count label="#@association.member_class.name.titleize"/></h2>
+        <section>
+          <table_for replace_option="table">
+            <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
+          </table_for>
+        </section>
+
+        <if q="#@pages.length > 1">
+          <section replace_option="page_nav">
+            <div class="page_links">
+              <page_nav/>
+            </div>
+          </section>
+        </if>
+
+        <if q="#Hobo.simple_has_many_association?(@association)">
+          <section replace_option="new_link">
+            <new_object_link for="#@association"/>
+          </section>
+        </if>
+      </panel>
+    </:main>
+  </page>
+</def>

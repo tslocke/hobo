@@ -27,10 +27,14 @@ module Hobo::ControllerHelpers
   end
 
 
-  def object_url(obj, options={})
-    action = options[:action] && options[:action].to_s
+  def object_url(obj, action=nil, *param_hashes)
+    action &&= action.to_s
     parts = if obj.is_a? Class
               [urlb, controller_for(obj)]
+              
+            elsif obj.is_a? Hobo::CompositeModel
+              [urlb, controller_for(obj), obj.id]
+              
             elsif obj.is_a? ActiveRecord::Base
               if obj.new_record?
                 [urlb, controller_for(obj)]
@@ -43,33 +47,33 @@ module Hobo::ControllerHelpers
                      else
                        obj.id
                      end
-                base = options[:owner] ? object_url(options[:owner]) : urlb
                 
-                [base, controller_for(obj), id]
+                [urlb, controller_for(obj), id]
               end
+              
             elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
               owner = obj.proxy_owner
               new_model = obj.proxy_reflection.klass
               [object_url(owner), obj.proxy_reflection.name]
+              
             else
               raise HoboError.new("cannot create url for #{obj.inspect}")
             end
     basic = parts.join("/")
-    path = case action
-           when "destroy"
-             basic + "?_method=DELETE"
-           when "update"
-             basic + "?_method=PUT"
-           when nil
-             basic
-           else
-             basic + ";" + action
-           end
-    if options[:params]
-      path + "?" + make_params(options[:params]) 
-    else
-      path
-    end
+    url = case action
+          when "new"
+            basic + "/new"
+          when "destroy"
+            basic + "?_method=DELETE"
+          when "update"
+            basic + "?_method=PUT"
+          when nil
+            basic
+          else
+            basic + ";" + action
+          end
+    params = make_params(*param_hashes)
+    params.blank? ? url : url + "?" + params
   end
 
 

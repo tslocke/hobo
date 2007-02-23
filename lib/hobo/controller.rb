@@ -28,6 +28,7 @@ module Hobo
 
 
     def ajax_update_response(this, part_page, render_specs, results={})
+      before_ajax if respond_to? :before_ajax
       add_variables_to_assigns
       renderer = Hobo::Dryml.page_renderer(@template, [], part_page) if part_page
 
@@ -43,6 +44,8 @@ module Hobo
           if spec[:as] or spec[:part]
             obj = if spec[:object] == "this" or !spec[:object]
                     this
+                  elsif spec[:object] == "nil"
+                    nil
                   else
                     Hobo.object_from_dom_id(spec[:object])
                   end

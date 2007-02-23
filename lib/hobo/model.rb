@@ -1,7 +1,7 @@
 module Hobo
 
   module Model
-
+    
     def self.included(base)
       Hobo.register_model(base)
       base.class_eval do
@@ -13,6 +13,8 @@ module Hobo
     end
 
     module ClassMethods
+      
+      include ModelSupport::ClassMethods
 
       def set_field_type(types)
         @hobo_field_types ||= {}
@@ -212,6 +214,16 @@ module Hobo
 
     def same_fields?(other, *fields)
       fields.all?{|f| self.send(f) == other.send(f)}
+    end
+    
+    
+    def compose_with(object, use=nil)
+      CompositeModel.new_for([self, object])
+    end
+    
+    
+    def typed_id
+      "#{self.class.name.underscore}_#{self.id}"
     end
     
   end

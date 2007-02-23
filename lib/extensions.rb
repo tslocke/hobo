@@ -81,6 +81,12 @@ module Enumerable
   def every(proc)
     map(&proc)
   end
+  
+  def map_with_index
+    res = []
+    each_with_index {|x, i| res << yield(x, i)}
+    res
+  end
 
 end
 

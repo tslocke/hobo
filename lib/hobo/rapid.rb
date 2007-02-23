@@ -12,7 +12,7 @@ module Hobo::Rapid
     js_options['form']          = options[:form] if options[:form]
     js_options['params']        = make_params_js(options[:params]) if options[:params]
     js_options['resultUpdate'] = js_result_updates(options[:result_update]) if options[:result_update]
-
+    
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
 
@@ -91,7 +91,7 @@ module Hobo::Rapid
 
 
   def_tag :form_field do
-    name = param_name_for_this
+    name = options[:name] || param_name_for_this
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
     if this_type.respond_to?(:macro)
       if this_type.macro == :belongs_to
@@ -222,10 +222,12 @@ module Hobo::Rapid
   AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method, :script, :form, :params, :confirm]
 
 
-  def_tag :update_button, :label, :message, :attrs, :update do
+  def_tag :update_button, :label, :message, :attrs, :update, :params do
     raise HoboError.new("no update specified") unless update
     message2 = message || label
-    func = ajax_updater(object_url(this), message2, update, :params => { this.class.name.underscore => attrs })
+    func = ajax_updater(object_url(this), message2, update,
+                        :params => { this.class.name.underscore => attrs }.merge(params),
+                        :method => :put)
     tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
                             "button_input update_button")
   end
@@ -307,7 +309,7 @@ module Hobo::Rapid
   def_tag :object_form, :message, :update, :hidden_fields do
     ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
 
-    url = object_url(this)
+    url = options[:url] || object_url(this)
     if update
       # add an onsubmit to convert to an ajax form if `update` is given
       function = ajax_updater(:post_form, message, update, ajax_options)

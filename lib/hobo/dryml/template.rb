@@ -99,6 +99,9 @@ module Hobo::Dryml
       # v important this comes before REXML::Text, as REXML::CData < REXML::Text
       when REXML::CData
         REXML::CData::START + node.to_s + REXML::CData::STOP
+        
+      when REXML::Comment
+        REXML::Comment::START + node.to_s + REXML::Comment::STOP
 
       when REXML::Text
         node.to_s
@@ -119,13 +122,13 @@ module Hobo::Dryml
       when "taglib"
         taglib_element(el)
         # return nothing - the import has no presence in the erb source
-        ""
+        tag_newlines(el)
         
       when "set_theme"
         require_attribute(el, "name", /^#{DRYML_NAME}$/)
         set_theme(el.attributes['name'])
         # return nothing - set_theme has no presence in the erb source
-        ""
+        tag_newlines(el)
 
       when "def"
         def_element(el)
@@ -215,11 +218,7 @@ module Hobo::Dryml
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
 
-        begin
-          @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
-        rescue
-          dryml_exception("cannot alias '#{old_name}' as '#{new name}", el)
-        end
+        @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
       end
 
       if alias_of
@@ -307,16 +306,17 @@ module Hobo::Dryml
 
     
     def tag_call(el)
-      require_attribute(el, "inner", /#{DRYML_NAME}/, true)
+      require_attribute(el, "content_option", /#{DRYML_NAME}/, true)
+      require_attribute(el, "replace_option", /#{DRYML_NAME}/, true)
       
       # find out if it's empty before removing any <:param_tags>
       empty_el = el.size == 0
 
       # gather <:param_tags>, and remove them from the dom
-      param_tags = get_parameter_tags(el)
+      compiled_param_tags = compile_parameter_tags(el)
         
       name = Hobo::Dryml.unreserve(el.name)
-      options = tag_options(el, param_tags)
+      options = tag_options(el, compiled_param_tags)
       newlines = tag_newlines(el)
       replace_option = el.attributes["replace_option"]
       content_option = el.attributes["content_option"]
@@ -330,7 +330,7 @@ module Hobo::Dryml
              end
 
       part_id = el.attributes['part_id']
-      if empty_el
+      x = if empty_el
         if part_id
           "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
         else
@@ -347,10 +347,86 @@ module Hobo::Dryml
           "<% _erbout.concat(#{call} do #{newlines}%>#{children}<% end) %>"
         end
       end
+      x
     end
     
     
-    def get_parameter_tags(el)
+    def compile_parameter_tags(el)
+      # The implementation of parameter tags is greatly complicated
+      # by the need to maintain line-number parity between the dryml source
+      # and generated erb source
+      
+      last = el.children.reverse.ofind{is_a?(REXML::Element) && name.starts_with?(":")}
+      return "" if last.nil?
+      param_section = el.children[0..el.index(last)]
+      
+      dryml_exception("invalid content before parameter tag", el) unless param_section.all? do |e|
+        (e.is_a?(REXML::Element) && e.name.starts_with?(":")) || 
+          (e.is_a?(REXML::Text) && e.to_s.blank?) ||
+          e.is_a?(REXML::Comment) 
+      end
+      
+      last = param_section.last
+      compiled = param_section.map do |e|
+        e.remove
+        case e
+        when REXML::Element
+          array_index = begin
+                          # If there are other param-tags with this
+                          # name, the index of this one, else nil
+                          same_name_params = param_section.select {|x| x.is_a?(REXML::Element) and x.name == e.name}
+                          same_name_params.length > 1 && same_name_params.index(e)
+                        end
+          
+          param_name = attr_name_to_option_key(e.name[1..-1], array_index)
+          
+          dryml_exception("duplicate attribute/parameter-tag #{param}", el) if
+            param_name.in?(el.attributes.keys)
+          
+          param_value = 
+            if e.has_attributes?
+              pairs = e.attributes.map do |n,v|
+                "#{attr_name_to_option_key(n)} => " + "#{attribute_to_ruby(v)}"
+              end
+              # If there is content to, that goes in the hash under the key :content
+              if e.size > 0
+                pairs << "#{tag_newlines(el)}:content => (capture do %>#{children_to_erb(e)}<%; end)"
+              end
+              "{" + pairs.join(",") + "}"
+            elsif e.size > 0
+              "#{tag_newlines(el)}(capture do %>#{children_to_erb(e)}<%; end)"
+            else
+              dryml_exception("valueless parameter tag")
+            end
+          pair = "#{param_name} => #{param_value}"
+          pair << ", " unless e == last
+          pair
+          
+        when REXML::Text
+          e.to_s
+          
+        when REXML::Comment
+          REXML::Comment::START + node.to_s + REXML::Comment::STOP
+          
+        end
+      end
+      
+      compiled.join
+    end
+      
+    
+    def attr_name_to_option_key(name, array_index=nil)
+      parts = name.split(".").map { |p| ":#{p}" }
+      parts << array_index if array_index
+      if parts.length == 1
+        parts.first
+      else
+        "[" + parts.join(', ') + "]"
+      end
+    end
+    
+    
+    def XXget_parameter_tags(el)
       param_tags = {}
       el.elements.each do |e|
         if e.name.starts_with?(":")
@@ -386,16 +462,19 @@ module Hobo::Dryml
     end
 
 
-    def tag_options(el, param_tags)
+    def tag_options(el, param_tags_compiled)
       attributes = el.attributes
 
-      # ensure no param given as both attribute and <:tag>
-      dryml_exception("duplicate attribute/parameter-tag #{param}", el) unless
-        (param_tags.keys & attributes.keys).empty?
+      options = attributes.map do |n,v|
+        param_name = attr_name_to_option_key(n)
+        param_value = attribute_to_ruby(v)
+        "#{param_name} => #{param_value}"
+      end
       
-      options = hash_to_ruby(all_options(attributes, param_tags))
-
-      xattrs = el.attributes['xattrs']
+      options << param_tags_compiled unless param_tags_compiled.blank?
+      all = options.join(', ')
+      
+      xattrs = attributes['xattrs']
       if xattrs
         extra_options = if xattrs.blank?
                           "options"
@@ -404,16 +483,16 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid xattrs", el)
                         end
-        "#{options}.update(#{extra_options})"
+        "#{extra_options}.reverse_merge({#{all}})"
       else
-        options
+        "{#{all}}"
       end
     end
 
 
-    def all_options(attributes, param_tags)
+    def XXall_options(attributes, param_tags)
       opts = {}
-      (attributes.keys + param_tags.keys).each do |name|
+      (attributes.keys + param_tags.keys - ['xattrs']).each do |name|
         value = if param_tags.include?(name)
                   param_tags[name]
                 else
@@ -428,15 +507,7 @@ module Hobo::Dryml
       opts
     end
     
-    def hash_to_ruby(hash)
-      pairs = hash.map do |k, v|
-        val = v.is_a?(Hash) ? hash_to_ruby(v) : v
-        ":#{k} => #{val}"
-      end
-      "{ #{pairs * ', '} }"
-    end
-    
-    def add_option(options, names, value)
+    def XXadd_option(options, names, value)
       if names.length == 1
         options[names.first] = value
       elsif names.length > 1

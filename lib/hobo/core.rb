@@ -132,16 +132,13 @@ module Hobo
     end
 
 
-    def_tag :object_link, :view, :owner do
-      if can_view_this?
-        if this.nil?
-          "(Not Available)"
-        else
-          raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
-          v = this.is_a?(String) ? this.singularize.classify.constantize : this
-          content = tagbody ? tagbody.call : display_name(:obj => v)
-          link_to content, object_url(v, options.merge(:action => view, :owner => owner))
-        end
+    def_tag :object_link, :view, :to do
+      target = to || this
+      if target.nil?
+        "(Not Available)"
+      elsif to ? can_view?(to) : can_view_this?
+        content = tagbody ? tagbody.call : display_name
+        link_to content, object_url(target, view, options)
       end
     end
 
@@ -153,7 +150,7 @@ module Hobo
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
         content = tagbody ? tagbody.call : default
-        link_to content, object_url(f, :action => "new")
+        link_to content, object_url(f, "new")
       end
     end
 

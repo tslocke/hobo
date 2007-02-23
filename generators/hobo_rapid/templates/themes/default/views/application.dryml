@@ -1,15 +1,16 @@
 <taglib src="plugins/hobo/tags/rapid"/>
 
-<def tag="page" attrs="title_prefix, title, onload, logo, footer, nav, account_nav, class">
+<def tag="page" attrs="title_prefix, title">
   <% title ||= human_type + ": " + display_name %>
   <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
   <html>
-    <head>
+    <head content_option="head">
       <title><%= title_prefix %><%= title %></title>
       <theme_stylesheet/>
       <%= javascript_include_tag :defaults %>
       <hobo_rapid_javascripts/>
     </head>
+
     <body onload="Hobo.applyEvents()" content_option="body">
 
       <div id='ajax_progress'>
@@ -58,7 +59,6 @@
       </div>
 
       <div id="footer" content_option="footer"/>
-
     </body>
   </html>
 </def>

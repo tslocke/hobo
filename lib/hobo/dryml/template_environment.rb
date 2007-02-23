@@ -50,6 +50,10 @@ module Hobo::Dryml
     def part_context_model_id
       if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
         this_field_dom_id
+      elsif this.respond_to?(:typed_id)
+        this.typed_id
+      elsif this.is_a?(Array) and !this.respond_to?(:proxy_reflection)
+        "nil"
       else
         Hobo.dom_id(this)
       end
@@ -185,6 +189,7 @@ module Hobo::Dryml
 
 
     def _tag_locals(options, attrs)
+      options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
       #ensure obj and attr are not in options
       options.delete(:obj)
@@ -201,8 +206,10 @@ module Hobo::Dryml
       options.delete(:replace_option)
       
       if external_param.is_a? Hash
-        before = external_param.delete(:before_tag)
-        after = external_param.delete(:after_tag)
+        before = external_param.delete(:before_content)
+        after = external_param.delete(:after_content)
+        top = external_param.delete(:top_content)
+        bottom = external_param.delete(:bottom_content)
         content = external_param.delete(:content)
         options = options.merge_tag_options(external_param)
       elsif !external_param.nil?
@@ -210,10 +217,23 @@ module Hobo::Dryml
       end
 
       tag = if respond_to?(name)
-              body = content ? proc { content } : b
+              body = if content
+                       proc { content }
+                     elsif b  && (top || bottom)
+                       proc { top.to_s + b.call + bottom.to_s }
+                     else
+                       b
+                     end
               send(name, options, &body)
             else
-              new_context { content_tag(name, content || (b && b.call), options) }
+              body = if content
+                       content
+                     elsif b
+                       top.to_s + new_context { b.call } + bottom.to_s
+                     else
+                       top.to_s + bottom.to_s
+                     end
+              content_tag(name, body, options)
             end
       before.to_s + tag.to_s + after.to_s
     end
@@ -224,6 +244,10 @@ module Hobo::Dryml
       
       if external_param.is_a? Hash
         content = external_param.delete(:content)
+        top     = external_param.delete(:top_content)
+        bottom  = external_param.delete(:bottom_content)
+        external_param.delete(:before_content)
+        external_param.delete(:after_content)
         options = options.merge_tag_options(external_param)
       elsif !external_param.nil?
         content = external_param.to_s
@@ -234,10 +258,23 @@ module Hobo::Dryml
       return if b.nil? and content.nil?
 
       tag = if respond_to?(name)
-              body = content ? proc { content } : b
+              body = if content
+                       proc { content }
+                     elsif b  && (top || bottom)
+                       proc { top.to_s + b.call + bottom.to_s }
+                     else
+                       b
+                     end
               send(name, options, &body)
             else
-              new_context { content_tag(name, content || (b && b.call), options) }
+              body = if content
+                       content
+                     elsif b
+                       top.to_s + new_context { b.call } + bottom.to_s
+                     else
+                       top.to_s + bottom.to_s
+                     end
+              content_tag(name, body, options)
             end
       tag.to_s
     end

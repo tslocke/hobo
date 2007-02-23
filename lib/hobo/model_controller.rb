@@ -57,7 +57,7 @@ module Hobo
         unless show_collection_method.in?(defined_methods)
           controller_class.class_eval <<-END, __FILE__, __LINE__+1
             def #{show_collection_method}
-              @owner = @#{controller_class.model.name.underscore} = find_instance
+              @owner = find_instance
               @association = @owner.#{name}
               @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
               options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
@@ -68,13 +68,14 @@ module Hobo
           END
         end
           
-        show_method = "show_#{name.to_s.singularize}"
-        unless show_collection_method.in?(defined_methods)
+        singular_name = name.to_s.singularize
+        show_method = "show_#{singular_name}"
+        unless show_method.in?(defined_methods)
           controller_class.class_eval <<-END, __FILE__, __LINE__+1
             def #{show_method}
-              @owner = @#{controller_class.model.name.underscore} = find_instance(params[:owner_id])
+              @owner = find_instance(params[:owner_id])
               @association = @owner.#{name}
-              @this = @association.member_class.find(params[:id])
+              @this = @#{singular_name} = @association.member_class.find(params[:id])
               hobo_render(:#{show_method}) or hobo_render(:show_in_collection, @association.member_class)
             end
           END
@@ -379,9 +380,13 @@ module Hobo
 
 
     def find_instance(id=nil)
-      res = self.class.find_instance(id || params[:id])
+      id ||= params[:id]
+      res = if respond_to?(:find_for_show)
+              find_for_show(id)
+            else
+              self.class.find_instance(id || params[:id])
+            end
       instance_variable_set("@#{model.name.underscore}", res)
-      res
     end
 
 
