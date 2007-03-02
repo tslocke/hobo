@@ -15,11 +15,21 @@ Object.merge = function() {
 var Hobo = {
 
     searchRequest: null,
+    uidCounter: 0,
+
+    uid: function() {
+        Hobo.uidCounter += 1
+        return "uid" + Hobo.uidCounter
+    },
+
+    updatesForElement: function(el) {
+        el = $(el)
+        var updates = el.getAttribute("hobo_update")
+        return updates ? updates.split(/\s*,\s*/) : []
+    },
 
     ajaxSetFieldForElement: function(el, val, options) {
-        var updates = el.getAttribute("hobo_update")
-        var updates = updates ? updates.split(/\s*,\s*/) : []
-
+        var updates = Hobo.updatesForElement(el)
         var params = Hobo.fieldSetParam(el, val)
         var p = el.getAttribute("hobo_ajax_params")
         if (p) params = params + "&" + p
@@ -31,8 +41,33 @@ var Hobo = {
                          opts)
     },
 
-    ajaxRequest: function(url_or_form, message, updates, options) {
+    ajaxUpdateParams: function(updates, resultUpdates) {
+        var params = []
+        var i = 0
+        if (updates.length > 0) {
+            updates.each(function(dom_id) {
+                params.push("render["+i+"][part]=" + hoboParts[dom_id][0])
+                params.push("render["+i+"][id]=" + dom_id)
+                params.push("render["+i+"][object]=" + hoboParts[dom_id][1])
+                i += 1
+            })
+            params.push("part_page=" + hoboPartPage)
+        }
 
+        if (resultUpdates) {
+            resultUpdates.each(function (resultUpdate) {
+                params.push("render["+i+"][id]=" + resultUpdate.id)
+                params.push("render["+i+"][result]=" + resultUpdate.result)
+                if (resultUpdate.func) {
+                    params.push("render["+i+"][function]=" + resultUpdate.func)
+                }
+                i += 1
+            })
+        }
+        return params.join('&')
+    },
+
+    ajaxRequest: function(url_or_form, message, updates, options) {
         options = Object.merge({ asynchronous:true,
                                  evalScripts:true }, options)
         if (typeof url_or_form == "string") {
@@ -43,21 +78,9 @@ var Hobo = {
             var url = form.action
         }
         var params = []
-        if (updates.length > 0) {
-            updates.each(function(dom_id) {
-                params.push("render[][part]=" + hoboParts[dom_id][0] +
-                            "&render[][id]=" + dom_id +
-                            "&render[][object]=" + hoboParts[dom_id][1])
-            })
-            params.push("part_page=" + hoboPartPage)
-        }
-
-        if (options.resultUpdate) {
-            options.resultUpdate.each(function (result_update) {
-                params.push("render[][id]=" + result_update[0] +
-                            "&render[][result]=" + result_update[1])
-            })
-        }
+        
+        updateParams = Hobo.ajaxUpdateParams(updates, options.resultUpdate)
+        if (updateParams != "") { params.push(updateParams) }
 
         if (options.params) {
             params.push(options.params)
@@ -81,6 +104,13 @@ var Hobo = {
             delete options.method
             params.push("_method=PUT")
         }
+
+        if (!options.onFailure) {
+            options.onFailure = function(response) {
+                alert(response.responseText)
+            }
+        }
+
         new Ajax.Request(url, Object.merge(options, { parameters: params.join("&"), onComplete: complete }))
     },
 
@@ -100,22 +130,43 @@ var Hobo = {
         }
     },
 
+    onFieldEditComplete: function(el, newValue) {
+        el = $(el)
+        var oldValue = el.nextSibling.innerHTML
+        el.nextSibling.remove()
+        el.update(newValue)
+        var modelId = el.getAttribute('hobo_model_id')
+        $$("*[hobo_model_id=" + modelId + "]").each(function(e) {
+            if (e != el && e.innerHTML == oldValue) e.update(newValue)
+        })
+    },
+
     _makeInPlaceEditor: function(el, options) {
         var old
         var spec = Hobo.parseFieldId(el)
+        var updates = Hobo.updatesForElement(el)
+        var id = el.id
+        if (!id) { id = el.id = Hobo.uid() }
+        var updateParams = Hobo.ajaxUpdateParams(updates, [{id: id,
+                                                            result: 'new_field_value',
+                                                            func: "Hobo.onFieldEditComplete"}])
         opts = {okButton: false,
                 cancelLink: false,
                 submitOnBlur: true,
                 callback: function(form, val) {
                     old = val
-                    return Hobo.fieldSetParam(el, val)
+                    return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
                 },
                 highlightcolor: '#ffffff',
                 highlightendcolor: Hobo.backgroundColor(el),
-                onFailure: function(t) { alert(t.responseText); el.innerHTML = old }
+                onFailure: function(resp) { alert(resp.responseText); el.innerHTML = old },
+                evalScripts: true
                }
         Object.extend(opts, options)
-        new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
+        var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
+        ipe.onEnterEditMode = function() {
+            new Insertion.After(el, "<span class='hidden'>" + el.innerHTML + "</span>")
+        }
     },
 
     applyEvents: function(root) {
@@ -155,6 +206,7 @@ var Hobo = {
             new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
         });
     },
+
 
     doSearch: function(el) {
         el = $(el)
@@ -218,7 +270,7 @@ var Hobo = {
 
 
     parseFieldId: function(el) {
-        id = el.getAttribute("model_id")
+        id = el.getAttribute("hobo_model_id")
         if (!id) return
         m = id.match(/^([a-z_]+)_([0-9]+)_([a-z_]+)$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
@@ -235,7 +287,7 @@ var Hobo = {
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
-            id = el.getAttribute("model_id") || el.getAttribute("id");
+            id = el.getAttribute("hobo_model_id") || el.getAttribute("id");
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
             el = el.parentNode;

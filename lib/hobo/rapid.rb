@@ -28,7 +28,7 @@ module Hobo::Rapid
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
     pairs = comma_split(updates).omap{split(/\s*=\s*/)}
-    '[' + pairs.map{|p| "[#{js_str(p[0])}, #{js_str(p[1])}]"}.join(", ") + ']'
+    '[' + pairs.map{|p| "{id: #{js_str(p[0])}, result: #{js_str(p[1])}}"}.join(", ") + ']'
   end
 
 
@@ -63,6 +63,7 @@ module Hobo::Rapid
 
 
   def no_break(s)
+    s = new_context { yield } if block_given?
     s.gsub(' ', '&nbsp;')
   end
 
@@ -105,7 +106,7 @@ module Hobo::Rapid
         when :integer, :float, :decimal, :string
         text_field_tag(name, this, options)
       
-      when :text
+      when :text, :html
         text_area_tag(name, this, options)
       
       when :boolean
@@ -121,7 +122,7 @@ module Hobo::Rapid
         password_field_tag(name, this)
       
       else
-        raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{this_field} " +
+        raise HoboError.new("<form_field> not implemented for #{this.class.name}\##{this_field} " +
                             "(#{this.inspect}:#{this_type})")
       end
     end
@@ -184,9 +185,11 @@ module Hobo::Rapid
   
   
   def in_place_editor(kind, options)
-    disp = show
+    disp = show(:no_span => true)
     disp = "(click to edit)" if disp.blank?
-    opts = add_classes(options, kind).merge(:model_id => this_field_dom_id)
+    opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
+    update = opts.delete(:update)
+    opts[:hobo_update] = update if update
     content_tag(:span, disp, opts)
   end
     
@@ -334,7 +337,7 @@ module Hobo::Rapid
       name = "#{pname}[#{h}]"
       hidden_field_tag(name, val.to_s) if val and name.not_in?(field_names)
     end
-    hidden_tags << hidden_field_tag("_method", "PUT") unless this.new_record?
+    hidden_tags << hidden_field_tag("_method", "PUT") unless this.respond_to?(:new_record?) and this.new_record?
 
     html_options[:method] = "post"
     body_with_hiddens = hidden_tags.compact.join("\n") + body

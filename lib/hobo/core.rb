@@ -125,20 +125,20 @@ module Hobo
         this.name.pluralize.titleize
       else
         res = [:display_name, :name, :title].search do |m|
-          this.send(m) if this.respond_to?(m) and can_view?(this, m)
+          show(:attr => m) if this.respond_to?(m) and can_view?(this, m)
         end
         res || "#{this.class.name.humanize} #{this.id}"
       end
     end
 
 
-    def_tag :object_link, :view, :to do
+    def_tag :object_link, :view, :to, :params do
       target = to || this
       if target.nil?
         "(Not Available)"
       elsif to ? can_view?(to) : can_view_this?
         content = tagbody ? tagbody.call : display_name
-        link_to content, object_url(target, view, options)
+        link_to content, object_url(target, view, params), options
       end
     end
 
@@ -167,12 +167,13 @@ module Hobo
     end
 
 
-    def_tag :show do
+    def_tag :show, :no_span do
       raise HoboError.new("attempted to show non-viewable field '#{this_field}'") unless can_view_this?
       
       type = this_type || this.class
       type = :string if type == String
       type = :integer if type == Fixnum
+      type = :date if type == Date
       if this.nil?
         case type
           when  :string, :text; ""
@@ -189,39 +190,40 @@ module Hobo
           end
         end
       else
-        case type
-        when :date
-          if respond_to?(:show_date)
-            show_date
-          else
-            this.to_s
-          end
-
-        when :datetime
-          if respond_to?(:show_datetime)
-            show_datetime
-          else
-            this.to_s
-          end
-          
-        when :integer, :float, :decimal, :string, :text
-          h(this).gsub("\n", "<br/>")
-
-        when :html
-          this
-
-        when :markdown
-          markdown(this)
-
-        when :textile
-          textilize(this)
-
-        when :boolean
-          this ? "Yes" : "No"
-
-        else
-          raise HoboError.new("Cannot show: #{this.inspect} (field is #{this_field}, type is #{this_type.inspect})")
-        end
+        res = case type
+              when :date
+                if respond_to?(:show_date)
+                  show_date
+                else
+                  this.to_s
+                end
+               
+              when :datetime
+                if respond_to?(:show_datetime)
+                  show_datetime
+                else
+                  this.to_s
+                end
+                
+              when :integer, :float, :decimal, :string, :text
+                h(this).gsub("\n", "<br/>")
+               
+              when :html
+                this
+               
+              when :markdown
+                markdown(this)
+               
+              when :textile
+                textilize(this)
+               
+              when :boolean
+                this ? "Yes" : "No"
+               
+              else
+                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this_type.inspect})"
+              end
+        no_span ? res : "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
       end
     end
 
@@ -326,7 +328,7 @@ module Hobo
         if even_odd
           map_this do
             klass = [options[:class], cycle("even", "odd")].compact.join(' ')
-            content_tag(even_odd, tagbody.call, options.merge(:class => klass, :model_id => dom_id(this)))
+            content_tag(even_odd, tagbody.call, options.merge(:class => klass, :hobo_model_id => dom_id(this)))
           end
         else
           map_this { tagbody.call }

@@ -19,7 +19,7 @@ module Hobo
       part_page = params[:part_page]
       r = params[:render]
       if r
-        ajax_update_response(this, part_page, r.is_a?(Array) ? r : [r], results)
+        ajax_update_response(this, part_page, r.values, results)
         true
       else
         false
@@ -35,11 +35,7 @@ module Hobo
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
         for spec in render_specs
-          function = if spec[:function]
-                       spec[:function][0..0].downcase + spec[:function].camelize[1..-1]
-                     else
-                       "_update"
-                     end
+          function = spec[:function] || "_update"
 
           if spec[:as] or spec[:part]
             obj = if spec[:object] == "this" or !spec[:object]

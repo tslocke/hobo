@@ -68,19 +68,6 @@ module Hobo
           END
         end
           
-        singular_name = name.to_s.singularize
-        show_method = "show_#{singular_name}"
-        unless show_method.in?(defined_methods)
-          controller_class.class_eval <<-END, __FILE__, __LINE__+1
-            def #{show_method}
-              @owner = find_instance(params[:owner_id])
-              @association = @owner.#{name}
-              @this = @#{singular_name} = @association.member_class.find(params[:id])
-              hobo_render(:#{show_method}) or hobo_render(:show_in_collection, @association.member_class)
-            end
-          END
-        end
-          
         if Hobo.simple_has_many_association?(controller_class.model.reflections[name.to_sym])
           new_method = "new_#{name.to_s.singularize}"
           if new_method.not_in?(defined_methods)
@@ -276,12 +263,14 @@ module Hobo
             redirect_to object_url(@this) unless performed?
           end
 
-          wants.js   do
-            if hobo_ajax_response(@this)
+          wants.js do
+            if changes.size == 1
+              # Decreasingly hacky support for the scriptaculous in-place-editor
+              new_val = Hobo::Dryml.render_tag(@template, "show",
+                                               :obj => @this, :attr => changes.keys.first, :no_span => true)
+              hobo_ajax_response(@this, :new_field_value => new_val)
+            elsif hobo_ajax_response(@this)
               # ok we're done then
-            elsif changes.size == 1
-              # Slightly hacky support for the scriptaculous in-place-editor
-              render_tag("show", :obj => @this, :attr => changes.keys.first)
             else
               # we don't expect this, but it's not really an error
               render :text => ""
@@ -299,7 +288,7 @@ module Hobo
           wants.js do
             # Temporary hack
             render(:status => 500,
-                   :text => ("There was a problem with that update.\n" +
+                   :text => ("There was a problem with that change.\n" +
                              @this.errors.full_messages.join("\n")))
           end
         end
@@ -391,7 +380,7 @@ module Hobo
 
 
     def hobo_render(page_kind = nil, page_model=nil)
-      if request_no_cache? and RAILS_ENV == "development"
+      if RAILS_ENV == "development"
         Dryml.clear_cache
         Dryml::Taglib.clear_cache
       end

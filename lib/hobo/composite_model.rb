@@ -26,7 +26,8 @@ module Hobo
       
       def new_for(objects)
         classes = objects.map{|o| o.class.name}.sort
-        composite_class = CompositeModel.composites[classes].constantize
+        composite_class = CompositeModel.composites[classes].constantize rescue
+          (raise ArgumentError, "No composite model for #{classes.inspect}")
         composite_class.new(*objects)
       end
       
@@ -34,7 +35,7 @@ module Hobo
       
     def initialize(*objects)
       objects.each do |obj|
-        raise ArgumentError, "invalid object for composition: #{obj.inspect}" unless
+        raise ArgumentError, "invalid objects for composition: #{objects.inspect}" unless
           obj.class.name.in? self.class.models
         instance_variable_set("@#{obj.class.name.underscore}", obj)
       end

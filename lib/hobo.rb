@@ -178,12 +178,8 @@ module Hobo
                       "#{controller_name}/:id/#{collection_name}",
                       :action => "show_#{collection_name}")
 
-        m.named_route("#{controller_name.singularize}_#{singular_name}",
-                      "#{controller_name}/:owner_id/#{collection_name}/:id",
-                      :action => "show_#{singular_name}")
-
         m.named_route("new_#{controller_name.singularize}_#{singular_name}",
-                      "#{controller_name}/:id/#{collection_name};new",
+                      "#{controller_name}/:id/#{collection_name}/new",
                       :action => "new_#{singular_name}") if new_method
       end
     end

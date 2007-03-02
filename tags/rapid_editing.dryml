@@ -125,7 +125,7 @@
 
 <def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
   <select class="number_editor_bhv" hobo_update="<%= update %>"
-          model_id="<%= this_field_dom_id %>"
+          hobo_model_id="<%= this_field_dom_id %>"
           xattrs="#message ? options.merge(:hobo_message => message) : options">
     <if q="#this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
     <%= options_for_select((min.to_i..max.to_i).to_a, this) %>

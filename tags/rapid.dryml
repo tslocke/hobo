@@ -81,7 +81,7 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <li class="<%= even_odd %>" model_id="<%= dom_id this %>">
+          <li class="<%= even_odd %>" hobo_model_id="<%= dom_id this %>">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </li>
         </if_can_view>
@@ -102,7 +102,7 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <tr class="<%= even_odd %> <%= row_class %>" model_id="<%= dom_id(this) %>">
+          <tr class="<%= even_odd %> <%= row_class %>" hobo_model_id="<%= dom_id(this) %>">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </tr>
         <% even_odd = even_odd == "even" ? "odd" : "even" %>

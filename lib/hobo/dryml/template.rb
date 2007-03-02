@@ -270,15 +270,13 @@ module Hobo::Dryml
 
 
     def tagbody_call(el)
-      options = if obj = el.attributes['obj']
-                  "{ :obj => #{attribute_to_ruby(obj)} }"
-                elsif attr = el.attributes['attr']
-                  "{ :attr => #{attribute_to_ruby(attr)} }"
-                else
-                  ""
-                end
-      else_ = attribute_to_ruby(options['else'])
-      "<%= tagbody ? tagbody.call(#{options}) : #{else_} %>"
+      options = []
+      obj = el.attributes['obj']
+      attr = el.attributes['attr']
+      options << ":obj => #{attribute_to_ruby(obj)}" if obj
+      options << ":attr => #{attribute_to_ruby(attr)}" if attr
+      else_ = attribute_to_ruby(el.attributes['else'])
+      "<%= tagbody ? tagbody.call({ #{options * ', '} }) : #{else_} %>"
     end
 
 
