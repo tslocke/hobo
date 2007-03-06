@@ -167,6 +167,7 @@ var Hobo = {
         ipe.onEnterEditMode = function() {
             new Insertion.After(el, "<span class='hidden'>" + el.innerHTML + "</span>")
         }
+        return ipe
     },
 
     applyEvents: function(root) {
@@ -184,7 +185,26 @@ var Hobo = {
         })
 
         select(".in_place_html_textarea_bhv").each(function (el) {
-            Hobo._makeInPlaceEditor(el, {rows: 2, handleLineBreaks: false})
+            var ipe = Hobo._makeInPlaceEditor(el, {rows: 2, handleLineBreaks: false})
+            if (typeof(tinyMCE) != "undefined") {
+                ipe.afterEnterEditMode = function() {
+                    var id = this.form.id = Hobo.uid()
+
+                    // 'orrible 'ack
+                    // What is the correct way to individually configure a tinyMCE instace?
+                    var old = tinyMCE.settings.theme_advanced_buttons1
+                    tinyMCE.settings.theme_advanced_buttons1 += ", separator, save"
+                    tinyMCE.addMCEControl(this.editField, id);
+                    tinyMCE.settings.theme_advanced_buttons1 = old
+
+                    this.form.onsubmit = function() {
+                        tinyMCE.removeMCEControl(ipe.form.id)
+                        ipe.editField.value = encodeURIComponent(ipe.editField.value)
+                        setTimeout(ipe.onSubmit.bind(ipe), 10)
+                        return false
+                    }
+                }
+            }
         })
 
         select("select.number_editor_bhv").each(function(el) {
@@ -355,4 +375,12 @@ Element.findContaining = function(el, tag) {
 // Fix scriptaculous - don't remove <p> tags please!
 Ajax.InPlaceEditor.prototype.convertHTMLLineBreaks = function(string) {
     return string.replace(/<br>/gi, "\n").replace(/<br\/>/gi, "\n");
+}
+
+
+origEnterEditMode = Ajax.InPlaceEditor.prototype.enterEditMode
+Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
+    origEnterEditMode.bind(this)(evt)
+    if (this.afterEnterEditMode) this.afterEnterEditMode()
+    return false
 }

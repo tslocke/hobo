@@ -89,55 +89,83 @@ module Hobo::Rapid
       end
     end
   end
+  
+  
+  def type_name(klass)
+    { Hobo::HtmlString     => :html,
+      Hobo::Text           => :textarea,
+      TrueClass            => :boolean,
+      FalseClass           => :boolean,
+      Date                 => :date,
+      Time                 => :datetime,
+      Hobo::PasswordString => :password,
+      Fixnum               => :integer,
+      BigDecimal           => :integer,
+      Float                => :float,
+      String               => :string }[klass]
+  end
 
 
   def_tag :form_field do
-    name = options[:name] || param_name_for_this
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
     if this_type.respond_to?(:macro)
       if this_type.macro == :belongs_to
-        belongs_to_menu_field(options)
+        belongs_to_field(options)
       elsif this_type.macro == :has_many
-        raise NotImplementedError.new("editor for has_many associations not implemented")
+        raise NotImplementedError, "editor for has_many associations not implemented"
       end
       
     else
-      case this_type
-        when :integer, :float, :decimal, :string
-        text_field_tag(name, this, options)
-      
-      when :text, :html
-        text_area_tag(name, this, options)
-      
-      when :boolean
-        check_box_tag(name, '1', this, options)
-      
-      when :date
-        date_field(options)
-      
-      when :datetime
-        datetime_field(options)
-      
-      when :password
-        password_field_tag(name, this)
-      
+      tag = type_name(this_type).to_s + "_field"
+      if respond_to?(tag)
+        options[:name] ||= param_name_for_this
+        send(tag, options)
       else
-        raise HoboError.new("<form_field> not implemented for #{this.class.name}\##{this_field} " +
-                            "(#{this.inspect}:#{this_type})")
+        raise HoboError, ("No form field tag for #{this_field}:#{this_type} (this=#{this.inspect})")
       end
     end
   end
   
+  def_tag :belongs_to_field do
+    belongs_to_menu_field(options)
+  end
+  
+  def_tag :textarea_field, :name do 
+    text_area_tag(name, this, options)
+  end
+  
+  
+  def_tag :boolean_field, :name do
+    check_box_tag(name, '1', this, options)
+  end
+  
+  def_tag :password_field, :name do
+    password_field_tag(name, this)
+  end
+  
+  def_tag :html_field, name do
+    text_area_tag(name, this, add_classes(options, "tiny_mce"))
+  end
   
   def_tag :date_field do
     select_date(this || Time.now, :prefix => param_name_for_this)
   end
 
-
   def_tag :datetime_field do
     select_datetime(this || Time.now, :prefix => param_name_for_this)
   end
 
+  def_tag :integer_field, :name do
+    text_field_tag(name, this, options)
+  end
+
+  def_tag :float_field, :name do
+    text_field_tag(name, this, options)
+  end
+
+  def_tag :string_field, :name do
+    text_field_tag(name, this, options)
+  end
 
   def_tag :editor do
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
@@ -147,35 +175,12 @@ module Hobo::Rapid
         belongs_to_editor(options)
       else
         # In place edit for has_many not implemented
-        object_link(options)
+        has_many_editor(options)
       end
     else
-      case this_type
-      when :string
-        text_field_editor(options)
-
-      when :text
-        text_area_editor(options)
-
-      when :html
-        html_editor(options)
-        
-      when :integer, :float, :decimal, :timestamp, :time, :date, :datetime
-        if respond_to?("#{this_type}_editor")
-          send("#{this_type}_editor", options)
-        else
-          text_field_editor(options)
-        end
-        
-      when :datetime
-        datetime_editor(options)
-        
-      when :date
-        date_editor(options)
-        
-      when :boolean
-        boolean_checkbox_editor(options)
-
+      tag = type_name(this_type).to_s + "_editor"
+      if respond_to?(tag)
+        send(tag, options)
       else
         raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
                             "(#{this.inspect}:#{this_type})")
@@ -184,21 +189,27 @@ module Hobo::Rapid
   end
   
   
+  def_tag :has_many_editor do
+    # TODO: Implement
+    object_link(options)
+  end
+  
+  
   def in_place_editor(kind, options)
     disp = show(:no_span => true)
     disp = "(click to edit)" if disp.blank?
     opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
     update = opts.delete(:update)
-    opts[:hobo_update] = update if update
+    opts[:hobo_update] = update if update 
     content_tag(:span, disp, opts)
   end
     
   
-  def_tag :text_field_editor do
+  def_tag :string_editor do
     in_place_editor "in_place_textfield_bhv", options
   end
   
-  def_tag :text_area_editor do
+  def_tag :textarea_editor do
     in_place_editor "in_place_textarea_bhv", options
   end
   
@@ -211,14 +222,28 @@ module Hobo::Rapid
     belongs_to_menu_editor(options)
   end
   
-  
   def_tag :datetime_editor do
-    text_field_editor(options)
+    string_editor(options)
   end
   
-  
   def_tag :date_editor do
-    text_field_editor(options)
+    string_editor(options)
+  end
+
+  def_tag :integer_editor do
+    in_place_editor "in_place_textfield_bhv", options
+  end
+
+  def_tag :float_editor do
+    in_place_editor "in_place_textfield_bhv", options
+  end
+
+  def_tag :password_editor do
+    raise HoboError, "passwords cannot be edited in place"
+  end
+  
+  def_tag :boolean_editor do
+    boolean_checkbox_editor(options)
   end
   
 

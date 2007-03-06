@@ -121,8 +121,9 @@ module Hobo::Dryml
           obj = Hobo.get_field(parent, field)
         end
 
-        type = if parent.class.respond_to?(:field_type) and col_type = parent.class.field_type(field)
-                 col_type
+        type = if (obj.nil? or obj.respond_to?(:proxy_reflection)) and
+                   parent.class.respond_to?(:field_type) and field_type = parent.class.field_type(field)
+                 field_type
                else
                  obj.class
                end

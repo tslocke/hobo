@@ -269,12 +269,12 @@ module Hobo
               new_val = Hobo::Dryml.render_tag(@template, "show",
                                                :obj => @this, :attr => changes.keys.first, :no_span => true)
               hobo_ajax_response(@this, :new_field_value => new_val)
-            elsif hobo_ajax_response(@this)
-              # ok we're done then
             else
-              # we don't expect this, but it's not really an error
-              render :text => ""
+              hobo_ajax_response(@this)
             end
+            
+            # Maybe no ajax requests were made
+            render :nothing => true unless performed?
           end
         end
       else
@@ -490,15 +490,14 @@ module Hobo
 
 
     def param_to_value(field_type, value)
-      case field_type
-      when :date
+      if field_type <= Date
         if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
         end
-      when :datetime
+      elsif field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String

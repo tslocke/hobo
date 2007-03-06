@@ -15,7 +15,8 @@ module Hobo
 
     protected
 
-    def hobo_ajax_response(this, results={})
+    def hobo_ajax_response(this=nil, results={})
+      this ||= @this
       part_page = params[:part_page]
       r = params[:render]
       if r

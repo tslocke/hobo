@@ -29,15 +29,18 @@ module Hobo::ControllerHelpers
 
   def object_url(obj, action=nil, *param_hashes)
     action &&= action.to_s
+    
+    controller_name = controller_for(obj)
+    
     parts = if obj.is_a? Class
-              [urlb, controller_for(obj)]
+              [urlb, controller_name]
               
             elsif obj.is_a? Hobo::CompositeModel
-              [urlb, controller_for(obj), obj.id]
+              [urlb, controller_name, obj.id]
               
             elsif obj.is_a? ActiveRecord::Base
               if obj.new_record?
-                [urlb, controller_for(obj)]
+                [urlb, controller_name]
               else
                 raise HoboError.new("invalid object url: new for existing object") if action == "new"
 
@@ -48,7 +51,7 @@ module Hobo::ControllerHelpers
                        obj.id
                      end
                 
-                [urlb, controller_for(obj), id]
+                [urlb, controller_name, id]
               end
               
             elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
@@ -60,17 +63,23 @@ module Hobo::ControllerHelpers
               raise HoboError.new("cannot create url for #{obj.inspect}")
             end
     basic = parts.join("/")
-    url = case action
-          when "new"
-            basic + "/new"
-          when "destroy"
-            basic + "?_method=DELETE"
-          when "update"
-            basic + "?_method=PUT"
-          when nil
-            basic
+    
+    controller = (controller_name + "Controller").classify.constantize rescue nil
+    url = if action && controller && action.to_sym.in?(controller.web_methods)
+            basic + "/#{action}"
           else
-            basic + ";" + action
+            case action
+            when "new"
+              basic + "/new"
+            when "destroy"
+              basic + "?_method=DELETE"
+            when "update"
+              basic + "?_method=PUT"
+            when nil
+              basic
+            else
+              basic + ";" + action
+            end
           end
     params = make_params(*param_hashes)
     params.blank? ? url : url + "?" + params

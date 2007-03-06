@@ -26,7 +26,9 @@
 <def tag="belongs_to_menu_field"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
+  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
+            [ display_name(:obj => x, :no_span => true), x.id ]
+          }
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
   %>
   <select name="<%= param_name_for_this(true) %>">
@@ -39,7 +41,9 @@
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="#link_id" part_id="rapid_belongs_to_edit">
-    <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x| [ display_name(:obj => x), x.id ] }
+    <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
+            [ display_name(:obj => x, :no_span => true), x.id ]
+          }
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
        link_id = "#{this_field_dom_id}_editor"
        f = ajax_updater(object_url(this_parent),
@@ -122,14 +126,36 @@
   </select>
 </def>
 
+      
+<def tag="sti_type_editor" attrs="update">
+  <% base_class = this.class
+     base_class = base_class.superclass while base_class.superclass != ActiveRecord::Base
+   f = ajax_updater("#{urlb}/#{controller_for base_class}/#{this.id}",
+                      "Change #{this_field.to_s.titleize}", update,
+                      :method => "put",
+                      :params => { base_class.name.underscore => {
+                          "type" => Hobo.raw_js('this.value')
+                       } })
+  %>
 
+  <select onchange="<%= f %>">
+    <if q="#tagbody">
+      <tagbody/>
+    </if>
+    <else>
+      <%= options_for_select(base_class.send(:subclasses).omap{[name.titleize, name]}, this.class.name) %>
+    </else>
+  </select>
+</def>
+
+      
 <def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
-  <select class="number_editor_bhv" hobo_update="<%= update %>"
+ <select class="number_editor_bhv" hobo_update="<%= update %>"
           hobo_model_id="<%= this_field_dom_id %>"
           xattrs="#message ? options.merge(:hobo_message => message) : options">
-    <if q="#this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
-    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
-  </select>
+   <if q="#this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
+   <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
+ </select>
 </def>
 
 

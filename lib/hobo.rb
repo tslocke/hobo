@@ -75,7 +75,7 @@ module Hobo
 
     def dom_id(obj, attr=nil)
       if obj.nil?
-        raise HoboError.new("Tried to get attribute '#{attr}' of nil") if attr
+        raise HoboError, "Tried to get dom id of nil.#{attr}" if attr
         return 'nil'
       end
 
@@ -84,9 +84,9 @@ module Hobo
         obj = obj.proxy_owner
       elsif !obj.respond_to?(:typed_id)
         if attr
-          dom_id(get_field(obj, attr))
+          return dom_id(get_field(obj, attr))
         else
-          raise Exception.new("Can't create dom id for #{obj.inspect}")
+          raise ArgumentError, "Can't create dom id for #{obj.inspect}"
         end
       end
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id

@@ -16,6 +16,7 @@
         </nav_item>
       </else>
     </repeat>
+    <tagbody/>
   </nav_container>
 </def>
 

@@ -125,7 +125,7 @@ module Hobo
         this.name.pluralize.titleize
       else
         res = [:display_name, :name, :title].search do |m|
-          show(:attr => m) if this.respond_to?(m) and can_view?(this, m)
+          show(options.merge(:attr => m)) if this.respond_to?(m) and can_view?(this, m)
         end
         res || "#{this.class.name.humanize} #{this.id}"
       end
@@ -168,62 +168,81 @@ module Hobo
 
 
     def_tag :show, :no_span do
-      raise HoboError.new("attempted to show non-viewable field '#{this_field}'") unless can_view_this?
+      raise HoboError, "attempted to show non-viewable field '#{this_field}'" unless can_view_this?
       
-      type = this_type || this.class
-      type = :string if type == String
-      type = :integer if type == Fixnum
-      type = :date if type == Date
-      if this.nil?
-        case type
-          when  :string, :text; ""
-          else; "(Not Available)"
-        end
-      elsif this_type.respond_to?(:macro)
+      if this_type.respond_to?(:macro)
         if this_type.macro == :belongs_to
-          object_link
+          show_belongs_to
         elsif this_type.macro == :has_many
-          if this.empty?
-            "(none)"
-          else
-            map_this { object_link }.join(", ")
-          end
+          show_has_many
         end
+      
       else
-        res = case type
-              when :date
+        res = case this
+              when nil
+                this_type < String ? "" : "(Not Available)"
+                
+              when Date
                 if respond_to?(:show_date)
                   show_date
                 else
                   this.to_s
                 end
                
-              when :datetime
+              when Time
                 if respond_to?(:show_datetime)
                   show_datetime
                 else
                   this.to_s
                 end
                 
-              when :integer, :float, :decimal, :string, :text
-                h(this).gsub("\n", "<br/>")
-               
-              when :html
+              when Fixnum, Float, BigDecimal
+                format = options[:format]
+                format ? format % this : this.to_s
+                
+              when Hobo::HtmlString
                 this
                
-              when :markdown
+              when Hobo::MarkdownString
                 markdown(this)
                
-              when :textile
+              when Hobo::TextileString
                 textilize(this)
                
-              when :boolean
-                this ? "Yes" : "No"
+              when Hobo::PasswordString
+                "[password withheld]"
                
+              when String
+                h(this).gsub("\n", "<br/>")
+               
+              when TrueClass
+                "Yes"
+                
+              when FalseClass
+                "No"
+                
               else
-                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this_type.inspect})"
+                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
               end
-        no_span ? res : "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
+        if !no_span && this_parent.respond_to?(:typed_id)
+          "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
+        else
+          res
+        end
+      end
+    end
+    
+    
+    def_tag :show_belongs_to do
+      object_link
+    end
+    
+    
+    def_tag :show_has_many do
+      if this.empty?
+        "(none)"
+      else
+        map_this { object_link }.join(", ")
       end
     end
 
