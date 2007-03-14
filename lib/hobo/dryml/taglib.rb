@@ -7,7 +7,7 @@ module Hobo::Dryml
     class << self
 
       def get(path)
-        raise DrymlException.new("No such taglib: #{path}") unless File.exists?(path)
+        raise DrymlException, "No such taglib: #{path}" unless File.exists?(path)
         file = File.new(path)
 
         taglib = @cache[file.path]
@@ -37,7 +37,6 @@ module Hobo::Dryml
 
     def load
       @module = Module.new
-      @module.extend(TagModule)
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)
       template.compile([], false)
@@ -46,7 +45,7 @@ module Hobo::Dryml
 
     def import_into(class_or_module, as)
       if as
-        raise NotImplementedError.new
+        raise NotImplementedError
         as_class = Class.new(TemplateEnvironment) { include @module }
         class_or_module.send(:define_method, as) { @module }
       else

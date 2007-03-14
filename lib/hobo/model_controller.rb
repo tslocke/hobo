@@ -58,12 +58,16 @@ module Hobo
           controller_class.class_eval <<-END, __FILE__, __LINE__+1
             def #{show_collection_method}
               @owner = find_instance
-              @association = @owner.#{name}
-              @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
-              options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
-              @this = @association.find(:all, options)
-              @this = @this.uniq if @association.proxy_reflection.options[:uniq]
-              hobo_render(:#{show_collection_method}) or hobo_render(:show_collection, @association.member_class)
+              if Hobo.can_view?(current_user, @owner, :#{name})
+                @association = @owner.#{name}
+                @pages = ::ActionController::Pagination::Paginator.new(self, @association.size, 20, params[:page])
+                options = { :limit  =>  @pages.items_per_page, :offset =>  @pages.current.offset }
+                @this = @association.find(:all, options)
+                @this = @this.uniq if @association.proxy_reflection.options[:uniq]
+                hobo_render(:#{show_collection_method}) or hobo_render(:show_collection, @association.member_class)
+              else
+                permission_denied
+              end
             end
           END
         end
@@ -74,9 +78,13 @@ module Hobo
             controller_class.class_eval <<-END, __FILE__, __LINE__+1
               def #{new_method}
                 @owner = find_instance
-                @this = @owner.#{name}.new_without_appending
-                @this.created_by(current_user)
-                hobo_render(:#{new_method}) or hobo_render(:new_in_collection, @this.class)
+                if Hobo.can_view?(current_user, @owner, :#{name})
+                  @this = @owner.#{name}.new_without_appending
+                  @this.created_by(current_user)
+                  hobo_render(:#{new_method}) or hobo_render(:new_in_collection, @this.class)
+                else
+                  permission_denied
+                end
               end
             END
           end
@@ -380,11 +388,6 @@ module Hobo
 
 
     def hobo_render(page_kind = nil, page_model=nil)
-      if RAILS_ENV == "development"
-        Dryml.clear_cache
-        Dryml::Taglib.clear_cache
-      end
-      
       page_kind ||= params[:action].to_sym
       page_model ||= model
       
@@ -534,17 +537,6 @@ module Hobo
       Hobo.object_from_dom_id(param)
     end
 
-
-    # debugging support
-
-    def debug(*args)
-      logger.debug(args.inspect)
-    end
-
-    def stop_with(*args)
-      x = args.length == 1 ? args[0] : args
-      raise PP.pp(x, "")
-    end
 
   end
 

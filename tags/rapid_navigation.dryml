@@ -3,15 +3,15 @@
   -->
 
 
-<def tag="navigation" attrs="current, item">
+<def tag="navigation" attrs="current, item, link_current">
   <nav_container xattrs="">
     <repeat obj="#item">
-      <% c = this[:content] %>
-      <if q="#c == current">
-        <nav_item class="current" content_option="li"><%= c %></nav_item>
+      <% c = this[:content]; klass = c == current ? "current" : "" %>
+      <if q="#!link_current && c == current">
+        <nav_item class="#klass" content_option="li"><%= c %></nav_item>
       </if>
       <else>
-        <nav_item content_option="item_el">
+        <nav_item content_option="item_el" class="#klass">
           <a href="#this[:href]" content_option="link"><%= c %></a>
         </nav_item>
       </else>

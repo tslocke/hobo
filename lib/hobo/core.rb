@@ -100,11 +100,6 @@ module Hobo
     end
 
 
-    def logged_in?
-      not current_user.guest?
-    end
-
-
     def theme_asset(path)
       "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
     end
@@ -180,7 +175,7 @@ module Hobo
       else
         res = case this
               when nil
-                this_type < String ? "" : "(Not Available)"
+                this_type <= String ? "" : "(Not Available)"
                 
               when Date
                 if respond_to?(:show_date)

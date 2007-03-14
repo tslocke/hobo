@@ -16,6 +16,7 @@ var Hobo = {
 
     searchRequest: null,
     uidCounter: 0,
+    ipeOldValues: {},
 
     uid: function() {
         Hobo.uidCounter += 1
@@ -132,13 +133,22 @@ var Hobo = {
 
     onFieldEditComplete: function(el, newValue) {
         el = $(el)
-        var oldValue = el.nextSibling.innerHTML
-        el.nextSibling.remove()
-        el.update(newValue)
+        var oldValue = Hobo.ipeOldValues[el.id]
+        delete Hobo.ipeOldValues[el.id]
+
+        var blank = el.getAttribute("hobo_blank_message")
+        if (blank && newValue.strip().length == 0) {
+            el.update(blank)
+        } else {
+            el.update(newValue)
+        }
+
         var modelId = el.getAttribute('hobo_model_id')
-        $$("*[hobo_model_id=" + modelId + "]").each(function(e) {
-            if (e != el && e.innerHTML == oldValue) e.update(newValue)
-        })
+        if (oldValue) {
+            $$("*[hobo_model_id=" + modelId + "]").each(function(e) {
+                if (e != el && e.innerHTML == oldValue) e.update(newValue)
+            })
+        }
     },
 
     _makeInPlaceEditor: function(el, options) {
@@ -165,7 +175,12 @@ var Hobo = {
         Object.extend(opts, options)
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
         ipe.onEnterEditMode = function() {
-            new Insertion.After(el, "<span class='hidden'>" + el.innerHTML + "</span>")
+            var blank = el.getAttribute("hobo_blank_message")
+            if (blank) {
+                el.innerHTML = "" 
+            } else {
+                Hobo.ipeOldValues[el.id] = el.innerHTML
+            }
         }
         return ipe
     },

@@ -4,11 +4,6 @@ module Hobo
     
     def self.included(base)
       Hobo.register_model(base)
-      base.class_eval do
-        # alias_method_chain :find, :block
-        # alias_method :rails_original_has_many, :has_many
-        #alias_method_chain :method_missing, :hobo_types
-      end
       base.extend(ClassMethods)
       base.set_field_type({})
     end
@@ -27,7 +22,7 @@ module Hobo
           alias_method aliased_name, name
           define_method name do
             res = send(aliased_name)
-            type_wrapper.new(res)
+            res && type_wrapper.new(res)
           end
         end
           
@@ -228,8 +223,12 @@ module Hobo
     
     def method_missing(name, *args, &b)
       val = super
-      type_wrapper = self.class.field_types && self.class.field_types[name]
-      type_wrapper ? type_wrapper.new(val) : val
+      if val.nil?
+        nil
+      else
+        type_wrapper = self.class.field_types && self.class.field_types[name]
+        type_wrapper ? type_wrapper.new(val) : val
+      end
     end
 
 

@@ -2,8 +2,6 @@ module Hobo::Dryml
 
   class TemplateEnvironment
 
-    # extend TagModule # include as class methods
-
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
@@ -40,6 +38,10 @@ module Hobo::Dryml
     attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
     
     def this; @_this; end
+    
+    def attr_extension(s)
+      Dryml::AttributeExtensionString.new(s)
+    end
     
     
     def this_field_dom_id
@@ -212,7 +214,7 @@ module Hobo::Dryml
         top = external_param.delete(:top_content)
         bottom = external_param.delete(:bottom_content)
         content = external_param.delete(:content)
-        options = options.merge_tag_options(external_param)
+        options = Hobo::Dryml.merge_tag_options(options, external_param)
       elsif !external_param.nil?
         return external_param.to_s
       end
@@ -249,7 +251,7 @@ module Hobo::Dryml
         bottom  = external_param.delete(:bottom_content)
         external_param.delete(:before_content)
         external_param.delete(:after_content)
-        options = options.merge_tag_options(external_param)
+        options = Hobo::Dryml.merge_tag_options(options, external_param)
       elsif !external_param.nil?
         content = external_param.to_s
       end

@@ -115,5 +115,16 @@ module Hobo::ControllerHelpers
     Hobo.dom_id(x, attr)
   end
 
+  
+  # debugging support
+
+  def debug(*args)
+    logger.debug(args.map{|arg| PP.pp(arg, "")}.join("\n"))
+    return args.first
+  end
+
+  def abort_with(*args)
+    raise args.map{|arg| PP.pp(arg, "")}.join("\n")
+  end
 
 end

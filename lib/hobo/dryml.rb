@@ -1,6 +1,8 @@
 module Hobo::Dryml
 
   class DrymlException < Exception; end
+  
+  class AttributeExtensionString < String; end
 
   TagDef = Struct.new "TagDef", :name, :attrs, :proc
 
@@ -31,6 +33,11 @@ module Hobo::Dryml
 
 
     def page_renderer(view, local_names=[], page=nil)
+      if RAILS_ENV == "development"
+        clear_cache
+        Taglib.clear_cache
+      end
+
       prepare_view!(view)
       if page == EMPTY_PAGE
         @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper]) if
@@ -105,6 +112,19 @@ module Hobo::Dryml
       end
     end
     
+    
+    def merge_tag_options(to, from)
+      res = to.merge({})
+      from.each_pair do |option, value|
+        res[option] = if value.is_a?(AttributeExtensionString) and to.has_key?(option)
+                        "#{to[option]} #{value}"
+                      else
+                        value
+                      end
+      end
+      res
+    end
+
     
     def hashify_options(options, merge_into=nil)
       result = merge_into || options

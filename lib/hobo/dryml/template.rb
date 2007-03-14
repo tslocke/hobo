@@ -11,6 +11,7 @@ module Hobo::Dryml
     def initialize(src, environment, template_path)
       @src = src
       @environment = environment # a class or a module
+      @environment.send(:include, Hobo::PredicateDispatch)
 
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
 
@@ -38,6 +39,7 @@ module Hobo::Dryml
       
     def create_render_page_method(local_names)
       erb_src = process_src
+      
       src = ERB.new(erb_src).src[("_erbout = '';").length..-1]
 
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
@@ -205,6 +207,7 @@ module Hobo::Dryml
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
       require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
+      require_attribute(el, "when", /^#{DRYML_NAME}$/, true)
 
       name = el.attributes["tag"]
 
@@ -245,8 +248,20 @@ module Hobo::Dryml
                        " = _tag_locals(__options__, #{attrs.inspect})" )
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
+      
+      pred = el.attributes["if"]
+      pred = pred[1..-1] if pred && pred.starts_with?('#')
+      
+      def_line = if pred
+                   "defp :#{name}, (proc {|options| #{pred}}) do |__options__, __block__|"
+                 elsif @environment.predicate_method?(name)
+                   # be sure not to overwrite the predicate dispatch method
+                   "defp :#{name} do |__options__, __block__|"
+                 else
+                   "def #{name}(__options__={}, &__block__)"
+                 end
 
-      method_src = ( "<% def #{name}(__options__={}, &__block__); #{start} " +
+      method_src = ( "<% #{def_line}; #{start} " +
                      # reproduce any line breaks in the start-tag so that line numbers are preserved
                      tag_newlines(el) + "%>" +
                      children_to_erb(el) +
@@ -328,7 +343,7 @@ module Hobo::Dryml
              end
 
       part_id = el.attributes['part_id']
-      x = if empty_el
+      if empty_el
         if part_id
           "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
         else
@@ -345,7 +360,6 @@ module Hobo::Dryml
           "<% _erbout.concat(#{call} do #{newlines}%>#{children}<% end) %>"
         end
       end
-      x
     end
     
     
@@ -366,7 +380,8 @@ module Hobo::Dryml
       
       last = param_section.last
       compiled = param_section.map do |e|
-        e.remove
+        # REXML Bug - don't use el.remove (also removes other children that are == )
+        el.delete_at(el.index(e))
         case e
         when REXML::Element
           array_index = begin
@@ -394,7 +409,7 @@ module Hobo::Dryml
             elsif e.size > 0
               "#{tag_newlines(el)}(capture do %>#{children_to_erb(e)}<%; end)"
             else
-              dryml_exception("valueless parameter tag")
+              "''"
             end
           pair = "#{param_name} => #{param_value}"
           pair << ", " unless e == last
@@ -424,42 +439,6 @@ module Hobo::Dryml
     end
     
     
-    def XXget_parameter_tags(el)
-      param_tags = {}
-      el.elements.each do |e|
-        if e.name.starts_with?(":")
-          e.remove
-          
-          param_value = if e.has_attributes?
-                          # A param tag with attributes becomes a hash, e.g. <:foo x="y"/>  =>  { :x => 'y' }
-                          hash = Hash.build(e.attributes.keys) {|n| [n, attribute_to_ruby(e.attributes[n])]}
-                          # If there is content to, that goes in the has under the key :content
-                          if e.size > 0
-                            hash[:content] = "(capture do %>#{children_to_erb(e)}<%; end)"
-                          end
-                          hash_to_ruby(hash)
-                        elsif e.size > 0
-                          "(capture do %>#{children_to_erb(e)}<%; end)"
-                        else
-                          dryml_exception("valueless parameter tag")
-                        end
-          
-          param_name = e.name[1..-1]
-          current = param_tags[param_name]
-          param_tags[param_name] = if current.nil?
-                                     param_value
-                                   elsif current.is_a? Array
-                                     current + [param_value]
-                                   else
-                                     [current, param_value]
-                                   end
-        end
-      end
-      param_tags.each {|k, v| param_tags[k] = "[#{v * ', '}]" if v.is_a?(Array) }
-      param_tags
-    end
-
-
     def tag_options(el, param_tags_compiled)
       attributes = el.attributes
 
@@ -484,42 +463,6 @@ module Hobo::Dryml
         "#{extra_options}.reverse_merge({#{all}})"
       else
         "{#{all}}"
-      end
-    end
-
-
-    def XXall_options(attributes, param_tags)
-      opts = {}
-      (attributes.keys + param_tags.keys - ['xattrs']).each do |name|
-        value = if param_tags.include?(name)
-                  param_tags[name]
-                else
-                  attribute_to_ruby(attributes[name])
-                end
-        begin
-          add_option(opts, name.split('.'), value)
-        rescue DrymlExcpetion
-          dryml_exception("inner-attribute conflict for {name}")
-        end
-      end
-      opts
-    end
-    
-    def XXadd_option(options, names, value)
-      if names.length == 1
-        options[names.first] = value
-      elsif names.length > 1
-        v = options[names.first]
-        if v.is_a? Hash
-          # it's ready for the inner-attribute - do nothing
-        elsif v.nil?
-          options[names.first] = v = {}
-        else
-          # Conflict, i.e. a = "ping" and a.b = "pong"
-          # Rescued by caller (all_options)
-          raise DrymlExcpetion.new
-        end
-        add_option(v, names[1..-1], value)
       end
     end
 
@@ -579,13 +522,14 @@ module Hobo::Dryml
       elsif is_code_attribute?(attr)
         "(#{attr[1..-1]})"
       else
-        if not attr =~ /"/
-          '"' + attr + '"'
-        elsif not attr =~ /'/
-          "'#{attr}'"
-        else
-          dryml_exception("invalid quote(s) in attribute value")
-        end
+        str = if not attr =~ /"/
+                '"' + attr + '"'
+              elsif not attr =~ /'/
+                "'#{attr}'"
+              else
+                dryml_exception("invalid quote(s) in attribute value")
+              end
+        str.starts_with?("++") ? "attr_extension(#{str})" : str
       end
     end
 

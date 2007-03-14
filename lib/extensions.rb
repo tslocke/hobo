@@ -135,17 +135,6 @@ class Hash
     [yes, no]
   end
   
-  def merge_tag_options(hash)
-    join_options = [:class, :style]
-    h = hash.merge({})
-    for option in join_options
-      if h.has_key?(option) and has_key?(option) and h[option].starts_with?('+')
-        h[option] = self[option] + ' ' + h[option][1..-1]
-      end
-    end
-    merge(h)
-  end
-
 end
 
 # --- Fix Chronic - can't parse '12th Jan' --- #

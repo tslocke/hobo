@@ -112,18 +112,27 @@ module Hobo::Rapid
       if this_type.macro == :belongs_to
         belongs_to_field(options)
       elsif this_type.macro == :has_many
-        raise NotImplementedError, "editor for has_many associations not implemented"
+        has_many_field(options)
       end
       
     else
       tag = type_name(this_type).to_s + "_field"
       if respond_to?(tag)
         options[:name] ||= param_name_for_this
-        send(tag, options)
+        tag_src = send(tag, options)
+        if this_parent.errors[this_field]
+          "<div class='field_with_errors'>#{tag_src}</div>"
+        else
+          tag_src
+        end
       else
         raise HoboError, ("No form field tag for #{this_field}:#{this_type} (this=#{this.inspect})")
       end
     end
+  end
+  
+  def_tag :has_many_field do
+    raise NotImplementedError, "form field for has_many associations not implemented"
   end
   
   def_tag :belongs_to_field do
@@ -143,7 +152,7 @@ module Hobo::Rapid
     password_field_tag(name, this)
   end
   
-  def_tag :html_field, name do
+  def_tag :html_field, :name do
     text_area_tag(name, this, add_classes(options, "tiny_mce"))
   end
   
@@ -174,7 +183,6 @@ module Hobo::Rapid
       if this_type.macro == :belongs_to
         belongs_to_editor(options)
       else
-        # In place edit for has_many not implemented
         has_many_editor(options)
       end
     else
@@ -196,12 +204,17 @@ module Hobo::Rapid
   
   
   def in_place_editor(kind, options)
-    disp = show(:no_span => true)
-    disp = "(click to edit)" if disp.blank?
     opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
+
     update = opts.delete(:update)
+    blank_message = opts.delete(:blank_message) || "(click to edit)"
+    
+    display = show(:no_span => true)
+    if display.blank?
+      opts[:hobo_blank_message] = display = blank_message
+    end
     opts[:hobo_update] = update if update 
-    content_tag(:span, disp, opts)
+    content_tag(:span, display, opts)
   end
     
   
@@ -212,8 +225,7 @@ module Hobo::Rapid
   def_tag :textarea_editor do
     in_place_editor "in_place_textarea_bhv", options
   end
-  
-  
+    
   def_tag :html_editor do
     in_place_editor "in_place_html_textarea_bhv", options
   end
@@ -334,10 +346,10 @@ module Hobo::Rapid
   end
 
 
-  def_tag :object_form, :message, :update, :hidden_fields do
+  def_tag :object_form, :message, :update, :hidden_fields, :url do
     ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
 
-    url = options[:url] || object_url(this)
+    url2 = url || object_url(this)
     if update
       # add an onsubmit to convert to an ajax form if `update` is given
       function = ajax_updater(:post_form, message, update, ajax_options)
@@ -366,7 +378,7 @@ module Hobo::Rapid
 
     html_options[:method] = "post"
     body_with_hiddens = hidden_tags.compact.join("\n") + body
-    content_tag("form", body_with_hiddens, html_options.merge(:action => url))
+    content_tag("form", body_with_hiddens, html_options.merge(:action => url2))
   end
 
   

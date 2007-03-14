@@ -22,12 +22,13 @@ module Hobo
         name = name.to_s
         @hobo_tag_blocks ||= HashWithIndifferentAccess.new
         @hobo_tag_blocks[name] = tagdef_block
+        @hobo_tag_blocks["#{name}_predicate"] = pred if pred
 
         safe_name = Dryml.unreserve(name)
         locals = attrs.map{|a| Hobo::Dryml.unreserve(a)} + ["options"]
         
         def_line = if pred
-                     "defp :#{safe_name}, (proc {#{pred}}) do |options, block|"
+                     "defp :#{safe_name}, @hobo_tag_blocks['#{name}_predicate'] do |options, block|"
                    elsif predicate_method?(safe_name)
                      # be sure not to overwrite the predicate dispatch method
                      "defp :#{safe_name} do |options, block|"
