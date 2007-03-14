@@ -16,8 +16,8 @@ module Hobo
         aliased_name = "#{name}_without_hobo_type"
         return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
         
-        type_wrapper = @hobo_field_types && @hobo_field_types[name]
-        if type_wrapper
+        type_wrapper = self.field_type(name)
+        if type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String
           aliased_name = "#{name}_without_hobo_type"
           alias_method aliased_name, name
           define_method name do
@@ -25,8 +25,6 @@ module Hobo
             res && type_wrapper.new(res)
           end
         end
-          
-          
       end
       
       def set_field_type(types)
@@ -146,7 +144,14 @@ module Hobo
         name = name.to_sym
         (@hobo_field_types && @hobo_field_types[name]) or
           reflections[name] or
-          (col = columns.find {|c| c.name == name.to_s} and (col.type == :boolean ? TrueClass : col.klass))
+          ((col = columns.find {|c| c.name == name.to_s}) and case col.type
+                                                              when :boolean
+                                                                TrueClass
+                                                              when :text
+                                                                Hobo::Text
+                                                              else
+                                                                col.klass
+                                                              end)
       end
 
 
@@ -226,8 +231,8 @@ module Hobo
       if val.nil?
         nil
       else
-        type_wrapper = self.class.field_types && self.class.field_types[name]
-        type_wrapper ? type_wrapper.new(val) : val
+        type_wrapper = self.class.field_type(name)
+        (type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String) ? type_wrapper.new(val) : val
       end
     end
 

@@ -262,6 +262,9 @@ module Hobo
       @this = find_instance
       original = @this.duplicate
       changes = params[model.name.underscore]
+      
+      render :nothing => true and return unless changes
+      
       update_with_params(@this, changes)
       permission_denied and return unless Hobo.can_update?(current_user, original, @this)
       if @this.save

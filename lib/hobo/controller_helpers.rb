@@ -13,6 +13,11 @@ module Hobo::ControllerHelpers
   end
 
 
+  def logged_in?
+    not current_user.guest?
+  end
+    
+    
   def urlb
     request.relative_url_root
   end

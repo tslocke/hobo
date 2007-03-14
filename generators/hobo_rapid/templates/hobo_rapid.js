@@ -175,8 +175,8 @@ var Hobo = {
         Object.extend(opts, options)
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
         ipe.onEnterEditMode = function() {
-            var blank = el.getAttribute("hobo_blank_message")
-            if (blank) {
+            var blank_message = el.getAttribute("hobo_blank_message")
+            if (el.innerHTML == blank_message) {
                 el.innerHTML = "" 
             } else {
                 Hobo.ipeOldValues[el.id] = el.innerHTML

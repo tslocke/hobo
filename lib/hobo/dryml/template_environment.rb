@@ -99,7 +99,7 @@ module Hobo::Dryml
                                                 refl = new_this.proxy_reflection
                                                 [new_this.proxy_owner, refl.name, refl]
                                               else
-                                                [nil, nil, (new_this.class if new_this.is_a?(ActiveRecord::Base))]
+                                                [nil, nil, new_this.class]
                                               end
         @_this = new_this
         yield
@@ -129,6 +129,7 @@ module Hobo::Dryml
                else
                  obj.class
                end
+        
 
         @_this, @this_parent, @this_field, @this_type = obj, parent, field, type
         @form_field_path += path if @form_field_path

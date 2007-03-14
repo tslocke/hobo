@@ -98,7 +98,7 @@ module Hobo::Rapid
       FalseClass           => :boolean,
       Date                 => :date,
       Time                 => :datetime,
-      Hobo::PasswordString => :password,
+      Hobo::PasswordString => :password_string,
       Fixnum               => :integer,
       BigDecimal           => :integer,
       Float                => :float,
@@ -148,7 +148,7 @@ module Hobo::Rapid
     check_box_tag(name, '1', this, options)
   end
   
-  def_tag :password_field, :name do
+  def_tag :password_string_field, :name do
     password_field_tag(name, this)
   end
   
@@ -210,9 +210,8 @@ module Hobo::Rapid
     blank_message = opts.delete(:blank_message) || "(click to edit)"
     
     display = show(:no_span => true)
-    if display.blank?
-      opts[:hobo_blank_message] = display = blank_message
-    end
+    opts[:hobo_blank_message] = blank_message
+    display = blank_message if display.blank?
     opts[:hobo_update] = update if update 
     content_tag(:span, display, opts)
   end
@@ -250,7 +249,7 @@ module Hobo::Rapid
     in_place_editor "in_place_textfield_bhv", options
   end
 
-  def_tag :password_editor do
+  def_tag :password_string_editor do
     raise HoboError, "passwords cannot be edited in place"
   end
   
