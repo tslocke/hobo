@@ -1,7 +1,5 @@
 === Release 0.5 ===
 
-(these are current at rev 74)
-
 Tabla theme
 
   Changed some heading levels to be more logical - e.g. now use H2 and
