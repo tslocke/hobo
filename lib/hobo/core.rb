@@ -100,13 +100,53 @@ module Hobo
     end
 
 
-    def logged_in?
-      not current_user.guest?
+    def theme_asset(path)
+      "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
+    end
+    
+    
+    def_tag :dynamic_tag, :name do
+      send(name, options)
+    end
+
+    
+    def_tag :display_name do
+      name_tag = "display_name_for_#{this.class.name.underscore}"
+      if respond_to?(name_tag)
+        send(name_tag)
+      elsif this.is_a? Array
+        "(#{count})"
+      elsif this.is_a? Class and this < ActiveRecord::Base
+        this.name.pluralize.titleize
+      else
+        res = [:display_name, :name, :title].search do |m|
+          show(options.merge(:attr => m)) if this.respond_to?(m) and can_view?(this, m)
+        end
+        res || "#{this.class.name.humanize} #{this.id}"
+      end
     end
 
 
-    def theme_asset(path)
-      "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
+    def_tag :object_link, :view, :to, :params do
+      target = to || this
+      if target.nil?
+        "(Not Available)"
+      elsif to ? can_view?(to) : can_view_this?
+        content = tagbody ? tagbody.call : display_name
+        link_to content, object_url(target, view, params), options
+      end
+    end
+
+
+    def_tag :new_object_link, :for do
+      f = for_ || this
+      new = f.new
+      new.created_by(current_user)
+      if can_create?(new)
+        default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
+        content = tagbody ? tagbody.call : default
+        link_to content, object_url(f, "new")
+      end
     end
 
 
@@ -122,55 +162,82 @@ module Hobo
     end
 
 
-    def_tag :show do
-      raise HoboError.new("attempted to show non-viewable field '#{this_field}'") unless can_view_this?
+    def_tag :show, :no_span do
+      raise HoboError, "attempted to show non-viewable field '#{this_field}'" unless can_view_this?
       
-      type = this_type || (this.is_a?(String) && :string)
-      if this.nil?
-        case type
-          when  :string, :text; ""
-          else; "(Not Available)"
-        end
-      elsif this_type.respond_to?(:macro)
+      if this_type.respond_to?(:macro)
         if this_type.macro == :belongs_to
-          object_link
-        else
-          map_this { object_link }.join(", ")
+          show_belongs_to
+        elsif this_type.macro == :has_many
+          show_has_many
         end
+      
       else
-        case type
-        when :date
-          if respond_to?(:show_date)
-            show_date
-          else
-            this.to_s
-          end
-
-        when :datetime
-          if respond_to?(:show_datetime)
-            show_datetime
-          else
-            this.to_s
-          end
-          
-        when :integer, :float, :decimal, :string, :text
-          h(this).gsub("\n", "<br/>")
-
-        when :html
-          this
-
-        when :markdown
-          markdown(this)
-
-        when :textile
-          textilize(this)
-
-        when :boolean
-          this ? "Yes" : "No"
-
+        res = case this
+              when nil
+                this_type <= String ? "" : "(Not Available)"
+                
+              when Date
+                if respond_to?(:show_date)
+                  show_date
+                else
+                  this.to_s
+                end
+               
+              when Time
+                if respond_to?(:show_datetime)
+                  show_datetime
+                else
+                  this.to_s
+                end
+                
+              when Fixnum, Float, BigDecimal
+                format = options[:format]
+                format ? format % this : this.to_s
+                
+              when Hobo::HtmlString
+                this
+               
+              when Hobo::MarkdownString
+                markdown(this)
+               
+              when Hobo::TextileString
+                textilize(this)
+               
+              when Hobo::PasswordString
+                "[password withheld]"
+               
+              when String
+                h(this).gsub("\n", "<br/>")
+               
+              when TrueClass
+                "Yes"
+                
+              when FalseClass
+                "No"
+                
+              else
+                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+              end
+        if !no_span && this_parent.respond_to?(:typed_id)
+          "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
         else
-          raise HoboError.new("Cannot show: #{this.inspect} (field is #{this_field}, type is #{this_type.inspect})")
+          res
         end
+      end
+    end
+    
+    
+    def_tag :show_belongs_to do
+      object_link
+    end
+    
+    
+    def_tag :show_has_many do
+      if this.empty?
+        "(none)"
+      else
+        map_this { object_link }.join(", ")
       end
     end
 
@@ -213,6 +280,7 @@ module Hobo
         options[:class] = options[:class] ? (klass + ' ' + options[:class]) : klass
       end
       options.map do |n,v|
+        v = v.to_s
         val = v.include?("'") ? '"' + v + '"' : "'" + v + "'"
         "#{n}=#{val}"
       end.join(' ')
@@ -224,6 +292,7 @@ module Hobo
       "#{object.class.name.underscore}#{attrs}"
     end
 
+    
     def param_name_for_this(association_foreign_key=false)
       return "" unless form_this
       name = if association_foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
@@ -234,7 +303,19 @@ module Hobo
       register_form_field(name)
       name
     end
-
+    
+    
+    def selector_type
+      if this.is_a? ActiveRecord::Base
+        this.class
+      elsif this.respond_to? :member_class
+        this.member_class
+      elsif this == @this
+        @model
+      end
+    end
+    
+    
     def_tag :human_type, :style do
       if can_view_this?
         res = if this.is_a? Array
@@ -254,14 +335,18 @@ module Hobo
     end
 
 
-    def_tag :repeat, :even_odd do
-      if even_odd
-        map_this do
-          klass = [options[:class], cycle("even", "odd")].compact.join(' ')
-          content_tag(even_odd, tagbody.call, options.merge(:class => klass, :model_id => dom_id(this)))
-        end
+    def_tag :repeat, :even_odd, :else do
+      if this.empty?
+        else_
       else
-        map_this { tagbody.call }
+        if even_odd
+          map_this do
+            klass = [options[:class], cycle("even", "odd")].compact.join(' ')
+            content_tag(even_odd, tagbody.call, options.merge(:class => klass, :hobo_model_id => dom_id(this)))
+          end
+        else
+          map_this { tagbody.call }
+        end
       end
     end
 

@@ -12,7 +12,7 @@ module Hobo::Rapid
     js_options['form']          = options[:form] if options[:form]
     js_options['params']        = make_params_js(options[:params]) if options[:params]
     js_options['resultUpdate'] = js_result_updates(options[:result_update]) if options[:result_update]
-
+    
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
 
@@ -28,7 +28,7 @@ module Hobo::Rapid
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
     pairs = comma_split(updates).omap{split(/\s*=\s*/)}
-    '[' + pairs.map{|p| "[#{js_str(p[0])}, #{js_str(p[1])}]"}.join(", ") + ']'
+    '[' + pairs.map{|p| "{id: #{js_str(p[0])}, result: #{js_str(p[1])}}"}.join(", ") + ']'
   end
 
 
@@ -63,6 +63,7 @@ module Hobo::Rapid
 
 
   def no_break(s)
+    s = new_context { yield } if block_given?
     s.gsub(' ', '&nbsp;')
   end
 
@@ -77,49 +78,6 @@ module Hobo::Rapid
   end
 
 
-  def_tag :display_name do
-    name_tag = "display_name_for_#{this.class.name.underscore}"
-    if respond_to?(name_tag)
-      send(name_tag)
-    elsif this.is_a? Array
-      "(#{count})"
-    elsif this.is_a? Class and this < ActiveRecord::Base
-      this.name.pluralize.titleize
-    else
-      res = [:display_name, :name, :title].search do |m|
-        this.send(m) if this.respond_to?(m) and can_view?(this, m)
-      end
-      res || "#{this.class.name.humanize} #{this.id}"
-    end
-  end
-
-
-  def_tag :object_link, :view do
-    if can_view_this?
-      if this.nil?
-        "(Not Available)"
-      else
-        raise HoboError.new("can't link to nil/false (\#<#{this.class}>.#{attr})") unless this
-        v = this.is_a?(String) ? this.singularize.classify.constantize : this
-        content = tagbody ? tagbody.call : display_name(:obj => v)
-        link_to content, object_url(v, view), options
-      end
-    end
-  end
-
-
-  def_tag :new_object_link, :for do
-    f = for_ || this
-    new = f.new
-    new.created_by(current_user)
-    if can_create?(new)
-      default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
-      content = tagbody ? tagbody.call : default
-      link_to content, object_url(f, "new")
-    end
-  end
-
-
   def_tag :edit, :in_place do
     if can_view_this?
       if not can_edit_this?
@@ -131,55 +89,92 @@ module Hobo::Rapid
       end
     end
   end
+  
+  
+  def type_name(klass)
+    { Hobo::HtmlString     => :html,
+      Hobo::Text           => :textarea,
+      TrueClass            => :boolean,
+      FalseClass           => :boolean,
+      Date                 => :date,
+      Time                 => :datetime,
+      Hobo::PasswordString => :password_string,
+      Fixnum               => :integer,
+      BigDecimal           => :integer,
+      Float                => :float,
+      String               => :string }[klass]
+  end
 
 
   def_tag :form_field do
-    name = param_name_for_this
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
     if this_type.respond_to?(:macro)
       if this_type.macro == :belongs_to
-        belongs_to_menu_field(options)
+        belongs_to_field(options)
       elsif this_type.macro == :has_many
-        raise NotImplementedError.new("editor for has_many associations not implemented")
+        has_many_field(options)
       end
       
     else
-      case this_type
-        when :integer, :float, :decimal, :string
-        text_field_tag(name, this, options)
-      
-      when :text
-        text_area_tag(name, this, options)
-      
-      when :boolean
-        check_box_tag(name, '1', this, options)
-      
-      when :date
-        date_field(options)
-      
-      when :datetime
-        datetime_field(options)
-      
-      when :password
-        password_field_tag(name, this)
-      
+      tag = type_name(this_type).to_s + "_field"
+      if respond_to?(tag)
+        options[:name] ||= param_name_for_this
+        tag_src = send(tag, options)
+        if this_parent.errors[this_field]
+          "<div class='field_with_errors'>#{tag_src}</div>"
+        else
+          tag_src
+        end
       else
-        raise HoboError.new("<form_edit> not implemented for #{this.class.name}\##{this_field} " +
-                            "(#{this.inspect}:#{this_type})")
+        raise HoboError, ("No form field tag for #{this_field}:#{this_type} (this=#{this.inspect})")
       end
     end
   end
   
+  def_tag :has_many_field do
+    raise NotImplementedError, "form field for has_many associations not implemented"
+  end
+  
+  def_tag :belongs_to_field do
+    belongs_to_menu_field(options)
+  end
+  
+  def_tag :textarea_field, :name do 
+    text_area_tag(name, this, options)
+  end
+  
+  
+  def_tag :boolean_field, :name do
+    check_box_tag(name, '1', this, options)
+  end
+  
+  def_tag :password_string_field, :name do
+    password_field_tag(name, this)
+  end
+  
+  def_tag :html_field, :name do
+    text_area_tag(name, this, add_classes(options, "tiny_mce"))
+  end
   
   def_tag :date_field do
     select_date(this || Time.now, :prefix => param_name_for_this)
   end
 
-
   def_tag :datetime_field do
     select_datetime(this || Time.now, :prefix => param_name_for_this)
   end
 
+  def_tag :integer_field, :name do
+    text_field_tag(name, this, options)
+  end
+
+  def_tag :float_field, :name do
+    text_field_tag(name, this, options)
+  end
+
+  def_tag :string_field, :name do
+    text_field_tag(name, this, options)
+  end
 
   def_tag :editor do
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
@@ -188,74 +183,90 @@ module Hobo::Rapid
       if this_type.macro == :belongs_to
         belongs_to_editor(options)
       else
-        # In place edit for has_many not implemented
-        object_link(options)
+        has_many_editor(options)
       end
     else
-      case this_type
-      when :string
-        text_field_editor(options)
-
-      when :text
-        text_area_editor(options)
-        
-      when :integer, :float, :decimal, :timestamp, :time, :date, :datetime
-        if respond_to?("#{this_type}_editor")
-          send("#{this_type}_editor", options)
-        else
-          text_field_editor(options)
-        end
-        
-      when :datetime
-        datetime_editor(options)
-        
-      when :date
-        date_editor(options)
-        
-      when :boolean
-        boolean_checkbox_editor(options)
-
+      tag = type_name(this_type).to_s + "_editor"
+      if respond_to?(tag)
+        send(tag, options)
       else
         raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
                             "(#{this.inspect}:#{this_type})")
       end
     end
   end
+  
+  
+  def_tag :has_many_editor do
+    # TODO: Implement
+    object_link(options)
+  end
+  
+  
+  def in_place_editor(kind, options)
+    opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
+
+    update = opts.delete(:update)
+    blank_message = opts.delete(:blank_message) || "(click to edit)"
     
-  def_tag :text_field_editor do
-    disp = show
-    disp = "(click to edit)" if disp.blank?
-    opts = add_classes(options, "in_place_edit_bhv").merge(:model_id => this_field_dom_id)
-    content_tag(:span, disp, opts)
+    display = show(:no_span => true)
+    opts[:hobo_blank_message] = blank_message
+    display = blank_message if display.blank?
+    opts[:hobo_update] = update if update 
+    content_tag(:span, display, opts)
+  end
+    
+  
+  def_tag :string_editor do
+    in_place_editor "in_place_textfield_bhv", options
   end
   
-  def_tag :text_area_editor do
-    text_field_editor(add_classes(options, "textarea_editor"))
+  def_tag :textarea_editor do
+    in_place_editor "in_place_textarea_bhv", options
   end
-  
+    
+  def_tag :html_editor do
+    in_place_editor "in_place_html_textarea_bhv", options
+  end
   
   def_tag :belongs_to_editor do
     belongs_to_menu_editor(options)
   end
   
-  
   def_tag :datetime_editor do
-    text_field_editor(options)
+    string_editor(options)
   end
   
-  
   def_tag :date_editor do
-    text_field_editor(options)
+    string_editor(options)
+  end
+
+  def_tag :integer_editor do
+    in_place_editor "in_place_textfield_bhv", options
+  end
+
+  def_tag :float_editor do
+    in_place_editor "in_place_textfield_bhv", options
+  end
+
+  def_tag :password_string_editor do
+    raise HoboError, "passwords cannot be edited in place"
+  end
+  
+  def_tag :boolean_editor do
+    boolean_checkbox_editor(options)
   end
   
 
   AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method, :script, :form, :params, :confirm]
 
 
-  def_tag :update_button, :label, :message, :attrs, :update do
+  def_tag :update_button, :label, :message, :attrs, :update, :params do
     raise HoboError.new("no update specified") unless update
     message2 = message || label
-    func = ajax_updater(object_url(this), message2, update, :params => { this.class.name.underscore => attrs })
+    func = ajax_updater(object_url(this), message2, update,
+                        :params => { this.class.name.underscore => attrs }.merge(params),
+                        :method => :put)
     tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
                             "button_input update_button")
   end
@@ -278,11 +289,7 @@ module Hobo::Rapid
         button_to(label2, url, opts)
       else
         opts[:value] = label2
-        opts[:onclick] = if update
-                           ajax_updater(url, message || "Removing", update, :confirm => confirm2)
-                         else
-                           "Hobo.removeButton(this, '#{url}')"
-                         end
+        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)})"
         tag(:input, opts)
       end
     else
@@ -338,10 +345,10 @@ module Hobo::Rapid
   end
 
 
-  def_tag :object_form, :message, :update, :hidden_fields do
+  def_tag :object_form, :message, :update, :hidden_fields, :url do
     ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
 
-    url = object_url(this)
+    url2 = url || object_url(this)
     if update
       # add an onsubmit to convert to an ajax form if `update` is given
       function = ajax_updater(:post_form, message, update, ajax_options)
@@ -356,7 +363,7 @@ module Hobo::Rapid
               when nil
                 []
               when '*'
-                this.class.column_names
+                this.class.column_names - ['type']
               else
                 comma_split(hidden_fields)
               end
@@ -366,11 +373,11 @@ module Hobo::Rapid
       name = "#{pname}[#{h}]"
       hidden_field_tag(name, val.to_s) if val and name.not_in?(field_names)
     end
-    hidden_tags << hidden_field_tag("_method", "PUT") unless this.new_record?
+    hidden_tags << hidden_field_tag("_method", "PUT") unless this.respond_to?(:new_record?) and this.new_record?
 
     html_options[:method] = "post"
     body_with_hiddens = hidden_tags.compact.join("\n") + body
-    content_tag("form", body_with_hiddens, html_options.merge(:action => url))
+    content_tag("form", body_with_hiddens, html_options.merge(:action => url2))
   end
 
   

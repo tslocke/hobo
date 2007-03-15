@@ -2,8 +2,6 @@ module Hobo::Dryml
 
   class TemplateEnvironment
 
-    extend TagModule # include as class methods
-
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
@@ -40,7 +38,11 @@ module Hobo::Dryml
     attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
     
     def this; @_this; end
-
+    
+    def attr_extension(s)
+      Dryml::AttributeExtensionString.new(s)
+    end
+    
     
     def this_field_dom_id
       Hobo.dom_id(this_parent, this_field)
@@ -50,6 +52,10 @@ module Hobo::Dryml
     def part_context_model_id
       if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
         this_field_dom_id
+      elsif this.respond_to?(:typed_id)
+        this.typed_id
+      elsif this.is_a?(Array) and !this.respond_to?(:proxy_reflection)
+        "nil"
       else
         Hobo.dom_id(this)
       end
@@ -81,10 +87,9 @@ module Hobo::Dryml
     def new_context
       ctx = @output, @_this, @this_parent, @this_field, @this_type, @form_field_path
       @output = ""
-      yield
-      output = @output
+      res = yield
       @output, @_this, @this_parent, @this_field, @this_type, @form_field_path = ctx
-      output
+      res.to_s
     end
 
 
@@ -94,7 +99,7 @@ module Hobo::Dryml
                                                 refl = new_this.proxy_reflection
                                                 [new_this.proxy_owner, refl.name, refl]
                                               else
-                                                [nil, nil, (new_this.class if new_this.is_a?(ActiveRecord::Base))]
+                                                [nil, nil, new_this.class]
                                               end
         @_this = new_this
         yield
@@ -118,11 +123,13 @@ module Hobo::Dryml
           obj = Hobo.get_field(parent, field)
         end
 
-        type = if parent.class.respond_to?(:field_type) and col_type = parent.class.field_type(field)
-                 col_type
+        type = if (obj.nil? or obj.respond_to?(:proxy_reflection)) and
+                   parent.class.respond_to?(:field_type) and field_type = parent.class.field_type(field)
+                 field_type
                else
                  obj.class
                end
+        
 
         @_this, @this_parent, @this_field, @this_type = obj, parent, field, type
         @form_field_path += path if @form_field_path
@@ -186,6 +193,7 @@ module Hobo::Dryml
 
 
     def _tag_locals(options, attrs)
+      options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
       #ensure obj and attr are not in options
       options.delete(:obj)
@@ -195,6 +203,84 @@ module Hobo::Dryml
       stripped_options = {}.update(options)
       attrs.each {|a| stripped_options.delete(a.to_sym) }
       attrs.map {|a| options[a.to_sym]} + [stripped_options]
+    end
+    
+    
+    def call_replaceable_tag(name, options, external_param, &b)
+      options.delete(:replace_option)
+      
+      if external_param.is_a? Hash
+        before = external_param.delete(:before_content)
+        after = external_param.delete(:after_content)
+        top = external_param.delete(:top_content)
+        bottom = external_param.delete(:bottom_content)
+        content = external_param.delete(:content)
+        options = Hobo::Dryml.merge_tag_options(options, external_param)
+      elsif !external_param.nil?
+        return external_param.to_s
+      end
+
+      tag = if respond_to?(name)
+              body = if content
+                       proc { content }
+                     elsif b  && (top || bottom)
+                       proc { top.to_s + b.call + bottom.to_s }
+                     else
+                       b
+                     end
+              send(name, options, &body)
+            else
+              body = if content
+                       content
+                     elsif b
+                       top.to_s + new_context { b.call } + bottom.to_s
+                     else
+                       top.to_s + bottom.to_s
+                     end
+              content_tag(name, body, options)
+            end
+      before.to_s + tag.to_s + after.to_s
+    end
+    
+    
+    def call_replaceable_content_tag(name, options, external_param, &b)
+      options.delete(:content_option)
+      
+      if external_param.is_a? Hash
+        content = external_param.delete(:content)
+        top     = external_param.delete(:top_content)
+        bottom  = external_param.delete(:bottom_content)
+        external_param.delete(:before_content)
+        external_param.delete(:after_content)
+        options = Hobo::Dryml.merge_tag_options(options, external_param)
+      elsif !external_param.nil?
+        content = external_param.to_s
+      end
+      
+      # If there's no body, and no content provided externally, remove
+      # the tag altogether
+      return if b.nil? and content.nil?
+
+      tag = if respond_to?(name)
+              body = if content
+                       proc { content }
+                     elsif b  && (top || bottom)
+                       proc { top.to_s + b.call + bottom.to_s }
+                     else
+                       b
+                     end
+              send(name, options, &body)
+            else
+              body = if content
+                       content
+                     elsif b
+                       top.to_s + new_context { b.call } + bottom.to_s
+                     else
+                       top.to_s + bottom.to_s
+                     end
+              content_tag(name, body, options)
+            end
+      tag.to_s
     end
 
 
@@ -206,7 +292,9 @@ module Hobo::Dryml
     def method_missing(name, *args)
       @view.send(name, *args)
     end
+    
 
   end
+  
 
 end

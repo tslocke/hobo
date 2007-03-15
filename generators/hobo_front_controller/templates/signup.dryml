@@ -1,8 +1,12 @@
 <page title="<%= app_name %>">
-  <h1 class="front_page_title"><%= app_name %></h1>
 
-  <panel>
-    <h1>Sign Up</h1>
+  <:intro>
+    <h1 class="front_page_title"><%= app_name %></h1>
+  </:intro>
+
+  <:main>
+    <panel>
+      <h2>Sign Up</h2>
       <section>
         <%%= error_messages_for :user %>
 
@@ -28,13 +32,14 @@
         <p><submit label='Sign Up'/></p>
         <%% end %>
       </section>
-  </panel>
+    </panel>
 
-  <panel>
-    <div style="padding: 5px; text-align: center; font-style: italic;">
-      Edit app/views/<%= full_class_path %>/signup.dryml to customise this page
-    </div>
-  </panel>
+    <panel>
+      <div style="padding: 5px; text-align: center; font-style: italic;">
+        Edit app/views/<%= full_class_path %>/signup.dryml to customise this page
+      </div>
+    </panel>
+  </:main>
 
 </page>
 

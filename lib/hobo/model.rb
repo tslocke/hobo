@@ -1,22 +1,51 @@
 module Hobo
 
   module Model
-
+    
     def self.included(base)
       Hobo.register_model(base)
-      base.class_eval do
-        # alias_method_chain :find, :block
-        # alias_method :rails_original_has_many, :has_many
-      end
       base.extend(ClassMethods)
       base.set_field_type({})
     end
 
     module ClassMethods
-
+      
+      include ModelSupport::ClassMethods
+      
+      def method_added(name)
+        aliased_name = "#{name}_without_hobo_type"
+        return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
+        
+        type_wrapper = self.field_type(name)
+        if type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String
+          aliased_name = "#{name}_without_hobo_type"
+          alias_method aliased_name, name
+          define_method name do
+            res = send(aliased_name)
+            res && type_wrapper.new(res)
+          end
+        end
+      end
+      
       def set_field_type(types)
-        @hobo_field_types ||= {}
-        @hobo_field_types.update(types)
+        types.each_pair do |field, type|
+          
+          # TODO: Make this extensible
+          type_class = case type
+                       when :html; HtmlString
+                       when :markdown; MarkdownString
+                       when :textile; TextileString
+                       when :password; PasswordString
+                       end
+          
+          @hobo_field_types ||= {}
+          @hobo_field_types[field] = type_class
+        end
+      end
+      
+      
+      def field_types
+        @hobo_field_types
       end
       
       
@@ -75,6 +104,7 @@ module Hobo
           class_eval %{
             def id_name
               #{id_name_field}
+
             end
           }
         end
@@ -108,12 +138,20 @@ module Hobo
 
       attr_reader :id_name_column
 
-
+      
+      
       def field_type(name)
         name = name.to_sym
-        @hobo_field_types[name] or
+        (@hobo_field_types && @hobo_field_types[name]) or
           reflections[name] or
-          (col = columns.find {|c| c.name == name.to_s} and col.type)
+          ((col = columns.find {|c| c.name == name.to_s}) and case col.type
+                                                              when :boolean
+                                                                TrueClass
+                                                              when :text
+                                                                Hobo::Text
+                                                              else
+                                                                col.klass
+                                                              end)
       end
 
 
@@ -186,6 +224,17 @@ module Hobo
       end
 
     end
+    
+    
+    def method_missing(name, *args, &b)
+      val = super
+      if val.nil?
+        nil
+      else
+        type_wrapper = self.class.field_type(name)
+        (type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String) ? type_wrapper.new(val) : val
+      end
+    end
 
 
     def created_by(user)
@@ -212,6 +261,16 @@ module Hobo
 
     def same_fields?(other, *fields)
       fields.all?{|f| self.send(f) == other.send(f)}
+    end
+    
+    
+    def compose_with(object, use=nil)
+      CompositeModel.new_for([self, object])
+    end
+    
+    
+    def typed_id
+      "#{self.class.name.underscore}_#{self.id}"
     end
     
   end

@@ -1,8 +1,12 @@
 <page title="<%= app_name %>">
-  <h1 class="front_page_title"><%= app_name %></h1>
 
-  <panel>
-    <h1>Login to <%= app_name %></h1>
+  <:intro>
+    <h1 class="front_page_title"><%= app_name %></h1>
+  </:intro>
+
+  <:main>
+    <panel>
+      <h2>Login to <%= app_name %></h2>
       <section>
         <%% form_tag do %>
         <table class="login_table">
@@ -18,22 +22,23 @@
 
           <!-- Uncomment if required. You will also need to
                add "before_filter :login_from_cookie" to ApplicationController
-          <tr>
-            <td class="field_label"><label for="remember_me">Remember me:</label></td>
-            <td><%%= check_box_tag 'remember_me' %></td>
-          </tr>
-          -->
+               <tr>
+                 <td class="field_label"><label for="remember_me">Remember me:</label></td>
+                 <td><%%= check_box_tag 'remember_me' %></td>
+               </tr>
+               -->
         </table>
 
         <p><submit label='Log in'/></p>
         <%% end %>
       </section>
-  </panel>
+    </panel>
 
-  <panel>
-    <div style="padding: 5px; text-align: center; font-style: italic;">
-      Edit app/views/<%= full_class_path %>/login.dryml to customise this page
-    </div>
-  </panel>
+    <panel>
+      <div style="padding: 5px; text-align: center; font-style: italic;">
+        Edit app/views/<%= full_class_path %>/login.dryml to customise this page
+      </div>
+    </panel>
+  </:main>
 
 </page>

@@ -6,20 +6,22 @@ module Hobo::Dryml
 
     class << self
 
-      attr_accessor :cache
-
       def get(path)
-        raise DrymlException.new("No such taglib: #{path}") unless File.exists?(path)
+        raise DrymlException, "No such taglib: #{path}" unless File.exists?(path)
         file = File.new(path)
 
-        taglib = cache[file.path]
+        taglib = @cache[file.path]
         if taglib
           taglib.reload
         else
           taglib = Taglib.new(file)
-          cache[file.path] = taglib
+          @cache[file.path] = taglib
         end
         taglib
+      end
+      
+      def clear_cache
+        @cache = {}
       end
 
     end
@@ -30,30 +32,24 @@ module Hobo::Dryml
     end
 
     def reload
-      load if RAILS_ENV == "development" or  @file.mtime > @last_load_time
+      load if @file.mtime > @last_load_time
     end
 
     def load
       @module = Module.new
-      @module.extend(TagModule)
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)
-      template.compile
-      @tags = template.tags
+      template.compile([], false)
       @last_load_time = @file.mtime
     end
 
     def import_into(class_or_module, as)
       if as
-        raise "not implemented!"
+        raise NotImplementedError
         as_class = Class.new(TemplateEnvironment) { include @module }
         class_or_module.send(:define_method, as) { @module }
-        res = {}
-        @tags.each {|full_name, tag| @res["#{as}.#{full_name}"] = tag }
-        res
       else
         class_or_module.send(:include, @module)
-        @tags
       end
     end
 

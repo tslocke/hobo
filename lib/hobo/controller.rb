@@ -15,11 +15,12 @@ module Hobo
 
     protected
 
-    def hobo_ajax_response(this, results={})
+    def hobo_ajax_response(this=nil, results={})
+      this ||= @this
       part_page = params[:part_page]
       r = params[:render]
       if r
-        ajax_update_response(this, part_page, r.is_a?(Array) ? r : [r], results)
+        ajax_update_response(this, part_page, r.values, results)
         true
       else
         false
@@ -28,21 +29,20 @@ module Hobo
 
 
     def ajax_update_response(this, part_page, render_specs, results={})
+      before_ajax if respond_to? :before_ajax
       add_variables_to_assigns
       renderer = Hobo::Dryml.page_renderer(@template, [], part_page) if part_page
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
         for spec in render_specs
-          function = if spec[:function]
-                       spec[:function][0..0].downcase + spec[:function].camelize[1..-1]
-                     else
-                       "_update"
-                     end
+          function = spec[:function] || "_update"
 
           if spec[:as] or spec[:part]
             obj = if spec[:object] == "this" or !spec[:object]
                     this
+                  elsif spec[:object] == "nil"
+                    nil
                   else
                     Hobo.object_from_dom_id(spec[:object])
                   end
@@ -111,25 +111,8 @@ module Hobo
     end
 
 
-    def logged_in?
-      not current_user.guest?
-    end
-
-
-    # Check if the user is authorized.
-    #
-    # Override this method in your controllers if you want to restrict access
-    # to only a few actions or if you want to check if the user
-    # has the correct rights.
-    #
-    # Example:
-    #
-    #  # only allow nonbobs
-    #  def authorize?
-    #    current_user.login != "bob"
-    #  end
-    def authorized?
-      true
+    def request_no_cache?
+      request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
     end
 
   end

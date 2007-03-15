@@ -22,9 +22,11 @@ module Hobo
 
   end
 
-  Object.instance_methods.each do |m|
+  (Object.instance_methods + 
+   Object.private_instance_methods +
+   Object.protected_instance_methods).each do |m|
     ProcBinding.send(:undef_method, m) unless
-      %w{send instance_eval}.include?(m) || m.starts_with?('_')
+      %w{initialize method_missing send instance_eval}.include?(m) || m.starts_with?('_')
   end
 
 end
