@@ -207,7 +207,7 @@ module Hobo::Dryml
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
       require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
-      require_attribute(el, "when", /^#{DRYML_NAME}$/, true)
+      require_attribute(el, "if", /^#{DRYML_NAME}$/, true)
 
       name = el.attributes["tag"]
 
