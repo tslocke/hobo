@@ -1,3 +1,290 @@
+=== Release 0.5 ===
+
+(these are current at rev 74)
+
+Tabla theme
+
+  Changed some heading levels to be more logical - e.g. now use H2 and
+  H3 inside a panel instead of H1 and H2
+
+  Various CSS tweaks
+
+  <page>
+
+    Upgraded to use inner tags
+
+    No longer imports public/stylesheets/application.css by default -
+    can easily be added using inner-tags
+
+  <application_nav> and <application_logo> moved into the theme (were
+  in Rapid)
+
+Frontpage generator
+
+  Page templates modified to use <:intro>, <:main> etc
+
+
+hobo_rapid generator
+
+  --import-tags option will add two tags to application.dryml:
+
+    <taglib src="plugins/hobo/tags/rapid"/>
+    <set_theme name="default"/>
+
+
+Plugin initialisation
+
+  Theme no longer set to default in hobo/init.rb. Instead use
+  <set_theme> in application.dryml
+
+
+Core extentions
+
+  Enumerable#map_with_index
+
+
+Ajax Mechanism
+
+  Render parameters (http parameters) are passed in as a hash of
+  requests with numeric keys rather than an array.
+  (e.g. render[1][id]=foo rather than render[][id]=foo
+
+  Hobo.ajaxRequest (javascript) now displays error messages in an
+  alert box. (Known issue: seems to show these twice for some reason)
+
+  In-place-editor support extended to allow other parts to be updated at
+  the same time.
+
+  Automatic mechanism for updating multiple displays of the same field
+  after an in-place-edit
+
+  In-place-editor for html fields will now use TinyMCE if installed
+  (integrated with Ajax.InPlaceEditor)
+
+  Select based ajax editor for numbers, suited for small ranges,
+  e.g. 1 to 10
+
+  Hobo.removeButton (javascript) now supports updating of other parts
+  along with the removal.
+
+  Dom attribute "model_id" renamed to "hobo_model_id"
+
+  Fix to Ajax.InPlaceEditor - no longer removes <p> tags
+
+  before_ajax hook. This method is called immediately before the ajax
+  response is performed. A chance for the controller to make extra
+  instance variabled available to the part methods.
+
+  If a custom JS function is specified for an ajax update
+  (render[...][function]=f), this name is no longer camelised - it is
+  called as-is.
+
+  The object (render[...][object]=...) is now allowed to be nil
+
+  In-place-editor fields now reset automatically to a preset message
+  when the field is blank (e.g. "click to edit")
+
+
+Core helpers
+
+  Fix: object_url gives correct urls when the action is a web-method
+  (controller-name/id/method-name)
+
+  <show> will wrap the displayed content in a <span> with a
+  hobo_model_id. This enables the automatic update of multiple
+  displays of a field value after an ajax edit.
+
+  <show> uses the new type-system added to Hobo models. The main
+  benefit is that values that don't come directly from AR should
+  display without problem, and more types are supported (e.g. float)
+
+  <show> supports a format attribute for numbers:
+    <show attr="price" format="%.2f"/>
+
+  <show> will not display password attributes (e.g. in your model
+  set_field_type :password => :password)
+
+  New tags <show_belongs_to> and <show_has_many> can be overriden to
+  handle the way these relationships are displayed by <show>
+
+  display_name moved into core (was in Rapid, but is needed by <show>)
+
+  display_name uses <show>, so will wrap the name in a span with a
+  hobo_model_id
+
+  <repeat> supports an 'else' attribute, used when the collection is
+  empty.
+
+  Debug methods abort_with and debug are now helpers so they are
+  available from views as well as controllers.
+
+
+User Authentication
+
+  Username validations are customisable - pass a block to
+  set_login_attr and do validations in there. Otherwise default
+  validations are used.
+
+
+Hobo::Controller
+
+  hobo_ajax_reponse will use @this if no page context is passed
+
+  
+Module defined tags
+
+  Can provide a predicate as a block, e.g. to have a different nav bar onced logged in.
+
+      def_tag :nav, (proc {logged_in?}) do ...
+      def_tag :nav do ...
+
+    The tag with no predicate will always take precedence if no
+    predicate is true. If the proc has a single parameter, it is
+    passed the options hash.
+
+
+DRYML
+
+  Changes to taglib cache system. 
+
+  A list of known HTML tags is defined in lib/hobo/static_tags. These
+  are available as an array by calling Hobo.static_tags. Any tags
+  parsed that are not in here are compiled as method calls. Thus the
+  order of tag definitions is no longer as critical, making it easier
+  to split large taglibs into multiple files. As a result, tag modules
+  no longer need to track defined tags in a module variable.
+
+  XML comments now passed through to the generated HTML.
+
+  <set_theme> tag to set current theme. Was previously a configuration
+  variable. This way it is easier to change or disable the theme.
+
+  New feature - inner tags
+
+  <def> now supports alias_current attribute, e.g.
+
+    <def tag="page" alias_current="theme_page">
+
+    This overrides the current <page> definition and makes the old one
+    available as <theme_page>
+
+  <tagbody> supports obj= and attr= at the same time, as with regular
+  tag calls
+
+
+
+Hobo models
+
+  New type system. This is the extended type system that allows you to
+  say, e.g. `set_field_type :intro => :html`. Previously this was
+  returned as a symbol from MyModel.field_type(:intro). The new system
+  uses wrapper types (simple subclasses of String), and modified your
+  model to return these. e.g.
+
+    MyModel.find(:first).intro.class => Hobo::HtmlString
+
+    There are similar types for textile, markdown, passwords, and text
+    (the text type just denotes a longer string, and is used for the
+    'text' sql type).
+
+
+Hobo model controller
+
+  `show_method` renamed to `show_action`
+
+  New class method `publish_collection`. Any `has_many` collections
+  are published automatically. This method allows custom collections,
+  i.e. model methods that return arrays, to be published also.
+
+  create action for an STI base-class controller can now be used to
+  create subclass instances by passing the 'type' parameter.
+
+  update action enhanced to allow a full Hobo ajax-reponse (i.e. part
+  updates) after in-place-edits.
+
+  Controllers can define a `find_for_show` method to provide a custom
+  instance finder, e.g. a chance to perform eager loading.
+
+  Association actions now check for permission to view the association
+  owner
+
+
+Model Queries
+
+  <field>_is predicates now work with belongs_to associations.
+
+
+Hobo Rapid
+
+  rapid.dryml split up into rapid.dryml, rapid_pages.dryml
+  rapid_editing.dryml and rapid_navigation.dryml
+
+  New set of tags for creating navigation bars.
+
+  <no_break> tag replaces spaces with &nbsp; in entire content.
+
+  <edit> tag customisation - for form fields (i.e. new records), will
+  delegate to one of:
+
+      has_many_field
+      belongs_to_field
+
+      string_field
+      textarea_field
+      password_field
+      html_field
+
+      boolean_field
+
+      date_field
+      datetime_field
+
+      integer_field
+      float_field
+
+    Redfine these to customise forms throughout the app.
+
+    Similarly, editor fields (i.e. ajax fields for existing records)
+    use:
+
+      has_many_editor
+      belongs_to_editor
+      
+      string_editor
+      textarea_editor
+      password_editor
+      html_editor
+
+      boolean_editor
+
+      datetime_editor
+      date_editor
+
+      integer_editor
+      float_editor
+
+    Redefine these to customise ajax editors throughout the app.
+
+    Note has_many_field and has_many_editor are just placeholders,
+    they are not implemented.
+
+  <update_button> supports a params attribute, to send extra params
+  along with the HTTP PUT.
+
+  <delete_button> now supports part updates and use of
+  Hobo.removeButton together. (i.e. you can have the fade effect and
+  also have other parts updated)
+
+  <object_form> does not create a hidden field for the STI 'type' field.
+
+
+New feature - Composite models
+
+Experimental new feature - mapping tags
+
+New feature - Predicate dispatch modules 
+
+
 === Release 0.4.3 ===
 
 Front-controller now filters parameter logging so that passwords are
