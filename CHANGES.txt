@@ -1,3 +1,9 @@
+=== Release 0.5.1 ===
+
+Fix to model extensions: hobo_user_model generator could not complete
+because an attempt to access the database before the table exists was
+made.
+
 === Release 0.5 ===
 
 Tabla theme
