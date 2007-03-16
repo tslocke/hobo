@@ -181,14 +181,14 @@ module Hobo
                 if respond_to?(:show_date)
                   show_date
                 else
-                  this.to_s
+                  this.to_s(:long)
                 end
                
               when Time
                 if respond_to?(:show_datetime)
                   show_datetime
                 else
-                  this.to_s
+                  this.to_s(:long)
                 end
                 
               when Fixnum, Float, BigDecimal
