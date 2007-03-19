@@ -13,6 +13,10 @@ module Hobo
       include ModelSupport::ClassMethods
       
       def method_added(name)
+        # avoid error when running model generators before
+        # db exists
+        return unless connected? 
+        
         aliased_name = "#{name}_without_hobo_type"
         return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
         
