@@ -261,8 +261,8 @@ module Hobo
     def update
       @this = find_instance
       original = @this.duplicate
-      changes = params[model.name.underscore]
       
+      changes = params[model.name.underscore]
       render :nothing => true and return unless changes
       
       update_with_params(@this, changes)
@@ -375,7 +375,11 @@ module Hobo
 
 
     def permission_denied
-      render :text => "Permission Denied", :status => 403
+      if respond_to? :permission_denied_response
+        permission_denied_response
+      else
+        render :text => "Permission Denied", :status => 403
+      end
     end
 
 

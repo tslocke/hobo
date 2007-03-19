@@ -124,11 +124,7 @@ module Hobo
     end
 
     def add_routes(map)
-      begin
-        ApplicationController
-      rescue
-        require "#{RAILS_ROOT}/app/controllers/application"
-      end
+      require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
 
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"
@@ -310,6 +306,8 @@ module Hobo
 
     def check_permission(permission, person, object, *args)
       return true if person.respond_to?(:super_user?) and person.super_user?
+      
+      return true if permission == :view && !(object.is_a?(ActiveRecord::Base) || object.is_a?(Hobo::CompositeModel))
 
       obj_method = case permission
                    when :create; :creatable_by?

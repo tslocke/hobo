@@ -92,9 +92,9 @@
 </def>
 
 
-<def tag="table_for" attrs="headings, empty, row_class, footer">
-  <if q="#this.empty? and empty">
-    <%= empty %>
+<def tag="table_for" attrs="headings, row_class, footer, else">
+  <if q="#this.empty? and else_">
+    <%= else_ %>
   </if>
   <else>
     <table xattrs="">

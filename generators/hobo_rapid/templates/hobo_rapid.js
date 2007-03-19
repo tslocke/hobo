@@ -176,7 +176,7 @@ var Hobo = {
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
         ipe.onEnterEditMode = function() {
             var blank_message = el.getAttribute("hobo_blank_message")
-            if (el.innerHTML == blank_message) {
+            if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
                 el.innerHTML = "" 
             } else {
                 Hobo.ipeOldValues[el.id] = el.innerHTML
@@ -284,15 +284,15 @@ var Hobo = {
         return spec.name + '[' + spec.field + ']=' + val
     },
 
+    fadeObjectElement: function(el) {
+        new Effect.Fade(Hobo.objectElementFor(el), {duration: 0.5});
+    },
 
     removeButton: function(el, url, updates) {
         if (confirm("Are you sure?")) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
-            function complete() {
-                Hobo.hideSpinner();
-                new Effect.Fade(objEl, {duration: 0.5});
-            }
+            function complete() { Hobo.fadeObjectElement(el) }
             if (updates && updates.length > 0) {
                 new Hobo.ajaxRequest(url, "Removing", updates, { method:'delete',
                                                                  onComplete: complete});
@@ -398,4 +398,13 @@ Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
     if (this.afterEnterEditMode) this.afterEnterEditMode()
     return false
+}
+
+// Silence errors from IE :-(
+Field.scrollFreeActivate = function(field) {
+  setTimeout(function() {
+      try {
+          Field.activate(field);
+      } catch(e) {}
+  }, 1);
 }

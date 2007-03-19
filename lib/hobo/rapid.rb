@@ -68,11 +68,6 @@ module Hobo::Rapid
   end
 
 
-  def current_user_in?(collection)
-    collection.member? current_user
-  end
-
-
   def_tag :if_current_user_in do
     if_(:q => current_user_in?(this)) { tagbody.call }
   end
@@ -327,7 +322,7 @@ module Hobo::Rapid
     message2 = message || method.titleize
     func = ajax_updater(object_url(this) + "/#{method}", message2, update,
                         ajax_options.merge(:params => params, :result_update => result_update))
-    tag :input, add_classes(html_options.merge(:type =>'button', :onclick => func, :value => label),
+    tag :input, add_classes(html_options.merge(:type =>'button', :onclick => "var e = this; " + func, :value => label),
                             "button_input remote_method_button")
   end
   
@@ -397,6 +392,21 @@ module Hobo::Rapid
     object_form(obj, options.merge(:message => m, :update => update, :hidden_fields => hiddens)) do
       tagbody.call
     end
+  end
+  
+  def_tag :remote_method_form, :method, :message, :update do
+    ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
+    
+    url = object_url(this, method)
+    if update || !ajax_options.empty?
+      # add an onsubmit to convert to an ajax form
+      function = ajax_updater(:post_form, message, update, ajax_options)
+      html_options[:onsubmit] = [html_options[:onsubmit],
+                                 "var e = this; #{function}; return false;"].compact.join("; ")
+    end
+
+    html_options[:method] = "post"
+    content_tag("form", tagbody.call, html_options.merge(:action => url))
   end
 
 end
