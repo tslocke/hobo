@@ -292,7 +292,10 @@ var Hobo = {
         if (confirm("Are you sure?")) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
-            function complete() { Hobo.fadeObjectElement(el) }
+            function complete() {
+                Hobo.fadeObjectElement(el)
+                Hobo.hideSpinner()
+            }
             if (updates && updates.length > 0) {
                 new Hobo.ajaxRequest(url, "Removing", updates, { method:'delete',
                                                                  onComplete: complete});
