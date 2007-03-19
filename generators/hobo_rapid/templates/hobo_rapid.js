@@ -281,7 +281,7 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + val
+        return spec.name + '[' + spec.field + ']=' + escape(val)
     },
 
     fadeObjectElement: function(el) {
