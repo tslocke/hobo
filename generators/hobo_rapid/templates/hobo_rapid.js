@@ -214,7 +214,6 @@ var Hobo = {
 
                     this.form.onsubmit = function() {
                         tinyMCE.removeMCEControl(ipe.form.id)
-                        ipe.editField.value = encodeURIComponent(ipe.editField.value)
                         setTimeout(ipe.onSubmit.bind(ipe), 10)
                         return false
                     }
