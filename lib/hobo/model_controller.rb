@@ -270,7 +270,7 @@ module Hobo
       if @this.save
         @this.send(:clear_aggregation_cache)
         @this.send(:clear_association_cache)
-        current_user = @this if @this == current_user
+        @current_user = @this if @this == current_user
         
         respond_to do |wants|
           wants.html do
