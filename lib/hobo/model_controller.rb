@@ -268,7 +268,9 @@ module Hobo
       update_with_params(@this, changes)
       permission_denied and return unless Hobo.can_update?(current_user, original, @this)
       if @this.save
-        @current_user = @this if @this == current_user
+        @this.send(:clear_aggregation_cache)
+        @this.send(:clear_association_cache)
+        current_user = @this if @this == current_user
         
         respond_to do |wants|
           wants.html do
