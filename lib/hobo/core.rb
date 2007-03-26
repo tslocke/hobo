@@ -163,7 +163,7 @@ module Hobo
 
 
     def_tag :show, :no_span do
-      raise HoboError, "attempted to show non-viewable field '#{this_field}'" unless can_view_this?
+      raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless can_view_this?
       
       if this_type.respond_to?(:macro)
         if this_type.macro == :belongs_to

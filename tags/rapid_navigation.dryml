@@ -65,3 +65,17 @@
     </p>
   </if>
 </def>
+
+<def tag="link_to_resource" attrs="type">
+  <%= link_to type, self.send("formatted_#{model.to_s.downcase}_url", this, type.downcase) %>
+</def>
+
+<def tag="link_to_resources" attrs="types">
+  <ul class="resource_list">
+    <% comma_split(types).each do |t| %>
+    <li class="<%= t.downcase %>_resource">
+      <link_to_resource type="#t" />
+    </li>
+    <% end %>
+  </ul>
+</def>

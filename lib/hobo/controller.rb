@@ -114,6 +114,10 @@ module Hobo
     def request_no_cache?
       request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
     end
+    
+    def not_found
+      
+    end
 
   end
 end

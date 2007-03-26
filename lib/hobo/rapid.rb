@@ -260,7 +260,7 @@ module Hobo::Rapid
     raise HoboError.new("no update specified") unless update
     message2 = message || label
     func = ajax_updater(object_url(this), message2, update,
-                        :params => { this.class.name.underscore => attrs }.merge(params),
+                        :params => { this.class.name.underscore => attrs }.merge(params || {}),
                         :method => :put)
     tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
                             "button_input update_button")
