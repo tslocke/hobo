@@ -287,12 +287,13 @@ var Hobo = {
         new Effect.Fade(Hobo.objectElementFor(el), {duration: 0.5});
     },
 
-    removeButton: function(el, url, updates) {
+    removeButton: function(el, url, updates, fade) {
+        if (fade == null) { fade = true; }
         if (confirm("Are you sure?")) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
             function complete() {
-                Hobo.fadeObjectElement(el)
+                if (fade) { Hobo.fadeObjectElement(el) }
                 Hobo.hideSpinner()
             }
             if (updates && updates.length > 0) {

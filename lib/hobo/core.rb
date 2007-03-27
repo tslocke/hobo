@@ -6,12 +6,12 @@ module Hobo
 
     include Hobo::ControllerHelpers
 
-    def debug(x)
-      logger.debug("\n############")
-      logger.debug("DRYML DEBUG: " + x.inspect)
+    def debug(*args)
+      logger.debug("\n### DRYML Debug ###")
+      args.each {|a| logger.debug("DRYML DEBUG: " + PP.pp(a, ""))}
       logger.debug("DRYML THIS = " + Hobo.dom_id(this))
-      logger.debug("############\n")
-      x
+      logger.debug("###################\n")
+      args.first unless args.empty?
     end
 
 

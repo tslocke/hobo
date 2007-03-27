@@ -267,7 +267,8 @@ module Hobo::Rapid
   end
 
 
-  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm do
+  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm, :fade do
+    fade2 = fade.nil? ? true : fade
     if can_delete?(this)
       opts = options.merge(if image
                              { :type => "image", :src => "#{urlb}/images/#{image}" }
@@ -284,7 +285,7 @@ module Hobo::Rapid
         button_to(label2, url, opts)
       else
         opts[:value] = label2
-        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)})"
+        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
         tag(:input, opts)
       end
     else
