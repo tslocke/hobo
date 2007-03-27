@@ -6,7 +6,7 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table" attrs="fields, skip_fields, associations">
+<def tag="object_table" attrs="fields, skip_fields, associations, update">
   <% fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
               else
@@ -29,7 +29,7 @@
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label"><%= no_break(field.titleize) %>:</td>
-        <td><edit attr="#field" /></td>
+        <td><edit attr="#field" update="#update"/></td>
       </tr>
     <% end %>
 
@@ -44,7 +44,7 @@
     <% for assoc in associations %>
       <tr>
         <td class="field_label"><%= no_break(assoc.to_s.titleize) %>:</td>
-        <td><edit attr="#assoc"/></td>
+        <td><edit attr="#assoc" update="#update"/></td>
       </tr>
     <% end %>
 
