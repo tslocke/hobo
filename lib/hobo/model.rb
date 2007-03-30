@@ -157,6 +157,11 @@ module Hobo
                                                                 col.klass
                                                               end)
       end
+      
+      
+      def conditions(&b)
+        ModelQueries.new(self).instance_eval(&b).to_sql
+      end
 
 
       def find(*args, &b)
@@ -169,8 +174,7 @@ module Hobo
           end
           
           if b
-            sql = ModelQueries.new(self).instance_eval(&b).to_sql
-            super(args.first, options.merge(:conditions => sql))
+            super(args.first, options.merge(:conditions => conditions(&b)))
           else
             super(*args)
           end

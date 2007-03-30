@@ -1,3 +1,11 @@
+module Kernel
+  
+  def extract_options_from_args!(args) #:nodoc:
+    args.last.is_a?(Hash) ? args.pop : {}
+  end
+
+end
+
 class Object
 
   def in?(array)
@@ -100,14 +108,19 @@ class Hash
     end
   end
 
-  def select_hash(new_keys=nil, &b)
+  def select_hash(new_keys=nil)
     res = {}
-    if b
+    if block_given?
       each {|k,v| res[k] = v if yield(k,v) }
     else
       new_keys.each {|k| res[k] = self[k] if self.has_key?(k)}
     end
     res
+  end
+  
+  def map_hash
+    res = {}
+    each {|k,v| res[k] = yield(k,v) }
   end
 
   #alias_method :hobo_original_reject, :reject
