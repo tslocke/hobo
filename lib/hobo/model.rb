@@ -40,16 +40,16 @@ module Hobo
                        when :markdown; MarkdownString
                        when :textile; TextileString
                        when :password; PasswordString
+                       else type
                        end
           
-          @hobo_field_types ||= {}
-          @hobo_field_types[field] = type_class
+          field_types[field] = type_class
         end
       end
       
       
       def field_types
-        @hobo_field_types
+        @hobo_field_types ||= superclass.respond_to?(:field_types) ? superclass.field_types : {}
       end
       
       
@@ -146,7 +146,7 @@ module Hobo
       
       def field_type(name)
         name = name.to_sym
-        (@hobo_field_types && @hobo_field_types[name]) or
+        field_types[name] or
           reflections[name] or
           ((col = columns.find {|c| c.name == name.to_s}) and case col.type
                                                               when :boolean

@@ -2,8 +2,8 @@ module ActiveRecord::Associations
 
   class HasManyAssociation
 
-    def new
-      res = build
+    def new(*args)
+      res = build(*args)
       if @owner.new_record?
         refl = @owner.class.reverse_reflection(@reflection.name)
         if refl

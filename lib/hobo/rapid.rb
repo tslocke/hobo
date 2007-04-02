@@ -198,7 +198,7 @@ module Hobo::Rapid
   end
   
   
-  def in_place_editor(kind, options)
+  def in_place_editor(kind, tag, options)
     opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
 
     update = opts.delete(:update)
@@ -208,20 +208,20 @@ module Hobo::Rapid
     opts[:hobo_blank_message] = blank_message
     display = blank_message if display.blank?
     opts[:hobo_update] = update if update 
-    content_tag(:span, display, opts)
+    content_tag(tag, display, opts)
   end
     
   
   def_tag :string_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
   
   def_tag :textarea_editor do
-    in_place_editor "in_place_textarea_bhv", options
+    in_place_editor "in_place_textarea_bhv", :div, options
   end
     
   def_tag :html_editor do
-    in_place_editor "in_place_html_textarea_bhv", options
+    in_place_editor "in_place_html_textarea_bhv", :div, options
   end
   
   def_tag :belongs_to_editor do
@@ -237,11 +237,11 @@ module Hobo::Rapid
   end
 
   def_tag :integer_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
 
   def_tag :float_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
 
   def_tag :password_string_editor do
@@ -328,7 +328,7 @@ module Hobo::Rapid
   end
   
 
-  def_tag :hobo_rapid_javascripts do
+  def_tag :hobo_rapid_javascripts, :tiny_mce do
     res = javascript_include_tag("hobo_rapid")
     res += "<script>"
     unless Hobo.all_controllers.empty?
@@ -337,6 +337,20 @@ module Hobo::Rapid
         "}; "
     end
     res += "urlBase = '#{urlb}'; hoboPartPage = '#{view_name}'</script>"
+    
+    if tiny_mce
+      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
+               <script type="text/javascript">
+                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
+                       plugins: 'save',
+                       theme_advanced_buttons1 : "bold, italic, separator, " +
+                                                 "bullist, outdent, indent, separator, " +
+                                                 "undo, redo, separator, link, unlink",
+                       theme_advanced_buttons2 : "",
+                       theme_advanced_buttons3 : ""
+                 });
+               </script>}
+    end
     res
   end
 

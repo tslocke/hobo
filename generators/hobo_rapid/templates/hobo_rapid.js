@@ -131,6 +131,18 @@ var Hobo = {
         }
     },
 
+    toggle: function() {
+        for (i = 0; i < arguments.length; i++) {
+            if ($(arguments[i])) {
+                if(Element.hasClassName(arguments[i], 'hidden')) {
+                    Element.removeClassName(arguments[i], 'hidden')
+                } else {
+                    Element.addClassName(arguments[i], 'hidden')
+                }
+            }
+        }
+        },
+
     onFieldEditComplete: function(el, newValue) {
         el = $(el)
         var oldValue = Hobo.ipeOldValues[el.id]
@@ -325,7 +337,7 @@ var Hobo = {
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
-            id = el.getAttribute("hobo_model_id") || el.getAttribute("id");
+            id = el.getAttribute("hobo_model_id");
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
             el = el.parentNode;

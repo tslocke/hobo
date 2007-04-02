@@ -114,7 +114,7 @@ module Hobo
       name_tag = "display_name_for_#{this.class.name.underscore}"
       if respond_to?(name_tag)
         send(name_tag)
-      elsif this.is_a? Array
+      elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
         "(#{count})"
       elsif this.is_a? Class and this < ActiveRecord::Base
         this.name.pluralize.titleize
@@ -318,7 +318,7 @@ module Hobo
     
     def_tag :human_type, :style do
       if can_view_this?
-        res = if this.is_a? Array
+        res = if this.respond_to? :proxy_reflection
                 this.proxy_reflection.klass.name.pluralize
               elsif this.is_a? Class
                 this.name

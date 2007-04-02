@@ -267,6 +267,8 @@ module Hobo::Dryml
                      children_to_erb(el) +
                      "<% @output; end; end %>" )
       
+      logger.debug(restore_erb_scriptlets(method_src)) if el.attributes["hobo_debug_source"]
+      
       src = erb_process(method_src)
       @environment.class_eval(src, template_path, element_line_num(el))
 
@@ -299,6 +301,9 @@ module Hobo::Dryml
       require_attribute(el, "part_id", /^#{DRYML_NAME}$/)
       part_name  = el.attributes['part_id']
       dom_id = el.attributes['id'] || part_name
+      
+      dryml_exception("dupplicate part name: #{part_name}", el) if
+        (part_name + "_part").in?(@environment.instance_methods)
 
       part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
         content +
@@ -335,9 +340,11 @@ module Hobo::Dryml
       content_option = el.attributes["content_option"]
       dryml_exception("both replace_option and content_option given") if replace_option && content_option
       call = if replace_option
-               "call_replaceable_tag(:#{name}, #{options}, options[:#{replace_option}])"
+               replace_option = attribute_to_ruby(replace_option)
+               "call_replaceable_tag(:#{name}, #{options}, options[#{replace_option}.to_sym])"
              elsif content_option
-               "call_replaceable_content_tag(:#{name}, #{options}, options[:#{content_option}])"
+               content_option = attribute_to_ruby(content_option)
+               "call_replaceable_content_tag(:#{name}, #{options}, options[#{content_option}.to_sym])"
              else
                "#{name}(#{options})"
              end

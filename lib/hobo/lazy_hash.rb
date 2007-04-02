@@ -1,6 +1,6 @@
 class Hobo::LazyHash < Hash
   
-  def initialize(hash)
+  def initialize(hash=nil)
     if hash.is_a?(Hash)
       update(hash)
     else
@@ -17,5 +17,12 @@ class Hobo::LazyHash < Hash
     end
   end
   
+  def inspect
+    "#<LazyHash:#{object_id} #{keys.inspect}>"
+  end
+  
+  def to_s
+    inspect
+  end
   
 end

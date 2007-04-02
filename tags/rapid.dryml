@@ -28,8 +28,8 @@
 
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label"><%= no_break(field.titleize) %>:</td>
-        <td><edit attr="#field" update="#update"/></td>
+        <td class="field_label" content_option="#field + '_label'"><%= no_break(field.titleize) %>:</td>
+        <td><edit attr="#field" replace_option="#field + '_editor'"/></td>
       </tr>
     <% end %>
 
@@ -114,10 +114,12 @@
 </def>
 
 
-<def tag="add_by_name" attrs="action_name, add_text, update, part_id">
+<def tag="add_by_name" attrs="action_name, add_text, update, part_id" hobo_debug_source="">
   <% add_to = this
      refl = this_type
+     debug refl.through_reflection.name
      joins = this_parent.send(refl.through_reflection.name)
+     debug 123
      add_name = refl.klass.name.titleize
      action_name ||= "Add #{add_name}"
      add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
@@ -131,7 +133,6 @@
          <p>
            <%= add_text %>:
            <belongs_to_autocompleting_field attr="#source" where_not_in="#dom_id(add_to)" class="autosubmit"/>
-           <submit_tag label="#action_name" class="text"/>
          </p>
        </object_form>
     </if_can_create>

@@ -56,7 +56,7 @@ module Hobo
         show_collection_method = "show_#{name}".to_sym
         unless show_collection_method.in?(defined_methods)
           controller_class.send(:define_method, show_collection_method) do
-            hobo_show_collection(show_collection_method)
+            hobo_show_collection(name)
           end  
         end
           
@@ -77,16 +77,20 @@ module Hobo
       attr_writer :model
       
       def web_methods
-        @web_methods ||= []
+        @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
       end
       
       def show_actions
-        @show_actions ||= []
+        @show_actions ||= superclass.respond_to?(:show_actions) ? superclass.show_actions : []
       end
       
       def collections
         # By default, all has_many associations are published
-        @collections ||= model.reflections.values.map {|r| r.name if r.macro == :has_many}.compact
+        @collections ||= if superclass.respond_to?(:collections)
+                           superclass.collections
+                         else
+                           model.reflections.values.map {|r| r.name if r.macro == :has_many}.compact
+                         end
       end
 
       def model
@@ -178,6 +182,16 @@ module Hobo
 
     protected
     
+    def overridable_response(options, key)
+      if options.has_key?(key)
+        options[key]
+        true
+      else
+        yield if block_given?
+        false
+      end
+    end
+    
     # --- action implementations --- #
     
     def hobo_index(options = {})
@@ -201,7 +215,8 @@ module Hobo
       if args.empty?
         total_number ||= count_with_data_filter
       else
-        collection = model.send(args.first)
+        owner, collection_name = args
+        collection = owner.send(collection_name)
         total_number ||= collection.size
       end
       
@@ -212,12 +227,12 @@ module Hobo
       options = {
         :limit  => @pages.items_per_page,
         :offset => @pages.current.offset,
-        :order => :default
       }.merge(options)
       
       if collection
         collection.find(:all, options, &b)
       else
+        options[:order] = :default
         find_with_data_filter(options, &b)
       end
     end
@@ -229,9 +244,8 @@ module Hobo
           rescue ActiveRecord::RecordNotFound
             nil
           end
-      unless x
-        options[:not_found_response] || not_found
-      end
+      
+      not_found unless x
       x
     end
     
@@ -245,7 +259,7 @@ module Hobo
           set_named_this!
           block_given? ? yield : hobo_render
         else
-          options[:permission_denied_response] || permission_denied
+          permission_denied
         end
       end
     end
@@ -260,13 +274,14 @@ module Hobo
         set_named_this!
         block_given? ? yield : hobo_render
       else
-        options[:permission_denied_response] || permission_denied
+        permission_denied
       end
     end
     
     
     def hobo_create(options={})
       options = LazyHash.new(options)
+      
       @this = (options[:this] || 
                begin
                  attributes = params[model.name.underscore]
@@ -293,17 +308,17 @@ module Hobo
           yield 
         else
           respond_to do |wants|
-            wants.html { options[:html_response] || redirect_to(object_url(@this)) }
-            wants.js   { options[:js_response] || hobo_ajax_response || render(:text => "") }
+            wants.html { overridable_response(options, :html_response)  || redirect_to(object_url(@this)) }
+            wants.js   { overridable_response(options, :js_response) || hobo_ajax_response || render(:text => "") }
           end
         end
       else
         # Validation errors
         unless options[:invalid_response]
           respond_to do |wants|
-            wants.html { options[:invalid_html_response] || hobo_render(:new) }
+            wants.html { overridable_response(options, :invalid_html_response) || hobo_render(:new) }
             wants.js do
-              (options[:invalid_js_response] ||
+              (overridable_response(options, :invalid_js_response) ||
                render(:status => 500,
                       :text => ("There was a problem creating that #{create_model.name}.\n" +
                                 @this.errors.full_messages.join("\n"))))
@@ -335,10 +350,7 @@ module Hobo
         @this.send(:clear_association_cache)
         
         update_with_params(@this, changes)
-        unless Hobo.can_update?(current_user, original, @this)
-          options[:permission_denied_response] || permission_denied
-          return 
-        end
+        permission_denied and return unless Hobo.can_update?(current_user, original, @this)
       end
       
       set_named_this!
@@ -351,11 +363,11 @@ module Hobo
         else
           respond_to do |wants|
             wants.html do
-              options[:html_response] || redirect_to(object_url(@this))
+              overridable_response(options, :html_response) || redirect_to(object_url(@this))
             end
 
             wants.js do
-              unless options[:js_response]
+              overridable_response(options, :js_response) do
                 if changes.size == 1
                   # Decreasingly hacky support for the scriptaculous in-place-editor
                   new_val = Hobo::Dryml.render_tag(@template, "show",
@@ -376,13 +388,15 @@ module Hobo
         # Validation errors
         respond_to do |wants|
           wants.html do
-            options[:invalid_html_response] || render(:action => :edit)
+            overridable_response(options, :invalid_html_response) || render(:action => :edit)
           end
 
           wants.js do
-            options[:invalid_js_response] || render(:status => 500,
-                                                    :text => ("There was a problem with that change.\n" +
-                                                              @this.errors.full_messages.join("\n")))
+            overridable_response(options, :invalid_js_response) do
+              render(:status => 500,
+                     :text => ("There was a problem with that change.\n" +
+                               @this.errors.full_messages.join("\n")))
+            end
           end
         end
       end
@@ -395,10 +409,7 @@ module Hobo
       return unless @this
       
       set_named_this!
-      unless Hobo.can_delete?(current_user, @this)
-        options[:permission_denied_response] || permission_denied
-        return
-      end
+      permission_denied and return unless Hobo.can_delete?(current_user, @this)
 
       @this.destroy
 
@@ -406,8 +417,8 @@ module Hobo
         yield
       else
         respond_to do |wants|
-          wants.html { options[:html_response] || redirect_to(:action => "index") }
-          wants.js   { options[:js_response] || hobo_ajax_response || render(:text => "") }
+          wants.html { overridable_response(options, :html_response) || redirect_to(:action => "index") }
+          wants.js   { overridable_response(options, :js_response) || hobo_ajax_response || render(:text => "") }
         end
       end
     end
@@ -418,20 +429,22 @@ module Hobo
       @owner = find_instance_for_action(options, :owner)
       return unless @owner
       
+      @reflection = @owner.class.reflections[collection]
+      
       if Hobo.can_view?(current_user, @owner, collection)
-        @association = options[:collection] || @owner.send(collection)
-        @this = paginated_find(collection)
-        
-        # Nasty hack because :uniq is not supported properly
-        @this = @this.uniq if @association.proxy_reflection.options[:uniq]
+        @this = options[:collection] || begin
+                                          @owner.send(collection)
+                                          @this = paginated_find(@owner, collection, options)
+                                        end
         
         if block_given?
           yield
         else
-          hobo_render("show_#{collection}") or hobo_render(:show_collection, @association.member_class)
+          hobo_render("show_#{collection}") or hobo_render(:show_collection,
+                                                           @reflection.klass)
         end
       else
-        options[:permission_denied_response] || permission_denied
+        permission_denied
       end
     end
     
@@ -451,7 +464,7 @@ module Hobo
           hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
         end
       else
-        options[:permission_denied_response] || permission_denied
+        permission_denied
       end
     end
     
@@ -477,16 +490,20 @@ module Hobo
     end
 
 
-    def permission_denied
-      if respond_to? :permission_denied_response
+    def permission_denied(options=nil)
+      if options and options[:permission_denied_response]
+        # do nothing (callback handled by LazyHash)
+      elsif respond_to? :permission_denied_response
         permission_denied_response
       else
         render :text => "Permission Denied", :status => 403
       end
     end
     
-    def not_found
-      if respond_to? :not_found_response
+    def not_found(options=nil)
+      if options && options[:not_found_response]
+        # do nothing (callback handled by LazyHash)
+      elsif respond_to? :not_found_response
         not_found_response
       else
         render(:text => "Can't find #{model.name.titleize}: #{params[:id]}", :status => 404)
@@ -495,6 +512,8 @@ module Hobo
 
     def find_instance(id=nil)
       res = self.class.find_instance(id || params[:id])
+      instance_variable_set("@#{model.name.underscore}", res)
+      res
     end
     
     def set_named_this!

@@ -225,19 +225,20 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      return false unless can_view?(person, object, field)
-
+      setter = "#{field}="
+      return false unless can_view?(person, object, field) and object.respond_to?(setter)
+      
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
       # has_many and polymorphic associations are not editable (for now)
       return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
 
       new = object.duplicate
-      new.send("#{field}=", if refl and refl.macro == :belongs_to
-                              Hobo::Undefined.new(refl.klass)
-                            else
-                              Hobo::Undefined.new
-                            end)
+      new.send(setter, if refl and refl.macro == :belongs_to
+                         Hobo::Undefined.new(refl.klass)
+                       else
+                         Hobo::Undefined.new
+                       end)
 
       begin
         if object.new_record?
@@ -259,22 +260,17 @@ module Hobo
     def can_view?(person, object, field=nil)
       if field
         field = field.to_sym if field.is_a? String
-        return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
-      else
-        # Special support for classes (can view instances?)
-        if object.is_a?(Class) and object < ActiveRecord::Base
-          object = object.new
-        elsif object.is_a?(Array)
-          if object.respond_to?(:new_without_appending)
-            object = object.new_without_appending
-          elsif object.respond_to?(:member_class)
-            object = object.member_class.new
-          end          
-        end
+        return false if object.class.respond_to?(:never_show?) && object.class.never_show?(field)
       end
+      
+      if object.is_a?(Array) && object.respond_to?(:member_class)
+        # Test class-level permission for member objects
+        object = object.member_class
+      end
+      
       viewable = check_permission(:view, person, object, field)
-      if viewable and field and
-          ( (field_val = get_field(object, field)).is_a?(ActiveRecord::Base) or field_val.is_a?(Array) )
+      if (viewable && field && !object.is_a?(Class) &&
+          (field_val = get_field(object, field)).is_a?(ActiveRecord::Base))
         # also ask the current value if it is viewable
         can_view?(person, field_val)
       else
@@ -315,7 +311,6 @@ module Hobo
                    when :delete; :deletable_by?
                    when :view;   :viewable_by?
                    end
-      person_method = "can_#{permission}?".to_sym
       p = if object.respond_to?(obj_method)
             begin
               object.send(obj_method, person, *args)
@@ -324,11 +319,14 @@ module Hobo
             end
           elsif object.class.respond_to?(obj_method)
             object.class.send(obj_method, person, *args)
-          elsif person.respond_to?(person_method)
-            person.send(person_method, object, *args)
-          else
-            # The object does not define permissions - you can only view it
-            permission == :view
+          elsif !object.is_a?(Class) # No user fallback for class-level permissions
+            person_method = "can_#{permission}?".to_sym
+            if person.respond_to?(person_method)
+              person.send(person_method, object, *args)
+            else
+              # The object does not define permissions - you can only view it
+              permission == :view
+            end
           end
     end
 
