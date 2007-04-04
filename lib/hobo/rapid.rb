@@ -11,7 +11,9 @@ module Hobo::Rapid
     js_options['evalScripts']   = false if options[:script] == false
     js_options['form']          = options[:form] if options[:form]
     js_options['params']        = make_params_js(options[:params]) if options[:params]
-    js_options['resultUpdate'] = js_result_updates(options[:result_update]) if options[:result_update]
+    js_options['resultUpdate']  = js_result_updates(options[:result_update]) if options[:result_update]
+    js_options['resetForm']     = false if options[:reset_form] == false
+    js_options['refocusForm']   = false if options[:refocus_form] == false
     
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
@@ -253,7 +255,9 @@ module Hobo::Rapid
   end
   
 
-  AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method, :script, :form, :params, :confirm]
+  AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method,
+                :script, :form, :params, :confirm,
+                :reset_form, :refocus_form]
 
 
   def_tag :update_button, :label, :message, :attrs, :update, :params do
@@ -409,13 +413,14 @@ module Hobo::Rapid
     end
   end
   
-  def_tag :remote_method_form, :method, :message, :update do
+  def_tag :remote_method_form, :method, :message, :update, :result_update do
     ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
     
     url = object_url(this, method)
-    if update || !ajax_options.empty?
+    if update || result_update || !ajax_options.empty?
       # add an onsubmit to convert to an ajax form
-      function = ajax_updater(:post_form, message, update, ajax_options)
+      
+      function = ajax_updater(:post_form, message, update, ajax_options.merge(:result_update => result_update))
       html_options[:onsubmit] = [html_options[:onsubmit],
                                  "var e = this; #{function}; return false;"].compact.join("; ")
     end

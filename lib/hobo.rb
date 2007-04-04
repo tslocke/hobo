@@ -257,20 +257,33 @@ module Hobo
     end
 
 
+    # can_view? has special behaviour if it's passed a class or an
+    # association-proxy -- it instantiates the class, or creates a new
+    # instance "in" the association (new_without_appending), and tests
+    # the permission of this object. This means the permission methods
+    # in models can't rely on the instance being properly initialised.
+    # But it's important that it works like this because, in the case
+    # of an association proxy, we don't want to loose the information
+    # that the object belongs_to the proxy owner.
     def can_view?(person, object, field=nil)
       if field
         field = field.to_sym if field.is_a? String
-        return false if object.class.respond_to?(:never_show?) && object.class.never_show?(field)
+        return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+      else
+        # Special support for classes (can view instances?)
+        if object.is_a?(Class) and object < ActiveRecord::Base
+          object = object.new
+        elsif object.is_a?(Array)
+          if object.respond_to?(:new_without_appending)
+            object = object.new_without_appending
+          elsif object.respond_to?(:member_class)
+            object = object.member_class.new
+          end          
+        end
       end
-      
-      if object.is_a?(Array) && object.respond_to?(:member_class)
-        # Test class-level permission for member objects
-        object = object.member_class
-      end
-      
       viewable = check_permission(:view, person, object, field)
-      if (viewable && field && !object.is_a?(Class) &&
-          (field_val = get_field(object, field)).is_a?(ActiveRecord::Base))
+      if viewable and field and
+          ( (field_val = get_field(object, field)).is_a?(ActiveRecord::Base) or field_val.is_a?(Array) )
         # also ask the current value if it is viewable
         can_view?(person, field_val)
       else
@@ -282,8 +295,8 @@ module Hobo
     def can_call?(person, object, method)
       return true if person.respond_to?(:super_user?) and person.super_user?
 
-      m = "can_call_#{method}?"
-      object.respond_to?(m) and object.send(m, current_user)
+      m = "#{method}_callable_by?"
+      object.respond_to?(m) and object.send(m, person)
     end 
     
     # --- end permissions -- #

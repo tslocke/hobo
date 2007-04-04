@@ -114,7 +114,7 @@
 </def>
 
 
-<def tag="add_by_name" attrs="action_name, add_text, update, part_id" hobo_debug_source="">
+<def tag="add_by_name" attrs="action_name, add_text, update, part_id">
   <% add_to = this
      refl = this_type
      debug refl.through_reflection.name

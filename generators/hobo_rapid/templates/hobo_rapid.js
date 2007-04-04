@@ -70,7 +70,10 @@ var Hobo = {
 
     ajaxRequest: function(url_or_form, message, updates, options) {
         options = Object.merge({ asynchronous:true,
-                                 evalScripts:true }, options)
+                                 evalScripts:true,
+                                 resetForm: true,
+                                 refocusForm: true
+                               }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
             var form = false
@@ -94,12 +97,12 @@ var Hobo = {
 
         Hobo.showSpinner(message)
         var complete = function() {
-            if (form) form.reset();
+            if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
 
             if (options.onComplete)
                 options.onComplete.apply(this, arguments)
-            if (form) Form.focusFirstElement(form)
+            if (form && options) Form.focusFirstElement(form)
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method

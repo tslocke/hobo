@@ -278,7 +278,7 @@ module Hobo
     
     
     def typed_id
-      "#{self.class.name.underscore}_#{self.id}"
+      id ? "#{self.class.name.underscore}_#{self.id}" : nil
     end
     
   end
