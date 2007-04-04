@@ -121,6 +121,7 @@ class Hash
   def map_hash
     res = {}
     each {|k,v| res[k] = yield(k,v) }
+    res
   end
 
   #alias_method :hobo_original_reject, :reject
