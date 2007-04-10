@@ -358,9 +358,9 @@ module Hobo
 
     
     def_tag :transpose_and_repeat, :with_field do
-      max_length = this.omap { length }.max
-      matrix = this.map do |obj|
-        a = obj.send(with_field)
+      matrix = this.omap { send(with_field) }
+      max_length = matrix.omap{ length }.max
+      matrix = matrix.map do |a|
         a + [nil] * (max_length - a.length)
       end
       repeat :obj => matrix.transpose { tagbody.call }
