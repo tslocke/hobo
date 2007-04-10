@@ -363,8 +363,7 @@ module Hobo
       matrix = matrix.map do |a|
         a + [nil] * (max_length - a.length)
       end
-      body = tagbody
-      repeat :obj => matrix.transpose { body.call }
+      repeat(:obj => matrix.transpose) { body.call }
     end
 
 
