@@ -1,3 +1,4 @@
+
 <def tag="submit" attrs="label">
   <input type="submit" value="<%= label %>" xattrs="" class="button_input submit_button"/>
 </def>
@@ -114,6 +115,7 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
                     } })
+  options = add_classes(options, editor_class)
 %>
   <input type="checkbox" value="1" onchange="<%= f %>"
          xattrs="# this ? options.merge(:checked => 'checked') : options" />

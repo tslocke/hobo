@@ -10,9 +10,7 @@ module Hobo
       if base.is_a?(Class)
         Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
         base.class_eval do
-          unless "redirect_to_without_object_url".in?(instance_methods)
-            alias_method_chain :redirect_to, :object_url
-          end
+          alias_method_chain :redirect_to, :object_url
         end
       end
     end

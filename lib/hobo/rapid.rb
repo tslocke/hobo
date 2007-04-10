@@ -431,5 +431,9 @@ module Hobo::Rapid
     html_options[:method] = "post"
     content_tag("form", tagbody.call, html_options.merge(:action => url))
   end
+  
+  def editor_class
+    "#{this_parent.class.name.underscore}_#{this_field}_editor"
+  end
 
 end

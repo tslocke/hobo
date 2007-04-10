@@ -23,6 +23,10 @@ module Hobo
         end
 
         base.before_filter :set_no_cache_headers
+
+        base.class_eval do
+          alias_method_chain :redirect_to, :object_url
+        end
       end
 
       def find_partial(klass, as)
@@ -678,7 +682,6 @@ module Hobo
     def object_from_param(param)
       Hobo.object_from_dom_id(param)
     end
-
 
   end
 
