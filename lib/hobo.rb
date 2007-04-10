@@ -39,7 +39,7 @@ module Hobo
     def models
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
-          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize
+          f =~ /.rb$/ and f.sub(/.rb$/, '').camelize.constantize
         end
         @models_loaded = true
       end
@@ -58,7 +58,7 @@ module Hobo
       _, name, id, attr = *dom_id.match(/^([a-z_]+)_([0-9]+(?:_[0-9]+)*)(_[a-z_]+)?$/)
       raise ArgumentError.new("invalid model-reference in dom id") unless name
       if name
-        model_class = name.classify.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
+        model_class = name.camelize.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
         return nil unless model_class
         attr = attr[1..-1] if attr
         obj = if false and attr and model_class.reflections[attr.to_sym].klass.superclass == ActiveRecord::Base
@@ -293,10 +293,10 @@ module Hobo
     
     
     def can_call?(person, object, method)
-      return true if person.respond_to?(:super_user?) and person.super_user?
+      return true if person.respond_to?(:super_user?) && person.super_user?
 
       m = "#{method}_callable_by?"
-      object.respond_to?(m) and object.send(m, person)
+      object.respond_to?(m) && object.send(m, person)
     end 
     
     # --- end permissions -- #

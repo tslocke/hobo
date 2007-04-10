@@ -40,7 +40,7 @@ module Hobo::Dryml
     def this; @_this; end
     
     def attr_extension(s)
-      Dryml::AttributeExtensionString.new(s)
+      AttributeExtensionString.new(s)
     end
     
     
@@ -192,17 +192,19 @@ module Hobo::Dryml
     end
 
 
-    def _tag_locals(options, attrs)
+    def _tag_locals(options, attrs, inner_tag_names)
       options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
       #ensure obj and attr are not in options
       options.delete(:obj)
       options.delete(:attr)
+      
+      inner_tag_options, options = options.partition_hash(inner_tag_names.omap{to_sym})
 
       # positional arguments never appear in the options hash
       stripped_options = {}.update(options)
       attrs.each {|a| stripped_options.delete(a.to_sym) }
-      attrs.map {|a| options[a.to_sym]} + [stripped_options]
+      attrs.map {|a| options[a.to_sym]} + [stripped_options, inner_tag_options]
     end
     
     

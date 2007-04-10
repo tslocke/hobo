@@ -103,7 +103,7 @@ module Hobo
       def pattern_predicate
         clauses = (pattern._selectors || []).omap{compile}
         type_name = pattern._dot_names.first
-        clauses << "selector_type && (#{type_name.to_s.classify} <= selector_type)" if type_name
+        clauses << "selector_type && (#{type_name.to_s.camelize} <= selector_type)" if type_name
         !clauses.empty? && "proc {|options| #{clauses.join(' and ')}}"
       end
       

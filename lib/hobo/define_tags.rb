@@ -39,7 +39,7 @@ module Hobo
         src = <<-END
           #{def_line}
             _tag_context(options, block) do |tagbody|
-              locals = _tag_locals(options, #{attrs.inspect})
+              locals = _tag_locals(options, #{attrs.inspect}, [])
               locals_hash = { :tagbody => tagbody };
               #{locals.inspect}.each_with_index{|a, i| locals_hash[a] = locals[i]}
               Hobo::ProcBinding.new(self, locals_hash).instance_eval(&#{self.name}.hobo_tag_blocks['#{name}'])

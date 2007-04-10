@@ -7,7 +7,9 @@
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
 <def tag="object_table" attrs="fields, skip_fields, associations, update">
-  <% fields = if fields.nil?
+  <% field_inner_tag_options, options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
+     inner_tag_options.merge!(field_inner_tag_options)
+     fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
               else
                 comma_split(fields)
@@ -81,7 +83,7 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <li class="<%= even_odd %>" hobo_model_id="<%= dom_id this %>">
+          <li class="<%= even_odd %> <%= this_type.name.underscore %>" hobo_model_id="<%= dom_id this %>">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </li>
         </if_can_view>
@@ -102,7 +104,8 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <tr class="<%= even_odd %> <%= row_class %>" hobo_model_id="<%= dom_id(this) %>">
+          <tr class="<%= even_odd %> <%= row_class %> <%= this_type.name.underscore %>"
+              hobo_model_id="<%= dom_id(this) %>">
             <%= tagbody && tagbody.call %>
           </tr>
         <% even_odd = even_odd == "even" ? "odd" : "even" %>
@@ -117,9 +120,7 @@
 <def tag="add_by_name" attrs="action_name, add_text, update, part_id">
   <% add_to = this
      refl = this_type
-     debug refl.through_reflection.name
      joins = this_parent.send(refl.through_reflection.name)
-     debug 123
      add_name = refl.klass.name.titleize
      action_name ||= "Add #{add_name}"
      add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +

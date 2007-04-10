@@ -12,7 +12,7 @@ module Hobo
       end
         
       def compose(*models)
-        @models = models.omap{to_s.classify}
+        @models = models.omap{to_s.camelize}
         attr_reader *models
         CompositeModel.composites ||= {}
         CompositeModel.composites[@models.sort] = self.name

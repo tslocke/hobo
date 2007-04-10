@@ -150,7 +150,7 @@ module Hobo::Rapid
   end
   
   def_tag :html_field, :name do
-    text_area_tag(name, this, add_classes(options, "tiny_mce"))
+    text_area_tag(name, this, add_classes(options, :tiny_mce))
   end
   
   def_tag :date_field do
@@ -391,7 +391,10 @@ module Hobo::Rapid
 
     html_options[:method] = "post"
     body_with_hiddens = hidden_tags.compact.join("\n") + body
-    content_tag("form", body_with_hiddens, html_options.merge(:action => url2))
+    
+    form_class = this.new_record? ? "new_#{this.class.name.underscore}" : this.class.name.underscore
+    
+    content_tag("form", body_with_hiddens, add_classes(html_options, form_class).merge(:action => url2))
   end
 
   

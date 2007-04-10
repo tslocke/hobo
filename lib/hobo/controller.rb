@@ -9,11 +9,24 @@ module Hobo
     def self.included(base)
       if base.is_a?(Class)
         Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
+        base.class_eval do
+          unless "redirect_to_without_object_url".in?(instance_methods)
+            alias_method_chain :redirect_to, :object_url
+          end
+        end
       end
     end
 
 
     protected
+    
+    def redirect_to_with_object_url(destination, view=nil)
+      if destination.is_a?(String, Hash)
+        redirect_to_without_object_url(destination)
+      else
+        redirect_to_without_object_url(object_url(destination, view))
+      end
+    end
 
     def hobo_ajax_response(this=nil, results={})
       this ||= @this

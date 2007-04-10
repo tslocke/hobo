@@ -1,5 +1,5 @@
 <def tag="submit" attrs="label">
-  <input type="submit" value="<%= label %>" xattrs="" class="button_input"/>
+  <input type="submit" value="<%= label %>" xattrs="" class="button_input submit_button"/>
 </def>
 
 

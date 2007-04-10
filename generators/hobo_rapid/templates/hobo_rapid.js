@@ -299,7 +299,9 @@ var Hobo = {
     },
 
     fadeObjectElement: function(el) {
-        new Effect.Fade(Hobo.objectElementFor(el), {duration: 0.5});
+        new Effect.Fade(Hobo.objectElementFor(el),
+                        { duration: 0.5,
+                          afterFinish: function (ef) { ef.element.remove() } });
     },
 
     removeButton: function(el, url, updates, fade) {

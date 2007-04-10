@@ -8,21 +8,26 @@ module Hobo
 
     def debug(*args)
       logger.debug("\n### DRYML Debug ###")
-      args.each {|a| logger.debug("DRYML DEBUG: " + PP.pp(a, ""))}
-      logger.debug("DRYML THIS = " + Hobo.dom_id(this))
+      logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
+      logger.debug("DRYML THIS = " + Hobo.dom_id(this).to_s)
       logger.debug("###################\n")
       args.first unless args.empty?
     end
 
 
     def add_classes!(options, *classes)
-      options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
+      option_class = options[:class]
+      options[:class] = if option_class.nil?
+                          classes
+                        else
+                          [option_class] + classes
+                        end.join(' ')
       options
     end
 
 
     def add_classes(options, *classes)
-      options.merge(:class => ([options[:class]] + classes).select{|x|x}.join(' '))
+      add_classes!({}.update(options), classes)
     end
     
     
@@ -133,7 +138,8 @@ module Hobo
         "(Not Available)"
       elsif to ? can_view?(to) : can_view_this?
         content = tagbody ? tagbody.call : display_name
-        link_to content, object_url(target, view, params), options
+        link_class = "#{target.class.name.underscore}_link"
+        link_to content, object_url(target, view, params), add_classes(options, link_class)
       end
     end
 
@@ -145,7 +151,8 @@ module Hobo
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
         content = tagbody ? tagbody.call : default
-        link_to content, object_url(f, "new")
+        link_class = "new_#{new.class.name.underscore}_link"
+        link_to content, object_url(f, "new"), add_classes(options, link_class)
       end
     end
 
@@ -258,8 +265,7 @@ module Hobo
 
     def render_params(*args)
       parts = args.map{|x| x.split(/, */) if x}.compact.flatten
-      {
-        :part_page => view_name,
+      { :part_page => view_name,
         :render => parts.map do |part_id|
           { :object => Hobo::RawJs.new("hoboParts.#{part_id}"),
             :part => part_id }
@@ -276,8 +282,7 @@ module Hobo
     def xattrs(options, klass=nil)
       options ||= {}
       if klass
-        options = options.symbolize_keys
-        options[:class] = options[:class] ? (klass + ' ' + options[:class]) : klass
+        options = add_classes(options.symbolize_keys, [klass])
       end
       options.map do |n,v|
         v = v.to_s
@@ -288,6 +293,7 @@ module Hobo
 
 
     def param_name_for(object, field_path)
+      field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
       attrs = field_path.map{|part| "[#{part}]"}.join
       "#{object.class.name.underscore}#{attrs}"
     end

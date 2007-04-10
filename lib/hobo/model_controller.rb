@@ -216,14 +216,15 @@ module Hobo
         total_number ||= count_with_data_filter
       else
         owner, collection_name = args
-        collection = owner.send(collection_name)
+        collection = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
         total_number ||= collection.size
+        @reflection = collection.proxy_reflection
       end
       
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
       @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
-      
+
       options = {
         :limit  => @pages.items_per_page,
         :offset => @pages.current.offset,
@@ -429,19 +430,14 @@ module Hobo
       @owner = find_instance_for_action(options, :owner)
       return unless @owner
       
-      @reflection = @owner.class.reflections[collection]
-      
-      if Hobo.can_view?(current_user, @owner, collection)
-        @this = options[:collection] || begin
-                                          @owner.send(collection)
-                                          @this = paginated_find(@owner, collection, options)
-                                        end
+      toplevel_collection = collection.to_s.split(".").first
+      if Hobo.can_view?(current_user, @owner, toplevel_collection)
+        @this = options[:collection] || @this = paginated_find(@owner, collection, options)
         
         if block_given?
           yield
         else
-          hobo_render("show_#{collection}") or hobo_render(:show_collection,
-                                                           @reflection.klass)
+          hobo_render("show_#{collection}") or hobo_render(:show_collection, @reflection.klass)
         end
       else
         permission_denied
