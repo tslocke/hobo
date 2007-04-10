@@ -328,7 +328,7 @@ module Hobo::Rapid
     func = ajax_updater(object_url(this) + "/#{method}", message2, update,
                         ajax_options.merge(:params => params, :result_update => result_update))
     tag :input, add_classes(html_options.merge(:type =>'button', :onclick => "var e = this; " + func, :value => label),
-                            "button_input remote_method_button")
+                            "button_input remote_method_button #{method}_button")
   end
   
 

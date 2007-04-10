@@ -115,7 +115,8 @@
                        this_field => Hobo.raw_js('this.checked')
                     } })
 %>
-  <%=  check_box_tag "x", "1", this, :onchange => f %>
+  <input type="checkbox" value="1" onchange="<%= f %>"
+         xattrs="# this ? options.merge(:checked => 'checked') : options" />
 </def>
 
 

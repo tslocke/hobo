@@ -356,6 +356,16 @@ module Hobo
       end
     end
 
+    
+    def_tag :transpose_and_repeat, :with_field do
+      max_length = this.omap { length }.max
+      matrix = this.map do |obj|
+        a = obj.send(with_field)
+        a + [nil] * (max_length - a.length)
+      end
+      repeat :obj => matrix.transpose { tagbody.call }
+    end
+
 
     def_tag :count, :label, :prefix do
       raise Exception.new("asked for count of a string") if this.is_a?(String)
