@@ -201,7 +201,7 @@ module Hobo::Rapid
   
   
   def in_place_editor(kind, tag, options)
-    opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
+    opts = add_classes(options, kind, editor_class).merge(:hobo_model_id => this_field_dom_id)
 
     update = opts.delete(:update)
     blank_message = opts.delete(:blank_message) || "(click to edit)"
@@ -267,7 +267,7 @@ module Hobo::Rapid
                         :params => { this.class.name.underscore => attrs }.merge(params || {}),
                         :method => :put)
     tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
-                            "button_input update_button")
+                            "button_input update_button update_#{this.class.name.underscore}_button")
   end
 
 
@@ -282,7 +282,9 @@ module Hobo::Rapid
       label2 = label || "Remove"
       confirm2 = confirm || "Are you sure?"
       
-      add_classes!(opts, image ? "image_button_input" : "button_input", "delete_button")
+      add_classes!(opts,
+                   image ? "image_button_input" : "button_input",
+                   "delete_button delete_#{this.class.name.underscore}_button")
       url = object_url(this, "destroy")
       if ajax == false
         opts[:confirm] = confirm2
@@ -302,19 +304,20 @@ module Hobo::Rapid
     raise HoboError.new("no update specified") unless update
     params = attrs || {}
     if model
-      new = (model.is_a?(String) ? model.constantize : model).new
+      new = (model.is_a?(String) ? model.constantize : model).new(params)
     else
       raise HoboError.new("invalid context for <create_button>") unless Hobo.simple_has_many_association?(this)
       params[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
-      new = this.new
+      new = this.new(params)
     end
     if can_create?(new)
       label2 = label || "New #{new.class.name.titleize}"
       message2 = message || label2
+      class_name = new.class.name.underscore
       func = ajax_updater(object_url(new.class), message2, update,
-                          ({:params => { new.class.name.underscore => params }} unless params.empty?))
+                          ({:params => { class_name => params }} unless params.empty?))
       tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2),
-                              "button_input create_button")
+                              "button_input create_button create_#{class_name}_button")
     else
       else_
     end
@@ -411,6 +414,7 @@ module Hobo::Rapid
       end
     end
     m = message || "New #{obj.class.name.titleize}"
+    options = add_classes(options, "create_#{obj.class.underscore.name}_form")
     object_form(obj, options.merge(:message => m, :update => update, :hidden_fields => hiddens)) do
       tagbody.call
     end
@@ -428,6 +432,7 @@ module Hobo::Rapid
                                  "var e = this; #{function}; return false;"].compact.join("; ")
     end
 
+    add_classes!(html_options, "#{this.class.name.underscore}_#{method}_form")
     html_options[:method] = "post"
     content_tag("form", tagbody.call, html_options.merge(:action => url))
   end

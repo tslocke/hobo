@@ -202,9 +202,9 @@ module Hobo
         refl = reflections[association]
         for assoc in subclass_associations
           class_name = assoc.to_s.classify
-          has_many(assoc, refl.options.merge(:class_name => class_name,
-                                             :source => refl.source_reflection.name,
-                                             :conditions => "type = '#{class_name}'"))
+          options = { :class_name => class_name, :conditions => "type = '#{class_name}'" }
+          option[:source] = refl.source_reflection.name if refl.source_reflection
+          has_many(assoc, refl.options.merge(options))
         end
       end
 
