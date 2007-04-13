@@ -50,7 +50,7 @@ module Hobo
           function = spec[:function] || "_update"
 
           if spec[:as] or spec[:part]
-            obj = if spec[:object] == "this" or !spec[:object]
+            obj = if spec[:object] == "this" or spec[:object].blank?
                     this
                   elsif spec[:object] == "nil"
                     nil
