@@ -33,6 +33,7 @@ module Hobo
       
     end
       
+    
     def initialize(*objects)
       objects.each do |obj|
         raise ArgumentError, "invalid objects for composition: #{objects.inspect}" unless
