@@ -203,7 +203,7 @@ module Hobo
         for assoc in subclass_associations
           class_name = assoc.to_s.classify
           options = { :class_name => class_name, :conditions => "type = '#{class_name}'" }
-          option[:source] = refl.source_reflection.name if refl.source_reflection
+          options[:source] = refl.source_reflection.name if refl.source_reflection
           has_many(assoc, refl.options.merge(options))
         end
       end

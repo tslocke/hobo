@@ -57,6 +57,12 @@ class Test::Unit::TestCase
       new_obj
     end
     
+    def deletes(object)
+      post object_url(object, "destroy")
+      assert_raise(ActiveRecord::RecordNotFound) { object.class.find(object.id) }
+      assert_response :redirect
+    end
+    
     def cant_create(klass, params)
       replace_objects_in_params!(params)
       post object_url(klass), klass.name.underscore => params

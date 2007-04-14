@@ -207,11 +207,17 @@ var Hobo = {
         }
 
         select(".in_place_textfield_bhv").each(function (el) {
-            Hobo._makeInPlaceEditor(el)
+            ipe = Hobo._makeInPlaceEditor(el)
+            ipe.getText = function() {
+                return this.element.innerHTML.unescapeHTML()
+            }
         })
 
         select(".in_place_textarea_bhv").each(function (el) {
-            Hobo._makeInPlaceEditor(el, {rows: 2})
+            ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
+            ipe.getText = function() {
+                return this.element.innerHTML.unescapeHTML()
+            }
         })
 
         select(".in_place_html_textarea_bhv").each(function (el) {
