@@ -424,6 +424,11 @@ module Hobo
       if_(:q => !q) { tagbody.call }
     end
     
+
+    def_tag :if_blank do
+      if_(:q => this.blank?) { tagbody.call }
+    end
+
     
     def_tag :unless_blank do
       if_(:q => !this.blank?) { tagbody.call }
