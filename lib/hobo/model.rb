@@ -30,7 +30,13 @@ module Hobo
           alias_method aliased_name, name
           define_method name do
             res = send(aliased_name)
-            res && type_wrapper.new(res)
+            if res.nil?
+              nil
+            elsif res.respond_to?(:hobo_undefined?) && res.hobo_undefined?
+              res
+            else
+              type_wrapper.new(res)
+            end
           end
         end
       end

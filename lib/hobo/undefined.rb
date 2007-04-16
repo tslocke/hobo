@@ -6,7 +6,7 @@ module Hobo
       @klass = klass
     end
 
-    def undefined?
+    def hobo_undefined?
       true
     end
 
