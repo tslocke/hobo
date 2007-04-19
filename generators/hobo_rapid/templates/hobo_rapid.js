@@ -209,14 +209,14 @@ var Hobo = {
         select(".in_place_textfield_bhv").each(function (el) {
             ipe = Hobo._makeInPlaceEditor(el)
             ipe.getText = function() {
-                return this.element.innerHTML.gsub(/<br\s*\/>/, "\n").unescapeHTML()
+                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
             }
         })
 
         select(".in_place_textarea_bhv").each(function (el) {
             ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
             ipe.getText = function() {
-                return this.element.innerHTML.gsub(/<br\s*\/>/, "\n").unescapeHTML()
+                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
             }
         })
 
