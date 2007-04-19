@@ -14,6 +14,7 @@ module ActiveRecord::Associations
       end
       res
     end
+    
 
     def new_without_appending(attributes = {})
       record = @reflection.klass.new(attributes)
@@ -34,6 +35,7 @@ module ActiveRecord::Associations
     def member_class
       proxy_reflection.klass
     end
+    
     
     def find_with_block(*args, &b)
       if b

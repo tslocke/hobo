@@ -373,6 +373,9 @@ module Hobo
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
+    def changed_fields?(other, *fields)
+      fields.all?{|f| self.send(f) != other.send(f)}
+    end
     
     def compose_with(object, use=nil)
       CompositeModel.new_for([self, object])

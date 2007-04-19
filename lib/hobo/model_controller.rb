@@ -441,7 +441,7 @@ module Hobo
         if block_given?
           yield
         else
-          hobo_render("show_#{collection}") or hobo_render(:show_collection, @reflection.klass)
+          hobo_render(params[:action]) or hobo_render(:show_collection, @reflection.klass)
         end
       else
         permission_denied
@@ -454,17 +454,18 @@ module Hobo
       @owner = find_instance_for_action(options, :owner)
       return unless @owner
       
-      if Hobo.can_view?(current_user, @owner, collection)
-        @association = options[:collection] || @owner.send(collection)
-        @this = options[:this] || @association.new_without_appending
-        @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
-        if block_given?
-          yield
-        else
-          hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
-        end
+      permission_denied and return unless Hobo.can_view?(current_user, @owner, collection)
+      
+      @association = options[:collection] || @owner.send(collection)
+      @this = options[:this] || @association.new_without_appending
+      @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+
+      permission_denied and return unless Hobo.can_create?(current_user, @this)
+      
+      if block_given?
+        yield
       else
-        permission_denied
+        hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
       end
     end
     

@@ -8,7 +8,7 @@ module ActiveRecord::Associations
       if loaded?
         target.include?(record)
       else
-        find(record.id) && true rescue false
+        !!find_by_id(record.id)
       end
     end
     
