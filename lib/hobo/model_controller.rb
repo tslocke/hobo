@@ -220,9 +220,9 @@ module Hobo
         total_number ||= count_with_data_filter
       else
         owner, collection_name = args
-        collection = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
-        total_number ||= collection.size
-        @reflection = collection.proxy_reflection
+        @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
+        total_number ||= @association.size
+        @reflection = @association.proxy_reflection
       end
       
       page_size = options.delete(:page_size) || 20
@@ -234,8 +234,8 @@ module Hobo
         :offset => @pages.current.offset,
       }.merge(options)
       
-      if collection
-        collection.find(:all, options, &b)
+      if @association
+        @association.find(:all, options, &b)
       else
         options[:order] = :default
         find_with_data_filter(options, &b)
