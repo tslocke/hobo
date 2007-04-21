@@ -479,7 +479,7 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid xattrs", el)
                         end
-        "#{extra_options}.reverse_merge({#{all}})"
+        "{#{all}}.merge((#{extra_options}) || {})"
       else
         "{#{all}}"
       end
