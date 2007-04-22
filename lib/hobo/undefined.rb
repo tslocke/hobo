@@ -6,7 +6,7 @@ module Hobo
       @klass = klass
     end
 
-    def undefined?
+    def hobo_undefined?
       true
     end
 
@@ -33,6 +33,8 @@ module Hobo
     def method_missing(name, *args)
       raise UndefinedAccessError.new("call to: #{name}")
     end
+    
+    undef_method :==
 
   end
 

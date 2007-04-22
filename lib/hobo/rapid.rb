@@ -11,7 +11,9 @@ module Hobo::Rapid
     js_options['evalScripts']   = false if options[:script] == false
     js_options['form']          = options[:form] if options[:form]
     js_options['params']        = make_params_js(options[:params]) if options[:params]
-    js_options['resultUpdate'] = js_result_updates(options[:result_update]) if options[:result_update]
+    js_options['resultUpdate']  = js_result_updates(options[:result_update]) if options[:result_update]
+    js_options['resetForm']     = false if options[:reset_form] == false
+    js_options['refocusForm']   = false if options[:refocus_form] == false
     
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
@@ -65,11 +67,6 @@ module Hobo::Rapid
   def no_break(s)
     s = new_context { yield } if block_given?
     s.gsub(' ', '&nbsp;')
-  end
-
-
-  def current_user_in?(collection)
-    collection.member? current_user
   end
 
 
@@ -153,7 +150,7 @@ module Hobo::Rapid
   end
   
   def_tag :html_field, :name do
-    text_area_tag(name, this, add_classes(options, "tiny_mce"))
+    text_area_tag(name, this, add_classes(options, :tiny_mce))
   end
   
   def_tag :date_field do
@@ -203,8 +200,8 @@ module Hobo::Rapid
   end
   
   
-  def in_place_editor(kind, options)
-    opts = add_classes(options, kind).merge(:hobo_model_id => this_field_dom_id)
+  def in_place_editor(kind, tag, options)
+    opts = add_classes(options, kind, editor_class).merge(:hobo_model_id => this_field_dom_id)
 
     update = opts.delete(:update)
     blank_message = opts.delete(:blank_message) || "(click to edit)"
@@ -213,20 +210,20 @@ module Hobo::Rapid
     opts[:hobo_blank_message] = blank_message
     display = blank_message if display.blank?
     opts[:hobo_update] = update if update 
-    content_tag(:span, display, opts)
+    content_tag(tag, display, opts)
   end
     
   
   def_tag :string_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
   
   def_tag :textarea_editor do
-    in_place_editor "in_place_textarea_bhv", options
+    in_place_editor "in_place_textarea_bhv", :div, options
   end
     
   def_tag :html_editor do
-    in_place_editor "in_place_html_textarea_bhv", options
+    in_place_editor "in_place_html_textarea_bhv", :div, options
   end
   
   def_tag :belongs_to_editor do
@@ -242,11 +239,11 @@ module Hobo::Rapid
   end
 
   def_tag :integer_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
 
   def_tag :float_editor do
-    in_place_editor "in_place_textfield_bhv", options
+    in_place_editor "in_place_textfield_bhv", :span, options
   end
 
   def_tag :password_string_editor do
@@ -258,21 +255,24 @@ module Hobo::Rapid
   end
   
 
-  AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method, :script, :form, :params, :confirm]
+  AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method,
+                :script, :form, :params, :confirm,
+                :reset_form, :refocus_form]
 
 
   def_tag :update_button, :label, :message, :attrs, :update, :params do
     raise HoboError.new("no update specified") unless update
     message2 = message || label
     func = ajax_updater(object_url(this), message2, update,
-                        :params => { this.class.name.underscore => attrs }.merge(params),
+                        :params => { this.class.name.underscore => attrs }.merge(params || {}),
                         :method => :put)
     tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
-                            "button_input update_button")
+                            "button_input update_button update_#{this.class.name.underscore}_button")
   end
 
 
-  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm do
+  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm, :fade do
+    fade2 = fade.nil? ? true : fade
     if can_delete?(this)
       opts = options.merge(if image
                              { :type => "image", :src => "#{urlb}/images/#{image}" }
@@ -282,14 +282,16 @@ module Hobo::Rapid
       label2 = label || "Remove"
       confirm2 = confirm || "Are you sure?"
       
-      add_classes!(opts, image ? "image_button_input" : "button_input", "delete_button")
+      add_classes!(opts,
+                   image ? "image_button_input" : "button_input",
+                   "delete_button delete_#{this.class.name.underscore}_button")
       url = object_url(this, "destroy")
       if ajax == false
         opts[:confirm] = confirm2
         button_to(label2, url, opts)
       else
         opts[:value] = label2
-        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)})"
+        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
         tag(:input, opts)
       end
     else
@@ -302,19 +304,20 @@ module Hobo::Rapid
     raise HoboError.new("no update specified") unless update
     params = attrs || {}
     if model
-      new = (model.is_a?(String) ? model.constantize : model).new
+      new = (model.is_a?(String) ? model.constantize : model).new(params)
     else
       raise HoboError.new("invalid context for <create_button>") unless Hobo.simple_has_many_association?(this)
       params[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
-      new = this.new
+      new = this.new(params)
     end
     if can_create?(new)
       label2 = label || "New #{new.class.name.titleize}"
       message2 = message || label2
+      class_name = new.class.name.underscore
       func = ajax_updater(object_url(new.class), message2, update,
-                          ({:params => { new.class.name.underscore => params }} unless params.empty?))
+                          ({:params => { class_name => params }} unless params.empty?))
       tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2),
-                              "button_input create_button")
+                              "button_input create_button create_#{class_name}_button")
     else
       else_
     end
@@ -327,12 +330,12 @@ module Hobo::Rapid
     message2 = message || method.titleize
     func = ajax_updater(object_url(this) + "/#{method}", message2, update,
                         ajax_options.merge(:params => params, :result_update => result_update))
-    tag :input, add_classes(html_options.merge(:type =>'button', :onclick => func, :value => label),
-                            "button_input remote_method_button")
+    html_options.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
+    tag(:input, add_classes(html_options, "button_input remote_method_button #{method}_button"))
   end
   
 
-  def_tag :hobo_rapid_javascripts do
+  def_tag :hobo_rapid_javascripts, :tiny_mce do
     res = javascript_include_tag("hobo_rapid")
     res += "<script>"
     unless Hobo.all_controllers.empty?
@@ -341,6 +344,20 @@ module Hobo::Rapid
         "}; "
     end
     res += "urlBase = '#{urlb}'; hoboPartPage = '#{view_name}'</script>"
+    
+    if tiny_mce
+      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
+               <script type="text/javascript">
+                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
+                       plugins: 'save',
+                       theme_advanced_buttons1 : "bold, italic, separator, " +
+                                                 "bullist, outdent, indent, separator, " +
+                                                 "undo, redo, separator, link, unlink",
+                       theme_advanced_buttons2 : "",
+                       theme_advanced_buttons3 : ""
+                 });
+               </script>}
+    end
     res
   end
 
@@ -377,7 +394,10 @@ module Hobo::Rapid
 
     html_options[:method] = "post"
     body_with_hiddens = hidden_tags.compact.join("\n") + body
-    content_tag("form", body_with_hiddens, html_options.merge(:action => url2))
+    
+    form_class = this.new_record? ? "new_#{this.class.name.underscore}" : this.class.name.underscore
+    
+    content_tag("form", body_with_hiddens, add_classes(html_options, form_class).merge(:action => url2))
   end
 
   
@@ -394,9 +414,31 @@ module Hobo::Rapid
       end
     end
     m = message || "New #{obj.class.name.titleize}"
+    options = add_classes(options, "create_#{obj.class.underscore.name}_form")
     object_form(obj, options.merge(:message => m, :update => update, :hidden_fields => hiddens)) do
       tagbody.call
     end
+  end
+  
+  def_tag :remote_method_form, :method, :message, :update, :result_update do
+    ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
+    
+    url = object_url(this, method)
+    if update || result_update || !ajax_options.empty?
+      # add an onsubmit to convert to an ajax form
+      
+      function = ajax_updater(:post_form, message, update, ajax_options.merge(:result_update => result_update))
+      html_options[:onsubmit] = [html_options[:onsubmit],
+                                 "var e = this; #{function}; return false;"].compact.join("; ")
+    end
+
+    add_classes!(html_options, "#{this.class.name.underscore}_#{method}_form")
+    html_options[:method] = "post"
+    content_tag("form", tagbody.call, html_options.merge(:action => url))
+  end
+  
+  def editor_class
+    "#{this_parent.class.name.underscore}_#{this_field}_editor"
   end
 
 end

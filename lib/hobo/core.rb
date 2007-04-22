@@ -6,12 +6,12 @@ module Hobo
 
     include Hobo::ControllerHelpers
 
-    def debug(x)
-      logger.debug("\n############")
-      logger.debug("DRYML DEBUG: " + x.inspect)
-      logger.debug("DRYML THIS = " + Hobo.dom_id(this))
-      logger.debug("############\n")
-      x
+    def debug(*args)
+      logger.debug("\n### DRYML Debug ###")
+      logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
+      logger.debug("DRYML THIS = " + Hobo.dom_id(this).to_s)
+      logger.debug("###################\n")
+      args.first unless args.empty?
     end
 
 
@@ -22,7 +22,7 @@ module Hobo
 
 
     def add_classes(options, *classes)
-      options.merge(:class => ([options[:class]] + classes).select{|x|x}.join(' '))
+      add_classes!({}.update(options), classes)
     end
     
     
@@ -114,7 +114,7 @@ module Hobo
       name_tag = "display_name_for_#{this.class.name.underscore}"
       if respond_to?(name_tag)
         send(name_tag)
-      elsif this.is_a? Array
+      elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
         "(#{count})"
       elsif this.is_a? Class and this < ActiveRecord::Base
         this.name.pluralize.titleize
@@ -132,8 +132,9 @@ module Hobo
       if target.nil?
         "(Not Available)"
       elsif to ? can_view?(to) : can_view_this?
-        content = tagbody ? tagbody.call : display_name
-        link_to content, object_url(target, view, params), options
+        content = tagbody ? tagbody.call : call_replaceable_tag(:display_name, options, options.delete(:name))
+        link_class = "#{target.class.name.underscore}_link"
+        link_to content, object_url(target, view, params), add_classes(options, link_class)
       end
     end
 
@@ -145,7 +146,8 @@ module Hobo
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
         content = tagbody ? tagbody.call : default
-        link_to content, object_url(f, "new")
+        link_class = "new_#{new.class.name.underscore}_link"
+        link_to content, object_url(f, "new"), add_classes(options, link_class)
       end
     end
 
@@ -162,69 +164,77 @@ module Hobo
     end
 
 
-    def_tag :show, :no_span do
-      raise HoboError, "attempted to show non-viewable field '#{this_field}'" unless can_view_this?
+    def_tag :show, :no_span, :truncate_tail do
+      # We can't do this as a declared attribute as it will hide the truncate helper
+      trunc = options.delete(:truncate)
       
-      if this_type.respond_to?(:macro)
-        if this_type.macro == :belongs_to
-          show_belongs_to
-        elsif this_type.macro == :has_many
-          show_has_many
-        end
+      raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+        can_view_this?
       
-      else
-        res = case this
-              when nil
-                this_type <= String ? "" : "(Not Available)"
-                
-              when Date
-                if respond_to?(:show_date)
-                  show_date
-                else
-                  this.to_s
-                end
-               
-              when Time
-                if respond_to?(:show_datetime)
-                  show_datetime
-                else
-                  this.to_s
-                end
-                
-              when Fixnum, Float, BigDecimal
-                format = options[:format]
-                format ? format % this : this.to_s
-                
-              when Hobo::HtmlString
-                this
-               
-              when Hobo::MarkdownString
-                markdown(this)
-               
-              when Hobo::TextileString
-                textilize(this)
-               
-              when Hobo::PasswordString
-                "[password withheld]"
-               
-              when String
-                h(this).gsub("\n", "<br/>")
-               
-              when TrueClass
-                "Yes"
-                
-              when FalseClass
-                "No"
-                
-              else
-                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+      res = if this_type.respond_to?(:macro)
+              if this_type.macro == :belongs_to
+                show_belongs_to
+              elsif this_type.macro == :has_many
+                show_has_many
               end
-        if !no_span && this_parent.respond_to?(:typed_id)
-          "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
-        else
-          res
-        end
-      end
+              
+            else
+              res2 = case this
+                     when nil
+                       this_type <= String ? "" : "(Not Available)"
+                       
+                     when Date
+                       if respond_to?(:show_date)
+                         show_date
+                       else
+                         this.to_s(:long)
+                       end
+                       
+                     when Time
+                       if respond_to?(:show_datetime)
+                         show_datetime
+                       else
+                         this.to_s(:long)
+                       end
+                       
+                     when Fixnum, Float, BigDecimal
+                       format = options[:format]
+                       format ? format % this : this.to_s
+                       
+                     when Hobo::HtmlString
+                       this
+                       
+                     when Hobo::MarkdownString
+                       markdown(this)
+                       
+                     when Hobo::TextileString
+                       textilize(this)
+                       
+                     when Hobo::PasswordString
+                       "[password withheld]"
+                       
+                     when String
+                       h(this).gsub("\n", "<br/>")
+                       
+                     when TrueClass
+                       "Yes"
+                       
+                     when FalseClass
+                       "No"
+                       
+                     else
+                       raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+                     end
+              
+              
+              
+              if !no_span && this_parent.respond_to?(:typed_id)
+                "<span hobo_model_id='#{this_field_dom_id}'>#{res2}</span>"
+              else
+                res2
+              end
+            end
+      trunc ? truncate(res2, trunc.to_i, truncate_tail || "...") : res2
     end
     
     
@@ -258,8 +268,7 @@ module Hobo
 
     def render_params(*args)
       parts = args.map{|x| x.split(/, */) if x}.compact.flatten
-      {
-        :part_page => view_name,
+      { :part_page => view_name,
         :render => parts.map do |part_id|
           { :object => Hobo::RawJs.new("hoboParts.#{part_id}"),
             :part => part_id }
@@ -276,8 +285,7 @@ module Hobo
     def xattrs(options, klass=nil)
       options ||= {}
       if klass
-        options = options.symbolize_keys
-        options[:class] = options[:class] ? (klass + ' ' + options[:class]) : klass
+        options = add_classes(options.symbolize_keys, [klass])
       end
       options.map do |n,v|
         v = v.to_s
@@ -288,6 +296,7 @@ module Hobo
 
 
     def param_name_for(object, field_path)
+      field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
       attrs = field_path.map{|part| "[#{part}]"}.join
       "#{object.class.name.underscore}#{attrs}"
     end
@@ -318,7 +327,7 @@ module Hobo
     
     def_tag :human_type, :style do
       if can_view_this?
-        res = if this.is_a? Array
+        res = if this.respond_to? :proxy_reflection
                 this.proxy_reflection.klass.name.pluralize
               elsif this.is_a? Class
                 this.name
@@ -348,6 +357,16 @@ module Hobo
           map_this { tagbody.call }
         end
       end
+    end
+
+    
+    def_tag :transpose_and_repeat, :with_field do
+      matrix = this.map {|obj| obj.send(with_field) }
+      max_length = matrix.omap{ length }.max
+      matrix = matrix.map do |a|
+        a + [nil] * (max_length - a.length)
+      end
+      repeat(:obj => matrix.transpose) { tagbody.call }
     end
 
 
@@ -408,6 +427,11 @@ module Hobo
       if_(:q => !q) { tagbody.call }
     end
     
+
+    def_tag :if_blank do
+      if_(:q => this.blank?) { tagbody.call }
+    end
+
     
     def_tag :unless_blank do
       if_(:q => !this.blank?) { tagbody.call }

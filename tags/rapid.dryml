@@ -6,8 +6,10 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table" attrs="fields, skip_fields, associations">
-  <% fields = if fields.nil?
+<def tag="object_table" attrs="fields, skip_fields, associations, update">
+  <% field_inner_tag_options, options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
+     inner_tag_options.merge!(field_inner_tag_options)
+     fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
               else
                 comma_split(fields)
@@ -28,8 +30,8 @@
 
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label"><%= no_break(field.titleize) %>:</td>
-        <td><edit attr="#field" /></td>
+        <td class="field_label" content_option="#field + '_label'"><%= no_break(field.titleize) %>:</td>
+        <td><edit attr="#field" replace_option="#field + '_editor'"/></td>
       </tr>
     <% end %>
 
@@ -44,7 +46,7 @@
     <% for assoc in associations %>
       <tr>
         <td class="field_label"><%= no_break(assoc.to_s.titleize) %>:</td>
-        <td><edit attr="#assoc"/></td>
+        <td><edit attr="#assoc" update="#update"/></td>
       </tr>
     <% end %>
 
@@ -81,7 +83,7 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <li class="<%= even_odd %>" hobo_model_id="<%= dom_id this %>">
+          <li class="<%= even_odd %> <%= this_type.name.underscore %>" hobo_model_id="<%= dom_id this %>">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </li>
         </if_can_view>
@@ -92,9 +94,9 @@
 </def>
 
 
-<def tag="table_for" attrs="headings, empty, row_class, footer">
-  <if q="#this.empty? and empty">
-    <%= empty %>
+<def tag="table_for" attrs="headings, row_class, footer, else">
+  <if q="#this.empty? and else_">
+    <%= else_ %>
   </if>
   <else>
     <table xattrs="">
@@ -102,8 +104,9 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <tr class="<%= even_odd %> <%= row_class %>" hobo_model_id="<%= dom_id(this) %>">
-            <%= tagbody.nil? ? object_link : tagbody.call %>
+          <tr class="<%= even_odd %> <%= row_class %> <%= this_type.name.underscore %>"
+              hobo_model_id="<%= dom_id(this) %>">
+            <%= tagbody && tagbody.call %>
           </tr>
         <% even_odd = even_odd == "even" ? "odd" : "even" %>
         </if_can_view>
@@ -131,7 +134,6 @@
          <p>
            <%= add_text %>:
            <belongs_to_autocompleting_field attr="#source" where_not_in="#dom_id(add_to)" class="autosubmit"/>
-           <submit_tag label="#action_name" class="text"/>
          </p>
        </object_form>
     </if_can_create>

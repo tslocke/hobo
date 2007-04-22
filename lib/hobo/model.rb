@@ -6,10 +6,14 @@ module Hobo
       Hobo.register_model(base)
       base.extend(ClassMethods)
       base.set_field_type({})
+      class << base
+        alias_method_chain :has_many, :defined_scopes
+      end
     end
 
     module ClassMethods
       
+      # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
       
       def method_added(name)
@@ -26,7 +30,13 @@ module Hobo
           alias_method aliased_name, name
           define_method name do
             res = send(aliased_name)
-            res && type_wrapper.new(res)
+            if res.nil?
+              nil
+            elsif res.respond_to?(:hobo_undefined?) && res.hobo_undefined?
+              res
+            else
+              type_wrapper.new(res)
+            end
           end
         end
       end
@@ -40,16 +50,16 @@ module Hobo
                        when :markdown; MarkdownString
                        when :textile; TextileString
                        when :password; PasswordString
+                       else type
                        end
           
-          @hobo_field_types ||= {}
-          @hobo_field_types[field] = type_class
+          field_types[field] = type_class
         end
       end
       
       
       def field_types
-        @hobo_field_types
+        @hobo_field_types ||= superclass.respond_to?(:field_types) ? superclass.field_types : {}
       end
       
       
@@ -146,7 +156,7 @@ module Hobo
       
       def field_type(name)
         name = name.to_sym
-        (@hobo_field_types && @hobo_field_types[name]) or
+        field_types[name] or
           reflections[name] or
           ((col = columns.find {|c| c.name == name.to_s}) and case col.type
                                                               when :boolean
@@ -156,6 +166,11 @@ module Hobo
                                                               else
                                                                 col.klass
                                                               end)
+      end
+      
+      
+      def conditions(&b)
+        ModelQueries.new(self).instance_eval(&b).to_sql
       end
 
 
@@ -169,8 +184,7 @@ module Hobo
           end
           
           if b
-            sql = ModelQueries.new(self).instance_eval(&b).to_sql
-            super(args.first, options.merge(:conditions => sql))
+            super(args.first, options.merge(:conditions => conditions(&b)))
           else
             super(*args)
           end
@@ -180,23 +194,24 @@ module Hobo
       end
       
       
-      def count(options={}, &b)
-        super(if b
-                sql = ModelQueries.new(self).instance_eval(&b).to_sql
-                options.merge(:conditions => sql)
-              else
-                options
-              end)
+      def count(*args, &b)
+        if b
+          sql = ModelQueries.new(self).instance_eval(&b).to_sql
+          options = extract_options_from_args!(args)
+          super(*args + [options.merge(:conditions => sql)])
+        else
+          super(*args)
+        end
       end
 
 
       def subclass_associations(association, *subclass_associations)
         refl = reflections[association]
         for assoc in subclass_associations
-          class_name = assoc.to_s.singularize.classify
-          has_many(assoc, refl.options.merge(:class_name => class_name,
-                                             :source => refl.source_reflection.name,
-                                             :conditions => "type = '#{class_name}'"))
+          class_name = assoc.to_s.classify
+          options = { :class_name => class_name, :conditions => "type = '#{class_name}'" }
+          options[:source] = refl.source_reflection.name if refl.source_reflection
+          has_many(assoc, refl.options.merge(options))
         end
       end
 
@@ -226,7 +241,99 @@ module Hobo
             r.primary_key_name == refl.primary_key_name
         end
       end
+      
+      
+      class ScopedProxy
+        def initialize(klass, scope={})
+          @klass, @scope = klass, scope
+        end
+        
+        def method_missing(name, *args, &block)
+          klass.with_scope(@scope) do
+            @klass.send(name, *args, &block)
+          end
+        end
+      end
+      (Object.instance_methods + 
+       Object.private_instance_methods +
+       Object.protected_instance_methods).each do |m|
+        ScopedProxy.send(:undef_method, m) unless
+          m.in?(%w{initialize method_missing}) || m.starts_with?('_')
+      end
+      
+      attr_accessor :defined_scopes
 
+      
+      def def_scope(name, scope=nil, &block)
+        @defined_scopes ||= {}
+        @defined_scopes[name.to_sym] = block || scope
+        
+        meta_def(name) do |*args|
+          ScopedProxy.new(self, block ? block.call(*args) : scope)
+        end
+      end
+      
+      
+      module DefinedScopeProxyExtender
+        
+        attr_accessor :reflections
+        
+        def method_missing(name, *args, &block)
+          scopes = proxy_reflection.klass.defined_scopes
+          scope = scopes && scopes[name.to_sym]
+          if scope
+            scope = scope.call(*args) if scope.is_a?(Proc)
+            
+            # Calling directly causes self to get loaded
+            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}")
+            unless assoc
+              options = proxy_reflection.options
+              has_many_conditions = options.has_key?(:condition)
+              scope_conditions = scope.delete(:conditions)
+              conditions = if has_many_conditions && scope_conditions
+                             "(#{scope_conditions}) AND (#{has_many_conditions})"
+                           else
+                             scope_conditions || has_many_conditions
+                           end
+              
+              options = options.merge(scope).update(:conditions => conditions,
+                                                    :class_name => proxy_reflection.klass.name,
+                                                    :foreign_key => proxy_reflection.primary_key_name)
+              r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
+                                                                      name,
+                                                                      options,
+                                                                      proxy_reflection.klass)
+              @reflections ||= {}
+              @reflections[name] = r
+              
+              assoc = if options.has_key?(:through)
+                        ActiveRecord::Associations::HasManyThroughAssociation
+                      else
+                        ActiveRecord::Associations::HasManyAssociation
+                      end.new(self.proxy_owner, r)
+              
+              # Calling directly causes self to get loaded
+              Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}", assoc)
+            end
+            assoc
+          else
+            super
+          end
+        end
+        
+      end
+      
+      
+      def has_many_with_defined_scopes(name, *args, &block)
+        options = extract_options_from_args!(args)
+        if options.has_key?(:extend) || block
+          # Normal has_many
+          has_many_without_defined_scopes(name, *args + [options], &block)
+        else
+          options[:extend] = DefinedScopeProxyExtender
+          has_many_without_defined_scopes(name, *args + [options], &block)
+        end
+      end
     end
     
     
@@ -267,6 +374,9 @@ module Hobo
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
+    def changed_fields?(other, *fields)
+      fields.all?{|f| self.send(f) != other.send(f)}
+    end
     
     def compose_with(object, use=nil)
       CompositeModel.new_for([self, object])
@@ -274,7 +384,7 @@ module Hobo
     
     
     def typed_id
-      "#{self.class.name.underscore}_#{self.id}"
+      id ? "#{self.class.name.underscore}_#{self.id}" : nil
     end
     
   end

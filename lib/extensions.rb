@@ -1,3 +1,11 @@
+module Kernel
+  
+  def extract_options_from_args!(args) #:nodoc:
+    args.last.is_a?(Hash) ? args.pop : {}
+  end
+
+end
+
 class Object
 
   def in?(array)
@@ -7,6 +15,26 @@ class Object
   def not_in?(array)
     not array.include?(self)
   end
+  
+  alias_method :is_a_without_multiple_args?, :is_a?
+  def is_a?(*args)
+    args.any? {|a| is_a_without_multiple_args?(a) }
+  end
+  
+  # metaid
+  def metaclass; class << self; self; end; end
+  def meta_eval &blk; metaclass.instance_eval &blk; end
+
+  # Adds methods to a metaclass
+  def meta_def name, &blk
+    meta_eval { define_method name, &blk }
+  end
+
+  # Defines an instance method within a class
+  def class_def name, &blk
+    class_eval { define_method name, &blk }
+  end
+
 end
 
 
@@ -25,6 +53,40 @@ class Module
       }
     end
   end
+  
+  # Custom alias_method_chain that won't cause inifinite recursion if
+  # called twice.
+  # Calling alias_method_chain on alias_method_chain
+  # was just way to confusing, so I copied it :-/
+  def alias_method_chain(target, feature)
+    # Strip out punctuation on predicates or bang methods since
+    # e.g. target?_without_feature is not a valid method name.
+    aliased_target, punctuation = target.to_s.sub(/([?!=])$/, ''), $1
+    yield(aliased_target, punctuation) if block_given?
+    without = "#{aliased_target}_without_#{feature}#{punctuation}"
+    unless without.in?(instance_methods)
+      alias_method without, target
+      alias_method target, "#{aliased_target}_with_#{feature}#{punctuation}"
+    end
+  end
+
+  
+  # Fix delegate so it doesn't go bang if 'to' is nil
+  def delegate(*methods)
+    options = methods.pop
+    unless options.is_a?(Hash) && to = options[:to]
+      raise ArgumentError, "Delegation needs a target. Supply an options hash with a :to key as the last argument (e.g. delegate :hello, :to => :greeter)."
+    end
+
+    methods.each do |method|
+      module_eval(<<-EOS, "(__DELEGATION__)", 1)
+        def #{method}(*args, &block)
+          (_to = #{to}) && _to.__send__(#{method.inspect}, *args, &block)
+        end
+      EOS
+    end
+  end
+
 
 end
 
@@ -100,13 +162,19 @@ class Hash
     end
   end
 
-  def select_hash(new_keys=nil, &b)
+  def select_hash(new_keys=nil)
     res = {}
-    if b
+    if block_given?
       each {|k,v| res[k] = v if yield(k,v) }
     else
       new_keys.each {|k| res[k] = self[k] if self.has_key?(k)}
     end
+    res
+  end
+  
+  def map_hash
+    res = {}
+    each {|k,v| res[k] = yield(k,v) }
     res
   end
 
@@ -121,12 +189,11 @@ class Hash
     end
   end
 
-  def partition_hash(keys=nil, &b)
+  def partition_hash(keys=nil)
     yes = {}
     no = {}
     each do |k,v|
-      q = b ? yield(k,v) : keys.include?(k)
-      if q
+      if block_given? ? yield(k,v) : keys.include?(k)
         yes[k] = v
       else
         no[k] = v
@@ -136,6 +203,11 @@ class Hash
   end
   
 end
+
+class <<ActiveRecord::Base
+  alias_method :[], :find
+end
+
 
 # --- Fix Chronic - can't parse '12th Jan' --- #
 begin

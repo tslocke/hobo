@@ -4,7 +4,7 @@ module Hobo::Dryml
 
   APPLICATION_TAGLIB = "hobolib/application"
   CORE_TAGLIB = "plugins/hobo/tags/core"
-
+  
   class Template
     DRYML_NAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
@@ -240,12 +240,12 @@ module Hobo::Dryml
 
     def create_tag_method(el, name, attrs)
       name = Hobo::Dryml.unreserve(name)
+      
+      inner_tags = find_inner_tags(el)
 
       # A statement to assign values to local variables named after the tag's attrs.
-      # Careful to unpack the list returned by _tag_locals even if there's only
-      # a single var (options) on the lhs (hence the trailing ',' on options)
-      setup_locals = ( (attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "} + ['options,']).join +
-                       " = _tag_locals(__options__, #{attrs.inspect})" )
+      setup_locals = ( (attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "} + ['options, inner_tag_options']).join +
+                       " = _tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})" )
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
       
@@ -267,11 +267,25 @@ module Hobo::Dryml
                      children_to_erb(el) +
                      "<% @output; end; end %>" )
       
+      logger.debug(restore_erb_scriptlets(method_src)) if el.attributes["hobo_debug_source"]
+      
       src = erb_process(method_src)
       @environment.class_eval(src, template_path, element_line_num(el))
 
       # keep line numbers matching up
       "<% #{"\n" * method_src.count("\n")} %>"
+    end
+    
+    
+    def find_inner_tags(el)
+      el.map do |e|
+        if e.is_a?(REXML::Element)
+          name = e.attributes["content_option"] || e.attributes["replace_option"]
+          [(name if name && !is_code_attribute?(name))] + find_inner_tags(e)
+        else
+          []
+        end
+      end.flatten.compact
     end
 
 
@@ -299,6 +313,9 @@ module Hobo::Dryml
       require_attribute(el, "part_id", /^#{DRYML_NAME}$/)
       part_name  = el.attributes['part_id']
       dom_id = el.attributes['id'] || part_name
+      
+      dryml_exception("dupplicate part name: #{part_name}", el) if
+        (part_name + "_part").in?(@environment.instance_methods)
 
       part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
         content +
@@ -335,9 +352,11 @@ module Hobo::Dryml
       content_option = el.attributes["content_option"]
       dryml_exception("both replace_option and content_option given") if replace_option && content_option
       call = if replace_option
-               "call_replaceable_tag(:#{name}, #{options}, options[:#{replace_option}])"
+               replace_option = attribute_to_ruby(replace_option)
+               "call_replaceable_tag(:#{name}, #{options}, inner_tag_options[#{replace_option}.to_sym])"
              elsif content_option
-               "call_replaceable_content_tag(:#{name}, #{options}, options[:#{content_option}])"
+               content_option = attribute_to_ruby(content_option)
+               "call_replaceable_content_tag(:#{name}, #{options}, inner_tag_options[#{content_option}.to_sym])"
              else
                "#{name}(#{options})"
              end
@@ -460,7 +479,7 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid xattrs", el)
                         end
-        "#{extra_options}.reverse_merge({#{all}})"
+        "{#{all}}.merge((#{extra_options}) || {})"
       else
         "{#{all}}"
       end
@@ -529,7 +548,7 @@ module Hobo::Dryml
               else
                 dryml_exception("invalid quote(s) in attribute value")
               end
-        str.starts_with?("++") ? "attr_extension(#{str})" : str
+        attr.starts_with?("++") ? "attr_extension(#{str})" : str
       end
     end
 

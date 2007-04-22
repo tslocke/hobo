@@ -1,11 +1,12 @@
+
 <def tag="submit" attrs="label">
-  <input type="submit" value="<%= label %>" xattrs="" class="button_input"/>
+  <input type="submit" value="<%= label %>" xattrs="" class="button_input submit_button"/>
 </def>
 
 
 <def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
   <% refl = this_type
-     if refl && refl.macro == :belongs_to
+     if refl.respond_to?(:macro) && refl.macro == :belongs_to
        completer_model ||= refl.klass
        completer_attr ||= refl.klass.id_name_column
      else
@@ -67,8 +68,7 @@
    completer_attr ||= refl.klass.id_name_column
    id ||= this_field_dom_id + "_completer"
    where_options = options.select_hash {|k,v| k.to_s.starts_with? "where_"}
-   url = object_url(completer_model, :action => :completions,
-                    :params => { :for => completer_attr }.update(where_options))
+   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_options))
   %>
 
   <input type="text" id="<%= id %>" class="autocomplete_bhv" autocomplete_url="<%= url %>"
@@ -115,8 +115,10 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
                     } })
+  options = add_classes(options, editor_class)
 %>
-  <%=  check_box_tag "x", "1", this, :onchange => f %>
+  <input type="checkbox" value="1" onchange="<%= f %>"
+         xattrs="# this ? options.merge(:checked => 'checked') : options" />
 </def>
 
 

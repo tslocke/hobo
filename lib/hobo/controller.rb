@@ -9,11 +9,22 @@ module Hobo
     def self.included(base)
       if base.is_a?(Class)
         Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
+        base.class_eval do
+          alias_method_chain :redirect_to, :object_url
+        end
       end
     end
 
 
     protected
+    
+    def redirect_to_with_object_url(destination, view=nil)
+      if destination.is_a?(String, Hash, Symbol)
+        redirect_to_without_object_url(destination)
+      else
+        redirect_to_without_object_url(object_url(destination, view))
+      end
+    end
 
     def hobo_ajax_response(this=nil, results={})
       this ||= @this
@@ -39,7 +50,7 @@ module Hobo
           function = spec[:function] || "_update"
 
           if spec[:as] or spec[:part]
-            obj = if spec[:object] == "this" or !spec[:object]
+            obj = if spec[:object] == "this" or spec[:object].blank?
                     this
                   elsif spec[:object] == "nil"
                     nil
@@ -113,6 +124,10 @@ module Hobo
 
     def request_no_cache?
       request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
+    end
+    
+    def not_found
+      
     end
 
   end

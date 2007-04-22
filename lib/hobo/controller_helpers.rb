@@ -65,11 +65,11 @@ module Hobo::ControllerHelpers
               [object_url(owner), obj.proxy_reflection.name]
               
             else
-              raise HoboError.new("cannot create url for #{obj.inspect}")
+              raise HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
             end
     basic = parts.join("/")
     
-    controller = (controller_name + "Controller").classify.constantize rescue nil
+    controller = (controller_name.camelize + "Controller").constantize rescue nil
     url = if action && controller && action.to_sym.in?(controller.web_methods)
             basic + "/#{action}"
           else

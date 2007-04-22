@@ -70,7 +70,10 @@ var Hobo = {
 
     ajaxRequest: function(url_or_form, message, updates, options) {
         options = Object.merge({ asynchronous:true,
-                                 evalScripts:true }, options)
+                                 evalScripts:true,
+                                 resetForm: true,
+                                 refocusForm: true
+                               }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
             var form = false
@@ -94,12 +97,12 @@ var Hobo = {
 
         Hobo.showSpinner(message)
         var complete = function() {
-            if (form) form.reset();
+            if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
 
             if (options.onComplete)
                 options.onComplete.apply(this, arguments)
-            if (form) Form.focusFirstElement(form)
+            if (form && options) Form.focusFirstElement(form)
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method
@@ -130,6 +133,18 @@ var Hobo = {
             }
         }
     },
+
+    toggle: function() {
+        for (i = 0; i < arguments.length; i++) {
+            if ($(arguments[i])) {
+                if(Element.hasClassName(arguments[i], 'hidden')) {
+                    Element.removeClassName(arguments[i], 'hidden')
+                } else {
+                    Element.addClassName(arguments[i], 'hidden')
+                }
+            }
+        }
+        },
 
     onFieldEditComplete: function(el, newValue) {
         el = $(el)
@@ -176,7 +191,7 @@ var Hobo = {
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
         ipe.onEnterEditMode = function() {
             var blank_message = el.getAttribute("hobo_blank_message")
-            if (el.innerHTML == blank_message) {
+            if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
                 el.innerHTML = "" 
             } else {
                 Hobo.ipeOldValues[el.id] = el.innerHTML
@@ -192,11 +207,17 @@ var Hobo = {
         }
 
         select(".in_place_textfield_bhv").each(function (el) {
-            Hobo._makeInPlaceEditor(el)
+            ipe = Hobo._makeInPlaceEditor(el)
+            ipe.getText = function() {
+                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
+            }
         })
 
         select(".in_place_textarea_bhv").each(function (el) {
-            Hobo._makeInPlaceEditor(el, {rows: 2})
+            ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
+            ipe.getText = function() {
+                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
+            }
         })
 
         select(".in_place_html_textarea_bhv").each(function (el) {
@@ -214,7 +235,6 @@ var Hobo = {
 
                     this.form.onsubmit = function() {
                         tinyMCE.removeMCEControl(ipe.form.id)
-                        ipe.editField.value = encodeURIComponent(ipe.editField.value)
                         setTimeout(ipe.onSubmit.bind(ipe), 10)
                         return false
                     }
@@ -281,17 +301,23 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + val
+        return spec.name + '[' + spec.field + ']=' + escape(val)
     },
 
+    fadeObjectElement: function(el) {
+        new Effect.Fade(Hobo.objectElementFor(el),
+                        { duration: 0.5,
+                          afterFinish: function (ef) { ef.element.remove() } });
+    },
 
-    removeButton: function(el, url, updates) {
+    removeButton: function(el, url, updates, fade) {
+        if (fade == null) { fade = true; }
         if (confirm("Are you sure?")) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
             function complete() {
-                Hobo.hideSpinner();
-                new Effect.Fade(objEl, {duration: 0.5});
+                if (fade) { Hobo.fadeObjectElement(el) }
+                Hobo.hideSpinner()
             }
             if (updates && updates.length > 0) {
                 new Hobo.ajaxRequest(url, "Removing", updates, { method:'delete',
@@ -322,7 +348,7 @@ var Hobo = {
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
-            id = el.getAttribute("hobo_model_id") || el.getAttribute("id");
+            id = el.getAttribute("hobo_model_id");
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
             el = el.parentNode;
@@ -398,4 +424,13 @@ Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
     if (this.afterEnterEditMode) this.afterEnterEditMode()
     return false
+}
+
+// Silence errors from IE :-(
+Field.scrollFreeActivate = function(field) {
+  setTimeout(function() {
+      try {
+          Field.activate(field);
+      } catch(e) {}
+  }, 1);
 }

@@ -2,8 +2,8 @@ module ActiveRecord::Associations
 
   class HasManyAssociation
 
-    def new
-      res = build
+    def new(*args)
+      res = build(*args)
       if @owner.new_record?
         refl = @owner.class.reverse_reflection(@reflection.name)
         if refl
@@ -14,6 +14,7 @@ module ActiveRecord::Associations
       end
       res
     end
+    
 
     def new_without_appending(attributes = {})
       record = @reflection.klass.new(attributes)
@@ -34,7 +35,19 @@ module ActiveRecord::Associations
     def member_class
       proxy_reflection.klass
     end
-
+    
+    
+    def find_with_block(*args, &b)
+      if b
+        options = extract_options_from_args!(args)
+        args << options.merge(:conditions => member_class.conditions(&b))
+        find_without_block(*args)
+      else
+        find_without_block(*args)
+      end
+    end
+    alias_method_chain :find, :block
+    
   end
 
 end

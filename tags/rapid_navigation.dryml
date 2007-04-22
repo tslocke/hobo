@@ -51,6 +51,18 @@
 </def>
 
 
+<def tag="first_page_link" attrs="query_params">
+  <% opts = { :page => @pages.first }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : '&laquo; First page', opts) if @pages and @pages.current != @pages.first %>
+</def>
+
+
+<def tag="last_page_link" attrs="query_params">
+  <% opts = { :page => @pages.last }.merge(query_params || {}) %>
+  <%= link_to(tagbody ? tagbody.call : '&laquo; Last page', opts) if @pages and @pages.current != @pages.last %>
+</def>
+
+
 <def tag="page_n_of_count">
   Page <%= @pages.current_page.number %> of <%= @pages.length %>
 </def>
@@ -60,8 +72,24 @@
   <if q="#@pages.length > 1">
     <p>
       <page_n_of_count/> - 
-      <previous_page_link query_params="#query_params"/>
-      <next_page_link query_params="#query_params"/>
+      <first_page_link query_params="#query_params">|&lt;</first_page_link>
+      <previous_page_link query_params="#query_params">Previous</previous_page_link>
+      <next_page_link query_params="#query_params">Next</next_page_link>
+      <last_page_link query_params="#query_params">&gt|</last_page_link>
     </p>
   </if>
+</def>
+
+<def tag="link_to_resource" attrs="type">
+  <%= link_to type, self.send("formatted_#{model.to_s.downcase}_url", this, type.downcase) %>
+</def>
+
+<def tag="link_to_resources" attrs="types">
+  <ul class="resource_list">
+    <% comma_split(types).each do |t| %>
+    <li class="<%= t.downcase %>_resource">
+      <link_to_resource type="#t" />
+    </li>
+    <% end %>
+  </ul>
 </def>

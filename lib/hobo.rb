@@ -39,7 +39,7 @@ module Hobo
     def models
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
-          f =~ /.rb$/ and f.sub(/.rb$/, '').classify.constantize
+          f =~ /.rb$/ and f.sub(/.rb$/, '').camelize.constantize
         end
         @models_loaded = true
       end
@@ -58,7 +58,7 @@ module Hobo
       _, name, id, attr = *dom_id.match(/^([a-z_]+)_([0-9]+(?:_[0-9]+)*)(_[a-z_]+)?$/)
       raise ArgumentError.new("invalid model-reference in dom id") unless name
       if name
-        model_class = name.classify.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
+        model_class = name.camelize.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
         return nil unless model_class
         attr = attr[1..-1] if attr
         obj = if false and attr and model_class.reflections[attr.to_sym].klass.superclass == ActiveRecord::Base
@@ -124,11 +124,7 @@ module Hobo
     end
 
     def add_routes(map)
-      begin
-        ApplicationController
-      rescue
-        require "#{RAILS_ROOT}/app/controllers/application"
-      end
+      require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
 
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"
@@ -229,19 +225,25 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      return false unless can_view?(person, object, field)
-
+      setter = "#{field}="
+      return false unless can_view?(person, object, field) and object.respond_to?(setter)
+      
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
       # has_many and polymorphic associations are not editable (for now)
       return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
 
+      current = object.send(field)
       new = object.duplicate
-      new.send("#{field}=", if refl and refl.macro == :belongs_to
-                              Hobo::Undefined.new(refl.klass)
-                            else
-                              Hobo::Undefined.new
-                            end)
+      new.send(setter, if current == true
+                         false
+                       elsif current == false
+                         true
+                       elsif refl and refl.macro == :belongs_to
+                         Hobo::Undefined.new(refl.klass)
+                       else
+                         Hobo::Undefined.new
+                       end)
 
       begin
         if object.new_record?
@@ -260,6 +262,14 @@ module Hobo
     end
 
 
+    # can_view? has special behaviour if it's passed a class or an
+    # association-proxy -- it instantiates the class, or creates a new
+    # instance "in" the association (new_without_appending), and tests
+    # the permission of this object. This means the permission methods
+    # in models can't rely on the instance being properly initialised.
+    # But it's important that it works like this because, in the case
+    # of an association proxy, we don't want to loose the information
+    # that the object belongs_to the proxy owner.
     def can_view?(person, object, field=nil)
       if field
         field = field.to_sym if field.is_a? String
@@ -288,10 +298,10 @@ module Hobo
     
     
     def can_call?(person, object, method)
-      return true if person.respond_to?(:super_user?) and person.super_user?
+      return true if person.respond_to?(:super_user?) && person.super_user?
 
-      m = "can_call_#{method}?"
-      object.respond_to?(m) and object.send(m, current_user)
+      m = "#{method}_callable_by?"
+      object.respond_to?(m) && object.send(m, person)
     end 
     
     # --- end permissions -- #
@@ -310,6 +320,8 @@ module Hobo
 
     def check_permission(permission, person, object, *args)
       return true if person.respond_to?(:super_user?) and person.super_user?
+      
+      return true if permission == :view && !(object.is_a?(ActiveRecord::Base) || object.is_a?(Hobo::CompositeModel))
 
       obj_method = case permission
                    when :create; :creatable_by?
@@ -317,7 +329,6 @@ module Hobo
                    when :delete; :deletable_by?
                    when :view;   :viewable_by?
                    end
-      person_method = "can_#{permission}?".to_sym
       p = if object.respond_to?(obj_method)
             begin
               object.send(obj_method, person, *args)
@@ -326,11 +337,14 @@ module Hobo
             end
           elsif object.class.respond_to?(obj_method)
             object.class.send(obj_method, person, *args)
-          elsif person.respond_to?(person_method)
-            person.send(person_method, object, *args)
-          else
-            # The object does not define permissions - you can only view it
-            permission == :view
+          elsif !object.is_a?(Class) # No user fallback for class-level permissions
+            person_method = "can_#{permission}?".to_sym
+            if person.respond_to?(person_method)
+              person.send(person_method, object, *args)
+            else
+              # The object does not define permissions - you can only view it
+              permission == :view
+            end
           end
     end
 

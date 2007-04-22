@@ -2,7 +2,9 @@ module Hobo::Dryml
 
   class DrymlException < Exception; end
   
-  class AttributeExtensionString < String; end
+  class AttributeExtensionString < String;
+    def drop_prefix; self[2..-1]; end
+  end
 
   TagDef = Struct.new "TagDef", :name, :attrs, :proc
 
@@ -117,7 +119,7 @@ module Hobo::Dryml
       res = to.merge({})
       from.each_pair do |option, value|
         res[option] = if value.is_a?(AttributeExtensionString) and to.has_key?(option)
-                        "#{to[option]} #{value}"
+                        "#{to[option]} #{value.drop_prefix}"
                       else
                         value
                       end

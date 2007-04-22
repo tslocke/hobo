@@ -37,7 +37,6 @@ def (ActiveRecord::Base).hobo_model
   include Hobo::Model
 end
 
-
 # Default settings
 
 Hobo.user_model ||= (User rescue (Person rescue nil))

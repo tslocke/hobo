@@ -38,8 +38,8 @@ class Test::Unit::TestCase
       assert_response :success
     end
 
-    def visits(obj, action=nil)
-      get object_url(obj, action)
+    def visits(obj, action=nil, params={})
+      get object_url(obj, action, params)
       assert_response :success
     end
     
@@ -55,6 +55,12 @@ class Test::Unit::TestCase
       flunk "validation errors: #{new_obj.errors.full_messages.join("\n")}" unless new_obj.errors.empty?
       assert_response :redirect
       new_obj
+    end
+    
+    def deletes(object)
+      post object_url(object, "destroy")
+      assert_raise(ActiveRecord::RecordNotFound) { object.class.find(object.id) }
+      assert_response :redirect
     end
     
     def cant_create(klass, params)
@@ -81,12 +87,17 @@ class Test::Unit::TestCase
       new_obj
     end
     
+    def calls_method(object, method, params={})
+      post object_url(object, method), params
+      assert_response :success
+    end
+    
     def current_should(s)
       "#{current_user.login} should #{s}"
     end
     
-    def object_url(obj, action=nil)
-      HoboHelpers.new.send(:object_url, obj, action)
+    def object_url(obj, action=nil, *param_hashes)
+      HoboHelpers.new.send(:object_url, obj, action, *param_hashes)
     end
     
     def replace_objects_in_params!(hash)
