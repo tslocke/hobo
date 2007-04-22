@@ -194,13 +194,14 @@ module Hobo
       end
       
       
-      def count(options={}, &b)
-        super(if b
-                sql = ModelQueries.new(self).instance_eval(&b).to_sql
-                options.merge(:conditions => sql)
-              else
-                options
-              end)
+      def count(*args, &b)
+        if b
+          sql = ModelQueries.new(self).instance_eval(&b).to_sql
+          options = extract_options_from_args!(args)
+          super(*args + [options.merge(:conditions => sql)])
+        else
+          super(*args)
+        end
       end
 
 

@@ -349,8 +349,8 @@ module Hobo
       changes = params[model.name.underscore]
       
       if changes
-        # The duplicate cal above can set these, we don't want them
-        # to conflict with the changes
+        # The 'duplicate' call above can set these, but they can
+        # conflict with the changes so we clear them
         @this.send(:clear_aggregation_cache)
         @this.send(:clear_association_cache)
         
@@ -573,19 +573,6 @@ module Hobo
         end
       end
     end
-    
-    def data_filter_block
-      filter_param = params.keys.ofind {starts_with? "where_"}
-      proc = filter_param && self.class.data_filter(filter_param[6..-1].to_sym)
-      if proc
-        filter_args = params[filter_param]
-        filter_args = [filter_args] unless filter_args.is_a? Array
-        proc {
-          instance_exec(*filter_args, &proc)
-        }
-      end
-    end
-    
     
     def find_with_data_filter(opts={}, &b)
       with_data_filter(:find, :all, opts, &b)

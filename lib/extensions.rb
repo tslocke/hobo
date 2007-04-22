@@ -21,7 +21,7 @@ class Object
     args.any? {|a| is_a_without_multiple_args?(a) }
   end
   
-  # mataid
+  # metaid
   def metaclass; class << self; self; end; end
   def meta_eval &blk; metaclass.instance_eval &blk; end
 

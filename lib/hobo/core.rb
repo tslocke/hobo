@@ -16,12 +16,7 @@ module Hobo
 
 
     def add_classes!(options, *classes)
-      option_class = options[:class]
-      options[:class] = if option_class.nil?
-                          classes
-                        else
-                          [option_class] + classes
-                        end.join(' ')
+      options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
       options
     end
 
@@ -137,7 +132,7 @@ module Hobo
       if target.nil?
         "(Not Available)"
       elsif to ? can_view?(to) : can_view_this?
-        content = tagbody ? tagbody.call : display_name
+        content = tagbody ? tagbody.call : call_replaceable_tag(:display_name, options, options.delete(:name))
         link_class = "#{target.class.name.underscore}_link"
         link_to content, object_url(target, view, params), add_classes(options, link_class)
       end
@@ -169,69 +164,77 @@ module Hobo
     end
 
 
-    def_tag :show, :no_span do
-      raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless can_view_this?
+    def_tag :show, :no_span, :truncate_tail do
+      # We can't do this as a declared attribute as it will hide the truncate helper
+      trunc = options.delete(:truncate)
       
-      if this_type.respond_to?(:macro)
-        if this_type.macro == :belongs_to
-          show_belongs_to
-        elsif this_type.macro == :has_many
-          show_has_many
-        end
+      raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+        can_view_this?
       
-      else
-        res = case this
-              when nil
-                this_type <= String ? "" : "(Not Available)"
-                
-              when Date
-                if respond_to?(:show_date)
-                  show_date
-                else
-                  this.to_s(:long)
-                end
-               
-              when Time
-                if respond_to?(:show_datetime)
-                  show_datetime
-                else
-                  this.to_s(:long)
-                end
-                
-              when Fixnum, Float, BigDecimal
-                format = options[:format]
-                format ? format % this : this.to_s
-                
-              when Hobo::HtmlString
-                this
-               
-              when Hobo::MarkdownString
-                markdown(this)
-               
-              when Hobo::TextileString
-                textilize(this)
-               
-              when Hobo::PasswordString
-                "[password withheld]"
-               
-              when String
-                h(this).gsub("\n", "<br/>")
-               
-              when TrueClass
-                "Yes"
-                
-              when FalseClass
-                "No"
-                
-              else
-                raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+      res = if this_type.respond_to?(:macro)
+              if this_type.macro == :belongs_to
+                show_belongs_to
+              elsif this_type.macro == :has_many
+                show_has_many
               end
-        if !no_span && this_parent.respond_to?(:typed_id)
-          "<span hobo_model_id='#{this_field_dom_id}'>#{res}</span>"
-        else
-          res
-        end
-      end
+              
+            else
+              res2 = case this
+                     when nil
+                       this_type <= String ? "" : "(Not Available)"
+                       
+                     when Date
+                       if respond_to?(:show_date)
+                         show_date
+                       else
+                         this.to_s(:long)
+                       end
+                       
+                     when Time
+                       if respond_to?(:show_datetime)
+                         show_datetime
+                       else
+                         this.to_s(:long)
+                       end
+                       
+                     when Fixnum, Float, BigDecimal
+                       format = options[:format]
+                       format ? format % this : this.to_s
+                       
+                     when Hobo::HtmlString
+                       this
+                       
+                     when Hobo::MarkdownString
+                       markdown(this)
+                       
+                     when Hobo::TextileString
+                       textilize(this)
+                       
+                     when Hobo::PasswordString
+                       "[password withheld]"
+                       
+                     when String
+                       h(this).gsub("\n", "<br/>")
+                       
+                     when TrueClass
+                       "Yes"
+                       
+                     when FalseClass
+                       "No"
+                       
+                     else
+                       raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+                     end
+              
+              
+              
+              if !no_span && this_parent.respond_to?(:typed_id)
+                "<span hobo_model_id='#{this_field_dom_id}'>#{res2}</span>"
+              else
+                res2
+              end
+            end
+      trunc ? truncate(res2, trunc.to_i, truncate_tail || "...") : res2
     end
     
     
