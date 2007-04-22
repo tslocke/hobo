@@ -1,3 +1,184 @@
+=== Release 0.5.2 ===
+
+Misuse of classify changed throughout to camelize. Bugs related to
+certain model names fixed as a result.
+
+Added Hobo::LazyHash. If a value is a proc, the proc is called on the
+first access of that key, and the result of the proc becomes the
+value. These are used in the new controller customisation mechanism.
+
+
+Hobo Rapid
+
+  New ajax options reset_form and refocus_form for ajax forms. Default
+  is true
+
+  toggle: new function like Element.toggle in prototype (Hobo uses the
+  css class 'hidden' instead of an inline 'style' attribute.
+
+  In place editing: various fixes related to HTML/URL encoding.
+
+  New option 'fade' to delete button. Pass fade="#false" to supress
+  the fade effect.
+
+  <hobo_rapid_javascripts> now takes an attribute tiny_mce. Set to
+  true to enable TinyMCE support for html editors.
+
+  <hobo_rapid_javascripts> within the <page> tag now available as
+  inner-tag 'rapid_javascripts'. e.g. you can do
+
+    <page rapid_javascripts.tiny_mce="#true">
+    
+    to enable TinyMCE support.
+
+  Removed helper current_user_in?
+
+  Editors now have a css class added automatically:
+  "<class>_<feild>_editor", e.g. "person_name_editor"
+
+  In place editors now wrap the content in a div if the editor will be
+  a textarea or an html editor (was a span).
+
+  All the buttons now have automatically added css classes like
+  "delete_person_button", "create_person_button".
+
+  create_button now uses any passed field values in the check for
+  create permission.
+
+  object form now has a css class added: either the model class name, or
+  "new_<class>"
+
+  New tag <remote_method_form> for calling remote methods with parameters, either with a traditional 
+
+
+Model Extensions
+
+  Fix to HasManyAssociation#new (didn't support parameters)
+
+  Added block queries to has_many associations,
+  e.g. post.comments.find { published = 1 }
+
+  MyModel[...] equivalent to MyModel.find(...) (Thanks to Jamis Buck's
+  tip on his blog)
+
+  New feature: defined scopes
+
+  Field types set by set_field_type are now inherited
+
+  Model#conditions { ... } generates an sql where clause from a query
+  block.
+
+  Fix to #subclass_associations with has_many :through
+
+  Method #changed_fields? to complement #same_fields?. Useful in
+  permission methods.
+
+
+Integration test extensions
+
+  #visits now can now be given http get parameters
+
+  #deletes added: bob.deletes(some_object)
+
+  #calls_method added: bob.calls_method(object, some_method)
+
+
+General extensions
+
+  #extract_options_from_args! added to Kernel
+
+  Object#is_a? extended to support multiple args:
+
+    if foo.is_a?(Symbol, String)
+
+  _why's metaid added to Object
+
+  Added Hash#map_hash. e.g. a new hash with all values incremented
+  by 1:
+
+    my_hash.map_hash {|k, v| v+1}
+
+
+Controller extensions
+
+  redirect_to can be passed an object, equivalent to
+  redirect_to(object_url(x)), e.g.
+
+    redirect_to current_user.adverts
+
+
+Model controllers
+
+  Removed customisation hooks, create_response,
+  invalid_create_response, update_response etc.
+
+  New mechanism for customising actions. 
+
+    def create
+      hobo_create ...customisation args...
+    end
+
+  web_method, show_method, and publish_collection declarations are now
+  inherited.
+
+
+Helpers
+
+  debug can now be passed multiple values you'd like to inspect
+
+  param_name_for now accepts a string as well as an array for the
+  field path, e.g. param_name_for(current_user, "account.name")
+
+Core tags
+
+  object_link automatically adds a css class "<class>_link",
+  e.g. "person_link"
+
+  Changed default date formatting to to_s(:long) for dates and times.
+
+  New tag transpose_and_repeat, useful for those tables when you wish
+  HTML grouped cells by column instead of by row.
+
+  New tag if_blank
+
+
+Permission system
+
+  Hobo::Undefined#undefined? renamed to hobo_undefined?
+
+  can_edit? now works better with boolean fields
+
+  can_call_<method>? renamed to <method>_callable_by?
+  
+
+DRYML
+
+  Fix: options to inner-tags were leaking through to the HTML output.
+
+  Debug feature -- if the <def> tag has an attribute
+  hobo_debug_source, the generated ERB source will be output to
+  logger.debug
+
+  Dryml now reports an error if a part name occurs more than once
+
+  Inner tag names can now be generated at runtime, this allows
+  e.g. the object_table tag to generate inner-tags on the fly for
+  every editor and label:
+
+    <object_table fields.name_editor.update="my_part" />
+
+  Go read that last one again - it's awesome
+
+New rake tasks
+
+  environments.rake defines tasks like dev, prod, testing so you can
+  e.g.:
+
+    rake prod db:migrate
+
+    (thanks to err.the_blog IIRC)
+
+
 === Release 0.5.1 ===
 
 Fix to model extensions: hobo_user_model generator could not complete
