@@ -243,7 +243,7 @@ module Hobo
     end
     
     
-    def find_instance_for_action(options, this_option)
+    def find_instance_or_not_found(options, this_option)
       x = begin
             options[this_option] || find_instance
           rescue ActiveRecord::RecordNotFound
@@ -258,18 +258,18 @@ module Hobo
     def hobo_show(options={})
       options = LazyHash.new(options)
       
-      @this = find_instance_for_action(options, :this)
+      @this = find_instance_or_not_found(options, :this)
       if @this
         if Hobo.can_view?(current_user, @this)
           set_named_this!
           block_given? ? yield : hobo_render
         else
-          permission_denied
+          permission_denied(options)
         end
       end
     end
-    
-    
+
+
     def hobo_new(options={})
       options = LazyHash.new(options)
       @this = options[:this] || model.new
@@ -279,7 +279,7 @@ module Hobo
         set_named_this!
         block_given? ? yield : hobo_render
       else
-        permission_denied
+        permission_denied(options)
       end
     end
     
@@ -301,7 +301,7 @@ module Hobo
                  @check_create_permission = [this]
                  initialize_from_params(this, attributes)
                  for obj in @check_create_permission
-                   permission_denied and return unless Hobo.can_create?(current_user, obj)
+                   permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
                  end
                  @check_create_permission = nil
                  this
@@ -341,7 +341,7 @@ module Hobo
     def hobo_update(options={})
       options = LazyHash.new(options)
       
-      @this = find_instance_for_action(options, :this)
+      @this = find_instance_or_not_found(options, :this)
       return unless @this
       
       original = @this.duplicate
@@ -355,7 +355,7 @@ module Hobo
         @this.send(:clear_association_cache)
         
         update_with_params(@this, changes)
-        permission_denied and return unless Hobo.can_update?(current_user, original, @this)
+        permission_denied(options) and return unless Hobo.can_update?(current_user, original, @this)
       end
       
       set_named_this!
@@ -381,7 +381,7 @@ module Hobo
                 else
                   hobo_ajax_response(@this)
                 end
-              
+                
                 # Maybe no ajax requests were made
                 render :nothing => true unless performed?
               end
@@ -410,11 +410,11 @@ module Hobo
     
     def hobo_destroy(options={})
       options = LazyHash.new(options)
-      @this = find_instance_for_action(options, :this)
+      @this = find_instance_or_not_found(options, :this)
       return unless @this
       
       set_named_this!
-      permission_denied and return unless Hobo.can_delete?(current_user, @this)
+      permission_denied(options) and return unless Hobo.can_delete?(current_user, @this)
 
       @this.destroy
 
@@ -431,7 +431,7 @@ module Hobo
     def hobo_show_collection(collection, options={})
       options = LazyHash.new(options)
       
-      @owner = find_instance_for_action(options, :owner)
+      @owner = find_instance_or_not_found(options, :owner)
       return unless @owner
       
       toplevel_collection = collection.to_s.split(".").first
@@ -444,23 +444,23 @@ module Hobo
           hobo_render(params[:action]) or hobo_render(:show_collection, @reflection.klass)
         end
       else
-        permission_denied
+        permission_denied(options)
       end
     end
     
     
     def hobo_new_in_collection(collection, options={})
       options = LazyHash.new(options)
-      @owner = find_instance_for_action(options, :owner)
+      @owner = find_instance_or_not_found(options, :owner)
       return unless @owner
       
-      permission_denied and return unless Hobo.can_view?(current_user, @owner, collection)
+      permission_denied(options) and return unless Hobo.can_view?(current_user, @owner, collection)
       
       @association = options[:collection] || @owner.send(collection)
       @this = options[:this] || @association.new_without_appending
       @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
 
-      permission_denied and return unless Hobo.can_create?(current_user, @this)
+      permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
       
       if block_given?
         yield

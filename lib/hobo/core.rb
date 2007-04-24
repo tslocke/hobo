@@ -197,7 +197,7 @@ module Hobo
                          this.to_s(:long)
                        end
                        
-                     when Fixnum, Float, BigDecimal
+                     when Numeric
                        format = options[:format]
                        format ? format % this : this.to_s
                        
