@@ -116,9 +116,8 @@ module Hobo
           }
         else
           class_eval %{
-            def id_name
+            def id_name(underscore=false)
               #{id_name_field}
-
             end
           }
         end
