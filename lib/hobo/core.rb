@@ -234,7 +234,7 @@ module Hobo
                 res2
               end
             end
-      trunc ? truncate(res2, trunc.to_i, truncate_tail || "...") : res2
+      trunc ? truncate(res2, trunc.to_i, truncate_tail || "...") : res
     end
     
     

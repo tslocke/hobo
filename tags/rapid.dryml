@@ -45,8 +45,8 @@
 
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label" content_option="#field + '_label'"><%= no_break(field.to_s.titleize) %>:</td>
-        <td><edit attr="#assoc"  replace_option="#field + '_editor'"/></td>
+        <td class="field_label" content_option="#field.to_s + '_label'"><%= no_break(field.to_s.titleize) %>:</td>
+        <td><edit attr="#field"  replace_option="#field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 

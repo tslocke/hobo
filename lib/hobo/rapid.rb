@@ -2,7 +2,20 @@ module Hobo::Rapid
 
   include Hobo::DefineTags
 
-
+  TYPE_NAMES = { 
+    Hobo::HtmlString     => :html,
+    Hobo::Text           => :textarea,
+    TrueClass            => :boolean,
+    FalseClass           => :boolean,
+    Date                 => :date,
+    Time                 => :datetime,
+    Hobo::PasswordString => :password_string,
+    Fixnum               => :integer,
+    BigDecimal           => :integer,
+    Float                => :float,
+    String               => :string 
+  }
+  
   def options_for_hobo_ajax(options)
     js_options = build_callbacks(options)
 
@@ -89,17 +102,7 @@ module Hobo::Rapid
   
   
   def type_name(klass)
-    { Hobo::HtmlString     => :html,
-      Hobo::Text           => :textarea,
-      TrueClass            => :boolean,
-      FalseClass           => :boolean,
-      Date                 => :date,
-      Time                 => :datetime,
-      Hobo::PasswordString => :password_string,
-      Fixnum               => :integer,
-      BigDecimal           => :integer,
-      Float                => :float,
-      String               => :string }[klass]
+    TYPE_NAMES[klass]
   end
 
 

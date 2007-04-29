@@ -124,7 +124,7 @@ module Hobo
 
         key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
         finder = if insenstive
-          "find(:first, :conditions => ['lower(name) = ?', #{key}.downcase])"
+          "find(:first, :conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase])"
         else
           "find_by_#{id_name_field}(#{key})"
         end
