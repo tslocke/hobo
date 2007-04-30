@@ -10,6 +10,10 @@ module Hobo::Dryml
     
     class << self
       attr_reader :build_cache
+
+      def clear_build_cache
+        @build_cache.clear()
+      end
     end
 
     def initialize(src, environment, template_path)
@@ -27,7 +31,7 @@ module Hobo::Dryml
     end
 
     attr_reader :tags, :template_path
-
+    
     def compile(local_names=[], auto_taglibs=true)
       now = Time.now
 
@@ -61,7 +65,7 @@ module Hobo::Dryml
       erb_src = process_src
       
       src = ERB.new(erb_src).src[("_erbout = '';").length..-1]
-
+      
       @builder.add_build_instruction(:type => :render_page, :src => src, :line_num => 1)
     end
 
@@ -87,7 +91,7 @@ module Hobo::Dryml
       @doc = REXML::Document.new(RexSource.new(@xmlsrc))
 
       erb_src = restore_erb_scriptlets(children_to_erb(@doc.root))
-
+      
       erb_src
     end
 
