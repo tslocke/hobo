@@ -6,7 +6,7 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table" attrs="fields, skip_fields, associations, update">
+<def tag="object_table" attrs="fields, skip, associations">
   <% field_inner_tag_options, options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
      fields = if fields.nil?
@@ -14,7 +14,15 @@
               else
                 comma_split(fields)
               end
-     fields -= comma_split(skip_fields) if skip_fields
+     fields -= comma_split(skip) if skip
+     associations = if associations == '*'
+                      this.class.reflections.values.every(:name)
+                    elsif associations == 'belongs_to'
+                      this.class.reflections.values.oselect{macro == :belongs_to}.every(:name)
+                    else
+                      comma_split(associations)
+                    end   
+     associations -= comma_split(skip) if skip
      options = add_classes(options, "object_table", ("new_record" if this.new_record?))
      # force load
      Hobo.models
@@ -35,18 +43,10 @@
       </tr>
     <% end %>
 
-    <% associations = if associations == '*'
-                        this.class.reflections.values.every(:name)
-                      elsif associations == 'belongs_to'
-                        this.class.reflections.values.oselect{macro == :belongs_to}.every(:name)
-                      else
-                        comma_split(associations)
-                      end
-    %>
-    <% for assoc in associations %>
+    <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label"><%= no_break(assoc.to_s.titleize) %>:</td>
-        <td><edit attr="#assoc" update="#update"/></td>
+        <td class="field_label" content_option="#field.to_s + '_label'"><%= no_break(field.to_s.titleize) %>:</td>
+        <td><edit attr="#field"  replace_option="#field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 

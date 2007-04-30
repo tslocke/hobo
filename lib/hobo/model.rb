@@ -116,16 +116,15 @@ module Hobo
           }
         else
           class_eval %{
-            def id_name
+            def id_name(underscore=false)
               #{id_name_field}
-
             end
           }
         end
 
         key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
         finder = if insenstive
-          "find(:first, :conditions => ['lower(name) = ?', #{key}.downcase])"
+          "find(:first, :conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase])"
         else
           "find_by_#{id_name_field}(#{key})"
         end

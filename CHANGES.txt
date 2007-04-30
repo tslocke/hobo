@@ -1,3 +1,38 @@
+=== Release 0.5.3 ===
+
+Core tags
+
+  Fix: <show> tag was broken - it wasn't displaying the surrounding
+  <span> or any associations
+
+  <show> now handles all kinds of Numeric types
+
+
+DRYML
+
+  DRYML Build cache: reloading unchanged DRYML files in dev mode is
+  now *much* faster.
+
+
+Model extensions
+
+  Fixes to the id_name feature
+
+
+Hobo model controller
+
+  Fix: :permission_denied_response was not supported on several
+  actions
+
+
+Hobo Rapid
+
+  Hobo::Rapid::TYPE_NAMES added - a hash that maps classes to names
+  (symbols) that are used when looking for an editor / form field for
+  a given type. Allows you to extend the <edit> tag to support your
+  own types.
+
+
 === Release 0.5.2 ===
 
 Misuse of classify changed throughout to camelize. Bugs related to

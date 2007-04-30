@@ -2,55 +2,71 @@ require 'rexml/document'
 
 module Hobo::Dryml
 
-  APPLICATION_TAGLIB = "hobolib/application"
-  CORE_TAGLIB = "plugins/hobo/tags/core"
-  
   class Template
+
     DRYML_NAME = "[a-zA-Z_][a-zA-Z0-9_]*"
+
+    @build_cache = {}
+    
+    class << self
+      attr_reader :build_cache
+
+      def clear_build_cache
+        @build_cache.clear()
+      end
+    end
 
     def initialize(src, environment, template_path)
       @src = src
+
       @environment = environment # a class or a module
       @environment.send(:include, Hobo::PredicateDispatch)
 
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
 
+      @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(@template_path)
+      @builder.set_environment(environment)
+
       @last_element = nil
     end
 
     attr_reader :tags, :template_path
-
+    
     def compile(local_names=[], auto_taglibs=true)
       now = Time.now
-      if auto_taglibs
-        import_taglib(CORE_TAGLIB)
-        import_taglib(APPLICATION_TAGLIB)
-        Hobo::MappingTags.apply_standard_mappings(@environment)
+
+      unless @template_path == EMPTY_PAGE
+        filename = RAILS_ROOT + (@template_path.starts_with?("/") ? @template_path : "/" + @template_path)
+        mtime = File.stat(filename).mtime
+      end
+        
+      if mtime.nil? || !@builder.ready?(mtime)
+        @builder.clear_instructions
+        parsed = true
+        # parse the DRYML file creating a list of build instructions
+        if is_taglib?
+          process_src
+        else
+          create_render_page_method
+        end
+
+        # store build instructions in the cache
+        Template.build_cache[@template_path] = @builder
       end
 
-      if is_taglib?
-        process_src
-      else
-        create_render_page_method(local_names)
-      end
-      logger.info("DRYML: Compiled #{template_path} in %.2fs" % (Time.now - now))
+      # compile the build instructions
+      @builder.build(local_names, auto_taglibs)
+
+      from_cache = (parsed ? '' : ' (from cache)')
+      logger.info("  DRYML: Compiled#{from_cache} #{template_path} in %.2fs" % (Time.now - now))
     end
       
-      
-    def create_render_page_method(local_names)
+    def create_render_page_method
       erb_src = process_src
       
       src = ERB.new(erb_src).src[("_erbout = '';").length..-1]
-
-      locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
-
-      method_src = ("def render_page(__page_this__, __local_assigns__); " +
-                    "#{locals} new_object_context(__page_this__) do " +
-                    src +
-                    "; end + part_contexts_js; end")
-
-      @environment.class_eval(method_src, template_path, 1)
-      @environment.compiled_local_names = local_names
+      
+      @builder.add_build_instruction(:type => :render_page, :src => src, :line_num => 1)
     end
 
     
@@ -75,7 +91,7 @@ module Hobo::Dryml
       @doc = REXML::Document.new(RexSource.new(@xmlsrc))
 
       erb_src = restore_erb_scriptlets(children_to_erb(@doc.root))
-
+      
       erb_src
     end
 
@@ -128,7 +144,8 @@ module Hobo::Dryml
         
       when "set_theme"
         require_attribute(el, "name", /^#{DRYML_NAME}$/)
-        set_theme(el.attributes['name'])
+        @builder.add_build_instruction(:type => :set_theme, :name => el.attributes['name'])
+
         # return nothing - set_theme has no presence in the erb source
         tag_newlines(el)
 
@@ -153,53 +170,21 @@ module Hobo::Dryml
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       if el.attributes["src"]
-        import_taglib(el.attributes["src"], el.attributes["as"])
+        @builder.add_build_instruction(:type => :taglib, 
+                                       :name => el.attributes["src"], 
+                                       :as => el.attributes["as"])
       elsif el.attributes["module"]
-        import_module(el.attributes["module"].constantize, el.attributes["as"])
+        @builder.add_build_instruction(:type => :module, 
+                                       :name => el.attributes["module"], 
+                                       :as => el.attributes["as"])
       end
     end
     
-    
-    def expand_template_path(path)
-      base = if path.starts_with? "plugins"
-               "vendor/" + path
-             elsif path.include?("/")
-               "app/views/#{path}"
-             else
-               template_dir = File.dirname(template_path)
-               "#{template_dir}/#{path}"
-             end
-       base + ".dryml"
-    end
-
-
-    def import_taglib(src_path, as=nil)
-      path = expand_template_path(src_path)
-      unless template_path == path
-        taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
-        taglib.import_into(@environment, as)
-      end
-    end
-
 
     def import_module(mod, as=nil)
-      raise NotImplementedError.new if as
-      @environment.send(:include, mod)
+      @builder.import_module(mod, as)
     end
-    
-    
-    def set_theme(name)
-      if Hobo.current_theme.nil? or Hobo.current_theme == name
-        Hobo.current_theme = name
-        import_taglib("hobolib/themes/#{name}/application")
-        mapping_module = "#{name}_mapping"
-        if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
-          load(path)
-          Hobo::MappingTags.apply_mappings(@environment)
-        end
-      end
-    end
-      
+
 
     def def_element(el)
       require_toplevel(el)
@@ -221,7 +206,7 @@ module Hobo::Dryml
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
 
-        @environment.send(:alias_method, new_name.to_sym, old_name.to_sym)
+        @builder.add_build_instruction(:type => :alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
       end
 
       if alias_of
@@ -269,8 +254,7 @@ module Hobo::Dryml
       
       logger.debug(restore_erb_scriptlets(method_src)) if el.attributes["hobo_debug_source"]
       
-      src = erb_process(method_src)
-      @environment.class_eval(src, template_path, element_line_num(el))
+        @builder.add_build_instruction(:type => :def, :src => erb_process(method_src), :line_num => element_line_num(el))
 
       # keep line numbers matching up
       "<% #{"\n" * method_src.count("\n")} %>"
@@ -329,9 +313,9 @@ module Hobo::Dryml
 
 
     def create_part(erb_src, line_num)
-      src = erb_process(erb_src)
       # Add a method to the part module for this template
-      @environment.class_eval(src, template_path, line_num)
+
+        @builder.add_build_instruction(:type => :part, :src => erb_process(erb_src), :line_num => line_num)
     end
 
     
