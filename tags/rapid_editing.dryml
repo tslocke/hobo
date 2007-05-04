@@ -107,6 +107,24 @@
 </def>
 
 
+<def tag="string_select_editor" attrs="update, values"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+
+  values = comma_split(values)
+  f = ajax_updater(object_url(this_parent),
+                   "Change #{this_field.to_s.titleize}", update,
+                   :method => "put",
+                   :params => { this_parent.class.name.underscore => {
+                       this_field => Hobo.raw_js('this.value')
+                    } })
+  options = add_classes(options, editor_class)
+%>
+  <select onchange="<%= f %>" xattrs="#options">
+    <%= options_for_select(values, this) %>
+  </select>  
+</def>
+
+
 <def tag="boolean_checkbox_editor" attrs="update"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   f = ajax_updater(object_url(this_parent),

@@ -131,7 +131,7 @@ module Hobo
       def show_action(*names)
         show_actions.concat(names)
         for name in names
-          class_eval "def #{name}; show; end"
+          class_eval "def #{name}; hobo_show; end"
         end
       end
       

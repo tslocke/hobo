@@ -248,9 +248,17 @@ module Hobo
         end
         
         def method_missing(name, *args, &block)
-          klass.with_scope(@scope) do
+          @klass.with_scope(@scope) do
             @klass.send(name, *args, &block)
           end
+        end
+        
+        def all
+          self.find(:all)
+        end
+        
+        def first
+          self.find(:first)
         end
       end
       (Object.instance_methods + 
