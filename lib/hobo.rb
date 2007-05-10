@@ -313,6 +313,8 @@ module Hobo
                          File.readlines(path).omap{chop} 
                        end
     end
+    
+    attr_writer :static_tags
 
     
     private
@@ -349,5 +351,8 @@ module Hobo
     end
 
   end
+  
+  # --- Asset Publishing --- #
+  
 
 end

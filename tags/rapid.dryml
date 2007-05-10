@@ -6,7 +6,13 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table" attrs="fields, skip, associations">
+<def tag="object_table">
+  <table>
+    <object_table_rows xattrs="#options"/>
+  </table>
+</def>
+
+<def tag="object_table_rows" attrs="fields, skip, associations, editor_tag">
   <% field_inner_tag_options, options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
      fields = if fields.nil?
@@ -24,10 +30,11 @@
                     end
      associations -= comma_split(skip).omap{to_sym} if skip
      options = add_classes(options, "object_table", ("new_record" if this.new_record?))
+     editor_tag ||= "edit"
      # force load
      Hobo.models
   %>
-  <table xattrs="">
+  <table xattrs="#options">
     <if q="#this.new_record? && 'type'.in?(this.class.column_names) && !this.class.send(:subclasses).empty?">
       <tr>
         <td class="field_label">Type:</td>
@@ -39,14 +46,14 @@
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label" content_option="#field + '_label'"><%= no_break(field.titleize) %>:</td>
-        <td><edit attr="#field" replace_option="#field + '_editor'"/></td>
+        <td><call_tag name="#editor_tag" attr="#field" replace_option="#field + '_editor'"/></td>
       </tr>
     <% end %>
 
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label" content_option="#field.to_s + '_label'"><%= no_break(field.to_s.titleize) %>:</td>
-        <td><edit attr="#field" replace_option="#field.to_s + '_editor'"/></td>
+        <td><call_tag name="#editor_tag" attr="#field" replace_option="#field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 

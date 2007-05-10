@@ -145,7 +145,7 @@ module Hobo::Rapid
   
   
   def_tag :boolean_field, :name do
-    check_box_tag(name, '1', this, options)
+    check_box_tag(name, '1', this, options) + hidden_field_tag(name, '0')
   end
   
   def_tag :password_string_field, :name do
@@ -176,6 +176,7 @@ module Hobo::Rapid
     text_field_tag(name, this, options)
   end
 
+  
   def_tag :editor do
     raise HoboError.new("Not allowed to edit") unless can_edit_this?
 

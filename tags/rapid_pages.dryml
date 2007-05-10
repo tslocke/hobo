@@ -93,7 +93,7 @@
       <panel replace_option="main_panel">
         <h2 replace_option="panel_heading">Details</h2>
         <section>
-          <object_table associations="*" skip_fields="name" replace_option="fields"/>
+          <object_table associations="*" skip="name" replace_option="fields"/>
         </section>
 
         <section_if replace_option="new_links">

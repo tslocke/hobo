@@ -105,24 +105,28 @@ module Hobo
     end
     
     
-    def_tag :dynamic_tag, :name do
+    def_tag :call_tag, :name do
       send(name, options)
     end
 
     
     def_tag :display_name do
-      name_tag = "display_name_for_#{this.class.name.underscore}"
-      if respond_to?(name_tag)
-        send(name_tag)
-      elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
-        "(#{count})"
-      elsif this.is_a? Class and this < ActiveRecord::Base
-        this.name.pluralize.titleize
+      if this.nil?
+        "(not available)"
       else
-        res = [:display_name, :name, :title].search do |m|
-          show(options.merge(:attr => m)) if this.respond_to?(m) and can_view?(this, m)
+        name_tag = "display_name_for_#{this.class.name.underscore}"
+        if respond_to?(name_tag)
+          send(name_tag)
+        elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
+          "(#{count})"
+        elsif this.is_a? Class and this < ActiveRecord::Base
+          this.name.pluralize.titleize
+        else
+          res = [:display_name, :name, :title].search do |m|
+            show(options.merge(:attr => m)) if this.respond_to?(m) and can_view?(this, m)
+          end
+          res || "#{this.class.name.humanize} #{this.id}"
         end
-        res || "#{this.class.name.humanize} #{this.id}"
       end
     end
 
@@ -141,7 +145,7 @@ module Hobo
 
     def_tag :new_object_link, :for do
       f = for_ || this
-      new = f.new
+      new = f.respond_to?(:new_without_appending) ? f.new_without_appending : f.new
       new.created_by(current_user)
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
@@ -164,7 +168,7 @@ module Hobo
     end
 
 
-    def_tag :show, :no_span, :truncate_tail do
+    def_tag :show, :no_span, :truncate_tail, :format do
       # We can't do this as a declared attribute as it will hide the truncate helper
       trunc = options.delete(:truncate)
       
@@ -198,7 +202,6 @@ module Hobo
                        end
                        
                      when Numeric
-                       format = options[:format]
                        format ? format % this : this.to_s
                        
                      when Hobo::HtmlString
@@ -226,10 +229,8 @@ module Hobo
                        raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
                      end
               
-              
-              
               if !no_span && this_parent.respond_to?(:typed_id)
-                "<span hobo_model_id='#{this_field_dom_id}'>#{res2}</span>"
+                content_tag :span, res2, options.merge(:hobo_model_id => this_field_dom_id)
               else
                 res2
               end
@@ -302,9 +303,9 @@ module Hobo
     end
 
     
-    def param_name_for_this(association_foreign_key=false)
+    def param_name_for_this(foreign_key=false)
       return "" unless form_this
-      name = if association_foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
+      name = if foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
                param_name_for(form_this, form_field_path[0..-2] + [this_type.primary_key_name])
              else
                param_name_for(form_this, form_field_path)

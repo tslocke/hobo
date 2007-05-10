@@ -71,8 +71,8 @@ var Hobo = {
     ajaxRequest: function(url_or_form, message, updates, options) {
         options = Object.merge({ asynchronous:true,
                                  evalScripts:true,
-                                 resetForm: true,
-                                 refocusForm: true
+                                 resetForm: false,
+                                 refocusForm: false
                                }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
@@ -102,7 +102,7 @@ var Hobo = {
 
             if (options.onComplete)
                 options.onComplete.apply(this, arguments)
-            if (form && options) Form.focusFirstElement(form)
+            if (form && options.refocusForm) Form.focusFirstElement(form)
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method

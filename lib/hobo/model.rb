@@ -286,8 +286,9 @@ module Hobo
         attr_accessor :reflections
         
         def method_missing(name, *args, &block)
-          scopes = proxy_reflection.klass.defined_scopes
-          scope = scopes && scopes[name.to_sym]
+          scope = (proxy_reflection.klass.respond_to?(:defined_scopes) and
+                   scopes = proxy_reflection.klass.defined_scopes and 
+                   scopes[name.to_sym])
           if scope
             scope = scope.call(*args) if scope.is_a?(Proc)
             

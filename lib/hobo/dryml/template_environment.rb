@@ -291,8 +291,8 @@ module Hobo::Dryml
     end
     
     
-    def method_missing(name, *args)
-      @view.send(name, *args)
+    def method_missing(name, *args, &b)
+      @view.send(name, *args, &b)
     end
     
 

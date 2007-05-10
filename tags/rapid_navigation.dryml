@@ -29,7 +29,7 @@
 
 <def tag="application_account_nav">
   <if q="#logged_in?">
-    <div class='nav_item'>Logged in as <%= h current_user.login %></div>
+    <div class='nav_item'>Logged in as <show obj="#current_user" attr="login" /></div>
     <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
   </if>
   <else>

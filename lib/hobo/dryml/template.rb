@@ -64,7 +64,7 @@ module Hobo::Dryml
     def create_render_page_method
       erb_src = process_src
       
-      src = ERB.new(erb_src).src[("_erbout = '';").length..-1]
+      src = ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-1]
       
       @builder.add_build_instruction(:type => :render_page, :src => src, :line_num => 1)
     end
@@ -97,7 +97,7 @@ module Hobo::Dryml
 
 
     def restore_erb_scriptlets(src)
-      src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) { "<%#{@scriptlets[Regexp.last_match[1].to_i]}%>" }
+      src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
     end
 
 
@@ -192,7 +192,6 @@ module Hobo::Dryml
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
       require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
-      require_attribute(el, "if", /^#{DRYML_NAME}$/, true)
 
       name = el.attributes["tag"]
 
@@ -493,6 +492,11 @@ module Hobo::Dryml
         end
         start_tag_src.sub!(/\s*xattrs\s*=\s*('[^']*?'|"[^"]*?")/, " <%= xattrs(#{attr_args}) %>")
       end
+      
+      # Allow #{...} as an alternate to <%= ... %>
+      start_tag_src.sub!(/=\s*('[^']*?'|"[^"]*?")/) do |s|
+        s.gsub(/#\{([^}]*)\}/, '<%= \1 %>')
+      end
 
       if start_tag_src.ends_with?("/>")
         start_tag_src
@@ -519,7 +523,7 @@ module Hobo::Dryml
     end
 
     def attribute_to_ruby(attr)
-      dryml_exception("erb scriptlet in attribute of defined tag") if attr && attr.index("[![HOBO-ERB")
+      dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if attr && attr.index("[![HOBO-ERB")
       if attr.nil?
         "nil"
       elsif is_code_attribute?(attr)
@@ -552,7 +556,7 @@ module Hobo::Dryml
     def require_attribute(el, name, rx=nil, optional=false)
       val = el.attributes[name]
       if val
-        dryml_exception("invalid #{name}=\"#{val}\" attribute on <#{el.name}>", el) unless val =~ rx
+        dryml_exception("invalid #{name}=\"#{val}\" attribute on <#{el.name}>", el) unless rx && val =~ rx
       else
         dryml_exception("missing #{name} attribute on <#{el.name}>", el) unless optional
       end

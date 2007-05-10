@@ -49,7 +49,11 @@ module Hobo
         u = find(:first, :conditions => ["#{@login_attr} = ?", login]) # need to get the salt
         
         if u && u.authenticated?(password)
-          u.last_login_at = Time.now and u.save if u.respond_to?(:last_login_at)
+          if u.respond_to?(:last_login_at) || u.respond_to?(:logins_count)
+            u.last_login_at = Time.now if u.respond_to?(:last_login_at)
+            u.logins_count = (u.logins_count.to_i + 1) if u.respond_to?(:logins_count)
+            u.save
+          end
           u
         else
           nil

@@ -85,6 +85,7 @@ module Hobo
     # cookie and log the user back in if apropriate
     def login_from_cookie
       return unless cookies[:auth_token] && !logged_in?
+      
       user = Hobo.user_model.find_by_remember_token(cookies[:auth_token])
       if user && user.remember_token?
         user.remember_me

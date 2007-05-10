@@ -33,8 +33,10 @@ class ActionController::Base
 
 end
 
-def (ActiveRecord::Base).hobo_model
-  include Hobo::Model
+class ActiveRecord::Base
+  def self.hobo_model
+    include Hobo::Model
+  end
 end
 
 # Default settings
