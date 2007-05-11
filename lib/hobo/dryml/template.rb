@@ -252,8 +252,11 @@ module Hobo::Dryml
                      "<% @output; end; end %>" )
       
       logger.debug(restore_erb_scriptlets(method_src)) if el.attributes["hobo_debug_source"]
+      logger.debug(erb_process(method_src)) if el.attributes["hobo_debug_source"]
       
-        @builder.add_build_instruction(:type => :def, :src => erb_process(method_src), :line_num => element_line_num(el))
+      @builder.add_build_instruction(:type => :def,
+                                     :src => erb_process(method_src),
+                                     :line_num => element_line_num(el))
 
       # keep line numbers matching up
       "<% #{"\n" * method_src.count("\n")} %>"

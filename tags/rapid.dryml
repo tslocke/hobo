@@ -37,7 +37,7 @@
   <table xattrs="#options">
     <if q="#this.new_record? && 'type'.in?(this.class.column_names) && !this.class.send(:subclasses).empty?">
       <tr>
-        <td class="field_label">Type:</td>
+        <td class="field_label"><label>Type:</label></td>
         <td><sti_type_field/></td>
       </tr>        
     </if>
@@ -45,14 +45,16 @@
 
     <% for field in fields.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label" content_option="#field + '_label'"><%= no_break(field.titleize) %>:</td>
+        <td class="field_label"
+            content_option="#field + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
         <td><call_tag name="#editor_tag" attr="#field" replace_option="#field + '_editor'"/></td>
       </tr>
     <% end %>
 
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
-        <td class="field_label" content_option="#field.to_s + '_label'"><%= no_break(field.to_s.titleize) %>:</td>
+        <td class="field_label"
+            content_option="#field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
         <td><call_tag name="#editor_tag" attr="#field" replace_option="#field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
