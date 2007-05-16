@@ -149,6 +149,24 @@ module Enumerable
     each_with_index {|x, i| res << yield(x, i)}
     res
   end
+  
+  def build_hash
+    res = {}
+    each do |x|
+      k, v = yield x
+      res[k] = v
+    end
+    res
+  end
+  
+  def map_hash
+    res = {}
+    each do |x|
+      v = yield x
+      res[x] = v
+    end
+    res
+  end
 
 end
 

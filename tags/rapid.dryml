@@ -13,7 +13,7 @@
 </def>
 
 <def tag="object_table_rows" attrs="fields, skip, associations, editor_tag">
-  <% field_inner_tag_options, options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
+  <% field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
      fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
@@ -29,12 +29,12 @@
                       comma_split(associations)
                     end
      associations -= comma_split(skip).omap{to_sym} if skip
-     options = add_classes(options, "object_table", ("new_record" if this.new_record?))
+     html_options = add_classes(html_options, "object_table", ("new_record" if this.new_record?))
      editor_tag ||= "edit"
      # force load
      Hobo.models
   %>
-  <table xattrs="#options">
+  <table xattrs="#html_options">
     <if q="#this.new_record? && 'type'.in?(this.class.column_names) && !this.class.send(:subclasses).empty?">
       <tr>
         <td class="field_label"><label>Type:</label></td>
@@ -84,7 +84,7 @@
 
 
 <def tag="ul_for" attrs="else">
-  <if q="#this.empty? and else_">
+  <if q="#this.empty? && else_">
     <%= else_ %>
   </if>
   <else>

@@ -8,6 +8,7 @@ class Hobo::LazyHash < Hash
     end
   end
   
+  
   def [](key)
     val = super
     if val.is_a?(Proc)
@@ -17,9 +18,20 @@ class Hobo::LazyHash < Hash
     end
   end
   
-  def inspect
-    "#<LazyHash:#{object_id} #{keys.inspect}>"
+  
+  def delete(key)
+    val = super
+    val.is_a?(Proc) ? val.call : val
   end
+  
+  
+  def inspect
+    pairs = map do |k, v|
+      "#{k.inspect} => #{v.is_a?(Proc) ? '??' : v.inspect}"
+    end
+    "{#{pairs * ', '}}"
+  end
+  
   
   def to_s
     inspect

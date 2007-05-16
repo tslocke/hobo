@@ -63,10 +63,8 @@ module Hobo::Dryml
       
     def create_render_page_method
       erb_src = process_src
-      
       src = ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-1]
-      
-      @builder.add_build_instruction(:type => :render_page, :src => src, :line_num => 1)
+      @builder.add_build_instruction(:render_page, :src => src, :line_num => 1)
     end
 
     
@@ -87,25 +85,25 @@ module Hobo::Dryml
       end
 
       @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
-
       @doc = REXML::Document.new(RexSource.new(@xmlsrc))
-
-      erb_src = restore_erb_scriptlets(children_to_erb(@doc.root))
       
-      erb_src
+      restore_erb_scriptlets(children_to_erb(@doc.root))
     end
 
-
+    
     def restore_erb_scriptlets(src)
       src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
     end
-
-
+ 
+    
     def erb_process(src)
-      ERB.new(restore_erb_scriptlets(src)).src
+      # Strip off "_erbout = ''" from the beginning and "; _erbout"
+      # from the end, because we do things differently around
+      # here. (_erbout is defined as a method)
+      ERB.new(restore_erb_scriptlets(src)).src["_erbout = '';".length..-("; _erbout".length)]
     end
 
-
+    
     def children_to_erb(nodes)
       nodes.map{|x| node_to_erb(x)}.join
     end
@@ -144,7 +142,7 @@ module Hobo::Dryml
         
       when "set_theme"
         require_attribute(el, "name", /^#{DRYML_NAME}$/)
-        @builder.add_build_instruction(:type => :set_theme, :name => el.attributes['name'])
+        @builder.add_build_instruction(:set_theme, :name => el.attributes['name'])
 
         # return nothing - set_theme has no presence in the erb source
         tag_newlines(el)
@@ -154,6 +152,9 @@ module Hobo::Dryml
 
       when "tagbody"
         tagbody_element(el)
+        
+      when "redefine"
+        redefine_element(el)
 
       else
         if el.name.not_in?(Hobo.static_tags) or
@@ -170,11 +171,11 @@ module Hobo::Dryml
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       if el.attributes["src"]
-        @builder.add_build_instruction(:type => :taglib, 
+        @builder.add_build_instruction(:taglib, 
                                        :name => el.attributes["src"], 
                                        :as => el.attributes["as"])
       elsif el.attributes["module"]
-        @builder.add_build_instruction(:type => :module, 
+        @builder.add_build_instruction(:module, 
                                        :name => el.attributes["module"], 
                                        :as => el.attributes["as"])
       end
@@ -184,82 +185,113 @@ module Hobo::Dryml
     def import_module(mod, as=nil)
       @builder.import_module(mod, as)
     end
+    
+    
+    def redefine_element(el)
+      redefined_tags = el.children.
+        select {|e| e.is_a?(REXML::Element) && e.name == "def"}.
+        map {|e| Hobo::Dryml.unreserve(e.attributes["tag"]) }
+      "<% self.class.start_redefine_block(#{redefined_tags.inspect}) #{tag_newlines(el)} %>" +
+        children_to_erb(el) +
+        "<% self.class.end_redefine_block %>"
+    end
 
 
     def def_element(el)
-      require_toplevel(el)
+      redefine = el.parent.name == "redefine"
+      
+      require_toplevel(el, "must be at the top-level or inside a <redefine>") unless redefine
       require_attribute(el, "tag", /^#{DRYML_NAME}$/)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
       require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
 
-      name = el.attributes["tag"]
+      unsafe_name = el.attributes["tag"]
+      name = Hobo::Dryml.unreserve(unsafe_name)
 
       alias_of = el.attributes['alias_of']
       alias_current = el.attributes['alias_current']
 
       dryml_exception("def cannot have both alias_of and alias_current", el) if alias_of && alias_current
       dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
-
+      
+      dryml_exception("redefined methods cannot have predicates", el) if redefine && el.attributes["if"]
+                      
+      # If we're redefining, we need a statement in the method body
+      # that does the alias_method on the fly.
+      re_alias = ""
+      
       if alias_of || alias_current
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
 
-        @builder.add_build_instruction(:type => :alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
+        if redefine
+          re_alias = "<% self.class.send(:alias_method, :#{new_name}, :#{old_name}) %>"
+        else
+          @builder.add_build_instruction(:alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
+        end
       end
+      
+      # While processing the children of this def, @def_name contains
+      # the names of all nested defs join with '_'. It's used to
+      # disambiguate the +tagbody+ local variables.
+      res = if alias_of
+              "#{re_alias}<% #{tag_newlines(el)} %>"
+            else
+              tag_method(name, el, re_alias, redefine)
+            end
+    end
+    
+    
+    def tag_method(name, el, re_alias, redefine)
+      attrspec = el.attributes["attrs"]
+      attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
 
-      if alias_of
-        "<% #{tag_newlines(el)} %>"
-      else
-        attrspec = el.attributes["attrs"]
-        attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
+      invalids = attr_names & %w{obj attr this}
+      dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
 
-        invalids = attr_names & %w{obj attr this}
-        dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
+      method_body = tag_method_body(el, attr_names.omap{to_sym})
+      logger.debug(restore_erb_scriptlets(method_body)) if el.attributes["hobo_debug_source"]
+      
+      res = if redefine
+              re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, __block__| " +
+                ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
+                ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
+            else
+              pred = el.attributes["if"]
+              pred = pred[1..-1] if pred && pred.starts_with?('#')
 
-        create_tag_method(el, name.to_sym, attr_names.omap{to_sym})
-      end
+              @builder.add_build_instruction(:def,
+                                             :name => name,
+                                             :method_body => erb_process("<% #{method_body} %>"),
+                                             :line_num => element_line_num(el),
+                                             :predicate => pred)
+              # keep line numbers matching up
+              "<% #{"\n" * method_body.count("\n")} %>"
+            end
+      res
     end
 
 
-    def create_tag_method(el, name, attrs)
-      name = Hobo::Dryml.unreserve(name)
-      
+    def tag_method_body(el, attrs)
       inner_tags = find_inner_tags(el)
 
       # A statement to assign values to local variables named after the tag's attrs.
-      setup_locals = ( (attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "} + ['options, inner_tag_options']).join +
-                       " = _tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})" )
+      locals_lhs = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + " = " if attrs.any?
+      setup_locals = "#{locals_lhs}_tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})"
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
       
-      pred = el.attributes["if"]
-      pred = pred[1..-1] if pred && pred.starts_with?('#')
-      
-      def_line = if pred
-                   "defp :#{name}, (proc {|options| #{pred}}) do |__options__, __block__|"
-                 elsif @environment.predicate_method?(name)
-                   # be sure not to overwrite the predicate dispatch method
-                   "defp :#{name} do |__options__, __block__|"
-                 else
-                   "def #{name}(__options__={}, &__block__)"
-                 end
-
-      method_src = ( "<% #{def_line}; #{start} " +
-                     # reproduce any line breaks in the start-tag so that line numbers are preserved
-                     tag_newlines(el) + "%>" +
-                     children_to_erb(el) +
-                     "<% @output; end; end %>" )
-      
-      logger.debug(restore_erb_scriptlets(method_src)) if el.attributes["hobo_debug_source"]
-      logger.debug(erb_process(method_src)) if el.attributes["hobo_debug_source"]
-      
-      @builder.add_build_instruction(:type => :def,
-                                     :src => erb_process(method_src),
-                                     :line_num => element_line_num(el))
-
-      # keep line numbers matching up
-      "<% #{"\n" * method_src.count("\n")} %>"
+      old_def_name = @def_name
+      unsafe_name = el.attributes['tag']
+      @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
+      res = "#{start} " +
+        # reproduce any line breaks in the start-tag so that line numbers are preserved
+        tag_newlines(el) + "%>" +
+        children_to_erb(el) +
+        "<% _erbout; end"
+      @def_name = old_def_name
+      res
     end
     
     
@@ -300,24 +332,14 @@ module Hobo::Dryml
       part_name  = el.attributes['part_id']
       dom_id = el.attributes['id'] || part_name
       
-      dryml_exception("dupplicate part name: #{part_name}", el) if
-        (part_name + "_part").in?(@environment.instance_methods)
-
       part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
         content +
         "<% end; end %>"
-      create_part(part_src, element_line_num(el))
+      @builder.add_part(part_name, erb_process(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
       res = "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
       res
-    end
-
-
-    def create_part(erb_src, line_num)
-      # Add a method to the part module for this template
-
-        @builder.add_build_instruction(:type => :part, :src => erb_process(erb_src), :line_num => line_num)
     end
 
     
@@ -389,6 +411,8 @@ module Hobo::Dryml
         el.delete_at(el.index(e))
         case e
         when REXML::Element
+          # Multiple param tags with the same name are allowed - they
+          # become an array passed to the tag
           array_index = begin
                           # If there are other param-tags with this
                           # name, the index of this one, else nil
@@ -404,15 +428,15 @@ module Hobo::Dryml
           param_value = 
             if e.has_attributes?
               pairs = e.attributes.map do |n,v|
-                "#{attr_name_to_option_key(n)} => " + "#{attribute_to_ruby(v)}"
+              "#{attr_name_to_option_key(n)} => " + "proc { #{attribute_to_ruby(v)} }"
               end
-              # If there is content to, that goes in the hash under the key :content
+              # If there is content too, that goes in the hash under the key :content
               if e.size > 0
-                pairs << "#{tag_newlines(el)}:content => (capture do %>#{children_to_erb(e)}<%; end)"
+                pairs << "#{tag_newlines(el)}:content => (proc { new_context { %>#{children_to_erb(e)}<%; } })"
               end
               "{" + pairs.join(",") + "}"
             elsif e.size > 0
-              "#{tag_newlines(el)}(capture do %>#{children_to_erb(e)}<%; end)"
+              "#{tag_newlines(el)}(proc { new_context { %>#{children_to_erb(e)}<%; }})"
             else
               "''"
             end
@@ -552,8 +576,9 @@ module Hobo::Dryml
       return nil
     end
 
-    def require_toplevel(el)
-      dryml_exception("<#{el.name}> can only be at the top level", el) if el.parent != @doc.root
+    def require_toplevel(el, message=nil)
+      message ||= "can only be at the top level"
+      dryml_exception("<#{el.name}> #{message}", el) if el.parent != @doc.root
     end
 
     def require_attribute(el, name, rx=nil, optional=false)
@@ -567,7 +592,7 @@ module Hobo::Dryml
 
     def dryml_exception(message, el=nil)
       el ||= @last_element
-      raise DrymlException.new(message + " -- at #{template_path}:#{element_line_num(el)}")
+      raise DrymlException.new(message, template_path, element_line_num(el))
     end
 
     def element_line_num(el)

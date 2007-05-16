@@ -397,7 +397,7 @@ module Hobo
     end
 
 
-    def_tag :with  do
+    def_tag :with do
       tagbody.call
     end
 

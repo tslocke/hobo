@@ -96,9 +96,3 @@
              [['Search', (search_url rescue "")]] %>
   <navbar items="#items"/>
 </def>
-
-
-<def tag="application_logo">
-  <theme_img src="logo.gif"/>
-</def>
-

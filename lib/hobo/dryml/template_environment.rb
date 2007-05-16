@@ -1,24 +1,60 @@
 module Hobo::Dryml
 
   class TemplateEnvironment
-
+    
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
       end
       attr_accessor :load_time, :compiled_local_names
-    end
+      
+      # --- Local Tags --- #
+      
+      def start_redefine_block(method_names)
+        @_preserved_methods_for_redefine ||= []
+        @_redef_impl_names ||= []
+        
+        methods = method_names.map_hash {|m| instance_method(m) }
+        @_preserved_methods_for_redefine.push(methods)
+        @_redef_impl_names.push []
+      end
+      
+      
+      def end_redefine_block
+        methods = @_preserved_methods_for_redefine.pop
+        methods.each_pair {|name, method| define_method(name, method) }
+        to_remove = @_redef_impl_names.pop
+        to_remove.each {|m| remove_method(m) }
+      end
+      
+      
+      def redefine_nesting
+        @_preserved_methods_for_redefine.length
+      end
+      
+      
+      def redefine_tag(name, proc)
+        impl_name = "#{name}_redefined_#{redefine_nesting}"
+        define_method(impl_name, proc)
+        class_eval "def #{name}(options, &b); #{impl_name}(options, b); end"
+        @_redef_impl_names.push(impl_name)
+      end
+      
+      # --- end local tags --- #
 
+    end
+    
     for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}
       include mod
     end
 
     def initialize(view_name, view)
       @view = view
-      @view_name = view_name
-      @erb_binding = binding
-      @part_contexts = {}
-      @stack = [nil]
+      @_view_name = view_name
+      @_erb_binding = binding
+      @_part_contexts = {}
+      @_options = {}
+      @_inner_tag_options = {}
 
       # Make sure the "assigns" from the controller are available (instance variables)
       if view
@@ -28,21 +64,25 @@ module Hobo::Dryml
 
         # copy view instance variables over
         view.instance_variables.each do |iv|
-          instance_variable_set(iv, @view.instance_variable_get(iv))
+          instance_variable_set(iv, view.instance_variable_get(iv))
         end
       end
     end
 
-    attr_accessor :erb_binding, :part_contexts, :view_name
+    attr_accessor 
 
-    attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
+    for attr in [:erb_binding, :part_contexts, :view_name,
+                 :this, :this_parent, :this_field, :this_type,
+                 :form_field_path, :form_this, :form_field_names,
+                 :options, :inner_tag_options]
+      class_eval "def #{attr}; @_#{attr}; end"
+    end
     
-    def this; @_this; end
-    
+
     def attr_extension(s)
       AttributeExtensionString.new(s)
     end
-    
+
     
     def this_field_dom_id
       Hobo.dom_id(this_parent, this_field)
@@ -66,12 +106,12 @@ module Hobo::Dryml
       res = ''
       if part_this
         new_object_context(part_this) do
-          @part_contexts[dom_id] = [part_id, part_context_model_id]
+          @_part_contexts[dom_id] = [part_id, part_context_model_id]
           res = send("#{part_id}_part")
         end
       else
         new_context do
-          @part_contexts[dom_id] = [part_id, part_context_model_id]
+          @_part_contexts[dom_id] = [part_id, part_context_model_id]
           res = send("#{part_id}_part")
         end
       end
@@ -80,22 +120,26 @@ module Hobo::Dryml
 
 
     def _erbout
-      @output
+      @_output
     end
 
 
     def new_context
-      ctx = @output, @_this, @this_parent, @this_field, @this_type, @form_field_path
-      @output = ""
+      ctx = [ @_output,
+              @_this, @_this_parent, @_this_field, @_this_type,
+              @_form_field_path,
+              @_options, @_inner_tag_options]
+      @_output = ""
       res = yield
-      @output, @_this, @this_parent, @this_field, @this_type, @form_field_path = ctx
+      @_output, @_this, @_this_parent, @_this_field, @_this_type,
+          @_form_field_path, @_options, @_inner_tag_options = ctx
       res.to_s
     end
 
 
     def new_object_context(new_this)
       new_context do
-        @this_parent,@this_field,@this_type = if new_this.respond_to?(:proxy_reflection)
+        @_this_parent,@_this_field,@_this_type = if new_this.respond_to?(:proxy_reflection)
                                                 refl = new_this.proxy_reflection
                                                 [new_this.proxy_owner, refl.name, refl]
                                               else
@@ -131,8 +175,8 @@ module Hobo::Dryml
                end
         
 
-        @_this, @this_parent, @this_field, @this_type = obj, parent, field, type
-        @form_field_path += path if @form_field_path
+        @_this, @_this_parent, @_this_field, @_this_type = obj, parent, field, type
+        @_form_field_path += path if @_form_field_path
         yield
       end
     end
@@ -141,6 +185,7 @@ module Hobo::Dryml
     def _tag_context(options, tagbody_proc)
       tagbody = tagbody_proc && proc do |*args|
         res = ''
+        
         block_options = args.length > 0 && args.first
         if block_options and block_options.has_key?(:obj)
           new_object_context(block_options[:obj]) { res = tagbody_proc.call }
@@ -153,7 +198,7 @@ module Hobo::Dryml
       end
       
       obj = options[:obj] == "page" ? @this : options[:obj]
-
+      
       if options.has_key?(:attr)
         new_field_context(options[:attr], obj) { yield tagbody }
       elsif options.has_key?(:obj)
@@ -165,18 +210,18 @@ module Hobo::Dryml
 
 
     def with_form_context
-      @form_this = this
-      @form_field_path = []
-      @form_field_names = []
+      @_form_this = this
+      @_form_field_path = []
+      @_form_field_names = []
       res = yield
-      field_names = @form_field_names
-      @form_this = @form_field_path = @form_field_names = nil
+      field_names = @_form_field_names
+      @_form_this = @_form_field_path = @_form_field_names = nil
       [res, field_names]
     end
     
     
     def register_form_field(name)
-      @form_field_names << name
+      @_form_field_names << name
     end
 
 
@@ -204,7 +249,12 @@ module Hobo::Dryml
       # positional arguments never appear in the options hash
       stripped_options = {}.update(options)
       attrs.each {|a| stripped_options.delete(a.to_sym) }
-      attrs.map {|a| options[a.to_sym]} + [stripped_options, inner_tag_options]
+      @_options = lazy_hash(stripped_options)
+      @_inner_tag_options = lazy_hash(inner_tag_options)
+      
+      # Return attrs declared as local variables (attrs="...")
+      call_procs_options = Hobo::LazyHash.new(options)
+      attrs.map {|a| call_procs_options[a.to_sym]}
     end
     
     
@@ -283,6 +333,11 @@ module Hobo::Dryml
               content_tag(name, body, options)
             end
       tag.to_s
+    end
+        
+    
+    def lazy_hash(hash)
+      Hobo::LazyHash.new(hash)
     end
 
 

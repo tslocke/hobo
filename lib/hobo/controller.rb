@@ -91,9 +91,10 @@ module Hobo
     end
 
 
-    def render_tag(tag, options={})
+    def render_tag(tag, options={}, render_options={})
       add_variables_to_assigns
-      render :text => Hobo::Dryml.render_tag(@template, tag, options), :layout => false
+      render({:text => Hobo::Dryml.render_tag(@template, tag, options),
+               :layout => false }.merge(render_options))
     end
 
 

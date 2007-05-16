@@ -8,6 +8,7 @@ module Hobo::Dryml
     def initialize(template_path)
       @build_instructions = Array.new
       @template_path      = template_path
+      @part_names = []
     end
 
 
@@ -26,8 +27,14 @@ module Hobo::Dryml
     end
 
 
-    def add_build_instruction(params)
-      @build_instructions << params
+    def add_build_instruction(type, params)
+      @build_instructions << params.merge(:type => type)
+    end
+    
+    def add_part(name, src, line_num)
+      raise DrymlException.new("duplicate part: #{name}", @template_path, line_num) if name.in?(@part_names)
+      add_build_instruction(:part, :src => src, :line_num => line_num)
+      @part_names << name
     end
 
 
@@ -53,27 +60,41 @@ module Hobo::Dryml
         Hobo::MappingTags.apply_standard_mappings(@environment)
       end
     
-      @build_instructions.each do |build_instruction|
-        case build_instruction[:type]
-        when :def, :part
-          @environment.class_eval(build_instruction[:src], @template_path, build_instruction[:line_num])
+      @build_instructions.each do |instruction|
+        name = instruction[:name]
+        pred = instruction[:pred]
+        case instruction[:type]
+        when :def
+          def_line = if pred
+                       "defp :#{name}, (proc {|options| #{pred}}) do |__options__, __block__|"
+                     elsif @environment.predicate_method?(name)
+                       # Make sure we don't overwrite an existing predicate dispatcher
+                       "defp :#{name} do |__options__, __block__|"
+                     else
+                       "def #{name}(__options__={}, &__block__)"
+                     end
+          src = "#{def_line}; #{instruction[:method_body]}; end"
+          @environment.class_eval(src, @template_path, instruction[:line_num])
+
+        when :part
+          @environment.class_eval(instruction[:src], @template_path, instruction[:line_num])
           
         when :render_page
-          method_src = get_render_page_source(build_instruction[:src], local_names)
+          method_src = get_render_page_source(instruction[:src], local_names)
           @environment.compiled_local_names = local_names
-          @environment.class_eval(method_src, @template_path, build_instruction[:line_num])
+          @environment.class_eval(method_src, @template_path, instruction[:line_num])
           
         when :taglib
-          import_taglib(build_instruction[:name], build_instruction[:as])
+          import_taglib(name, instruction[:as])
           
         when :module
-          import_module(build_instruction[:name].constantize, build_instruction[:as])
+          import_module(name.constantize, instruction[:as])
           
         when :set_theme
-          set_theme(build_instruction[:name])
+          set_theme(name)
           
         when :alias_method
-          @environment.send(:alias_method, build_instruction[:new], build_instruction[:old])
+          @environment.send(:alias_method, instruction[:new], instruction[:old])
           
         else
           raise HoboError.new("DRYML: Unknown build instruction type found when building #{@template_path}")
