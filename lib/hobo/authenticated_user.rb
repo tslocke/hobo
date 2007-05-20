@@ -4,6 +4,11 @@ module Hobo
 
   module AuthenticatedUser
 
+    # Extend the base class with AuthenticatedUser functionality
+    # This includes:
+    # - plaintext password during login and encrypted password in the database
+    # - plaintext password validation
+    # - login token for rembering a login during multiple browser sessions
     def self.included(base)
       base.extend(ClassMethods)
 
@@ -25,8 +30,10 @@ module Hobo
       end
     end
 
+    # Additional classmethods for AuthenticatedUser
     module ClassMethods
       
+      # Validation of the plaintext password
       def password_validations
         validates_length_of :password, :within => 4..40, :if => :password_required?
       end
@@ -72,10 +79,12 @@ module Hobo
       self.class.encrypt(password, salt)
     end
 
+    # Check if the encrypted passwords match
     def authenticated?(password)
       crypted_password == encrypt(password)
     end
 
+    # Do we still need to remember the login token, or has it expired?
     def remember_token?
       remember_token_expires_at && Time.now.utc < remember_token_expires_at
     end
@@ -87,6 +96,7 @@ module Hobo
       save(false)
     end
 
+    # Expire the login token, resulting in a forced login next time.
     def forget_me
       self.remember_token_expires_at = nil
       self.remember_token            = nil
@@ -94,13 +104,14 @@ module Hobo
     end
 
     protected
-    # before filter
+    # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
       return if password.blank?
       self.salt = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{login}--") if new_record?
       self.crypted_password = encrypt(password)
     end
 
+    # Is a password required for login? (or do we have an empty password?
     def password_required?
       (crypted_password.blank? && password != nil) || !password.blank?
     end

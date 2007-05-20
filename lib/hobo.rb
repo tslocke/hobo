@@ -232,27 +232,42 @@ module Hobo
       
       # has_many and polymorphic associations are not editable (for now)
       return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
+      
+      if object.respond_to?(:editable_by?)
+        check_permission(:edit, person, object, field.to_sym)
+      else
+        # Fake an edit test by setting the field in question to
+        # Hobo::Undefined and then testing for update permission
+        
+        current = object.send(field)
+        new = object.duplicate
 
-      current = object.send(field)
-      new = object.duplicate
-      new.send(setter, if current == true
-                         false
-                       elsif current == false
-                         true
-                       elsif refl and refl.macro == :belongs_to
-                         Hobo::Undefined.new(refl.klass)
-                       else
-                         Hobo::Undefined.new
-                       end)
-
-      begin
-        if object.new_record?
-          check_permission(:create, person, new)
-        else
-          check_permission(:update, person, object, new)
+        begin
+          # Setting the undefined value can sometimes result in an
+          # UndefinedAccessError. In that case we have no choice but
+          # return false.
+          new.send(setter, if current == true
+                             false
+                           elsif current == false
+                             true
+                           elsif refl and refl.macro == :belongs_to
+                             Hobo::Undefined.new(refl.klass)
+                           else
+                             Hobo::Undefined.new
+                           end)
+        rescue Hobo::UndefinedAccessError
+          raise HoboError, "#{object.class.name} does not support undefined assignements, define editable_by(user, field)"
         end
-      rescue Hobo::UndefinedAccessError
-        false
+        
+        begin
+          if object.new_record?
+            check_permission(:create, person, new)
+          else
+            check_permission(:update, person, object, new)
+          end
+        rescue Hobo::UndefinedAccessError
+          false
+        end
       end
     end
 
@@ -329,6 +344,7 @@ module Hobo
                    when :create; :creatable_by?
                    when :update; :updatable_by?
                    when :delete; :deletable_by?
+                   when :edit;   :editable_by?
                    when :view;   :viewable_by?
                    end
       p = if object.respond_to?(obj_method)

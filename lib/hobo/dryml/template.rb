@@ -276,9 +276,9 @@ module Hobo::Dryml
     def tag_method_body(el, attrs)
       inner_tags = find_inner_tags(el)
 
-      # A statement to assign values to local variables named after the tag's attrs.
-      locals_lhs = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + " = " if attrs.any?
-      setup_locals = "#{locals_lhs}_tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})"
+      # A statement to assign values to local variables named after the tag's attrs
+      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "options, inner_tag_options = " +
+        "_tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})"
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
       
@@ -428,13 +428,13 @@ module Hobo::Dryml
           param_value = 
             if e.has_attributes?
               pairs = e.attributes.map do |n,v|
-              "#{attr_name_to_option_key(n)} => " + "proc { #{attribute_to_ruby(v)} }"
+              "#{attr_name_to_option_key(n)} => (proc {#{attribute_to_ruby(v)}})"
               end
               # If there is content too, that goes in the hash under the key :content
               if e.size > 0
-                pairs << "#{tag_newlines(el)}:content => (proc { new_context { %>#{children_to_erb(e)}<%; } })"
+                pairs << "#{tag_newlines(el)}:content => (proc {new_context { %>#{children_to_erb(e)}<%; }})"
               end
-              "{" + pairs.join(",") + "}"
+              "{#{pairs * ','}}"
             elsif e.size > 0
               "#{tag_newlines(el)}(proc { new_context { %>#{children_to_erb(e)}<%; }})"
             else

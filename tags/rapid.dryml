@@ -6,14 +6,13 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table">
-  <table>
-    <object_table_rows xattrs="#options"/>
-  </table>
+<def tag="object_table_X">
+  <object_table_rows xattrs="#options"/>
 </def>
 
-<def tag="object_table_rows" attrs="fields, skip, associations, editor_tag">
-  <% field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
+<def tag="object_table" attrs="fields, skip, associations, editor_tag">
+  <% 
+     field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
      fields = if fields.nil?
                 this.class.content_columns.every(:name) - %w{created_at updated_at}
@@ -47,7 +46,9 @@
       <tr>
         <td class="field_label"
             content_option="#field + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
-        <td><call_tag name="#editor_tag" attr="#field" replace_option="#field + '_editor'"/></td>
+        <td><with  attr="#field">
+            <call_tag name="#editor_tag" replace_option="#field + '_editor'"/>
+        </with></td>
       </tr>
     <% end %>
 

@@ -341,7 +341,7 @@ module Hobo::Rapid
 
   def_tag :hobo_rapid_javascripts, :tiny_mce do
     res = javascript_include_tag("hobo_rapid")
-    res += "<script>"
+    res += '<script type="text/javascript">'
     unless Hobo.all_controllers.empty?
       res += "var controllerNames = {" +
         Hobo.all_controllers.map {|c| "#{c.singularize}: '#{c}'"}.join(', ') +
@@ -384,7 +384,7 @@ module Hobo::Rapid
               when nil
                 []
               when '*'
-                this.class.column_names - ['type']
+                this.class.column_names - ['type', 'created_at', 'updated_at']
               else
                 comma_split(hidden_fields)
               end

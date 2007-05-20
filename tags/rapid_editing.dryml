@@ -117,9 +117,9 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.value')
                     } })
-  options = add_classes(options, editor_class)
+  html_options = add_classes(options, editor_class)
 %>
-  <select onchange="<%= f %>" xattrs="#options">
+  <select onchange="<%= f %>" xattrs="#html_options">
     <%= options_for_select(values, this) %>
   </select>  
 </def>

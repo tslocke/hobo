@@ -201,7 +201,7 @@ module Hobo
     def hobo_index(options = {})
       options = LazyHash.new(options)
       @model = model
-      @this = options[:collection] || paginated_find
+      @this = options[:collection] || paginated_find(options)
 
       instance_variable_set("@#{@model.name.pluralize.underscore}", @this)
       if block_given?
@@ -216,15 +216,18 @@ module Hobo
       options = extract_options_from_args!(args)
       
       total_number = options.delete(:total_number)
-      if args.empty?
-        total_number ||= count_with_data_filter
-      else
-        owner, collection_name = args
-        @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
-        total_number ||= @association.size
-        @reflection = @association.proxy_reflection
+      @association = options.delete(:association) or
+        if args.any?
+          owner, collection_name = args
+          @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
+        end
+        
+      if @association
+        total_number ||= @association.count
+        @reflection = @association.proxy_reflection if @association.respond_to?(:proxy_reflection)
       end
       
+      total_number ||= count_with_data_filter
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
       @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
@@ -287,26 +290,26 @@ module Hobo
     def hobo_create(options={})
       options = LazyHash.new(options)
       
-      @this = (options[:this] || 
-               begin
-                 attributes = params[model.name.underscore]
-                 type_attr = params['type']
-                 create_model = if 'type'.in?(model.column_names) and 
-                                    type_attr and type_attr.in?(model.send(:subclasses).omap{name})
-                                  type_attr.constantize
-                                else
-                                  model
-                                end
-                 this = create_model.new
-                 @check_create_permission = [this]
-                 initialize_from_params(this, attributes)
-                 for obj in @check_create_permission
-                   permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
-                 end
-                 @check_create_permission = nil
-                 this
-               end)
-
+      if (@this = options[:this])
+        permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
+      else
+        attributes = params[model.name.underscore]
+        type_attr = params['type']
+        create_model = if 'type'.in?(model.column_names) and 
+                           type_attr and type_attr.in?(model.send(:subclasses).omap{name})
+                         type_attr.constantize
+                       else
+                         model
+                       end
+        @this = create_model.new
+        @check_create_permission = [@this]
+        initialize_from_params(@this, attributes)
+        for obj in @check_create_permission
+          permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
+        end
+        @check_create_permission = nil
+      end
+      
       set_named_this!
       if @this.save
         if block_given?
@@ -627,14 +630,14 @@ module Hobo
 
 
     def param_to_value(field_type, value)
-      if field_type <= Date
+      if field_type && field_type <= Date
         if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
         end
-      elsif field_type <= Time
+      elsif field_type && field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String

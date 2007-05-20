@@ -25,7 +25,7 @@ module Hobo
         @hobo_tag_blocks["#{name}_predicate"] = pred if pred
 
         safe_name = Dryml.unreserve(name)
-        locals = attrs.map{|a| Hobo::Dryml.unreserve(a)}
+        locals = attrs.map{|a| Hobo::Dryml.unreserve(a)} + %w{options inner_tag_options}
         
         def_line = if pred
                      "defp :#{safe_name}, @hobo_tag_blocks['#{name}_predicate'] do |options, block|"

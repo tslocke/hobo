@@ -53,8 +53,6 @@ module Hobo::Dryml
       @_view_name = view_name
       @_erb_binding = binding
       @_part_contexts = {}
-      @_options = {}
-      @_inner_tag_options = {}
 
       # Make sure the "assigns" from the controller are available (instance variables)
       if view
@@ -73,8 +71,7 @@ module Hobo::Dryml
 
     for attr in [:erb_binding, :part_contexts, :view_name,
                  :this, :this_parent, :this_field, :this_type,
-                 :form_field_path, :form_this, :form_field_names,
-                 :options, :inner_tag_options]
+                 :form_field_path, :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
     end
     
@@ -127,12 +124,11 @@ module Hobo::Dryml
     def new_context
       ctx = [ @_output,
               @_this, @_this_parent, @_this_field, @_this_type,
-              @_form_field_path,
-              @_options, @_inner_tag_options]
+              @_form_field_path]
       @_output = ""
       res = yield
       @_output, @_this, @_this_parent, @_this_field, @_this_type,
-          @_form_field_path, @_options, @_inner_tag_options = ctx
+          @_form_field_path = ctx
       res.to_s
     end
 
@@ -249,12 +245,11 @@ module Hobo::Dryml
       # positional arguments never appear in the options hash
       stripped_options = {}.update(options)
       attrs.each {|a| stripped_options.delete(a.to_sym) }
-      @_options = lazy_hash(stripped_options)
-      @_inner_tag_options = lazy_hash(inner_tag_options)
       
       # Return attrs declared as local variables (attrs="...")
       call_procs_options = Hobo::LazyHash.new(options)
-      attrs.map {|a| call_procs_options[a.to_sym]}
+      attrs.map {|a| call_procs_options[a.to_sym]} + [lazy_hash(stripped_options), 
+                                                      lazy_hash(inner_tag_options)]
     end
     
     

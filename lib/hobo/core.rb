@@ -403,7 +403,7 @@ module Hobo
 
 
     def_tag :join, :with do
-      map_this { tagbody.call }.join(with)
+      map_this { tagbody ? tagbody.call : display_name }.join(with)
     end
 
 
