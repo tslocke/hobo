@@ -77,7 +77,7 @@
 </def>
 
 
-<def tag="show_page" hobo_debug_source="">
+<def tag="show_page">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
@@ -149,7 +149,16 @@
 
     <:main>
       <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count label="#@reflection.klass.name.titleize"/></h2>
+        <h2 replace_option="panel_heading"><count obj="#@pages.item_count"
+                                                  label="#@reflection.klass.name.titleize"/></h2>
+        <if q="#@pages.length > 1">
+          <section replace_option="page_nav">
+            <div class="page_links">
+              <page_nav/>
+            </div>
+          </section>
+        </if>
+
         <section>
           <table_for replace_option="table">
             <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>

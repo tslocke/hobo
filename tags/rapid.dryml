@@ -14,12 +14,20 @@
   <% 
      field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
-     fields = if fields.nil?
-                this.class.content_columns.every(:name) - %w{created_at updated_at}
-              else
-                comma_split(fields)
-              end
+                                                        
+     if fields.nil?
+       fields = this.class.content_columns.every(:name) - %w{created_at updated_at}
+       if this.new_record? && 
+           'type'.in?(this.class.column_names) &&
+           !this.class.send(:subclasses).empty? &&
+         fields << 'type'
+       else
+         comma_split(fields)
+       end
+       
      fields -= comma_split(skip) if skip
+     fields.select! {|f| can_view?(this, f)}
+       
      associations = if associations == '*'
                       this.class.reflections.values.every(:name)
                     elsif associations == 'belongs_to'
@@ -34,7 +42,7 @@
      Hobo.models
   %>
   <table xattrs="#html_options">
-    <if q="#this.new_record? && 'type'.in?(this.class.column_names) && !this.class.send(:subclasses).empty?">
+    <if q="#'type'.in?(fields)">
       <tr>
         <td class="field_label"><label>Type:</label></td>
         <td><sti_type_field/></td>
@@ -42,7 +50,7 @@
     </if>
 
 
-    <% for field in fields.select{|f| can_view?(this, f)} %>
+    <% for field in (fields - ['type']) %>
       <tr>
         <td class="field_label"
             content_option="#field + '_label'"><label><%= no_break(field.titleize) %>:</label></td>

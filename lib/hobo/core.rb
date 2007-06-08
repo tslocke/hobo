@@ -146,7 +146,7 @@ module Hobo
     def_tag :new_object_link, :for do
       f = for_ || this
       new = f.respond_to?(:new_without_appending) ? f.new_without_appending : f.new
-      new.created_by(current_user)
+      new.created_by(current_user) if new.respond_to?(:current_user)
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
         content = tagbody ? tagbody.call : default
@@ -383,7 +383,13 @@ module Hobo
           assoc_name = this.proxy_reflection.name.to_s
           l = assoc_name.singularize.titleize
         end
-        c = this.size
+        c = if this.is_a?(Fixnum)
+              this
+            elsif this.respond_to?(:count)
+              this.count
+            else 
+              this.length
+            end
       end
 
       main = l.blank? ? c : pluralize(c, l)

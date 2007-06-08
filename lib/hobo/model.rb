@@ -289,22 +289,23 @@ module Hobo
           scope = (proxy_reflection.klass.respond_to?(:defined_scopes) and
                    scopes = proxy_reflection.klass.defined_scopes and 
                    scopes[name.to_sym])
-          if scope
-            scope = scope.call(*args) if scope.is_a?(Proc)
-            
+          
+          scope = scope.call(*args) if scope.is_a?(Proc)
+          if scope and (find_scope = scope[:find])
             # Calling directly causes self to get loaded
             assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}")
             unless assoc
               options = proxy_reflection.options
-              has_many_conditions = options.has_key?(:condition)
-              scope_conditions = scope.delete(:conditions)
+              has_many_conditions = options.has_key?(:conditions)
+              scope_conditions = find_scope.delete(:conditions)
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
                            else
                              scope_conditions || has_many_conditions
                            end
+              puts conditions.inspect
               
-              options = options.merge(scope).update(:conditions => conditions,
+              options = options.merge(find_scope).update(:conditions => conditions,
                                                     :class_name => proxy_reflection.klass.name,
                                                     :foreign_key => proxy_reflection.primary_key_name)
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,

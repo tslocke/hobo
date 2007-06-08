@@ -283,8 +283,10 @@ var Hobo = {
                                                         if (spinner) Hobo.hide(spinner)
                                                         if (search_results_panel) {
                                                             Hobo.show(search_results_panel)
-                                                         }
+                                                        }
+                                                        setTimeout(function() {Hobo.applyEvents(search_results)}, 1)
                                                     },
+                                                    method: "get",
                                                     parameters:"query=" + value });
         } else {
             Hobo.updateElement(search_results, '')
@@ -301,7 +303,7 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + escape(val)
+        return spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
     },
 
     fadeObjectElement: function(el) {

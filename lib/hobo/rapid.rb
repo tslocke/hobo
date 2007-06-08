@@ -418,7 +418,7 @@ module Hobo::Rapid
       end
     end
     m = message || "New #{obj.class.name.titleize}"
-    options = add_classes(options, "create_#{obj.class.underscore.name}_form")
+    options = add_classes(options, "create_#{obj.class.name.underscore}_form")
     object_form(obj, options.merge(:message => m, :update => update, :hidden_fields => hiddens)) do
       tagbody.call
     end

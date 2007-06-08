@@ -240,7 +240,7 @@ module Hobo
       if @association
         @association.find(:all, options, &b)
       else
-        options[:order] = :default
+        options[:order] ||= :default
         find_with_data_filter(options, &b)
       end
     end
@@ -265,7 +265,8 @@ module Hobo
       if @this
         if Hobo.can_view?(current_user, @this)
           set_named_this!
-          block_given? ? yield : hobo_render
+          yield if block_given?
+          hobo_render unless performed?
         else
           permission_denied(options)
         end
@@ -280,7 +281,8 @@ module Hobo
       
       if Hobo.can_create?(current_user, @this)
         set_named_this!
-        block_given? ? yield : hobo_render
+        yield if block_given?
+        hobo_render unless performed?
       else
         permission_denied(options)
       end
