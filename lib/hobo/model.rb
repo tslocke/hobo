@@ -244,7 +244,14 @@ module Hobo
       
       class ScopedProxy
         def initialize(klass, scope={})
-          @klass, @scope = klass, scope
+          @klass = klass
+          
+          # If there's no :find, or :create specified, assume it's a find scope
+          @scope = if scope.has_key?(:find) || scope.has_key?(:create)
+                     scope
+                   else
+                     { :find => scope }
+                   end
         end
         
         def method_missing(name, *args, &block)
@@ -291,9 +298,19 @@ module Hobo
                    scopes[name.to_sym])
           
           scope = scope.call(*args) if scope.is_a?(Proc)
-          if scope and (find_scope = scope[:find])
-            # Calling directly causes self to get loaded
+          
+          # If there's no :find, or :create specified, assume it's a find scope
+          find_scope = if scope && (scope.has_key?(:find) || scope.has_key?(:create))
+                         scope[:find]
+                       else
+                         scope
+                       end
+          
+          if find_scope
+            # Calling instance_variable_get directly causes self to
+            # get loaded, hence this trick
             assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}")
+            
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options.has_key?(:conditions)
@@ -303,7 +320,6 @@ module Hobo
                            else
                              scope_conditions || has_many_conditions
                            end
-              puts conditions.inspect
               
               options = options.merge(find_scope).update(:conditions => conditions,
                                                     :class_name => proxy_reflection.klass.name,

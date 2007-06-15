@@ -19,14 +19,15 @@
        fields = this.class.content_columns.every(:name) - %w{created_at updated_at}
        if this.new_record? && 
            'type'.in?(this.class.column_names) &&
-           !this.class.send(:subclasses).empty? &&
+           !this.class.send(:subclasses).empty?
          fields << 'type'
-       else
-         comma_split(fields)
        end
+     else
+       fields = comma_split(fields)
+     end
        
      fields -= comma_split(skip) if skip
-     fields.select! {|f| can_view?(this, f)}
+     fields = fields.select {|f| can_view?(this, f)}
        
      associations = if associations == '*'
                       this.class.reflections.values.every(:name)
