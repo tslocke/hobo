@@ -220,6 +220,18 @@ class Hash
     [yes, no]
   end
   
+  def -(keys)
+    res = {}
+    each_pair {|k, v| res[k] = v unless k.in?(keys)}
+    res
+  end
+  
+  def &(keys)
+    res = {}
+    keys.each {|k| res[k] = self[k] if has_key?(k)}
+    res    
+  end
+  
 end
 
 class <<ActiveRecord::Base

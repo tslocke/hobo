@@ -84,7 +84,7 @@ module Hobo::Dryml
           @environment.compiled_local_names = local_names
           @environment.class_eval(method_src, @template_path, instruction[:line_num])
           
-        when :taglib
+        when :include
           import_taglib(name, instruction[:as])
           
         when :module

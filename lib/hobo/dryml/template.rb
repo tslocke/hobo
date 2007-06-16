@@ -5,6 +5,9 @@ module Hobo::Dryml
   class Template
 
     DRYML_NAME = "[a-zA-Z_][a-zA-Z0-9_]*"
+    DRYML_NAME_RX = /^#{DRYML_NAME}$/
+    
+    CODE_ATTRIBUTE_CHAR = "&"
 
     @build_cache = {}
     
@@ -85,7 +88,7 @@ module Hobo::Dryml
       end
 
       @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
-      @doc = REXML::Document.new(RexSource.new(@xmlsrc))
+      @doc = REXML::Document.new(RexSource.new(@xmlsrc), :dryml_mode => true)
       
       restore_erb_scriptlets(children_to_erb(@doc.root))
     end
@@ -135,8 +138,8 @@ module Hobo::Dryml
       @last_element = el
       case el.name
 
-      when "taglib"
-        taglib_element(el)
+      when "include"
+        include_element(el)
         # return nothing - the import has no presence in the erb source
         tag_newlines(el)
         
@@ -155,6 +158,9 @@ module Hobo::Dryml
         
       when "redefine"
         redefine_element(el)
+        
+      when "set"
+        set_element(el)
 
       else
         if el.name.not_in?(Hobo.static_tags) or
@@ -167,11 +173,11 @@ module Hobo::Dryml
     end
 
 
-    def taglib_element(el)
+    def include_element(el)
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       if el.attributes["src"]
-        @builder.add_build_instruction(:taglib, 
+        @builder.add_build_instruction(:include, 
                                        :name => el.attributes["src"], 
                                        :as => el.attributes["as"])
       elsif el.attributes["module"]
@@ -195,16 +201,24 @@ module Hobo::Dryml
         children_to_erb(el) +
         "<% self.class.end_redefine_block %>"
     end
+    
+    
+    def set_element(el)
+      el.attributes.map do |name, value|
+        dryml_exception(el, "invalid name in set") unless name =~ DRYML_NAME_RX
+        "#{name} = #{attribute_to_ruby(value)}; "
+      end.join + tag_newlines(el)
+    end
 
 
     def def_element(el)
       redefine = el.parent.name == "redefine"
       
       require_toplevel(el, "must be at the top-level or inside a <redefine>") unless redefine
-      require_attribute(el, "tag", /^#{DRYML_NAME}$/)
+      require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
-      require_attribute(el, "alias_of", /^#{DRYML_NAME}$/, true)
-      require_attribute(el, "alias_current", /^#{DRYML_NAME}$/, true)
+      require_attribute(el, "alias_of", DRYML_NAME_RX, true)
+      require_attribute(el, "alias_current", DRYML_NAME_RX, true)
 
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
@@ -259,7 +273,7 @@ module Hobo::Dryml
                 ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
             else
               pred = el.attributes["if"]
-              pred = pred[1..-1] if pred && pred.starts_with?('#')
+              pred = pred[1..-1] if pred && pred.starts_with?(CODE_ATTRIBUTE_CHAR)
 
               @builder.add_build_instruction(:def,
                                              :name => name,
@@ -480,14 +494,14 @@ module Hobo::Dryml
       options << param_tags_compiled unless param_tags_compiled.blank?
       all = options.join(', ')
       
-      xattrs = attributes['xattrs']
-      if xattrs
-        extra_options = if xattrs.blank?
+      merge_attrs = attributes['merge_attrs']
+      if merge_attrs
+        extra_options = if merge_attrs.blank?
                           "options"
-                        elsif xattrs.starts_with?("#")
-                          xattrs[1..-1]
+                        elsif merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
+                          merge_attrs[1..-1]
                         else
-                          dryml_exception("invalid xattrs", el)
+                          dryml_exception("invalid merge_attrs", el)
                         end
         "{#{all}}.merge((#{extra_options}) || {})"
       else
@@ -500,24 +514,24 @@ module Hobo::Dryml
       start_tag_src = el.instance_variable_get("@start_tag_source").
         gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
 
-      xattrs = el.attributes["xattrs"]
-      if xattrs
-        attr_args = if xattrs.starts_with?('#')
-                      xattrs[1..-1]
-                    elsif xattrs.blank?
+      merge_attrs = el.attributes["merge_attrs"]
+      if merge_attrs
+        attr_args = if merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
+                      merge_attrs[1..-1]
+                    elsif merge_attrs.blank?
                       "options"
                     else
-                      dryml_exception("invalid xattrs", el)
+                      dryml_exception("invalid merge_attrs", el)
                     end
         class_attr = el.attributes["class"]
         if class_attr
-          raise HoboError.new("invalid class attribute with xattrs: '#{class_attr}'") if
+          raise HoboError.new("invalid class attribute with merge_attrs: '#{class_attr}'") if
             class_attr =~ /'|\[!\[HOBO-ERB/
 
           attr_args.concat(", '#{class_attr}'")
           start_tag_src.sub!(/\s*class\s*=\s*('[^']*?'|"[^"]*?")/, "")
         end
-        start_tag_src.sub!(/\s*xattrs\s*=\s*('[^']*?'|"[^"]*?")/, " <%= xattrs(#{attr_args}) %>")
+        start_tag_src.sub!(/\s*merge_attrs\s*=\s*('[^']*?'|"[^"]*?")/, " <%= merge_attrs(#{attr_args}) %>")
       end
       
       # Allow #{...} as an alternate to <%= ... %>
@@ -550,9 +564,12 @@ module Hobo::Dryml
     end
 
     def attribute_to_ruby(attr)
-      dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if attr && attr.index("[![HOBO-ERB")
+      dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if
+        attr && attr.index("[![HOBO-ERB")
       if attr.nil?
         "nil"
+      elsif attr == true   # An attribute with no RHS (not valid XML but allowed in DRYML)
+        "true"
       elsif is_code_attribute?(attr)
         "(#{attr[1..-1]})"
       else
@@ -606,7 +623,7 @@ module Hobo::Dryml
     end
 
     def is_code_attribute?(attr_value)
-      attr_value.starts_with?("#")
+      attr_value.starts_with?(CODE_ATTRIBUTE_CHAR)
     end
 
     def logger
