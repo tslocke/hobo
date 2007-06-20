@@ -93,11 +93,11 @@ module Hobo::Dryml
       restore_erb_scriptlets(children_to_erb(@doc.root))
     end
 
-    
+
     def restore_erb_scriptlets(src)
       src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
     end
- 
+
     
     def erb_process(src)
       # Strip off "_erbout = ''" from the beginning and "; _erbout"
@@ -152,6 +152,9 @@ module Hobo::Dryml
 
       when "def"
         def_element(el)
+        
+      when "template"
+        template_element(el)
 
       when "tagbody"
         tagbody_element(el)
@@ -212,9 +215,9 @@ module Hobo::Dryml
 
 
     def def_element(el)
-      redefine = el.parent.name == "redefine"
+      redefine = el.parent.name == "def"
       
-      require_toplevel(el, "must be at the top-level or inside a <redefine>") unless redefine
+      require_toplevel(el, "must be at the top-level or directly inside a <def>") unless redefine
       require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", DRYML_NAME_RX, true)
@@ -261,7 +264,7 @@ module Hobo::Dryml
       attrspec = el.attributes["attrs"]
       attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
 
-      invalids = attr_names & %w{obj attr this}
+      invalids = attr_names & %w{with field this}
       dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
 
       method_body = tag_method_body(el, attr_names.omap{to_sym})
@@ -332,10 +335,10 @@ module Hobo::Dryml
 
     def tagbody_call(el)
       options = []
-      obj = el.attributes['obj']
-      attr = el.attributes['attr']
-      options << ":obj => #{attribute_to_ruby(obj)}" if obj
-      options << ":attr => #{attribute_to_ruby(attr)}" if attr
+      with = el.attributes['with']
+      attr = el.attributes['field']
+      options << ":with => #{attribute_to_ruby(with)}" if with
+      options << ":field => #{attribute_to_ruby(field)}" if field
       else_ = attribute_to_ruby(el.attributes['else'])
       "<%= tagbody ? tagbody.call({ #{options * ', '} }) : #{else_} %>"
     end

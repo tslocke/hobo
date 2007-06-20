@@ -183,22 +183,22 @@ module Hobo::Dryml
         res = ''
         
         block_options = args.length > 0 && args.first
-        if block_options and block_options.has_key?(:obj)
-          new_object_context(block_options[:obj]) { res = tagbody_proc.call }
-        elsif block_options and block_options.has_key?(:attr)
-          new_field_context(block_options[:attr]) { res = tagbody_proc.call }
+        if block_options and block_options.has_key?(:with)
+          new_object_context(block_options[:with]) { res = tagbody_proc.call }
+        elsif block_options and block_options.has_key?(:field)
+          new_field_context(block_options[:field]) { res = tagbody_proc.call }
         else
           new_context { res = tagbody_proc.call }
         end
         res
       end
       
-      obj = options[:obj] == "page" ? @this : options[:obj]
+      with = options[:with] == "page" ? @this : options[:with]
       
-      if options.has_key?(:attr)
-        new_field_context(options[:attr], obj) { yield tagbody }
-      elsif options.has_key?(:obj)
-        new_object_context(obj) { yield tagbody }
+      if options.has_key?(:field)
+        new_field_context(options[:field], with) { yield tagbody }
+      elsif options.has_key?(:with)
+        new_object_context(with) { yield tagbody }
       else
         new_context { yield tagbody }
       end
@@ -236,9 +236,9 @@ module Hobo::Dryml
     def _tag_locals(options, attrs, inner_tag_names)
       options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
-      #ensure obj and attr are not in options
-      options.delete(:obj)
-      options.delete(:attr)
+      #ensure with and field are not in options
+      options.delete(:with)
+      options.delete(:field)
       
       inner_tag_options, options = options.partition_hash(inner_tag_names.omap{to_sym})
 
