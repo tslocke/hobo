@@ -83,7 +83,7 @@
 
 
 <def tag="navbar" attrs="items,current">
-  <repeat obj="&items">
+  <repeat with="&items">
     <div class='nav_item <%= "current" if current == this[0] %>'><%= link_to this[0].upcase, this[1] %></div>
   </repeat>
   <clearer/>

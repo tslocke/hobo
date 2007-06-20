@@ -85,7 +85,7 @@
   <page merge_attrs="">
 
     <:intro>
-      <h1><human_type/><if q="&this.respond_to? :name">: <edit attr="name"/></if></h1>
+      <h1><human_type/><if q="&this.respond_to? :name">: <edit field="name"/></if></h1>
       <p><delete_button ajax="&false"/></p>
     </:intro>
     
@@ -97,7 +97,7 @@
         </section>
 
         <section_if replace_option="new_links">
-          <repeat obj="&has_many_assocs">
+          <repeat with="&has_many_assocs">
             <p><new_object_link/></p>
           </repeat>
         </section_if>
@@ -113,7 +113,7 @@
 
     <:intro>
       <h1>New <human_type/></h1>
-      <h2>For: <object_link obj="&@owner" /></h2>
+      <h2>For: <object_link with="&@owner" /></h2>
     </:intro>
 
     <:main>
@@ -144,12 +144,12 @@
 
     <:intro>
       <h1><%= title %></h1>
-      <h2>Back to <object_link obj="&@owner"/></h2>
+      <h2>Back to <object_link with="&@owner"/></h2>
     </:intro>
 
     <:main>
       <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count obj="&@pages.item_count"
+        <h2 replace_option="panel_heading"><count with="&@pages.item_count"
                                                   label="&@reflection.klass.name.titleize"/></h2>
         <if q="&@pages.length > 1">
           <section replace_option="page_nav">

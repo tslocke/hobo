@@ -58,7 +58,7 @@
       <tr>
         <td class="field_label"
             content_option="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
-        <td><with  attr="&field">
+        <td><with field="&field">
             <call_tag name="&editor_tag" replace_option="&base_name + '_editor'"/>
         </with></td>
       </tr>
@@ -68,7 +68,7 @@
       <tr>
         <td class="field_label"
             content_option="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
-        <td><call_tag name="&editor_tag" attr="&field" replace_option="&field.to_s + '_editor'"/></td>
+        <td><call_tag name="&editor_tag" field="&field" replace_option="&field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 
@@ -149,13 +149,13 @@
                   "enter its name"
      source = refl.source_reflection.name
   %>
-  <tagbody obj="&joins"/>
-  <with obj="&joins.new_without_appending">
+  <tagbody with="&joins"/>
+  <with with="&joins.new_without_appending">
     <if_can_create>
        <object_form update="&[update, part_id]" message="&action_name" hidden_fields="*">
          <p>
            <%= add_text %>:
-           <belongs_to_autocompleting_field attr="&source" where_not_in="&dom_id(add_to)" class="autosubmit"/>
+           <belongs_to_autocompleting_field field="&source" where_not_in="&dom_id(add_to)" class="autosubmit"/>
          </p>
        </object_form>
     </if_can_create>
