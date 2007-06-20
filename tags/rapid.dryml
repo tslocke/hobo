@@ -1,8 +1,8 @@
-<taglib module="Hobo::Rapid"/>
+<include module="Hobo::Rapid"/>
 
-<taglib src="rapid_pages"/>
-<taglib src="rapid_editing"/>
-<taglib src="rapid_navigation"/>
+<include src="rapid_pages"/>
+<include src="rapid_editing"/>
+<include src="rapid_navigation"/>
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 

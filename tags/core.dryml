@@ -1,4 +1,4 @@
-<taglib module="Hobo::Core"/>
+<include module="Hobo::Core"/>
 
 <def tag="theme_stylesheet">
   <link href="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"

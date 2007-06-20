@@ -1,4 +1,4 @@
-<taglib src="plugins/hobo/tags/rapid"/>
+<include src="plugins/hobo/tags/rapid"/>
 
 <def tag="page" attrs="title_prefix, title">
   <% title ||= human_type + ": " + display_name(:no_span => true) %>
