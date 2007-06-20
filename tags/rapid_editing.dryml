@@ -41,7 +41,7 @@
 <def tag="belongs_to_menu_editor"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   link_id = "#{this_field_dom_id}_editor" %>
-  <span id="#link_id" part_id="rapid_belongs_to_edit">
+  <span id="&link_id" part_id="rapid_belongs_to_edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ display_name(:obj => x, :no_span => true), x.id ]
           }
@@ -54,7 +54,7 @@
                             this_type.primary_key_name => Hobo.raw_js('this.value')
                           } })
     %>
-    <select onchange="<%= f %>" id="#link_id">
+    <select onchange="<%= f %>" id="&link_id">
       <%= options_for_select(select_options.sort, this ? this.id : "") %>
     </select>
     <if_this><object_link>View</object_link></if_this>
@@ -119,7 +119,7 @@
                     } })
   html_options = add_classes(options, editor_class)
 %>
-  <select onchange="<%= f %>" merge_attrs="#html_options">
+  <select onchange="<%= f %>" merge_attrs="&html_options">
     <%= options_for_select(values, this) %>
   </select>  
 </def>
@@ -136,7 +136,7 @@
   options = add_classes(options, editor_class)
 %>
   <input type="checkbox" value="1" onchange="<%= f %>"
-         merge_attrs="# this ? options.merge(:checked => 'checked') : options" />
+         merge_attrs="& this ? options.merge(:checked => 'checked') : options" />
 </def>
 
 
@@ -159,7 +159,7 @@
   %>
 
   <select onchange="<%= f %>">
-    <if q="#tagbody">
+    <if q="&tagbody">
       <tagbody/>
     </if>
     <else>
@@ -172,8 +172,8 @@
 <def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
  <select class="number_editor_bhv" hobo_update="<%= update %>"
           hobo_model_id="<%= this_field_dom_id %>"
-          merge_attrs="#message ? options.merge(:hobo_message => message) : options">
-   <if q="#this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
+          merge_attrs="&message ? options.merge(:hobo_message => message) : options">
+   <if q="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
  </select>
 </def>

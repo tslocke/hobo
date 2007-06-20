@@ -36,14 +36,14 @@
             
             <div class="nav_bars" content_option="navigation">
               <div class="nav" content_option="main_nav"><application_nav/></div>
-              <if q="#login_url rescue false">
+              <if q="&login_url rescue false">
                 <div class="account_nav" content_option="account_nav"><application_account_nav/></div>
               </if>
             </div>
             <clearer/>
           </div>
 
-          <if q="#flash[:notice]">
+          <if q="&flash[:notice]">
             <div class="flash"><%= flash[:notice] %></div>
           </if>
 
@@ -83,7 +83,7 @@
 
 
 <def tag="navbar" attrs="items,current">
-  <repeat obj="#items">
+  <repeat obj="&items">
     <div class='nav_item <%= "current" if current == this[0] %>'><%= link_to this[0].upcase, this[1] %></div>
   </repeat>
   <clearer/>
@@ -94,5 +94,5 @@
   <% items = [['Home', urlb + '/']] +
              Hobo.models[0..2].map{|m| [m.name.pluralize.titlecase, object_url(m)]} +
              [['Search', (search_url rescue "")]] %>
-  <navbar items="#items"/>
+  <navbar items="&items"/>
 </def>

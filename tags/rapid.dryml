@@ -8,7 +8,7 @@
 
 <def tag="object_table_X">
   <table merge_attrs="object_table">
-    <object_table_rows merge_attrs="#options"/>
+    <object_table_rows merge_attrs="&options"/>
   </table>
 </def>
 
@@ -44,8 +44,8 @@
      # force load
      Hobo.models
   %>
-  <table merge_attrs="#html_options">
-    <if q="#'type'.in?(fields)">
+  <table merge_attrs="&html_options">
+    <if q="&'type'.in?(fields)">
       <tr>
         <td class="field_label"><label>Type:</label></td>
         <td><sti_type_field/></td>
@@ -57,9 +57,9 @@
       <% base_name = field.ends_with?("?") ? field[0..-2] : field %>
       <tr>
         <td class="field_label"
-            content_option="#base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
-        <td><with  attr="#field">
-            <call_tag name="#editor_tag" replace_option="#base_name + '_editor'"/>
+            content_option="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
+        <td><with  attr="&field">
+            <call_tag name="&editor_tag" replace_option="&base_name + '_editor'"/>
         </with></td>
       </tr>
     <% end %>
@@ -67,8 +67,8 @@
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label"
-            content_option="#field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
-        <td><call_tag name="#editor_tag" attr="#field" replace_option="#field.to_s + '_editor'"/></td>
+            content_option="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
+        <td><call_tag name="&editor_tag" attr="&field" replace_option="&field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 
@@ -79,25 +79,25 @@
 
 
 <def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
-  <table_for headings="#headings" merge_attrs="">
+  <table_for headings="&headings" merge_attrs="">
     <:empty>
       <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
     </:empty>
 
     <tagbody/>
 
-    <if q="#delete_buttons != false and can_delete?(this)">
+    <if q="&delete_buttons != false and can_delete?(this)">
       <td><delete_button/></td>
     </if>
   </table_for>
   <div>
-    <create_button update="#id || part_id"/>
+    <create_button update="&id || part_id"/>
   </div>
 </def>
 
 
 <def tag="ul_for" attrs="else">
-  <if q="#this.empty? && else_">
+  <if q="&this.empty? && else_">
     <%= else_ %>
   </if>
   <else>
@@ -117,12 +117,12 @@
 
 
 <def tag="table_for" attrs="headings, row_class, footer, else">
-  <if q="#this.empty? and else_">
+  <if q="&this.empty? and else_">
     <%= else_ %>
   </if>
   <else>
     <table merge_attrs="">
-      <if q="#headings"><tr><%= headings %></tr></if>
+      <if q="&headings"><tr><%= headings %></tr></if>
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
@@ -149,13 +149,13 @@
                   "enter its name"
      source = refl.source_reflection.name
   %>
-  <tagbody obj="#joins"/>
-  <with obj="#joins.new_without_appending">
+  <tagbody obj="&joins"/>
+  <with obj="&joins.new_without_appending">
     <if_can_create>
-       <object_form update="#[update, part_id]" message="#action_name" hidden_fields="*">
+       <object_form update="&[update, part_id]" message="&action_name" hidden_fields="*">
          <p>
            <%= add_text %>:
-           <belongs_to_autocompleting_field attr="#source" where_not_in="#dom_id(add_to)" class="autosubmit"/>
+           <belongs_to_autocompleting_field attr="&source" where_not_in="&dom_id(add_to)" class="autosubmit"/>
          </p>
        </object_form>
     </if_can_create>

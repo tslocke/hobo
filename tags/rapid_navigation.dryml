@@ -5,14 +5,14 @@
 
 <def tag="navigation" attrs="current, item, link_current">
   <nav_container merge_attrs="">
-    <repeat obj="#item">
+    <repeat obj="&item">
       <% c = this[:content]; klass = c == current ? "current" : "" %>
-      <if q="#!link_current && c == current">
-        <nav_item class="#klass" content_option="li"><%= c %></nav_item>
+      <if q="&!link_current && c == current">
+        <nav_item class="&klass" content_option="li"><%= c %></nav_item>
       </if>
       <else>
-        <nav_item content_option="item_el" class="#klass">
-          <a href="#this[:href]" content_option="link"><%= c %></a>
+        <nav_item content_option="item_el" class="&klass">
+          <a href="&this[:href]" content_option="link"><%= c %></a>
         </nav_item>
       </else>
     </repeat>
@@ -28,13 +28,13 @@
 
 
 <def tag="application_account_nav">
-  <if q="#logged_in?">
-    <div class='nav_item'>Logged in as <show obj="#current_user" attr="login" /></div>
+  <if q="&logged_in?">
+    <div class='nav_item'>Logged in as <show obj="&current_user" attr="login" /></div>
     <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
   </if>
   <else>
     <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
-    <if q="#signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+    <if q="&signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
   </else>
 </def>
 
@@ -69,13 +69,13 @@
 
 
 <def tag="page_nav" attrs="query_params">
-  <if q="#@pages.length > 1">
+  <if q="&@pages.length > 1">
     <p>
       <page_n_of_count/> - 
-      <first_page_link query_params="#query_params">|&lt;</first_page_link>
-      <previous_page_link query_params="#query_params">Previous</previous_page_link>
-      <next_page_link query_params="#query_params">Next</next_page_link>
-      <last_page_link query_params="#query_params">&gt|</last_page_link>
+      <first_page_link query_params="&query_params">|&lt;</first_page_link>
+      <previous_page_link query_params="&query_params">Previous</previous_page_link>
+      <next_page_link query_params="&query_params">Next</next_page_link>
+      <last_page_link query_params="&query_params">&gt|</last_page_link>
     </p>
   </if>
 </def>
@@ -88,7 +88,7 @@
   <ul class="resource_list">
     <% comma_split(types).each do |t| %>
     <li class="<%= t.downcase %>_resource">
-      <link_to_resource type="#t" />
+      <link_to_resource type="&t" />
     </li>
     <% end %>
   </ul>
