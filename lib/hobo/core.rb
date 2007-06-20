@@ -123,7 +123,7 @@ module Hobo
           this.name.pluralize.titleize
         else
           res = [:display_name, :name, :title].search do |m|
-            show(options.merge(:attr => m)) if this.respond_to?(m) and can_view?(this, m)
+            show(options.merge(:field => m)) if this.respond_to?(m) and can_view?(this, m)
           end
           res || "#{this.class.name.humanize} #{this.id}"
         end

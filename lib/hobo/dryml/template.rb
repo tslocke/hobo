@@ -336,7 +336,7 @@ module Hobo::Dryml
     def tagbody_call(el)
       options = []
       with = el.attributes['with']
-      attr = el.attributes['field']
+      field = el.attributes['field']
       options << ":with => #{attribute_to_ruby(with)}" if with
       options << ":field => #{attribute_to_ruby(field)}" if field
       else_ = attribute_to_ruby(el.attributes['else'])

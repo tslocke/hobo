@@ -6,12 +6,6 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table_X">
-  <table merge_attrs="object_table">
-    <object_table_rows merge_attrs="&options"/>
-  </table>
-</def>
-
 <def tag="object_table" attrs="fields, skip, associations, editor_tag">
   <% 
      field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
