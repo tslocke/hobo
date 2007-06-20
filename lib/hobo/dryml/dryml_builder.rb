@@ -23,6 +23,7 @@ module Hobo::Dryml
 
 
     def clear_instructions
+      @part_names.clear
       @build_instructions.clear
     end
 
@@ -43,7 +44,7 @@ module Hobo::Dryml
     end
 
 
-    def get_render_page_source(src, local_names)
+    def render_page_source(src, local_names)
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
 
       ("def render_page(__page_this__, __local_assigns__); " +
@@ -80,7 +81,7 @@ module Hobo::Dryml
           @environment.class_eval(instruction[:src], @template_path, instruction[:line_num])
           
         when :render_page
-          method_src = get_render_page_source(instruction[:src], local_names)
+          method_src = render_page_source(instruction[:src], local_names)
           @environment.compiled_local_names = local_names
           @environment.class_eval(method_src, @template_path, instruction[:line_num])
           

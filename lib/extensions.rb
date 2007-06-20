@@ -86,7 +86,25 @@ class Module
       EOS
     end
   end
+  
+  private
+  
+  def bool_attr_accessor(*args)
+    options = extract_options_from_args!(args)
+    (args + options.keys).each {|n| class_eval "def #{n}=(x); @#{n} = x; end" }
+    
+    args.each {|n| class_eval "def #{n}?; !!@#{n}; end" }
 
+    options.keys.each do |n|
+      class_eval %(def #{n}?
+                     if @#{n}.nil? && !instance_variables.include?("@\#{@#{n}}")
+                       @#{n} = #{options[n].inspect}
+                     else
+                       @#{n}
+                     end
+                   end)
+    end
+  end
 
 end
 

@@ -288,7 +288,7 @@ module Hobo
       end
     end
     
-    
+
     def hobo_create(options={})
       options = LazyHash.new(options)
       

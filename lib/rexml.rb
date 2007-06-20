@@ -34,9 +34,12 @@ module REXML
     
     class BaseParser
       
-      DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR})(\s*=\s*(["'])(.*?)\3)?/um
+      DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
       
-      attr_writer :drmly_mode
+      DRYML_TAG_MATCH = /^<((?>#{NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
+
+      
+      attr_writer :dryml_mode
       def dryml_mode?
         @dryml_mode
       end
@@ -193,7 +196,7 @@ module REXML
                 @source)
             else
               # Get the next tag
-              md = @source.match(TAG_MATCH, true)
+              md = @source.match(dryml_mode? ? DRYML_TAG_MATCH : TAG_MATCH, true)
               raise REXML::ParseException.new("malformed XML: missing tag start", @source) unless md
               attrs = []
               if md[2].size > 0
@@ -209,11 +212,7 @@ module REXML
                 @tags.push([md[1], cl && cl[2]])
               end
               attributes = {}
-              if dryml_mode?
-                attrs.each { |a,b,c| attributes[a] = (c || true) }
-              else
-                attrs.each { |a,_,b,c| attributes[a] = c }
-              end
+              attrs.each { |a,b,c| attributes[a] = (c || true) }
               return [ :start_element, md[1], attributes, md[0],
                        @source.respond_to?(:last_match_offset) && @source.last_match_offset ]
             end
@@ -243,7 +242,8 @@ module REXML
         entities = nil
         begin
           while true
-            event = @parser.pull case event[0]
+            event = @parser.pull
+            case event[0]
             when :end_document
               return
             when :start_element
@@ -365,8 +365,8 @@ module Hobo::Dryml
     end
 
     def current_line
-      pos = last_match_offset
-      [0, 0, @orig[0..pos].count("\n") + 1]
+      pos = last_match_offset || 0
+      [0, 0, @orig[0..pos].count("\n") + 1] 
     end
 
   end

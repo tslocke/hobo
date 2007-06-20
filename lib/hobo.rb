@@ -225,7 +225,7 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      setter = "#{field}="
+      setter = field.ends_with?("?") ? "#{field[0..-2]}=" : "#{field}=" 
       return false unless can_view?(person, object, field) and object.respond_to?(setter)
       
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
