@@ -19,7 +19,7 @@
 
 <def tag="index_page">
   <% model_name = @model.name.titleize %>
-  <page title="All #{model_name.pluralize}" xattrs="">
+  <page title="All #{model_name.pluralize}" merge_attrs="">
 
     <:intro>
       <h1><%= model_name.pluralize %></h1>
@@ -52,7 +52,7 @@
 
 
 <def tag="new_page">
-  <page title="New #{human_type}" xattrs="">
+  <page title="New #{human_type}" merge_attrs="">
     <:intro>
       <h1>New <human_type/></h1>
     </:intro>
@@ -82,7 +82,7 @@
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <page xattrs="">
+  <page merge_attrs="">
 
     <:intro>
       <h1><human_type/><if q="#this.respond_to? :name">: <edit attr="name"/></if></h1>
@@ -109,7 +109,7 @@
 
 
 <def tag="new_in_collection_page">
-  <page title="New #{human_type}" xattrs="">
+  <page title="New #{human_type}" merge_attrs="">
 
     <:intro>
       <h1>New <human_type/></h1>
@@ -140,7 +140,7 @@
 
 <def tag="show_collection_page">
   <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:obj => @owner, :no_span => true)}" %>
-  <page title="#title" xattrs="">
+  <page title="#title" merge_attrs="">
 
     <:intro>
       <h1><%= title %></h1>

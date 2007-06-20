@@ -65,7 +65,7 @@
 
 
 <def tag="panel">
-  <div class="panel" xattrs="">
+  <div class="panel" merge_attrs="">
     <div class="panel_top"><div class="panel_right">
     <div class="panel_bottom"><div class="panel_left">
     <div class="panel_corner02"><div class="panel_corner04">
@@ -78,7 +78,7 @@
 </def>
 
 <def tag="section">
-  <div class="section" xattrs=""><tagbody/></div>
+  <div class="section" merge_attrs=""><tagbody/></div>
 </def>
 
 

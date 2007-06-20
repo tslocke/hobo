@@ -1,6 +1,6 @@
 
 <def tag="submit" attrs="label">
-  <input type="submit" value="<%= label %>" xattrs="" class="button_input submit_button"/>
+  <input type="submit" value="<%= label %>" merge_attrs="" class="button_input submit_button"/>
 </def>
 
 
@@ -19,7 +19,7 @@
   %>
   <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
          autocomplete_url="<%= url %>" value="<%= value %>"
-         xattrs=""/>
+         merge_attrs=""/>
   <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
@@ -72,7 +72,7 @@
   %>
 
   <input type="text" id="<%= id %>" class="autocomplete_bhv" autocomplete_url="<%= url %>"
-         name="<%= param_name_for_this %>" xattrs=""/>
+         name="<%= param_name_for_this %>" merge_attrs=""/>
   <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
@@ -97,7 +97,7 @@
   %>
     <form onsubmit="<%= f %>; $('<%= id %>').blur(); return false">
       <input type="text" class="autocomplete_bhv autosubmit" id="<%= id %>" autocomplete_url="<%= url %>"
-             value="<%= this && this.id_name %>" xattrs="" />
+             value="<%= this && this.id_name %>" merge_attrs="" />
       <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
     </form>
   </if_can_edit>
@@ -119,7 +119,7 @@
                     } })
   html_options = add_classes(options, editor_class)
 %>
-  <select onchange="<%= f %>" xattrs="#html_options">
+  <select onchange="<%= f %>" merge_attrs="#html_options">
     <%= options_for_select(values, this) %>
   </select>  
 </def>
@@ -136,7 +136,7 @@
   options = add_classes(options, editor_class)
 %>
   <input type="checkbox" value="1" onchange="<%= f %>"
-         xattrs="# this ? options.merge(:checked => 'checked') : options" />
+         merge_attrs="# this ? options.merge(:checked => 'checked') : options" />
 </def>
 
 
@@ -172,7 +172,7 @@
 <def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
  <select class="number_editor_bhv" hobo_update="<%= update %>"
           hobo_model_id="<%= this_field_dom_id %>"
-          xattrs="#message ? options.merge(:hobo_message => message) : options">
+          merge_attrs="#message ? options.merge(:hobo_message => message) : options">
    <if q="#this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
  </select>

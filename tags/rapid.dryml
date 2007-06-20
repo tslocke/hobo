@@ -8,7 +8,7 @@
 
 <def tag="object_table_X">
   <table merge_attrs="object_table">
-    <object_table_rows xattrs="#options"/>
+    <object_table_rows merge_attrs="#options"/>
   </table>
 </def>
 
@@ -44,7 +44,7 @@
      # force load
      Hobo.models
   %>
-  <table xattrs="#html_options">
+  <table merge_attrs="#html_options">
     <if q="#'type'.in?(fields)">
       <tr>
         <td class="field_label"><label>Type:</label></td>
@@ -79,7 +79,7 @@
 
 
 <def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
-  <table_for headings="#headings" xattrs="">
+  <table_for headings="#headings" merge_attrs="">
     <:empty>
       <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
     </:empty>
@@ -101,7 +101,7 @@
     <%= else_ %>
   </if>
   <else>
-    <ul xattrs="">
+    <ul merge_attrs="">
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
@@ -121,7 +121,7 @@
     <%= else_ %>
   </if>
   <else>
-    <table xattrs="">
+    <table merge_attrs="">
       <if q="#headings"><tr><%= headings %></tr></if>
       <% even_odd = "odd" %>
       <repeat>
@@ -164,17 +164,17 @@
 
 
 <def tag="spinner">
-  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" xattrs=""/>
+  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" merge_attrs=""/>
 </def>
 
 
 <def tag="image" attrs="src">
-  <img src="<%= urlb %>/images/<%= src %>" xattrs=""/>
+  <img src="<%= urlb %>/images/<%= src %>" merge_attrs=""/>
 </def>
 
 
 <def tag="theme_img" attrs="src">
-  <img src="<%= theme_asset('images/' + src)%>" xattrs=""/>
+  <img src="<%= theme_asset('images/' + src)%>" merge_attrs=""/>
 </def>
 
 
