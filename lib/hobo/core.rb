@@ -283,15 +283,19 @@ module Hobo
     end
 
 
-    def xattrs(options, klass=nil)
+    def merge_attrs(options, klass=nil)
       options ||= {}
       if klass
         options = add_classes(options.symbolize_keys, [klass])
       end
       options.map do |n,v|
-        v = v.to_s
-        val = v.include?("'") ? '"' + v + '"' : "'" + v + "'"
-        "#{n}=#{val}"
+        if v == true
+          n
+        else
+          v = v.to_s
+          val = v.include?("'") ? '"' + v + '"' : "'" + v + "'"
+          "#{n}=#{val}"
+        end
       end.join(' ')
     end
 
