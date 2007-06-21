@@ -16,6 +16,9 @@ end
 
 desc 'Test the hobo plugin.'
 Rake::TestTask.new(:test) do |t|
+  raise "You should freeze edge rails in test/rails_root/vendor/rails before running the tests" unless
+    File.exists?("test/rails_root/vendor/rails")
+ 
   t.libs << 'lib'
   t.pattern = 'test/unit/**/*_test.rb' # Update this line
   t.verbose = true

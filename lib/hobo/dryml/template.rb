@@ -103,14 +103,15 @@ module Hobo::Dryml
       # Strip off "_erbout = ''" from the beginning and "; _erbout"
       # from the end, because we do things differently around
       # here. (_erbout is defined as a method)
-      ERB.new(restore_erb_scriptlets(src)).src["_erbout = '';".length..-("; _erbout".length)]
+      erb = ERB.new(restore_erb_scriptlets(src), nil, ActionView::Base.erb_trim_mode)
+      erb.src["_erbout = '';".length..-("; _erbout".length)]
     end
 
     
     def children_to_erb(nodes)
       nodes.map{|x| node_to_erb(x)}.join
     end
-
+ 
 
     def node_to_erb(node)
       case node
