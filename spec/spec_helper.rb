@@ -1,13 +1,15 @@
-# This file is copied to ~/spec when you run 'ruby script/generate rspec'
-# from the project root directory.
-ENV["RAILS_ENV"] ||= "test"
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+ENV['RAILS_ENV'] ||= 'mysql'
+require File.dirname(__FILE__) + '/rails_root/config/environment.rb'
+
+# Run the migrations
+ActiveRecord::Migrator.migrate("#{RAILS_ROOT}/db/migrate")
+
 require 'spec/rails'
 
 Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures'
+  config.fixture_path = File.dirname(__FILE__) + "/fixtures/"
   config.before(:each, :behaviour_type => :controller) do
     raise_controller_errors
   end
