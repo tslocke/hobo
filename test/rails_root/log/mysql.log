@@ -1,0 +1,7 @@
+# Logfile created on Thu Jun 21 11:08:43 BST 2007 by logger.rb/1.5.2.7
+ApplicationController: missing default helper path application_helper
+  [4;36;1mSQL (0.000234)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000163)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000085)[0m   [0;1mROLLBACK[0m

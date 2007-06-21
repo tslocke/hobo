@@ -72,7 +72,7 @@ module Hobo::Dryml
                        # Make sure we don't overwrite an existing predicate dispatcher
                        "defp :#{name} do |__options__, __block__|"
                      else
-                       "def #{name}(__options__={}, &__block__)"
+                       "def #{name}(__options__={}, template_procs, &__block__)"
                      end
           src = "#{def_line}; #{instruction[:method_body]}; end"
           @environment.class_eval(src, @template_path, instruction[:line_num])

@@ -36,7 +36,8 @@ module Hobo::Dryml
       def redefine_tag(name, proc)
         impl_name = "#{name}_redefined_#{redefine_nesting}"
         define_method(impl_name, proc)
-        class_eval "def #{name}(options, &b); #{impl_name}(options, b); end"
+        class_eval "def #{name}(options, template_parameters={}, &b); " +
+          "#{impl_name}(options, template_parameters, b); end"
         @_redef_impl_names.push(impl_name)
       end
       
@@ -183,10 +184,11 @@ module Hobo::Dryml
         res = ''
         
         block_options = args.length > 0 && args.first
-        if block_options and block_options.has_key?(:with)
-          new_object_context(block_options[:with]) { res = tagbody_proc.call }
-        elsif block_options and block_options.has_key?(:field)
-          new_field_context(block_options[:field]) { res = tagbody_proc.call }
+        block_with = block_options && block_options[:with]
+        if block_options && block_options.has_key?(:field)
+          new_field_context(block_options[:field], block_with) { res = tagbody_proc.call }
+        elsif block_options && block_options.has_key?(:with)
+          new_object_context(block_with) { res = tagbody_proc.call }
         else
           new_context { res = tagbody_proc.call }
         end
@@ -233,27 +235,28 @@ module Hobo::Dryml
     end
 
 
-    def _tag_locals(options, attrs, inner_tag_names)
+    def _tag_locals(options, attrs)
       options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
       #ensure with and field are not in options
       options.delete(:with)
       options.delete(:field)
       
-      inner_tag_options, options = options.partition_hash(inner_tag_names.omap{to_sym})
-
       # positional arguments never appear in the options hash
       stripped_options = {}.update(options)
       attrs.each {|a| stripped_options.delete(a.to_sym) }
       
       # Return attrs declared as local variables (attrs="...")
       call_procs_options = Hobo::LazyHash.new(options)
-      attrs.map {|a| call_procs_options[a.to_sym]} + [lazy_hash(stripped_options), 
-                                                      lazy_hash(inner_tag_options)]
+      attrs.map {|a| call_procs_options[a.to_sym]} + [lazy_hash(stripped_options)]
     end
     
     
-    def call_replaceable_tag(name, options, external_param, &b)
+    def merge_and_call(name, options, template_procs, external_t)
+    end
+    
+    
+    def DELETE_ME_call_replaceable_tag(name, options, external_param, &b)
       options.delete(:replace_option)
       
       if external_param.is_a? Hash
@@ -290,7 +293,7 @@ module Hobo::Dryml
     end
     
     
-    def call_replaceable_content_tag(name, options, external_param, &b)
+    def DELETE_ME_call_replaceable_content_tag(name, options, external_param, &b)
       options.delete(:content_option)
       
       if external_param.is_a? Hash

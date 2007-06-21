@@ -1,5 +1,9 @@
 require 'rake'
 require 'rake/rdoctask'
+require 'rake/testtask'
+
+desc 'Default: run unit tests.'
+task :default => :test
 
 desc 'Generate documentation for the Hobo plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
@@ -8,4 +12,11 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+desc 'Test the hobo plugin.'
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'lib'
+  t.pattern = 'test/unit/**/*_test.rb' # Update this line
+  t.verbose = true
 end

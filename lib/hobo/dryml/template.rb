@@ -153,14 +153,8 @@ module Hobo::Dryml
       when "def"
         def_element(el)
         
-      when "template"
-        template_element(el)
-
       when "tagbody"
         tagbody_element(el)
-        
-      when "redefine"
-        redefine_element(el)
         
       when "set"
         set_element(el)
@@ -168,7 +162,11 @@ module Hobo::Dryml
       else
         if el.name.not_in?(Hobo.static_tags) or
             el.attributes['replace_option'] or el.attributes['content_option']
-          tag_call(el)
+          if el =~ /^[A-Z]/
+            template_call(el)
+          else
+            tag_call(el)
+          end
         else
           html_element_to_erb(el)
         end
@@ -215,7 +213,7 @@ module Hobo::Dryml
 
 
     def def_element(el)
-      redefine = el.parent.name == "def"
+      redefine = el.parent.name.in? %w{def template}
       
       require_toplevel(el, "must be at the top-level or directly inside a <def>") unless redefine
       require_attribute(el, "tag", DRYML_NAME_RX)
@@ -271,7 +269,7 @@ module Hobo::Dryml
       logger.debug(restore_erb_scriptlets(method_body)) if el.attributes["hobo_debug_source"]
       
       res = if redefine
-              re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, __block__| " +
+              re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, template_procs, __block__| " +
                 ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
                 ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
             else
@@ -291,11 +289,10 @@ module Hobo::Dryml
 
 
     def tag_method_body(el, attrs)
-      inner_tags = find_inner_tags(el)
-
       # A statement to assign values to local variables named after the tag's attrs
-      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "options, inner_tag_options = " +
-        "_tag_locals(__options__, #{attrs.inspect}, #{inner_tags.inspect})"
+      # The trailing comma on `options` is supposed to be there!
+      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "options, = " +
+        "_tag_locals(__options__, #{attrs.inspect})"
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
       
@@ -312,18 +309,6 @@ module Hobo::Dryml
     end
     
     
-    def find_inner_tags(el)
-      el.map do |e|
-        if e.is_a?(REXML::Element)
-          name = e.attributes["content_option"] || e.attributes["replace_option"]
-          [(name if name && !is_code_attribute?(name))] + find_inner_tags(e)
-        else
-          []
-        end
-      end.flatten.compact
-    end
-
-
     def tagbody_element(el)
       dryml_exception("tagbody can only appear inside a <def>", el) unless
         find_ancestor(el) {|e| e.name == 'def'}
@@ -345,7 +330,7 @@ module Hobo::Dryml
 
 
     def part_element(el, content)
-      require_attribute(el, "part_id", /^#{DRYML_NAME}$/)
+      require_attribute(el, "part_id", DRYML_NAME_RX)
       part_name  = el.attributes['part_id']
       dom_id = el.attributes['id'] || part_name
       
@@ -360,13 +345,45 @@ module Hobo::Dryml
     end
 
     
-    def tag_call(el)
-      require_attribute(el, "content_option", /#{DRYML_NAME}/, true)
-      require_attribute(el, "replace_option", /#{DRYML_NAME}/, true)
+    def template_call(el)
+      name = Hobo::Dryml.unreserve(el.name)
+      options = tag_options(el)
+      newlines = tag_newlines(el)
       
-      # find out if it's empty before removing any <:param_tags>
-      empty_el = el.size == 0
+      merge_name = el.attributes["merge"]
+      merge_name = el.name if merge_name == true
+      
+      template_procs = el.elements.map {|e| template_proc(e) }
+      
+      call = if merge_name
+               merge_name = attribute_to_ruby(replace_option)
+               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}.to_sym])"
+             else
+               "#{name}(#{options})"
+             end
 
+      part_id = el.attributes['part_id']
+      if empty_el
+        if part_id
+          "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
+        else
+          "<%= #{call} #{newlines}%>"
+        end
+      else
+        children = children_to_erb(el)
+        if part_id
+          id = el.attributes['id'] || part_id
+          "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
+            part_element(el, "<% _erbout.concat(#{call} do %>#{children}<% end) %>") +
+            "</span>"
+        else
+          "<% _erbout.concat(#{call} do #{newlines}%>#{children}<% end) %>"
+        end
+      end
+    end
+
+    
+    def tag_call(el)
       # gather <:param_tags>, and remove them from the dom
       compiled_param_tags = compile_parameter_tags(el)
         
@@ -474,41 +491,23 @@ module Hobo::Dryml
     end
       
     
-    def attr_name_to_option_key(name, array_index=nil)
-      parts = name.split(".").map { |p| ":#{p}" }
-      parts << array_index if array_index
-      if parts.length == 1
-        parts.first
-      else
-        "[" + parts.join(', ') + "]"
-      end
-    end
-    
-    
-    def tag_options(el, param_tags_compiled)
+    def tag_options(el)
       attributes = el.attributes
 
-      options = attributes.map do |n,v|
-        param_name = attr_name_to_option_key(n)
-        param_value = attribute_to_ruby(v)
-        "#{param_name} => #{param_value}"
-      end
-      
-      options << param_tags_compiled unless param_tags_compiled.blank?
-      all = options.join(', ')
+      options = attributes.map {|n,v| "#{n} => #{attribute_to_ruby(v)}" }.join(', ')
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs
-        extra_options = if merge_attrs.blank?
+        extra_options = if merge_attrs == true
                           "options"
                         elsif merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
                           merge_attrs[1..-1]
                         else
                           dryml_exception("invalid merge_attrs", el)
                         end
-        "{#{all}}.merge((#{extra_options}) || {})"
+        "{#{options}}.merge((#{extra_options}) || {})"
       else
-        "{#{all}}"
+        "{#{options}}"
       end
     end
 
@@ -538,8 +537,8 @@ module Hobo::Dryml
       end
       
       # Allow #{...} as an alternate to <%= ... %>
-      start_tag_src.sub!(/=\s*('[^']*?'|"[^"]*?")/) do |s|
-        s.gsub(/#\{([^}]*)\}/, '<%= \1 %>')
+      start_tag_src.sub!(/=\s*('.*?'|".*?")/) do |s|
+        s.gsub(/#\{(.*?)\}/, '<%= \1 %>')
       end
 
       if start_tag_src.ends_with?("/>")
