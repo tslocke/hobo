@@ -28,7 +28,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
-            [ display_name(:obj => x, :no_span => true), x.id ]
+            [ display_name(:with => x, :no_span => true), x.id ]
           }
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
   %>
@@ -43,7 +43,7 @@
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="&link_id" part_id="rapid_belongs_to_edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
-            [ display_name(:obj => x, :no_span => true), x.id ]
+            [ display_name(:with => x, :no_span => true), x.id ]
           }
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
        link_id = "#{this_field_dom_id}_editor"

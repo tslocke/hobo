@@ -126,7 +126,7 @@
 
           <object_form hidden_fields="*">
             <object_table associations="belongs_to" replace_option="fields"/>
-            <submit label='#"Add to #{display_name(:obj => @owner, :no_span => true)}"'
+            <submit label='#"Add to #{display_name(:with => @owner, :no_span => true)}"'
                     replace_option="submit_button"/>
           </object_form>
         </section>
@@ -139,7 +139,7 @@
 
 
 <def tag="show_collection_page">
-  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:obj => @owner, :no_span => true)}" %>
+  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:with => @owner, :no_span => true)}" %>
   <page title="&title" merge_attrs="">
 
     <:intro>

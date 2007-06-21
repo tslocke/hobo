@@ -381,7 +381,7 @@ module Hobo
                 if changes.size == 1
                   # Decreasingly hacky support for the scriptaculous in-place-editor
                   new_val = Hobo::Dryml.render_tag(@template, "show",
-                                                   :obj => @this, :attr => changes.keys.first, :no_span => true)
+                                                   :with => @this, :field => changes.keys.first, :no_span => true)
                   hobo_ajax_response(@this, :new_field_value => new_val)
                 else
                   hobo_ajax_response(@this)
@@ -538,7 +538,7 @@ module Hobo
         true
       else
         if page_kind.in? GENERIC_PAGE_TAGS
-          render_tag("#{page_kind}_page", :obj => @this)
+          render_tag("#{page_kind}_page", :with => @this)
           true
         else
           false
