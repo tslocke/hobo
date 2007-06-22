@@ -11,6 +11,8 @@ class <%= class_name %> < ActiveRecord::Base
   # --- Hobo Permissions --- #
 
   def super_user?
+    # Return true to make this user exempt from permission restrictions
+    # e.g.
     # login == 'admin'
   end
 
