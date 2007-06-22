@@ -313,6 +313,41 @@ module REXML
       end
     end
   end
+  
+  class Attribute
+    
+    def initialize_with_dryml(first, second=nil, parent=nil)
+      initialize_without_dryml(first, second, parent)
+      if first.is_a?(String) && second == true
+        @value = true
+      end
+    end
+    alias_method_chain :initialize, :dryml
+    
+    def value_with_dryml
+      if no_rhs?
+        true
+      else
+        value_without_dryml
+      end
+    end
+    alias_method_chain :value, :dryml
+
+    def to_string_with_dryml
+      if no_rhs?
+        @expanded_name
+      else
+        to_string_without_dryml
+      end
+    end
+    alias_method_chain :to_string, :dryml
+    
+    def no_rhs?
+      @value == true
+    end
+    
+  end
+
 end
 
 module Hobo::Dryml
@@ -370,4 +405,5 @@ module Hobo::Dryml
     end
 
   end
+    
 end

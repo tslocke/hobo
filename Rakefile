@@ -3,7 +3,7 @@ require 'rake/rdoctask'
 require 'rake/testtask'
 
 desc 'Default: run unit tests.'
-task :default => :test
+task :default => :spec
 
 desc 'Generate documentation for the Hobo plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
@@ -32,7 +32,6 @@ spec_prereq = :noop # File.exist?(File.join(PLUGIN_DIR, 'config', 'database.yml'
 task :noop do
 end
 
-task :default => :spec
 task :stats => "spec:statsetup"
 
 desc "Run all specs in spec directory (excluding plugin specs)"

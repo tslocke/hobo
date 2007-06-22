@@ -118,17 +118,22 @@ module Hobo::Dryml
 
 
     def _erbout
-      @_output
+      @_erb_output
+    end
+    
+    
+    def _output(s)
+      @_erb_output.concat(s)
     end
 
 
     def new_context
-      ctx = [ @_output,
+      ctx = [ @_erb_output,
               @_this, @_this_parent, @_this_field, @_this_type,
               @_form_field_path]
-      @_output = ""
+      @_erb_output = ""
       res = yield
-      @_output, @_this, @_this_parent, @_this_field, @_this_type,
+      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type,
           @_form_field_path = ctx
       res.to_s
     end

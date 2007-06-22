@@ -40,7 +40,7 @@ module Hobo::Dryml
 
       unless @template_path == EMPTY_PAGE
         filename = RAILS_ROOT + (@template_path.starts_with?("/") ? @template_path : "/" + @template_path)
-        mtime = File.stat(filename).mtime
+        mtime = File.stat(filename).mtime rescue nil
       end
         
       if mtime.nil? || !@builder.ready?(mtime)
@@ -348,17 +348,18 @@ module Hobo::Dryml
     
     def template_call(el)
       name = Hobo::Dryml.unreserve(el.name)
+
+      merge_name = el.attributes.delete("merge")
+      merge_name = el.name if merge_name == true
+      
       options = tag_options(el)
       newlines = tag_newlines(el)
-      
-      merge_name = el.attributes["merge"]
-      merge_name = el.name if merge_name == true
       
       template_procs = el.elements.map {|e| template_proc(e) }
       
       call = if merge_name
-               merge_name = attribute_to_ruby(replace_option)
-               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}.to_sym])"
+               merge_name = attribute_to_ruby(merge_name, :symbolize => true)
+               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}])"
              else
                "#{name}(#{options})"
              end
@@ -375,37 +376,37 @@ module Hobo::Dryml
         if part_id
           id = el.attributes['id'] || part_id
           "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
-            part_element(el, "<% _erbout.concat(#{call} do %>#{children}<% end) %>") +
+            part_element(el, "<% _output(#{call} do %>#{children}<% end) %>") +
             "</span>"
         else
-          "<% _erbout.concat(#{call} do #{newlines}%>#{children}<% end) %>"
+          "<% _output(#{call} do #{newlines}%>#{children}<% end) %>"
         end
       end
     end
 
     
     def tag_call(el)
-      # gather <:param_tags>, and remove them from the dom
-      compiled_param_tags = compile_parameter_tags(el)
-        
+      merge_name = el.attributes["merge"]
+      if merge_name == true
+        merge_name = el.name 
+        el.attributes.delete("merge")
+      end
+      
       name = Hobo::Dryml.unreserve(el.name)
-      options = tag_options(el, compiled_param_tags)
+      options = tag_options(el)
       newlines = tag_newlines(el)
-      replace_option = el.attributes["replace_option"]
-      content_option = el.attributes["content_option"]
-      dryml_exception("both replace_option and content_option given") if replace_option && content_option
-      call = if replace_option
-               replace_option = attribute_to_ruby(replace_option)
-               "call_replaceable_tag(:#{name}, #{options}, inner_tag_options[#{replace_option}.to_sym])"
-             elsif content_option
-               content_option = attribute_to_ruby(content_option)
-               "call_replaceable_content_tag(:#{name}, #{options}, inner_tag_options[#{content_option}.to_sym])"
+
+      template_procs = el.elements.map {|e| template_proc(e) }
+      
+      call = if merge_name
+               merge_name = attribute_to_ruby(merge_name, :symbolize => true)
+               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}])"
              else
-               "#{name}(#{options})"
+               "#{name}(#{options unless options == '{}'})"
              end
 
       part_id = el.attributes['part_id']
-      if empty_el
+      if el.children.empty?
         if part_id
           "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
         else
@@ -416,10 +417,10 @@ module Hobo::Dryml
         if part_id
           id = el.attributes['id'] || part_id
           "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
-            part_element(el, "<% _erbout.concat(#{call} do %>#{children}<% end) %>") +
+            part_element(el, "<% _output(#{call} do %>#{children}<% end) %>") +
             "</span>"
         else
-          "<% _erbout.concat(#{call} do #{newlines}%>#{children}<% end) %>"
+          "<% _output(#{call} do #{newlines}%>#{children}<% end) %>"
         end
       end
     end
@@ -495,7 +496,7 @@ module Hobo::Dryml
     def tag_options(el)
       attributes = el.attributes
 
-      options = attributes.map {|n,v| "#{n} => #{attribute_to_ruby(v)}" }.join(', ')
+      options = attributes.map {|n,v| ":#{n} => #{attribute_to_ruby(v)}" }.join(', ')
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs
@@ -507,6 +508,8 @@ module Hobo::Dryml
                           dryml_exception("invalid merge_attrs", el)
                         end
         "{#{options}}.merge((#{extra_options}) || {})"
+      elsif options.empty?
+        "{}"
       else
         "{#{options}}"
       end
@@ -566,24 +569,30 @@ module Hobo::Dryml
       end
     end
 
-    def attribute_to_ruby(attr)
+    def attribute_to_ruby(attr, options={})
       dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if
-        attr && attr.index("[![HOBO-ERB")
-      if attr.nil?
-        "nil"
-      elsif attr == true   # An attribute with no RHS (not valid XML but allowed in DRYML)
-        "true"
-      elsif is_code_attribute?(attr)
-        "(#{attr[1..-1]})"
+        attr.is_a?(String) && attr.index("[![HOBO-ERB")
+
+      if options[:symbolize] && attr =~ /^[a-zA-Z_][^a-zA-Z0-9_]*[\?!]?/
+        ":#{attr}"
       else
-        str = if not attr =~ /"/
-                '"' + attr + '"'
-              elsif not attr =~ /'/
-                "'#{attr}'"
+        res = if attr.nil?
+                "nil"
+              elsif attr == true   # An attribute with no RHS (not valid XML but allowed in DRYML)
+                "true"
+              elsif is_code_attribute?(attr)
+                "(#{attr[1..-1]})"
               else
-                dryml_exception("invalid quote(s) in attribute value")
-              end
-        attr.starts_with?("++") ? "attr_extension(#{str})" : str
+                if attr !~ /"/
+                  '"' + attr + '"'
+                elsif attr !~ /'/
+                  "'#{attr}'"
+                else
+                  dryml_exception("invalid quote(s) in attribute value")
+                end
+                #attr.starts_with?("++") ? "attr_extension(#{str})" : str
+              end 
+        options[:symbolize] ? (res + ".to_sym") : res
       end
     end
 
