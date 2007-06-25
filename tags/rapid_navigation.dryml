@@ -34,7 +34,7 @@
   </if>
   <else>
     <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
-    <if q="&respond_to? signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+    <if q="&respond_to? :signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
   </else>
 </def>
 
