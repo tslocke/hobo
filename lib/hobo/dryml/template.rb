@@ -23,7 +23,6 @@ module Hobo::Dryml
       @src = src
 
       @environment = environment # a class or a module
-      @environment.send(:include, Hobo::PredicateDispatch)
 
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
 
@@ -66,8 +65,7 @@ module Hobo::Dryml
       
     def create_render_page_method
       erb_src = process_src
-      src = ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-1]
-      @builder.add_build_instruction(:render_page, :src => src, :line_num => 1)
+      @builder.add_build_instruction(:render_page, :src => process_src, :line_num => 1)
     end
 
     
@@ -96,15 +94,6 @@ module Hobo::Dryml
 
     def restore_erb_scriptlets(src)
       src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
-    end
-
-    
-    def erb_process(src)
-      # Strip off "_erbout = ''" from the beginning and "; _erbout"
-      # from the end, because we do things differently around
-      # here. (_erbout is defined as a method)
-      erb = ERB.new(restore_erb_scriptlets(src), nil, ActionView::Base.erb_trim_mode)
-      erb.src["_erbout = '';".length..-("; _erbout".length)]
     end
 
     
@@ -141,7 +130,7 @@ module Hobo::Dryml
 
       when "include"
         include_element(el)
-        # return nothing - the import has no presence in the erb source
+        # return nothing - the include has no presence in the erb source
         tag_newlines(el)
         
       when "set_theme"
@@ -161,9 +150,8 @@ module Hobo::Dryml
         set_element(el)
 
       else
-        if el.name.not_in?(Hobo.static_tags) or
-            el.attributes['replace_option'] or el.attributes['content_option']
-          if el =~ /^[A-Z]/
+        if el.name.not_in?(Hobo.static_tags) or el.attributes['merge']
+          if el.name =~ /^[A-Z]/
             template_call(el)
           else
             tag_call(el)
@@ -214,7 +202,7 @@ module Hobo::Dryml
 
 
     def def_element(el)
-      redefine = el.parent.name.in? %w{def template}
+      redefine = el.parent.name == "def"
       
       require_toplevel(el, "must be at the top-level or directly inside a <def>") unless redefine
       require_attribute(el, "tag", DRYML_NAME_RX)
@@ -231,8 +219,6 @@ module Hobo::Dryml
       dryml_exception("def cannot have both alias_of and alias_current", el) if alias_of && alias_current
       dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
       
-      dryml_exception("redefined methods cannot have predicates", el) if redefine && el.attributes["if"]
-                      
       # If we're redefining, we need a statement in the method body
       # that does the alias_method on the fly.
       re_alias = ""
@@ -248,47 +234,58 @@ module Hobo::Dryml
         end
       end
       
-      # While processing the children of this def, @def_name contains
-      # the names of all nested defs join with '_'. It's used to
-      # disambiguate the +tagbody+ local variables.
-      res = if alias_of
-              "#{re_alias}<% #{tag_newlines(el)} %>"
-            else
-              tag_method(name, el, re_alias, redefine)
-            end
+      if alias_of
+        "#{re_alias}<% #{tag_newlines(el)} %>"
+      else
+        attrspec = el.attributes["attrs"]
+        attr_names = attrspec ? attrspec.split(/\s*,\s*/).every(:to_sym) : []
+        invalids = attr_names & [:with, :field, :this]
+        dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
+        
+        src = if name =~ /^[A-Z]/
+                was_inside_template = @inside_template
+                @inside_template = true
+                method_body = tag_method_body(el, attr_names)
+                @inside_template = was_inside_template
+                template_method(name, re_alias, redefine, method_body)
+              else
+                method_body = tag_method_body(el, attr_names)
+                tag_method(name, re_alias, redefine, method_body)
+              end
+        
+        logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
+        
+        @builder.add_build_instruction(:def,
+                                       :src => restore_erb_scriptlets(src),
+                                       :line_num => element_line_num(el))
+        # keep line numbers matching up
+        "<% #{"\n" * method_body.count("\n")} %>"
+      end
     end
     
     
-    def tag_method(name, el, re_alias, redefine)
-      attrspec = el.attributes["attrs"]
-      attr_names = attrspec ? attrspec.split(/\s*,\s*/) : []
-
-      invalids = attr_names & %w{with field this}
-      dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
-
-      method_body = tag_method_body(el, attr_names.omap{to_sym})
-      logger.debug(restore_erb_scriptlets(method_body)) if el.attributes["hobo_debug_source"]
-      
-      res = if redefine
-              re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, template_procs, __block__| " +
-                ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
-                ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
-            else
-              pred = el.attributes["if"]
-              pred = pred[1..-1] if pred && pred.starts_with?(CODE_ATTRIBUTE_CHAR)
-
-              @builder.add_build_instruction(:def,
-                                             :name => name,
-                                             :method_body => erb_process("<% #{method_body} %>"),
-                                             :line_num => element_line_num(el),
-                                             :predicate => pred)
-              # keep line numbers matching up
-              "<% #{"\n" * method_body.count("\n")} %>"
-            end
-      res
+    def template_method(name, re_alias, redefine, method_body)
+      if redefine
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, template_procs, __block__| " +
+          ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
+          ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
+      else
+        "<% def #{name}(__options__={}, template_procs, &__block__); #{method_body}; end %>"
+      end
     end
-
-
+    
+    
+    def tag_method(name, re_alias, redefine, method_body)
+      if redefine
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, __block__| " +
+          ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
+          ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
+      else
+        "<% def #{name}(__options__={}, &__block__); #{method_body}; end %>"
+      end
+    end
+              
+    
     def tag_method_body(el, attrs)
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `options` is supposed to be there!
@@ -297,9 +294,13 @@ module Hobo::Dryml
 
       start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
       
+      # While processing the children of this def, @def_name contains
+      # the names of all nested defs join with '_'. It's used to
+      # disambiguate the +tagbody+ local variables.
       old_def_name = @def_name
       unsafe_name = el.attributes['tag']
       @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
+
       res = "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
@@ -338,73 +339,81 @@ module Hobo::Dryml
       part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
         content +
         "<% end; end %>"
-      @builder.add_part(part_name, erb_process(part_src), element_line_num(el))
+      @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
       res = "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
       res
     end
+    
+    def extract_merge_name!(el)
+      merge_name = el.attributes["merge"]
+      
+      dryml_exception("merge is not allowed outside of template definitions", el) if merge_name && !@inside_template
+      
+      el.attributes.delete("merge")
+      merge_name == true ? el.name : merge_name
+    end
 
     
     def template_call(el)
       name = Hobo::Dryml.unreserve(el.name)
-
-      merge_name = el.attributes.delete("merge")
-      merge_name = el.name if merge_name == true
-      
+      merge_name = extract_merge_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
       
-      template_procs = el.elements.map {|e| template_proc(e) }
+      template_procs = compile_template_procs(el)
       
       call = if merge_name
                merge_name = attribute_to_ruby(merge_name, :symbolize => true)
-               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}])"
+               "merge_and_call_template(:#{name}, #{options}, #{template_procs}, template_procs[#{merge_name}])"
              else
-               "#{name}(#{options})"
+               "#{name}(#{options}, #{template_procs})"
              end
 
-      part_id = el.attributes['part_id']
-      if empty_el
-        if part_id
-          "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
-        else
-          "<%= #{call} #{newlines}%>"
-        end
-      else
-        children = children_to_erb(el)
-        if part_id
-          id = el.attributes['id'] || part_id
-          "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
-            part_element(el, "<% _output(#{call} do %>#{children}<% end) %>") +
-            "</span>"
-        else
-          "<% _output(#{call} do #{newlines}%>#{children}<% end) %>"
-        end
+      "<% _output(#{call}) %>"
+    end
+    
+    
+    def compile_template_procs(el)
+      "{" + 
+        (el.elements.map do |e|
+           merge_name = extract_merge_name!(e)
+           if merge_name
+             ":#{e.name} => merge_template_parameter(#{template_proc(e)}, template_procs[:#{merge_name}])"
+           else
+             ":#{e.name} => #{template_proc(e)}"
+           end
+         end.join(", ")) +
+        "}"
+    end
+    
+    
+    def template_proc(el)
+      items = el.attributes.map do |name, value|
+        ":#{name} => #{attribute_to_ruby(value)}"
       end
+      
+      body = children_to_erb(el)
+      items << ":content => %>#{body}<% " unless body.blank?
+      
+      "proc { {#{items * ', '}} }"
     end
 
     
     def tag_call(el)
-      merge_name = el.attributes["merge"]
-      if merge_name == true
-        merge_name = el.name 
-        el.attributes.delete("merge")
-      end
-      
       name = Hobo::Dryml.unreserve(el.name)
+      merge_name = extract_merge_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
 
-      template_procs = el.elements.map {|e| template_proc(e) }
-      
       call = if merge_name
                merge_name = attribute_to_ruby(merge_name, :symbolize => true)
                "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}])"
              else
                "#{name}(#{options unless options == '{}'})"
              end
-
+      
       part_id = el.attributes['part_id']
       if el.children.empty?
         if part_id
@@ -425,73 +434,6 @@ module Hobo::Dryml
       end
     end
     
-    
-    def compile_parameter_tags(el)
-      # The implementation of parameter tags is greatly complicated
-      # by the need to maintain line-number parity between the dryml source
-      # and generated erb source
-      
-      last = el.children.reverse.ofind{is_a?(REXML::Element) && name.starts_with?(":")}
-      return "" if last.nil?
-      param_section = el.children[0..el.index(last)]
-      
-      dryml_exception("invalid content before parameter tag", el) unless param_section.all? do |e|
-        (e.is_a?(REXML::Element) && e.name.starts_with?(":")) || 
-          (e.is_a?(REXML::Text) && e.to_s.blank?) ||
-          e.is_a?(REXML::Comment) 
-      end
-      
-      last = param_section.last
-      compiled = param_section.map do |e|
-        # REXML Bug - don't use el.remove (also removes other children that are == )
-        el.delete_at(el.index(e))
-        case e
-        when REXML::Element
-          # Multiple param tags with the same name are allowed - they
-          # become an array passed to the tag
-          array_index = begin
-                          # If there are other param-tags with this
-                          # name, the index of this one, else nil
-                          same_name_params = param_section.select {|x| x.is_a?(REXML::Element) and x.name == e.name}
-                          same_name_params.length > 1 && same_name_params.index(e)
-                        end
-          
-          param_name = attr_name_to_option_key(e.name[1..-1], array_index)
-          
-          dryml_exception("duplicate attribute/parameter-tag #{param}", el) if
-            param_name.in?(el.attributes.keys)
-          
-          param_value = 
-            if e.has_attributes?
-              pairs = e.attributes.map do |n,v|
-              "#{attr_name_to_option_key(n)} => (proc {#{attribute_to_ruby(v)}})"
-              end
-              # If there is content too, that goes in the hash under the key :content
-              if e.size > 0
-                pairs << "#{tag_newlines(el)}:content => (proc {new_context { %>#{children_to_erb(e)}<%; }})"
-              end
-              "{#{pairs * ','}}"
-            elsif e.size > 0
-              "#{tag_newlines(el)}(proc { new_context { %>#{children_to_erb(e)}<%; }})"
-            else
-              "''"
-            end
-          pair = "#{param_name} => #{param_value}"
-          pair << ", " unless e == last
-          pair
-          
-        when REXML::Text
-          e.to_s
-          
-        when REXML::Comment
-          REXML::Comment::START + node.to_s + REXML::Comment::STOP
-          
-        end
-      end
-      
-      compiled.join
-    end
-      
     
     def tag_options(el)
       attributes = el.attributes

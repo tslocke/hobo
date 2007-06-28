@@ -3,7 +3,7 @@ module Kernel
   def extract_options_from_args!(args) #:nodoc:
     args.last.is_a?(Hash) ? args.pop : {}
   end
-
+  
 end
 
 class Object
@@ -103,6 +103,7 @@ class Module
                        @#{n}
                      end
                    end)
+      set_field_type(n => TrueClass) if respond_to?(:set_field_type)
     end
   end
 

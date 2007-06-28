@@ -6,10 +6,12 @@ module Hobo::Dryml
     CORE_TAGLIB = "plugins/hobo/tags/core"
 
     def initialize(template_path)
+      @template_path = template_path
       @build_instructions = Array.new
-      @template_path      = template_path
       @part_names = []
     end
+    
+    attr_reader :template_path
 
 
     def set_environment(environment)
@@ -33,7 +35,7 @@ module Hobo::Dryml
     end
     
     def add_part(name, src, line_num)
-      raise DrymlException.new("duplicate part: #{name}", @template_path, line_num) if name.in?(@part_names)
+      raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
       add_build_instruction(:part, :src => src, :line_num => line_num)
       @part_names << name
     end
@@ -50,7 +52,15 @@ module Hobo::Dryml
       ("def render_page(__page_this__, __local_assigns__); " +
             "#{locals} new_object_context(__page_this__) do " +
             src +
-           "; end + part_contexts_js; end")
+           "; _erbout; end + part_contexts_js; end")
+    end
+    
+    
+    def erb_process(erb_src)
+      # Strip off "_erbout = ''" from the beginning and "; _erbout"
+      # from the end, because we do things differently around
+      # here. (_erbout is defined as a method)
+      ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-("; _erbout".length)]
     end
 
 
@@ -66,24 +76,19 @@ module Hobo::Dryml
         pred = instruction[:pred]
         case instruction[:type]
         when :def
-          def_line = if pred
-                       "defp :#{name}, (proc {|options| #{pred}}) do |__options__, __block__|"
-                     elsif @environment.predicate_method?(name)
-                       # Make sure we don't overwrite an existing predicate dispatcher
-                       "defp :#{name} do |__options__, __block__|"
-                     else
-                       "def #{name}(__options__={}, template_procs, &__block__)"
-                     end
-          src = "#{def_line}; #{instruction[:method_body]}; end"
-          @environment.class_eval(src, @template_path, instruction[:line_num])
+          src = erb_process(instruction[:src])
+          @environment.class_eval(src, template_path, instruction[:line_num])
+          
+        when :template
+          raise "Not Implemented"
 
         when :part
-          @environment.class_eval(instruction[:src], @template_path, instruction[:line_num])
+          @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
           
         when :render_page
-          method_src = render_page_source(instruction[:src], local_names)
+          method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
-          @environment.class_eval(method_src, @template_path, instruction[:line_num])
+          @environment.class_eval(method_src, template_path, instruction[:line_num])
           
         when :include
           import_taglib(name, instruction[:as])
@@ -98,7 +103,7 @@ module Hobo::Dryml
           @environment.send(:alias_method, instruction[:new], instruction[:old])
           
         else
-          raise HoboError.new("DRYML: Unknown build instruction type found when building #{@template_path}")
+          raise HoboError.new("DRYML: Unknown build instruction type found when building #{template_path}")
         end
       end
       @last_build_time = Time.now
@@ -111,7 +116,7 @@ module Hobo::Dryml
              elsif path.include?("/")
                "app/views/#{path}"
              else
-               template_dir = File.dirname(@template_path)
+               template_dir = File.dirname(template_path)
                "#{template_dir}/#{path}"
              end
        base + ".dryml"
@@ -120,7 +125,7 @@ module Hobo::Dryml
 
     def import_taglib(src_path, as=nil)
       path = expand_template_path(src_path)
-      unless @template_path == path
+      unless template_path == path
         taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
         taglib.import_into(@environment, as)
       end

@@ -160,7 +160,7 @@ module Hobo
       opts = {}.update(options)
       opts.delete(:name)
 
-      if this_type and m = "#{name}_for_#{this_type.name.underscore}" and respond_to?(m)
+      if this_type and respond_to?(m = "#{name}_for_#{this_type.name.underscore}")
         send(m, opts)
       else
         send(name, opts)
@@ -302,7 +302,7 @@ module Hobo
 
     def param_name_for(object, field_path)
       field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
-      attrs = field_path.map{|part| "[#{part}]"}.join
+      attrs = field_path.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
       "#{object.class.name.underscore}#{attrs}"
     end
 

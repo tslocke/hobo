@@ -632,19 +632,23 @@ module Hobo
 
 
     def param_to_value(field_type, value)
-      if field_type && field_type <= Date
+      if field_type.nil?
+        value
+      elsif field_type <= Date
         if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
         end
-      elsif field_type && field_type <= Time
+      elsif field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           parse_datetime(value)
         end
+      elsif field_type <= TrueClass
+        (value.is_a?(String) && value.strip == '0' || value.blank?) ? false : true
       else
         # primitive field
         value

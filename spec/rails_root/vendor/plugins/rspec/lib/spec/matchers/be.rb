@@ -33,7 +33,7 @@ module Spec
       end
       
       def failure_message
-        return "expected #{@comparison}#{expected}, got #{@actual.inspect}" unless handling_predicate?
+        return "expected:\n#{@comparison}#{expected}\ngot:\n#{@actual.inspect}" unless handling_predicate?
         return "expected #{predicate}#{args_to_s} to return true, got #{@result.inspect}"
       end
       
