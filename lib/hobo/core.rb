@@ -349,10 +349,9 @@ module Hobo
     end
 
 
-    def_tag :repeat, :even_odd, :else do
-      if this.empty?
-        else_
-      else
+    def_tag :repeat, :even_odd do
+      Dryml.last_if = !this.blank?
+      if Dryml.last_if
         if even_odd
           map_this do
             klass = [options[:class], cycle("even", "odd")].compact.join(' ')
@@ -361,6 +360,8 @@ module Hobo
         else
           map_this { tagbody.call }
         end
+      else
+        ""
       end
     end
 
