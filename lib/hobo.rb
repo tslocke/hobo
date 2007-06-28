@@ -125,11 +125,12 @@ module Hobo
 
     def add_routes(map)
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
-
+      require "#{RAILS_ROOT}/app/init.rb" if File.exists? "#{RAILS_ROOT}/app/plugins_init.rb"
+      
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"
         controller = controller_name.constantize if
-          File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
+          Object.const_defined? controller_name || File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
         if controller
           web_name = model.name.underscore.pluralize.downcase
 
