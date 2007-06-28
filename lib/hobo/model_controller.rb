@@ -36,7 +36,8 @@ module Hobo
 
       def template_path(dir, name, is_partial)
         fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-        unless Dir.entries("#{RAILS_ROOT}/app/views/#{dir}").grep(fileRx).empty?
+        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+        unless !File.exists?(full_dir) || Dir.entries(full_dir).grep(fileRx).empty?
           return "#{dir}/#{name}"
         end
       end
