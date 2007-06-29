@@ -33,6 +33,10 @@ describe Template do
   it "should allow :foo as a shorthand for field='foo' on block tags" do 
     compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
   end
+  
+  it "should allow close tags to ommit the :field_name part" do 
+    compile_dryml("<foo:name></foo>").should == '<% _output(foo({:field => "name"}) do %><% end) %>'
+  end
 
   # --- Compilation: Defining Block Tags --- #
   
