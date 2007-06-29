@@ -326,6 +326,14 @@ module REXML
     
   end
   
+  class Element
+    
+    def dryml_name
+      expanded_name.sub(/:.*/, "")
+    end
+    
+  end
+  
   class Attribute
     
     def initialize_with_dryml(first, second=nil, parent=nil)

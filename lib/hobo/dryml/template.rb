@@ -128,7 +128,7 @@ module Hobo::Dryml
         el.name.starts_with?(":")
 
       @last_element = el
-      case el.name
+      case el.dryml_name
 
       when "include"
         include_element(el)
@@ -152,8 +152,8 @@ module Hobo::Dryml
         set_element(el)
 
       else
-        if el.name.not_in?(Hobo.static_tags) or el.attributes['merge']
-          if el.name =~ /^[A-Z]/
+        if el.dryml_name.not_in?(Hobo.static_tags) or el.attributes['merge']
+          if el.dryml_name =~ /^[A-Z]/
             template_call(el)
           else
             tag_call(el)
@@ -355,13 +355,12 @@ module Hobo::Dryml
       dryml_exception("merge is not allowed outside of template definitions", el) if merge_name && !@inside_template
       
       el.attributes.delete("merge")
-      merge_name == "&true" ? el.name : merge_name
+      merge_name == "&true" ? el.dryml_name : merge_name
     end
     
     
     def call_name(el)
-      name = el.expanded_name.sub(/:.*/, "")
-      Hobo::Dryml.unreserve(name)
+      Hobo::Dryml.unreserve(el.dryml_name)
     end
 
     
@@ -515,9 +514,9 @@ module Hobo::Dryml
           dryml_exception("multiple part ids", el) if start_tag_src.index("part_id=")
 
 
-          start_tag_src + body + "</#{el.name}>"
+          start_tag_src + body + "</#{el.dryml_name}>"
         else
-          start_tag_src + children_to_erb(el) + "</#{el.name}>"
+          start_tag_src + children_to_erb(el) + "</#{el.dryml_name}>"
         end
       end
     end

@@ -29,8 +29,11 @@ describe Template do
     compile_dryml("<foo>the body</foo>").should == "<% _output(foo() do %>the body<% end) %>"
   end
   
-    
   it "should allow :foo as a shorthand for field='foo' on block tags" do 
+    compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
+  end
+  
+  it "should allow :title as a shorthand for field='title' on block tags (title is a static tag)" do 
     compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
   end
   
@@ -129,7 +132,7 @@ describe Template do
   end
   
   it "should allow :foo as a shorthand for field='foo' on template tags" do 
-    compile_dryml("<Foo:name/>").should == '<%= Foo({:field => "name"}) %>'
+    compile_dryml("<Foo:name/>").should == '<% _output(Foo({:field => "name"}, {})) %>'
   end
 
 
@@ -250,7 +253,7 @@ describe Template do
   it "should merge into static tags with no body" do
     eval_with_templates("<EmptyStaticMerge><img class='small'/></EmptyStaticMerge>").should == 
       '<img class="small" src="..." />'
-  end    
+  end
     
   
   
