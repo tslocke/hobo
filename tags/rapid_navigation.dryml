@@ -3,28 +3,27 @@
   -->
 
 
-<def tag="navigation" attrs="current, item, link_current">
-  <nav_container merge_attrs="">
+<def tag="Navigation" attrs="current, item, link_current">
+  <nav_container merge_attrs="&true">
     <repeat with="&item">
       <% c = this[:content]; klass = c == current ? "current" : "" %>
       <if q="&!link_current && c == current">
-        <nav_item class="&klass" content_option="li"><%= c %></nav_item>
+        <nav_item class="&klass" merge="li"><%= c %></nav_item>
       </if>
       <else>
-        <nav_item content_option="item_el" class="&klass">
-          <a href="&this[:href]" content_option="link"><%= c %></a>
+        <nav_item merge="item_el" class="&klass">
+          <a href="&this[:href]" merge="link"><%= c %></a>
         </nav_item>
       </else>
     </repeat>
-    <tagbody/>
   </nav_container>
 </def>
 
 
-<def tag="nav_container"><ul merge_attrs=""><tagbody/></ul></def>
+<def tag="nav_container"><ul merge_attrs="&true"><tagbody/></ul></def>
 
                                                             
-<def tag="nav_item"><li merge_attrs=""><tagbody/></li></def>
+<def tag="nav_item"><li merge_attrs="&true"><tagbody/></li></def>
 
 
 <def tag="application_account_nav">

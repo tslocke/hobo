@@ -1,158 +1,158 @@
-<def tag="page" attrs="title_prefix, title">
+<def tag="Page" attrs="title_prefix, title">
   <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
   <html>
     <head>
       <title><%= title_prefix %><%= title || human_type + ": " + display_name(:no_span => true) %></title>
       <%= stylesheet_link_tag 'application' %>
       <%= javascript_include_tag :defaults %>
-      <hobo_rapid_javascripts replace_option="rapid_javascripts" tiny_mce="&true"/>
+      <hobo_rapid_javascripts merge="rapid_javascripts" tiny_mce="&true"/>
     </head>
-    <body onload="Hobo.applyEvents();" content_option="body">
-      <div content_option="header"/>
-      <div content_option="intro"/>
-      <div content_option="main"/>
-      <div content_option="footer"/>
+    <body onload="Hobo.applyEvents();" merge="body">
+      <div merge="header"/>
+      <div merge="intro"/>
+      <div merge="main"/>
+      <div merge="footer"/>
     </body>
   </html>
 </def>
 
 
-<def tag="index_page">
+<def tag="IndexPage">
   <% model_name = @model.name.titleize %>
-  <page title="All #{model_name.pluralize}" merge_attrs="">
+  <Page title="All #{model_name.pluralize}" merge_attrs="&true">
 
-    <:intro>
+    <intro>
       <h1><%= model_name.pluralize %></h1>
-    </:intro>
+    </intro>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count label="&model_name"/></h2>
+    <main>
+      <panel merge="main_panel">
+        <h2 merge="panel_heading"><count label="&model_name"/></h2>
         <section>
-          <table_for replace_option="table">
+          <table_for merge="table">
             <td><object_link/></td><td><delete_button class='text'/></td>
           </table_for>
         </section>
         
         <if q="&@pages.length > 1">
-          <section replace_option="page_nav">
+          <section merge="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
           </section>
         </if>
 
-        <section_if replace_option="new_link">
+        <section_if merge="new_link">
           <p><new_object_link for="&@model"/></p>
         </section_if>
       </panel>
-    </:main>
-  </page>
+    </main>
+  </Page>
 </def>
 
 
-<def tag="new_page">
-  <page title="New #{human_type}" merge_attrs="">
-    <:intro>
+<def tag="NewPage">
+  <Page title="New #{human_type}" merge_attrs="&true">
+    <intro>
       <h1>New <human_type/></h1>
-    </:intro>
+    </intro>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading">Details</h2>
+    <main>
+      <panel merge="main_panel">
+        <h2 merge="panel_heading">Details</h2>
         <section>
-          <div class="error_messages" replace_option="error_messages">
+          <div class="error_messages" merge="error_messages">
             <%= error_messages_for 'this' %>
           </div>
 
           <object_form hidden_fields="*">
-            <object_table associations="belongs_to" replace_option="fields"/>
-            <submit label="Create" class="create_button" replace_option="submit_button"/>
+            <object_table associations="belongs_to" merge="fields"/>
+            <submit label="Create" class="create_button" merge="submit_button"/>
           </object_form>
         </section>
       </panel>
-    </:main>
+    </main>
 
-  </page>
+  </Page>
 </def>
 
 
-<def tag="show_page">
+<def tag="ShowPage">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <page merge_attrs="">
+  <Page merge_attrs="&true">
 
-    <:intro>
+    <intro>
       <h1><human_type/><if q="&this.respond_to? :name">: <edit field="name"/></if></h1>
       <p><delete_button ajax="&false"/></p>
-    </:intro>
+    </intro>
     
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading">Details</h2>
+    <main>
+      <panel merge="main_panel">
+        <h2 merge="panel_heading">Details</h2>
         <section>
-          <object_table associations="*" skip="name" replace_option="fields"/>
+          <object_table associations="*" skip="name" merge="fields"/>
         </section>
 
-        <section_if replace_option="new_links">
+        <section_if merge="new_links">
           <repeat with="&has_many_assocs">
             <p><new_object_link/></p>
           </repeat>
         </section_if>
       </panel>
-    </:main>
+    </main>
 
-  </page>
+  </Page>
 </def>
 
 
-<def tag="new_in_collection_page">
-  <page title="New #{human_type}" merge_attrs="">
+<def tag="NewInCollectionPage">
+  <Page title="New #{human_type}" merge_attrs="&true">
 
-    <:intro>
+    <intro>
       <h1>New <human_type/></h1>
       <h2>For: <object_link with="&@owner" /></h2>
-    </:intro>
+    </intro>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading">Details</h2>
+    <main>
+      <panel merge="main_panel">
+        <h2 merge="panel_heading">Details</h2>
         <section>
-          <div class="error_messages" replace_option="error_messages">
+          <div class="error_messages" merge="error_messages">
             <%= error_messages_for 'this' %>
           </div>
 
           <object_form hidden_fields="*">
-            <object_table associations="belongs_to" replace_option="fields"/>
+            <object_table associations="belongs_to" merge="fields"/>
             <submit label='#"Add to #{display_name(:with => @owner, :no_span => true)}"'
-                    replace_option="submit_button"/>
+                    merge="submit_button"/>
           </object_form>
         </section>
 
       </panel>
-    </:main>
+    </main>
 
-  </page>
+  </Page>
 </def>
 
 
-<def tag="show_collection_page">
+<def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:with => @owner, :no_span => true)}" %>
-  <page title="&title" merge_attrs="">
+  <Page title="&title" merge_attrs="&true">
 
-    <:intro>
+    <intro>
       <h1><%= title %></h1>
       <h2>Back to <object_link with="&@owner"/></h2>
-    </:intro>
+    </intro>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count with="&@pages.item_count"
+    <main>
+      <panel merge="main_panel">
+        <h2 merge="panel_heading"><count with="&@pages.item_count"
                                                   label="&@reflection.klass.name.titleize"/></h2>
         <if q="&@pages.length > 1">
-          <section replace_option="page_nav">
+          <section merge="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
@@ -160,13 +160,13 @@
         </if>
 
         <section>
-          <table_for replace_option="table">
+          <table_for merge="table">
             <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
           </table_for>
         </section>
 
         <if q="&@pages.length > 1">
-          <section replace_option="page_nav">
+          <section merge="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
@@ -174,11 +174,11 @@
         </if>
 
         <if q="&Hobo.simple_has_many_association?(@association)">
-          <section replace_option="new_link">
+          <section merge="new_link">
             <new_object_link for="&@association"/>
           </section>
         </if>
       </panel>
-    </:main>
-  </page>
+    </main>
+  </Page>
 </def>

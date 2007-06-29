@@ -6,7 +6,7 @@
 
 <def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
-<def tag="object_table" attrs="fields, skip, associations, editor_tag">
+<def tag="ObjectTable" attrs="fields, skip, associations, editor_tag">
   <% 
      field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
      inner_tag_options.merge!(field_inner_tag_options)
@@ -51,9 +51,9 @@
       <% base_name = field.ends_with?("?") ? field[0..-2] : field %>
       <tr>
         <td class="field_label"
-            content_option="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
+            merge="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
         <td><with field="&field">
-            <call_tag name="&editor_tag" replace_option="&base_name + '_editor'"/>
+            <call_tag name="&editor_tag" merge="&base_name + '_editor'"/>
         </with></td>
       </tr>
     <% end %>
@@ -61,8 +61,8 @@
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label"
-            content_option="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
-        <td><call_tag name="&editor_tag" field="&field" replace_option="&field.to_s + '_editor'"/></td>
+            merge="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
+        <td><call_tag name="&editor_tag" field="&field" merge="&field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 
@@ -73,10 +73,7 @@
 
 
 <def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
-  <table_for headings="&headings" merge_attrs="">
-    <:empty>
-      <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
-    </:empty>
+  <table_for headings="&headings" merge_attrs="&true">
 
     <tagbody/>
 
@@ -84,18 +81,18 @@
       <td><delete_button/></td>
     </if>
   </table_for>
+  <else>
+    <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
+  </else>
   <div>
     <create_button update="&id || part_id"/>
   </div>
 </def>
 
 
-<def tag="ul_for" attrs="else">
-  <if q="&this.empty? && else_">
-    <%= else_ %>
-  </if>
-  <else>
-    <ul merge_attrs="">
+<def tag="ul_for">
+  <if q="&!this.empty?">
+    <ul merge_attrs="&true">
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
@@ -106,16 +103,13 @@
         <% even_odd = even_odd == "even" ? "odd" : "even" %>
       </repeat>
     </ul>
-  </else>
+  </if>
 </def>
 
 
-<def tag="table_for" attrs="headings, row_class, footer, else">
-  <if q="&this.empty? and else_">
-    <%= else_ %>
-  </if>
-  <else>
-    <table merge_attrs="">
+<def tag="table_for" attrs="headings, row_class, footer">
+  <if q="&!this.empty?">
+    <table merge_attrs="&true">
       <if q="&headings"><tr><%= headings %></tr></if>
       <% even_odd = "odd" %>
       <repeat>
@@ -129,7 +123,7 @@
       </repeat>
       <%= footer %>
     </table>
-  </else>
+  </if>
 </def>
 
 
@@ -158,17 +152,17 @@
 
 
 <def tag="spinner">
-  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" merge_attrs=""/>
+  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" merge_attrs="&true"/>
 </def>
 
 
 <def tag="image" attrs="src">
-  <img src="<%= urlb %>/images/<%= src %>" merge_attrs=""/>
+  <img src="<%= urlb %>/images/<%= src %>" merge_attrs="&true"/>
 </def>
 
 
 <def tag="theme_img" attrs="src">
-  <img src="<%= theme_asset('images/' + src)%>" merge_attrs=""/>
+  <img src="<%= theme_asset('images/' + src)%>" merge_attrs="&true"/>
 </def>
 
 

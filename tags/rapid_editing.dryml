@@ -1,6 +1,6 @@
 
 <def tag="submit" attrs="label">
-  <input type="submit" value="<%= label %>" merge_attrs="" class="button_input submit_button"/>
+  <input type="submit" value="<%= label %>" merge_attrs="&true" class="button_input submit_button"/>
 </def>
 
 
@@ -19,7 +19,7 @@
   %>
   <input type="text" name="<%= name %>" id="<%= id %>" class="autocomplete_bhv"
          autocomplete_url="<%= url %>" value="<%= value %>"
-         merge_attrs=""/>
+         merge_attrs="&true"/>
   <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
@@ -72,7 +72,7 @@
   %>
 
   <input type="text" id="<%= id %>" class="autocomplete_bhv" autocomplete_url="<%= url %>"
-         name="<%= param_name_for_this %>" merge_attrs=""/>
+         name="<%= param_name_for_this %>" merge_attrs="&true"/>
   <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
 </def>
 
@@ -97,7 +97,7 @@
   %>
     <form onsubmit="<%= f %>; $('<%= id %>').blur(); return false">
       <input type="text" class="autocomplete_bhv autosubmit" id="<%= id %>" autocomplete_url="<%= url %>"
-             value="<%= this && this.id_name %>" merge_attrs="" />
+             value="<%= this && this.id_name %>" merge_attrs="&true" />
       <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
     </form>
   </if_can_edit>
