@@ -197,6 +197,8 @@ describe Template do
 
       <def tag="StaticMerge"><p>a <b class="big" merge>bold</b> word</p></def>
 
+      <def tag="EmptyStaticMerge"><img class="big" src="..." merge/></def>
+
       <def tag="DefTagMerge">foo <defined merge b="3">baa</defined>!</def>
     END
   end
@@ -244,6 +246,11 @@ describe Template do
   end
   
   it "should merge template parameters into nested templates"
+  
+  it "should merge into static tags with no body" do
+    eval_with_templates("<EmptyStaticMerge><img class='small'/></EmptyStaticMerge>").should == 
+      '<img class="small" src="..." />'
+  end    
     
   
   

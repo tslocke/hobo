@@ -282,8 +282,16 @@ module Hobo::Dryml
       end      
       
       if name.to_s.in?(Hobo.static_tags)
-        body = tagbody ? tagbody.call : new_context(&b)
-        content_tag(name, body, options)
+        if tagbody || b
+          body = if tagbody
+                   tagbody.call
+                 elsif b
+                   new_context(&b)
+                 end
+          content_tag(name, body, options)
+        else
+          tag(name, options)
+        end
       else
         send(name, options, &(tagbody || b))
       end
