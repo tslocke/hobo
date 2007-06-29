@@ -124,6 +124,7 @@ module Hobo
     end
 
     def add_routes(map)
+      ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
       require "#{RAILS_ROOT}/app/plugins_init.rb" if File.exists? "#{RAILS_ROOT}/app/plugins_init.rb"
       
@@ -232,7 +233,7 @@ module Hobo
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
       # has_many and polymorphic associations are not editable (for now)
-      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
+      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic] or refl.macro == :has_one)
       
       if object.respond_to?(:editable_by?)
         check_permission(:edit, person, object, field.to_sym)
