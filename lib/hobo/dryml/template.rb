@@ -88,6 +88,7 @@ module Hobo::Dryml
 
       @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
       @doc = REXML::Document.new(RexSource.new(@xmlsrc), :dryml_mode => true)
+      @doc.default_attribute_value = "&true"
       
       restore_erb_scriptlets(children_to_erb(@doc.root))
     end
@@ -123,7 +124,7 @@ module Hobo::Dryml
 
 
     def element_to_erb(el)
-      dryml_exception("badly placed parameter tag <#{el.name}>", el) if
+      dryml_exception("parameter tags (<#{el.name}>) are no more, wake up and smell the coffee", el) if
         el.name.starts_with?(":")
 
       @last_element = el
@@ -254,6 +255,7 @@ module Hobo::Dryml
                 tag_method(name, re_alias, redefine, method_body)
               end
         
+        puts src if el.attributes["debug_source"]
         logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
         
         @builder.add_build_instruction(:def,
@@ -353,7 +355,7 @@ module Hobo::Dryml
       dryml_exception("merge is not allowed outside of template definitions", el) if merge_name && !@inside_template
       
       el.attributes.delete("merge")
-      merge_name == true ? el.name : merge_name
+      merge_name == "&true" ? el.name : merge_name
     end
     
     
@@ -531,8 +533,6 @@ module Hobo::Dryml
       else
         res = if attr.nil?
                 "nil"
-              elsif attr == true   # An attribute with no RHS (not valid XML but allowed in DRYML)
-                "true"
               elsif is_code_attribute?(attr)
                 "(#{attr[1..-1]})"
               else

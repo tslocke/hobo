@@ -320,6 +320,12 @@ module REXML
     end
   end
   
+  class Document
+    
+    attr_accessor :default_attribute_value
+    
+  end
+  
   class Attribute
     
     def initialize_with_dryml(first, second=nil, parent=nil)
@@ -332,7 +338,7 @@ module REXML
     
     def value_with_dryml
       if no_rhs?
-        true
+        element.document.default_attribute_value
       else
         value_without_dryml
       end

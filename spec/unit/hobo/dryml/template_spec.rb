@@ -22,7 +22,7 @@ describe Template do
   end
   
   it "should compile block-tag attributes with no RHS as passing `true`" do 
-    compile_dryml("<foo a/>").should == '<%= foo({:a => true}) %>'
+    compile_dryml("<foo a/>").should == '<%= foo({:a => (true)}) %>'
   end
   
   it "should compile content of a block-tag call as a Ruby block" do 
@@ -35,7 +35,7 @@ describe Template do
   end
   
   it "should allow close tags to ommit the :field_name part" do 
-    compile_dryml("<foo:name></foo>").should == '<% _output(foo({:field => "name"}) do %><% end) %>'
+    compile_dryml("<foo:name></foo>").should == '<%= foo({:field => "name"}) %>'
   end
 
   # --- Compilation: Defining Block Tags --- #
@@ -183,7 +183,7 @@ describe Template do
   
   def eval_with_templates(dryml)
     eval_dryml(<<-END + dryml).strip
-      <def tag="defined" attrs="a, b" debug_source>a is <%= a %>, b is <%= b %>, body is <tagbody/></def>
+      <def tag="defined" attrs="a, b">a is <%= a %>, b is <%= b %>, body is <tagbody/></def>
 
       <def tag="T">plain template</def>
 
