@@ -258,9 +258,11 @@ module Hobo::Dryml
     
     
     def merge_and_call(name, options, template_proc, &b)
-      merge_hash = template_proc.call
-      tagbody = merge_hash.delete(:tagbody)
-      options = options.update(merge_hash)
+      if template_proc
+        merge_hash = template_proc.call
+        tagbody = merge_hash.delete(:tagbody)
+        options = options.update(merge_hash)
+      end      
       
       if name.to_s.in?(Hobo.static_tags)
         body = tagbody ? tagbody.call : new_context(&b)

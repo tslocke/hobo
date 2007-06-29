@@ -230,7 +230,10 @@ describe Template do
       'foo a is , b is 3, body is zip!'
   end
   
-  
+  it "should leave non-merged tags unchanged" do
+    eval_with_templates('<StaticMerge></StaticMerge>').should ==
+      '<p>a <b class="big">bold</b> word</p>'
+  end
   # --- Test Helpers --- #
   
   def prepare_template(src, options)
