@@ -162,6 +162,8 @@ describe Template do
       <def tag="t_attr" attrs="x">it is <%= x %></def>
 
       <def tag="t_body">( <tagbody/> )</def>
+
+      <def tag="merge_attrs_example"><p merge_attrs>hi</p></def>
     END
   end
 
@@ -177,6 +179,12 @@ describe Template do
   it "should call block tags with a body" do
     eval_with_defs("<t_body>foo</t_body>").should == "( foo )"
   end
+  
+    
+  it "should support merge_attrs on static tags" do 
+    eval_with_defs('<merge_attrs_example class="x"/>').should == '<p class="x">hi</p>'
+  end
+
   
   
   # --- Template Tags --- #
@@ -234,6 +242,13 @@ describe Template do
     eval_with_templates('<StaticMerge></StaticMerge>').should ==
       '<p>a <b class="big">bold</b> word</p>'
   end
+  
+  it "should merge template parameters into nested templates"
+    
+  
+  
+  
+  
   # --- Test Helpers --- #
   
   def prepare_template(src, options)

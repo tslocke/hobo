@@ -478,9 +478,7 @@ module Hobo::Dryml
       merge_attrs = el.attributes["merge_attrs"]
       if merge_attrs
         attr_args = if merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
-                      merge_attrs[1..-1]
-                    elsif merge_attrs.blank?
-                      "options"
+                      "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? options : __merge_attrs__)"
                     else
                       dryml_exception("invalid merge_attrs", el)
                     end
@@ -492,7 +490,7 @@ module Hobo::Dryml
           attr_args.concat(", '#{class_attr}'")
           start_tag_src.sub!(/\s*class\s*=\s*('[^']*?'|"[^"]*?")/, "")
         end
-        start_tag_src.sub!(/\s*merge_attrs\s*=\s*('[^']*?'|"[^"]*?")/, " <%= merge_attrs(#{attr_args}) %>")
+        start_tag_src.sub!(/\s*merge_attrs(?:\s*=\s*('[^']*?'|"[^"]*?"))?/, " <%= merge_attrs(#{attr_args}) %>")
       end
       
       # Allow #{...} as an alternate to <%= ... %>

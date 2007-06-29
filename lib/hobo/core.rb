@@ -283,23 +283,6 @@ module Hobo
     end
 
 
-    def merge_attrs(options, klass=nil)
-      options ||= {}
-      if klass
-        options = add_classes(options.symbolize_keys, [klass])
-      end
-      options.map do |n,v|
-        if v == true
-          n
-        else
-          v = v.to_s
-          val = v.include?("'") ? '"' + v + '"' : "'" + v + "'"
-          "#{n}=#{val}"
-        end
-      end.join(' ')
-    end
-
-
     def param_name_for(object, field_path)
       field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
       attrs = field_path.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
