@@ -63,6 +63,7 @@ module Hobo::Dryml
       logger.info("  DRYML: Compiled#{from_cache} #{template_path} in %.2fs" % (Time.now - now))
     end
       
+
     def create_render_page_method
       erb_src = process_src
       @builder.add_build_instruction(:render_page, :src => process_src, :line_num => 1)
@@ -270,7 +271,7 @@ module Hobo::Dryml
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
           ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
       else
-        "<% def #{name}(__options__={}, template_procs, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__options__={}, template_procs={}, &__block__); #{method_body}; end %>"
       end
     end
     
@@ -354,10 +355,16 @@ module Hobo::Dryml
       el.attributes.delete("merge")
       merge_name == true ? el.name : merge_name
     end
+    
+    
+    def call_name(el)
+      name = el.expanded_name.sub(/:.*/, "")
+      Hobo::Dryml.unreserve(name)
+    end
 
     
     def template_call(el)
-      name = Hobo::Dryml.unreserve(el.name)
+      name = call_name(el)
       merge_name = extract_merge_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
@@ -395,14 +402,14 @@ module Hobo::Dryml
       end
       
       body = children_to_erb(el)
-      items << ":content => %>#{body}<% " unless body.blank?
+      items << ":tagbody => proc { new_context { %>#{body}<% } } " unless body.blank?
       
       "proc { {#{items * ', '}} }"
     end
 
     
     def tag_call(el)
-      name = Hobo::Dryml.unreserve(el.name)
+      name = call_name(el)
       merge_name = extract_merge_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
@@ -437,8 +444,12 @@ module Hobo::Dryml
     
     def tag_options(el)
       attributes = el.attributes
+      items = attributes.map {|n,v| ":#{n} => #{attribute_to_ruby(v)}" }
 
-      options = attributes.map {|n,v| ":#{n} => #{attribute_to_ruby(v)}" }.join(', ')
+      # if there's a ':' el.name is just the part after the ':'
+      items << ":field => \"#{el.name}\"" if el.name != el.expanded_name
+      
+      options = items.join(", ")
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs

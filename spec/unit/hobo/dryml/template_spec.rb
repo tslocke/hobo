@@ -5,21 +5,9 @@ DrymlException = Hobo::Dryml::DrymlException
 
 describe Template do
   
-  # --- Static Tags --- #
-  
-  it "should pass through tags declared as static" do
-    "p".should be_in(Hobo.static_tags)
-    eval_dryml("<p>abc</p>").should == "<p>abc</p>"
-    eval_dryml("<p x='1'   y='2'>abc</p>").should == "<p x='1'   y='2'>abc</p>"
-  end
-  
-  it "should pass through attributes with no rhs on static tags" do 
-    "p".should be_in(Hobo.static_tags)
-    eval_dryml("<p foo baa>abc</p>").should == "<p foo baa>abc</p>"    
-  end
+  # --- Tag Compilation Examples --- #
 
-  
-  # --- Calling Block Tags --- #
+  # --- Compilation: Calling Block Tags --- #
   
   it "should compile block-tag calls as method calls" do
     compile_dryml("<foo/>").should == "<%= foo() %>"
@@ -41,7 +29,12 @@ describe Template do
     compile_dryml("<foo>the body</foo>").should == "<% _output(foo() do %>the body<% end) %>"
   end
   
-  # --- Defining Block Tags --- #
+    
+  it "should allow :foo as a shorthand for field='foo' on block tags" do 
+    compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
+  end
+
+  # --- Compilation: Defining Block Tags --- #
   
   it "should compile defs with lower-case names as block tags" do 
     compile_def("<def tag='foo'></def>").should == 
@@ -50,12 +43,19 @@ describe Template do
       "<% _erbout; end; end %>"
   end
   
-  # --- Defining Templates --- #
+  it "should compile attrs in defs as local variables" do 
+    compile_def("<def tag='foo' attrs='a, b'></def>").should == 
+      "<% def foo(__options__={}, &__block__); " +
+      "_tag_context(__options__, __block__) do |tagbody| a, b, options, = _tag_locals(__options__, [:a, :b]) %>" + 
+      "<% _erbout; end; end %>"
+  end
+  
+  # --- Compilation: Defining Templates --- #
   
   it "should compile defs with cap names as templates" do 
     # Note the presence of the `template_procs` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
-      "<% def Foo(__options__={}, template_procs, &__block__); " +
+      "<% def Foo(__options__={}, template_procs={}, &__block__); " +
       "_tag_context(__options__, __block__) do |tagbody| options, = _tag_locals(__options__, []) %>" + 
       "<% _erbout; end; end %>"
   end
@@ -99,10 +99,10 @@ describe Template do
   
   it "should compile template parameters with merge and a tag body" do
     compile_in_template("<Foo><abc merge>ha!</abc></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_template_parameter(proc { {:content => %>ha!<% } }, template_procs[:abc])})) %>'
+      '<% _output(Foo({}, {:abc => merge_template_parameter(proc { {:tagbody => proc { new_context { %>ha!<% } } } }, template_procs[:abc])})) %>'
   end
 
-  # --- Calling Templates --- # 
+  # --- Compilation: Calling Templates --- # 
   
   it "should compile template calls as method calls" do 
     compile_dryml("<Foo/>").should == "<% _output(Foo({}, {})) %>"
@@ -114,16 +114,118 @@ describe Template do
   
   it "should compile template parameters as procs" do 
     compile_dryml("<Foo><x>hello</x><y>world</y></Foo>").should ==
-      '<% _output(Foo({}, {:x => proc { {:content => %>hello<% } }, :y => proc { {:content => %>world<% } }})) %>'
+      '<% _output(Foo({}, {' + 
+      ':x => proc { {:tagbody => proc { new_context { %>hello<% } } } }, ' + 
+      ':y => proc { {:tagbody => proc { new_context { %>world<% } } } }})) %>'
   end
   
   it "should compile template parameters with attributes" do
     compile_dryml("<Foo><abc x='1'>hello</abc></Foo>").should ==
-      '<% _output(Foo({}, {:abc => proc { {:x => "1", :content => %>hello<% } }})) %>'
+      '<% _output(Foo({}, {:abc => proc { {:x => "1", :tagbody => proc { new_context { %>hello<% } } } }})) %>'
+  end
+  
+  it "should allow :foo as a shorthand for field='foo' on template tags" do 
+    compile_dryml("<Foo:name/>").should == '<%= Foo({:field => "name"}) %>'
+  end
+
+
+  
+  # --- Tag Evalutation Examples --- #
+  
+  
+  
+  # --- Static Tags --- #
+  
+  it "should pass through tags declared as static" do
+    "p".should be_in(Hobo.static_tags)
+    eval_dryml("<p>abc</p>").should == "<p>abc</p>"
+    eval_dryml("<p x='1'   y='2'>abc</p>").should == "<p x='1'   y='2'>abc</p>"
+  end
+  
+  it "should pass through attributes with no rhs on static tags" do 
+    "p".should be_in(Hobo.static_tags)
+    eval_dryml("<p foo baa>abc</p>").should == "<p foo baa>abc</p>"    
+  end
+  
+  
+  # --- Block Tags --- #
+  
+  
+  def eval_with_defs(dryml)
+    eval_dryml(<<-END + dryml).strip
+      <def tag="t">plain tag</def>
+
+      <def tag="t_attr" attrs="x">it is <%= x %></def>
+
+      <def tag="t_body">( <tagbody/> )</def>
+    END
+  end
+
+  it "should call block tags" do 
+    eval_with_defs("<t/>").should == "plain tag"
+  end
+    
+
+  it "should call block tags passing attributes" do
+    eval_with_defs("<t_attr x='10'/>").should == "it is 10"
+  end
+  
+  it "should call block tags with a body" do
+    eval_with_defs("<t_body>foo</t_body>").should == "( foo )"
+  end
+  
+  
+  # --- Template Tags --- #
+  
+  def eval_with_templates(dryml)
+    eval_dryml(<<-END + dryml).strip
+      <def tag="defined" attrs="a, b" debug_source>a is <%= a %>, b is <%= b %>, body is <tagbody/></def>
+
+      <def tag="T">plain template</def>
+
+      <def tag="StaticMerge"><p>a <b class="big" merge>bold</b> word</p></def>
+
+      <def tag="DefTagMerge">foo <defined merge b="3">baa</defined>!</def>
+    END
+  end
+
+  it "should call template tags" do
+    eval_with_templates("<T/>").should == "plain template"
+  end
+
+  
+  it "should add attributes to static tags when merging" do 
+    eval_with_templates("<StaticMerge><b onclick='alert()'/></StaticMerge>").should == 
+      '<p>a <b class="big" onclick="alert()">bold</b> word</p>'    
   end
   
 
-
+  it "should override attributes on static tags when merging" do 
+    eval_with_templates("<StaticMerge><b class='small'/></StaticMerge>").should == 
+      '<p>a <b class="small">bold</b> word</p>'
+  end
+  
+  
+  it "should replace tag bodies on static tags when merging" do
+    eval_with_templates('<StaticMerge><b>BOLD</b></StaticMerge>').should == 
+      '<p>a <b class="big">BOLD</b> word</p>'
+  end
+  
+  it "should add attributes to defined tags when merging" do 
+    eval_with_templates('<DefTagMerge><defined a="2"/></DefTagMerge>').should ==
+      'foo a is 2, b is 3, body is baa!'
+  end
+  
+  it "should override attributes on defined tags when merging" do 
+    eval_with_templates('<DefTagMerge><defined b="2"/></DefTagMerge>').should ==
+      'foo a is , b is 2, body is baa!'
+  end
+  
+  it "should replace tag bodies on defined tags when merging" do 
+    eval_with_templates('<DefTagMerge><defined>zip</defined></DefTagMerge>').should ==
+      'foo a is , b is 3, body is zip!'
+  end
+  
   
   # --- Test Helpers --- #
   

@@ -173,9 +173,15 @@ module REXML
               last_tag, line_no = @tags.pop
               #md = @source.match_to_consume('>', CLOSE_MATCH)
               md = @source.match(CLOSE_MATCH, true)
+              
+              valid_end_tag = if dryml_mode?
+                                last_tag =~ /^#{Regexp.escape(md[1])}(:.*)?/
+                              else
+                                last_tag == md[1]
+                              end
               raise REXML::ParseException.new("Missing end tag for "+
                                               "'#{last_tag}' (line #{line_no}) (got \"#{md[1]}\")", 
-                @source) unless last_tag == md[1]
+                @source) unless valid_end_tag
               return [ :end_element, last_tag ]
             elsif @source.buffer[1] == ?!
               md = @source.match(/\A(\s*[^>]*>)/um)

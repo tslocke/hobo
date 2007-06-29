@@ -36,7 +36,7 @@ module Hobo::Dryml
       def redefine_tag(name, proc)
         impl_name = "#{name}_redefined_#{redefine_nesting}"
         define_method(impl_name, proc)
-        class_eval "def #{name}(options, template_parameters={}, &b); " +
+        class_eval "def #{name}(options={}, template_parameters={}, &b); " +
           "#{impl_name}(options, template_parameters, b); end"
         @_redef_impl_names.push(impl_name)
       end
@@ -257,7 +257,21 @@ module Hobo::Dryml
     end
     
     
-    def merge_and_call(name, options, template_procs, external_t)
+    def merge_and_call(name, options, template_proc, &b)
+      merge_hash = template_proc.call
+      tagbody = merge_hash.delete(:tagbody)
+      options = options.update(merge_hash)
+      
+      if name.to_s.in?(Hobo.static_tags)
+        body = tagbody ? tagbody.call : new_context(&b)
+        content_tag(name, body, options)
+      else
+        send(name, options, &(tagbody || b))
+      end
+    end
+    
+    
+    def merge_and_call_template(name, options, template_proc)
     end
     
     
