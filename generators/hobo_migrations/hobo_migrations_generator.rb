@@ -68,7 +68,7 @@ class HoboMigrationsGenerator < Rails::Generator::NamedBase
     adds = missing_columns.map do |c|
       spec = model.field_specs[c]
       args = [":#{spec.sql_type}"] + format_options(spec.options, spec.sql_type)
-      "add_column :#{model.table_name}, #{c}, #{args * ', '}"
+      "add_column :#{model.table_name}, :#{c}, #{args * ', '}"
     end
     
     removes = extra_columns.map do |c|

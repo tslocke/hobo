@@ -88,7 +88,7 @@ module Hobo
       def belongs_to_with_foreign_key_declaration(name, *args, &block)
         res = belongs_to_without_foreign_key_declaration(name, *args, &block)
         refl = reflections[name]
-        fkey = "#{name}_id"
+        fkey = refl.primary_key_name
         field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer)
         res
       end
