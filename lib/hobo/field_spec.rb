@@ -16,8 +16,8 @@ module Hobo
     def initialize(model, name, type, options={})
       raise ArgumentError, "you cannot provide a field spec for the primary key" if name == model.primary_key
       self.model = model
-      self.name = name
-      self.type = type
+      self.name = name.to_sym
+      self.type = type.to_sym
       self.options = options
     end
     

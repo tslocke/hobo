@@ -9,6 +9,7 @@ module Hobo
       base.send(:set_field_type, {})
       class << base
         alias_method_chain :has_many, :defined_scopes
+        alias_method_chain :belongs_to, :foreign_key_declaration
       end
     end
 
@@ -55,21 +56,43 @@ module Hobo
       
       
       class FieldDeclarationsDsl
+        
         def initialize(model)
           @model = model
         end
-        def method_missing(name, *args, &b)
+        
+        def timestamps
+          dynamic_field(:created_at, :datetime)
+          dynamic_field(:updated_at, :datetime)
+        end
+        
+        def dynamic_field(name, *args)
           type = args.shift
           options = extract_options_from_args!(args)
           @model.send(:set_field_type, name => type)
-          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
+          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)          
         end
+        
+        def method_missing(name, *args)
+          dynamic_field(name, *args)
+        end
+        
       end
       
       
       def fields(&b)
         FieldDeclarationsDsl.new(self).instance_eval(&b)
       end
+      
+      
+      def belongs_to_with_foreign_key_declaration(name, *args, &block)
+        res = belongs_to_without_foreign_key_declaration(name, *args, &block)
+        refl = reflections[name]
+        fkey = "#{name}_id"
+        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer)
+        res
+      end
+      
       
       attr_reader :field_specs
       public :field_specs
