@@ -454,7 +454,7 @@ module Hobo::Dryml
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs
-        extra_options = if merge_attrs == true
+        extra_options = if merge_attrs == "&true"
                           "options"
                         elsif merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
                           merge_attrs[1..-1]
