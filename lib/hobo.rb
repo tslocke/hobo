@@ -212,10 +212,10 @@ module Hobo
     def can_create?(person, object)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
-        object.created_by(person)
+        object.set_creator(person)
       elsif Hobo.simple_has_many_association?(object)
         object = object.new_without_appending
-        object.created_by(person)
+        object.set_creator(person)
       end
       check_permission(:create, person, object)
     end

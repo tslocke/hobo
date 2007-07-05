@@ -135,10 +135,8 @@ describe Template do
     compile_dryml("<Foo:name/>").should == '<% _output(Foo({:field => "name"}, {})) %>'
   end
 
-
   
   # --- Tag Evalutation Examples --- #
-  
   
   
   # --- Static Tags --- #

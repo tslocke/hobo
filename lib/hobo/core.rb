@@ -146,7 +146,7 @@ module Hobo
     def_tag :new_object_link, :for do
       f = for_ || this
       new = f.respond_to?(:new_without_appending) ? f.new_without_appending : f.new
-      new.created_by(current_user) if new.respond_to?(:current_user)
+      new.set_creator(current_user) if new.respond_to?(:current_user)
       if can_create?(new)
         default = "New " + (f.is_a?(Array) ? f.proxy_reflection.klass.name : f.name).titleize
         content = tagbody ? tagbody.call : default

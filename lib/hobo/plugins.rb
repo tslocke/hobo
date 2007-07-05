@@ -19,7 +19,7 @@ module Hobo::Plugins
   
     def make_class(class_name, base_class, &b)
       c = Class.new(base_class)
-      silence_warnings {Object.const_set(class_name, c)}
+      silence_warnings { Object.const_set(class_name, c) }
       c.class_eval(&b) if b
       c
     end

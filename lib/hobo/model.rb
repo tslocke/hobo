@@ -5,7 +5,8 @@ module Hobo
     def self.included(base)
       Hobo.register_model(base)
       base.extend(ClassMethods)
-      base.set_field_type({})
+      base.instance_variable_set("@field_specs", {})
+      base.send(:set_field_type, {})
       class << base
         alias_method_chain :has_many, :defined_scopes
       end
@@ -16,7 +17,18 @@ module Hobo
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
       
+      private
+      
+      def return_type(type)
+        @next_method_type = type
+      end
+      
       def method_added(name)
+        if @next_method_type
+          set_field_type(name => @next_method_type)
+          @next_method_type = nil
+        end
+        
         # avoid error when running model generators before
         # db exists
         return unless connected? 
@@ -40,6 +52,27 @@ module Hobo
           end
         end
       end
+      
+      
+      class FieldDeclarationsDsl
+        def initialize(model)
+          @model = model
+        end
+        def method_missing(name, *args, &b)
+          type = args.shift
+          options = extract_options_from_args!(args)
+          @model.send(:set_field_type, name => type)
+          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
+        end
+      end
+      
+      
+      def fields(&b)
+        FieldDeclarationsDsl.new(self).instance_eval(&b)
+      end
+      
+      attr_reader :field_specs
+      public :field_specs
       
       def set_field_type(types)
         types.each_pair do |field, type|
@@ -75,10 +108,10 @@ module Hobo
         @hobo_never_show.concat(fields.omap{to_sym})
       end
 
-
       def never_show?(field)
         @hobo_never_show and field.to_sym.in?(@hobo_never_show)
       end
+      public :never_show?
 
       def set_creator_attr(attr)
         class_eval %{
@@ -143,11 +176,11 @@ module Hobo
           underscore
       end
 
-
+      public
+      
       def id_name?
         respond_to?(:find_by_id_name)
       end
-
 
       attr_reader :id_name_column
 
@@ -156,15 +189,18 @@ module Hobo
       def field_type(name)
         name = name.to_sym
         field_types[name] or
-          reflections[name] or
-          ((col = columns.find {|c| c.name == name.to_s}) and case col.type
-                                                              when :boolean
-                                                                TrueClass
-                                                              when :text
-                                                                Hobo::Text
-                                                              else
-                                                                col.klass
-                                                              end)
+          reflections[name] or begin
+                                 col = columns.find {|c| c.name == name.to_s} rescue nil
+                                 return nil if col.nil?
+                                 case col.type
+                                 when :boolean
+                                   TrueClass
+                                 when :text
+                                   Hobo::Text
+                                 else
+                                   col.klass
+                                 end
+                               end
       end
       
       
@@ -373,7 +409,7 @@ module Hobo
     end
 
 
-    def created_by(user)
+    def set_creator(user)
       self.creator ||= user if self.class.has_creator? and not user.guest?
     end
 

@@ -278,7 +278,7 @@ module Hobo
     def hobo_new(options={})
       options = LazyHash.new(options)
       @this = options[:this] || model.new
-      @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
       
       if Hobo.can_create?(current_user, @this)
         set_named_this!
@@ -464,7 +464,7 @@ module Hobo
       
       @association = options[:collection] || @owner.send(collection)
       @this = options[:this] || @association.new_without_appending
-      @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
 
       permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
       
@@ -592,7 +592,7 @@ module Hobo
 
     def initialize_from_params(obj, params)
       update_with_params(obj, params)
-      obj.created_by(current_user)
+      obj.set_creator(current_user)
       (@check_create_permission ||= []) << obj
       obj
     end
