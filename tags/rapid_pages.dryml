@@ -66,7 +66,7 @@
           </div>
 
           <object_form hidden_fields="*">
-            <object_table associations="belongs_to" merge="fields"/>
+            <ObjectTable associations="belongs_to" />
             <submit label="Create" class="create_button" merge="submit_button"/>
           </object_form>
         </section>
@@ -93,7 +93,7 @@
       <panel merge="main_panel">
         <h2 merge="panel_heading">Details</h2>
         <section>
-          <object_table associations="*" skip="name" merge="fields"/>
+          <ObjectTable associations="*" skip="name"/>
         </section>
 
         <section_if merge="new_links">
@@ -125,8 +125,8 @@
           </div>
 
           <object_form hidden_fields="*">
-            <object_table associations="belongs_to" merge="fields"/>
-            <submit label='#"Add to #{display_name(:with => @owner, :no_span => true)}"'
+            <ObjectTable associations="belongs_to"/>
+            <submit label='Add to #{display_name(:with => @owner, :no_span => true)}'
                     merge="submit_button"/>
           </object_form>
         </section>

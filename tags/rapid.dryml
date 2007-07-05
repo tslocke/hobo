@@ -9,7 +9,7 @@
 <def tag="ObjectTable" attrs="fields, skip, associations, editor_tag">
   <% 
      field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
-     inner_tag_options.merge!(field_inner_tag_options)
+#     inner_tag_options.merge!(field_inner_tag_options)
                                                         
      if fields.nil?
        fields = this.class.content_columns.every(:name) - %w{created_at updated_at}

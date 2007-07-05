@@ -136,7 +136,7 @@ module Hobo
       if target.nil?
         "(Not Available)"
       elsif to ? can_view?(to) : can_view_this?
-        content = tagbody ? tagbody.call : call_replaceable_tag(:display_name, options, options.delete(:name))
+        content = tagbody ? tagbody.call : display_name
         link_class = "#{target.class.name.underscore}_link"
         link_to content, object_url(target, view, params), add_classes(options, link_class)
       end
