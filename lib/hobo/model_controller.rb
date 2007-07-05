@@ -539,7 +539,7 @@ module Hobo
         true
       else
         if page_kind.in? GENERIC_PAGE_TAGS
-          render_tag("#{page_kind}_page", :with => @this)
+          render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
           true
         else
           false
