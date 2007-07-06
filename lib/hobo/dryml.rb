@@ -1,8 +1,12 @@
 module Hobo::Dryml
 
   class DrymlException < Exception
-    def initialize(message, path, line_num)
-      super(message + " -- at #{path}:#{line_num}")
+    def initialize(message, path=nil, line_num=nil)
+      if path && line_num
+        super(message + " -- at #{path}:#{line_num}")
+      else
+        super(message)
+      end
     end
   end
   
