@@ -21,33 +21,48 @@ class HoboMigrationGenerator < Rails::Generator::NamedBase
     renames = to_rename.map do |old_name, new_name|
       "rename_table :#{old_name}, :#{new_name}"
     end * "\n"
-    
+    undo_renames = to_rename.map do |old_name, new_name|
+      "rename_table :#{new_name}, :#{old_name}"
+    end * "\n"
+
     drops = to_drop.map do |t|
       "drop_table :#{t}"
     end * "\n"
-    
+    undo_drops = to_drop.map do |t|
+      revert_table(t)
+    end * "\n\n"
+
     creates = to_create.map do |t|
       create_table(table_models[t])
     end * "\n\n"
+    undo_creates = to_create.map do |t|
+      "drop_table :#{t}"
+    end * "\n"
     
-    changes = to_change.map do |t|
-      change_table(table_models[t])
-    end * "\n\n"
+    changes = []
+    undo_changes = []
+    to_change.each do |t|
+      change, undo = change_table(table_models[t])
+      changes << change
+      undo_changes << undo
+    end
     
-    up = [renames, drops, creates, changes].select{|s|!s.blank?}.join("\n\n")
+    up = [renames, drops, creates, changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
     
-    down = ""
+    down = [undo_renames, undo_drops, undo_creates, undo_changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
     
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
+    puts "\n---------- Down Migration --------", down, "----------------------------------"
     
-    ok = input("OK? [Yn]:").strip.downcase != "n"
+    generate = !up.blank? && input("OK? [Yn]:").strip.downcase != "n"
     
     up.gsub!("\n", "\n    ")
+    down.gsub!("\n", "\n    ")
     
     record do |m|
       m.migration_template 'migration.rb', 'db/migrate', 
                            :assigns => { :up => up, :down => down, :migration_name => @migration_name.camelize }, 
-                           :migration_file_name => @migration_name if ok && !up.blank?
+                           :migration_file_name => @migration_name if generate
     end
   end
   
@@ -111,6 +126,9 @@ class HoboMigrationGenerator < Rails::Generator::NamedBase
     renames = to_rename.map do |old_name, new_name|
       "rename_column :#{table_name}, :#{old_name}, :#{new_name}"
     end
+    undo_renames = to_rename.map do |old_name, new_name|
+      "rename_column :#{table_name}, :#{new_name}, :#{old_name}"
+    end
     
     to_add = to_add.sort_by{|c| model.field_specs[c].position }
     adds = to_add.map do |c|
@@ -118,33 +136,45 @@ class HoboMigrationGenerator < Rails::Generator::NamedBase
       args = [":#{spec.sql_type}"] + format_options(spec.options, spec.sql_type)
       "add_column :#{table_name}, :#{c}, #{args * ', '}"
     end
+    undo_adds = to_add.map do |c|
+      "remove_column :#{table_name}, :#{c}"
+    end
     
     removes = to_remove.map do |c|
       "remove_column :#{table_name}, :#{c}"
     end
+    undo_removes = to_remove.map do |c|
+      revert_column(table_name, c)
+    end
     
     old_names = to_rename.invert
-    changes = to_change.map do |c|
+    changes = []
+    undo_changes = []
+    to_change.each do |c|
       col_name = old_names[c] || c
       col = db_columns[col_name]
-      spec = model.field_specs[c.to_sym]
+      spec = model.field_specs[c]
       if spec.different_to?(col)
         change_spec = {}
-        change_spec[:type]      = spec.sql_type
         change_spec[:limit]     = spec.limit if !spec.limit.nil?
         change_spec[:precision] = spec.precision if !spec.precision.nil?
         change_spec[:scale]     = spec.scale if !spec.scale.nil?
         change_spec[:null]      = false unless spec.null
         change_spec[:default]   = spec.default if !spec.default.nil?
-        "change_column :#{table_name}, :#{c}, " + 
-          format_options(change_spec, spec.sql_type).join(", ")
+        
+        changes << "change_column :#{table_name}, :#{c}, " + 
+          ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
+        back = change_column_back(table_name, c)
+        undo_changes << back unless back.blank?
       else
         nil
       end
     end.compact
     
-    (renames + adds + removes + changes) * "\n"
+    [(renames + adds + removes + changes) * "\n",
+     (undo_renames + undo_adds + undo_removes + undo_changes) * "\n"]
   end
+  
   
   def format_options(options, type)
     options.map do |k, v|
@@ -153,6 +183,24 @@ class HoboMigrationGenerator < Rails::Generator::NamedBase
       "#{k.inspect} => #{v.inspect}" 
       end.compact
   end
+  
+  
+  def revert_table(table)
+    res = StringIO.new
+    ActiveRecord::SchemaDumper.send(:new, ActiveRecord::Base.connection).send(:table, table, res)
+    res.string.strip.gsub("\n  ", "\n")
+  end
+  
+  
+  def change_column_back(table, column)
+    _, type, options = *revert_table(table).match(/\s*t\.column\s+"#{column}",\s+(:[a-zA-Z0-9_]+)(?:,\s+(.*?)$)?/m)
+    "change_column :#{table}, :#{column}, #{type}#{', ' + options.strip if options}"
+  end
+
+  def revert_column(table, column)
+    "add_column :#{table}, :#{column}, " + revert_table(table).match(/\s*t\.column\s+"#{column}",\s+(.*?)$/m)[1].strip
+  end
+  
   
   def input(prompt)
     print(prompt + " ")
