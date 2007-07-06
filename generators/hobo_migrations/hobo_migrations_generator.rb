@@ -12,37 +12,74 @@ class HoboMigrationsGenerator < Rails::Generator::NamedBase
     table_models = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)
     
-    missing_tables = model_table_names - connection.tables
-    extra_tables = connection.tables - model_table_names - ['schema_info']
-    changed_tables = connection.tables & model_table_names
+    to_create = model_table_names - connection.tables
+    to_drop = connection.tables - model_table_names - ['schema_info']
+    to_change = connection.tables & model_table_names
     
-    drops = extra_tables.map do |t|
+    to_rename = rename_or_drop!(to_create, to_drop, "table")
+    
+    renames = to_rename.map do |old_name, new_name|
+      "rename_table :#{old_name}, :#{new_name}"
+    end * "\n"
+    
+    drops = to_drop.map do |t|
       "drop_table :#{t}"
-    end * "\n\n"
+    end * "\n"
     
-    creates = missing_tables.map do |t|
+    creates = to_create.map do |t|
       create_table(table_models[t])
     end * "\n\n"
     
-    changes = changed_tables.map do |t|
+    changes = to_change.map do |t|
       change_table(table_models[t])
     end * "\n\n"
     
-    
-    up = [drops, "", creates, "", changes] * "\n"
-    
-    up.gsub!("\n", "\n    ")
+    up = [renames, drops, creates, changes].select{|s|!s.blank?}.join("\n\n")
     
     down = ""
     
-    puts up, ""
+    puts "\n---------- Up Migration ----------", up, "----------------------------------"
+    
+    ok = input("OK? [Yn]:").strip.downcase != "n"
+    
+    up.gsub!("\n", "\n    ")
     
     record do |m|
       m.migration_template 'migration.rb', 'db/migrate', 
                            :assigns => { :up => up, :down => down, :migration_name => @migration_name.camelize }, 
-                           :migration_file_name => @migration_name unless
-        up.blank? && down.blank?
+                           :migration_file_name => @migration_name if ok && !up.blank?
     end
+  end
+  
+  def rename_or_drop!(to_create, to_drop, kind_str, name_prefix="")
+    to_rename = {}
+    rename_to_choices = to_create
+    to_drop.dup.each do |t|
+      if rename_to_choices.empty?
+        puts "\nCONFIRM DROP! #{kind_str} #{name_prefix}#{t}"
+        resp = input("Enter 'drop #{t}' to confirm:")
+        if resp.strip != "drop " + t.to_s
+          to_drop.delete(t)
+        end
+      else
+        puts "\nDROP or RENAME?: #{kind_str} #{name_prefix}#{t}"
+        puts "Rename choices: #{to_create * ', '}"
+        resp = input("Enter either 'drop #{t}' or one of the rename choices:")
+        resp.strip!
+        
+        if resp == "drop " + t
+          # Leave things as they are
+        else
+          to_drop.delete(t)
+          if resp.in?(rename_to_choices)
+            to_rename[t] = resp
+            to_create.delete(resp)
+            rename_to_choices.delete(resp)
+          end
+        end
+      end
+    end
+    to_rename
   end
 
   def create_table(model)
@@ -57,47 +94,69 @@ class HoboMigrationsGenerator < Rails::Generator::NamedBase
   end
   
   def change_table(model)
-    db_columns = model.connection.columns(model.table_name).index_by{|c|c.name.to_sym}
-    model_column_names = model.field_specs.keys
-    db_column_names = db_columns.keys
+    table_name = model.table_name
+    db_columns = model.connection.columns(model.table_name).index_by{|c|c.name} - [model.primary_key]
+    model_column_names = model.field_specs.keys.every(:to_s)
+    db_column_names = db_columns.keys.every(:to_s)
     
-    missing_columns = model_column_names - db_column_names
-    extra_columns = db_column_names - model_column_names - [model.primary_key.to_sym]
-    changed_columns = db_column_names & model_column_names
+    to_add = model_column_names - db_column_names
+    to_remove = db_column_names - model_column_names - [model.primary_key.to_sym]
+
+    to_rename = rename_or_drop!(to_add, to_remove, "column", "#{table_name}.")
+
+    db_column_names -= to_rename.keys
+    db_column_names |= to_rename.values
+    to_change = db_column_names & model_column_names
     
-    adds = missing_columns.map do |c|
+    renames = to_rename.map do |old_name, new_name|
+      "rename_column :#{table_name}, :#{old_name}, :#{new_name}"
+    end
+    
+    to_add = to_add.sort_by{|c| model.field_specs[c].position }
+    adds = to_add.map do |c|
       spec = model.field_specs[c]
       args = [":#{spec.sql_type}"] + format_options(spec.options, spec.sql_type)
-      "add_column :#{model.table_name}, :#{c}, #{args * ', '}"
+      "add_column :#{table_name}, :#{c}, #{args * ', '}"
     end
     
-    removes = extra_columns.map do |c|
-      "remove_column :#{model.table_name}, :#{c}"
+    removes = to_remove.map do |c|
+      "remove_column :#{table_name}, :#{c}"
     end
     
-    changes = changed_columns.map do |c|
-      col = db_columns[c]
-      spec = model.field_specs[c]
+    old_names = to_rename.invert
+    changes = to_change.map do |c|
+      col_name = old_names[c] || c
+      col = db_columns[col_name]
+      spec = model.field_specs[c.to_sym]
       if spec.different_to?(col)
         change_spec = {}
         change_spec[:type]      = spec.sql_type
-        change_spec[:limit]     = spec.limit if col.type != :decimal && !spec.limit.nil?
+        change_spec[:limit]     = spec.limit if !spec.limit.nil?
         change_spec[:precision] = spec.precision if !spec.precision.nil?
         change_spec[:scale]     = spec.scale if !spec.scale.nil?
         change_spec[:null]      = false unless spec.null
         change_spec[:default]   = spec.default if !spec.default.nil?
-        "change_column :#{model.table_name}, #{c.inspect}, " + 
+        "change_column :#{table_name}, :#{c}, " + 
           format_options(change_spec, spec.sql_type).join(", ")
       else
         nil
       end
     end.compact
     
-    (adds + removes + changes) * "\n"
+    (renames + adds + removes + changes) * "\n"
   end
   
   def format_options(options, type)
-    options.map{|k, v| "#{k.inspect} => #{v.inspect}" unless k == :limit && v == @types[type][:limit] }.compact
+    options.map do |k, v|
+      next if k == :limit && (type == :decimal || v == @types[type][:limit])
+      next if k == :null && v == true
+      "#{k.inspect} => #{v.inspect}" 
+      end.compact
+  end
+  
+  def input(prompt)
+    print(prompt + " ")
+    STDIN.readline
   end
   
 end

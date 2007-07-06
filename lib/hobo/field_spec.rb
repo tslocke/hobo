@@ -16,14 +16,15 @@ module Hobo
       self.name = name.to_sym
       self.type = type.to_sym
       self.options = options
+      self.position = model.field_specs.length
     end
     
-    attr_accessor :model, :name, :type, :options
+    attr_accessor :model, :name, :type, :position, :options
     
     def sql_type
       options[:sql_type] or begin
                               sql_types = model.connection.native_database_types.keys - [:primary_key]
-                              if type.in?(SQL_TYPES)
+                              if type.in?(Model::SQL_TYPES)
                                 type
                               elsif options[:length]
                                 :string
