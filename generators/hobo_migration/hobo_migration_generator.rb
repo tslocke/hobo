@@ -1,4 +1,4 @@
-class HoboMigrationsGenerator < Rails::Generator::NamedBase
+class HoboMigrationGenerator < Rails::Generator::NamedBase
 
   def initialize(runtime_args, runtime_options = {})
     super
