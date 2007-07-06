@@ -90,8 +90,10 @@ module Hobo::Dryml
 
     
     def default_imports_for_view(view)
-      [ApplicationHelper,
-       view.controller.class.name.sub(/Controller$/, "Helper").constantize]
+      imports = [ApplicationHelper]
+      controller_helper = view.controller.class.name.sub(/Controller$/, "Helper")
+      imports << controller_helper.constantize if Object.const_defined? controller_helper
+      imports
     end
 
     
