@@ -2,6 +2,9 @@ module Hobo
 
   module Model
     
+    SQL_TYPES = [ :integer, :float, :decimal, :datetime, :date, :timestamp, :time, :text, :string,
+                  :binary, :boolean ]
+  
     def self.included(base)
       Hobo.register_model(base)
       base.extend(ClassMethods)
@@ -69,7 +72,7 @@ module Hobo
         def dynamic_field(name, *args)
           type = args.shift
           options = extract_options_from_args!(args)
-          @model.send(:set_field_type, name => type)
+          @model.send(:set_field_type, name => type) unless type.in?(SQL_TYPES)
           @model.field_specs[name] = FieldSpec.new(@model, name, type, options)          
         end
         

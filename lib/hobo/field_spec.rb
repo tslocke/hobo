@@ -10,9 +10,6 @@ module Hobo
       :textile => :text
     }
     
-    SQL_TYPES = [ :integer, :float, :decimal, :datetime, :date, :timestamp, :time, :text, :string,
-                  :binary, :boolean ]
-  
     def initialize(model, name, type, options={})
       raise ArgumentError, "you cannot provide a field spec for the primary key" if name == model.primary_key
       self.model = model
