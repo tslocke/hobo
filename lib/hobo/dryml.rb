@@ -20,6 +20,9 @@ module Hobo::Dryml
 
   EMPTY_PAGE = "[tag-page]"
 
+  APPLICATION_TAGLIB = "taglibs/application"
+  CORE_TAGLIB = "plugins/hobo/tags/core"
+
   @renderer_classes = {}
 
   class << self
@@ -49,8 +52,10 @@ module Hobo::Dryml
       end
 
       prepare_view!(view)
+      included_taglibs = (view.controller.class.respond_to? :included_taglibs) ? view.controller.class.included_taglibs : []
+
       if page == EMPTY_PAGE
-        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper]) if
+        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper], included_taglibs) if
           @tag_page_renderer_class.nil?
         @tag_page_renderer_class.new(page, view)
       else
@@ -64,7 +69,7 @@ module Hobo::Dryml
             (local_names - renderer_class.compiled_local_names).any? or # any new local names?
             renderer_class.load_time < src_file.mtime)                  # cache out of date?
           renderer_class = make_renderer_class(src_file.read, template_path, local_names,
-                                               default_imports_for_view(view))
+                                               default_imports_for_view(view), included_taglibs)
           renderer_class.load_time = src_file.mtime
           @renderer_classes[page] = renderer_class
         end
@@ -97,21 +102,23 @@ module Hobo::Dryml
     end
 
     
-    def make_renderer_class(template_src, template_path, locals, imports)
+    def make_renderer_class(template_src, template_path, locals, imports, included_taglibs=[])
       renderer_class = Class.new(TemplateEnvironment)
-      compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
+      compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs)
       renderer_class
     end
 
     
-    def compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
+    def compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs=[])
       template = Template.new(template_src, renderer_class, template_path)
       imports.each {|m| template.import_module(m)}
+
+      taglibs = [CORE_TAGLIB, APPLICATION_TAGLIB] + included_taglibs
 
       # the sum of all the names we've seen so far - eventually we'll be ready for all of 'em
       all_local_names = renderer_class.compiled_local_names | locals
 
-      template.compile(all_local_names)
+      template.compile(all_local_names, taglibs)
     end
 
     

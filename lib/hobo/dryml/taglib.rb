@@ -39,7 +39,7 @@ module Hobo::Dryml
       @module = Module.new
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)
-      template.compile([], false)
+      template.compile([], [])
       @last_load_time = @file.mtime
     end
 

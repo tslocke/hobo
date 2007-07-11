@@ -126,7 +126,7 @@ module Hobo
     def add_routes(map)
       ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
-      require "#{RAILS_ROOT}/app/plugins_init.rb" if File.exists? "#{RAILS_ROOT}/app/plugins_init.rb"
+      require "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
       
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"

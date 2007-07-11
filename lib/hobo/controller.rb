@@ -8,13 +8,44 @@ module Hobo
 
     def self.included(base)
       if base.is_a?(Class)
-        Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
-        base.class_eval do
-          alias_method_chain :redirect_to, :object_url
-        end
+        included_in_class(base)
+      end
+    end
+    
+    def self.included_in_class(base)
+      Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
+      base.extend(ClassMethods)
+      base.class_eval do
+        alias_method_chain :redirect_to, :object_url
+        @included_taglibs = []
       end
     end
 
+    module ClassMethods
+
+      attr_reader :included_taglibs
+
+      def include_taglib(options)
+        plugin = nil
+        src    = nil
+        options.each do |k,v|
+          if v.nil?
+            src = k.to_s
+          else
+            key = k.to_sym
+            case key
+            when :src
+              src = v.to_s
+            when :from_plugin
+              plugin = v.to_s
+            end
+          end
+        end
+        src = 'plugins/'+plugin+'/taglibs/'+src if plugin
+      
+        @included_taglibs << src if src
+      end
+    end
 
     protected
     

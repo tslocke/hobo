@@ -5,11 +5,7 @@ module ::Hobo::Plugins
       @opt = opt || Hash.new
       set_up_options(self.class::PLUGIN_DEFAULTS)
 
-      if @opt[:setup_using]
-        send @opt[:setup_using]
-      else
-        default
-      end
+      send @opt[:setup_using] || :default
     end
 
     def set_up_options(*defaults)
@@ -48,14 +44,22 @@ module ::Hobo::Plugins
     def resource_controller(name, &b)
       make_class @opt[name], ApplicationController do
         hobo_model_controller
+        
         class_eval &b if b
       end
     end
   
     def make_class(class_name, base_class, &b)
+      opt = @opt
       c = Class.new(base_class)
       silence_warnings { Object.const_set(class_name, c) }
-      c.class_eval(&b) if b
+      c.class_eval do
+        @opt = opt
+        def self.sym
+          @opt
+        end
+      end
+      c.class_eval &b if b
       c
     end
     

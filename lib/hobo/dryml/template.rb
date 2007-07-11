@@ -34,7 +34,7 @@ module Hobo::Dryml
 
     attr_reader :tags, :template_path
     
-    def compile(local_names=[], auto_taglibs=true)
+    def compile(local_names=[], auto_taglibs=[])
       now = Time.now
 
       unless @template_path == EMPTY_PAGE
@@ -183,8 +183,8 @@ module Hobo::Dryml
     def import_module(mod, as=nil)
       @builder.import_module(mod, as)
     end
-    
-    
+
+
     def redefine_element(el)
       redefined_tags = el.children.
         select {|e| e.is_a?(REXML::Element) && e.name == "def"}.

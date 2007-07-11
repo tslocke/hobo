@@ -1,9 +1,6 @@
 module Hobo::Dryml
   
   class DRYMLBuilder
-    
-    APPLICATION_TAGLIB = "hobolib/application"
-    CORE_TAGLIB = "plugins/hobo/tags/core"
 
     def initialize(template_path)
       @template_path = template_path
@@ -65,11 +62,8 @@ module Hobo::Dryml
 
 
     def build(local_names, auto_taglibs)
-      if auto_taglibs
-        import_taglib(CORE_TAGLIB)
-        import_taglib(APPLICATION_TAGLIB)
-        Hobo::MappingTags.apply_standard_mappings(@environment)
-      end
+
+      auto_taglibs.each{|t| import_taglib(t)}
     
       @build_instructions.each do |instruction|
         name = instruction[:name]
@@ -141,9 +135,9 @@ module Hobo::Dryml
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
-        import_taglib("hobolib/themes/#{name}/application")
+        import_taglib("taglibs/themes/#{name}/application")
         mapping_module = "#{name}_mapping"
-        if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
+        if File.exists?(path = RAILS_ROOT + "/app/views/taglibs/themes/#{mapping_module}.rb")
           load(path)
           Hobo::MappingTags.apply_mappings(@environment)
         end

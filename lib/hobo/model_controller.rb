@@ -6,7 +6,7 @@ module Hobo
 
     class PermissionDeniedError < RuntimeError; end
 
-    VIEWLIB_DIR = "hobolib"
+    VIEWLIB_DIR = "taglibs"
     
     GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
 
@@ -23,10 +23,8 @@ module Hobo
         end
 
         base.before_filter :set_no_cache_headers
-
-        base.class_eval do
-          alias_method_chain :redirect_to, :object_url
-        end
+        
+        Hobo::Controller.included_in_class(base)
       end
 
       def find_partial(klass, as)
