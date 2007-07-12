@@ -8,8 +8,10 @@ module Hobo
     def self.included(base)
       Hobo.register_model(base)
       base.extend(ClassMethods)
-      base.instance_variable_set("@field_specs", {})
-      base.send(:set_field_type, {})
+      base.class_eval do
+        @field_specs  = HashWithIndifferentAccess.new
+        set_field_type({})
+      end
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
@@ -69,7 +71,7 @@ module Hobo
           dynamic_field(:updated_at, :datetime)
         end
         
-        def dynamic_field(name, *args)
+        def field(name, *args)
           type = args.shift
           options = extract_options_from_args!(args)
           @model.send(:set_field_type, name => type) unless type.in?(SQL_TYPES)

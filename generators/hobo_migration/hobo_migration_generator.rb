@@ -1,8 +1,11 @@
-class HoboMigrationGenerator < Rails::Generator::NamedBase
+class HoboMigrationGenerator < Rails::Generator::Base
 
   def initialize(runtime_args, runtime_options = {})
     super
-    @migration_name = runtime_args.first
+    @migration_name = runtime_args.first || begin
+                                              i = Dir["#{RAILS_ROOT}/db/migrate/*hobo_migration*"].length
+                                              "hobo_migration_#{i+1}"
+                                            end
   end
 
   def manifest
