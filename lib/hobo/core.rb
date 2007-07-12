@@ -15,17 +15,6 @@ module Hobo
     end
 
 
-    def add_classes!(options, *classes)
-      options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
-      options
-    end
-
-
-    def add_classes(options, *classes)
-      add_classes!({}.update(options), classes)
-    end
-    
-    
     def map_this
       res = []
       this.each_index {|i| new_field_context(i) { res << yield } }

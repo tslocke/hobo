@@ -186,6 +186,11 @@ describe Template do
     eval_dryml("<p foo baa>abc</p>").should == "<p foo baa>abc</p>"    
   end
   
+  it "should support attribute merging on static tags" do 
+    eval_dryml(%(<p class="big" id="x" merge_attrs="&{:class => 'small', :id => 'y', :a => 'b'}"/>)).
+      should be_dom_equal_to('<p class="big small" id="y" a="b"/>')
+  end
+  
   
   # --- Block Tags --- #
   
@@ -320,6 +325,12 @@ describe Template do
     context_eval(a_user, show_tag + '<show:name/>').should == "Tom"
   end
   
+  it "should allow the :<field-name> to be ommitted from the close tag" do 
+    context_eval(a_user, show_tag + '<show:name></show:name>').should == "Tom"
+    context_eval(a_user, show_tag + '<show:name></show>').should == "Tom"
+  end
+  
+  
   it "should allow the context to be changed with a 'with' attribute" do 
     eval_dryml(show_tag + %(<show with="&'hello'"/>)).should == 'hello'
   end
@@ -339,6 +350,16 @@ describe Template do
   
   it "should provide <set> to create local variables" do
     eval_dryml("<set x='&1' y='&2'/><%= x + y %>").should == '3'
+  end
+  
+  it 'should interpolate #{...} blocks in attributes of any tag' do 
+    tag = '<def tag="t" attrs="x"><%= x %></def>'
+    
+    eval_dryml(tag + "<t x='#{1+2}'/>").should == '3'
+    eval_dryml(tag + "<t x='hey #{1+2} ho'/>").should == 'hey 3 ho'
+
+    eval_dryml(tag + "<p class='#{1+2}'/>").should == "<p class='3'/>"
+    eval_dryml(tag + "<p class='hey #{1+2} ho'/>").should == "<p class='hey 3 ho'/>"
   end
   
   
@@ -417,4 +438,35 @@ class CompiledDryml < String
     self.to_s.gsub(/\s+/, ' ').strip == other.gsub(/\s+/, ' ').strip
   end
   
+end
+
+
+module Spec
+  module Matchers
+
+    class BeDomEqualTo #:nodoc:
+      def initialize(expected)
+        @expected = expected
+      end
+      
+      def matches?(actual)
+        @actual = actual
+        expected_dom = HTML::Document.new(@expected).root
+        actual_dom = HTML::Document.new(@actual).root
+        expected_dom == actual_dom
+      end
+      
+      def failure_message
+        "#{@expected}\nexpected to be == (by DOM) to\n#{@actual}"
+      end
+      
+      def description
+        "be DOM equal to\n#{@expected}"
+      end
+    end
+    
+    def be_dom_equal_to(expected)
+      Matchers::BeDomEqualTo.new(expected)
+    end
+  end
 end

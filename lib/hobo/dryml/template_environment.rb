@@ -92,20 +92,20 @@ module Hobo::Dryml
     end
     
     
-    def merge_attrs(options, klass=nil)
-      options ||= {}
-      if klass
-        options = add_classes(options.symbolize_keys, [klass])
-      end
-      options.map do |n,v|
-        if v == true
-          n
-        else
-          v = v.to_s
-          val = v.include?('"') ? "'" + v + "'" : '"' + v + '"'
-          "#{n}=#{val}"
-        end
-      end.join(' ')
+    def add_classes!(options, *classes)
+      options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
+      options
+    end
+
+
+    def add_classes(options, *classes)
+      add_classes!({}.update(options), classes)
+    end
+
+    
+    def merge_attrs(attrs, overriding_attrs)
+      attrs = add_classes(attrs, *[overriding_attrs.delete(:class)].compact)
+      attrs.update(overriding_attrs)
     end
 
 

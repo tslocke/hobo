@@ -159,7 +159,7 @@ module Hobo::Dryml
             tag_call(el)
           end
         else
-          html_element_to_erb(el)
+          static_element_to_erb(el)
         end
       end
     end
@@ -246,10 +246,7 @@ module Hobo::Dryml
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
         
         src = if template_name?(name)
-                was_inside_template = @inside_template
-                @inside_template = true
                 method_body = tag_method_body(el, attr_names)
-                @inside_template = was_inside_template
                 template_method(name, re_alias, redefine, method_body)
               else
                 method_body = tag_method_body(el, attr_names)
@@ -257,7 +254,6 @@ module Hobo::Dryml
               end
         src << "<% _register_tag_attrs(:#{name}, #{attr_names.inspect}) %>"
         
-        puts src if el.attributes["debug_source"]
         logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
         
         @builder.add_build_instruction(:def,
@@ -330,7 +326,7 @@ module Hobo::Dryml
       dryml_exception("tagbody can only appear inside a <def>", el) unless
         find_ancestor(el) {|e| e.name == 'def'}
       dryml_exception("tagbody cannot appear inside a part", el) if
-        find_ancestor(el) {|e| e.attributes['part_id']}
+        find_ancestor(el) {|e| e.attributes['part']}
       tagbody_call(el)
     end
 
@@ -347,8 +343,8 @@ module Hobo::Dryml
 
 
     def part_element(el, content)
-      require_attribute(el, "part_id", DRYML_NAME_RX)
-      part_name  = el.attributes['part_id']
+      require_attribute(el, "part", DRYML_NAME_RX)
+      part_name  = el.attributes['part']
       dom_id = el.attributes['id'] || part_name
       
       part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
@@ -364,7 +360,11 @@ module Hobo::Dryml
     def extract_merge_name!(el)
       merge_name = el.attributes["merge"]
       
-      dryml_exception("merge is not allowed outside of template definitions", el) if merge_name && !@inside_template
+      if merge_name
+        def_tag = find_ancestor(el) {|e| e.name == "def"}
+        dryml_exception("merge is not allowed outside of template definitions", el) if
+          def_tag.nil? || !template_name?(def_tag.attributes["tag"])
+      end
       
       el.attributes.delete("merge")
       res = merge_name == "&true" ? el.dryml_name : merge_name
@@ -454,17 +454,17 @@ module Hobo::Dryml
                "#{name}(#{options unless options == '{}'})"
              end
       
-      part_id = el.attributes['part_id']
+      part_name = el.attributes['part']
       if el.children.empty?
-        if part_id
-          "<span id='#{part_id}'>" + part_element(el, "<%= #{call} %>") + "</span>"
+        if part_name
+          "<span id='#{part_name}'>" + part_element(el, "<%= #{call} %>") + "</span>"
         else
           "<%= #{call} #{newlines}%>"
         end
       else
         children = children_to_erb(el)
-        if part_id
-          id = el.attributes['id'] || part_id
+        if part_name
+          id = el.attributes['id'] || part_name
           "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
             part_element(el, "<% _output(#{call} do %>#{children}<% end) %>") +
             "</span>"
@@ -501,54 +501,64 @@ module Hobo::Dryml
       end
     end
 
-    
-    def html_element_to_erb(el)
-      start_tag_src = el.instance_variable_get("@start_tag_source").
-        gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
-
-      merge_attrs = el.attributes["merge_attrs"]
-      if merge_attrs
-        attr_args = if merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
-                      "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? options : __merge_attrs__)"
-                    else
-                      dryml_exception("invalid merge_attrs", el)
-                    end
-        class_attr = el.attributes["class"]
-        if class_attr
-          raise HoboError.new("invalid class attribute with merge_attrs: '#{class_attr}'") if
-            class_attr =~ /'|\[!\[HOBO-ERB/
-
-          attr_args.concat(", '#{class_attr}'")
-          start_tag_src.sub!(/\s*class\s*=\s*('[^']*?'|"[^"]*?")/, "")
-        end
-        start_tag_src.sub!(/\s*merge_attrs(?:\s*=\s*('[^']*?'|"[^"]*?"))?/, " <%= merge_attrs(#{attr_args}) %>")
+    def static_tag_to_method_call(el)
+      part = el.attributes["part"]
+      attrs = el.attributes.map do |n, v|
+        next if n.in? %w(merge_attrs part)
+        
+        val = v.gsub('"', '\"')
+        %(:#{n} => "#{val}")
+      end
+      # If there's a part but no id, the id defaults to the part name
+      if part && !el.attributes["id"]
+        attrs << ":id => '#{part}'"
       end
       
-      # Allow #{...} as an alternate to <%= ... %>
-      start_tag_src.sub!(/=\s*('.*?'|".*?")/) do |s|
-        s.gsub(/#\{(.*?)\}/, '<%= \1 %>')
-      end
-
-      if start_tag_src.ends_with?("/>")
-        start_tag_src
+      # Convert the attributes hash to a call to merge_attrs if
+      # there's a merge_attrs attribute
+      attrs = if (merge_attrs = el.attributes['merge_attrs'])
+                dryml_exception("merge_attrs was given a string", el) unless is_code_attribute?(merge_attrs)
+        
+                "merge_attrs({#{attrs * ', '}}, " +
+                  "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? options : __merge_attrs__))"
+              else
+                "{" + attrs.join(', ') + "}"
+              end
+      
+      if el.children.empty?
+        dryml_exception("part attribute on empty static tag", el) if part
+        
+        args = ["", attrs].compact.join(', ')
+        method = "tag"
+        "<%= tag(:#{el.name}, #{attrs} #{tag_newlines(el)})%>"
       else
-        if el.attributes['part_id']
+        if part
           body = part_element(el, children_to_erb(el))
-          if el.attributes["id"]
-            # remove part_id, and eval the id attribute with an erb scriptlet
-            start_tag_src.sub!(/\s*part_id\s*=\s*('[^']*?'|"[^"]*?")/, "")
-            id_expr = attribute_to_ruby(el.attributes['id'])
-            start_tag_src.sub!(/id\s*=\s*('[^']*?'|"[^"]*?")/, "id='<%= #{id_expr} %>'")
-          else
-            # rename part_id to id
-            start_tag_src.sub!(/part_id\s*=\s*('[^']*?'|"[^"]*?")/, "id=\\1")
-          end
-          dryml_exception("multiple part ids", el) if start_tag_src.index("part_id=")
-
-
-          start_tag_src + body + "</#{el.dryml_name}>"
         else
-          start_tag_src + children_to_erb(el) + "</#{el.dryml_name}>"
+          body = children_to_erb(el)               
+        end
+
+        args = [":#{el.name}", body, attrs].compact.join(', ')
+        method = "content_tag"
+        "<%= tag :#{el.name}, #{attrs}, true #{tag_newlines(el)} %>#{body}</#{el.name}>"
+      end
+    end
+    
+    def static_element_to_erb(el)
+      if el.attributes["part"] || el.attributes["merge_attrs"]
+        static_tag_to_method_call(el)
+      else
+        start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
+        
+        # Allow #{...} as an alternate to <%= ... %>
+        start_tag_src.sub!(/=\s*('.*?'|".*?")/) do |s|
+          s.gsub(/#\{(.*?)\}/, '<%= \1 %>')
+        end
+
+        if el.has_end_tag?
+          start_tag_src + children_to_erb(el) + "</#{el.name}>"
+        else
+          start_tag_src
         end
       end
     end
@@ -607,12 +617,12 @@ module Hobo::Dryml
     end
 
     def element_line_num(el)
-      offset = el.instance_variable_get("@source_offset")
+      offset = el.source_offset
       line_no = @xmlsrc[0..offset].count("\n") + 1
     end
 
     def tag_newlines(el)
-      src = el.instance_variable_get("@start_tag_source")
+      src = el.start_tag_source
       "\n" * src.count("\n")
     end
 

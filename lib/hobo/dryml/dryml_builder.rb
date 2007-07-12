@@ -124,7 +124,7 @@ module Hobo::Dryml
 
 
     def import_module(mod, as=nil)
-      raise NotImplementedError.new if as
+      raise NotImplementedError if as
       @environment.send(:include, mod)
     end
   
