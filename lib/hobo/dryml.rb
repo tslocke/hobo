@@ -52,10 +52,15 @@ module Hobo::Dryml
       end
 
       prepare_view!(view)
-      included_taglibs = (view.controller.class.respond_to? :included_taglibs) ? view.controller.class.included_taglibs : []
+      included_taglibs = if view.controller.class.respond_to? :included_taglibs
+                           view.controller.class.included_taglibs
+                         else
+                           []
+                         end
 
       if page == EMPTY_PAGE
-        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper], included_taglibs) if
+        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names,
+                                                        [ApplicationHelper], included_taglibs) if
           @tag_page_renderer_class.nil?
         @tag_page_renderer_class.new(page, view)
       else

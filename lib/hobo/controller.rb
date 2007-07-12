@@ -25,25 +25,12 @@ module Hobo
 
       attr_reader :included_taglibs
 
-      def include_taglib(options)
-        plugin = nil
-        src    = nil
-        options.each do |k,v|
-          if v.nil?
-            src = k.to_s
-          else
-            key = k.to_sym
-            case key
-            when :src
-              src = v.to_s
-            when :from_plugin
-              plugin = v.to_s
-            end
-          end
-        end
-        src = 'plugins/'+plugin+'/taglibs/'+src if plugin
-      
-        @included_taglibs << src if src
+      def include_taglib(src, options={})
+        @included_taglibs << if options[:from_plugin]
+                               'plugins/' + options[:from_plugin] + '/taglibs/' + src
+                             else
+                               src
+                             end
       end
     end
 
