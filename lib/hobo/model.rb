@@ -79,7 +79,7 @@ module Hobo
         end
         
         def method_missing(name, *args)
-          dynamic_field(name, *args)
+          field(name, *args)
         end
         
       end
