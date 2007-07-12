@@ -1,43 +1,3 @@
-module Kernel
-  
-  def extract_options_from_args!(args) #:nodoc:
-    args.last.is_a?(Hash) ? args.pop : {}
-  end
-  
-end
-
-class Object
-
-  def in?(array)
-    array.include?(self)
-  end
-
-  def not_in?(array)
-    not array.include?(self)
-  end
-  
-  alias_method :is_a_without_multiple_args?, :is_a?
-  def is_a?(*args)
-    args.any? {|a| is_a_without_multiple_args?(a) }
-  end
-  
-  # metaid
-  def metaclass; class << self; self; end; end
-  def meta_eval &blk; metaclass.instance_eval &blk; end
-
-  # Adds methods to a metaclass
-  def meta_def name, &blk
-    meta_eval { define_method name, &blk }
-  end
-
-  # Defines an instance method within a class
-  def class_def name, &blk
-    class_eval { define_method name, &blk }
-  end
-
-end
-
-
 class Module
   
   def inheriting_attr_accessor(*names)
@@ -108,6 +68,47 @@ class Module
   end
 
 end
+
+module Kernel
+  
+  def extract_options_from_args!(args) #:nodoc:
+    args.last.is_a?(Hash) ? args.pop : {}
+  end
+  
+end
+
+class Object
+
+  def in?(array)
+    array.include?(self)
+  end
+
+  def not_in?(array)
+    not array.include?(self)
+  end
+  
+  alias_method :is_a_without_multiple_args?, :is_a?
+  def is_a?(*args)
+    args.any? {|a| is_a_without_multiple_args?(a) }
+  end
+  
+  # metaid
+  def metaclass; class << self; self; end; end
+  def meta_eval &blk; metaclass.instance_eval &blk; end
+
+  # Adds methods to a metaclass
+  def meta_def name, &blk
+    meta_eval { define_method name, &blk }
+  end
+
+  # Defines an instance method within a class
+  def class_def name, &blk
+    class_eval { define_method name, &blk }
+  end
+
+end
+
+
 
 module Enumerable
 

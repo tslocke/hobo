@@ -24,7 +24,7 @@ module Hobo
     def sql_type
       options[:sql_type] or begin
                               sql_types = model.connection.native_database_types.keys - [:primary_key]
-                              if type.in?(Model::SQL_TYPES)
+                              if type.in?(sql_types)
                                 type
                               elsif options[:length]
                                 :string
