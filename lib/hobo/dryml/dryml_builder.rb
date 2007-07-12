@@ -31,6 +31,7 @@ module Hobo::Dryml
       @build_instructions << params.merge(:type => type)
     end
     
+    
     def add_part(name, src, line_num)
       raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
       add_build_instruction(:part, :src => src, :line_num => line_num)
@@ -67,15 +68,11 @@ module Hobo::Dryml
     
       @build_instructions.each do |instruction|
         name = instruction[:name]
-        pred = instruction[:pred]
         case instruction[:type]
         when :def
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
           
-        when :template
-          raise "Not Implemented"
-
         when :part
           @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
           
@@ -97,7 +94,7 @@ module Hobo::Dryml
           @environment.send(:alias_method, instruction[:new], instruction[:old])
           
         else
-          raise HoboError.new("DRYML: Unknown build instruction type found when building #{template_path}")
+          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, building #{template_path}")
         end
       end
       @last_build_time = Time.now

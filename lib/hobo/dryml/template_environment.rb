@@ -42,28 +42,38 @@ module Hobo::Dryml
       end
       
       # --- end local tags --- #
-
+      
+      
+      def _register_tag_attrs(tag_name, attrs)
+        @tag_attrs ||= {}
+        @tag_attrs[tag_name] = attrs
+      end
+      
+      attr_reader :tag_attrs
+      
     end
-    
+
     for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}
       include mod
     end
 
-    def initialize(view_name, view)
-      @view = view
-      @_view_name = view_name
-      @_erb_binding = binding
-      @_part_contexts = {}
+    def initialize(view_name=nil, view=nil)
+      unless view_name.nil? && view.nil?
+        @view = view
+        @_view_name = view_name
+        @_erb_binding = binding
+        @_part_contexts = {}
 
-      # Make sure the "assigns" from the controller are available (instance variables)
-      if view
-        view.assigns.each do |key, value|
-          instance_variable_set("@#{key}", value)
-        end
+        # Make sure the "assigns" from the controller are available (instance variables)
+        if view
+          view.assigns.each do |key, value|
+            instance_variable_set("@#{key}", value)
+          end
 
-        # copy view instance variables over
-        view.instance_variables.each do |iv|
-          instance_variable_set(iv, view.instance_variable_get(iv))
+          # copy view instance variables over
+          view.instance_variables.each do |iv|
+            instance_variable_set(iv, view.instance_variable_get(iv))
+          end
         end
       end
     end
@@ -74,6 +84,11 @@ module Hobo::Dryml
                  :this, :this_parent, :this_field, :this_type,
                  :form_field_path, :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
+    end
+    
+    
+    def attrs_for(name)
+      self.class.tag_attrs[name]
     end
     
     
@@ -132,7 +147,7 @@ module Hobo::Dryml
       end
       res
     end
-
+    
 
     def _erbout
       @_erb_output

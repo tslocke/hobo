@@ -219,6 +219,10 @@ describe Template do
   it "should support merge_attrs on static tags" do 
     eval_with_defs('<merge_attrs_example class="x"/>').should == '<p class="x">hi</p>'
   end
+  
+  it "should make the declared attributes available via the 'attrs_for' method" do 
+    eval_with_defs('<%= attrs_for(:t_attr).inspect %>').should == '[:x]'
+  end
 
   
   
@@ -288,7 +292,66 @@ describe Template do
     eval_with_templates('<NestedStaticMerge><StaticMerge><b class="small"/></StaticMerge></NestedStaticMerge>').should ==
       'merge StaticMerge: <p>a <b class="small">bold</b> word</p>'
   end
-    
+  
+  it "should merge the body of template parameters into nested templates" do 
+    eval_with_templates('<NestedStaticMerge><StaticMerge><b>BOLD</b></StaticMerge></NestedStaticMerge>').should ==
+      'merge StaticMerge: <p>a <b class="big">BOLD</b> word</p>'
+  end
+  
+  # --- The Context --- #
+  
+  def context_eval(context, src)
+    eval_dryml(src, :context => context)
+  end
+  
+  def a_user
+    Struct.new(:name, :email).new("Tom", "tom@foo.net")
+  end
+  
+  def show_tag
+    '<def tag="show"><%= this %></def>'
+  end
+  
+  it "should make the initial context available as `this`"  do 
+    context_eval('hello', "<%= this %>").should == "hello"
+  end
+  
+  it "should allow the context to be changed with the :<field-name> syntax" do 
+    context_eval(a_user, show_tag + '<show:name/>').should == "Tom"
+  end
+  
+  it "should allow the context to be changed with a 'with' attribute" do 
+    eval_dryml(show_tag + %(<show with="&'hello'"/>)).should == 'hello'
+  end
+  
+  it "should allow the context to be changed with a 'field' attribute" do 
+    context_eval(a_user, show_tag + '<show field="name"/>').should == "Tom"
+  end
+  
+  it "should allow the context to be changed inside template parameters" do 
+    tags = %(<def tag="do"><tagbody/></def>
+             <def tag="Template"><do:name><p merge/></do></def>)
+    context_eval(a_user, tags + '<Template><p><%= this %></p></Template>').should == '<p>Tom</p>'
+  end
+  
+  
+  # --- Misc --- #
+  
+  it "should provide <set> to create local variables" do
+    eval_dryml("<set x='&1' y='&2'/><%= x + y %>").should == '3'
+  end
+  
+  
+  # --- Taglibs --- #
+  
+  it "should import tags from taglibs with the <include> tag" do 
+    eval_dryml("<include src='taglibs/simple'/> <foo/>").should == "I am the foo tag"
+  end
+  
+  it "should import tags from taglibs into a namespace with <include as/>" do 
+    proc { eval_dryml("<include src='taglibs/simple' as='a'/> <foo/>") }.should raise_error
+    eval_dryml("<include src='taglibs/simple' as='a'/> <a.foo/>").should == "I am the foo tag"
+  end
   
   
   
@@ -307,11 +370,11 @@ describe Template do
   
   
   def eval_dryml(src, options={})
-    options.reverse_merge!(:locals => {})
+    options.reverse_merge!(:locals => {}, :implicit_imports => [])
     
     template = prepare_template(src, options)
     template.compile(options[:locals].keys, options[:implicit_imports])
-    new_renderer.render_page(options[:this], options[:locals])
+    new_renderer.render_page(options[:context], options[:locals]).strip
   end
   
   def compile_dryml(src, options={})
@@ -332,7 +395,7 @@ describe Template do
     compile_dryml("<def tag='MyTemplate'>#{src}</def>", :builder => builder)
     
     # get rid of first and last scriptlets - they're to do with the method declaration
-    def_src.to_s.sub(/^\<\%.*?\%\>/, "").sub(/<% _erbout; end; end %>$/, "")
+    def_src.to_s.sub(/^\<\%.*?\%\>/, "").sub(/<% _erbout; end; end %><% _register_tag_attrs.*$/, "")
   end
   
   def compile_def(src)
@@ -343,7 +406,7 @@ describe Template do
     end
     compile_dryml(src, :builder => builder)
     
-    def_src
+    def_src.sub(/<% _register_tag_attrs.*/, "")
   end
   
 end

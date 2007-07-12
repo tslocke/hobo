@@ -198,7 +198,7 @@ module Hobo::Dryml
     def set_element(el)
       el.attributes.map do |name, value|
         dryml_exception(el, "invalid name in set") unless name =~ DRYML_NAME_RX
-        "#{name} = #{attribute_to_ruby(value)}; "
+        "<% #{name} = #{attribute_to_ruby(value)}; %>"
       end.join + tag_newlines(el)
     end
 
@@ -241,6 +241,7 @@ module Hobo::Dryml
       else
         attrspec = el.attributes["attrs"]
         attr_names = attrspec ? attrspec.split(/\s*,\s*/).every(:to_sym) : []
+        
         invalids = attr_names & [:with, :field, :this]
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
         
@@ -254,6 +255,7 @@ module Hobo::Dryml
                 method_body = tag_method_body(el, attr_names)
                 tag_method(name, re_alias, redefine, method_body)
               end
+        src << "<% _register_tag_attrs(:#{name}, #{attr_names.inspect}) %>"
         
         puts src if el.attributes["debug_source"]
         logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
@@ -430,8 +432,10 @@ module Hobo::Dryml
       if template_call?(el)
         "proc { [{#{options * ', '}}, #{compile_template_procs(el)}] }"
       else
-        body = children_to_erb(el)
-        options << ":tagbody => proc { new_context { %>#{body}<% } } " unless body.blank?
+        if el.has_end_tag?
+          body = children_to_erb(el)
+          options << ":tagbody => proc { new_context { %>#{body}<% } } " 
+        end
         "proc { {#{options * ', '}} }"
       end
     end

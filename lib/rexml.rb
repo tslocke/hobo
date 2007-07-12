@@ -37,7 +37,6 @@ module REXML
       DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
       
       DRYML_TAG_MATCH = /^<((?>#{NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
-
       
       attr_writer :dryml_mode
       def dryml_mode?
@@ -48,7 +47,7 @@ module REXML
       def pull
         if @closed
           x, @closed = @closed, nil
-          return [ :end_element, x ]
+          return [ :end_element, x, false ]
         end
         return [ :end_document ] if empty?
         return @stack.shift if @stack.size > 0
@@ -181,8 +180,8 @@ module REXML
                               end
               raise REXML::ParseException.new("Missing end tag for "+
                                               "'#{last_tag}' (line #{line_no}) (got \"#{md[1]}\")", 
-                @source) unless valid_end_tag
-              return [ :end_element, last_tag ]
+                                              @source) unless valid_end_tag
+              return [ :end_element, last_tag, true ]
             elsif @source.buffer[1] == ?!
               md = @source.match(/\A(\s*[^>]*>)/um)
               raise REXML::ParseException.new("Malformed node", @source) unless md
@@ -256,10 +255,11 @@ module REXML
               tag_stack.push(event[1])
               # find the observers for namespaces
               @build_context = @build_context.add_element(event[1], event[2])
-              @build_context.instance_variable_set("@start_tag_source", event[3])
-              @build_context.instance_variable_set("@source_offset", event[4])
+              @build_context.start_tag_source = event[3]
+              @build_context.source_offset = event[4]
             when :end_element
               tag_stack.pop
+              @build_context.has_end_tag = event[2]
               @build_context = @build_context.parent
             when :text
               if not in_doctype
@@ -330,6 +330,13 @@ module REXML
     
     def dryml_name
       expanded_name.sub(/:.*/, "")
+    end
+    
+    attr_accessor :start_tag_source, :source_offset
+    
+    attr_writer :has_end_tag
+    def has_end_tag?
+      @has_end_tag
     end
     
   end
