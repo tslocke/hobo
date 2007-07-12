@@ -244,7 +244,7 @@ module Hobo::Dryml
         invalids = attr_names & [:with, :field, :this]
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
         
-        src = if name =~ /^[A-Z]/
+        src = if template_name?(name)
                 was_inside_template = @inside_template
                 @inside_template = true
                 method_body = tag_method_body(el, attr_names)
@@ -264,6 +264,16 @@ module Hobo::Dryml
         # keep line numbers matching up
         "<% #{"\n" * method_body.count("\n")} %>"
       end
+    end
+    
+    
+    def template_call?(el)
+      template_name?(el.name)
+    end
+    
+    
+    def template_name?(name)
+      name =~ /^[A-Z]/
     end
     
     
@@ -355,7 +365,14 @@ module Hobo::Dryml
       dryml_exception("merge is not allowed outside of template definitions", el) if merge_name && !@inside_template
       
       el.attributes.delete("merge")
-      merge_name == "&true" ? el.dryml_name : merge_name
+      res = merge_name == "&true" ? el.dryml_name : merge_name
+
+      dryml_exception("merge name for a template call must be capitalised", el) if
+        res && template_call?(el) && !template_name?(res)
+      dryml_exception("merge name for a block-tag call must not be capitalised", el) if
+        res && !template_call?(el) && template_name?(res)
+      
+      res
     end
     
     
@@ -385,27 +402,38 @@ module Hobo::Dryml
     
     def compile_template_procs(el)
       "{" + 
-        (el.elements.map do |e|
+        (el.children.map do |e|
+           dryml_exception("content is not allowed in template calls", el) if e.is_a?(REXML::Text) && !e.to_s.blank?
+
+           next unless e.is_a?(REXML::Element)
+           
            merge_name = extract_merge_name!(e)
            if merge_name
-             ":#{e.name} => merge_template_parameter(#{template_proc(e)}, template_procs[:#{merge_name}])"
+             if template_call?(e)
+               ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+             else
+               ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+             end
            else
              ":#{e.name} => #{template_proc(e)}"
            end
-         end.join(", ")) +
+         end.compact.join(", ")) +
         "}"
     end
     
     
     def template_proc(el)
-      items = el.attributes.map do |name, value|
+      options = el.attributes.map do |name, value|
         ":#{name} => #{attribute_to_ruby(value)}"
       end
       
-      body = children_to_erb(el)
-      items << ":tagbody => proc { new_context { %>#{body}<% } } " unless body.blank?
-      
-      "proc { {#{items * ', '}} }"
+      if template_call?(el)
+        "proc { [{#{options * ', '}}, #{compile_template_procs(el)}] }"
+      else
+        body = children_to_erb(el)
+        options << ":tagbody => proc { new_context { %>#{body}<% } } " unless body.blank?
+        "proc { {#{options * ', '}} }"
+      end
     end
 
     

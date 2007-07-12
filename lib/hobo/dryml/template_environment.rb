@@ -274,11 +274,11 @@ module Hobo::Dryml
     end
     
     
-    def merge_and_call(name, options, template_proc, &b)
-      if template_proc
-        merge_hash = template_proc.call
-        tagbody = merge_hash.delete(:tagbody)
-        options = options.update(merge_hash)
+    def merge_and_call(name, options, overriding_proc, &b)
+      if overriding_proc
+        overriding_options = overriding_proc.call
+        tagbody = overriding_options.delete(:tagbody)
+        options = options.update(overriding_options)
       end      
       
       if name.to_s.in?(Hobo.static_tags)
@@ -298,7 +298,33 @@ module Hobo::Dryml
     end
     
     
-    def merge_and_call_template(name, options, template_proc)
+    def merge_and_call_template(name, options, template_procs, overriding_proc)
+      if overriding_proc
+        overriding_options, overriding_template_procs = overriding_proc.call
+        options = options.merge(overriding_options)
+        template_procs = template_procs.merge(overriding_template_procs)
+      end      
+      
+      send(name, options, template_procs)
+    end
+    
+    # Takes two procs that each returh hashes and returns a single
+    # proc that calls these in turn and merges the results into a
+    # single hash
+    def merge_option_procs(general_proc, overriding_proc)
+      proc { general_param.call.merge(overriding_param.call) }
+    end
+    
+    # Same as merge_option_procs, except these procs return a pair of
+    # hashes rather than a single hash. The first hash is the tag
+    # attributes (options), the second is a hash of procs -- the
+    # template parameters.
+    def merge_template_parameter_procs(general_proc, overriding_proc)
+      proc do
+        general_options, general_template_procs = general_proc.call
+        overriding_options, overriding_template_procs = overriding_proc.call
+        [general_options.merge(overriding_options), general_template_procs.merge(overriding_template_procs)]
+      end
     end
     
     
