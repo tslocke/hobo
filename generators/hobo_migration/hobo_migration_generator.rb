@@ -102,7 +102,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
 
   def create_table(model)
       (["create_table :#{model.table_name} do |t|"] +
-       model.field_specs.values.map {|f| create_field(f)} +
+       model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f)} +
        ["end"]) * "\n"
   end
   
