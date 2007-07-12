@@ -9,8 +9,8 @@ Description:
     You don't have to think up all attributes up front, but it's a good idea of adding just the baseline of what's 
     needed to start really working with the resource.
 
-    The generator creates a model class in app/models, a test suite in test/unit, test fixtures in
-    test/fixtures/singular_name.yml, and a migration in db/migrate.
+    The generator creates a model class in app/models, a test suite in test/unit and test fixtures in
+    test/fixtures/singular_name.yml.
 
 Examples:
     ./script/generate model account
@@ -19,7 +19,6 @@ Examples:
             Model:      app/models/account.rb
             Test:       test/unit/account_test.rb
             Fixtures:   test/fixtures/accounts.yml
-            Migration:  db/migrate/XXX_add_accounts.rb
 
     ./script/generate model post title:string created_on:date body:text published:boolean
     
