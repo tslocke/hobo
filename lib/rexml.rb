@@ -352,25 +352,25 @@ module REXML
     alias_method_chain :initialize, :dryml
     
     def value_with_dryml
-      if no_rhs?
-        element.document.default_attribute_value
-      else
+      if has_rhs?
         value_without_dryml
+      else
+        element.document.default_attribute_value
       end
     end
     alias_method_chain :value, :dryml
 
     def to_string_with_dryml
-      if no_rhs?
-        @expanded_name
-      else
+      if has_rhs?
         to_string_without_dryml
+      else
+        @expanded_name
       end
     end
     alias_method_chain :to_string, :dryml
     
-    def no_rhs?
-      @value == true
+    def has_rhs?
+      @value != true
     end
     
   end

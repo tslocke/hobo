@@ -169,6 +169,21 @@ describe Template do
       '{:Baa => proc { [{:x => "1"}, {:a => proc { {:tagbody => proc { new_context { %>hello<% } } } }}] }})) %>'
   end
 
+  it "should compile template modifier parameters " do
+    compile_dryml("<Page><head.append>abc</head.append></Page>").should == 
+      '<% _output(Page({}, {:head => proc { {:_append => proc { new_context { %>abc<% } }} }})) %>'
+  end
+  
+  it "should compile consecutive template modifier parameters " do
+    compile_dryml("<Page><head.append>abc</head.append><head.prepend>def</head.prepend></Page>").should == 
+      '<% _output(Page({}, {:head => proc { {:_append => proc { new_context { %>abc<% } }, ' + 
+      ':_prepend => proc { new_context { %>def<% } }} }})) %>'
+  end
+  
+  it "should compile modifiers and a merge parameter on the same template parameter" do 
+    compile_dryml("<Page><head.before>abc</head.before><head x='1'/></Page>").should == 
+      '<% _output(Page({}, {:head => proc { {:_before => proc { new_context { %>abc<% } }, :x => "1"} }})) %>'
+  end
   
   # --- Tag Evalutation Examples --- #
   
@@ -302,6 +317,12 @@ describe Template do
     eval_with_templates('<NestedStaticMerge><StaticMerge><b>BOLD</b></StaticMerge></NestedStaticMerge>').should ==
       'merge StaticMerge: <p>a <b class="big">BOLD</b> word</p>'
   end
+  
+  it "should allow merge names to be defined dynamically" do 
+    eval_dryml('<def tag="T"><p merge="& :a.to_s + :b.to_s"/></def>' +
+               '<T><ab x="1"/></T>').should == '<p x="1" />'
+  end
+  
   
   # --- The Context --- #
   

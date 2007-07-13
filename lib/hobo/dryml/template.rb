@@ -353,9 +353,9 @@ module Hobo::Dryml
       @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
-      res = "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
-      res
+      "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
     end
+    
     
     def extract_merge_name!(el)
       merge_name = el.attributes["merge"]
@@ -403,36 +403,52 @@ module Hobo::Dryml
     
     
     def compile_template_procs(el)
-      "{" + 
-        (el.children.map do |e|
-           dryml_exception("content is not allowed in template calls", el) if e.is_a?(REXML::Text) && !e.to_s.blank?
-
-           next unless e.is_a?(REXML::Element)
-           
-           merge_name = extract_merge_name!(e)
-           if merge_name
-             if template_call?(e)
-               ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
-             else
-               ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
-             end
-           else
-             ":#{e.name} => #{template_proc(e)}"
-           end
-         end.compact.join(", ")) +
-        "}"
+      dryml_exception("content is not allowed directly inside template calls", el) if 
+        el.children.find { |e| e.is_a?(REXML::Text) && !e.to_s.blank? }
+      
+      param_groups = el.elements.group_by { |e| e.name.split('.')[0] }
+      
+      param_options = param_groups.map do |group_name, tags| 
+        if tags.length == 1 and (e = tags.first) and e.name !~ /\./
+          merge_name = extract_merge_name!(e)
+          if merge_name
+            if template_call?(e)
+              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+            else
+              ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+            end
+          else
+            ":#{e.name} => #{template_proc(e)}"
+          end
+        else
+          merge_param, modifiers = tags.partition{ |e| e.name == group_name }
+          dryml_exception("duplicate template parameter: #{group_name}", el) if merge_param.length > 1
+          merge_param = merge_param.first # there's zero or one
+          
+          ":#{group_name} => #{template_proc(merge_param, modifiers)}"
+        end
+      end
+      "{" + param_options.join(', ') + "}"
     end
     
     
-    def template_proc(el)
-      options = el.attributes.map do |name, value|
-        ":#{name} => #{attribute_to_ruby(value)}"
+    def template_proc(el, modifiers=[])
+      options = modifiers.map do |e|
+        mod = e.name.split('.')[1]
+        dryml_exception("invalid template parameter modifier: #{e.name}") if 
+          !mod.in? %w{before after append prepend replace}
+
+        ":_#{mod} => proc { new_context { %>#{children_to_erb(e)}<% } }"
       end
       
-      if template_call?(el)
+      if el
+        options.concat(el.attributes.map { |name, value| ":#{name} => #{attribute_to_ruby(value)}" })
+      end
+      
+      if el && template_call?(el)
         "proc { [{#{options * ', '}}, #{compile_template_procs(el)}] }"
       else
-        if el.has_end_tag?
+        if el && el.has_end_tag?
           body = children_to_erb(el)
           options << ":tagbody => proc { new_context { %>#{body}<% } } " 
         end
