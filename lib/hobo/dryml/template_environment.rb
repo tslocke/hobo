@@ -340,11 +340,21 @@ module Hobo::Dryml
     def merge_and_call_template(name, options, template_procs, overriding_proc)
       if overriding_proc
         overriding_options, overriding_template_procs = overriding_proc.call
+        
+        replace = overriding_options[:_replace]
+        return replace.call if replace
+
+        before  = overriding_options.delete(:_before)
+        after   = overriding_options.delete(:_after)
+        
         options = options.merge(overriding_options)
         template_procs = template_procs.merge(overriding_template_procs)
       end      
       
-      send(name, options, template_procs)
+      before = (before && before.call).to_s
+      after  = (after && after.call).to_s
+
+      before + send(name, options, template_procs) + after
     end
     
     # Takes two procs that each returh hashes and returns a single

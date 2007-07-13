@@ -433,6 +433,7 @@ module Hobo::Dryml
     
     
     def template_proc(el, modifiers=[])
+      
       options = modifiers.map do |e|
         mod = e.name.split('.')[1]
         dryml_exception("invalid template parameter modifier: #{e.name}") if 
@@ -445,8 +446,9 @@ module Hobo::Dryml
         options.concat(el.attributes.map { |name, value| ":#{name} => #{attribute_to_ruby(value)}" })
       end
       
-      if el && template_call?(el)
-        "proc { [{#{options * ', '}}, #{compile_template_procs(el)}] }"
+      if template_call?(el || modifiers.first)
+        template_procs = el ? compile_template_procs(el) : "{}"
+        "proc { [{#{options * ', '}}, #{template_procs}] }"
       else
         if el && el.has_end_tag?
           body = children_to_erb(el)

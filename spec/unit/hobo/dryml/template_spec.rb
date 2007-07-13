@@ -346,9 +346,26 @@ describe Template do
       '<p>a <b class="big">bold!!!</b> word</p>'
   end
 
-  it "should allow template parameters to be replced entirely" do 
+  it "should allow template parameters to be replaced entirely" do 
     eval_with_templates("<StaticMerge><b.replace>!!!</b.replace></StaticMerge>").should == 
       '<p>a !!! word</p>'
+  end
+  
+  it "should allow content to be inserted before template parameters that are templates" do 
+    eval_with_templates("<NestedStaticMerge><StaticMerge.before>!!!</StaticMerge.before></NestedStaticMerge>").should ==
+      'merge StaticMerge: !!!<p>a <b class="big">bold</b> word</p>'
+  end
+
+  it "should allow content to be inserted after template parameters that are templates" do 
+    eval_with_templates("<NestedStaticMerge><StaticMerge.after>!!!</StaticMerge.after></NestedStaticMerge>").should ==
+      'merge StaticMerge: <p>a <b class="big">bold</b> word</p>!!!'
+  end
+
+  it "should allow template parameters that are templates to be replaced entirely" do 
+    eval_with_templates("<NestedStaticMerge><StaticMerge.replace>!!!</StaticMerge.replace></NestedStaticMerge>").
+      should == 'merge StaticMerge: !!!'
+    eval_with_templates("<NestedStaticMerge><StaticMerge.replace/></NestedStaticMerge>").
+      should == 'merge StaticMerge:'
   end
 
   # --- The Context --- #
