@@ -324,6 +324,33 @@ describe Template do
   end
   
   
+  # --- Template Parameter Modifiers --- #
+  
+  it "should allow content to be inserted before template parameters" do 
+    eval_with_templates("<StaticMerge><b.before>!!!</b.before></StaticMerge>").should == 
+      '<p>a !!!<b class="big">bold</b> word</p>'
+  end
+  
+  it "should allow content to be inserted after template parameters" do 
+    eval_with_templates("<StaticMerge><b.after>!!!</b.after></StaticMerge>").should == 
+      '<p>a <b class="big">bold</b>!!! word</p>'
+  end
+  
+  it "should allow content to be prepended to template parameter bodies" do 
+    eval_with_templates("<StaticMerge><b.prepend>!!!</b.prepend></StaticMerge>").should == 
+      '<p>a <b class="big">!!!bold</b> word</p>'
+  end
+  
+  it "should allow content to be prepended to template parameter bodies" do 
+    eval_with_templates("<StaticMerge><b.append>!!!</b.append></StaticMerge>").should == 
+      '<p>a <b class="big">bold!!!</b> word</p>'
+  end
+
+  it "should allow template parameters to be replced entirely" do 
+    eval_with_templates("<StaticMerge><b.replace>!!!</b.replace></StaticMerge>").should == 
+      '<p>a !!! word</p>'
+  end
+
   # --- The Context --- #
   
   def context_eval(context, src)

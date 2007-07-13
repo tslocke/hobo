@@ -292,24 +292,48 @@ module Hobo::Dryml
     def merge_and_call(name, options, overriding_proc, &b)
       if overriding_proc
         overriding_options = overriding_proc.call
+        
+        replace = overriding_options[:_replace]
+        return replace.call if replace
+
         tagbody = overriding_options.delete(:tagbody)
+        
+        before  = overriding_options.delete(:_before)
+        after   = overriding_options.delete(:_after)
+        append  = overriding_options.delete(:_append)
+        prepend = overriding_options.delete(:_prepend)
         options = options.update(overriding_options)
-      end      
-      
-      if name.to_s.in?(Hobo.static_tags)
-        if tagbody || b
-          body = if tagbody
-                   tagbody.call
-                 elsif b
-                   new_context(&b)
-                 end
-          content_tag(name, body, options)
-        else
-          tag(name, options)
-        end
-      else
-        send(name, options, &(tagbody || b))
       end
+      
+      before = (before && before.call).to_s
+      after  = (after && after.call).to_s
+      replace = (replace && replace.call).to_s
+      
+      res = if name.to_s.in?(Hobo.static_tags)
+              prepend = (prepend && prepend.call).to_s
+              append = (append && append.call).to_s
+              body = if tagbody
+                       tagbody.call
+                     elsif b
+                       prepend + new_context { b.call } + append
+                     else
+                       prepend + append
+                     end
+              if body.empty?
+                tag(name, options)
+              else
+                content_tag(name, body, options)
+              end
+            else
+              body = tagbody || b
+              modified_body = if append || prepend
+                                proc { (prepend && prepend.call).to_s + body.call + (append && append.call).to_s }
+                              else
+                                body
+                              end
+              send(name, options, &modified_body)
+            end
+      before + res + after
     end
     
     
