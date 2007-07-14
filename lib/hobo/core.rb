@@ -348,7 +348,7 @@ module Hobo
     end
 
 
-    def_tag :count, :label, :prefix do
+    def_tag :count, :label, :prefix, :unless_none do
       raise Exception.new("asked for count of a string") if this.is_a?(String)
 
       l = label
@@ -369,13 +369,18 @@ module Hobo
             end
       end
 
-      main = l.blank? ? c : pluralize(c, l)
+      Dryml.last_if = (c > 0 || unless_none.nil?)
+      if Dryml.last_if        
+        main = l.blank? ? c : pluralize(c, l)
 
-      if prefix == "are"
-        p = c == 1 ? "is" : "are"
-        p + ' ' + main
+        if prefix == "are"
+          p = c == 1 ? "is" : "are"
+          p + ' ' + main
+        else
+          main
+        end
       else
-        main
+        ""
       end
     end
 
