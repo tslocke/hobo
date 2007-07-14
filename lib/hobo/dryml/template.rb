@@ -526,7 +526,7 @@ module Hobo::Dryml
         
         val = v.gsub('"', '\"')
         %(:#{n} => "#{val}")
-      end
+      end.compact
       # If there's a part but no id, the id defaults to the part name
       if part && !el.attributes["id"]
         attrs << ":id => '#{part}'"
