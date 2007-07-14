@@ -29,11 +29,11 @@
 <def tag="application_account_nav">
   <if q="&logged_in?">
     <div class='nav_item'>Logged in as <show with="&current_user" field="login" /></div>
-    <div class='nav_item'><a href="<%= logout_url%>">Log out</a></div>
+    <div class='nav_item'><a href="#{logout_url}">Log out</a></div>
   </if>
   <else>
-    <div class='nav_item'><a href="<%= login_url%>">Log in</a></div>
-    <if q="&respond_to? :signup_url"> <div class='nav_item'><a href="<%= signup_url%>">Sign up</a></div> </if>
+    <div class='nav_item'><a href="#{login_url}">Log in</a></div>
+    <if q="&respond_to? :signup_url"> <div class='nav_item'><a href="#{signup_url}">Sign up</a></div> </if>
   </else>
 </def>
 
