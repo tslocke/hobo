@@ -411,6 +411,30 @@ describe Template do
   end
   
   
+  # --- Local Tags --- #
+  
+  it "should allow tags to be overriden with local tags" do 
+    eval_dryml("<def tag='foo'>ab</def>\n" +
+               "<def tag='test'><def tag='foo'>cd</def> <foo/> </def>\n" +
+               "<test/>").should == "cd"
+  end
+  
+  it "should allow local tags to be new tags" do
+    eval_dryml("<def tag='test'><def tag='foo'>cd</def> <foo/> </def>\n" +
+               "<test/>").should == "cd"
+  end
+  
+  it "should make local tags available in the tagobdy of the local tags parent" do 
+    eval_dryml("<def tag='test'><def tag='foo'>cd</def> <tagbody/> </def>\n" +
+               "<test><foo/></test>").should == "cd"
+  end
+  
+  it "should allow local tags to capture local state" do
+    eval_dryml("<def tag='test' attrs='x'><def tag='foo'><%= x %></def> <tagbody/> </def>\n" +
+               "<test x='abc'><foo/></test>").should == "abc"
+  end
+  
+  
   # --- Misc --- #
   
   it "should provide <set> to create local variables" do

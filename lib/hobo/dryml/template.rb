@@ -185,13 +185,17 @@ module Hobo::Dryml
     end
 
 
-    def redefine_element(el)
-      redefined_tags = el.children.
-        select {|e| e.is_a?(REXML::Element) && e.name == "def"}.
-        map {|e| Hobo::Dryml.unreserve(e.attributes["tag"]) }
-      "<% self.class.start_redefine_block(#{redefined_tags.inspect}) #{tag_newlines(el)} %>" +
-        children_to_erb(el) +
-        "<% self.class.end_redefine_block %>"
+    def with_redefines(el)
+      def_tags = el.children.select {|e| e.is_a?(REXML::Element) && e.name == "def"}
+      
+      if def_tags.empty?
+        yield
+      else
+        def_names = def_tags.map {|e| Hobo::Dryml.unreserve(e.attributes["tag"]) }
+        "<% self.class.start_redefine_block(#{def_names.inspect}) #{tag_newlines(el)} %>" +
+          yield +
+          "<% self.class.end_redefine_block %>"
+      end
     end
     
     
@@ -245,22 +249,26 @@ module Hobo::Dryml
         invalids = attr_names & [:with, :field, :this]
         dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
         
+        
+        method_body = tag_method_body(el, attr_names)
         src = if template_name?(name)
-                method_body = tag_method_body(el, attr_names)
                 template_method(name, re_alias, redefine, method_body)
               else
-                method_body = tag_method_body(el, attr_names)
                 tag_method(name, re_alias, redefine, method_body)
               end
-        src << "<% _register_tag_attrs(:#{name}, #{attr_names.inspect}) %>"
+        src << "<% _register_tag_attrs(:#{name}, #{attr_names.inspect}) %>" unless redefine
         
         logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
         
-        @builder.add_build_instruction(:def,
-                                       :src => restore_erb_scriptlets(src),
-                                       :line_num => element_line_num(el))
-        # keep line numbers matching up
-        "<% #{"\n" * method_body.count("\n")} %>"
+        if redefine
+          src
+        else
+          @builder.add_build_instruction(:def,
+                                         :src => restore_erb_scriptlets(src),
+                                         :line_num => element_line_num(el))
+          # keep line numbers matching up
+          "<% #{"\n" * src.count("\n")} %>"
+        end
       end
     end
     
@@ -315,7 +323,7 @@ module Hobo::Dryml
       res = "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
-        children_to_erb(el) +
+        with_redefines(el) { children_to_erb(el) } +
         "<% _erbout; end"
       @def_name = old_def_name
       res

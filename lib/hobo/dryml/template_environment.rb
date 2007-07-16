@@ -14,7 +14,8 @@ module Hobo::Dryml
         @_preserved_methods_for_redefine ||= []
         @_redef_impl_names ||= []
         
-        methods = method_names.map_hash {|m| instance_method(m) }
+        methods = {}
+        method_names.each {|m| methods[m] = instance_method(m) if m.in?(self.methods) }.compact
         @_preserved_methods_for_redefine.push(methods)
         @_redef_impl_names.push []
       end
@@ -36,11 +37,19 @@ module Hobo::Dryml
       def redefine_tag(name, proc)
         impl_name = "#{name}_redefined_#{redefine_nesting}"
         define_method(impl_name, proc)
+        class_eval "def #{name}(options={}, &b); " +
+          "#{impl_name}(options, b); end"
+        @_redef_impl_names.push(impl_name)
+      end
+      
+      def redefine_template(name, proc)
+        impl_name = "#{name}_redefined_#{redefine_nesting}"
+        define_method(impl_name, proc)
         class_eval "def #{name}(options={}, template_parameters={}, &b); " +
           "#{impl_name}(options, template_parameters, b); end"
         @_redef_impl_names.push(impl_name)
       end
-      
+
       # --- end local tags --- #
       
       
