@@ -9,13 +9,13 @@ module ::Hobo::Plugins
     end
 
     def set_up_options(*defaults)
-      @opt.reverse_merge!(*defaults)
+      @opt = @opt.reverse_merge(*defaults)
       make_variations(self.class::PLUGIN_SYMBOLS)
     end
 
     def make_variations(h)
       h.each do |name|
-        if @opt[name]
+        if @opt[name] && @opt[name] != false
           # start with :product_category
         
           # add :product_categories
@@ -30,6 +30,8 @@ module ::Hobo::Plugins
           # :ProductCategoriesController
           @opt[(name.to_s.camelize.pluralize+'Controller').to_sym] =
             (@opt[name].to_s.camelize.pluralize+'Controller').to_sym
+        else
+          @opt[name.to_s.pluralize.to_sym] = false
         end
       end
     end
@@ -54,9 +56,12 @@ module ::Hobo::Plugins
       c = Class.new(base_class)
       silence_warnings { Object.const_set(class_name, c) }
       c.class_eval do
-        @opt = opt
+        @plugin_opt = opt
         def self.sym
-          @opt
+          @plugin_opt
+        end
+        def self.has_feature(name)
+          !@plugin_opt[name].nil? && @plugin_opt[name] != false
         end
       end
       c.class_eval &b if b
