@@ -532,7 +532,7 @@ module Hobo::Dryml
       attrs = el.attributes.map do |n, v|
         next if n.in? %w(merge_attrs part)
         
-        val = v.gsub('"', '\"')
+        val = v.gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %(:#{n} => "#{val}")
       end.compact
       # If there's a part but no id, the id defaults to the part name
