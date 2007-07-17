@@ -326,7 +326,11 @@ module Hobo
     
     def static_tags
       @static_tags ||= begin
-                         path = File.join(File.dirname(__FILE__), "hobo/static_tags")
+                         path = if FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
+                                    "#{RAILS_ROOT}/config/dryml_static_tags.txt"
+                                else
+                                    File.join(File.dirname(__FILE__), "hobo/static_tags")
+                                end
                          File.readlines(path).omap{chop} 
                        end
     end
