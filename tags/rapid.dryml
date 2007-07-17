@@ -96,7 +96,7 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <li class="<%= even_odd %> <%= this_type.name.underscore %>" hobo_model_id="<%= dom_id this %>">
+          <li class="#{even_odd} #{this_type.name.underscore}" hobo_model_id="#{dom_id this}">
             <%= tagbody.nil? ? object_link : tagbody.call %>
           </li>
         </if_can_view>
@@ -114,8 +114,8 @@
       <% even_odd = "odd" %>
       <repeat>
         <if_can_view>
-          <tr class="<%= even_odd %> <%= row_class %> <%= this_type.name.underscore %>"
-              hobo_model_id="<%= dom_id(this) %>">
+          <tr class="#{even_odd} #{row_class} #{this_type.name.underscore}"
+              hobo_model_id="#{dom_id(this)}">
             <%= tagbody && tagbody.call %>
           </tr>
         <% even_odd = even_odd == "even" ? "odd" : "even" %>
@@ -152,17 +152,17 @@
 
 
 <def tag="spinner">
-  <img src="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/images/spinner.gif" class="hidden" merge_attrs="&true"/>
+  <img src="#{urlb}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
 </def>
 
 
 <def tag="image" attrs="src">
-  <img src="<%= urlb %>/images/<%= src %>" merge_attrs="&true"/>
+  <img src="#{urlb}/images/#{src}" merge_attrs/>
 </def>
 
 
 <def tag="theme_img" attrs="src">
-  <img src="<%= theme_asset('images/' + src)%>" merge_attrs="&true"/>
+  <img src="#{theme_asset('images/' + src)}" merge_attrs/>
 </def>
 
 

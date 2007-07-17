@@ -4,7 +4,7 @@
 
 
 <def tag="Navigation" attrs="current, item, link_current">
-  <nav_container merge_attrs="&true">
+  <nav_container merge_attrs>
     <repeat with="&item">
       <% c = this[:content]; klass = c == current ? "current" : "" %>
       <if q="&!link_current && c == current">
@@ -20,10 +20,10 @@
 </def>
 
 
-<def tag="nav_container"><ul merge_attrs="&true"><tagbody/></ul></def>
+<def tag="nav_container"><ul merge_attrs><tagbody/></ul></def>
 
                                                             
-<def tag="nav_item"><li merge_attrs="&true"><tagbody/></li></def>
+<def tag="nav_item"><li merge_attrs><tagbody/></li></def>
 
 
 <def tag="application_account_nav">
