@@ -63,6 +63,8 @@ module Hobo
           @model = model
         end
         
+        attr_reader :model
+        
         def timestamps
           field(:created_at, :datetime)
           field(:updated_at, :datetime)

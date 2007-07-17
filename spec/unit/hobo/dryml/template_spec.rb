@@ -434,6 +434,11 @@ describe Template do
                "<test x='abc'><foo/></test>").should == "abc"
   end
   
+  it "should allow local tags to modify captured state" do
+    eval_dryml("<def tag='test'><set x='&0'/><def tag='foo'><% x += 1 %></def> <tagbody/> <%= x %></def>\n" +
+               "<test x='abc'><foo/><foo/><foo/></test>").should == "3"
+  end    
+  
   
   # --- Misc --- #
   
