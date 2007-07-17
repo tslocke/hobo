@@ -39,7 +39,7 @@ module Hobo
     def models
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
-          f =~ /.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
         end
         @models_loaded = true
       end
