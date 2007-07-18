@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type)
+    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless for_all)
 
     @build_cache = {}
     
@@ -422,6 +422,7 @@ module Hobo::Dryml
                end
              end
 
+      call = apply_control_attributes(call, el)
       "<% _output(#{call}) %>"
     end
     
@@ -519,20 +520,20 @@ module Hobo::Dryml
       
       part_name = el.attributes['part']
       if el.children.empty?
+        call = apply_control_attributes(call, el)
         if part_name
-          "<span id='#{part_name}'>" + part_element(el, "<%= #{call} %>") + "</span>"
+          "<span id='#{part_name}'>" + part_element(el, "<%= #{call} #{newlines}%>") + "</span>"
         else
           "<%= #{call} #{newlines}%>"
         end
       else
         children = children_to_erb(el)
+        call = "<% " + apply_control_attributes("_output(#{call} do #{newlines}%>#{children}<% end)", el) + " %>"
         if part_name
           id = el.attributes['id'] || part_name
-          "<span id='<%= #{attribute_to_ruby(id)} %>'>" +
-            part_element(el, "<% _output(#{call} do %>#{children}<% end) %>") +
-            "</span>"
+          "<span id='<%= #{attribute_to_ruby(id)} %>'>" + part_element(el, call) + "</span>"
         else
-          "<% _output(#{call} do #{newlines}%>#{children}<% end) %>"
+          call
         end
       end
     end
@@ -609,6 +610,7 @@ module Hobo::Dryml
       end
     end
     
+    
     def static_element_to_erb(el)
       if el.attributes["part"] || el.attributes["merge_attrs"]
         static_tag_to_method_call(el)
@@ -627,6 +629,37 @@ module Hobo::Dryml
         end
       end
     end
+    
+    
+    def apply_control_attributes(expression, el)
+      if_, unless_, for_all = controls = %w(if unless for_all).map {|x| el.attributes[x]}
+      controls.compact!
+      
+      dryml_exception("You can't have multiple control attributes on the same element", el) if
+        controls.length > 1
+      
+      val = controls.first
+      if val.nil?
+        expression
+      else
+        control = if val.starts_with?(CODE_ATTRIBUTE_CHAR)
+                    val[1..-1]
+                  elsif for_all
+                    "this.#{val}"
+                  else
+                    "this.#{val}.blank?"
+                  end
+        
+        if if_
+          "(#{expression} if #{control})"
+        elsif unless_
+          "(#{expression} unless #{control})"
+        elsif for_all
+          "#{control}.map_this { #{expression} }"
+        end
+      end
+    end
+    
 
     def attribute_to_ruby(attr, options={})
       dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if
