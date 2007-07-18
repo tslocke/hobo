@@ -8,6 +8,8 @@ module Hobo::Dryml
     DRYML_NAME_RX = /^#{DRYML_NAME}$/
     
     CODE_ATTRIBUTE_CHAR = "&"
+    
+    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type)
 
     @build_cache = {}
     
@@ -152,7 +154,7 @@ module Hobo::Dryml
         set_element(el)
 
       else
-        if el.dryml_name.not_in?(Hobo.static_tags) or el.attributes['merge']
+        if el.dryml_name.not_in?(Hobo.static_tags) or el.attributes['param']
           if el.dryml_name =~ /^[A-Z]/
             template_call(el)
           else
@@ -365,21 +367,21 @@ module Hobo::Dryml
     end
     
     
-    def extract_merge_name!(el)
-      merge_name = el.attributes["merge"]
+    def extract_param_name!(el)
+      param_name = el.attributes["param"]
       
-      if merge_name
+      if param_name
         def_tag = find_ancestor(el) {|e| e.name == "def"}
-        dryml_exception("merge is not allowed outside of template definitions", el) if
+        dryml_exception("param is not allowed outside of template definitions", el) if
           def_tag.nil? || !template_name?(def_tag.attributes["tag"])
       end
       
-      el.attributes.delete("merge")
-      res = merge_name == "&true" ? el.dryml_name : merge_name
+      el.attributes.delete("param")
+      res = param_name == "&true" ? el.dryml_name : param_name
 
-      dryml_exception("merge name for a template call must be capitalised", el) if
+      dryml_exception("param name for a template call must be capitalised", el) if
         res && template_call?(el) && !template_name?(res)
-      dryml_exception("merge name for a block-tag call must not be capitalised", el) if
+      dryml_exception("param name for a block-tag call must not be capitalised", el) if
         res && !template_call?(el) && template_name?(res)
       
       res
@@ -390,20 +392,34 @@ module Hobo::Dryml
       Hobo::Dryml.unreserve(el.dryml_name)
     end
 
+   
+    def polymorphic_call?(el)
+      !!el.attributes['for_type']
+    end
+    
     
     def template_call(el)
       name = call_name(el)
-      merge_name = extract_merge_name!(el)
+      param_name = extract_param_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
       
       template_procs = compile_template_procs(el)
       
-      call = if merge_name
-               merge_name = attribute_to_ruby(merge_name, :symbolize => true)
-               "merge_and_call_template(:#{name}, #{options}, #{template_procs}, template_procs[#{merge_name}])"
+      call = if param_name
+               param_name = attribute_to_ruby(param_name, :symbolize => true)
+               args = "#{options}, #{template_procs}, template_procs[#{param_name}]"
+               if polymorphic_call?(el)
+                 "merge_and_call_template(find_polymorphic_template(:#{name}), #{args})"
+               else
+                 "merge_and_call_template(:#{name}, #{args})"
+               end
              else
-               "#{name}(#{options}, #{template_procs})"
+               if polymorphic_call?(el)
+                 "send(find_polymorphic_template(:#{name}), #{options}, #{template_procs})"
+               else
+                 "#{name}(#{options}, #{template_procs})"
+               end
              end
 
       "<% _output(#{call}) %>"
@@ -418,22 +434,22 @@ module Hobo::Dryml
       
       param_options = param_groups.map do |group_name, tags| 
         if tags.length == 1 and (e = tags.first) and e.name !~ /\./
-          merge_name = extract_merge_name!(e)
-          if merge_name
+          param_name = extract_param_name!(e)
+          if param_name
             if template_call?(e)
-              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{param_name}])"
             else
-              ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{merge_name}])"
+              ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{param_name}])"
             end
           else
             ":#{e.name} => #{template_proc(e)}"
           end
         else
-          merge_param, modifiers = tags.partition{ |e| e.name == group_name }
-          dryml_exception("duplicate template parameter: #{group_name}", el) if merge_param.length > 1
-          merge_param = merge_param.first # there's zero or one
+          param, modifiers = tags.partition{ |e| e.name == group_name }
+          dryml_exception("duplicate template parameter: #{group_name}", el) if param.length > 1
+          param = param.first # there's zero or one
           
-          ":#{group_name} => #{template_proc(merge_param, modifiers)}"
+          ":#{group_name} => #{template_proc(param, modifiers)}"
         end
       end
       "{" + param_options.join(', ') + "}"
@@ -469,15 +485,23 @@ module Hobo::Dryml
     
     def tag_call(el)
       name = call_name(el)
-      merge_name = extract_merge_name!(el)
+      param_name = extract_param_name!(el)
       options = tag_options(el)
       newlines = tag_newlines(el)
 
-      call = if merge_name
-               merge_name = attribute_to_ruby(merge_name, :symbolize => true)
-               "merge_and_call(:#{name}, #{options}, template_procs[#{merge_name}])"
+      call = if param_name
+               param_name = attribute_to_ruby(param_name, :symbolize => true)
+               if polymorphic_call?(el)
+                 "merge_and_call(find_polymorphic_tag(:#{name}), #{options}, template_procs[#{param_name}])"
+               else
+                 "merge_and_call(:#{name}, #{options}, template_procs[#{param_name}])"
+               end
              else
-               "#{name}(#{options unless options == '{}'})"
+               if polymorphic_call?(el)
+                 "send(find_polymorphic_tag(:#{name}), #{options unless options == '{}'})"
+               else
+                 "#{name}(#{options unless options == '{}'})"
+               end
              end
       
       part_name = el.attributes['part']
@@ -503,8 +527,10 @@ module Hobo::Dryml
     
     def tag_options(el)
       attributes = el.attributes
-      items = attributes.map {|n,v| ":#{n} => #{attribute_to_ruby(v)}" }
-
+      items = attributes.map do |n,v|
+        ":#{n} => #{attribute_to_ruby(v)}" unless n.in?(NOT_PARAMETER_ATTRIBUTES)
+      end.compact
+      
       # if there's a ':' el.name is just the part after the ':'
       items << ":field => \"#{el.name}\"" if el.name != el.expanded_name
       

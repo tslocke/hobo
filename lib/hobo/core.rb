@@ -145,18 +145,6 @@ module Hobo
     end
 
 
-    def_tag :tag_for_object, :name do
-      opts = {}.update(options)
-      opts.delete(:name)
-
-      if this_type and respond_to?(m = "#{name}_for_#{this_type.name.underscore}")
-        send(m, opts)
-      else
-        send(name, opts)
-      end
-    end
-
-
     def_tag :show, :no_span, :truncate_tail, :format do
       # We can't do this as a declared attribute as it will hide the truncate helper
       trunc = options.delete(:truncate)

@@ -67,61 +67,61 @@ describe Template do
       "<% _erbout; end; end %>"
   end
   
-  it "should dissallow `merge` outside of template definitions" do 
-    proc { compile_dryml("<foo merge/>") }.should raise_error(DrymlException)
+  it "should dissallow `param` outside of template definitions" do 
+    proc { compile_dryml("<foo param/>") }.should raise_error(DrymlException)
   end
   
   it "should compile merged tag-calls as calls to `merge_and_call`" do 
-    compile_in_template("<foo merge a='1'/>").should == '<%= merge_and_call(:foo, {:a => "1"}, template_procs[:foo]) %>'
+    compile_in_template("<foo param a='1'/>").should == '<%= merge_and_call(:foo, {:a => "1"}, template_procs[:foo]) %>'
   end
   
-  it "should compile merged tag-calls with support for named merges" do 
-    compile_in_template("<foo merge='zap'/>").should == "<%= merge_and_call(:foo, {}, template_procs[:zap]) %>"
+  it "should compile merged tag-calls with support for named params" do 
+    compile_in_template("<foo param='zap'/>").should == "<%= merge_and_call(:foo, {}, template_procs[:zap]) %>"
   end
 
   it "should compile a merged tag-call with body" do 
-    compile_in_template("<foo merge>abc</foo>").should == 
+    compile_in_template("<foo param>abc</foo>").should == 
       "<% _output(merge_and_call(:foo, {}, template_procs[:foo]) do %>abc<% end) %>"
   end
   
   it "should compile merged template-calls as calls to `merge_and_call_template`" do 
-    compile_in_template("<Foo merge/>").should == 
+    compile_in_template("<Foo param/>").should == 
       "<% _output(merge_and_call_template(:Foo, {}, {}, template_procs[:Foo])) %>"
   end
   
   it "should compile merged template-calls with parameters as calls to `merge_and_call_template`" do 
-    compile_in_template("<Foo merge><a x='1'/></Foo>").should == 
+    compile_in_template("<Foo param><a x='1'/></Foo>").should == 
       '<% _output(merge_and_call_template(:Foo, {}, {:a => proc { {:x => "1"} }}, template_procs[:Foo])) %>'
   end
   
-  it "should compile template parameters with merge" do
-    compile_in_template("<Foo><abc merge/></Foo>").should == 
+  it "should compile template parameters with param" do
+    compile_in_template("<Foo><abc param/></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, template_procs[:abc])})) %>'
   end
   
-  it "should compile template parameters with named merges" do
-    compile_in_template("<Foo><abc merge='x'/></Foo>").should == 
+  it "should compile template parameters with named params" do
+    compile_in_template("<Foo><abc param='x'/></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, template_procs[:x])})) %>'
   end
   
-  it "should compile template parameters with merge and attributes" do
-    compile_in_template("<Foo><abc merge='x' a='b'/></Foo>").should == 
+  it "should compile template parameters with param and attributes" do
+    compile_in_template("<Foo><abc param='x' a='b'/></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(proc { {:a => "b"} }, template_procs[:x])})) %>'
   end
   
-  it "should compile template parameters with merge and a tag body" do
-    compile_in_template("<Foo><abc merge>ha!</abc></Foo>").should == 
+  it "should compile template parameters with param and a tag body" do
+    compile_in_template("<Foo><abc param>ha!</abc></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(' +
       'proc { {:tagbody => proc { new_context { %>ha!<% } } } }, template_procs[:abc])})) %>'
   end
   
   it "should compile template parameters which are template calls themselves" do 
-    compile_in_template("<Foo><Baa merge x='1'/></Foo>").should == 
+    compile_in_template("<Foo><Baa param x='1'/></Foo>").should == 
       '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(proc { [{:x => "1"}, {}] }, template_procs[:Baa])})) %>'
   end
 
   it "should compile template parameters which are templates themselves with their own parameters" do 
-    compile_in_template("<Foo><Baa merge><x>hello</x></Baa></Foo>").should == 
+    compile_in_template("<Foo><Baa param><x>hello</x></Baa></Foo>").should == 
       '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(' + 
       'proc { [{}, {:x => proc { {:tagbody => proc { new_context { %>hello<% } } } }}] }, template_procs[:Baa])})) %>'
   end
@@ -180,7 +180,7 @@ describe Template do
       ':_prepend => proc { new_context { %>def<% } }} }})) %>'
   end
   
-  it "should compile modifiers and a merge parameter on the same template parameter" do 
+  it "should compile modifiers and a parameter on the same template parameter" do 
     compile_dryml("<Page><head.before>abc</head.before><head x='1'/></Page>").should == 
       '<% _output(Page({}, {:head => proc { {:_before => proc { new_context { %>abc<% } }, :x => "1"} }})) %>'
   end
@@ -254,13 +254,13 @@ describe Template do
 
       <def tag="T">plain template</def>
 
-      <def tag="StaticMerge"><p>a <b class="big" merge>bold</b> word</p></def>
+      <def tag="StaticMerge"><p>a <b class="big" param>bold</b> word</p></def>
 
-      <def tag="EmptyStaticMerge"><img class="big" src="..." merge/></def>
+      <def tag="EmptyStaticMerge"><img class="big" src="..." param/></def>
 
-      <def tag="DefTagMerge">foo <defined merge b="3">baa</defined>!</def>
+      <def tag="DefTagMerge">foo <defined param b="3">baa</defined>!</def>
 
-      <def tag="NestedStaticMerge">merge StaticMerge: <StaticMerge merge/></def>
+      <def tag="NestedStaticMerge">merge StaticMerge: <StaticMerge param/></def>
     END
   end
 
@@ -319,7 +319,7 @@ describe Template do
   end
   
   it "should allow merge names to be defined dynamically" do 
-    eval_dryml('<def tag="T"><p merge="& :a.to_s + :b.to_s"/></def>' +
+    eval_dryml('<def tag="T"><p param="& :a.to_s + :b.to_s"/></def>' +
                '<T><ab x="1"/></T>').should == '<p x="1" />'
   end
   
@@ -406,7 +406,7 @@ describe Template do
   
   it "should allow the context to be changed inside template parameters" do 
     tags = %(<def tag="do"><tagbody/></def>
-             <def tag="Template"><do:name><p merge/></do></def>)
+             <def tag="Template"><do:name><p param/></do></def>)
     context_eval(a_user, tags + '<Template><p><%= this %></p></Template>').should == '<p>Tom</p>'
   end
   

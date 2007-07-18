@@ -15,7 +15,7 @@ module Hobo::Dryml
         @_redef_impl_names ||= []
         
         methods = {}
-        method_names.each {|m| methods[m] = instance_method(m) if m.in?(self.methods) }.compact
+        method_names.each {|m| methods[m] = m.in?(self.methods) && instance_method(m) }
         @_preserved_methods_for_redefine.push(methods)
         @_redef_impl_names.push []
       end
@@ -23,7 +23,13 @@ module Hobo::Dryml
       
       def end_redefine_block
         methods = @_preserved_methods_for_redefine.pop
-        methods.each_pair {|name, method| define_method(name, method) }
+        methods.each_pair do |name, method|
+          if method
+            define_method(name, method)
+          else
+            remove_method(name)
+          end
+        end
         to_remove = @_redef_impl_names.pop
         to_remove.each {|m| remove_method(m) }
       end
@@ -156,8 +162,36 @@ module Hobo::Dryml
       end
       res
     end
-    
 
+    
+    def find_polymorphic_tag(name)
+      t = this_type
+      while true
+        if t == ActiveRecord::Base || t == Object
+          return name
+        elsif respond_to?(poly_name = "#{t.name.underscore}_#{name}")
+          return poly_name
+        else
+          t = t.superclass
+        end
+      end
+    end
+
+
+    def find_polymorphic_template(name)
+      t = this_type
+      while true
+        if t == ActiveRecord::Base || t == Object
+          return name
+        elsif respond_to?(poly_name = "#{t.name}#{name}")
+          return poly_name
+        else
+          t = t.superclass
+        end      
+      end
+    end
+
+    
     def _erbout
       @_erb_output
     end
