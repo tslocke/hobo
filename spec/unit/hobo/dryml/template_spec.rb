@@ -45,15 +45,15 @@ describe Template do
   
   it "should compile defs with lower-case names as block tags" do 
     compile_def("<def tag='foo'></def>").should == 
-      "<% def foo(__options__={}, &__block__); " +
-      "_tag_context(__options__, __block__) do |tagbody| options, = _tag_locals(__options__, []) %>" + 
+      "<% def foo(__attributes__={}, &__block__); " +
+      "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "<% _erbout; end; end %>"
   end
   
   it "should compile attrs in defs as local variables" do 
     compile_def("<def tag='foo' attrs='a, b'></def>").should == 
-      "<% def foo(__options__={}, &__block__); " +
-      "_tag_context(__options__, __block__) do |tagbody| a, b, options, = _tag_locals(__options__, [:a, :b]) %>" + 
+      "<% def foo(__attributes__={}, &__block__); " +
+      "_tag_context(__attributes__, __block__) do |tagbody| a, b, attributes, = _tag_locals(__attributes__, [:a, :b]) %>" + 
       "<% _erbout; end; end %>"
   end
   
@@ -62,8 +62,8 @@ describe Template do
   it "should compile defs with cap names as templates" do 
     # Note the presence of the `template_procs` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
-      "<% def Foo(__options__={}, template_procs={}, &__block__); " +
-      "_tag_context(__options__, __block__) do |tagbody| options, = _tag_locals(__options__, []) %>" + 
+      "<% def Foo(__attributes__={}, template_procs={}, &__block__); " +
+      "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "<% _erbout; end; end %>"
   end
   
@@ -162,7 +162,7 @@ describe Template do
   
   it "should compile template parameters which are themselves templates" do 
     # Template parameters which are themselves templates are procs
-    # that return a pair of hashes, the first is the options to the
+    # that return a pair of hashes, the first is the attributes to the
     # template, the second is the sub-template procs
     compile_dryml("<Foo><Baa x='1'><a>hello</a></Baa></Foo>").should ==
       '<% _output(Foo({}, ' +

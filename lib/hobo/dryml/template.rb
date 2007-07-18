@@ -287,33 +287,33 @@ module Hobo::Dryml
     
     def template_method(name, re_alias, redefine, method_body)
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, template_procs, __block__| " +
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, template_procs, __block__| " +
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
           ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
       else
-        "<% def #{name}(__options__={}, template_procs={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, template_procs={}, &__block__); #{method_body}; end %>"
       end
     end
     
     
     def tag_method(name, re_alias, redefine, method_body)
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__options__, __block__| " +
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, __block__| " +
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
           ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
       else
-        "<% def #{name}(__options__={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, &__block__); #{method_body}; end %>"
       end
     end
               
     
     def tag_method_body(el, attrs)
       # A statement to assign values to local variables named after the tag's attrs
-      # The trailing comma on `options` is supposed to be there!
-      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "options, = " +
-        "_tag_locals(__options__, #{attrs.inspect})"
+      # The trailing comma on `attributes` is supposed to be there!
+      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "attributes, = " +
+        "_tag_locals(__attributes__, #{attrs.inspect})"
 
-      start = "_tag_context(__options__, __block__) do |tagbody| #{setup_locals}"
+      start = "_tag_context(__attributes__, __block__) do |tagbody| #{setup_locals}"
       
       # While processing the children of this def, @def_name contains
       # the names of all nested defs join with '_'. It's used to
@@ -342,13 +342,13 @@ module Hobo::Dryml
 
 
     def tagbody_call(el)
-      options = []
+      attributes = []
       with = el.attributes['with']
       field = el.attributes['field']
-      options << ":with => #{attribute_to_ruby(with)}" if with
-      options << ":field => #{attribute_to_ruby(field)}" if field
+      attributes << ":with => #{attribute_to_ruby(with)}" if with
+      attributes << ":field => #{attribute_to_ruby(field)}" if field
       else_ = attribute_to_ruby(el.attributes['else'])
-      "<%= tagbody ? tagbody.call({ #{options * ', '} }) : #{else_} %>"
+      "<%= tagbody ? tagbody.call({ #{attributes * ', '} }) : #{else_} %>"
     end
 
 
@@ -401,14 +401,14 @@ module Hobo::Dryml
     def template_call(el)
       name = call_name(el)
       param_name = extract_param_name!(el)
-      options = tag_options(el)
+      attributes = tag_attributes(el)
       newlines = tag_newlines(el)
       
-      template_procs = compile_template_procs(el)
+      template_procs = tag_parameters(el)
       
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
-               args = "#{options}, #{template_procs}, template_procs[#{param_name}]"
+               args = "#{attributes}, #{template_procs}, template_procs[#{param_name}]"
                if polymorphic_call?(el)
                  "merge_and_call_template(find_polymorphic_template(:#{name}), #{args})"
                else
@@ -416,9 +416,9 @@ module Hobo::Dryml
                end
              else
                if polymorphic_call?(el)
-                 "send(find_polymorphic_template(:#{name}), #{options}, #{template_procs})"
+                 "send(find_polymorphic_template(:#{name}), #{attributes}, #{template_procs})"
                else
-                 "#{name}(#{options}, #{template_procs})"
+                 "#{name}(#{attributes}, #{template_procs})"
                end
              end
 
@@ -426,13 +426,13 @@ module Hobo::Dryml
     end
     
     
-    def compile_template_procs(el)
+    def tag_parameters(el)
       dryml_exception("content is not allowed directly inside template calls", el) if 
         el.children.find { |e| e.is_a?(REXML::Text) && !e.to_s.blank? }
       
       param_groups = el.elements.group_by { |e| e.name.split('.')[0] }
       
-      param_options = param_groups.map do |group_name, tags| 
+      param_items = param_groups.map do |group_name, tags| 
         if tags.length == 1 and (e = tags.first) and e.name !~ /\./
           param_name = extract_param_name!(e)
           if param_name
@@ -452,13 +452,13 @@ module Hobo::Dryml
           ":#{group_name} => #{template_proc(param, modifiers)}"
         end
       end
-      "{" + param_options.join(', ') + "}"
+      "{" + param_items.join(', ') + "}"
     end
     
     
     def template_proc(el, modifiers=[])
       
-      options = modifiers.map do |e|
+      attributes = modifiers.map do |e|
         mod = e.name.split('.')[1]
         dryml_exception("invalid template parameter modifier: #{e.name}") if 
           !mod.in? %w{before after append prepend replace}
@@ -467,18 +467,18 @@ module Hobo::Dryml
       end
       
       if el
-        options.concat(el.attributes.map { |name, value| ":#{name} => #{attribute_to_ruby(value)}" })
+        attributes.concat(el.attributes.map { |name, value| ":#{name} => #{attribute_to_ruby(value)}" })
       end
       
       if template_call?(el || modifiers.first)
-        template_procs = el ? compile_template_procs(el) : "{}"
-        "proc { [{#{options * ', '}}, #{template_procs}] }"
+        template_procs = el ? tag_parameters(el) : "{}"
+        "proc { [{#{attributes * ', '}}, #{template_procs}] }"
       else
         if el && el.has_end_tag?
           body = children_to_erb(el)
-          options << ":tagbody => proc { new_context { %>#{body}<% } } " 
+          attributes << ":tagbody => proc { new_context { %>#{body}<% } } " 
         end
-        "proc { {#{options * ', '}} }"
+        "proc { {#{attributes * ', '}} }"
       end
     end
 
@@ -486,21 +486,21 @@ module Hobo::Dryml
     def tag_call(el)
       name = call_name(el)
       param_name = extract_param_name!(el)
-      options = tag_options(el)
+      attributes = tag_attributes(el)
       newlines = tag_newlines(el)
 
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
                if polymorphic_call?(el)
-                 "merge_and_call(find_polymorphic_tag(:#{name}), #{options}, template_procs[#{param_name}])"
+                 "merge_and_call(find_polymorphic_tag(:#{name}), #{attributes}, template_procs[#{param_name}])"
                else
-                 "merge_and_call(:#{name}, #{options}, template_procs[#{param_name}])"
+                 "merge_and_call(:#{name}, #{attributes}, template_procs[#{param_name}])"
                end
              else
                if polymorphic_call?(el)
-                 "send(find_polymorphic_tag(:#{name}), #{options unless options == '{}'})"
+                 "send(find_polymorphic_tag(:#{name}), #{attributes unless attributes == '{}'})"
                else
-                 "#{name}(#{options unless options == '{}'})"
+                 "#{name}(#{attributes unless attributes == '{}'})"
                end
              end
       
@@ -525,7 +525,7 @@ module Hobo::Dryml
     end
     
     
-    def tag_options(el)
+    def tag_attributes(el)
       attributes = el.attributes
       items = attributes.map do |n,v|
         ":#{n} => #{attribute_to_ruby(v)}" unless n.in?(NOT_PARAMETER_ATTRIBUTES)
@@ -534,22 +534,22 @@ module Hobo::Dryml
       # if there's a ':' el.name is just the part after the ':'
       items << ":field => \"#{el.name}\"" if el.name != el.expanded_name
       
-      options = items.join(", ")
+      attributes = items.join(", ")
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs
-        extra_options = if merge_attrs == "&true"
-                          "options"
+        extra_attributes = if merge_attrs == "&true"
+                          "attributes"
                         elsif merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
                           merge_attrs[1..-1]
                         else
                           dryml_exception("invalid merge_attrs", el)
                         end
-        "{#{options}}.merge((#{extra_options}) || {})"
-      elsif options.empty?
+        "{#{attributes}}.merge((#{extra_attributes}) || {})"
+      elsif attributes.empty?
         "{}"
       else
-        "{#{options}}"
+        "{#{attributes}}"
       end
     end
 
@@ -572,7 +572,7 @@ module Hobo::Dryml
                 dryml_exception("merge_attrs was given a string", el) unless is_code_attribute?(merge_attrs)
         
                 "merge_attrs({#{attrs * ', '}}, " +
-                  "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? options : __merge_attrs__))"
+                  "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? attributes : __merge_attrs__))"
               else
                 "{" + attrs.join(', ') + "}"
               end
