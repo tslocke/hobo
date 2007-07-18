@@ -287,11 +287,11 @@ module Hobo::Dryml
     
     def template_method(name, re_alias, redefine, method_body)
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, template_procs, __block__| " +
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, parameters, __block__| " +
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
           ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
       else
-        "<% def #{name}(__attributes__={}, template_procs={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, parameters={}, &__block__); #{method_body}; end %>"
       end
     end
     
@@ -404,11 +404,11 @@ module Hobo::Dryml
       attributes = tag_attributes(el)
       newlines = tag_newlines(el)
       
-      template_procs = tag_parameters(el)
+      parameters = tag_parameters(el)
       
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
-               args = "#{attributes}, #{template_procs}, template_procs[#{param_name}]"
+               args = "#{attributes}, #{parameters}, parameters[#{param_name}]"
                if polymorphic_call?(el)
                  "merge_and_call_template(find_polymorphic_template(:#{name}), #{args})"
                else
@@ -416,16 +416,16 @@ module Hobo::Dryml
                end
              else
                if polymorphic_call?(el)
-                 "send(find_polymorphic_template(:#{name}), #{attributes}, #{template_procs})"
+                 "send(find_polymorphic_template(:#{name}), #{attributes}, #{parameters})"
                else
-                 "#{name}(#{attributes}, #{template_procs})"
+                 "#{name}(#{attributes}, #{parameters})"
                end
              end
 
       "<% _output(#{call}) %>"
     end
     
-    
+    # Tag parameters are parameters to templates.
     def tag_parameters(el)
       dryml_exception("content is not allowed directly inside template calls", el) if 
         el.children.find { |e| e.is_a?(REXML::Text) && !e.to_s.blank? }
@@ -437,9 +437,9 @@ module Hobo::Dryml
           param_name = extract_param_name!(e)
           if param_name
             if template_call?(e)
-              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, template_procs[:#{param_name}])"
+              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, parameters[:#{param_name}])"
             else
-              ":#{e.name} => merge_option_procs(#{template_proc(e)}, template_procs[:#{param_name}])"
+              ":#{e.name} => merge_option_procs(#{template_proc(e)}, parameters[:#{param_name}])"
             end
           else
             ":#{e.name} => #{template_proc(e)}"
@@ -452,7 +452,20 @@ module Hobo::Dryml
           ":#{group_name} => #{template_proc(param, modifiers)}"
         end
       end
-      "{" + param_items.join(', ') + "}"
+
+      merge_params = el.attributes['merge_params']
+      if merge_params
+        extra_params = if merge_params == "&true"
+                         "parameters"
+                        elsif merge_params.starts_with?(CODE_ATTRIBUTE_CHAR)
+                          merge_params[1..-1]
+                        else
+                          dryml_exception("invalid merge_params", el)
+                        end
+        "{#{param_items * ', '}}.merge((#{extra_attributes}) || {})"
+      else
+        "{#{param_items * ', '}}"
+      end
     end
     
     
@@ -471,8 +484,8 @@ module Hobo::Dryml
       end
       
       if template_call?(el || modifiers.first)
-        template_procs = el ? tag_parameters(el) : "{}"
-        "proc { [{#{attributes * ', '}}, #{template_procs}] }"
+        parameters = el ? tag_parameters(el) : "{}"
+        "proc { [{#{attributes * ', '}}, #{parameters}] }"
       else
         if el && el.has_end_tag?
           body = children_to_erb(el)
@@ -492,9 +505,9 @@ module Hobo::Dryml
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
                if polymorphic_call?(el)
-                 "merge_and_call(find_polymorphic_tag(:#{name}), #{attributes}, template_procs[#{param_name}])"
+                 "merge_and_call(find_polymorphic_tag(:#{name}), #{attributes}, parameters[#{param_name}])"
                else
-                 "merge_and_call(:#{name}, #{attributes}, template_procs[#{param_name}])"
+                 "merge_and_call(:#{name}, #{attributes}, parameters[#{param_name}])"
                end
              else
                if polymorphic_call?(el)
