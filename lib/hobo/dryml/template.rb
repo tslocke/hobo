@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless for_all)
+    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless for_all part)
 
     @build_cache = {}
     
@@ -570,7 +570,7 @@ module Hobo::Dryml
     def static_tag_to_method_call(el)
       part = el.attributes["part"]
       attrs = el.attributes.map do |n, v|
-        next if n.in? %w(merge_attrs part)
+        next if n.in? NOT_PARAMETER_ATTRIBUTES
         
         val = v.gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %(:#{n} => "#{val}")
@@ -595,8 +595,7 @@ module Hobo::Dryml
         dryml_exception("part attribute on empty static tag", el) if part
         
         args = ["", attrs].compact.join(', ')
-        method = "tag"
-        "<%= tag(:#{el.name}, #{attrs} #{tag_newlines(el)})%>"
+        "<%= " + apply_control_attributes("tag(:#{el.name}, #{attrs} #{tag_newlines(el)})", el) + " %>"
       else
         if part
           body = part_element(el, children_to_erb(el))
@@ -605,14 +604,14 @@ module Hobo::Dryml
         end
 
         args = [":#{el.name}", body, attrs].compact.join(', ')
-        method = "content_tag"
-        "<%= tag :#{el.name}, #{attrs}, true #{tag_newlines(el)} %>#{body}</#{el.name}>"
+        "<%= " + apply_control_attributes("tag(:#{el.name}, #{attrs}, true)", el) +
+          "#{tag_newlines(el)} %>#{body}</#{el.name}>"
       end
     end
     
     
     def static_element_to_erb(el)
-      if el.attributes["part"] || el.attributes["merge_attrs"]
+      if %w(part merge_attrs if unless for_all).any? {|x| el.attributes[x]}
         static_tag_to_method_call(el)
       else
         start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")

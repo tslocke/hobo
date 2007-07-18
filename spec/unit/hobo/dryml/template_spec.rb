@@ -469,6 +469,14 @@ describe Template do
   end
   
   
+  # --- Control Attributes --- #
+  
+  it "should alow tags to be conditional with the 'if' attribute" do 
+    eval_dryml("<p if='&false'/>").should == ""
+    eval_dryml("<p if='&true'/>").should == "<p />"
+  end
+  
+  
   
   # --- Test Helpers --- #
   
