@@ -5,13 +5,13 @@
       <title><%= title_prefix %><%= title || human_type + ": " + display_name(:no_wrapper => true) %></title>
       <%= stylesheet_link_tag 'application' %>
       <%= javascript_include_tag :defaults %>
-      <hobo_rapid_javascripts merge="rapid_javascripts" tiny_mce="&true"/>
+      <hobo_rapid_javascripts param="rapid_javascripts" tiny_mce="&true"/>
     </head>
-    <body onload="Hobo.applyEvents();" merge="body">
-      <div merge="header"/>
-      <div merge="intro"/>
-      <div merge="main"/>
-      <div merge="footer"/>
+    <body onload="Hobo.applyEvents();" param="body">
+      <div param="header"/>
+      <div param="intro"/>
+      <div param="main"/>
+      <div param="footer"/>
     </body>
   </html>
 </def>
@@ -26,23 +26,23 @@
     </intro>
 
     <main>
-      <panel merge="main_panel">
-        <h2 merge="panel_heading"><count label="&model_name"/></h2>
+      <panel param="main_panel">
+        <h2 param="panel_heading"><count label="&model_name"/></h2>
         <section>
-          <table_for merge="table">
+          <table_for param="table">
             <td><object_link/></td><td><delete_button class='text'/></td>
           </table_for>
         </section>
         
         <if q="&@pages.length > 1">
-          <section merge="page_nav">
+          <section param="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
           </section>
         </if>
 
-        <section_if merge="new_link">
+        <section_if param="new_link">
           <p><new_object_link for="&@model"/></p>
         </section_if>
       </panel>
@@ -58,16 +58,16 @@
     </intro>
 
     <main>
-      <panel merge="main_panel">
-        <h2 merge="panel_heading">Details</h2>
+      <panel param="main_panel">
+        <h2 param="panel_heading">Details</h2>
         <section>
-          <div class="error_messages" merge="error_messages">
+          <div class="error_messages" param="error_messages">
             <%= error_messages_for 'this' %>
           </div>
 
           <object_form hidden_fields="*">
             <ObjectTable associations="belongs_to" />
-            <submit label="Create" class="create_button" merge="submit_button"/>
+            <submit label="Create" class="create_button" param="submit_button"/>
           </object_form>
         </section>
       </panel>
@@ -90,13 +90,13 @@
     </intro>
     
     <main>
-      <panel merge="main_panel">
-        <h2 merge="panel_heading">Details</h2>
+      <panel param="main_panel">
+        <h2 param="panel_heading">Details</h2>
         <section>
           <ObjectTable associations="*" skip="name"/>
         </section>
 
-        <section_if merge="new_links">
+        <section_if param="new_links">
           <repeat with="&has_many_assocs">
             <p><new_object_link/></p>
           </repeat>
@@ -117,17 +117,17 @@
     </intro>
 
     <main>
-      <panel merge="main_panel">
-        <h2 merge="panel_heading">Details</h2>
+      <panel param="main_panel">
+        <h2 param="panel_heading">Details</h2>
         <section>
-          <div class="error_messages" merge="error_messages">
+          <div class="error_messages" param="error_messages">
             <%= error_messages_for 'this' %>
           </div>
 
           <object_form hidden_fields="*">
             <ObjectTable associations="belongs_to"/>
             <submit label='Add to #{display_name(:with => @owner, :no_wrapper => true)}'
-                    merge="submit_button"/>
+                    param="submit_button"/>
           </object_form>
         </section>
 
@@ -148,11 +148,11 @@
     </intro>
 
     <main>
-      <panel merge="main_panel">
-        <h2 merge="panel_heading"><count with="&@pages.item_count"
+      <panel param="main_panel">
+        <h2 param="panel_heading"><count with="&@pages.item_count"
                                                   label="&@reflection.klass.name.titleize"/></h2>
         <if q="&@pages.length > 1">
-          <section merge="page_nav">
+          <section param="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
@@ -160,13 +160,13 @@
         </if>
 
         <section>
-          <table_for merge="table">
+          <table_for param="table">
             <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
           </table_for>
         </section>
 
         <if q="&@pages.length > 1">
-          <section merge="page_nav">
+          <section param="page_nav">
             <div class="page_links">
               <page_nav/>
             </div>
@@ -174,7 +174,7 @@
         </if>
 
         <if q="&Hobo.simple_has_many_association?(@association)">
-          <section merge="new_link">
+          <section param="new_link">
             <new_object_link for="&@association"/>
           </section>
         </if>

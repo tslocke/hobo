@@ -8,7 +8,7 @@
 
 <def tag="ObjectTable" attrs="fields, skip, associations, editor_tag">
   <% 
-     field_inner_tag_options, html_options = options.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
+     field_inner_tag_options, html_options = attributes.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
 #     inner_tag_options.merge!(field_inner_tag_options)
                                                         
      if fields.nil?
@@ -51,9 +51,9 @@
       <% base_name = field.ends_with?("?") ? field[0..-2] : field %>
       <tr>
         <td class="field_label"
-            merge="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
+            param="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
         <td><with field="&field">
-            <call_tag name="&editor_tag" merge="&base_name + '_editor'"/>
+            <call_tag name="&editor_tag" param="&base_name + '_editor'"/>
         </with></td>
       </tr>
     <% end %>
@@ -61,8 +61,8 @@
     <% for field in associations.select{|f| can_view?(this, f)} %>
       <tr>
         <td class="field_label"
-            merge="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
-        <td><call_tag name="&editor_tag" field="&field" merge="&field.to_s + '_editor'"/></td>
+            param="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
+        <td><call_tag name="&editor_tag" field="&field" param="&field.to_s + '_editor'"/></td>
       </tr>
     <% end %>
 

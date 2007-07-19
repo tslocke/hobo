@@ -8,11 +8,11 @@
     <repeat with="&item">
       <% c = this[:content]; klass = c == current ? "current" : "" %>
       <if q="&!link_current && c == current">
-        <nav_item class="&klass" merge="li"><%= c %></nav_item>
+        <nav_item class="&klass" param="li"><%= c %></nav_item>
       </if>
       <else>
-        <nav_item merge="item_el" class="&klass">
-          <a href="&this[:href]" merge="link"><%= c %></a>
+        <nav_item param="item_el" class="&klass">
+          <a href="&this[:href]" param="link"><%= c %></a>
         </nav_item>
       </else>
     </repeat>

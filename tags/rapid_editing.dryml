@@ -15,7 +15,7 @@
      id ||= this_field_dom_id + "_completer"
      url = object_url(completer_model, "completions",
                       { :for => completer_attr },
-                      options.select_hash {|k,v| k.to_s.starts_with? "where_"})
+                      attributes.select_hash {|k,v| k.to_s.starts_with? "where_"})
   %>
   <input type="text" name="#{name}" id="#{id}" class="autocomplete_bhv"
          autocomplete_url="#{url}" value="#{value}"
@@ -67,7 +67,7 @@
    completer_model ||= refl.klass
    completer_attr ||= refl.klass.id_name_column
    id ||= this_field_dom_id + "_completer"
-   where_options = options.select_hash {|k,v| k.to_s.starts_with? "where_"}
+   where_options = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
    url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_options))
   %>
 
@@ -93,7 +93,7 @@
   completer_attr ||= refl.klass.id_name_column
   url = object_url(completer_model, "completions",
                    { :for => completer_attr },
-                   options.select_hash {|k,v| k.to_s.starts_with? "where_"})
+                   attributes.select_hash {|k,v| k.to_s.starts_with? "where_"})
   %>
     <form onsubmit="#{f}; $('#{id}').blur(); return false">
       <input type="text" class="autocomplete_bhv autosubmit" id="#{id}" autocomplete_url="#{url}"
@@ -117,7 +117,7 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.value')
                     } })
-  html_options = add_classes(options, editor_class)
+  html_options = add_classes(attributes, editor_class)
 %>
   <select onchange="#{f}" merge_attrs="&html_options">
     <%= options_for_select(values, this) %>
@@ -133,10 +133,10 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
                     } })
-  options = add_classes(options, editor_class)
+  attributes = add_classes(attributes, editor_class)
 %>
   <input type="checkbox" value="1" onchange="#{f}"
-         merge_attrs="& this ? options.merge(:checked => 'checked') : options" />
+         merge_attrs="& this ? attributes.merge(:checked => 'checked') : attributes" />
 </def>
 
 
@@ -172,7 +172,7 @@
 <def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
  <select class="number_editor_bhv" hobo_update="#{update}"
           hobo_model_id="#{this_field_dom_id}"
-          merge_attrs="&message ? options.merge(:hobo_message => message) : options">
+          merge_attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
    <if q="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
  </select>
