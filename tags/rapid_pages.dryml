@@ -2,7 +2,7 @@
   <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
   <html>
     <head>
-      <title><%= title_prefix %><%= title || human_type + ": " + display_name(:no_span => true) %></title>
+      <title><%= title_prefix %><%= title || human_type + ": " + display_name(:no_wrapper => true) %></title>
       <%= stylesheet_link_tag 'application' %>
       <%= javascript_include_tag :defaults %>
       <hobo_rapid_javascripts merge="rapid_javascripts" tiny_mce="&true"/>
@@ -126,7 +126,7 @@
 
           <object_form hidden_fields="*">
             <ObjectTable associations="belongs_to"/>
-            <submit label='Add to #{display_name(:with => @owner, :no_span => true)}'
+            <submit label='Add to #{display_name(:with => @owner, :no_wrapper => true)}'
                     merge="submit_button"/>
           </object_form>
         </section>
@@ -139,7 +139,7 @@
 
 
 <def tag="ShowCollectionPage">
-  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:with => @owner, :no_span => true)}" %>
+  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:with => @owner, :no_wrapper => true)}" %>
   <Page title="&title" merge_attrs="&true">
 
     <intro>

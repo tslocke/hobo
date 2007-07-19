@@ -145,7 +145,7 @@ module Hobo
     end
 
 
-    def_tag :show, :no_span, :truncate_tail, :format do
+    def_tag :show, :no_wrapper, :truncate_tail, :format do
       # We can't do this as a declared attribute as it will hide the truncate helper
       trunc = options.delete(:truncate)
       
@@ -205,9 +205,15 @@ module Hobo
                      else
                        raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
                      end
+              tag = case this
+                    when Hobo::Text, Hobo::HtmlString, Hobo::MarkdownString, Hobo::TextileString
+                      :div
+                    else
+                      :span
+                    end
               
-              if !no_span && this_parent.respond_to?(:typed_id)
-                content_tag :span, res2, options.merge(:hobo_model_id => this_field_dom_id)
+              if !no_wrapper && this_parent.respond_to?(:typed_id)
+                content_tag tag, res2, options.merge(:hobo_model_id => this_field_dom_id)
               else
                 res2
               end
