@@ -463,7 +463,7 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid merge_params", el)
                         end
-        "{#{param_items * ', '}}.merge((#{extra_attributes}) || {})"
+        "{#{param_items * ', '}}.merge((#{extra_params}) || {})"
       else
         "{#{param_items * ', '}}"
       end

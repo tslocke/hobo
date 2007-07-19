@@ -261,6 +261,8 @@ describe Template do
       <def tag="DefTagMerge">foo <defined param b="3">baa</defined>!</def>
 
       <def tag="NestedStaticMerge">merge StaticMerge: <StaticMerge param/></def>
+
+      <def tag="ParameterMerge">parameter merge: <StaticMerge><b param/></StaticMerge></def>
     END
   end
 
@@ -318,10 +320,17 @@ describe Template do
       'merge StaticMerge: <p>a <b class="big">BOLD</b> word</p>'
   end
   
-  it "should allow merge names to be defined dynamically" do 
+  it "should allow param names to be defined dynamically" do 
     eval_dryml('<def tag="T"><p param="& :a.to_s + :b.to_s"/></def>' +
                '<T><ab x="1"/></T>').should == '<p x="1" />'
   end
+  
+  it "should allow params to be defined on other params" do 
+    eval_with_templates('<ParameterMerge><b class="small">foo</b></ParameterMerge>').should == 
+      'parameter merge: <p>a <b class="small">foo</b> word</p>'
+    
+  end
+  
   
   
   # --- Template Parameter Modifiers --- #
@@ -368,6 +377,25 @@ describe Template do
       should == 'merge StaticMerge:'
   end
 
+  
+  # --- Merge Params --- #
+  
+  
+  it "should support merge_param on template calls" do
+    tags = %(<def tag="Page"><h1 param='title'/><div param='footer'/></def>
+             <def tag="MyPage"><Page merge_params><footer>the footer</footer></Page></def>)
+
+    eval_dryml(tags + "<MyPage><title>Hi!</title></MyPage>").should == '<h1>Hi!</h1><div>the footer</div>'
+  end
+  
+  
+  # --- Merge Attrs --- #
+  
+  
+  
+  
+  
+
   # --- The Context --- #
   
   def context_eval(context, src)
@@ -409,9 +437,10 @@ describe Template do
              <def tag="Template"><do:name><p param/></do></def>)
     context_eval(a_user, tags + '<Template><p><%= this %></p></Template>').should == '<p>Tom</p>'
   end
-  
+
   
   # --- Local Tags --- #
+  
   
   it "should allow tags to be overriden with local tags" do 
     eval_dryml("<def tag='foo'>ab</def>\n" +
