@@ -254,7 +254,7 @@ module Hobo::Dryml
         
         method_body = tag_method_body(el, attr_names)
         src = if template_name?(name)
-                template_method(name, re_alias, redefine, method_body)
+                template_method(name, re_alias, redefine, method_body, el)
               else
                 tag_method(name, re_alias, redefine, method_body)
               end
@@ -285,7 +285,7 @@ module Hobo::Dryml
     end
     
     
-    def template_method(name, re_alias, redefine, method_body)
+    def template_method(name, re_alias, redefine, method_body, el)
       if redefine
         re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, all_parameters, __block__| " +
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
@@ -652,7 +652,7 @@ module Hobo::Dryml
         elsif unless_
           "(#{expression} unless Hobo::Dryml.last_if = #{control})"
         elsif repeat
-          "#{control}.map { #{expression} }.join"
+          "#{control}.map {|x| new_object_context(x) { #{expression} } }.join"
         end
       end
     end
