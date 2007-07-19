@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless for_all part)
+    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part)
 
     @build_cache = {}
     
@@ -604,14 +604,14 @@ module Hobo::Dryml
         end
 
         args = [":#{el.name}", body, attrs].compact.join(', ')
-        "<%= " + apply_control_attributes("tag(:#{el.name}, #{attrs}, true)", el) +
-          "#{tag_newlines(el)} %>#{body}</#{el.name}>"
+        output_tag = "_output(tag(:#{el.name}, #{attrs}, true) + new_context { %>#{body}</#{el.name}><% })"
+        "<% " + apply_control_attributes(output_tag, el) + "%>"
       end
     end
     
     
     def static_element_to_erb(el)
-      if %w(part merge_attrs if unless for_all).any? {|x| el.attributes[x]}
+      if %w(part merge_attrs if unless repeat).any? {|x| el.attributes[x]}
         static_tag_to_method_call(el)
       else
         start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
@@ -631,7 +631,7 @@ module Hobo::Dryml
     
     
     def apply_control_attributes(expression, el)
-      if_, unless_, for_all = controls = %w(if unless for_all).map {|x| el.attributes[x]}
+      if_, unless_, repeat = controls = %w(if unless repeat).map {|x| el.attributes[x]}
       controls.compact!
       
       dryml_exception("You can't have multiple control attributes on the same element", el) if
@@ -643,17 +643,17 @@ module Hobo::Dryml
       else
         control = if val.starts_with?(CODE_ATTRIBUTE_CHAR)
                     val[1..-1]
-                  elsif for_all
+                  elsif repeat
                     "this.#{val}"
                   else
                     "this.#{val}.blank?"
                   end
         
         if if_
-          "(#{expression} if #{control})"
+          "(#{expression} if Hobo::Dryml.last_if = #{control})"
         elsif unless_
-          "(#{expression} unless #{control})"
-        elsif for_all
+          "(#{expression} unless Hobo::Dryml.last_if = #{control})"
+        elsif repeat
           "#{control}.map_this { #{expression} }"
         end
       end

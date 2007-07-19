@@ -474,7 +474,10 @@ describe Template do
   it "should alow tags to be conditional with the 'if' attribute" do 
     eval_dryml("<p if='&false'/>").should == ""
     eval_dryml("<p if='&true'/>").should == "<p />"
-  end
+
+    eval_dryml("<p if='&false'>hello</p>").should == ""
+    eval_dryml("<p if='&true'>hello</p>").should == "<p>hello</p>"
+end
   
   
   
