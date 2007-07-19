@@ -67,7 +67,7 @@ describe Template do
   it "should compile defs with cap names as templates" do 
     # Note the presence of the `parameters` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
-      "<% def Foo(__attributes__={}, parameters={}, &__block__); " +
+      "<% def Foo(__attributes__={}, all_parameters={}, &__block__); " +
       "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "<% _erbout; end; end %>"
   end
@@ -77,58 +77,58 @@ describe Template do
   end
   
   it "should compile merged tag-calls as calls to `merge_and_call`" do 
-    compile_in_template("<foo param a='1'/>").should == '<%= merge_and_call(:foo, {:a => "1"}, parameters[:foo]) %>'
+    compile_in_template("<foo param a='1'/>").should == '<%= merge_and_call(:foo, {:a => "1"}, all_parameters[:foo]) %>'
   end
   
   it "should compile merged tag-calls with support for named params" do 
-    compile_in_template("<foo param='zap'/>").should == "<%= merge_and_call(:foo, {}, parameters[:zap]) %>"
+    compile_in_template("<foo param='zap'/>").should == "<%= merge_and_call(:foo, {}, all_parameters[:zap]) %>"
   end
 
   it "should compile a merged tag-call with body" do 
     compile_in_template("<foo param>abc</foo>").should == 
-      "<% _output(merge_and_call(:foo, {}, parameters[:foo]) do %>abc<% end) %>"
+      "<% _output(merge_and_call(:foo, {}, all_parameters[:foo]) do %>abc<% end) %>"
   end
   
   it "should compile merged template-calls as calls to `merge_and_call_template`" do 
     compile_in_template("<Foo param/>").should == 
-      "<% _output(merge_and_call_template(:Foo, {}, {}, parameters[:Foo])) %>"
+      "<% _output(merge_and_call_template(:Foo, {}, {}, all_parameters[:Foo])) %>"
   end
   
   it "should compile merged template-calls with parameters as calls to `merge_and_call_template`" do 
     compile_in_template("<Foo param><a x='1'/></Foo>").should == 
-      '<% _output(merge_and_call_template(:Foo, {}, {:a => proc { {:x => "1"} }}, parameters[:Foo])) %>'
+      '<% _output(merge_and_call_template(:Foo, {}, {:a => proc { {:x => "1"} }}, all_parameters[:Foo])) %>'
   end
   
   it "should compile template parameters with param" do
     compile_in_template("<Foo><abc param/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, parameters[:abc])})) %>'
+      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, all_parameters[:abc])})) %>'
   end
   
   it "should compile template parameters with named params" do
     compile_in_template("<Foo><abc param='x'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, parameters[:x])})) %>'
+      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, all_parameters[:x])})) %>'
   end
   
   it "should compile template parameters with param and attributes" do
     compile_in_template("<Foo><abc param='x' a='b'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {:a => "b"} }, parameters[:x])})) %>'
+      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {:a => "b"} }, all_parameters[:x])})) %>'
   end
   
   it "should compile template parameters with param and a tag body" do
     compile_in_template("<Foo><abc param>ha!</abc></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(' +
-      'proc { {:tagbody => proc { new_context { %>ha!<% } } } }, parameters[:abc])})) %>'
+      'proc { {:tagbody => proc { new_context { %>ha!<% } } } }, all_parameters[:abc])})) %>'
   end
   
   it "should compile template parameters which are template calls themselves" do 
     compile_in_template("<Foo><Baa param x='1'/></Foo>").should == 
-      '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(proc { [{:x => "1"}, {}] }, parameters[:Baa])})) %>'
+      '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(proc { [{:x => "1"}, {}] }, all_parameters[:Baa])})) %>'
   end
 
   it "should compile template parameters which are templates themselves with their own parameters" do 
     compile_in_template("<Foo><Baa param><x>hello</x></Baa></Foo>").should == 
       '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(' + 
-      'proc { [{}, {:x => proc { {:tagbody => proc { new_context { %>hello<% } } } }}] }, parameters[:Baa])})) %>'
+      'proc { [{}, {:x => proc { {:tagbody => proc { new_context { %>hello<% } } } }}] }, all_parameters[:Baa])})) %>'
   end
 
   # --- Compilation: Calling Templates --- # 
@@ -504,9 +504,12 @@ describe Template do
 
     eval_dryml("<p if='&false'>hello</p>").should == ""
     eval_dryml("<p if='&true'>hello</p>").should == "<p>hello</p>"
-end
+  end
   
-  
+  it "should alow tags to be repeated with the 'repeat' attribute" do 
+    eval_dryml("<img repeat='&[1,2,3]'/>").should == "<img /><img /><img />"
+  end
+
   
   # --- Test Helpers --- #
   

@@ -287,11 +287,11 @@ module Hobo::Dryml
     
     def template_method(name, re_alias, redefine, method_body)
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, parameters, __block__| " +
+        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, all_parameters, __block__| " +
           ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
           ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
       else
-        "<% def #{name}(__attributes__={}, parameters={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, all_parameters={}, &__block__); #{method_body}; end %>"
       end
     end
     
@@ -408,7 +408,7 @@ module Hobo::Dryml
       
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
-               args = "#{attributes}, #{parameters}, parameters[#{param_name}]"
+               args = "#{attributes}, #{parameters}, all_parameters[#{param_name}]"
                if polymorphic_call?(el)
                  "merge_and_call_template(find_polymorphic_template(:#{name}), #{args})"
                else
@@ -438,9 +438,9 @@ module Hobo::Dryml
           param_name = extract_param_name!(e)
           if param_name
             if template_call?(e)
-              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, parameters[:#{param_name}])"
+              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, all_parameters[:#{param_name}])"
             else
-              ":#{e.name} => merge_option_procs(#{template_proc(e)}, parameters[:#{param_name}])"
+              ":#{e.name} => merge_option_procs(#{template_proc(e)}, all_parameters[:#{param_name}])"
             end
           else
             ":#{e.name} => #{template_proc(e)}"
@@ -457,7 +457,7 @@ module Hobo::Dryml
       merge_params = el.attributes['merge_params']
       if merge_params
         extra_params = if merge_params == "&true"
-                         "parameters"
+                         "all_parameters"
                         elsif merge_params.starts_with?(CODE_ATTRIBUTE_CHAR)
                           merge_params[1..-1]
                         else
@@ -505,9 +505,9 @@ module Hobo::Dryml
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
                if polymorphic_call?(el)
-                 "merge_and_call(find_polymorphic_tag(:#{name}), #{attributes}, parameters[#{param_name}])"
+                 "merge_and_call(find_polymorphic_tag(:#{name}), #{attributes}, all_parameters[#{param_name}])"
                else
-                 "merge_and_call(:#{name}, #{attributes}, parameters[#{param_name}])"
+                 "merge_and_call(:#{name}, #{attributes}, all_parameters[#{param_name}])"
                end
              else
                if polymorphic_call?(el)
@@ -572,6 +572,7 @@ module Hobo::Dryml
         val = v.gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %(:#{n} => "#{val}")
       end.compact
+      
       # If there's a part but no id, the id defaults to the part name
       if part && !el.attributes["id"]
         attrs << ":id => '#{part}'"
@@ -651,7 +652,7 @@ module Hobo::Dryml
         elsif unless_
           "(#{expression} unless Hobo::Dryml.last_if = #{control})"
         elsif repeat
-          "#{control}.map_this { #{expression} }"
+          "#{control}.map { #{expression} }.join"
         end
       end
     end
