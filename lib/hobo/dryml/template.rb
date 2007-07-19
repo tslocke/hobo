@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    NOT_PARAMETER_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part)
+    SPECIAL_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part)
 
     @build_cache = {}
     
@@ -471,7 +471,6 @@ module Hobo::Dryml
     
     
     def template_proc(el, modifiers=[])
-      
       attributes = modifiers.map do |e|
         mod = e.name.split('.')[1]
         dryml_exception("invalid template parameter modifier: #{e.name}") if 
@@ -542,13 +541,13 @@ module Hobo::Dryml
     def tag_attributes(el)
       attributes = el.attributes
       items = attributes.map do |n,v|
-        ":#{n} => #{attribute_to_ruby(v)}" unless n.in?(NOT_PARAMETER_ATTRIBUTES)
+        ":#{n} => #{attribute_to_ruby(v)}" unless n.in?(SPECIAL_ATTRIBUTES)
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
       items << ":field => \"#{el.name}\"" if el.name != el.expanded_name
       
-      attributes = items.join(", ")
+      items = items.join(", ")
       
       merge_attrs = attributes['merge_attrs']
       if merge_attrs
@@ -559,18 +558,16 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid merge_attrs", el)
                         end
-        "{#{attributes}}.merge((#{extra_attributes}) || {})"
-      elsif attributes.empty?
-        "{}"
+        "{#{items}}.merge((#{extra_attributes}) || {})"
       else
-        "{#{attributes}}"
+        "{#{items}}"
       end
     end
 
     def static_tag_to_method_call(el)
       part = el.attributes["part"]
       attrs = el.attributes.map do |n, v|
-        next if n.in? NOT_PARAMETER_ATTRIBUTES
+        next if n.in? SPECIAL_ATTRIBUTES
         
         val = v.gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %(:#{n} => "#{val}")

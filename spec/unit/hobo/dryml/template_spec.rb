@@ -41,6 +41,11 @@ describe Template do
     compile_dryml("<foo:name></foo>").should == '<%= foo({:field => "name"}) %>'
   end
 
+  it "should compile block-tag calls with merge_attrs" do
+    compile_dryml("<foo merge_attrs/>").should == "<%= foo({}.merge((attributes) || {})) %>"
+    compile_dryml("<foo a='1' merge_attrs/>").should == '<%= foo({:a => "1"}.merge((attributes) || {})) %>'
+  end
+
   # --- Compilation: Defining Block Tags --- #
   
   it "should compile defs with lower-case names as block tags" do 
@@ -389,13 +394,6 @@ describe Template do
   end
   
   
-  # --- Merge Attrs --- #
-  
-  
-  
-  
-  
-
   # --- The Context --- #
   
   def context_eval(context, src)
