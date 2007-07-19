@@ -507,7 +507,8 @@ describe Template do
   end
   
   it "should alow tags to be repeated with the 'repeat' attribute" do 
-    eval_dryml("<img repeat='&[1,2,3]'/>").should == "<img /><img /><img />"
+    eval_dryml('<img repeat="&[1,2,3]" src="#{this}" />').should == 
+      '<img src="1" /><img src="2" /><img src="3" />'
   end
 
   

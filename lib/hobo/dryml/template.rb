@@ -591,8 +591,7 @@ module Hobo::Dryml
       
       if el.children.empty?
         dryml_exception("part attribute on empty static tag", el) if part
-        
-        args = ["", attrs].compact.join(', ')
+
         "<%= " + apply_control_attributes("tag(:#{el.name}, #{attrs} #{tag_newlines(el)})", el) + " %>"
       else
         if part
@@ -601,7 +600,6 @@ module Hobo::Dryml
           body = children_to_erb(el)               
         end
 
-        args = [":#{el.name}", body, attrs].compact.join(', ')
         output_tag = "_output(tag(:#{el.name}, #{attrs}, true) + new_context { %>#{body}</#{el.name}><% })"
         "<% " + apply_control_attributes(output_tag, el) + "%>"
       end
@@ -652,7 +650,7 @@ module Hobo::Dryml
         elsif unless_
           "(#{expression} unless Hobo::Dryml.last_if = #{control})"
         elsif repeat
-          "#{control}.map {|x| new_object_context(x) { #{expression} } }.join"
+          "repeat_attribute(#{control}) { #{expression} }"
         end
       end
     end

@@ -190,6 +190,13 @@ module Hobo::Dryml
         end      
       end
     end
+    
+    
+    def repeat_attribute(array, &b)
+      res = array.map { |x| new_object_context(x, &b) }.join
+      Hobo::Dryml.last_if = !array.empty?
+      res
+    end
 
     
     def _erbout
