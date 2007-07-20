@@ -488,7 +488,7 @@ module Hobo::Dryml
       merge_params = el.attributes['merge_params']
       if merge_params
         extra_params = if merge_params == "&true"
-                         "all_parameters"
+                         "parameters"
                         elsif is_code_attribute?(merge_params)
                           merge_params[1..-1]
                         else
