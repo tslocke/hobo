@@ -654,7 +654,7 @@ module Hobo::Dryml
         start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
         
         # Allow #{...} as an alternate to <%= ... %>
-        start_tag_src.sub!(/=\s*('.*?'|".*?")/) do |s|
+        start_tag_src.gsub!(/=\s*('.*?'|".*?")/) do |s|
           s.gsub(/#\{(.*?)\}/, '<%= \1 %>')
         end
 
