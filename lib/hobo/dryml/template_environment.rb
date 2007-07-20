@@ -334,8 +334,7 @@ module Hobo::Dryml
       attrs.each {|a| stripped_options.delete(a.to_sym) }
       
       # Return attrs declared as local variables (attrs="...")
-      call_procs_options = Hobo::LazyHash.new(options)
-      attrs.map {|a| call_procs_options[a.to_sym]} + [lazy_hash(stripped_options)]
+      attrs.map {|a| options[a.to_sym]} + [stripped_options]
     end
     
     
