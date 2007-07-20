@@ -68,7 +68,7 @@ module Hobo::Dryml
 
     def create_render_page_method
       erb_src = process_src
-      @builder.add_build_instruction(:render_page, :src => process_src, :line_num => 1)
+      @builder.add_build_instruction(:render_page, :src => erb_src, :line_num => 1)
     end
 
     
@@ -207,6 +207,15 @@ module Hobo::Dryml
         "<% #{name} = #{attribute_to_ruby(value)}; %>"
       end.join + tag_newlines(el)
     end
+    
+    
+    def declared_attributes(def_element)
+      attrspec = def_element.attributes["attrs"]
+      attr_names = attrspec ? attrspec.split(/\s*,\s*/).every(:to_sym) : []
+      invalids = attr_names & ([:with, :field, :this] + SPECIAL_ATTRIBUTES.every(:to_sym))
+      dryml_exception("invalid attrs in def: #{invalids * ', '}", def_element) unless invalids.empty?
+      attr_names
+    end
 
 
     def def_element(el)
@@ -220,6 +229,13 @@ module Hobo::Dryml
 
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
+      
+      # While processing this def, @def_name contains
+      # the names of all nested defs join with '_'. It's used to
+      # disambiguate local variables as a workaround for the broken
+      # scope semantics of Ruby 1.8.
+      old_def_name = @def_name
+      @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
 
       alias_of = el.attributes['alias_of']
       alias_current = el.attributes['alias_current']
@@ -242,36 +258,30 @@ module Hobo::Dryml
         end
       end
       
-      if alias_of
-        "#{re_alias}<% #{tag_newlines(el)} %>"
-      else
-        attrspec = el.attributes["attrs"]
-        attr_names = attrspec ? attrspec.split(/\s*,\s*/).every(:to_sym) : []
-        
-        invalids = attr_names & [:with, :field, :this]
-        dryml_exception("invalid attrs in def: #{invalids * ', '}", el) unless invalids.empty?
-        
-        
-        method_body = tag_method_body(el, attr_names)
-        src = if template_name?(name)
-                template_method(name, re_alias, redefine, method_body, el)
+      res = if alias_of
+              "#{re_alias}<% #{tag_newlines(el)} %>"
+            else
+              src = if template_name?(name)
+                      template_method(name, re_alias, redefine, el)
+                    else
+                      tag_method(name, re_alias, redefine, el)
+                    end
+              src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>" unless redefine
+              
+              logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
+              
+              if redefine
+                src
               else
-                tag_method(name, re_alias, redefine, method_body)
+                @builder.add_build_instruction(:def,
+                                               :src => restore_erb_scriptlets(src),
+                                               :line_num => element_line_num(el))
+                # keep line numbers matching up
+                "<% #{"\n" * src.count("\n")} %>"
               end
-        src << "<% _register_tag_attrs(:#{name}, #{attr_names.inspect}) %>" unless redefine
-        
-        logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
-        
-        if redefine
-          src
-        else
-          @builder.add_build_instruction(:def,
-                                         :src => restore_erb_scriptlets(src),
-                                         :line_num => element_line_num(el))
-          # keep line numbers matching up
-          "<% #{"\n" * src.count("\n")} %>"
-        end
-      end
+            end
+      @def_name = old_def_name
+      res
     end
     
     
@@ -285,50 +295,71 @@ module Hobo::Dryml
     end
     
     
-    def template_method(name, re_alias, redefine, method_body, el)
+    def param_names_in_template(el)
+      REXML::XPath.match(el, ".//*[@param]").
+        map {|e| get_param_name(e)}.
+        select {|name| is_code_attribute?(name) }.
+        every(:to_sym)
+    end
+    
+    
+    def template_method(name, re_alias, redefine, el)
+      param_names = param_names_in_template(el)
+
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, all_parameters, __block__| " +
-          ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
-          ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
+        method_body = tag_method_body(el, "#{@def_name}_attributes", "#{@def_name}_block")
+        re_alias + 
+          "<% self.class.redefine_tag(:#{name}, " + 
+          "proc {|#{@def_name}_attributes, #{@def_name}_all_parameters, #{@def_name}_block| " +
+          "@_locals_stack.push [tagbody, attributes, parameters]; " +
+          "parameters = #{@def_name}_all_parameters - #{param_names.inspect}; " +
+          "__res__ = #{method_body}; " +
+          "tagbody, attributes, parameters = @_locals_stack.pop; " +
+          "__res__; }); %>"
       else
-        "<% def #{name}(__attributes__={}, all_parameters={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, all_parameters={}, &__block__); " +
+          "parameters = all_parameters - #{param_names.inspect}; " +
+          tag_method_body(el) +
+          "; end %>"
       end
     end
     
     
-    def tag_method(name, re_alias, redefine, method_body)
+    def tag_method(name, re_alias, redefine, el)
       if redefine
-        re_alias + "<% self.class.redefine_tag(:#{name}, proc {|__attributes__, __block__| " +
-          ("#{@def_name}_tagbody = tagbody; " if @def_name).to_s + "__res__ = #{method_body} " +
-          ("; tagbody = #{@def_name}_tagbody; __res__; " if @def_name).to_s + "}); %>"
+        method_body = tag_method_body(el, "#{@def_name}_attributes", "#{@def_name}_block")
+        re_alias + 
+          "<% self.class.redefine_tag(:#{name}, " +
+          "proc {|#{@def_name}_attributes, #{@def_name}_block| " +
+          "@_locals_stack.push [tagbody, attributes, parameters]; " +
+          "parameters = nil; " +
+          "__res__ = #{method_body}; " +
+          "tagbody, attributes, parameters = @_locals_stack.pop; " +
+          "__res__; }); %>"
       else
-        "<% def #{name}(__attributes__={}, &__block__); #{method_body}; end %>"
+        "<% def #{name}(__attributes__={}, &__block__); " +
+          "parameters = nil; " +
+          tag_method_body(el) + 
+          "; end %>"
       end
     end
               
     
-    def tag_method_body(el, attrs)
+    def tag_method_body(el, attributes_var="__attributes__", block_var="__block__")
+      attrs = declared_attributes(el)
+      
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `attributes` is supposed to be there!
       setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "attributes, = " +
-        "_tag_locals(__attributes__, #{attrs.inspect})"
+        "_tag_locals(#{attributes_var}, #{attrs.inspect})"
 
-      start = "_tag_context(__attributes__, __block__) do |tagbody| #{setup_locals}"
+      start = "_tag_context(#{attributes_var}, #{block_var}) do |tagbody| #{setup_locals}"
       
-      # While processing the children of this def, @def_name contains
-      # the names of all nested defs join with '_'. It's used to
-      # disambiguate the +tagbody+ local variables.
-      old_def_name = @def_name
-      unsafe_name = el.attributes['tag']
-      @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
-
-      res = "#{start} " +
+      "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
         with_redefines(el) { children_to_erb(el) } +
         "<% _erbout; end"
-      @def_name = old_def_name
-      res
     end
     
     
@@ -367,7 +398,7 @@ module Hobo::Dryml
     end
     
     
-    def extract_param_name!(el)
+    def get_param_name(el)
       param_name = el.attributes["param"]
       
       if param_name
@@ -376,7 +407,7 @@ module Hobo::Dryml
           def_tag.nil? || !template_name?(def_tag.attributes["tag"])
       end
       
-      el.attributes.delete("param")
+      el.attributes["param"]
       res = param_name == "&true" ? el.dryml_name : param_name
 
       dryml_exception("param name for a template call must be capitalised", el) if
@@ -400,7 +431,7 @@ module Hobo::Dryml
     
     def template_call(el)
       name = call_name(el)
-      param_name = extract_param_name!(el)
+      param_name = get_param_name(el)
       attributes = tag_attributes(el)
       newlines = tag_newlines(el)
       
@@ -435,7 +466,7 @@ module Hobo::Dryml
       
       param_items = param_groups.map do |group_name, tags| 
         if tags.length == 1 and (e = tags.first) and e.name !~ /\./
-          param_name = extract_param_name!(e)
+          param_name = get_param_name(e)
           if param_name
             if template_call?(e)
               ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, all_parameters[:#{param_name}])"
@@ -458,7 +489,7 @@ module Hobo::Dryml
       if merge_params
         extra_params = if merge_params == "&true"
                          "all_parameters"
-                        elsif merge_params.starts_with?(CODE_ATTRIBUTE_CHAR)
+                        elsif is_code_attribute?(merge_params)
                           merge_params[1..-1]
                         else
                           dryml_exception("invalid merge_params", el)
@@ -480,7 +511,10 @@ module Hobo::Dryml
       end
       
       if el
-        attributes.concat(el.attributes.map { |name, value| ":#{name} => #{attribute_to_ruby(value)}" })
+        attrs = el.attributes.map do 
+          |name, value| ":#{name} => #{attribute_to_ruby(value)}" unless name.in?(SPECIAL_ATTRIBUTES)
+        end.compact
+        attributes.concat(attrs)
       end
       
       if template_call?(el || modifiers.first)
@@ -498,7 +532,7 @@ module Hobo::Dryml
     
     def tag_call(el)
       name = call_name(el)
-      param_name = extract_param_name!(el)
+      param_name = get_param_name(el)
       attributes = tag_attributes(el)
       newlines = tag_newlines(el)
 
@@ -553,7 +587,7 @@ module Hobo::Dryml
       if merge_attrs
         extra_attributes = if merge_attrs == "&true"
                           "attributes"
-                        elsif merge_attrs.starts_with?(CODE_ATTRIBUTE_CHAR)
+                        elsif is_code_attribute?(merge_attrs)
                           merge_attrs[1..-1]
                         else
                           dryml_exception("invalid merge_attrs", el)
@@ -637,7 +671,7 @@ module Hobo::Dryml
       if val.nil?
         expression
       else
-        control = if val.starts_with?(CODE_ATTRIBUTE_CHAR)
+        control = if is_code_attribute?(val)
                     val[1..-1]
                   elsif repeat
                     "this.#{val}"

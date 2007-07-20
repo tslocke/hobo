@@ -51,6 +51,7 @@ describe Template do
   it "should compile defs with lower-case names as block tags" do 
     compile_def("<def tag='foo'></def>").should == 
       "<% def foo(__attributes__={}, &__block__); " +
+      "parameters = nil; " +
       "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "<% _erbout; end; end %>"
   end
@@ -58,7 +59,9 @@ describe Template do
   it "should compile attrs in defs as local variables" do 
     compile_def("<def tag='foo' attrs='a, b'></def>").should == 
       "<% def foo(__attributes__={}, &__block__); " +
-      "_tag_context(__attributes__, __block__) do |tagbody| a, b, attributes, = _tag_locals(__attributes__, [:a, :b]) %>" + 
+      "parameters = nil; " +
+      "_tag_context(__attributes__, __block__) do |tagbody| " +
+      "a, b, attributes, = _tag_locals(__attributes__, [:a, :b]) %>" + 
       "<% _erbout; end; end %>"
   end
   
@@ -68,6 +71,7 @@ describe Template do
     # Note the presence of the `parameters` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
       "<% def Foo(__attributes__={}, all_parameters={}, &__block__); " +
+      "parameters = all_parameters - []; " +
       "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "<% _erbout; end; end %>"
   end

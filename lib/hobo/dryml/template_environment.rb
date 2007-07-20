@@ -78,6 +78,7 @@ module Hobo::Dryml
         @_view_name = view_name
         @_erb_binding = binding
         @_part_contexts = {}
+        @_locals_stack = []
 
         # Make sure the "assigns" from the controller are available (instance variables)
         if view
