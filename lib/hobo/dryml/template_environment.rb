@@ -324,7 +324,6 @@ module Hobo::Dryml
 
 
     def _tag_locals(options, attrs)
-      options = Hobo::Dryml.hashify_options(options)
       options.symbolize_keys!
       #ensure with and field are not in options
       options.delete(:with)
@@ -428,89 +427,6 @@ module Hobo::Dryml
     end
     
     
-    def DELETE_ME_call_replaceable_tag(name, options, external_param, &b)
-      options.delete(:replace_option)
-      
-      if external_param.is_a? Hash
-        before = external_param.delete(:before_content)
-        after = external_param.delete(:after_content)
-        top = external_param.delete(:top_content)
-        bottom = external_param.delete(:bottom_content)
-        content = external_param.delete(:content)
-        options = Hobo::Dryml.merge_tag_options(options, external_param)
-      elsif !external_param.nil?
-        return external_param.to_s
-      end
-
-      tag = if respond_to?(name)
-              body = if content
-                       proc { content }
-                     elsif b  && (top || bottom)
-                       proc { top.to_s + b.call + bottom.to_s }
-                     else
-                       b
-                     end
-              send(name, options, &body)
-            else
-              body = if content
-                       content
-                     elsif b
-                       top.to_s + new_context { b.call } + bottom.to_s
-                     else
-                       top.to_s + bottom.to_s
-                     end
-              content_tag(name, body, options)
-            end
-      before.to_s + tag.to_s + after.to_s
-    end
-    
-    
-    def DELETE_ME_call_replaceable_content_tag(name, options, external_param, &b)
-      options.delete(:content_option)
-      
-      if external_param.is_a? Hash
-        content = external_param.delete(:content)
-        top     = external_param.delete(:top_content)
-        bottom  = external_param.delete(:bottom_content)
-        external_param.delete(:before_content)
-        external_param.delete(:after_content)
-        options = Hobo::Dryml.merge_tag_options(options, external_param)
-      elsif !external_param.nil?
-        content = external_param.to_s
-      end
-      
-      # If there's no body, and no content provided externally, remove
-      # the tag altogether
-      return if b.nil? and content.nil?
-
-      tag = if respond_to?(name)
-              body = if content
-                       proc { content }
-                     elsif b  && (top || bottom)
-                       proc { top.to_s + b.call + bottom.to_s }
-                     else
-                       b
-                     end
-              send(name, options, &body)
-            else
-              body = if content
-                       content
-                     elsif b
-                       top.to_s + new_context { b.call } + bottom.to_s
-                     else
-                       top.to_s + bottom.to_s
-                     end
-              content_tag(name, body, options)
-            end
-      tag.to_s
-    end
-        
-    
-    def lazy_hash(hash)
-      Hobo::LazyHash.new(hash)
-    end
-
-
     def render_tag(tag_name, options)
       (send(tag_name, options) + part_contexts_js).strip
     end

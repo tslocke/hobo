@@ -676,13 +676,13 @@ module Hobo::Dryml
                   elsif repeat
                     "this.#{val}"
                   else
-                    "this.#{val}.blank?"
+                    "!this.#{val}.blank?"
                   end
         
         if if_
-          "(#{expression} if Hobo::Dryml.last_if = #{control})"
+          "(#{expression} if Hobo::Dryml.last_if = (#{control}))"
         elsif unless_
-          "(#{expression} unless Hobo::Dryml.last_if = #{control})"
+          "(#{expression} unless Hobo::Dryml.last_if = (#{control}))"
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end

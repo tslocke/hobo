@@ -62,8 +62,8 @@ module Hobo
     end
 
 
-    def can_delete?(object)
-      Hobo.can_delete?(current_user, object)
+    def can_delete?(object=nil)
+      Hobo.can_delete?(current_user, object || this)
     end
 
 
@@ -147,7 +147,6 @@ module Hobo
 
 
     def_tag :show, :no_wrapper, :truncate_tail, :format do
-      # We can't do this as a declared attribute as it will hide the truncate helper
       trunc = options.delete(:truncate)
       
       raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
@@ -363,8 +362,10 @@ module Hobo
             end
       end
 
-      Dryml.last_if = (c > 0 || unless_none.nil?)
-      if Dryml.last_if        
+      Dryml.last_if = c > 0 if unless_none
+      if unless_none && c == 0
+        ""
+      else
         main = l.blank? ? c : pluralize(c, l)
 
         if prefix == "are"
@@ -373,8 +374,6 @@ module Hobo
         else
           main
         end
-      else
-        ""
       end
     end
 
@@ -384,8 +383,8 @@ module Hobo
     end
 
 
-    def_tag :join, :with do
-      map_this { tagbody ? tagbody.call : display_name }.join(with)
+    def_tag :join, :separator do
+      map_this { tagbody ? tagbody.call : display_name }.join(separator)
     end
 
 

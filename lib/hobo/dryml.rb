@@ -136,50 +136,6 @@ module Hobo::Dryml
       end
     end
     
-    
-    def merge_tag_options(to, from)
-      res = {}.merge(to)
-      from.each_pair do |option, value|
-        res[option] = if value.is_a?(AttributeExtensionString) and to.has_key?(option)
-                        "#{to[option]} #{value.drop_prefix}"
-                      else
-                        value
-                      end
-      end
-      res
-    end
-
-    
-    def hashify_options(options, merge_into=nil)
-      result = merge_into || options
-      
-      options.each_pair do |key, val|
-        if key.is_a? Array
-          result.delete(key)
-          k = key.first
-          
-          if key.length == 2 && key.last.is_a?(Fixnum)
-            # It's an array of parameters (multiple param tags with the same name)
-            hashify_options(val) if val.is_a?(Hash)
-            result[k] ||= Hobo::LazyArray.new
-            result[k][key.last] = val
-          else
-            # Don't use options[k] as that would trigger the lazy evaluation
-            existing = options.fetch(k, nil)
-            v = if key.length == 1
-                  val.is_a?(Hash) ? hashify_options(val, existing) : val
-                else
-                  hashify_options(Hobo::LazyHash.new({key[1..-1] => val}), existing)
-                end
-            result[k] = v
-          end
-        else
-          hashify_options(val) if val.is_a?(Hash)
-        end
-      end
-      result
-    end
-
   end
 
 end
