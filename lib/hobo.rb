@@ -130,7 +130,8 @@ module Hobo
       
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"
-        controller = controller_name.constantize if (Object.const_defined? controller_name) || File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
+        controller = controller_name.constantize if (Object.const_defined? controller_name) || 
+          File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
           
         if controller
           web_name = model.name.underscore.pluralize.downcase
@@ -373,8 +374,6 @@ module Hobo
     end
 
   end
-  
-  # --- Asset Publishing --- #
   
 
 end

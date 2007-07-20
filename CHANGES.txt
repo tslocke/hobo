@@ -99,6 +99,10 @@ DRYML
 
   Fix: calling @view methods with a block now works
 
+  The list of tags considered 'static' (i.e. plain HTML tags) can now
+  be customised by putting your own list (one tag per line) in
+  config/dryml_static_tags.txt
+
 
 Hobo Controllers
 
@@ -120,10 +124,12 @@ Hobo Controllers
   Hobo controller actions now perform a #hobo_render if you give a
   response block but the blog does not do a render or a redirect. So
   e.g. if you just want to update the session you can leave hobo to
-  handle the response.
+  handle the response
 
   Fix: hobo_create now checks for create permission if you pass a
-  custom :this parameter.
+  custom :this parameter
+
+  POSTing and PUTing now support boolean values
 
 
 Hobo Models
@@ -152,7 +158,8 @@ Hobo Models
 
   Fix: def_scope was pretty much completely broken
 
-
+RSpec support and a test Rails app (in spec/rails-root) added to the
+repository.
 
 
 DRYML Core Tags
@@ -176,6 +183,18 @@ DRYML Helpers
 
   #param_name_for will strip a trailing '?' if there is one.
   
+
+Hobo Rapid Tags
+  
+  <boolean_field> now also generates a hidden tag with the same name
+  and value '0' like the rails helper. This fixes HTMLs broken idea of
+  how to handle checkboxes (you get a 0 value if the checkbox is not
+  checked, instead of no parameter at all)
+
+  <object_form> no longer generates hidden fields for created_at and updated_at
+
+
+Hobo::TextileString now includes a monkey-patch to RedCloth
 
 
 Users & Authentication
@@ -207,6 +226,19 @@ Generators
 
     hobo_model and hobo_user_model generators updated accordingly --
     they don't generate migrations any more.
+
+Routes
+
+  Routes with ';' have been changed to use '/' as per edge Rails.
+
+Permission System
+
+  Hobo.can_edit? can now handle feild names that end in '?'
+
+Hobo Module
+
+  Hobo.models now skips files whos names don't look like models
+  (e.g. editor backup files)
 
 
 Core Extensions:
