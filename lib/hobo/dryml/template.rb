@@ -298,7 +298,7 @@ module Hobo::Dryml
     def param_names_in_template(el)
       REXML::XPath.match(el, ".//*[@param]").
         map {|e| get_param_name(e)}.
-        select {|name| is_code_attribute?(name) }.
+        select {|name| !is_code_attribute?(name) }.
         every(:to_sym)
     end
     
