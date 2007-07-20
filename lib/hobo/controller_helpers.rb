@@ -83,7 +83,7 @@ module Hobo::ControllerHelpers
             when nil
               basic
             else
-              basic + ";" + action
+              basic + "/" + action
             end
           end
     params = make_params(*param_hashes)
