@@ -457,6 +457,13 @@ module Hobo::Dryml
       "<% _output(#{call}) %>"
     end
     
+    
+    def merge_attribute(el)
+      merge = el.attributes['merge']
+      dryml_exception("merge cannot have a RHS", el) if merge && merge != "&true"
+      merge
+    end
+    
     # Tag parameters are parameters to templates.
     def tag_parameters(el)
       dryml_exception("content is not allowed directly inside template calls", el) if 
@@ -485,7 +492,7 @@ module Hobo::Dryml
         end
       end
 
-      merge_params = el.attributes['merge_params']
+      merge_params = el.attributes['merge_params'] || merge_attribute(el)
       if merge_params
         extra_params = if merge_params == "&true"
                          "parameters"
@@ -583,7 +590,7 @@ module Hobo::Dryml
       
       items = items.join(", ")
       
-      merge_attrs = attributes['merge_attrs']
+      merge_attrs = attributes['merge_attrs'] || merge_attribute(el)
       if merge_attrs
         extra_attributes = if merge_attrs == "&true"
                           "attributes"
