@@ -41,7 +41,7 @@
 <def tag="belongs_to_menu_editor"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   link_id = "#{this_field_dom_id}_editor" %>
-  <span id="&link_id" part_id="rapid_belongs_to_edit">
+  <span id="&link_id" part="rapid_belongs_to_edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ display_name(:with => x, :no_wrapper => true), x.id ]
           }

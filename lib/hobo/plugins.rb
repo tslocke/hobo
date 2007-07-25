@@ -63,6 +63,9 @@ module ::Hobo::Plugins
         def self.has_feature(name)
           !@plugin_opt[name].nil? && @plugin_opt[name] != false
         end
+        def sym
+          self.class.sym
+        end
       end
       c.class_eval &b if b
       c
