@@ -470,6 +470,18 @@ describe Template do
                "<test x='abc'><foo/><foo/><foo/></test>").should == "3"
   end    
   
+  it "should allow local tags inside template parameters" do 
+    eval_dryml(<<-END).should == '<h1>ab</h1> <h2>cd</h2>'
+      <def tag='do'><tagbody/></def>
+      <def tag='x'>ab</def>
+      <def tag='T'>
+        <h1 param/> <do><def tag='x'>cd</def><h2 param/></do>
+      </def>
+      <T><h1><x/></h1><h2><x/></h2></T>
+    END
+    
+  end
+  
   
   # --- Misc --- #
   
