@@ -154,14 +154,16 @@ module Hobo::Dryml
         set_element(el)
 
       else
-        if el.dryml_name.not_in?(Hobo.static_tags) or el.attributes['param']
-          if el.dryml_name =~ /^[A-Z]/
-            template_call(el)
+        with_local_tag_redefines(el) do
+          if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param']
+            if el.dryml_name =~ /^[A-Z]/
+              template_call(el)
+            else
+              tag_call(el)
+            end
           else
-            tag_call(el)
+            static_element_to_erb(el)
           end
-        else
-          static_element_to_erb(el)
         end
       end
     end
@@ -187,7 +189,7 @@ module Hobo::Dryml
     end
 
 
-    def with_redefines(el)
+    def with_local_tag_redefines(el)
       def_tags = el.children.select {|e| e.is_a?(REXML::Element) && e.name == "def"}
       
       if def_tags.empty?
@@ -219,9 +221,9 @@ module Hobo::Dryml
 
 
     def def_element(el)
-      redefine = el.parent.name == "def"
+      # If it's not a toplevel element, it's a redefine (a local tag)
+      redefine = el.parent != el.document.root
       
-      require_toplevel(el, "must be at the top-level or directly inside a <def>") unless redefine
       require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", DRYML_NAME_RX, true)
@@ -305,14 +307,16 @@ module Hobo::Dryml
     
     def template_method(name, re_alias, redefine, el)
       param_names = param_names_in_template(el)
-
+      
       if redefine
-        method_body = tag_method_body(el, "#{@def_name}_attributes", "#{@def_name}_block")
+        prefix = @def_name.downcase
+
+        method_body = tag_method_body(el, "#{prefix}_attributes", "#{prefix}_block")
         re_alias + 
           "<% self.class.redefine_tag(:#{name}, " + 
-          "proc {|#{@def_name}_attributes, #{@def_name}_all_parameters, #{@def_name}_block| " +
+          "proc {|#{prefix}_attributes, #{prefix}_all_parameters, #{prefix}_block| " +
           "@_locals_stack.push [tagbody, attributes, parameters]; " +
-          "parameters = #{@def_name}_all_parameters - #{param_names.inspect}; " +
+          "parameters = #{prefix}_all_parameters - #{param_names.inspect}; " +
           "__res__ = #{method_body}; " +
           "tagbody, attributes, parameters = @_locals_stack.pop; " +
           "__res__; }); %>"
@@ -327,10 +331,12 @@ module Hobo::Dryml
     
     def tag_method(name, re_alias, redefine, el)
       if redefine
-        method_body = tag_method_body(el, "#{@def_name}_attributes", "#{@def_name}_block")
+        prefix = @def_name.downcase
+
+        method_body = tag_method_body(el, "#{prefix}_attributes", "#{prefix}_block")
         re_alias + 
           "<% self.class.redefine_tag(:#{name}, " +
-          "proc {|#{@def_name}_attributes, #{@def_name}_block| " +
+          "proc {|#{prefix}_attributes, #{prefix}_block| " +
           "@_locals_stack.push [tagbody, attributes, parameters]; " +
           "parameters = nil; " +
           "__res__ = #{method_body}; " +
@@ -358,7 +364,7 @@ module Hobo::Dryml
       "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
-        with_redefines(el) { children_to_erb(el) } +
+        with_local_tag_redefines(el) { children_to_erb(el) } +
         "<% _erbout; end"
     end
     

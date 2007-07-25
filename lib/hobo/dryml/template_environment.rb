@@ -43,8 +43,7 @@ module Hobo::Dryml
       def redefine_tag(name, proc)
         impl_name = "#{name}_redefined_#{redefine_nesting}"
         define_method(impl_name, proc)
-        class_eval "def #{name}(options={}, &b); " +
-          "#{impl_name}(options, b); end"
+        class_eval "def #{name}(options={}, &b); #{impl_name}(options, b); end"
         @_redef_impl_names.push(impl_name)
       end
       
