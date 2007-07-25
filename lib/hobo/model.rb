@@ -229,6 +229,12 @@ module Hobo
                                  end
                                end
       end
+
+      
+      def nilable_field?(name)
+        col = columns.find {|c| c.name == name.to_s} rescue nil
+        col.nil? || col.null
+      end
       
       
       def conditions(&b)
