@@ -19,7 +19,7 @@ class HoboUserModelGenerator < Rails::Generator::NamedBase
 
   protected
     def banner
-      "Usage: #{$0} generate ModelName"
+      "Usage: #{$0} #{spec.name} ModelName"
     end
 
 end

@@ -25,7 +25,7 @@ class HoboGenerator < Rails::Generator::Base
 
   protected
     def banner
-      "Usage: #{$0} generate [--add-routes]"
+      "Usage: #{$0} #{spec.name} [--add-routes]"
     end
 
     def add_options!(opt)

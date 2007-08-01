@@ -37,7 +37,7 @@ class HoboRapidGenerator < Hobo::Generator
 
   protected
     def banner
-      "Usage: #{$0} generate [--import-tags]"
+      "Usage: #{$0} #{spec.name} [--import-tags]"
     end
 
     def add_options!(opt)
