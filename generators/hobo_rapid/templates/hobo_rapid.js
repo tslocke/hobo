@@ -221,7 +221,9 @@ var Hobo = {
         })
 
         select(".in_place_html_textarea_bhv").each(function (el) {
-            var ipe = Hobo._makeInPlaceEditor(el, {rows: 2, handleLineBreaks: false})
+            var options = {rows: 2, handleLineBreaks: false}
+            if (typeof(tinyMCE) != "undefined") options["submitOnBlur"] = false
+            var ipe = Hobo._makeInPlaceEditor(el, options) 
             if (typeof(tinyMCE) != "undefined") {
                 ipe.afterEnterEditMode = function() {
                     var id = this.form.id = Hobo.uid()
