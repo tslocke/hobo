@@ -135,7 +135,7 @@
                     } })
   attributes = add_classes(attributes, editor_class)
 %>
-  <input type="checkbox" value="1" onchange="#{f}"
+  <input type="checkbox" value="1" onclick="#{f}"
          merge_attrs="& this ? attributes.merge(:checked => 'checked') : attributes" />
 </def>
 
