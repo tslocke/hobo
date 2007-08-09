@@ -324,7 +324,7 @@ module Hobo
         end
         
         def method_missing(name, *args, &block)
-          @klass.with_scope(@scope) do
+          @klass.send(:with_scope, @scope) do
             @klass.send(name, *args, &block)
           end
         end
