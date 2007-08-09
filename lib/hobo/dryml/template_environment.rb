@@ -257,7 +257,6 @@ module Hobo::Dryml
                else
                  obj.class
                end
-        
 
         @_this, @_this_parent, @_this_field, @_this_type = obj, parent, field, type
         @_form_field_path += path if @_form_field_path
@@ -270,14 +269,14 @@ module Hobo::Dryml
       tagbody = tagbody_proc && proc do |*args|
         res = ''
         
-        block_options = args.length > 0 && args.first
+        block_options, default_tagbody = args
         block_with = block_options && block_options[:with]
         if block_options && block_options.has_key?(:field)
-          new_field_context(block_options[:field], block_with) { res = tagbody_proc.call }
+          new_field_context(block_options[:field], block_with) { res = tagbody_proc.call(default_tagbody) }
         elsif block_options && block_options.has_key?(:with)
-          new_object_context(block_with) { res = tagbody_proc.call }
+          new_object_context(block_with) { res = tagbody_proc.call(default_tagbody) }
         else
-          new_context { res = tagbody_proc.call }
+          new_context { res = tagbody_proc.call(default_tagbody) }
         end
         res
       end
@@ -337,7 +336,58 @@ module Hobo::Dryml
     end
     
     
-    def merge_and_call(name, options, overriding_proc, &b)
+    def do_tagbody(tagbody, attributes, default_tagbody)
+        _output(if tagbody
+                  tagbody.call(attributes, default_tagbody)
+                else
+                  default_tagbody.call
+                end)
+        Hobo::Dryml.last_if = !!tagbody
+    end
+    
+    
+    def call_block_tag_parameter(the_tag, options, overriding_proc, &b)
+      if overriding_proc && overriding_proc.arity == 1
+        # This is a 'replace' parameter
+        
+        template_default = proc do |attributes, body_block|
+          tagbody_proc = body_block && proc {|| body_block.call(b) }
+          call_block_tag_parameter(the_tag, opts, proc { attributes.update(:tagbody => tagbody_proc)}, &b)
+        end
+        overriding_proc.call(template_default)
+      else
+        if overriding_proc
+          overriding_options = overriding_proc.call
+          tagbody = overriding_options.delete(:tagbody)
+          options = options.update(overriding_options)
+        end
+      
+        if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+          body = if tagbody
+                   tagbody.call(b)
+                 elsif b
+                   new_context { b.call(nil) }
+                 else
+                   nil
+                 end
+          if body.blank?
+            tag(the_tag, options)
+          else
+            content_tag(the_tag, body, options)
+          end
+        else
+          body = tagbody || b
+          if the_tag.is_a?(String, Symbol)
+            send(the_tag, options, &body)
+          else
+            # It's a proc - a template default
+            the_tag.call(options, body)
+          end
+        end
+      end
+    end
+
+    def merge_and_callXX(name, options, overriding_proc, &b)
       if overriding_proc
         overriding_options = overriding_proc.call
         
@@ -352,10 +402,6 @@ module Hobo::Dryml
         prepend = overriding_options.delete(:_prepend)
         options = options.update(overriding_options)
       end
-      
-      before = (before && before.call).to_s
-      after  = (after && after.call).to_s
-      replace = (replace && replace.call).to_s
       
       res = if name.to_s.in?(Hobo.static_tags)
               prepend = (prepend && prepend.call).to_s
@@ -381,11 +427,13 @@ module Hobo::Dryml
                               end
               send(name, options, &modified_body)
             end
-      before + res + after
+      (before && before.call).to_s + 
+        res + 
+        (after && after.call).to_s
     end
     
     
-    def merge_and_call_template(name, options, template_procs, overriding_proc)
+    def call_template_parameter(name, options, template_procs, overriding_proc)
       if overriding_proc
         overriding_options, overriding_template_procs = overriding_proc.call
         
@@ -399,10 +447,9 @@ module Hobo::Dryml
         template_procs = template_procs.merge(overriding_template_procs)
       end      
       
-      before = (before && before.call).to_s
-      after  = (after && after.call).to_s
-
-      before + send(name, options, template_procs) + after
+      (before && before.call).to_s + 
+        send(name, options, template_procs) + 
+        (after && after.call).to_s
     end
     
     # Takes two procs that each returh hashes and returns a single
@@ -429,7 +476,7 @@ module Hobo::Dryml
       (send(tag_name, options) + part_contexts_js).strip
     end
     
-    
+
     def method_missing(name, *args, &b)
       @view.send(name, *args, &b)
     end
