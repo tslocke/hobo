@@ -381,51 +381,28 @@ describe Template do
   
   
   
-  # --- Template Parameter Modifiers --- #
+  # --- Replacing Template Parameters --- #
   
-  # it "should allow content to be inserted before template parameters" do 
-  #   eval_with_templates("<StaticMerge><b.before>!!!</b.before></StaticMerge>").should == 
-  #     '<p>a !!!<b class="big">bold</b> word</p>'
-  # end
-  #  
-  # it "should allow content to be inserted after template parameters" do 
-  #   eval_with_templates("<StaticMerge><b.after>!!!</b.after></StaticMerge>").should == 
-  #     '<p>a <b class="big">bold</b>!!! word</p>'
-  # end
-  #  
-  # it "should allow content to be prepended to template parameter bodies" do 
-  #   eval_with_templates("<StaticMerge><b.prepend>!!!</b.prepend></StaticMerge>").should == 
-  #     '<p>a <b class="big">!!!bold</b> word</p>'
-  # end
-  #  
-  # it "should allow content to be prepended to template parameter bodies" do 
-  #   eval_with_templates("<StaticMerge><b.append>!!!</b.append></StaticMerge>").should == 
-  #     '<p>a <b class="big">bold!!!</b> word</p>'
-  # end
-  #  
-  # it "should allow template parameters to be replaced entirely" do 
-  #   eval_with_templates("<StaticMerge><b.replace>!!!</b.replace></StaticMerge>").should == 
-  #     '<p>a !!! word</p>'
-  # end
-  #  
-  # it "should allow content to be inserted before template parameters that are templates" do 
-  #   eval_with_templates("<NestedStaticMerge><StaticMerge.before>!!!</StaticMerge.before></NestedStaticMerge>").should ==
-  #     'merge StaticMerge: !!!<p>a <b class="big">bold</b> word</p>'
-  # end
-  #  
-  # it "should allow content to be inserted after template parameters that are templates" do 
-  #   eval_with_templates("<NestedStaticMerge><StaticMerge.after>!!!</StaticMerge.after></NestedStaticMerge>").should ==
-  #     'merge StaticMerge: <p>a <b class="big">bold</b> word</p>!!!'
-  # end
-  #  
-  # it "should allow template parameters that are templates to be replaced entirely" do 
-  #   eval_with_templates("<NestedStaticMerge><StaticMerge.replace>!!!</StaticMerge.replace></NestedStaticMerge>").
-  #     should == 'merge StaticMerge: !!!'
-  #   eval_with_templates("<NestedStaticMerge><StaticMerge.replace/></NestedStaticMerge>").
-  #     should == 'merge StaticMerge:'
-  # end
+  it "should allow template parameters to be replaced" do 
+    eval_with_templates('<StaticMerge><b replace>short</b></StaticMerge>').should ==
+      '<p>a short word</p>'
+  end
+  
+  it "should allow template parameters to be replaced and then re-instated" do 
+    eval_with_templates('<StaticMerge><b replace>short <default_b/></b></StaticMerge>').should ==
+      '<p>a short <b class="big">bold</b> word</p>'
+  end
 
-  
+  it "should allow template parameters to be replaced and then re-instated with different attributes" do 
+    eval_with_templates('<StaticMerge><b replace>short <default_b class="small"/></b></StaticMerge>').should ==
+      '<p>a short <b class="small">bold</b> word</p>'
+  end
+
+  it "should allow template parameters to be replaced and then re-instated with a different tagbody" do 
+    eval_with_templates('<StaticMerge><b replace>short <default_b>big</default_b></b></StaticMerge>').should ==
+      '<p>a short <b class="big">big</b> word</p>'
+  end
+
   # --- Merge Params --- #
   
   
@@ -480,49 +457,7 @@ describe Template do
   end
 
   
-  # --- Local Tags --- #
-  
-  
-  it "should allow tags to be overriden with local tags" do 
-    eval_dryml("<def tag='foo'>ab</def>\n" +
-               "<def tag='test'><def tag='foo'>cd</def> <foo/> </def>\n" +
-               "<test/>").should == "cd"
-  end
-  
-  it "should allow local tags to be new tags" do
-    eval_dryml("<def tag='test'><def tag='foo'>cd</def> <foo/> </def>\n" +
-               "<test/>").should == "cd"
-  end
-  
-  it "should make local tags available in the tagobdy of the local tags parent" do 
-    eval_dryml("<def tag='test'><def tag='foo'>cd</def> <tagbody/> </def>\n" +
-               "<test><foo/></test>").should == "cd"
-  end
-  
-  it "should allow local tags to capture local state" do
-    eval_dryml("<def tag='test' attrs='x'><def tag='foo'><%= x %></def> <tagbody/> </def>\n" +
-               "<test x='abc'><foo/></test>").should == "abc"
-  end
-  
-  it "should allow local tags to modify captured state" do
-    eval_dryml("<def tag='test'><set x='&0'/><def tag='foo'><% x += 1 %></def> <tagbody/> <%= x %></def>\n" +
-               "<test x='abc'><foo/><foo/><foo/></test>").should == "3"
-  end    
-  
-  it "should allow local tags inside template parameters" do 
-    eval_dryml(<<-END).should == '<h1>ab</h1> <h2>cd</h2>'
-      <def tag='do'><tagbody/></def>
-      <def tag='x'>ab</def>
-      <def tag='T'>
-        <h1 param/> <do><def tag='x'>cd</def><h2 param/></do>
-      </def>
-      <T><h1><x/></h1><h2><x/></h2></T>
-    END
-    
-  end
-  
-  
-  # --- Misc --- #
+  # --- <set> --- #
   
   it "should provide <set> to create local variables" do
     eval_dryml("<set x='&1' y='&2'/><%= x + y %>").should == '3'
@@ -536,6 +471,17 @@ describe Template do
 
     eval_dryml(tag + "<p class='#{1+2}'/>").should == "<p class='3'/>"
     eval_dryml(tag + "<p class='hey #{1+2} ho'/>").should == "<p class='hey 3 ho'/>"
+  end
+  
+  
+  # --- <set_scoped> --- #
+  
+  it "should support scoped variables" do 
+    tags =
+      "<def tag='t1'><set_scoped x='ping'><tagbody/></set_scoped></def>" + 
+      "<def tag='t2'><set_scoped x='pong'><tagbody/></set_scoped></def>"
+    eval_dryml(tags + "<t1><%= scope.x %></t1>").should == 'ping'
+    eval_dryml(tags + "<t1><t2><%= scope.x %></t2> <%= scope.x %></t1>").should == 'pong ping'
   end
   
   

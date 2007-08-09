@@ -153,8 +153,8 @@ module Hobo::Dryml
       when "set"
         set_element(el)
         
-      when "with_scope"
-        with_scope_element(el)
+      when "set_scoped"
+        set_scoped_element(el)
         
       when "default_tagbody"
         default_tagbody_element(el)
@@ -210,10 +210,20 @@ module Hobo::Dryml
     
     
     def set_element(el)
-      el.attributes.map do |name, value|
+      assigns = el.attributes.map do |name, value|
         dryml_exception(el, "invalid name in set") unless name =~ DRYML_NAME_RX
-        "<% #{name} = #{attribute_to_ruby(value)}; %>"
-      end.join + tag_newlines(el)
+        "#{name} = #{attribute_to_ruby(value)}; "
+      end.join
+      "<% #{assigns}#{tag_newlines(el)} %>"
+    end
+    
+    
+    def set_scoped_element(el)
+      assigns = el.attributes.map do |name, value|
+        dryml_exception(el, "invalid name in set_scoped") unless name =~ DRYML_NAME_RX
+        "scope[:#{name}] = #{attribute_to_ruby(value)}; "
+      end.join
+      "<% scope.new_scope { #{assigns}#{tag_newlines(el)} %>#{children_to_erb(el)}<% } %>"
     end
     
     
@@ -228,13 +238,15 @@ module Hobo::Dryml
 
     def def_element(el)
       # If it's not a toplevel element, it's a redefine (a local tag)
-      redefine = el.parent != el.document.root
-      
+      # DISABLED
+      redefine = false # el.parent != el.document.root
+
+      require_toplevel(el)
       require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", DRYML_NAME_RX, true)
       require_attribute(el, "alias_current_as", DRYML_NAME_RX, true)
-
+      
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       

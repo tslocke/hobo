@@ -77,7 +77,7 @@ module Hobo::Dryml
         @_view_name = view_name
         @_erb_binding = binding
         @_part_contexts = {}
-        @_locals_stack = []
+        @_scoped_variables = ScopedVariables.new
 
         # Make sure the "assigns" from the controller are available (instance variables)
         if view
@@ -121,6 +121,11 @@ module Hobo::Dryml
     def merge_attrs(attrs, overriding_attrs)
       attrs = add_classes(attrs, *[overriding_attrs.delete(:class)].compact)
       attrs.update(overriding_attrs)
+    end
+    
+    
+    def scope
+      @_scoped_variables
     end
 
 
@@ -337,12 +342,12 @@ module Hobo::Dryml
     
     
     def do_tagbody(tagbody, attributes, default_tagbody)
-        _output(if tagbody
-                  tagbody.call(attributes, default_tagbody)
-                else
-                  default_tagbody.call
-                end)
-        Hobo::Dryml.last_if = !!tagbody
+      _output(if tagbody
+                tagbody.call(attributes, default_tagbody)
+              else
+                default_tagbody.call
+              end)
+      Hobo::Dryml.last_if = !!tagbody
     end
     
     
@@ -351,8 +356,8 @@ module Hobo::Dryml
         # This is a 'replace' parameter
         
         template_default = proc do |attributes, body_block|
-          tagbody_proc = body_block && proc {|| body_block.call(b) }
-          call_block_tag_parameter(the_tag, opts, proc { attributes.update(:tagbody => tagbody_proc)}, &b)
+          tagbody_proc = body_block && proc {|_| new_context { body_block.call(b) } }
+          call_block_tag_parameter(the_tag, options, proc { attributes.update(:tagbody => tagbody_proc) }, &b)
         end
         overriding_proc.call(template_default)
       else
