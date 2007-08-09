@@ -341,7 +341,7 @@ module Hobo
        Object.private_instance_methods +
        Object.protected_instance_methods).each do |m|
         ScopedProxy.send(:undef_method, m) unless
-          m.in?(%w{initialize method_missing}) || m.starts_with?('_')
+          m.in?(%w{initialize method_missing send}) || m.starts_with?('_')
       end
       
       attr_accessor :defined_scopes
