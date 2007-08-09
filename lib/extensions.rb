@@ -293,3 +293,10 @@ module PP::ObjectMixin
 
 end
 
+class Proc
+  
+  def call_with_block(*args, &b)
+    call(*args + [b])
+  end
+  
+end
