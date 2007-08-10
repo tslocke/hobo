@@ -342,12 +342,13 @@ module Hobo::Dryml
     
     
     def do_tagbody(tagbody, attributes, default_tagbody)
-      _output(if tagbody
-                tagbody.call(attributes, default_tagbody)
-              else
-                default_tagbody.call
-              end)
+      res = if tagbody
+              tagbody.call(attributes, default_tagbody)
+            else
+              default_tagbody.call
+            end
       Hobo::Dryml.last_if = !!tagbody
+      res
     end
     
     
