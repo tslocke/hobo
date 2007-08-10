@@ -23,8 +23,15 @@
 <def tag="nav_container"><ul merge_attrs><tagbody/></ul></def>
 
                                                             
-<def tag="nav_item"><li merge_attrs><tagbody/></li></def>
+<def tag="nav_item_OLD"><li merge_attrs><tagbody/></li></def>
 
+<def tag="navigation"><ul merge_attrs><tagbody/></ul></def>
+<def tag="nav_item" attrs="href,before,after"><% 
+  body = tagbody.nil? ? "" : tagbody.call
+  link = href.nil? ? "/" + body.downcase : href %>
+  <% highlight = link == request.request_uri ? ' current' : '' %>
+  <li class="nav-item#{highlight}"><%= before %><a href="#{link}"><%= body %></a><%= after %></li>
+</def>
 
 <def tag="application_account_nav">
   <if q="&logged_in?">

@@ -8,7 +8,7 @@
       <title><%= title_prefix %><%= title %></title>
       <theme_stylesheet/>
       <%= javascript_include_tag :defaults %>
-      <hobo_rapid_javascripts replace_option="rapid_javascripts"/>
+      <hobo_rapid_javascripts param="rapid_javascripts"/>
     </head>
 
     <body onload="Hobo.applyEvents()" content_option="body">

@@ -87,19 +87,6 @@ module Hobo::Rapid
     if_(:q => current_user_in?(this)) { tagbody.call }
   end
 
-
-  def_tag :edit, :in_place do
-    if can_view_this?
-      if not can_edit_this?
-        show
-      elsif this_parent.new_record? or in_place == false
-        form_field(options)
-      else
-        editor(options)
-      end
-    end
-  end
-  
   
   def type_name(klass)
     TYPE_NAMES[klass]
@@ -218,115 +205,12 @@ module Hobo::Rapid
   end
     
   
-  def_tag :string_editor do
-    in_place_editor "in_place_textfield_bhv", :span, options
-  end
-  
-  def_tag :textarea_editor do
-    in_place_editor "in_place_textarea_bhv", :div, options
-  end
-    
-  def_tag :html_editor do
-    in_place_editor "in_place_html_textarea_bhv", :div, options
-  end
-  
-  def_tag :belongs_to_editor do
-    belongs_to_menu_editor(options)
-  end
-  
-  def_tag :datetime_editor do
-    string_editor(options)
-  end
-  
-  def_tag :date_editor do
-    string_editor(options)
-  end
-
-  def_tag :integer_editor do
-    in_place_editor "in_place_textfield_bhv", :span, options
-  end
-
-  def_tag :float_editor do
-    in_place_editor "in_place_textfield_bhv", :span, options
-  end
-
-  def_tag :password_string_editor do
-    raise HoboError, "passwords cannot be edited in place"
-  end
-  
-  def_tag :boolean_editor do
-    boolean_checkbox_editor(options)
-  end
-  
 
   AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method,
                 :script, :form, :params, :confirm,
                 :reset_form, :refocus_form]
 
 
-  def_tag :update_button, :label, :message, :attrs, :update, :params do
-    raise HoboError.new("no update specified") unless update
-    message2 = message || label
-    func = ajax_updater(object_url(this), message2, update,
-                        :params => { this.class.name.underscore => attrs }.merge(params || {}),
-                        :method => :put)
-    tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label),
-                            "button_input update_button update_#{this.class.name.underscore}_button")
-  end
-
-
-  def_tag :delete_button, :label, :message, :update, :ajax, :else, :image, :confirm, :fade do
-    fade2 = fade.nil? ? true : fade
-    if can_delete?(this)
-      opts = options.merge(if image
-                             { :type => "image", :src => "#{urlb}/images/#{image}" }
-                           else
-                             { :type => "button" }
-                           end)
-      label2 = label || "Remove"
-      confirm2 = confirm || "Are you sure?"
-      
-      add_classes!(opts,
-                   image ? "image_button_input" : "button_input",
-                   "delete_button delete_#{this.class.name.underscore}_button")
-      url = object_url(this, "destroy")
-      if ajax == false
-        opts[:confirm] = confirm2
-        button_to(label2, url, opts)
-      else
-        opts[:value] = label2
-        opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
-        tag(:input, opts)
-      end
-    else
-      else_
-    end
-  end
-  
-  
-  def_tag :create_button, :model, :update, :attrs, :label, :message, :else do
-    raise HoboError.new("no update specified") unless update
-    params = attrs || {}
-    if model
-      new = (model.is_a?(String) ? model.constantize : model).new(params)
-    else
-      raise HoboError.new("invalid context for <create_button>") unless Hobo.simple_has_many_association?(this)
-      params[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
-      new = this.new(params)
-    end
-    if can_create?(new)
-      label2 = label || "New #{new.class.name.titleize}"
-      message2 = message || label2
-      class_name = new.class.name.underscore
-      func = ajax_updater(object_url(new.class), message2, update,
-                          ({:params => { class_name => params }} unless params.empty?))
-      tag :input, add_classes(options.merge(:type =>'button', :onclick => func, :value => label2),
-                              "button_input create_button create_#{class_name}_button")
-    else
-      else_
-    end
-  end
-  
   
   def_tag :remote_method_button, :method, :update, :result_update, :params, :label, :message do
     ajax_options, html_options = options.partition_hash(AJAX_ATTRS)

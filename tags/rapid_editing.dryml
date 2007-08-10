@@ -24,13 +24,13 @@
 </def>
 
 
-<def tag="belongs_to_menu_field"><%
+<def tag="belongs_to_menu_field" attrs="include_none"><%
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
             [ display_name(:with => x, :no_wrapper => true), x.id ]
           }
-  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
+  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
   %>
   <select name="<%= param_name_for_this(true) %>">
     <%= options_for_select(select_options.sort, this ? this.id : "") %>

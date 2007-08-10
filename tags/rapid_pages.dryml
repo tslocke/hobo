@@ -30,7 +30,7 @@
         <h2 param="panel_heading"><count label="&model_name"/></h2>
         <section>
           <table_for param="table">
-            <td><object_link/></td><td><delete_button class='text'/></td>
+            <td><object_link/></td><td><DeleteButton class='text'/></td>
           </table_for>
         </section>
         
@@ -86,7 +86,7 @@
 
     <intro>
       <h1><human_type/><if q="&this.respond_to? :name">: <edit field="name"/></if></h1>
-      <p><delete_button ajax="&false"/></p>
+      <p><DeleteButton ajax="&false"/></p>
     </intro>
     
     <main>
@@ -161,7 +161,7 @@
 
         <section>
           <table_for param="table">
-            <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
+            <if_can_view><td><object_link/></td><td><DeleteButton class='text'/></td></if_can_view>
           </table_for>
         </section>
 
