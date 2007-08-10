@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    SPECIAL_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part)
+    SPECIAL_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part restore)
 
     @build_cache = {}
     
@@ -161,7 +161,7 @@ module Hobo::Dryml
         
       else
         with_local_tag_redefines(el) do
-          if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param']
+          if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param'] || el.attributes['restore']
             if el.dryml_name =~ /^[A-Z]/
               template_call(el)
             else
@@ -409,7 +409,7 @@ module Hobo::Dryml
                        "proc { new_context { %>#{children_to_erb(el)}<% } }"
                      end
       
-      "<% do_tagbody(tagbody, {#{attributes * ', '}}, #{default_body}) %>"
+      "<% _output(do_tagbody(tagbody, {#{attributes * ', '}}, #{default_body})) %>"
     end
 
     
@@ -473,7 +473,7 @@ module Hobo::Dryml
       
       parameters = tag_parameters(el)
       
-      is_param_default_call = el.name =~ /^Default[A-Z]/
+      is_param_default_call = el.attributes['restore']
       
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
@@ -491,7 +491,7 @@ module Hobo::Dryml
              else
                if is_param_default_call
                  # The tag is a proc available in a local variable
-                 "#{name}.call(#{attributes}, #{parameters})"
+                 "#{name}__default.call(#{attributes}, #{parameters})"
                elsif polymorphic_call?(el)
                  "send(find_polymorphic_template(:#{name}), #{attributes}, #{parameters})"
                else
@@ -630,11 +630,7 @@ module Hobo::Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
-        default_tag_name = if template_call?(el)
-                             "Default#{el.name}"
-                           else
-                             "default_#{el.name}"
-                           end
+        default_tag_name = "#{el.name}__default"
 
         "proc {|#{default_tag_name}| new_context { %>#{children_to_erb(el)}<% } }"
       else
@@ -671,7 +667,7 @@ module Hobo::Dryml
       attributes = tag_attributes(el)
       newlines = tag_newlines(el)
       
-      is_param_default_call = el.name =~ /^default_/
+      is_param_default_call = el.attributes['restore']
 
       call = if param_name
                to_call = if is_param_default_call
@@ -687,7 +683,7 @@ module Hobo::Dryml
                "call_block_tag_parameter(#{to_call}, #{attributes}, all_parameters[#{param_name}])"
              else
                if is_param_default_call
-                 "#{name}.call_with_block(#{attributes})"
+                 "#{name}__default.call_with_block(#{attributes})"
                elsif polymorphic_call?(el)
                  "send(find_polymorphic_tag(:#{name}), #{attributes})"
                else

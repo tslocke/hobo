@@ -481,6 +481,16 @@ module Hobo
       id ? "#{self.class.name.underscore}_#{self.id}" : nil
     end
     
+    def to_s
+      if respond_to? :title
+        title
+      elsif respond_to? :name
+        name
+      else
+        "#{self.class.name.humanize} #{id}"
+      end
+    end
+    
   end
 end
 

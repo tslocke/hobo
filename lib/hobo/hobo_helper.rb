@@ -1,4 +1,4 @@
-module Hobo::ControllerHelpers
+module Hobo::HoboHelper
 
   protected
 
@@ -123,13 +123,97 @@ module Hobo::ControllerHelpers
   
   # debugging support
 
+  def abort_with(*args)
+    raise args.map{|arg| PP.pp(arg, "")}.join("-------\n")
+  end
+  
   def debug(*args)
-    logger.debug(args.map{|arg| PP.pp(arg, "")}.join("\n"))
-    return args.first
+    logger.debug("\n### DRYML Debug ###")
+    logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
+    logger.debug("DRYML THIS = #{Hobo.dom_id(this)}")
+    logger.debug("###################\n")
+    args.first unless args.empty?
   end
 
-  def abort_with(*args)
-    raise args.map{|arg| PP.pp(arg, "")}.join("\n")
+
+  def map_this
+    res = []
+    this.each_index {|i| new_field_context(i) { res << yield } }
+    Dryml.last_if = !this.empty?
+    res
   end
+  alias_method :collect_this, :map_this
+
+
+  def comma_split(x)
+    case x
+    when nil
+      []
+    when Symbol
+      x.to_s
+    when String
+      x.split(/\s*,\s*/)
+    else
+      x.map{|e| comma_split(e)}.flatten
+    end
+  end
+
+
+  def can_create?(object=nil)
+    Hobo.can_create?(current_user, object || this)
+  end
+
+
+  def can_update?(object, new)
+    Hobo.can_update?(current_user, object, new)
+  end
+
+
+  def can_edit?(*args)
+    if args.empty?
+      this_parent && this_field && can_edit?(this_parent, this_field)
+    else
+      object, field = args.length == 2 ? args : [this, args.first]
+      
+      if !field and object.respond_to?(:proxy_reflection)
+        Hobo.can_edit?(current_user, object.proxy_owner, object.proxy_reflection.name)
+      else
+        Hobo.can_edit?(current_user, object, field)
+      end
+    end
+  end
+
+
+  def can_delete?(object=nil)
+    Hobo.can_delete?(current_user, object || this)
+  end
+
+
+  def can_view?(object=nil, field=nil)
+    if object.nil? && field.nil?
+      if this_parent && this_field
+        object, field = this_parent, this_field
+      else
+        object = this
+      end
+    end
+    
+    if !field and object.respond_to?(:proxy_reflection)
+      Hobo.can_view?(current_user, object.proxy_owner, object.proxy_reflection.name)
+    else
+      Hobo.can_view?(current_user, object, field)
+    end
+  end
+
+
+  def select_viewable(collection)
+    collection.select {|x| can_view?(x)}
+  end
+
+
+  def theme_asset(path)
+    "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
+  end
+
 
 end

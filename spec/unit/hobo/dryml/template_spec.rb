@@ -83,7 +83,7 @@ describe Template do
       "parameters = nil; " +
       "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
       "123 " +
-      "<% do_tagbody(tagbody, {}, proc { new_context { %>blah<% } }) %>" +
+      "<% _output(do_tagbody(tagbody, {}, proc { new_context { %>blah<% } })) %>" +
       " 456" +
       "<% _erbout; end; end %>"    
   end
@@ -209,20 +209,22 @@ describe Template do
 
   it "should compile 'replace' parameters" do
     compile_dryml("<Page><head replace>abc</head></Page>").should == 
-      '<% _output(Page({}, {:head => proc {|default_head| new_context { %>abc<% } }, })) %>'
+      '<% _output(Page({}, {:head => proc {|head__default| new_context { %>abc<% } }, })) %>'
   end
     
   it "should compile 'replace' parameters with a default parameter call" do
-    compile_dryml("<Page><head replace>abc <default_head>blah</default_head></head></Page>").should == 
-      '<% _output(Page({}, {:head => proc {|default_head| new_context { %>abc ' +
-      '<% _output(default_head.call_with_block({}) do |default_head_default_tagbody| %>blah<% end) %>' +
+    compile_dryml("<Page><head replace>abc <head restore>blah</head></head></Page>").should == 
+      
+      '<% _output(Page({}, {:head => proc {|head__default| new_context { %>abc ' +
+      '<% _output(head__default.call_with_block({}) do |head_default_tagbody| %>blah<% end) %>' +
       '<% } }, })) %>'
   end
   
   it "should compile 'replace' template parameters with a default parameter call" do
-    compile_dryml("<Page><Head replace>abc <DefaultHead/></Head></Page>").should == 
-      '<% _output(Page({}, {:Head => proc {|DefaultHead| new_context { %>abc ' +
-      '<% _output(DefaultHead.call({}, {})) %>' +
+    compile_dryml("<Page><Head replace>abc <Head restore/></Head></Page>").should == 
+      
+      '<% _output(Page({}, {:Head => proc {|Head__default| new_context { %>abc ' +
+      '<% _output(Head__default.call({}, {})) %>' +
       '<% } }, })) %>'
   end
   
@@ -389,17 +391,17 @@ describe Template do
   end
   
   it "should allow template parameters to be replaced and then re-instated" do 
-    eval_with_templates('<StaticMerge><b replace>short <default_b/></b></StaticMerge>').should ==
+    eval_with_templates('<StaticMerge><b replace>short <b restore/></b></StaticMerge>').should ==
       '<p>a short <b class="big">bold</b> word</p>'
   end
 
   it "should allow template parameters to be replaced and then re-instated with different attributes" do 
-    eval_with_templates('<StaticMerge><b replace>short <default_b class="small"/></b></StaticMerge>').should ==
+    eval_with_templates('<StaticMerge><b replace>short <b restore class="small"/></b></StaticMerge>').should ==
       '<p>a short <b class="small">bold</b> word</p>'
   end
 
   it "should allow template parameters to be replaced and then re-instated with a different tagbody" do 
-    eval_with_templates('<StaticMerge><b replace>short <default_b>big</default_b></b></StaticMerge>').should ==
+    eval_with_templates('<StaticMerge><b replace>short <b restore>big</b></b></StaticMerge>').should ==
       '<p>a short <b class="big">big</b> word</p>'
   end
 

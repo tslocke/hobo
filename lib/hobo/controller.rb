@@ -2,9 +2,9 @@ module Hobo
 
   module Controller
 
-    include ControllerHelpers
-    
     include AuthenticationSupport
+    
+    helper Hobo::HoboHelper
 
     def self.included(base)
       if base.is_a?(Class)
@@ -13,7 +13,6 @@ module Hobo
     end
     
     def self.included_in_class(base)
-      Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
       base.extend(ClassMethods)
       base.class_eval do
         alias_method_chain :redirect_to, :object_url
