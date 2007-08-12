@@ -13,7 +13,6 @@ class Test::Unit::TestCase
   module HoboTesting
 
     class HoboHelpers
-      include Hobo::ControllerHelpers
       
       def urlb
         "http://example.com"

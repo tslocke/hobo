@@ -16,8 +16,6 @@ module Hobo
         base.extend(ClassMethods)
         base.helper_method(:find_partial, :model, :current_user)
 
-        Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
-
         for collection in base.collections
           add_collection_actions(base, collection.to_sym)
         end
