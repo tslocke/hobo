@@ -4,8 +4,6 @@ module Hobo
 
     include AuthenticationSupport
     
-    helper Hobo::HoboHelper
-
     def self.included(base)
       if base.is_a?(Class)
         included_in_class(base)
@@ -18,6 +16,7 @@ module Hobo
         alias_method_chain :redirect_to, :object_url
         @included_taglibs = []
       end
+      base.helper Hobo::HoboHelper
     end
 
     module ClassMethods
