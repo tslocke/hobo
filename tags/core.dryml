@@ -46,7 +46,7 @@
 %></def>
 
 
-<def tag="else"><tagbody unless="&Dryml.last_if"/></def>
+<def tag="else"><tagbody unless="&Hobo::Dryml.last_if"/></def>
 
 
 <def tag="unless" attrs="test"><%= 

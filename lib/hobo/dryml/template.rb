@@ -254,7 +254,7 @@ module Hobo::Dryml
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       if (for_type = el.attributes['for'])
-        name << "__for_#{for_type}"
+        name << "__for_#{for_type.gsub(':', '_')}"
       end
       
       # While processing this def, @def_name contains
@@ -777,9 +777,9 @@ module Hobo::Dryml
                   end
         
         if if_
-          "(#{expression} unless Hobo::Dryml.last_if = (#{control}).blank?)"
+          "(#{expression} unless Hobo::Dryml.last_if = (#{control}).blank?).to_s"
         elsif unless_
-          "(#{expression} if Hobo::Dryml.last_if = (#{control}).blank?)"
+          "(#{expression} if Hobo::Dryml.last_if = (#{control}).blank?).to_s"
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end
