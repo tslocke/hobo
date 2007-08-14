@@ -13,7 +13,7 @@
     <with_fields merge_attrs="&attributes & attrs_for :with_field">
       <lli>
         <item_label param="#{this_field.sub('?', '')}_label"><%= this_field %></item_label>
-        <item_value param="#{this_field.sub('?', '')}_label"><call_tag tag="&tag" param=""/></item_value>
+        <item_value param="#{this_field.sub('?', '')}_label"><call_tag tag="&tag" /></item_value>
       </lli>
     </with_fields>
   </ll>
