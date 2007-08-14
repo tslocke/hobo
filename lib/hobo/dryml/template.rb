@@ -319,10 +319,12 @@ module Hobo::Dryml
     
     
     def param_names_in_template(el)
-      REXML::XPath.match(el, ".//*[@param]").
-        map {|e| get_param_name(e)}.
-        select {|name| !is_code_attribute?(name) }.
-        every(:to_sym)
+      REXML::XPath.match(el, ".//*[@param]").map do |e|
+        name = get_param_name(e)
+        dryml_exception("invalid param name: #{name.inspect}", e) unless 
+          name =~ DRYML_NAME_RX || name =~ /#\{/
+        name.to_sym unless is_code_attribute?(name)
+      end.compact
     end
     
     
@@ -447,7 +449,6 @@ module Hobo::Dryml
           def_tag.nil? || !template_name?(def_tag.attributes["tag"])
       end
       
-      el.attributes["param"]
       res = param_name == "&true" ? el.dryml_name : param_name
 
       dryml_exception("param name for a template call must be capitalised", el) if
