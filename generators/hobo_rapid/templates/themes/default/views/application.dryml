@@ -36,14 +36,14 @@
             
             <div class="nav_bars" content_option="navigation">
               <div class="nav" content_option="main_nav"><application_nav/></div>
-              <if q="&login_url rescue false">
+              <if test="&login_url rescue false">
                 <div class="account_nav" content_option="account_nav"><application_account_nav/></div>
               </if>
             </div>
             <clearer/>
           </div>
 
-          <if q="&flash[:notice]">
+          <if test="&flash[:notice]">
             <div class="flash"><%= flash[:notice] %></div>
           </if>
 

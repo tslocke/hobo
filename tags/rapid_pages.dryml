@@ -94,7 +94,7 @@
   <RapidPage merge>    
     <main>
       <section class="intro">
-        <h><human_type/><if q="&this.respond_to? :name">: <editor:name/></if></h>
+        <h><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></h>
         <p><delete_button in_place="&false"/></p>
       </section>
       
@@ -148,7 +148,7 @@
     <main>
       <section class="intro">
         <h1><%= title %></h1>
-        <h2>Back to <object_link with="&@owner"/></h2>
+        <h2>Back to <a with="&@owner"/></h2>
       </section>
       <panel param="main">
         <header param="main_header">

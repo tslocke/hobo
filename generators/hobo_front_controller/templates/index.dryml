@@ -23,9 +23,9 @@
       <panel>
         <h2><%%= this.name.titlecase.pluralize %></h2>
         <section>
-          <if q="&this.count == 0">
+          <if test="&this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>
-            <if q="&can_create?(this) and this != Hobo.user_model">
+            <if test="&can_create?(this) and this != Hobo.user_model">
               <p>Create a <new_object_link for="&this"/>.</p>
             </if>
           </if>

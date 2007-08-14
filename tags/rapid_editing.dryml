@@ -226,7 +226,7 @@
   %>
 
   <select onchange="#{f}">
-    <if q="&tagbody">
+    <if test="&tagbody">
       <tagbody/>
     </if>
     <else>
@@ -240,7 +240,7 @@
  <select class="number_editor_bhv" hobo_update="#{update}"
           hobo_model_id="#{this_field_dom_id}"
           merge_attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
-   <if q="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
+   <if test="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
  </select>
 </def>

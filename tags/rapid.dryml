@@ -313,7 +313,7 @@ in the future - use at your own risk. -->
 
     <tagbody/>
 
-    <if q="&delete_buttons != false and can_delete?(this)">
+    <if test="&delete_buttons != false and can_delete?(this)">
       <td><DeleteButton/></td>
     </if>
   </table_for>
