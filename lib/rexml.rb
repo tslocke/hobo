@@ -34,7 +34,7 @@ module REXML
     
     class BaseParser
       
-      DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR}\??)(?:\s*=\s*(["'])(.*?)\2)?/um
+      DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
       
       DRYML_TAG_MATCH = /^<((?>#{NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
       
