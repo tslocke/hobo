@@ -217,7 +217,7 @@
 <def tag="sti_type_editor" attrs="update">
   <% base_class = this.class
      base_class = base_class.superclass while base_class.superclass != ActiveRecord::Base
-   f = ajax_updater("#{urlb}/#{controller_for base_class}/#{this.id}",
+   f = ajax_updater("#{base_url}/#{controller_for base_class}/#{this.id}",
                       "Change #{this_field.to_s.titleize}", update,
                       :method => "put",
                       :params => { base_class.name.underscore => {

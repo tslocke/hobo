@@ -132,7 +132,7 @@
 <def tag="delete_button" attrs="label, message, update, in_place, image, confirm, fade"><%=
   if can_delete?
     attributes = attributes.merge(if image
-                                    { :type => "image", :src => "#{urlb}/images/#{image}" }
+                                    { :type => "image", :src => "#{base_url}/images/#{image}" }
                                   else
                                     { :type => "button" }
                                   end)

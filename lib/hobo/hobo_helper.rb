@@ -44,14 +44,14 @@ module Hobo::HoboHelper
     controller_name = controller_for(obj)
     
     parts = if obj.is_a? Class
-              [urlb, controller_name]
+              [base_url, controller_name]
               
             elsif obj.is_a? Hobo::CompositeModel
-              [urlb, controller_name, obj.id]
+              [base_url, controller_name, obj.id]
               
             elsif obj.is_a? ActiveRecord::Base
               if obj.new_record?
-                [urlb, controller_name]
+                [base_url, controller_name]
               else
                 raise HoboError.new("invalid object url: new for existing object") if action == "new"
 
@@ -62,7 +62,7 @@ module Hobo::HoboHelper
                        obj.id
                      end
                 
-                [urlb, controller_name, id]
+                [base_url, controller_name, id]
               end
               
             elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
@@ -203,7 +203,7 @@ module Hobo::HoboHelper
 
 
   def theme_asset(path)
-    "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
+    "#{base_url}/hobothemes/#{Hobo.current_theme}/#{path}"
   end
   
   def js_str(s)

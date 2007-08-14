@@ -48,12 +48,12 @@
 
 
 <def tag="image" attrs="src">
-  <img src="#{urlb}/images/#{src}" merge_attrs/>
+  <img src="#{base_url}/images/#{src}" merge_attrs/>
 </def>
 
 
 <def tag="spinner">
-  <image src="#{urlb}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
+  <image src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
 </def>
 
 
@@ -76,7 +76,7 @@
         Hobo.all_controllers.map {|c| "#{c.singularize}: '#{c}'"}.join(', ') +
         "}; "
     end
-    res += "urlBase = '#{urlb}'; hoboPartPage = '#{view_name}'</script>"
+    res += "urlBase = '#{base_url}'; hoboPartPage = '#{view_name}'</script>"
     
     if tiny_mce
       res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
@@ -297,7 +297,7 @@
 
 
 <def tag="theme_stylesheet">
-  <link href="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
+  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 

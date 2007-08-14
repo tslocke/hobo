@@ -1,10 +1,8 @@
-<page title="<%= app_name %>">
+<Page title="<%= app_name %>">
 
-  <:intro>
+  <main>
     <h1 class="front_page_title"><%= app_name %></h1>
-  </:intro>
 
-  <:main>
     <panel>
       <h2>Login to <%= app_name %></h2>
       <section>

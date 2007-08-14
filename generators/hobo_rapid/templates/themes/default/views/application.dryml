@@ -91,7 +91,7 @@
 
 
 <def tag="application_nav">
-  <% items = [['Home', urlb + '/']] +
+  <% items = [['Home', base_url + '/']] +
              Hobo.models[0..2].map{|m| [m.name.pluralize.titlecase, object_url(m)]} +
              [['Search', (search_url rescue "")]] %>
   <navbar items="&items"/>
