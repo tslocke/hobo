@@ -15,7 +15,7 @@
 
       <div id='ajax_progress'>
         <div>
-          <span id="ajax_progress_text"></span><theme_img src="spinner.gif"/>
+          <span id="ajax_progress_text"></span><theme_image src="spinner.gif"/>
         </div>
       </div>
 
@@ -32,7 +32,7 @@
         <div id="page_inner_top">
 
           <div id='header' content_option="header">
-            <div class="logo" content_option="logo"><theme_img src="logo.gif"/></div>
+            <div class="logo" content_option="logo"><theme_image src="logo.gif"/></div>
             
             <div class="nav_bars" content_option="navigation">
               <div class="nav" content_option="main_nav"><application_nav/></div>

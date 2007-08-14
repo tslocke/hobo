@@ -201,7 +201,7 @@
 <def tag="ajax_progress">
   <div id='ajax_progress'>
     <div>
-      <span id="ajax_progress_text"></span><theme_img src="spinner.gif"/>
+      <span id="ajax_progress_text"></span><theme_image src="spinner.gif"/>
     </div>
   </div>
 </def>
