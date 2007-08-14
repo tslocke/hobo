@@ -1,0 +1,40 @@
+<def tag="ll"><table class="nl"/><tagbody/></table></def>
+
+<def tag="lli"><tr class="ni" merge_attrs><tagbody/></tr></def>
+
+<def tag="item_label"><th merge_attrs><tagbody/></th></def>
+
+<def tag="item_value"><td merge_attrs><tagbody/></td></def>
+
+
+<def tag="h">
+  <div class="h" merge_attrs><tagbody/></div>
+</def>
+
+<% # section represents a generic document or application section. %>
+<def tag="section">
+  <set body="&tagbody.call">
+  <div class="section" merge_attrs if="&body"><tagbody/></div>
+</def>
+
+<def tag="aside">
+  <set body="&tagbody.call">
+  <div class="aside" merge_attrs if="&body"><tagbody/></div>
+</def>
+
+<def tag="header">
+  <set body="&tagbody.call">
+  <div class="header" merge_attrs if="&body"><tagbody/></div>
+</def>
+
+<def tag="footer">
+  <set body="&tagbody.call">
+  <div class="footer" merge_attrs if="&body"><tagbody/></div>
+</def>
+
+<% # article represents an independent piece of content of a 
+   # document, such as a blog entry or newspaper article. %>
+<def tag="article">
+  <set body="&tagbody.call">
+  <div class="article" merge_attrs if="&body"><tagbody/></div>
+</def>

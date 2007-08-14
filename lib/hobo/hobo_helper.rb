@@ -121,21 +121,6 @@ module Hobo::HoboHelper
   end
 
   
-  # debugging support
-
-  def abort_with(*args)
-    raise args.map{|arg| PP.pp(arg, "")}.join("-------\n")
-  end
-  
-  def debug(*args)
-    logger.debug("\n### DRYML Debug ###")
-    logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
-    logger.debug("DRYML THIS = #{Hobo.dom_id(this)}")
-    logger.debug("###################\n")
-    args.first unless args.empty?
-  end
-
-
   def map_this
     res = []
     this.each_index {|i| new_field_context(i) { res << yield } }
@@ -214,6 +199,96 @@ module Hobo::HoboHelper
   def theme_asset(path)
     "#{urlb}/hobothemes/#{Hobo.current_theme}/#{path}"
   end
+  
+  def js_str(s)
+    if s.is_a? Hobo::RawJs
+      s.to_s
+    else
+      "'" + s.gsub("'"){"\\'"} + "'"
+    end
+  end
 
+
+  def make_params_js(*args)
+    ("'" + make_params(*args) + "'").sub(/ \+ ''$/,'')
+  end
+
+
+  def render_params(*args)
+    parts = args.map{|x| x.split(/, */) if x}.compact.flatten
+    { :part_page => view_name,
+      :render => parts.map do |part_id|
+        { :object => Hobo::RawJs.new("hoboParts.#{part_id}"),
+          :part => part_id }
+      end
+    }
+  end
+
+
+  def nl_to_br(s)
+    s.to_s.gsub("\n", "<br/>") if s
+  end
+
+
+  def param_name_for(object, field_path)
+    field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
+    attrs = field_path.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
+    "#{object.class.name.underscore}#{attrs}"
+  end
+
+  
+  def param_name_for_this(foreign_key=false)
+    return "" unless form_this
+    name = if foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
+             param_name_for(form_this, form_field_path[0..-2] + [this_type.primary_key_name])
+           else
+             param_name_for(form_this, form_field_path)
+           end
+    register_form_field(name)
+    name
+  end
+  
+  
+  def selector_type
+    if this.is_a? ActiveRecord::Base
+      this.class
+    elsif this.respond_to? :member_class
+      this.member_class
+    elsif this == @this
+      @model
+    end
+  end
+  
+  
+  def transpose_with_field(field)
+    matrix = this.map {|obj| obj.send(field) }
+    max_length = matrix.every(:length).max
+    matrix = matrix.map do |a|
+      a + [nil] * (max_length - a.length)
+    end
+    matrix.transpose
+  end
+  
+  
+  def create(model)
+    n = model.new
+    n.set_creator(current_user)
+    n
+  end
+  
+  
+  # debugging support
+
+  def abort_with(*args)
+    raise args.map{|arg| PP.pp(arg, "")}.join("-------\n")
+  end
+  
+  def log_debug(*args)
+    logger.debug("\n### DRYML Debug ###")
+    logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
+    logger.debug("DRYML THIS = #{Hobo.dom_id(this)}")
+    logger.debug("###################\n")
+    args.first unless args.empty?
+  end
 
 end

@@ -4,166 +4,10 @@
 
 
 <def tag="CallTemplate" attrs="template">
-  <%= send(template, attributes, all_parameters %>
+  <%= send(template, attributes, all_parameters) %>
 </def>
 
     
-<def tag="name"><%= 
-  if this.nil?
-    "(not available)"
-  else
-    name_tag = find_polymorphic_tag("name")
-    if name_tag != "name"
-      send(name_tag)
-    elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
-      count
-    elsif this.is_a? Class and this < ActiveRecord::Base
-      this.name.pluralize.titleize
-    else
-      this.to_s
-    end
-  end
-%></def>
-
-
-<def tag="a" attrs="view, to, params"><%=
-  if attributes[:href].nil? && attributes[:name].nil?
-    target = to || this
-    if target.nil?
-      "(Not Available)"
-    elsif target.respond_to?(:new_object?) && target.new_object?
-      target.set_creator(current_user) if target.respond_to?(:current_user)
-      if can_create?(target)
-        content = tagbody ? tagbody.call : "New #{target.name.titleize}"
-        link_class = "new_#{new.class.name.underscore}_link"
-        link_to content, object_url(f, "new"), add_classes(options, link_class)
-      end
-    elsif to ? can_view?(to) : can_view_this?
-      attributes = add_classes(attributes, "#{target.class.name.underscore}_link")
-      if tagbody
-        content = tagbody.call
-      else
-        content = name
-        attributes.update(:hobo_model_id => this_field_dom_id)
-      end
-      link_to content, object_url(target, view, params), attirbutes
-    end
-  else
-    content_tag :a, tagbody ? tagbody.call : "", attributes
-  end
-%></def>
-
-        
-<def tag="view" attrs="no_wrapper"><%=
-  raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
-    can_view_this?
-   
-   if this == nil
-     this_type <= String ? "" : "(Not Available)"
-   elsif this_type.respond_to?(:macro)
-     if this_type.macro == :belongs_to
-       belongs_to_view(attributes)
-     elsif this_type.macro == :has_many
-       has_many_view(attributes)
-     end
-   else
-     attrs = if !no_wrapper && this_parent.respond_to?(:typed_id)
-               attributes.merge(:hobo_model_id => this_field_dom_id)
-             else
-               attributes
-             end
-     call_polymorphic_tag("view", attrs) or 
-       raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
-   end
-%></def>
-    
-    
-<def tag="belongs_to_view"><a/></def>
-    
-    
-<def tag="show_has_many"><%= 
-     if this.empty?
-       "(none)"
-     else
-       map_this { a }.join(", ")
-     end
-</def>
-
-
-<def tag="view" for="Date">
-  <span merge_attrs><%=
-   if respond_to?(:show_date)
-     show_date
-   else
-     this.to_s(:long)
-   end %>
-   </span>
-</def>
-
-
-<def tag="view" for="Time">
-  <span merge_attrs><%=
-   if respond_to?(:show_datetime)
-     show_datetime
-   else
-     this.to_s(:long)
-   end %>
-   </span>
-</def>
-                       
-
-<def tag="view" for="Numeric">
-  <span merge_attrs><%= format ? format % this : this.to_s %></span>
-</def>
-
-
-<def tag="view" for="Hobo::Text">
-  <div merge_attrs><%= h(this).gsub("\n", "<br/>") %></div>
-</def>
-
-
-<def tag="view" for="Hobo::HtmlString">
-  <div merge_attrs><%= this %></div>
-</def>
-
-
-<def tag="view" for="Hobo::MarkdownString">
-  <div merge_attrs><%= markdown(this) %></div>
-</def>
-
-
-<def tag="view" for="Hobo::TextileString">
-  <div merge_attrs><%= textilize(this) %></div>
-</def>
-
-
-<def tag="view" for="Hobo::PasswordString">
-  <span merge_attrs>[password withheld]</span>
-</def>
-
-                       
-<def tag="view" for="String">
-  <span merge_attrs><%= h(this).gsub("\n", "<br/>") %></span>
-</def>
-
-<def tag="view" for="TrueClass"><span merge_attrs>Yes</span></def>
-<def tag="view" for="FalseClass"><span merge_attrs>No</span></def>
-
-
-<def tag="human_type" attrs="style"><%= 
-      if can_view_this?
-        res = if this.respond_to? :proxy_reflection
-                this.proxy_reflection.klass.name.pluralize
-              elsif this.is_a? Class
-                this.name
-              else
-                this.class.name
-              end
-        res.underscore.humanize.send(style || :titleize)
-      end
-%></def>
-
-
 <def tag="partial" attrs="as">
    <%= render(:partial => find_partial(this, as), :locals => { :this => this }) %>
 </def>
@@ -177,43 +21,16 @@
         content_tag(even_odd, tagbody.call, options.merge(:class => klass, :hobo_model_id => dom_id(this)))
       end.join(join)
     else
-      map_this { tagbody.call }.join(join)
+      scope.new_scope do
+        scope[:even_odd] = "odd"
+        map_this do
+          tagbody.call
+          scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
+        end.join(join)
+      end
     end
   else
     ""
-  end
-%></def>
-
-    
-<def tag="count" attrs="label, prefix, unless_none"><%=
-  raise Exception.new("asked for count of a string") if this.is_a?(String)
-   
-  if this.is_a?(Class) and this < ActiveRecord::Base
-    c = this.count
-    label ||= this.name.titleize
-  else
-    label ||= this.respond_to?(:proxy_reflection) && this.proxy_reflection.name.to_s.singularize.titleize
-    c = if this.is_a?(Fixnum)
-          this
-        elsif this.respond_to?(:count)
-          this.count
-        else
-          this.length
-        end
-  end
-   
-  Dryml.last_if = c > 0 if unless_none
-  if unless_none && c == 0
-    ""
-  else
-    main = label.blank? ? c : pluralize(c, l)
-   
-    if prefix.in? %w(are is)
-      p = c == 1 ? "is" : "are"
-      p + ' ' + main
-    else
-      main
-    end
   end
 %></def>
 
@@ -222,16 +39,9 @@
 <def tag="with"><tagbody/></def>
 
 
-<def tag="if"><%= 
-  cond = if attributes.has_key?(:condition)
-           attributes[:condition]
-         elsif attributes.length == 1 && attributes.values.first == true
-           eval(attributes.keys.first)
-         else
-           this
-         end
-  res = cond.blank? ? tagbody.call : ""
-  Dryml.last_if = cond
+<def tag="if" attrs="test"><%= 
+  res = test.blank? ? tagbody.call : ""
+  Hobo::Dryml.last_if = cond
   res
 %></def>
 
@@ -239,21 +49,9 @@
 <def tag="else"><tagbody unless="&Dryml.last_if"/></def>
 
 
-<def tag="unless"><%= 
-  cond = if attributes.has_key?(:condition)
-           attributes[:condition]
-         elsif attributes.length == 1 && attributes.values.first == true
-           eval(attributes.keys.first)
-         else
-           this
-         end
-  res = cond.blank? ? "" : tagbody.call
-  Dryml.last_if = !cond
+<def tag="unless" attrs="test"><%= 
+  res = test.blank? ? "" : tagbody.call
+  Dryml.last_if = !test
   res
 %></def>
-    
 
-<def tag="theme_stylesheet">
-  <link href="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
-        media="screen" rel="Stylesheet" type="text/css" />
-</def>

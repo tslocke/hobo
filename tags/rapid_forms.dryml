@@ -1,0 +1,182 @@
+<def tag="hidden_fields" attrs="fields, skip"><%= 
+  hiddens = case fields
+            when '*', nil
+              this.class.column_names - ['type', 'created_at', 'updated_at']
+            else
+              comma_split(fields)
+            end
+  hiddens -= comma_split(skip)
+  pname = this.class.name.underscore
+  hidden_tags = hiddens.map do |h|
+    val = this.send(h)
+    name = "#{pname}[#{h}]"
+    hidden_field_tag(name, val.to_s) if val
+  end.join("\n")
+%></def>
+
+
+<def tag="form" attrs="message, update, hidden_fields, action, method"><%= 
+  ajax_attrs, html_attrs = attributes.partition_hash(AJAX_ATTRS)
+
+  add_classes!(html_attrs, "#{'new_' if this.new_record?}#{this.class.name.underscore}")
+  html_attrs[:action] = action || object_url(this, method)
+
+  if update || !ajax_attrs.empty?
+    # add an onsubmit to convert to an ajax form if `update` is given
+    function = ajax_updater(:post_form, message, update, ajax_options)
+    html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+  end
+
+  body, field_names = with_form_context { tagbody.call }
+
+  method_hidden = hidden_field_tag("_method", "PUT") unless this.respond_to?(:new_record?) and this.new_record?
+
+  html_attrs[:method] = "post"
+
+  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if this.new_record?
+
+  body = [method_hidden, hiddens, body].join
+    
+  content_tag("form", body, html_attrs)
+%></def>
+
+
+<def tag="input"><%=
+  if attributes["type"]
+    tag :input, attributes
+  else
+    raise HoboError.new("Not allowed to edit") unless can_edit_this?
+    if this_type.respond_to?(:macro)
+      if this_type.macro == :belongs_to
+        belongs_to_input(attributes)
+      elsif this_type.macro == :has_many
+        has_many_input(attributes)
+      end
+    else
+      attrs = attrs.merge(:name => param_name_for_this)
+      the_input = call_polymorphic_tag('input', attributes.merge) or
+        raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+      if this_parent.errors[this_field]
+        "<div class='field_with_errors'>#{the_input}</div>"
+      else
+        the_input
+      end
+    end
+  end
+%></def>
+
+<def tag="input" for="text" attrs="name">
+  <%= text_area_tag(name, this, options) %>
+</def>
+
+<def tag="input" for="boolean" attrs="name">
+  <%= check_box_tag(name, '1', this, options) + hidden_field_tag(name, '0') %>
+</def>
+  
+<def tag="input" for="password" attrs="name">
+  <%= password_field_tag(name, this) %>
+</def>
+
+<def tag="input" for="html" attrs="name">
+  <%= text_area_tag(name, this, add_classes(options, :tiny_mce)) %>
+</def>
+
+<def tag="input" for="date">
+  <%= select_date(this || Time.now, :prefix => param_name_for_this) %>
+</def>
+
+<def tag="input" for="datetime">
+  <%= select_datetime(this || Time.now, :prefix => param_name_for_this) %>
+</def>
+
+<def tag="input" for="integer" attrs="name">
+  <%= text_field_tag(name, this, options) %>
+</def>
+
+<def tag="input" for="float" attrs="name">
+  <%= text_field_tag(name, this, options) %>
+</def>
+
+<def tag="input" for="string" attrs="name">
+    <%= text_field_tag(name, this, options) %>
+</def>
+
+<def tag="belongs_to_input">
+  <%= belongs_to_menu_field(options) %>
+</def>
+
+<!--- Buttons --->
+
+<def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
+  ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
+
+  message2 = message || method.titleize
+  func = ajax_updater(object_url(this) + "/#{method}", message2, update,
+                      ajax_options.merge(:params => params, :result_update => result_update))
+  html_options.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
+  tag(:input, add_classes(html_options, "button_input remote_method_button #{method}_button"))
+%></def>
+  
+
+<def tag="update_button" attrs="label, message, update, fields, params"><%=
+  raise HoboError.new("no update specified") unless update
+  message ||= label
+  func = ajax_updater(object_url(this), message, update,
+                      :params => { this.class.name.underscore => fields }.merge(params || {}),
+                      :method => :put)
+  tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+                          "button_input update_button update_#{this.class.name.underscore}_button") %>
+</def>
+
+
+<def tag="delete_button" attrs="label, message, update, in_place, image, confirm, fade"><%=
+  if can_delete?
+    attributes = attributes.merge(if image
+                                    { :type => "image", :src => "#{urlb}/images/#{image}" }
+                                  else
+                                    { :type => "button" }
+                                  end)
+    label ||= "Remove"
+    confirm ||= "Are you sure?"
+    
+    add_classes!(attributes,
+                 image ? "image_button_input" : "button_input",
+                 "delete_button delete_#{this.class.name.underscore}_button")
+    url = object_url(this, "destroy")
+    if in_place == false
+      attributes[:confirm] = confirm
+      button_to(label, url, attributes)
+    else
+      fade = true if fade.nil?
+      attributes[:value] = label
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
+      tag(:input, attributes)
+    end
+  end
+%></def>
+
+
+<def tag="create_button" attrs="model, update, label, message, fields"><%
+  raise HoboError.new("no update specified") unless update
+
+  fields ||= {}
+  klass_or_assoc = if model
+                     model.is_a?(String) ? model.constantize : model
+                   elsif Hobo.simple_has_many_association?(this)
+                     fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
+                     this
+                   else
+                     raise HoboError.new("invalid context for <create_button>")
+                   end
+  new = klass.new(fields)
+  new.set_creator(current_user)
+  if can_create?(new)
+    label ||= "New #{new.class.name.titleize}"
+    message ||= label
+    class_name = new.class.name.underscore
+    func = ajax_updater(object_url(new.class), message2, update,
+                        ({:params => { class_name => fields }} unless fields.empty?))
+    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label2),
+                            "button_input create_button create_#{class_name}_button")
+  end
+%></def>

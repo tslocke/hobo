@@ -4,12 +4,6 @@ module Hobo
     
     class UnknownSqlTypeError < RuntimeError; end
   
-    DEFAULT_SQL_TYPES = {
-      :html => :text,
-      :markdown => :text,
-      :textile => :text
-    }
-    
     def initialize(model, name, type, options={})
       raise ArgumentError, "you cannot provide a field spec for the primary key" if name == model.primary_key
       self.model = model
@@ -29,7 +23,7 @@ module Hobo
                               elsif options[:length]
                                 :string
                               else
-                                DEFAULT_SQL_TYPES[type] or raise UnknownSqlTypeError, type
+                                Hobo.field_types[type]::COLUMN_TYPE or raise UnknownSqlTypeError, type
                               end
                             end
     end

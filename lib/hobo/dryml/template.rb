@@ -249,6 +249,9 @@ module Hobo::Dryml
       
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
+      if (for_type = el.attributes['for'])
+        name << "__for_#{for_type}"
+      end
       
       # While processing this def, @def_name contains
       # the names of all nested defs join with '_'. It's used to
@@ -406,16 +409,17 @@ module Hobo::Dryml
       default_body = if el.children.empty?
                        "nil"
                      else
-                       "proc { new_context { %>#{children_to_erb(el)}<% } }"
+                       "proc { %>#{children_to_erb(el)}<% }"
                      end
       
-      "<% _output(do_tagbody(tagbody, {#{attributes * ', '}}, #{default_body})) %>"
+      call = apply_control_attributes("do_tagbody(tagbody, {#{attributes * ', '}}, #{default_body})", el)
+      "<% _output(#{call}) %>"
     end
 
     
     def default_tagbody_element(el)
       name = el.attributes['for'] || @containing_tag_name
-      "<%= #{name}_default_tagbody.call %>"
+      "<% #{name}_default_tagbody.call %>"
     end
 
 
@@ -460,8 +464,21 @@ module Hobo::Dryml
     end
 
    
-    def polymorphic_call?(el)
-      !!el.attributes['for_type']
+    def polymorphic_call_type(el)
+      t = el.attributes['for_type']
+      if t.nil?
+        nil
+      elsif t == "&true"
+        'this_type'
+      elsif t =~ /^[A-Z]/
+        t
+      elsif t =~ /^[a-z]/
+        "Hobo.field_types[:#{t}]"
+      elsif is_code_attribute?(t)
+        t[1..-1]
+      else
+        dryml_exception("invalid for_type attribute", el)
+      end
     end
     
     
@@ -482,8 +499,8 @@ module Hobo::Dryml
                            # The tag is available in a local variable
                            # holding a proc
                            el.name
-                         elsif polymorphic_call?(el)
-                           "find_polymorphic_template(:#{name})"
+                         elsif (call_type = polymorphic_call_type(el))
+                           "find_polymorphic_template(:#{name}, #{call_type})"
                          else
                            ":#{name}"
                          end
@@ -492,8 +509,8 @@ module Hobo::Dryml
                if is_param_default_call
                  # The tag is a proc available in a local variable
                  "#{name}__default.call(#{attributes}, #{parameters})"
-               elsif polymorphic_call?(el)
-                 "send(find_polymorphic_template(:#{name}), #{attributes}, #{parameters})"
+               elsif (call_type = polymorphic_call_type(el))
+                 "send(find_polymorphic_template(:#{name}, #{call_type}), #{attributes}, #{parameters})"
                else
                  "#{name}(#{attributes}, #{parameters})"
                end
@@ -510,50 +527,7 @@ module Hobo::Dryml
       merge
     end
     
-    # Tag parameters are parameters to templates.
-    def tag_parametersXX(el)
-      dryml_exception("content is not allowed directly inside template calls", el) if 
-        el.children.find { |e| e.is_a?(REXML::Text) && !e.to_s.blank? }
-      
-      param_groups = el.elements.group_by { |e| e.name.split('.')[0] }
-      
-      param_items = param_groups.map do |group_name, tags| 
-        if tags.length == 1 and (e = tags.first) and e.name !~ /\./
-          param_name = get_param_name(e)
-          if param_name
-            if template_call?(e)
-              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, all_parameters[:#{param_name}])"
-            else
-              ":#{e.name} => merge_option_procs(#{template_proc(e)}, all_parameters[:#{param_name}])"
-            end
-          else
-            ":#{e.name} => #{template_proc(e)}"
-          end
-        else
-          param, modifiers = tags.partition{ |e| e.name == group_name }
-          dryml_exception("duplicate template parameter: #{group_name}", el) if param.length > 1
-          param = param.first # there's zero or one
-          
-          ":#{group_name} => #{template_proc(param, modifiers)}"
-        end
-      end
 
-      merge_params = el.attributes['merge_params'] || merge_attribute(el)
-      if merge_params
-        extra_params = if merge_params == "&true"
-                         "parameters"
-                        elsif is_code_attribute?(merge_params)
-                          merge_params[1..-1]
-                        else
-                          dryml_exception("invalid merge_params", el)
-                        end
-        "{#{param_items * ', '}}.merge((#{extra_params}) || {})"
-      else
-        "{#{param_items * ', '}}"
-      end
-    end
-    
-    
     # Tag parameters are parameters to templates.
     def tag_parameters(el)
       dryml_exception("content is not allowed directly inside template calls", el) if 
@@ -596,35 +570,6 @@ module Hobo::Dryml
     end
 
     
-    def template_procXX(el, modifiers=[])
-      attributes = modifiers.map do |e|
-        mod = e.name.split('.')[1]
-        dryml_exception("invalid template parameter modifier: #{e.name}") if 
-          !mod.in? %w{before after append prepend replace}
-
-        ":_#{mod} => proc { new_context { %>#{children_to_erb(e)}<% } }"
-      end
-      
-      if el
-        attrs = el.attributes.map do 
-          |name, value| ":#{name} => #{attribute_to_ruby(value)}" unless name.in?(SPECIAL_ATTRIBUTES)
-        end.compact
-        attributes.concat(attrs)
-      end
-      
-      if template_call?(el || modifiers.first)
-        parameters = el ? tag_parameters(el) : "{}"
-        "proc { [{#{attributes * ', '}}, #{parameters}] }"
-      else
-        if el && el.has_end_tag?
-          body = children_to_erb(el)
-          attributes << ":tagbody => proc { new_context { %>#{body}<% } } " 
-        end
-        "proc { {#{attributes * ', '}} }"
-      end
-    end
-
-    
     def template_proc(el)
       if (repl = el.attribute("replace"))
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
@@ -643,7 +588,11 @@ module Hobo::Dryml
           "proc { [{#{attributes * ', '}}, #{parameters}] }"
         else
           if el && el.has_end_tag?
+            old = @containing_tag_name
+            @containing_tag_name = el.name
             body = children_to_erb(el)
+            @containing_tag_name = old
+
             attributes << ":tagbody => proc {|#{el.name}_default_tagbody| new_context { %>#{body}<% } } " 
           end
           "proc { {#{attributes * ', '}} }"
@@ -674,8 +623,8 @@ module Hobo::Dryml
                            # The tag is available in a local variable
                            # holding a proc
                            el.name
-                         elsif polymorphic_call?(el)
-                           "find_polymorphic_tag(:#{name})"
+                         elsif (call_type = polymorphic_call_type(el))
+                           "find_polymorphic_tag(:#{name}, #{call_type})"
                          else
                            ":#{name}"
                          end
@@ -684,8 +633,8 @@ module Hobo::Dryml
              else
                if is_param_default_call
                  "#{name}__default.call_with_block(#{attributes})"
-               elsif polymorphic_call?(el)
-                 "send(find_polymorphic_tag(:#{name}), #{attributes})"
+               elsif (call_type = polymorphic_call_type(el))
+                 "send(find_polymorphic_tag(:#{name}, #{call_type}), #{attributes})"
                else
                  "#{name}(#{attributes unless attributes == '{}'})"
                end
@@ -817,17 +766,15 @@ module Hobo::Dryml
         expression
       else
         control = if is_code_attribute?(val)
-                    val[1..-1]
-                  elsif repeat
-                    "this.#{val}"
+                    "#{val[1..-1]}"
                   else
-                    "!this.#{val}.blank?"
+                    "this.#{val}"
                   end
         
         if if_
-          "(#{expression} if Hobo::Dryml.last_if = (#{control}))"
+          "(#{expression} unless Hobo::Dryml.last_if = (#{control}).blank?)"
         elsif unless_
-          "(#{expression} unless Hobo::Dryml.last_if = (#{control}))"
+          "(#{expression} if Hobo::Dryml.last_if = (#{control}).blank?)"
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end

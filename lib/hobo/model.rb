@@ -2,6 +2,20 @@ module Hobo
 
   module Model
     
+    Hobo.field_types.update({ :html        => HtmlString,
+                              :markdown    => MarkdownString,
+                              :textile     => TextileString,
+                              :password    => PasswordString,
+                              :text        => Hobo::Text,
+                              :boolean     => TrueClass,
+                              :date        => Date,
+                              :datetime    => Time,
+                              :integer     => Fixnum,
+                              :big_integer => BigDecimal,
+                              :float       => Float,
+                              :string      => String
+                            })
+    
     def self.included(base)
       Hobo.register_model(base)
       base.extend(ClassMethods)
@@ -73,8 +87,9 @@ module Hobo
         def field(name, *args)
           type = args.shift
           options = extract_options_from_args!(args)
-          @model.send(:set_field_type, name => type) unless type.in?(@model.connection.native_database_types.keys)
-          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)          
+          @model.send(:set_field_type, name => type) unless
+            type.in?(@model.connection.native_database_types.keys - [:text])
+          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
         end
         
         def method_missing(name, *args)
@@ -103,16 +118,7 @@ module Hobo
       
       def set_field_type(types)
         types.each_pair do |field, type|
-          
-          # TODO: Make this extensible
-          type_class = case type
-                       when :html; HtmlString
-                       when :markdown; MarkdownString
-                       when :textile; TextileString
-                       when :password; PasswordString
-                       else type
-                       end
-          
+          type_class = Hobo.field_types[type] || type
           field_types[field] = type_class
         end
       end

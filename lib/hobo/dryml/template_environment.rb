@@ -167,34 +167,31 @@ module Hobo::Dryml
       end
       res
     end
+    
+    def call_polymorphic_tag(name, attributes, &b)
+      tag = find_polymorphic_tag(name)
+      if tag != name
+        send(name, attributes, &b)
+      else
+        nil
+      end
+    end
 
     
-    def find_polymorphic_tag(name)
-      t = this_type
+    def find_polymorphic_tag(name, call_type=nil)
+      call_type ||= this_type
+      call_type = TrueClass if call_type = FalseClass
       while true
-        if t == ActiveRecord::Base || t == Object
+        if call_type == ActiveRecord::Base || call_type == Object
           return name
-        elsif respond_to?(poly_name = "#{t.name.underscore}_#{name}")
+        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.underscore.gsub('/', ' ')}")
           return poly_name
         else
-          t = t.superclass
+          call_type = call_type.superclass
         end
       end
     end
-
-
-    def find_polymorphic_template(name)
-      t = this_type
-      while true
-        if t == ActiveRecord::Base || t == Object
-          return name
-        elsif respond_to?(poly_name = "#{t.name}#{name}")
-          return poly_name
-        else
-          t = t.superclass
-        end      
-      end
-    end
+    alias_method :find_polymorphic_template, :find_polymorphic_tag
     
     
     def repeat_attribute(array, &b)
@@ -345,7 +342,7 @@ module Hobo::Dryml
       res = if tagbody
               tagbody.call(attributes, default_tagbody)
             else
-              default_tagbody.call
+              new_context { default_tagbody.call }
             end
       Hobo::Dryml.last_if = !!tagbody
       res
@@ -370,7 +367,7 @@ module Hobo::Dryml
       
         if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
           body = if tagbody
-                   tagbody.call(b)
+                   new_context { tagbody.call(proc {b.call(nil)}) }
                  elsif b
                    new_context { b.call(nil) }
                  else
@@ -393,52 +390,6 @@ module Hobo::Dryml
       end
     end
 
-    def merge_and_callXX(name, options, overriding_proc, &b)
-      if overriding_proc
-        overriding_options = overriding_proc.call
-        
-        replace = overriding_options[:_replace]
-        return replace.call if replace
-
-        tagbody = overriding_options.delete(:tagbody)
-        
-        before  = overriding_options.delete(:_before)
-        after   = overriding_options.delete(:_after)
-        append  = overriding_options.delete(:_append)
-        prepend = overriding_options.delete(:_prepend)
-        options = options.update(overriding_options)
-      end
-      
-      res = if name.to_s.in?(Hobo.static_tags)
-              prepend = (prepend && prepend.call).to_s
-              append = (append && append.call).to_s
-              body = if tagbody
-                       tagbody.call
-                     elsif b
-                       prepend + new_context { b.call } + append
-                     else
-                       prepend + append
-                     end
-              if body.empty?
-                tag(name, options)
-              else
-                content_tag(name, body, options)
-              end
-            else
-              body = tagbody || b
-              modified_body = if append || prepend
-                                proc { (prepend && prepend.call).to_s + body.call + (append && append.call).to_s }
-                              else
-                                body
-                              end
-              send(name, options, &modified_body)
-            end
-      (before && before.call).to_s + 
-        res + 
-        (after && after.call).to_s
-    end
-    
-    
     def call_template_parameter(name, options, template_procs, overriding_proc)
       if overriding_proc
         overriding_options, overriding_template_procs = overriding_proc.call

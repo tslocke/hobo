@@ -1,74 +1,303 @@
-<include module="Hobo::Rapid"/>
+<include module="Hobo::RapidHelper"/>
 
+<include src="rapid_support"/>
+<include src="rapid_document_tags"/>
 <include src="rapid_pages"/>
 <include src="rapid_editing"/>
+<include src="rapid_forms"/>
 <include src="rapid_navigation"/>
 
-<def tag="clearer"><div class='clearer'>&nbsp;</div></def>
-
-<def tag="ObjectTable" attrs="fields, skip, associations, editor_tag">
-  <% 
-     field_inner_tag_options, html_options = attributes.partition_hash {|k,v| k.to_s =~ /_label$|_editor$/ }
-#     inner_tag_options.merge!(field_inner_tag_options)
-                                                        
-     if fields.nil?
-       fields = this.class.content_columns.every(:name) - %w{created_at updated_at}
-       if this.new_record? && 
-           'type'.in?(this.class.column_names) &&
-           !this.class.send(:subclasses).empty?
-         fields << 'type'
-       end
-     else
-       fields = comma_split(fields)
-     end
-       
-     fields -= comma_split(skip) if skip
-     fields = fields.select {|f| can_view?(this, f)}
-       
-     associations = if associations == '*'
-                      this.class.reflections.values.every(:name)
-                    elsif associations == 'belongs_to'
-                      this.class.reflections.values.oselect{macro == :belongs_to}.every(:name)
-                    else
-                      comma_split(associations)
-                    end
-     associations -= comma_split(skip).omap{to_sym} if skip
-     html_options = add_classes(html_options, "object_table", ("new_record" if this.new_record?))
-     editor_tag ||= "edit"
-     # force load
-     Hobo.models
-  %>
-  <table merge_attrs="&html_options">
-    <if q="&'type'.in?(fields)">
-      <tr>
-        <td class="field_label"><label>Type:</label></td>
-        <td><sti_type_field/></td>
-      </tr>        
-    </if>
+<def tag="FieldList" attrs="tag">
+  <ll merge_attrs="&attributes - attrs_for :with_field">
+    <with_fields merge_attrs="&attributes & attrs_for :with_field">
+      <lli>
+        <item_label param="#{this_field.sub('?', '')}_label"><%= this_field %></item_label>
+        <item_value param="#{this_field.sub('?', '')}_label"><call_tag tag="&tag" param=""/></item_value>
+      </lli>
+    </with_fields>
+  </ll>
+</def>
 
 
-    <% for field in (fields - ['type']) %>
-      <% base_name = field.ends_with?("?") ? field[0..-2] : field %>
-      <tr>
-        <td class="field_label"
-            param="&base_name + '_label'"><label><%= no_break(field.titleize) %>:</label></td>
-        <td><with field="&field">
-            <call_tag name="&editor_tag" param="&base_name + '_editor'"/>
-        </with></td>
-      </tr>
-    <% end %>
+<def tag="UL">
+  <ul merge_attrs unless="&this.empty?">
+    <repeat>
+      <li param if="can_view?" class="#{scope.even_odd} #{this_type.name.underscore}" hobo_model_id="#{dom_id this}">
+        <tagbody></view></tagbody>
+      </li>
+    </repeat>
+  </ul>
+</def>
 
-    <% for field in associations.select{|f| can_view?(this, f)} %>
-      <tr>
-        <td class="field_label"
-            param="&field.to_s + '_label'"><label><%= no_break(field.to_s.titleize) %>:</label></td>
-        <td><call_tag name="&editor_tag" field="&field" param="&field.to_s + '_editor'"/></td>
-      </tr>
-    <% end %>
 
+<def tag="Table">
+  <table merge_attrs unless="&this.empty?">
+    <thead if="&all_parameters[:thead]" param/>
+    <tbody>
+      <repeat>
+        <tr param if="can_view?"
+            class="#{scope.even_odd} #{this_type.name.underscore}"
+            hobo_model_id="#{dom_id(this)}">
+        </tr>
+      </repeat>      
+    </tbody>
+    <tfoot if="&all_parameters[:tfoot]" param/>
   </table>
 </def>
 
+
+<def tag="image" attrs="src">
+  <img src="#{urlb}/images/#{src}" merge_attrs/>
+</def>
+
+
+<def tag="spinner">
+  <image src="#{urlb}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
+</def>
+
+
+<def tag="theme_image" attrs="src">
+  <img src="#{theme_asset('images/' + src)}" merge_attrs/>
+</def>
+
+
+<def tag="card">
+  <%= poly = call_polymorphic_tag('card', attributes) %>
+  <div class="card" unless="&poly"><human_type/>: <a/></div>
+</def>
+  
+
+<def tag="hobo_rapid_javascripts" attrs="tiny_mce"><%=
+    res = javascript_include_tag("hobo_rapid")
+    res += '<script type="text/javascript">'
+    unless Hobo.all_controllers.empty?
+      res += "var controllerNames = {" +
+        Hobo.all_controllers.map {|c| "#{c.singularize}: '#{c}'"}.join(', ') +
+        "}; "
+    end
+    res += "urlBase = '#{urlb}'; hoboPartPage = '#{view_name}'</script>"
+    
+    if tiny_mce
+      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
+               <script type="text/javascript">
+                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
+                       plugins: 'save',
+                       theme_advanced_buttons1 : "bold, italic, separator, " +
+                                                 "bullist, outdent, indent, separator, " +
+                                                 "undo, redo, separator, link, unlink",
+                       theme_advanced_buttons2 : "",
+                       theme_advanced_buttons3 : ""
+                 });
+               </script>}
+    end
+    res
+%></def>
+
+
+<def tag="name"><%= 
+  if this.nil?
+    "(not available)"
+  else
+    name_tag = find_polymorphic_tag("name")
+    if name_tag != "name"
+      send(name_tag)
+    elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
+      count
+    elsif this.is_a? Class and this < ActiveRecord::Base
+      this.name.pluralize.titleize
+    else
+      this.to_s
+    end
+  end
+%></def>
+
+
+<def tag="a" attrs="view, to, params"><%=
+  content = tagbody.call if tagbody 
+   
+  if attributes[:href] || attributes[:name]
+    # Regular link - skip all this stuff
+  else
+    target = to || this
+  
+    return "(Not Available)" if target.nil? 
+    
+    if target.respond_to?(:new_object?) && target.new_object?
+      return "" if begin
+                     target.set_creator(current_user) if target.respond_to?(:current_user)
+                     !can_create?(target)
+                   end
+
+      attributes[:href] = object_url(f, "new")
+      add_classes!(attributes, "new_#{new.class.name.underscore}_link")
+      content ||= "New #{target.name.titleize}"
+    else
+      return "" if to ? can_view?(to) : can_view_this?
+
+      add_classes!(attributes, "#{target.class.name.underscore}_link")
+      attributes.update(:href => object_url(target, view, params),
+                        :hobo_model_id = this_field_dom_id)
+      content ||= name
+    end
+  end
+  content_tag :a, content, attributes
+%></def>
+
+        
+<def tag="view" attrs="no_wrapper"><%=
+  raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+    can_view_this?
+   
+   if this == nil
+     this_type <= String ? "" : "(Not Available)"
+   elsif this_type.respond_to?(:macro)
+     if this_type.macro == :belongs_to
+       belongs_to_view(attributes)
+     elsif this_type.macro == :has_many
+       has_many_view(attributes)
+     end
+   else
+     attrs = if !no_wrapper && this_parent.respond_to?(:typed_id)
+               attributes.merge(:hobo_model_id => this_field_dom_id)
+             else
+               attributes
+             end
+     call_polymorphic_tag("view", attrs) or 
+       raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+   end
+%></def>
+
+    
+<def tag="belongs_to_view"><a/></def>
+    
+    
+<def tag="has_many_view"><%= 
+  if this.empty?
+    "(none)"
+  else
+    map_this { a }.join(", ")
+  end
+%></def>
+
+
+<def tag="view" for="Date">
+  <span merge_attrs><%=
+   if respond_to?(:show_date)
+     show_date
+   else
+     this.to_s(:long)
+   end %>
+   </span>
+</def>
+
+
+<def tag="view" for="Time">
+  <span merge_attrs><%=
+   if respond_to?(:show_datetime)
+     show_datetime
+   else
+     this.to_s(:long)
+   end %>
+   </span>
+</def>
+                       
+
+<def tag="view" for="Numeric">
+  <span merge_attrs><%= format ? format % this : this.to_s %></span>
+</def>
+
+
+<def tag="view" for="Hobo::Text">
+  <div merge_attrs><%= h(this).gsub("\n", "<br/>") %></div>
+</def>
+
+
+<def tag="view" for="Hobo::HtmlString">
+  <div merge_attrs><%= this %></div>
+</def>
+
+
+<def tag="view" for="Hobo::MarkdownString">
+  <div merge_attrs><%= markdown(this) %></div>
+</def>
+
+
+<def tag="view" for="Hobo::TextileString">
+  <div merge_attrs><%= textilize(this) %></div>
+</def>
+
+
+<def tag="view" for="Hobo::PasswordString">
+  <span merge_attrs>[password withheld]</span>
+</def>
+
+                       
+<def tag="view" for="String">
+  <span merge_attrs><%= h(this).gsub("\n", "<br/>") %></span>
+</def>
+
+<def tag="view" for="TrueClass"><span merge_attrs>Yes</span></def>
+<def tag="view" for="FalseClass"><span merge_attrs>No</span></def>
+
+
+<def tag="human_type" attrs="style"><%= 
+      if can_view_this?
+        res = if this.respond_to? :proxy_reflection
+                this.proxy_reflection.klass.name.pluralize
+              elsif this.is_a? Class
+                this.name
+              else
+                this.class.name
+              end
+        res.underscore.humanize.send(style || :titleize)
+      end
+%></def>
+
+
+<def tag="count" attrs="label, prefix, unless_none"><%=
+  raise Exception.new("asked for count of a string") if this.is_a?(String)
+   
+  if this.is_a?(Class) and this < ActiveRecord::Base
+    c = this.count
+    label ||= this.name.titleize
+  else
+    label ||= this.respond_to?(:proxy_reflection) && this.proxy_reflection.name.to_s.singularize.titleize
+    c = if this.is_a?(Fixnum)
+          this
+        elsif this.respond_to?(:count)
+          this.count
+        else
+          this.length
+        end
+  end
+   
+  Dryml.last_if = c > 0 if unless_none
+  if unless_none && c == 0
+    ""
+  else
+    main = label.blank? ? c : pluralize(c, l)
+   
+    if prefix.in? %w(are is)
+      p = c == 1 ? "is" : "are"
+      p + ' ' + main
+    else
+      main
+    end
+  end
+%></def>
+
+
+<def tag="theme_stylesheet">
+  <link href="<%= urlb %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
+        media="screen" rel="Stylesheet" type="text/css" />
+</def>
+
+
+<def tag="clearer"><div class='clearer'>&nbsp;</div></def>
+
+
+<!-- The Tags defined below here are a bit rough and will be improved
+in the future - use at your own risk. -->
 
 <def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
   <table_for headings="&headings" merge_attrs="&true">
@@ -85,60 +314,6 @@
   <div>
     <CreateButton update="&id || part_id"/>
   </div>
-</def>
-
-
-<def tag="ul_for">
-  <if q="&!this.empty?">
-    <ul merge_attrs="&true">
-      <% even_odd = "odd" %>
-      <repeat>
-        <if_can_view>
-          <li class="#{even_odd} #{this_type.name.underscore}" hobo_model_id="#{dom_id this}">
-            <%= tagbody.nil? ? object_link : tagbody.call %>
-          </li>
-        </if_can_view>
-        <% even_odd = even_odd == "even" ? "odd" : "even" %>
-      </repeat>
-    </ul>
-  </if>
-</def>
-
-<def tag="Table" attrs="row_class">
-  <table merge_attrs if="&!this.empty?">
-    <thead if="&all_parameters[:thead]"><tr param="thead"></tr></thead>
-    <tbody>
-      <% even_odd = "odd" %>
-      <repeat>
-        <if_can_view>
-          <tr class="#{even_odd} #{row_class} #{this_type.name.underscore}"
-              hobo_model_id="#{dom_id(this)}" param="row">
-          </tr>
-        </if_can_view>
-        <% even_odd = even_odd == "even" ? "odd" : "even" %>
-      </repeat>      
-    </tbody>
-    <tfoot if="&all_parameters[:tfoot]"><tr param="tfoot"></tr></tfoot>
-  </table>
-</def>
-
-<def tag="table_for" attrs="headings, row_class, footer">
-  <if q="&!this.empty?">
-    <table merge_attrs="&true">
-      <if q="&headings"><tr><%= headings %></tr></if>
-      <% even_odd = "odd" %>
-      <repeat>
-        <if_can_view>
-          <tr class="#{even_odd} #{row_class} #{this_type.name.underscore}"
-              hobo_model_id="#{dom_id(this)}">
-            <%= tagbody && tagbody.call %>
-          </tr>
-        <% even_odd = even_odd == "even" ? "odd" : "even" %>
-        </if_can_view>
-      </repeat>
-      <%= footer %>
-    </table>
-  </if>
 </def>
 
 
@@ -166,148 +341,3 @@
 </def>
 
 
-<def tag="spinner">
-  <img src="#{urlb}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
-</def>
-
-
-<def tag="image" attrs="src">
-  <img src="#{urlb}/images/#{src}" merge_attrs/>
-</def>
-
-
-<def tag="theme_img" attrs="src">
-  <img src="#{theme_asset('images/' + src)}" merge_attrs/>
-</def>
-
-
-<def tag="search_result">
-  <div class='search_result'>
-    <human_type/>: <object_link/>
-  </div>
-</def>
-
-
-<def tag="object_card">
-  <div class="object_card">
-    <object_link/>
-  </div>
-</def>
-
-
-<def tag="section_if">
-  <% body = tagbody.call %>
-  <%= body.blank? ? "" : section{body} %>
-</def>
-
-
-
-<def tag="edit" attrs="in_place"><%=
-  if can_view_this?
-    if not can_edit_this?
-      show
-    elsif this_parent.new_record? or in_place == false
-      form_field(attributes)
-    else
-      editor(attributes)
-    end
-  end %>
-</def>
-
-
-<def tag="string_editor">
-  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
-</def>
-
-<def tag="textarea_editor">
-  <%= in_place_editor "in_place_textarea_bhv", :div, attributes %>
-</def>
-  
-<def tag="html_editor">
-  <%= in_place_editor "in_place_html_textarea_bhv", :div, attributes %>
-</def>
-
-<def tag="belongs_to_editor">
-  <%= belongs_to_menu_editor(attributes) %>
-</def>
-
-<def tag="datetime_editor">
-  <%= string_editor(attributes) %>
-</def>
-
-<def tag="date_editor">
-  <%= string_editor(attributes) %>
-</def>
-
-<def tag="integer_editor">
-  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
-</def>
-
-<def tag="float_editor">
-  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
-</def>
-
-<def tag="password_string_editor">
-  <%= raise HoboError, "passwords cannot be edited in place" %>
-</def>
-
-<def tag="boolean_editor">
-  <%= boolean_checkbox_editor(attributes) %>
-</def>
-
-<def tag="UpdateButton" attrs="label,message,update,attrs,params"><%=
-  raise HoboError.new("no update specified") unless update
-  message2 = message || label
-  func = ajax_updater(object_url(this), message2, update,
-                      :params => { this.class.name.underscore => attrs }.merge(params || {}),
-                      :method => :put)
-  tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                          "button_input update_button update_#{this.class.name.underscore}_button") %>
-</def>
-
-<def tag="DeleteButton" attrs="label,message,update,ajax,image,confirm,fade">
-  <if_can_delete><%=
-    opts = attributes.merge(if image
-                           { :type => "image", :src => "#{urlb}/images/#{image}" }
-                         else
-                           { :type => "button" }
-                         end)
-    label2 = label || "Remove"
-    confirm2 = confirm || "Are you sure?"
-    
-    add_classes!(opts,
-                 image ? "image_button_input" : "button_input",
-                 "delete_button delete_#{this.class.name.underscore}_button")
-    url = object_url(this, "destroy")
-    if ajax == false
-      opts[:confirm] = confirm2
-      button_to(label2, url, opts)
-    else
-      fade2 = fade.nil? ? true : fade
-      opts[:value] = label2
-      opts[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
-      tag(:input, opts)
-    end
-  %></if_can_delete>
-</def>
-
-<def tag="CreateButton" attrs="model,update,label,message"><%
-  raise HoboError.new("no update specified") unless update
-  params = all_parameters[:new_object_fields].call || {}
-  if model
-    new = (model.is_a?(String) ? model.constantize : model).new(params)
-  else
-    raise HoboError.new("invalid context for <CreateButton>") unless Hobo.simple_has_many_association?(this)
-    params[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
-    new = this.new(params)
-  end %>
-  <if q="&can_create?(new)"><%=
-    label2 = label || "New #{new.class.name.titleize}"
-    message2 = message || label2
-    class_name = new.class.name.underscore
-    func = ajax_updater(object_url(new.class), message2, update,
-                        ({:params => { class_name => params }} unless params.empty?))
-    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label2),
-                            "button_input create_button create_#{class_name}_button")
-  %></if>
-</def>

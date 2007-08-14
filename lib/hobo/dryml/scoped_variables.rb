@@ -19,8 +19,9 @@ module Hobo::Dryml
     
     def new_scope
       @scopes << {}
-      yield
+      res = yield
       @scopes.pop
+      res
     end
     
     def method_missing(name)

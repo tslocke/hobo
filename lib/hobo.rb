@@ -5,10 +5,11 @@ module Hobo
   class RawJs < String; end
 
   @models = []
-
+  @field_types = HashWithIndifferentAccess.new
+  
   class << self
 
-    attr_accessor :current_theme
+    attr_accessor :current_theme, :field_types
     attr_writer :developer_features
 
     def developer_features?
@@ -19,8 +20,8 @@ module Hobo
     def raw_js(s)
       RawJs.new(s)
     end
-
-
+    
+    
     def user_model=(model)
       @user_model = model && model.name
     end

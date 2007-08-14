@@ -1,6 +1,73 @@
+<def tag="editor"><%= 
+  raise HoboError.new("Not allowed to edit") unless can_edit_this?
 
-<def tag="submit" attrs="label">
-  <input type="submit" value="#{label}" merge_attrs class="button_input submit_button"/>
+  if this_type.respond_to?(:macro)
+    if this_type.macro == :belongs_to
+      belongs_to_editor(options)
+    else
+      has_many_editor(options)
+    end
+  else
+    call_polymorphic_tag("editor", attributes) or
+        raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
+                            "(#{this.inspect}:#{this_type})")
+  end
+%></def>
+  
+
+<def tag="has_many_editor">
+  <% #TODO: Implement %>
+  <a merge_attrs/>
+</def>
+  
+<def tag="editor" for="string">
+  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
+</def>
+
+<def tag="editor" for="text">
+  <%= in_place_editor "in_place_textarea_bhv", :div, attributes %>
+</def>
+  
+<def tag="editor" for="html">
+  <%= in_place_editor "in_place_html_textarea_bhv", :div, attributes %>
+</def>
+
+<def tag="editor" for="datetime">
+  <%= string_editor(attributes) %>
+</def>
+
+<def tag="editor" for="date">
+  <%= string_editor(attributes) %>
+</def>
+
+<def tag="editor" for="integer">
+  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
+</def>
+
+<def tag="editor" for="float">
+  <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
+</def>
+
+<def tag="editor" for="password">
+  <%= raise HoboError, "passwords cannot be edited in place" %>
+</def>
+
+<def tag="editor" for="boolean">
+  <%= boolean_checkbox_editor(attributes) %>
+</def>
+
+<def tag="belongs_to_editor">
+  <%= belongs_to_menu_editor(attributes) %>
+</def>
+
+<!-------------------->
+
+
+<def tag="submit" attrs="label, image">
+  <input if="image" type="image" src="&image" merge_attrs class="image_input submit_button"/>
+  <else>
+    <input type="submit" value="#{label}" merge_attrs class="button_input submit_button"/>
+  </else>
 </def>
 
 

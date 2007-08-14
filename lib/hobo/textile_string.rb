@@ -1,5 +1,7 @@
 class Hobo::TextileString < String
 
+  COLUMN_TYPE = :text
+
   def to_html
     if blank?
       ""
