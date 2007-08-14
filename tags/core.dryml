@@ -40,7 +40,7 @@
 
 
 <def tag="if" attrs="test"><%= 
-  res = test.blank? ? tagbody.call : ""
+  res = (cond = test.blank?) ? tagbody.call : ""
   Hobo::Dryml.last_if = cond
   res
 %></def>
