@@ -10,13 +10,13 @@ module Hobo
       end
     end
     
-    def self.included_in_class(base)
-      base.extend(ClassMethods)
-      base.class_eval do
+    def self.included_in_class(klass)
+      klass.extend(ClassMethods)
+      klass.class_eval do
         alias_method_chain :redirect_to, :object_url
         @included_taglibs = []
       end
-      base.helper Hobo::HoboHelper
+      Hobo::HoboHelper.add_to_controller(klass)
     end
 
     module ClassMethods
