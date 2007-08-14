@@ -133,11 +133,6 @@ module Hobo::Dryml
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
         import_taglib("taglibs/themes/#{name}/application")
-        mapping_module = "#{name}_mapping"
-        if File.exists?(path = RAILS_ROOT + "/app/views/taglibs/themes/#{mapping_module}.rb")
-          load(path)
-          Hobo::MappingTags.apply_mappings(@environment)
-        end
       end
     end
   end
