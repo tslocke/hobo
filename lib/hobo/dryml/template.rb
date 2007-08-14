@@ -89,7 +89,11 @@ module Hobo::Dryml
       end
 
       @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
-      @doc = REXML::Document.new(RexSource.new(@xmlsrc), :dryml_mode => true)
+      begin
+        @doc = REXML::Document.new(RexSource.new(@xmlsrc), :dryml_mode => true)
+      rescue REXML::ParseException => e
+        raise DrymlSyntaxError, "File: #{@template_path}\n#{e}"
+      end
       @doc.default_attribute_value = "&true"
       
       restore_erb_scriptlets(children_to_erb(@doc.root))

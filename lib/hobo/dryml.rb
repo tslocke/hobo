@@ -1,4 +1,6 @@
 module Hobo::Dryml
+  
+  class DrymlSyntaxError < RuntimeError; end
 
   class DrymlException < Exception
     def initialize(message, path=nil, line_num=nil)

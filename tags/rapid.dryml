@@ -9,8 +9,8 @@
 
 <def tag="FieldList" attrs="tag">
   <% tag ||= (this.respond_to?(:new_record?) && this.new_record?) ? "input" : "editor" %>
-  <ll merge_attrs="&attributes - attrs_for :with_field">
-    <with_fields merge_attrs="&attributes & attrs_for :with_field">
+  <ll merge_attrs="&attributes - attrs_for(:with_field)">
+    <with_fields merge_attrs="&attributes & attrs_for(:with_field)">
       <lli>
         <item_label param="#{this_field.sub('?', '')}_label"><%= this_field %></item_label>
         <item_value param="#{this_field.sub('?', '')}_label"><call_tag tag="&tag" /></item_value>

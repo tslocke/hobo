@@ -17,8 +17,8 @@
 <def tag="nav_item">
   <set body="&tagbody.call"/>
   <li class="#{'current' if scope.current_navigation.downcase == body.downcase.strip}"
-      merge_attrs="&attributes - attrs_for :a">
-    <a merge_attrs="&attributes & attrs_for :a"><%= body %></a>
+      merge_attrs="&attributes - attrs_for(:a)">
+    <a merge_attrs="&attributes & attrs_for(:a)"><%= body %></a>
   </li>
 </def>
 

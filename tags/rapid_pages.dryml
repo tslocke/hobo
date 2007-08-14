@@ -1,5 +1,5 @@
 <def tag="Page" attrs="title, doctype">
-  <doctype version="&doctype || 'HTML 4.01 STRICT'">
+  <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
       <title><%= title %></title>
@@ -157,7 +157,7 @@
         <section><page_nav param/></section>
 
         <section>
-          <Table param="table">
+          <Table param="Table">
             <tr>
               <if test="can_view?">
                 <td><a/></td><td><delete_button/></td>
@@ -170,7 +170,7 @@
 
         <if test="&Hobo.simple_has_many_association?(@association)">
           <section param="new_link">
-            <a to="&@associaton.new">
+            <a to="&@associaton.new"/>
           </section>
         </if>
       </panel>
