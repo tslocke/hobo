@@ -1,79 +1,88 @@
-<def tag="Page" attrs="title_prefix, title">
-  <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
+<def tag="Page" attrs="title, doctype">
+  <doctype version="&doctype || 'HTML 4.01 STRICT'">
   <html>
-    <head>
-      <title><%= title_prefix %><%= title || human_type + ": " + display_name(:no_wrapper => true) %></title>
+    <head param>
+      <title><%= title %></title>
       <%= stylesheet_link_tag 'application' %>
       <%= javascript_include_tag :defaults %>
-      <hobo_rapid_javascripts param="rapid_javascripts" tiny_mce="&true"/>
     </head>
-    <body onload="Hobo.applyEvents();" param="body">
-      <div param="header"/>
-      <div param="intro"/>
-      <div param="main"/>
-      <div param="footer"/>
+    <body onload="Hobo.applyEvents();" param>
     </body>
   </html>
 </def>
 
+<def tag="RapidPage">
+  <Page merge>
+    <head param>
+      <default_tagbody/>
+      <hobo_rapid_javascripts param/>
+    </head>
+    <body param>
+      <div class="page_wrapper" param="wrapper">
+        <ajax_progress/>
+        <header id="page_header" param>
+          <div class="logo" param="logo"><image src="logo.png"/></div>
+          <do param="navigation"><magic_nav/></do>
+          <account_nav if="&respond_to? :login_url" param/>
+        </header>
+        <display_flash/>
+        <div id="page_main" param="main"></div>
+        <footer id="page_footer" param/>
+      </div>
+    </body>
+  </Page>
+</def>
 
 <def tag="IndexPage">
   <% model_name = @model.name.titleize %>
-  <Page title="All #{model_name.pluralize}" merge_attrs="&true">
-
-    <intro>
-      <h1><%= model_name.pluralize %></h1>
-    </intro>
-
+  <RapidPage title="All #{model_name.pluralize}" merge>
     <main>
-      <panel param="main_panel">
-        <h2 param="panel_heading"><count label="&model_name"/></h2>
-        <section>
-          <table_for param="table">
-            <td><object_link/></td><td><DeleteButton class='text'/></td>
-          </table_for>
+      <section class="intro">
+        <header>
+          <h><%= model_name.pluralize %></h>
+        </header>
+      </section>
+
+      <panel param="main" class="main">
+        <header param="main_header">
+          <h><count label="&model_name"/></h>
+        </header>
+        <section param="main_section">
+          <Table param>
+            <tr><td><a/></td><td><delete_button/></td></tr>
+          </Table>
         </section>
         
-        <if q="&@pages.length > 1">
-          <section param="page_nav">
-            <div class="page_links">
-              <page_nav/>
-            </div>
-          </section>
-        </if>
+        <section><page_nav param/></section>
 
-        <section_if param="new_link">
-          <p><new_object_link for="&@model"/></p>
-        </section_if>
+        <section param="new_link"><a to="&@model.new"/></section>
+
       </panel>
     </main>
-  </Page>
+  </RapidPage>
 </def>
 
 
 <def tag="NewPage">
-  <Page title="New #{human_type}" merge_attrs="&true">
-    <intro>
-      <h1>New <human_type/></h1>
-    </intro>
-
+  <RapidPage title="New #{human_type}" merge>
     <main>
-      <panel param="main_panel">
-        <h2 param="panel_heading">Details</h2>
-        <section>
-          <div class="error_messages" param="error_messages">
-            <%= error_messages_for 'this' %>
-          </div>
+      <section class="intro">
+        <header>New <human_type/></header>
+      </section>
 
-          <object_form hidden_fields="*">
-            <ObjectTable associations="belongs_to" />
-            <submit label="Create" class="create_button" param="submit_button"/>
-          </object_form>
+      <panel param="main" class="main">
+        <header param="main_header">Details</header>
+        <section>
+          <error_messages param="error_messages"/>
+
+          <form>
+            <FieldList associations="belongs_to" />
+            <submit label="Create" param/>
+          </form>
         </section>
       </panel>
     </main>
-
-  </Page>
+  </RapidPage>
 </def>
 
 
@@ -82,103 +91,134 @@
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <Page merge_attrs="&true">
-
-    <intro>
-      <h1><human_type/><if q="&this.respond_to? :name">: <edit field="name"/></if></h1>
-      <p><DeleteButton ajax="&false"/></p>
-    </intro>
-    
+  <RapidPage merge>    
     <main>
+      <section class="intro">
+        <h><human_type/><if q="&this.respond_to? :name">: <editor:name/></if></h>
+        <p><delete_button in_place="&false"/></p>
+      </section>
+      
       <panel param="main_panel">
-        <h2 param="panel_heading">Details</h2>
+        <header param="main_header">Details</header>
         <section>
-          <ObjectTable associations="*" skip="name"/>
+          <field_list skip="name"/>
         </section>
 
-        <section_if param="new_links">
+        <section param="new_links">
           <repeat with="&has_many_assocs">
-            <p><new_object_link/></p>
+            <p><a to="this.new"/></p>
           </repeat>
-        </section_if>
+        </section>
       </panel>
     </main>
-
-  </Page>
+  </RapidPage>
 </def>
 
 
 <def tag="NewInCollectionPage">
-  <Page title="New #{human_type}" merge_attrs="&true">
-
-    <intro>
-      <h1>New <human_type/></h1>
-      <h2>For: <object_link with="&@owner" /></h2>
-    </intro>
+  <RapidPage title="New #{human_type}" merge>
 
     <main>
-      <panel param="main_panel">
-        <h2 param="panel_heading">Details</h2>
+      <section class="intro">
+        <h1>New <human_type/></h1>
+        <h2>For: <a with="&@owner" /></h2>
+      </section>
+      <panel param="main">
+        <header param="main_header">Details</header>
         <section>
-          <div class="error_messages" param="error_messages">
-            <%= error_messages_for 'this' %>
-          </div>
+          <error_messages param="error_messages"/>
 
-          <object_form hidden_fields="*">
-            <ObjectTable associations="belongs_to"/>
-            <submit label='Add to #{display_name(:with => @owner, :no_wrapper => true)}'
+          <form>
+            <FieldList associations="belongs_to"/>
+            <submit label='Add to #{name(:with => @owner)}'
                     param="submit_button"/>
-          </object_form>
+          </form>
         </section>
-
       </panel>
     </main>
-
-  </Page>
+  </RapidPage>
 </def>
 
 
 <def tag="ShowCollectionPage">
-  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:with => @owner, :no_wrapper => true)}" %>
-  <Page title="&title" merge_attrs="&true">
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
+  <RapidPage title="&title" merge>
 
-    <intro>
-      <h1><%= title %></h1>
-      <h2>Back to <object_link with="&@owner"/></h2>
-    </intro>
 
     <main>
-      <panel param="main_panel">
-        <h2 param="panel_heading"><count with="&@pages.item_count"
-                                                  label="&@reflection.klass.name.titleize"/></h2>
-        <if q="&@pages.length > 1">
-          <section param="page_nav">
-            <div class="page_links">
-              <page_nav/>
-            </div>
-          </section>
-        </if>
+      <section class="intro">
+        <h1><%= title %></h1>
+        <h2>Back to <object_link with="&@owner"/></h2>
+      </section>
+      <panel param="main">
+        <header param="main_header">
+          <count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/>
+        </header>
+        <section><page_nav param/></section>
 
         <section>
-          <table_for param="table">
-            <if_can_view><td><object_link/></td><td><DeleteButton class='text'/></td></if_can_view>
-          </table_for>
+          <Table param="table">
+            <tr>
+              <if test="can_view?">
+                <td><a/></td><td><delete_button/></td>
+              </if>
+            </tr>
+          </Table>
         </section>
 
-        <if q="&@pages.length > 1">
-          <section param="page_nav">
-            <div class="page_links">
-              <page_nav/>
-            </div>
-          </section>
-        </if>
+        <section><page_nav param/></section>
 
-        <if q="&Hobo.simple_has_many_association?(@association)">
+        <if test="&Hobo.simple_has_many_association?(@association)">
           <section param="new_link">
-            <new_object_link for="&@association"/>
+            <a to="&@associaton.new">
           </section>
         </if>
       </panel>
     </main>
-  </Page>
+  </RapidPage>
 </def>
+
+<def tag="doctype" attrs="version"><%=
+  case version.upcase
+    when "HTML 4.01 STRICT"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
+    when "HTML 4.01 TRANSITIONAL"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
+    when "XHTML 1.0 STRICT"
+      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    when "XHTML 1.0 TRANSITIONAL"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    when "XHTML 1.1"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+  end
+%></def>
+
+<def tag="display_flash" attr="type">
+  <% type ||= 'notice' %>
+  <div class="flash" if="&flash[type]"><%= flash[type] %></div>
+</def>
+
+<def tag="ajax_progress">
+  <div id='ajax_progress'>
+    <div>
+      <span id="ajax_progress_text"></span><theme_img src="spinner.gif"/>
+    </div>
+  </div>
+</def>
+
+<def tag="error_messages">
+  <div class="error_messages">
+    <%= error_messages_for 'this' %>
+  </div>
+</def>
+
+<!-- magic nav, just to get you started -->
+<!-- write your own navigation using the <navigation> tag -->
+<def tag="magic_nav">
+  <navigation merge_attrs>
+    <nav_item href="#{base_url}/">Home</nav_item>
+    <nav_item repeat="&Hobo.models[0..2]"><name/></nav_item>
+    <nav_item href="&search_url" if="&respond_to? :search_url">Search</nav_item>
+  </navigation>
+</def>
+
