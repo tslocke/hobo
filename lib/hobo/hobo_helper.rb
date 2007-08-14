@@ -18,7 +18,7 @@ module Hobo::HoboHelper
   end
     
     
-  def urlb
+  def base_url
     request.relative_url_root
   end
 

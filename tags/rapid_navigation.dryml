@@ -2,70 +2,55 @@
      Main nav bar, account nav bar (login, signup...), page nav
   -->
 
+<!--- General Navigation --->
+  
+<def tag="navigation" attrs="current">
+  <nav>
+    <ul merge_attrs>
+      <set_scoped current_navigation="&current">
+        <tagbody/>
+      </set_scoped>
+    </ul>
+  </nav>
+</def>
 
-<def tag="Navigation" attrs="current, item, link_current">
-  <nav_container merge_attrs>
-    <repeat with="&item">
-      <% c = this[:content]; klass = c == current ? "current" : "" %>
-      <if q="&!link_current && c == current">
-        <nav_item class="&klass" param="li"><%= c %></nav_item>
+<def tag="nav_item">
+  <set body="&tagbody.call"/>
+  <li class="#{'current' if scope.current_navigation.downcase == body.downcase.strip}"
+      merge_attrs="&attributes - attrs_for :a">
+    <a merge_attrs="&attributes & attrs_for :a"><%= body %></a>
+  </li>
+</def>
+
+
+<!--- Account Navigation (log in / out / signup) --->
+
+<def tag="account_nav">
+  <nav class="account">
+    <ul>
+      <if test="logged_in?">
+        <li class='nav_item'>Logged in as <view:login with="&current_user"/></li>
+        <li class='nav_item'><a href="&logout_url">Log out</a></li>
       </if>
       <else>
-        <nav_item param="item_el" class="&klass">
-          <a href="&this[:href]" param="link"><%= c %></a>
-        </nav_item>
+        <li class='nav_item'><a href="&login_url">Log in</a></li>
+        <li if="&respond_to? :signup_url" class='nav_item'><a href="&signup_url">Sign up</a></li>
       </else>
-    </repeat>
-  </nav_container>
+    </ul>
+  </nav>
 </def>
 
 
-<def tag="nav_container"><ul merge_attrs><tagbody/></ul></def>
+<!--- Pagination Navigation --->
 
-                                                            
-<def tag="nav_item_OLD"><li merge_attrs><tagbody/></li></def>
-
-<def tag="navigation"><ul merge_attrs><tagbody/></ul></def>
-<def tag="nav_item" attrs="href,before,after"><% 
-  body = tagbody.nil? ? "" : tagbody.call
-  link = href.nil? ? "/" + body.downcase : href %>
-  <% highlight = link == request.request_uri ? ' current' : '' %>
-  <li class="nav-item#{highlight}"><%= before %><a href="#{link}"><%= body %></a><%= after %></li>
-</def>
-
-<def tag="application_account_nav">
-  <if q="&logged_in?">
-    <div class='nav_item'>Logged in as <show with="&current_user" field="login" /></div>
-    <div class='nav_item'><a href="#{logout_url}">Log out</a></div>
-  </if>
-  <else>
-    <div class='nav_item'><a href="#{login_url}">Log in</a></div>
-    <if q="&respond_to? :signup_url"> <div class='nav_item'><a href="#{signup_url}">Sign up</a></div> </if>
-  </else>
-</def>
-
-
-<def tag="previous_page_link" attrs="query_params">
-  <% opts = { :page => @pages.current.previous }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : '&laquo; Previous page', opts) if @pages and @pages.current.previous %>
-</def>
-
-
-<def tag="next_page_link" attrs="query_params">
-  <% opts = { :page => @pages.current.next }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : 'Next page &raquo;', opts) if @pages and @pages.current.next %>
-</def>
-
-
-<def tag="first_page_link" attrs="query_params">
-  <% opts = { :page => @pages.first }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : '&laquo; First page', opts) if @pages and @pages.current != @pages.first %>
-</def>
-
-
-<def tag="last_page_link" attrs="query_params">
-  <% opts = { :page => @pages.last }.merge(query_params || {}) %>
-  <%= link_to(tagbody ? tagbody.call : '&laquo; Last page', opts) if @pages and @pages.current != @pages.last %>
+<def tag="page_nav" attrs="params">
+  <nav if="&@pages.length > 1">
+    <page_n_of_count/> - 
+    <first_page_link params="&params">|&lt;</first_page_link>
+    <previous_page_link params="&params">Previous</previous_page_link>
+    <next_page_link params="&params">Next</next_page_link>
+    <last_page_link params="&params">&gt|</last_page_link>
+  </nav>
 </def>
 
 
@@ -74,28 +59,33 @@
 </def>
 
 
-<def tag="page_nav" attrs="query_params">
-  <if q="&@pages.length > 1">
-    <p>
-      <page_n_of_count/> - 
-      <first_page_link query_params="&query_params">|&lt;</first_page_link>
-      <previous_page_link query_params="&query_params">Previous</previous_page_link>
-      <next_page_link query_params="&query_params">Next</next_page_link>
-      <last_page_link query_params="&query_params">&gt|</last_page_link>
-    </p>
-  </if>
+<def tag="previous_page_link" attrs="params">
+  <a if="&@pages && @pages.current.previous"
+     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+    <tagbody>&laquo; Previous page</tagbody>
+  </a>
 </def>
 
-<def tag="link_to_resource" attrs="type">
-  <%= link_to type, self.send("formatted_#{model.to_s.downcase}_url", this, type.downcase) %>
+
+<def tag="next_page_link" attrs="params">
+  <a if="&@pages && @pages.current.next"
+     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+    <tagbody>Next page &raqou;</tagbody>
+  </a>
 </def>
 
-<def tag="link_to_resources" attrs="types">
-  <ul class="resource_list">
-    <% comma_split(types).each do |t| %>
-    <li class="<%= t.downcase %>_resource">
-      <link_to_resource type="&t" />
-    </li>
-    <% end %>
-  </ul>
+
+<def tag="first_page_link" attrs="params">
+  <a if="&@pages && @pages.current.first"
+     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+    <tagbody>&laquo; First page</tagbody>
+  </a>
+</def>
+
+
+<def tag="last_page_link" attrs="params">
+  <a if="&@pages && @pages.current.last"
+     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+    <tagbody>Last page &raquo;</tagbody>
+  </a>
 </def>

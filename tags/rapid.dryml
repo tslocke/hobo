@@ -112,7 +112,7 @@
 %></def>
 
 
-<def tag="a" attrs="view, to, params"><%=
+<def tag="a" attrs="view, to, params, resource_type"><%=
   content = tagbody.call if tagbody 
    
   if attributes[:href] || attributes[:name]
@@ -123,6 +123,8 @@
     return "(Not Available)" if target.nil? 
     
     if target.respond_to?(:new_object?) && target.new_object?
+      # Link to a new object form
+      
       return "" if begin
                      target.set_creator(current_user) if target.respond_to?(:current_user)
                      !can_create?(target)
@@ -132,11 +134,17 @@
       add_classes!(attributes, "new_#{new.class.name.underscore}_link")
       content ||= "New #{target.name.titleize}"
     else
+      # Link to an existing object
+      
       return "" if to ? can_view?(to) : can_view_this?
 
       add_classes!(attributes, "#{target.class.name.underscore}_link")
-      attributes.update(:href => object_url(target, view, params),
-                        :hobo_model_id = this_field_dom_id)
+      attributes[:href] = if resource_type
+                            send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
+                          else
+                            object_url(target, view, params)
+                          end
+      attributes[:hobo_model_id] = this_field_dom_id
       content ||= name
     end
   end

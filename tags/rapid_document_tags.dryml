@@ -8,8 +8,12 @@
 
 
 <def tag="h">
-  <div class="h" merge_attrs><tagbody/></div>
+  <%= content_tag "h#{scope.heading_level || '1'}", tagbody.call, attributes %>
 </def>
+
+<def tag="nav">
+  <div class="nav" merge_attrs><tagbody/></div>
+</def>  
 
 <% # section represents a generic document or application section. %>
 <def tag="section">
