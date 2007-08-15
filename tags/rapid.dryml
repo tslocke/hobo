@@ -214,7 +214,7 @@
 </def>
                        
 
-<def tag="view" for="Numeric">
+<def tag="view" for="Numeric" attrs="format">
   <span merge_attrs><%= format ? format % this : this.to_s %></span>
 </def>
 
