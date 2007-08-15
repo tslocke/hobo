@@ -593,7 +593,7 @@ module Hobo::Dryml
         "proc {|#{default_tag_name}| new_context { %>#{children_to_erb(el)}<% } }"
       else
         attributes = el.attributes.map do 
-          |name, value| ":#{name} => #{attribute_to_ruby(value)}" unless name.in?(SPECIAL_ATTRIBUTES)
+          |name, value| ":#{name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
         end.compact
       
         if template_call?(el || modifiers.first)
@@ -797,8 +797,11 @@ module Hobo::Dryml
     end
     
 
-    def attribute_to_ruby(attr, options={})
-      dryml_exception('erb scriptlet in attribute of defined tag (use #{ ... } instead)') if
+    def attribute_to_ruby(*args)
+      options = extract_options_from_args!(args)
+      attr, el = args
+      
+      dryml_exception('erb scriptlet not allowed in this attribute (use #{ ... } instead)', el) if
         attr.is_a?(String) && attr.index("[![HOBO-ERB")
 
       if options[:symbolize] && attr =~ /^[a-zA-Z_][^a-zA-Z0-9_]*[\?!]?/

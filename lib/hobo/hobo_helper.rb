@@ -123,8 +123,12 @@ module Hobo
     end
      
      
-    def dom_id(x, attr=nil)
-      Hobo.dom_id(x, attr)
+    def dom_id(*args)
+      if args.length == 0
+        Hobo.dom_id(this)
+      else
+        Hobo.dom_id(*args)
+      end
     end
      
      
