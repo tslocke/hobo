@@ -40,7 +40,7 @@
 
 
 <def tag="if" attrs="test"><%= 
-  res = (cond = test.blank?) ? tagbody.call : ""
+  res = (cond = !test.blank?) ? tagbody.call : ""
   Hobo::Dryml.last_if = cond
   res
 %></def>
@@ -50,8 +50,8 @@
 
 
 <def tag="unless" attrs="test"><%= 
-  res = test.blank? ? "" : tagbody.call
-  Dryml.last_if = !test
+  res = (cond = test.blank?) ? "" : tagbody.call
+  Dryml.last_if = cond
   res
 %></def>
 
