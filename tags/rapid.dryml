@@ -31,7 +31,7 @@
 </def>
 
 
-<def tag="Table">
+<def tag="Table" debug_source>
   <table merge_attrs unless="&this.empty?">
     <thead if="&all_parameters[:thead]" param/>
     <tbody>
@@ -284,7 +284,7 @@
   if unless_none && c == 0
     ""
   else
-    main = label.blank? ? c : pluralize(c, l)
+    main = label.blank? ? c : pluralize(c, label)
    
     if prefix.in? %w(are is)
       p = c == 1 ? "is" : "are"

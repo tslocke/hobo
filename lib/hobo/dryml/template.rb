@@ -667,8 +667,8 @@ module Hobo::Dryml
         children = children_to_erb(el)
         @containing_tag_name = old
         
-        call_statement = "_output(#{call} do |#{el.dryml_name}_default_tagbody| #{newlines}%>#{children}<% end)"        
-        call = "<% " + apply_control_attributes(call_statement, el) + " %>"
+        call_statement = "#{call} do |#{el.dryml_name}_default_tagbody| #{newlines}%>#{children}<% end"
+        call = "<% _output(" + apply_control_attributes(call_statement, el) + ") %>"
         if part_name
           id = el.attributes['id'] || part_name
           "<span id='<%= #{attribute_to_ruby(id)} %>'>" + part_element(el, call) + "</span>"
@@ -741,8 +741,8 @@ module Hobo::Dryml
           body = children_to_erb(el)               
         end
 
-        output_tag = "_output(tag(:#{el.name}, #{attrs}, true) + new_context { %>#{body}</#{el.name}><% })"
-        "<% " + apply_control_attributes(output_tag, el) + "%>"
+        output_tag = "tag(:#{el.name}, #{attrs}, true) + new_context { %>#{body}</#{el.name}><% }"
+        "<% _output(" + apply_control_attributes(output_tag, el) + ") %>"
       end
     end
     

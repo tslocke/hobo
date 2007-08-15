@@ -24,8 +24,9 @@
       scope.new_scope do
         scope[:even_odd] = "odd"
         map_this do
-          tagbody.call
+          res = tagbody.call
           scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
+          res
         end.join(join)
       end
     end

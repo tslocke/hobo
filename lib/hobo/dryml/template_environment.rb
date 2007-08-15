@@ -182,11 +182,13 @@ module Hobo::Dryml
     
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= this_type
+      return name if call_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
       call_type = TrueClass if call_type == FalseClass
+
       while true
         if call_type == ActiveRecord::Base || call_type == Object
           return name
-        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.underscore.gsub('/', '__')}")
+        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
           return poly_name
         else
           call_type = call_type.superclass
