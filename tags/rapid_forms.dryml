@@ -45,7 +45,7 @@
   if attributes["type"]
     tag :input, attributes
   else
-    raise HoboError.new("Not allowed to edit") unless can_edit_this?
+    raise HoboError.new("Not allowed to edit") unless can_edit?
     if this_type.respond_to?(:macro)
       if this_type.macro == :belongs_to
         belongs_to_input(attributes)

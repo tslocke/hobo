@@ -137,7 +137,7 @@
     else
       # Link to an existing object
       
-      return "" if to ? can_view?(to) : can_view_this?
+      return "" if to ? can_view?(to) : can_view?
 
       add_classes!(attributes, "#{target.class.name.underscore}_link")
       attributes[:href] = if resource_type
@@ -155,7 +155,7 @@
         
 <def tag="view" attrs="no_wrapper"><%=
   raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
-    can_view_this?
+    can_view?
    
    if this == nil
      this_type <= String ? "" : "(Not Available)"
@@ -250,7 +250,7 @@
 
 
 <def tag="human_type" attrs="style"><%= 
-      if can_view_this?
+      if can_view?
         res = if this.respond_to? :proxy_reflection
                 this.proxy_reflection.klass.name.pluralize
               elsif this.is_a? Class
