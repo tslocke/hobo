@@ -398,23 +398,24 @@ module Hobo::Dryml
       end
     end
 
-    def call_template_parameter(name, options, template_procs, overriding_proc)
-      if overriding_proc
-        overriding_options, overriding_template_procs = overriding_proc.call
+    def call_template_parameter(the_template, attributes, template_procs, overriding_proc)
+      if overriding_proc && overriding_proc.arity == 1
+        # It's a replace parameter
         
-        replace = overriding_options[:_replace]
-        return replace.call if replace
-
-        before  = overriding_options.delete(:_before)
-        after   = overriding_options.delete(:_after)
-        
-        options = options.merge(overriding_options)
-        template_procs = template_procs.merge(overriding_template_procs)
-      end      
+        template_default = proc do |attributes, parameters|
+          call_template_parameter(the_template, attributes, template_procs, proc { [attributes, parameters] })
+        end
+        overriding_proc.call(template_default)
+      else
+        if overriding_proc
+          overriding_attributes, overriding_template_procs = overriding_proc.call
+          
+          attributes = attributes.merge(overriding_attributes)
+          template_procs = template_procs.merge(overriding_template_procs)
+        end   
       
-      (before && before.call).to_s + 
-        send(name, options, template_procs) + 
-        (after && after.call).to_s
+        send(the_template, attributes, template_procs)
+      end
     end
     
     # Takes two procs that each returh hashes and returns a single
@@ -430,19 +431,19 @@ module Hobo::Dryml
     
     # Same as merge_option_procs, except these procs return a pair of
     # hashes rather than a single hash. The first hash is the tag
-    # attributes (options), the second is a hash of procs -- the
-    # template parameters.
+    # attributes, the second is a hash of procs -- the template
+    # parameters.
     def merge_template_parameter_procs(general_proc, overriding_proc)
       proc do
-        general_options, general_template_procs = general_proc.call
-        overriding_options, overriding_template_procs = overriding_proc.call
-        [general_options.merge(overriding_options), general_template_procs.merge(overriding_template_procs)]
+        general_attributes, general_template_procs = general_proc.call
+        overriding_attributes, overriding_template_procs = overriding_proc.call
+        [general_attributes.merge(overriding_attributes), general_template_procs.merge(overriding_template_procs)]
       end
     end
     
     
-    def render_tag(tag_name, options)
-      (send(tag_name, options) + part_contexts_js).strip
+    def render_tag(tag_name, attributes)
+      (send(tag_name, attributes) + part_contexts_js).strip
     end
     
 
