@@ -2,7 +2,7 @@
      Main nav bar, account nav bar (login, signup...), page nav
   -->
 
-<!--- General Navigation --->
+<!--- General Navigation -->
   
 <def tag="navigation" attrs="current">
   <nav>
@@ -23,7 +23,7 @@
 </def>
 
 
-<!--- Account Navigation (log in / out / signup) --->
+<!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account_nav">
   <nav class="account">
@@ -41,7 +41,7 @@
 </def>
 
 
-<!--- Pagination Navigation --->
+<!--- Pagination Navigation -->
 
 <def tag="page_nav" attrs="params">
   <nav if="&@pages.length > 1">
