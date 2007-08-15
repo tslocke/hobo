@@ -63,7 +63,9 @@ module Hobo::Dryml
         @tag_attrs[tag_name] = attrs
       end
       
-      attr_reader :tag_attrs
+      def tag_attrs
+        @tag_attrs ||= {}
+      end
       
     end
 

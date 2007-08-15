@@ -37,9 +37,12 @@ module Hobo::Dryml
 
     def load
       @module = Module.new do
+        @tag_attrs = {}
         def self._register_tag_attrs(tag_name, attrs)
-          @tag_attrs ||= {}
           @tag_attrs[tag_name] = attrs
+        end
+        class << self
+          attr_reader :tag_attrs
         end
       end
       @file.rewind
@@ -68,6 +71,7 @@ module Hobo::Dryml
         end
       else
         class_or_module.send(:include, @module)
+        class_or_module.tag_attrs.update(@module.tag_attrs) if @module.respond_to?(:tag_attrs)
       end
     end
 
