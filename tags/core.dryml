@@ -17,7 +17,7 @@
   if !this.blank? 
     if even_odd
       map_this do
-        klass = [options[:class], cycle("even", "odd")].compact.join(' ')
+        klass = [attribtes[:class], cycle("even", "odd")].compact.join(' ')
         content_tag(even_odd, tagbody.call, options.merge(:class => klass, :hobo_model_id => dom_id(this)))
       end.join(join)
     else

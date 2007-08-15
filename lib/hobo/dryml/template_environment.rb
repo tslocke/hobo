@@ -325,18 +325,18 @@ module Hobo::Dryml
     end
 
 
-    def _tag_locals(options, attrs)
-      options.symbolize_keys!
-      #ensure with and field are not in options
-      options.delete(:with)
-      options.delete(:field)
+    def _tag_locals(attributes, locals)
+      attributes.symbolize_keys!
+      #ensure with and field are not in attributes
+      attributes.delete(:with)
+      attributes.delete(:field)
       
-      # positional arguments never appear in the options hash
-      stripped_options = {}.update(options)
-      attrs.each {|a| stripped_options.delete(a.to_sym) }
+      # positional arguments never appear in the attributes hash
+      stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
+      locals.each {|a| stripped_attributes.delete(a.to_sym) }
       
-      # Return attrs declared as local variables (attrs="...")
-      attrs.map {|a| options[a.to_sym]} + [stripped_options]
+      # Return locals declared as local variables (attrs="...")
+      locals.map {|a| attributes[a.to_sym]} + [stripped_attributes]
     end
     
     

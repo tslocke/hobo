@@ -42,7 +42,7 @@
 
 
 <def tag="input"><%=
-  if attributes["type"]
+  if attributes[:type]
     tag :input, attributes
   elsif !can_edit?
     view
