@@ -7,7 +7,7 @@
 <def tag="item_value"><td merge_attrs><tagbody/></td></def>
 
 
-<def tag="h">
+<def tag="heading">
   <%= content_tag "h#{scope.heading_level || '1'}", tagbody.call, attributes %>
 </def>
 

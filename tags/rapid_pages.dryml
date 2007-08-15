@@ -39,13 +39,13 @@
     <main>
       <section class="intro">
         <header>
-          <h><%= model_name.pluralize %></h>
+          <heading><%= model_name.pluralize %></heading>
         </header>
       </section>
 
       <panel param="main" class="main">
         <header param="main_header">
-          <h><count label="&model_name"/></h>
+          <heading><count label="&model_name"/></heading>
         </header>
         <section param="main_section">
           <Table param>
@@ -67,7 +67,9 @@
   <RapidPage title="New #{human_type}" merge>
     <main>
       <section class="intro">
-        <header>New <human_type/></header>
+        <header>
+          <heading>New <human_type/></heading>
+        </header>
       </section>
 
       <panel param="main" class="main">
@@ -94,7 +96,7 @@
   <RapidPage merge>    
     <main>
       <section class="intro">
-        <h><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></h>
+        <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
         <p><delete_button in_place="&false"/></p>
       </section>
       
