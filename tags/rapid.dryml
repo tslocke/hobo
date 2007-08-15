@@ -113,10 +113,10 @@
 %></def>
 
 
-<def tag="a" attrs="view, to, params, resource_type"><%=
-  content = tagbody.call if tagbody 
-   
-  if attributes[:href] || attributes[:name]
+<def tag="a" attrs="view, to, params, resource_type, href"><%=
+  content = tagbody.call if tagbody
+  
+  if href || attributes[:name]
     # Regular link - skip all this stuff
   else
     target = to || this
@@ -126,30 +126,30 @@
     if target.respond_to?(:new_object?) && target.new_object?
       # Link to a new object form
       
-      return "" if begin
-                     target.set_creator(current_user) if target.respond_to?(:current_user)
-                     !can_create?(target)
-                   end
+      return "" unless begin
+                         target.set_creator(current_user) if target.respond_to?(:current_user)
+                         can_create?(target)
+                       end
 
-      attributes[:href] = object_url(f, "new")
+      href = object_url(f, "new")
       add_classes!(attributes, "new_#{new.class.name.underscore}_link")
       content ||= "New #{target.name.titleize}"
     else
       # Link to an existing object
       
-      return "" if to ? can_view?(to) : can_view?
+      return "" unless to ? can_view?(to) : can_view?
 
       add_classes!(attributes, "#{target.class.name.underscore}_link")
-      attributes[:href] = if resource_type
-                            send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
-                          else
-                            object_url(target, view, params)
-                          end
+      href = if resource_type
+               send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
+             else
+               object_url(target, view, params)
+             end
       attributes[:hobo_model_id] = this_field_dom_id
       content ||= name
     end
   end
-  content_tag :a, content, attributes
+  content_tag :a, content, attributes.update(:href => href)
 %></def>
 
         
