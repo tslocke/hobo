@@ -186,7 +186,7 @@ module Hobo::Dryml
       while true
         if call_type == ActiveRecord::Base || call_type == Object
           return name
-        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.underscore.gsub('/', ' ')}")
+        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.underscore.gsub('/', ':')}")
           return poly_name
         else
           call_type = call_type.superclass

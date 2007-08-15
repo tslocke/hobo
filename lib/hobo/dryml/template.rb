@@ -259,7 +259,7 @@ module Hobo::Dryml
                       Hobo.field_types[for_type].name
                     else
                       for_type
-                    end.underscore.gsub('/', ' ')
+                    end.underscore.gsub('/', ':')
         suffix = "__for_#{type_name}"
         name        += suffix
         unsafe_name += suffix
