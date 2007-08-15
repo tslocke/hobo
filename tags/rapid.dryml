@@ -9,15 +9,18 @@
 
 <def tag="FieldList" attrs="tag">
   <% tag ||= (this.respond_to?(:new_record?) && this.new_record?) ? "input" : "editor" %>
-  <ll merge_attrs="&attributes - attrs_for(:with_field)">
+  <field_list merge_attrs="&attributes - attrs_for(:with_field)">
     <with_fields merge_attrs="&attributes & attrs_for(:with_field)">
-      <lli>
+      <field_list_item>
         <item_label param="#{this_field.sub('?', '')}_label"><%= this_field %></item_label>
-        <item_value param="#{this_field.sub('?', '')}_label"><call_tag tag="&tag" /></item_value>
-      </lli>
+        <item_value param="#{this_field.sub('?', '')}_view"><call_tag tag="&tag" /></item_value>
+      </field_list_item>
     </with_fields>
-  </ll>
+  </field_list>
 </def>
+
+
+<def tag="item"><% scope.items << tagbody.call %></def>
 
 
 <def tag="UL">
@@ -31,9 +34,9 @@
 </def>
 
 
-<def tag="Table" debug_source>
+<def tag="Table">
   <table merge_attrs unless="&this.empty?">
-    <thead if="&all_parameters[:thead]" param/>
+    <thead if="&parameters[:thead]" param/>
     <tbody>
       <repeat>
         <tr param if="&can_view?"
@@ -42,7 +45,7 @@
         </tr>
       </repeat>      
     </tbody>
-    <tfoot if="&all_parameters[:tfoot]" param/>
+    <tfoot if="&parameters[:tfoot]" param/>
   </table>
 </def>
 
