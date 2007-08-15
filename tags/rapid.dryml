@@ -125,8 +125,8 @@
     target = to || this
   
     return "(Not Available)" if target.nil? 
-    
-    if target.respond_to?(:new_object?) && target.new_object?
+
+    if target.respond_to?(:new_record?) && target.new_record?
       # Link to a new object form
       
       return "" unless begin
@@ -134,8 +134,8 @@
                          can_create?(target)
                        end
 
-      href = object_url(f, "new")
-      add_classes!(attributes, "new_#{new.class.name.underscore}_link")
+      href = object_url(target.class, "new")
+      add_classes!(attributes, "new_#{target.class.name.underscore}_link")
       content ||= "New #{target.name.titleize}"
     else
       # Link to an existing object
