@@ -421,7 +421,11 @@ module Hobo::Dryml
     # proc that calls these in turn and merges the results into a
     # single hash
     def merge_option_procs(general_proc, overriding_proc)
-      proc { general_proc.call.merge(overriding_proc.call) }
+      if overriding_proc
+        proc { general_proc.call.merge(overriding_proc.call) }
+      else
+        general_proc
+      end
     end
     
     # Same as merge_option_procs, except these procs return a pair of
