@@ -24,8 +24,12 @@ module Hobo::Dryml
       res
     end
     
-    def method_missing(name)
-      self[name]
+    def method_missing(name, arg)
+      if name =~ /=$/
+        self[name] = arg
+      else
+        self[name]
+      end
     end
     
   end
