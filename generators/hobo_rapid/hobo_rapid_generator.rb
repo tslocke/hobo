@@ -11,7 +11,6 @@ class HoboRapidGenerator < Hobo::Generator
     
     record do |m|
       m.file "hobo_rapid.js", "public/javascripts/hobo_rapid.js"
-      m.file "themes/default/default_mapping.rb", "app/views/taglibs/default_mapping.rb"
       create_all(m, "themes/default/public", "public/hobothemes/default")
       create_all(m, "themes/default/views", "app/views/taglibs/themes/default")
     end
