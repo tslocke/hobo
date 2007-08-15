@@ -111,8 +111,8 @@
 <def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  message2 = message || method.titleize
-  func = ajax_updater(object_url(this) + "/#{method}", message2, update,
+  message ||= method.titleize
+  func = ajax_updater(object_url(this) + "/#{method}", message, update,
                       ajax_attributes.merge(:params => params, :result_update => result_update))
   html_attributes.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
   tag(:input, add_classes(html_attributes, "button_input remote_method_button #{method}_button"))
@@ -161,7 +161,7 @@
   raise HoboError.new("no update specified") unless update
 
   fields ||= {}
-  klass_or_assoc = if model
+  class_or_assoc = if model
                      model.is_a?(String) ? model.constantize : model
                    elsif Hobo.simple_has_many_association?(this)
                      fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
@@ -169,15 +169,15 @@
                    else
                      raise HoboError.new("invalid context for <create_button>")
                    end
-  new = klass.new(fields)
+  new = class_or_assoc.new(fields)
   new.set_creator(current_user)
   if can_create?(new)
     label ||= "New #{new.class.name.titleize}"
     message ||= label
     class_name = new.class.name.underscore
-    func = ajax_updater(object_url(new.class), message2, update,
+    func = ajax_updater(object_url(new.class), message, update,
                         ({:params => { class_name => fields }} unless fields.empty?))
-    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label2),
+    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
                             "button_input create_button create_#{class_name}_button")
   end
 %></def>
@@ -187,7 +187,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit_this?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
-            [ display_name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x), x.id ]
           }
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
   %>

@@ -15,7 +15,7 @@ class <%= class_name %> < ActiveRecord::Base
   
   set_login_attr :username
   
-  alias_attribute :display_name, :username
+  alias_attribute :to_s, :username
 
   # --- Hobo Permissions --- #
 

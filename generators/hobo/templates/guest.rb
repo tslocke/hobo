@@ -1,6 +1,6 @@
 class Guest
 
-  def display_name
+  def to_s
     "Guest"
   end
 

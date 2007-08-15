@@ -3,9 +3,9 @@
     view
   elsif this_type.respond_to?(:macro)
     if this_type.macro == :belongs_to
-      belongs_to_editor(options)
+      belongs_to_editor(attributes)
     else
-      has_many_editor(options)
+      has_many_editor(attributes)
     end
   else
     call_polymorphic_tag("editor", attributes) or
@@ -20,6 +20,10 @@
   <a merge_attrs/>
 </def>
   
+<def tag="belongs_to_editor">
+  <%= belongs_to_menu_editor(attributes) %>
+</def>
+
 <def tag="editor" for="string">
   <%= in_place_editor "in_place_textfield_bhv", :span, attributes %>
 </def>
@@ -54,10 +58,6 @@
 
 <def tag="editor" for="boolean">
   <%= boolean_checkbox_editor(attributes) %>
-</def>
-
-<def tag="belongs_to_editor">
-  <%= belongs_to_menu_editor(attributes) %>
 </def>
 
 <!-------------------->
@@ -96,7 +96,7 @@
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="&link_id" part="rapid_belongs_to_edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
-            [ display_name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x), x.id ]
           }
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
        link_id = "#{this_field_dom_id}_editor"
@@ -155,9 +155,9 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.value')
                     } })
-  html_options = add_classes(attributes, editor_class)
+  html_attributes = add_classes(attributes, editor_class)
 %>
-  <select onchange="#{f}" merge_attrs="&html_options">
+  <select onchange="#{f}" merge_attrs="&html_attributes">
     <%= options_for_select(values, this) %>
   </select>  
 </def>

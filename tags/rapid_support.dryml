@@ -17,7 +17,7 @@
                 end
 
   field_names -= comma_split(skip) if skip
-  field_names.select! {|f| can_view?(this, f)}
+  field_names = field_names.select {|f| can_view?(this, f)}
   field_names.each do |field| %><with field="&field"><tagbody/></with><% end
 %></def>
 
