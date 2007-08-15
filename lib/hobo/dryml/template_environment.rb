@@ -342,7 +342,7 @@ module Hobo::Dryml
       res = if tagbody
               tagbody.call(attributes, default_tagbody)
             else
-              new_context { default_tagbody.call }
+              default_tagbody ? new_context { default_tagbody.call } : ""
             end
       Hobo::Dryml.last_if = !!tagbody
       res
