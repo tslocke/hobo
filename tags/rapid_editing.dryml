@@ -1,7 +1,7 @@
 <def tag="editor"><%= 
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
-
-  if this_type.respond_to?(:macro)
+  if !can_edit?
+    view
+  elsif this_type.respond_to?(:macro)
     if this_type.macro == :belongs_to
       belongs_to_editor(options)
     else
@@ -91,22 +91,8 @@
 </def>
 
 
-<def tag="belongs_to_menu_field" attrs="include_none"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
-  #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
-            [ display_name(:with => x, :no_wrapper => true), x.id ]
-          }
-  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
-  %>
-  <select name="<%= param_name_for_this(true) %>">
-    <%= options_for_select(select_options.sort, this ? this.id : "") %>
-  </select>
-</def>
-
-
 <def tag="belongs_to_menu_editor"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  raise HoboError.new("Not allowed to edit") unless can_edit?
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="&link_id" part="rapid_belongs_to_edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
@@ -129,24 +115,9 @@
 </def>
 
 
-<def tag="belongs_to_autocompleting_field">
-<% refl = this_type
-   completer_model ||= refl.klass
-   completer_attr ||= refl.klass.id_name_column
-   id ||= this_field_dom_id + "_completer"
-   where_options = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
-   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_options))
-  %>
-
-  <input type="text" id="#{id}" class="autocomplete_bhv" autocomplete_url="#{url}"
-         name="#{param_name_for_this}" merge_attrs/>
-  <div id="#{id}_completions" class="completions_popup" style="display:none"></div>
-</def>
-
-
 <def tag="belongs_to_autocompleting_editor" attrs="update">
   <if_can_edit><%
-  return object_link unless can_edit_this?
+  return object_link unless can_edit?
 
   id ||= this_field_dom_id + "_completer"
   f = ajax_updater(object_url(this_parent),
@@ -175,7 +146,7 @@
 
 
 <def tag="string_select_editor" attrs="update, values"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  raise HoboError.new("Not allowed to edit") unless can_edit?
 
   values = comma_split(values)
   f = ajax_updater(object_url(this_parent),
@@ -193,7 +164,7 @@
 
 
 <def tag="boolean_checkbox_editor" attrs="update"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  raise HoboError.new("Not allowed to edit") unless can_edit?
   f = ajax_updater(object_url(this_parent),
                    "Change #{this_field.to_s.titleize}", update,
                    :method => "put",
@@ -207,13 +178,6 @@
 </def>
 
 
-<def tag="sti_type_field">
-  <select name="<%= param_name_for(form_this, form_field_path + ['type']) %>">
-    <%= options_for_select(this.class.send(:subclasses).omap{[name.titleize, name]}, this.class.name) %>
-  </select>
-</def>
-
-      
 <def tag="sti_type_editor" attrs="update">
   <% base_class = this.class
      base_class = base_class.superclass while base_class.superclass != ActiveRecord::Base
@@ -246,8 +210,3 @@
 </def>
 
 
-<def tag="select_field">
-  <select name="#{param_name_for_this}">
-    <tagbody/>
-  </select>
-</def>

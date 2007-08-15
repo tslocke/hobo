@@ -170,10 +170,10 @@ module Hobo::Dryml
       res
     end
     
-    def call_polymorphic_tag(name, attributes, &b)
+    def call_polymorphic_tag(name, attributes={}, &b)
       tag = find_polymorphic_tag(name)
       if tag != name
-        send(name, attributes, &b)
+        send(tag, attributes, &b)
       else
         nil
       end
@@ -182,7 +182,7 @@ module Hobo::Dryml
     
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= this_type
-      call_type = TrueClass if call_type = FalseClass
+      call_type = TrueClass if call_type == FalseClass
       while true
         if call_type == ActiveRecord::Base || call_type == Object
           return name

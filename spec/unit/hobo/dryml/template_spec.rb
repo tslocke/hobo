@@ -422,6 +422,17 @@ describe Template do
   end
   
   
+  # --- Polymorphic Tags --- #
+  
+  it "should allow tags to be selected based on types" do
+    tags = %(<def tag="do"><tagbody/></def>
+             <def tag="t" for="String">A string</def>
+             <def tag="t" for="TrueClass">A boolean</def>)
+
+    eval_dryml(tags + '<do with="&\'foo\'"><%= call_polymorphic_tag(:t) %></do>').should == "A string"
+    eval_dryml(tags + '<do with="&false"><%= call_polymorphic_tag(:t) %></do>').should == "A boolean"
+  end
+  
   # --- The Context --- #
   
   def context_eval(context, src)
@@ -518,6 +529,10 @@ describe Template do
   it "should alow tags to be repeated with the 'repeat' attribute" do 
     eval_dryml('<img repeat="&[1,2,3]" src="#{this}" />').should == 
       '<img src="1" /><img src="2" /><img src="3" />'
+  end
+  
+  it "should allow <else> to be used with the if attribute" do
+    eval_dryml("<p if='&false'/><%= Hobo::Dryml.last_if %>").should == "false"
   end
 
   

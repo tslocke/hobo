@@ -154,7 +154,7 @@
 
         
 <def tag="view" attrs="no_wrapper"><%=
-  raise HoboError, "show of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+  raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
    if this == nil
@@ -172,7 +172,7 @@
                attributes
              end
      call_polymorphic_tag("view", attrs) or 
-       raise HoboError, "Cannot show: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+       raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
    end
 %></def>
 

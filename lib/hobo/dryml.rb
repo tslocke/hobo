@@ -62,7 +62,7 @@ module Hobo::Dryml
 
       if page == EMPTY_PAGE
         @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names,
-                                                        [ApplicationHelper], included_taglibs) if
+                                                        [Hobo::HoboHelper, ApplicationHelper], included_taglibs) if
           @tag_page_renderer_class.nil?
         @tag_page_renderer_class.new(page, view)
       else
@@ -102,7 +102,7 @@ module Hobo::Dryml
 
     
     def default_imports_for_view(view)
-      imports = [ApplicationHelper]
+      imports = [Hobo::HoboHelper, ApplicationHelper]
       controller_helper = view.controller.class.name.sub(/Controller$/, "Helper")
       imports << controller_helper.constantize if Object.const_defined? controller_helper
       imports

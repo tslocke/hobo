@@ -254,7 +254,15 @@ module Hobo::Dryml
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       if (for_type = el.attributes['for'])
-        name << "__for_#{for_type.gsub(':', '_')}"
+        type_name = if for_type =~ /^[a-z]/
+                      # It's a symbolic type name - look up the Ruby type name
+                      Hobo.field_types[for_type].name
+                    else
+                      for_type
+                    end.underscore.gsub('/', ' ')
+        suffix = "__for_#{type_name}"
+        name        += suffix
+        unsafe_name += suffix
       end
       
       # While processing this def, @def_name contains
@@ -326,7 +334,7 @@ module Hobo::Dryml
       REXML::XPath.match(el, ".//*[@param]").map do |e|
         name = get_param_name(e)
         dryml_exception("invalid param name: #{name.inspect}", e) unless 
-          name =~ DRYML_NAME_RX || name =~ /#\{/
+          is_code_attribute?(name) || name =~ DRYML_NAME_RX || name =~ /#\{/
         name.to_sym unless is_code_attribute?(name)
       end.compact
     end
@@ -776,10 +784,13 @@ module Hobo::Dryml
                     "this.#{val}"
                   end
         
+        x = gensym
         if if_
-          "(#{expression} unless Hobo::Dryml.last_if = (#{control}).blank?).to_s"
+          "(if !(#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
+            "else (Hobo::Dryml.last_if = false; ''); end)"
         elsif unless_
-          "(#{expression} if Hobo::Dryml.last_if = (#{control}).blank?).to_s"
+          "(if (#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
+            "else (Hobo::Dryml.last_if = false; ''); end)"
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end
@@ -856,6 +867,12 @@ module Hobo::Dryml
 
     def logger
       ActionController::Base.logger rescue nil
+    end
+    
+    def gensym(name="__tmp")
+      @gensym_counter ||= 0
+      @gensym_counter += 1
+      "#{name}_#{@gensym_counter}"
     end
 
   end

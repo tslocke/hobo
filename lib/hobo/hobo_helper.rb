@@ -1,7 +1,6 @@
 module Hobo::HoboHelper
   
   def self.add_to_controller(controller)
-    controller.helper(self)
     controller.send(:include, self)
     controller.hide_action(self.instance_methods)
   end
