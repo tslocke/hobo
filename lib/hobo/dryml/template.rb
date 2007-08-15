@@ -709,8 +709,7 @@ module Hobo::Dryml
       part = el.attributes["part"]
       attrs = el.attributes.map do |n, v|
         next if n.in? SPECIAL_ATTRIBUTES
-        
-        val = v.gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
+        val = restore_erb_scriptlets(v).gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %(:#{n} => "#{val}")
       end.compact
       

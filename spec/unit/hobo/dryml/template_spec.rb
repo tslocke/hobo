@@ -529,6 +529,10 @@ describe Template do
   it "should alow tags to be repeated with the 'repeat' attribute" do 
     eval_dryml('<img repeat="&[1,2,3]" src="#{this}" />').should == 
       '<img src="1" /><img src="2" /><img src="3" />'
+    
+    # Make sure <%= %> doesn't break
+    eval_dryml('<img repeat="&[1,2,3]" src="<%= this %>" />').should == 
+      '<img src="1" /><img src="2" /><img src="3" />'
   end
   
   it "should allow <else> to be used with the if attribute" do
