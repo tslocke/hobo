@@ -137,7 +137,11 @@ module Hobo::Dryml
 
     
     def this_field_dom_id
-      Hobo.dom_id(this_parent, this_field)
+      if this_parent && this_field
+        Hobo.dom_id(this_parent, this_field)
+      else
+        Hobo.dom_id(this)
+      end
     end
 
 

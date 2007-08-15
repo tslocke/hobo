@@ -110,7 +110,7 @@
     <select onchange="<%= f %>" id="&link_id">
       <%= options_for_select(select_options.sort, this ? this.id : "") %>
     </select>
-    <if_this><object_link>View</object_link></if_this>
+    <a if="&this">View</a>
   </span>
 </def>
 

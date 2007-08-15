@@ -12,7 +12,7 @@
   <field_list merge_attrs="&attributes - attrs_for(:with_fields)">
     <with_fields merge_attrs="&attributes & attrs_for(:with_fields)">
       <field_list_item>
-        <item_label param="#{this_field.to_s.sub('?', '')}_label"><%= this_field %></item_label>
+        <item_label param="#{this_field.to_s.sub('?', '')}_label"><%= this_field.to_s.titleize %></item_label>
         <item_value param="#{this_field.to_s.sub('?', '')}_view"><call_tag tag="&tag" /></item_value>
       </field_list_item>
     </with_fields>
@@ -148,7 +148,7 @@
              else
                object_url(target, view, params)
              end
-      attributes[:hobo_model_id] = this_field_dom_id
+      attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target)
       content ||= name
     end
   end
@@ -192,65 +192,35 @@
 %></def>
 
 
-<def tag="view" for="Date">
-  <span merge_attrs><%=
-   if respond_to?(:show_date)
-     show_date
-   else
-     this.to_s(:long)
-   end %>
-   </span>
-</def>
+<def tag="view" for="Date"><span merge_attrs><%= this.to_s(:long) %></span></def>
 
 
-<def tag="view" for="Time">
-  <span merge_attrs><%=
+<def tag="view" for="Time"><span merge_attrs><%=
    if respond_to?(:show_datetime)
      show_datetime
    else
      this.to_s(:long)
-   end %>
-   </span>
-</def>
+   end 
+%></span></def>
                        
 
-<def tag="view" for="Numeric" attrs="format">
-  <span merge_attrs><%= format ? format % this : this.to_s %></span>
-</def>
+<def tag="view" for="Numeric" attrs="format"><span merge_attrs><%= format ? format % this : this.to_s %></span></def>
 
+<def tag="view" for="Hobo::Text"><div merge_attrs><%= h(this).gsub("\n", "<br/>") %></div></def>
 
-<def tag="view" for="Hobo::Text">
-  <div merge_attrs><%= h(this).gsub("\n", "<br/>") %></div>
-</def>
+<def tag="view" for="Hobo::HtmlString"><div merge_attrs><%= this %></div></def>
 
+<def tag="view" for="Hobo::MarkdownString"><div merge_attrs><%= markdown(this) %></div></def>
 
-<def tag="view" for="Hobo::HtmlString">
-  <div merge_attrs><%= this %></div>
-</def>
+<def tag="view" for="Hobo::TextileString"><div merge_attrs><%= textilize(this) %></div></def>
 
+<def tag="view" for="Hobo::PasswordString"><span merge_attrs>[password withheld]</span></def>
 
-<def tag="view" for="Hobo::MarkdownString">
-  <div merge_attrs><%= markdown(this) %></div>
-</def>
-
-
-<def tag="view" for="Hobo::TextileString">
-  <div merge_attrs><%= textilize(this) %></div>
-</def>
-
-
-<def tag="view" for="Hobo::PasswordString">
-  <span merge_attrs>[password withheld]</span>
-</def>
-
-                       
-<def tag="view" for="String">
-  <span merge_attrs><%= h(this).gsub("\n", "<br/>") %></span>
-</def>
+<def tag="view" for="String"><span merge_attrs><%= h(this).gsub("\n", "<br/>") %></span></def>
 
 <def tag="view" for="TrueClass"><span merge_attrs>Yes</span></def>
-<def tag="view" for="FalseClass"><span merge_attrs>No</span></def>
 
+<def tag="view" for="FalseClass"><span merge_attrs>No</span></def>
 
 <def tag="human_type" attrs="style"><%= 
       if can_view?
