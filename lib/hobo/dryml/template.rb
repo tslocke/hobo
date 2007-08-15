@@ -511,7 +511,7 @@ module Hobo::Dryml
                to_call = if is_param_default_call
                            # The tag is available in a local variable
                            # holding a proc
-                           el.name
+                           el.dryml_name
                          elsif (call_type = polymorphic_call_type(el))
                            "find_polymorphic_template(:#{name}, #{call_type})"
                          else
@@ -588,7 +588,7 @@ module Hobo::Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
-        default_tag_name = "#{el.name}__default"
+        default_tag_name = "#{el.dryml_name}__default"
 
         "proc {|#{default_tag_name}| new_context { %>#{children_to_erb(el)}<% } }"
       else
@@ -602,11 +602,11 @@ module Hobo::Dryml
         else
           if el && el.has_end_tag?
             old = @containing_tag_name
-            @containing_tag_name = el.name
+            @containing_tag_name = el.dryml_name
             body = children_to_erb(el)
             @containing_tag_name = old
 
-            attributes << ":tagbody => proc {|#{el.name}_default_tagbody| new_context { %>#{body}<% } } " 
+            attributes << ":tagbody => proc {|#{el.dryml_name}_default_tagbody| new_context { %>#{body}<% } } " 
           end
           "proc { {#{attributes * ', '}} }"
         end
@@ -616,9 +616,9 @@ module Hobo::Dryml
     
     def default_tag_name(el)
       if template_call?(el)
-        "Default#{el.name}"
+        "Default#{el.dryml_name}"
       else
-        "default_#{el.name}"
+        "default_#{el.dryml_name}"
       end
     end
     
@@ -635,7 +635,7 @@ module Hobo::Dryml
                to_call = if is_param_default_call
                            # The tag is available in a local variable
                            # holding a proc
-                           el.name
+                           el.dryml_name
                          elsif (call_type = polymorphic_call_type(el))
                            "find_polymorphic_tag(:#{name}, #{call_type})"
                          else
@@ -663,11 +663,11 @@ module Hobo::Dryml
         end
       else
         old = @containing_tag_name
-        @containing_tag_name = el.name
+        @containing_tag_name = el.dryml_name
         children = children_to_erb(el)
         @containing_tag_name = old
         
-        call_statement = "_output(#{call} do |#{el.name}_default_tagbody| #{newlines}%>#{children}<% end)"        
+        call_statement = "_output(#{call} do |#{el.dryml_name}_default_tagbody| #{newlines}%>#{children}<% end)"        
         call = "<% " + apply_control_attributes(call_statement, el) + " %>"
         if part_name
           id = el.attributes['id'] || part_name
@@ -834,15 +834,15 @@ module Hobo::Dryml
 
     def require_toplevel(el, message=nil)
       message ||= "can only be at the top level"
-      dryml_exception("<#{el.name}> #{message}", el) if el.parent != @doc.root
+      dryml_exception("<#{el.dryml_name}> #{message}", el) if el.parent != @doc.root
     end
 
     def require_attribute(el, name, rx=nil, optional=false)
       val = el.attributes[name]
       if val
-        dryml_exception("invalid #{name}=\"#{val}\" attribute on <#{el.name}>", el) unless rx && val =~ rx
+        dryml_exception("invalid #{name}=\"#{val}\" attribute on <#{el.dryml_name}>", el) unless rx && val =~ rx
       else
-        dryml_exception("missing #{name} attribute on <#{el.name}>", el) unless optional
+        dryml_exception("missing #{name} attribute on <#{el.dryml_name}>", el) unless optional
       end
     end
 

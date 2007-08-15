@@ -16,7 +16,7 @@
 
 
 <def tag="form" attrs="message, update, hidden_fields, action, method"><%= 
-  ajax_attrs, html_attrs = attributes.partition_hash(AJAX_ATTRS)
+  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
   add_classes!(html_attrs, "#{'new_' if this.new_record?}#{this.class.name.underscore}")
   html_attrs[:action] = action || object_url(this, method)
@@ -54,8 +54,8 @@
         has_many_input(attributes)
       end
     else
-      attrs = attrs.merge(:name => param_name_for_this)
-      the_input = call_polymorphic_tag('input', attributes.merge) or
+      attrs = attributes.merge(:name => param_name_for_this)
+      the_input = call_polymorphic_tag('input', attrs) or
         raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
       if this_parent.errors[this_field]
         "<div class='field_with_errors'>#{the_input}</div>"
@@ -67,11 +67,11 @@
 %></def>
 
 <def tag="input" for="text" attrs="name">
-  <%= text_area_tag(name, this, options) %>
+  <%= text_area_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="boolean" attrs="name">
-  <%= check_box_tag(name, '1', this, options) + hidden_field_tag(name, '0') %>
+  <%= check_box_tag(name, '1', this, attributes) + hidden_field_tag(name, '0') %>
 </def>
   
 <def tag="input" for="password" attrs="name">
@@ -79,7 +79,7 @@
 </def>
 
 <def tag="input" for="html" attrs="name">
-  <%= text_area_tag(name, this, add_classes(options, :tiny_mce)) %>
+  <%= text_area_tag(name, this, add_classes(attributes, :tiny_mce)) %>
 </def>
 
 <def tag="input" for="date">
@@ -91,31 +91,31 @@
 </def>
 
 <def tag="input" for="integer" attrs="name">
-  <%= text_field_tag(name, this, options) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="float" attrs="name">
-  <%= text_field_tag(name, this, options) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="string" attrs="name">
-    <%= text_field_tag(name, this, options) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="belongs_to_input">
-  <%= belongs_to_menu_field(options) %>
+  <%= belongs_to_menu_field(attributes) %>
 </def>
 
 <!--- Buttons --->
 
 <def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
-  ajax_options, html_options = options.partition_hash(AJAX_ATTRS)
+  ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
   message2 = message || method.titleize
   func = ajax_updater(object_url(this) + "/#{method}", message2, update,
-                      ajax_options.merge(:params => params, :result_update => result_update))
-  html_options.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
-  tag(:input, add_classes(html_options, "button_input remote_method_button #{method}_button"))
+                      ajax_attributes.merge(:params => params, :result_update => result_update))
+  html_attributes.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
+  tag(:input, add_classes(html_attributes, "button_input remote_method_button #{method}_button"))
 %></def>
   
 
@@ -150,7 +150,7 @@
     else
       fade = true if fade.nil?
       attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade2 ? 'true' : 'false'})"
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade ? 'true' : 'false'})"
       tag(:input, attributes)
     end
   end
@@ -202,8 +202,8 @@
    completer_model ||= refl.klass
    completer_attr ||= refl.klass.id_name_column
    id ||= this_field_dom_id + "_completer"
-   where_options = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
-   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_options))
+   where_attributes = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
+   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_attributes))
   %>
 
   <input type="text" id="#{id}" class="autocomplete_bhv" autocomplete_url="#{url}"

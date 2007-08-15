@@ -75,7 +75,7 @@ module Hobo::RapidHelper
     update = opts.delete(:update)
     blank_message = opts.delete(:blank_message) || "(click to edit)"
     
-    display = show(:no_wrapper => true)
+    display = view(:no_wrapper => true)
     opts[:hobo_blank_message] = blank_message
     display = blank_message if display.blank?
     opts[:hobo_update] = update if update 

@@ -17,8 +17,8 @@
   if !this.blank? 
     if even_odd
       map_this do
-        klass = [attribtes[:class], cycle("even", "odd")].compact.join(' ')
-        content_tag(even_odd, tagbody.call, options.merge(:class => klass, :hobo_model_id => dom_id(this)))
+        klass = [attributes[:class], cycle("even", "odd")].compact.join(' ')
+        content_tag(even_odd, tagbody.call, attributes.merge(:class => klass, :hobo_model_id => dom_id(this)))
       end.join(join)
     else
       scope.new_scope do

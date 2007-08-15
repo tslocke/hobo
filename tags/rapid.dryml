@@ -36,7 +36,7 @@
     <thead if="&all_parameters[:thead]" param/>
     <tbody>
       <repeat>
-        <tr param if="can_view?"
+        <tr param if="&can_view?"
             class="#{scope.even_odd} #{this_type.name.underscore}"
             hobo_model_id="#{dom_id(this)}">
         </tr>
