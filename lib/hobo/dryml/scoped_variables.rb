@@ -24,9 +24,9 @@ module Hobo::Dryml
       res
     end
     
-    def method_missing(name, arg)
+    def method_missing(name, *args)
       if name =~ /=$/
-        self[name] = arg
+        self[name] = args.first
       else
         self[name]
       end
