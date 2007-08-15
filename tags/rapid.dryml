@@ -136,7 +136,7 @@
 
       href = object_url(target.class, "new")
       add_classes!(attributes, "new_#{target.class.name.underscore}_link")
-      content ||= "New #{target.name.titleize}"
+      content ||= "New #{target.class.name.titleize}"
     else
       # Link to an existing object
       
@@ -148,7 +148,9 @@
              else
                object_url(target, view, params)
              end
-      attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target)
+      unless target.is_a?(Class)
+        attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target) 
+      end
       content ||= name
     end
   end
