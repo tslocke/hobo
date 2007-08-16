@@ -87,7 +87,7 @@ module Hobo::RapidHelper
 
   AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method,
                 :script, :form, :params, :confirm,
-                :reset_form, :refocus_form]
+                :reset_form, :refocus_form, :result_update]
 
 
   def editor_class

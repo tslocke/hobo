@@ -786,7 +786,7 @@ module Hobo::Dryml
                   end
         
         x = gensym
-        y = if if_
+        if if_
           "(if !(#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
             "else (Hobo::Dryml.last_if = false; ''); end)"
         elsif unless_
@@ -795,8 +795,6 @@ module Hobo::Dryml
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end
-        puts y if if_ == "account.site_exists?"
-        y
       end
     end
     

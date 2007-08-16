@@ -23,7 +23,7 @@
 
   if update || !ajax_attrs.empty?
     # add an onsubmit to convert to an ajax form if `update` is given
-    function = ajax_updater(:post_form, message, update, ajax_options)
+    function = ajax_updater(:post_form, message, update, ajax_attrs)
     html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
   end
 

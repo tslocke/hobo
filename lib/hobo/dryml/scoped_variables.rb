@@ -25,8 +25,8 @@ module Hobo::Dryml
     end
     
     def method_missing(name, *args)
-      if name =~ /=$/
-        self[name] = args.first
+      if name.to_s =~ /=$/
+        self[name.to_s[0..-2].to_sym] = args.first
       else
         self[name]
       end
