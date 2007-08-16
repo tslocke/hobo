@@ -69,17 +69,18 @@ module Hobo::RapidHelper
 
 
   
-  def in_place_editor(kind, tag, options)
-    opts = add_classes(options, kind, editor_class).merge(:hobo_model_id => this_field_dom_id)
+  def in_place_editor(behaviour_class, attributes)
+    blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
-    update = opts.delete(:update)
-    blank_message = opts.delete(:blank_message) || "(click to edit)"
+    attributes = add_classes(attributes, behaviour_class)
+    attributes.update(:hobo_model_id => this_field_dom_id,
+                      :hobo_blank_message => blank_message,
+                      :if_blank => blank_message)
+
+    update = attributes.delete(:update)
+    attributes[:hobo_update] = update if update 
     
-    display = view(:no_wrapper => true)
-    opts[:hobo_blank_message] = blank_message
-    display = blank_message if display.blank?
-    opts[:hobo_update] = update if update 
-    content_tag(tag, display, opts)
+    view(attibutes)
   end
     
   
@@ -90,7 +91,6 @@ module Hobo::RapidHelper
 
 
   def editor_class
-    "#{this_parent.class.name.underscore}_#{this_field}_editor"
   end
 
 end

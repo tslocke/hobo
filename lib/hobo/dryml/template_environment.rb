@@ -110,7 +110,7 @@ module Hobo::Dryml
     
     
     def add_classes!(options, *classes)
-      options[:class] = ([options[:class]] + classes).select{|x|x}.join(' ')
+      options[:class] = ([options[:class]] + classes).select{|x|x}.uniq.join(' ')
       options
     end
 
@@ -121,7 +121,7 @@ module Hobo::Dryml
 
     
     def merge_attrs(attrs, overriding_attrs)
-      attrs = add_classes(attrs, *[overriding_attrs.delete(:class)].compact)
+      attrs = add_classes(attrs, *overriding_attrs.delete(:class).split)
       attrs.update(overriding_attrs)
     end
     

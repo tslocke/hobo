@@ -11,6 +11,14 @@ module Hobo
 
     attr_accessor :current_theme, :field_types
     attr_writer :developer_features
+    
+    def symbolic_type_name(type)
+      field_types.index[type]
+    end
+    
+    def type_name(type)
+      symbolic_type_name || type.name.underscore.gsub("/", "__")
+    end
 
     def developer_features?
       @developer_features

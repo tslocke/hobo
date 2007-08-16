@@ -130,6 +130,21 @@ module Hobo
         Hobo.dom_id(*args)
       end
     end
+    
+    
+    def type_name(type=nil)
+      Hobo.type_name(type || this.class)
+    end
+    
+    
+    def type_and_field(*args)
+      if args.empty?
+        this_parent && this_field && "#{Hobo.type_name(this_parent)}_#{this_field}"
+      else
+        type, field = args
+        "#{type_name(type)}_#{field}"
+      end
+    end
      
      
     def map_this

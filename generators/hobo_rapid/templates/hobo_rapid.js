@@ -167,6 +167,7 @@ var Hobo = {
     },
 
     _makeInPlaceEditor: function(el, options) {
+        if el.hasClassName("view_wrapper") { el = el.firstChild }
         var old
         var spec = Hobo.parseFieldId(el)
         var updates = Hobo.updatesForElement(el)

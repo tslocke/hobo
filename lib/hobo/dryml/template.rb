@@ -657,7 +657,7 @@ module Hobo::Dryml
       if el.children.empty?
         call = apply_control_attributes(call, el)
         if part_name
-          "<span id='#{part_name}'>" + part_element(el, "<%= #{call} #{newlines}%>") + "</span>"
+          "<div class='part_wrapper' id='#{part_name}'>" + part_element(el, "<%= #{call} #{newlines}%>") + "</div>"
         else
           "<%= #{call} #{newlines}%>"
         end
@@ -671,7 +671,7 @@ module Hobo::Dryml
         call = "<% _output(" + apply_control_attributes(call_statement, el) + ") %>"
         if part_name
           id = el.attributes['id'] || part_name
-          "<span id='<%= #{attribute_to_ruby(id)} %>'>" + part_element(el, call) + "</span>"
+          "<div class='part_wrapper' id='<%= #{attribute_to_ruby(id)} %>'>" + part_element(el, call) + "</div>"
         else
           call
         end
@@ -777,7 +777,9 @@ module Hobo::Dryml
       if val.nil?
         expression
       else
-        control = if is_code_attribute?(val)
+        control = if repeat && val == "&true"
+                    "this"
+                  elsif is_code_attribute?(val)
                     "#{val[1..-1]}"
                   else
                     "this.#{val}"
