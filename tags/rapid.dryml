@@ -158,7 +158,7 @@
 %></def>
 
         
-<def tag="view" attrs="inline, if_blank"><%=
+<def tag="view" attrs="inline, block, if_blank"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
@@ -172,18 +172,24 @@
     end
   else
     attrs = add_classes(attributes, "view", type_name, type_and_field)
-    attrs[:hobo_model_id] = this_field_dom_id = if this_parent.respond_to?(:typed_id)
+    attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
 
     view_tag = find_polymorphic_tag("view")
     if view_tag == "view" # i.e. it didn't find a type specific tag
       raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
     else
-      wrapper = inline ? :span : :div
+      wrapper = if inline
+                  :span
+                elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
+                  :div
+                else
+                  :span
+                end
       
       view_attrs = attrs_for(view_tag)
       the_view = send(view_tag, attrs & view_attrs)
       
-      the_view = blank_message if blank_message && the_view.blank?
+      the_view = if_blank if if_blank && the_view.blank?
       
       content_tag(wrapper, the_view, attrs - view_attrs)
     end
@@ -192,7 +198,7 @@
 
     
 <def tag="belongs_to_view"><a/></def>
-    
+
 <def tag="has_many_view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
 
 <def tag="view" for="Date"><%= this.to_s(:long) %></def>

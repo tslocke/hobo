@@ -105,7 +105,7 @@ module Hobo::Dryml
     
     
     def attrs_for(name)
-      self.class.tag_attrs[name]
+      self.class.tag_attrs[name.to_sym]
     end
     
     
@@ -121,7 +121,8 @@ module Hobo::Dryml
 
     
     def merge_attrs(attrs, overriding_attrs)
-      attrs = add_classes(attrs, *overriding_attrs.delete(:class).split)
+      classes = overriding_attrs.delete(:class)
+      attrs = add_classes(attrs, *classes.split) if classes
       attrs.update(overriding_attrs)
     end
     

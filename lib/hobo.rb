@@ -13,11 +13,11 @@ module Hobo
     attr_writer :developer_features
     
     def symbolic_type_name(type)
-      field_types.index[type]
+      field_types.index(type)
     end
     
     def type_name(type)
-      symbolic_type_name || type.name.underscore.gsub("/", "__")
+      symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
     end
 
     def developer_features?

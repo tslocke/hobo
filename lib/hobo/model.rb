@@ -482,7 +482,14 @@ module Hobo
       CompositeModel.new_for([self, object])
     end
     
+    def created_date
+      created_at.to_date
+    end
     
+    def modified_date
+      modified_at.to_date
+    end
+
     def typed_id
       id ? "#{self.class.name.underscore}_#{self.id}" : nil
     end

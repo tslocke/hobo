@@ -80,7 +80,7 @@ module Hobo::RapidHelper
     update = attributes.delete(:update)
     attributes[:hobo_update] = update if update 
     
-    view(attibutes)
+    view(attributes)
   end
     
   

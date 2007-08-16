@@ -139,7 +139,7 @@ module Hobo
     
     def type_and_field(*args)
       if args.empty?
-        this_parent && this_field && "#{Hobo.type_name(this_parent)}_#{this_field}"
+        this_parent && this_field && "#{Hobo.type_name(this_parent.class)}_#{this_field}"
       else
         type, field = args
         "#{type_name(type)}_#{field}"
