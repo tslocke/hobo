@@ -1,4 +1,4 @@
-<def tag="Page" attrs="title, doctype">
+<def tag="BasePage" attrs="title, doctype">
   <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
@@ -11,8 +11,8 @@
   </html>
 </def>
 
-<def tag="RapidPage">
-  <Page merge>
+<def tag="Page">
+  <BasePage merge>
     <head param>
       <default_tagbody/>
       <hobo_rapid_javascripts param/>
@@ -30,12 +30,12 @@
         <footer id="page_footer" param/>
       </div>
     </body>
-  </Page>
+  </BasePage>
 </def>
 
 <def tag="IndexPage">
   <% model_name = @model.name.titleize %>
-  <RapidPage title="All #{model_name.pluralize}" merge>
+  <Page title="All #{model_name.pluralize}" merge>
     <main>
       <section class="intro">
         <header>
@@ -59,12 +59,12 @@
 
       </panel>
     </main>
-  </RapidPage>
+  </Page>
 </def>
 
 
 <def tag="NewPage">
-  <RapidPage title="New #{human_type}" merge>
+  <Page title="New #{human_type}" merge>
     <main>
       <section class="intro">
         <header>
@@ -84,7 +84,7 @@
         </section>
       </panel>
     </main>
-  </RapidPage>
+  </Page>
 </def>
 
 
@@ -93,7 +93,7 @@
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <RapidPage merge>    
+  <Page merge>    
     <main>
       <section class="intro">
         <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
@@ -113,12 +113,12 @@
         </section>
       </panel>
     </main>
-  </RapidPage>
+  </Page>
 </def>
 
 
 <def tag="NewInCollectionPage">
-  <RapidPage title="New #{human_type}" merge>
+  <Page title="New #{human_type}" merge>
 
     <main>
       <section class="intro">
@@ -138,13 +138,13 @@
         </section>
       </panel>
     </main>
-  </RapidPage>
+  </Page>
 </def>
 
 
 <def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
-  <RapidPage title="&title" merge>
+  <Page title="&title" merge>
 
 
     <main>
@@ -177,7 +177,7 @@
         </if>
       </panel>
     </main>
-  </RapidPage>
+  </Page>
 </def>
 
 <def tag="doctype" attrs="version"><%=
