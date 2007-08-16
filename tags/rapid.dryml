@@ -158,7 +158,7 @@
 %></def>
 
         
-<def tag="view" attrs="inline, block, if_blank"><%=
+<def tag="view" attrs="inline, block, if_blank, no_wrapper"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
@@ -178,20 +178,23 @@
     if view_tag == "view" # i.e. it didn't find a type specific tag
       raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
     else
-      wrapper = if inline
-                  :span
-                elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
-                  :div
-                else
-                  :span
-                end
-      
       view_attrs = attrs_for(view_tag)
       the_view = send(view_tag, attrs & view_attrs)
       
       the_view = if_blank if if_blank && the_view.blank?
       
-      content_tag(wrapper, the_view, attrs - view_attrs)
+      if no_wrapper
+        the_view
+      else
+        wrapper = if inline
+                    :span
+                  elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
+                    :div
+                  else
+                    :span
+                  end
+        content_tag(wrapper, the_view, attrs - view_attrs)
+      end
     end
   end
 %></def>
