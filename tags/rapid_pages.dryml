@@ -3,7 +3,8 @@
   <html>
     <head param>
       <title><%= title %></title>
-      <%= stylesheet_link_tag 'application' %>
+      <stylesheet name="hobo_base"/>
+      <stylesheet name="application"/>
       <%= javascript_include_tag :defaults %>
     </head>
     <body onload="Hobo.applyEvents();" param>
@@ -15,6 +16,7 @@
   <BasePage merge>
     <head param>
       <default_tagbody/>
+      <stylesheet name="hobo_rapid"/>
       <hobo_rapid_javascripts param/>
     </head>
     <body param>
@@ -194,6 +196,10 @@
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
   end
 %></def>
+
+<def tag="stylesheet" attrs="name,media">
+  <link href="#{base_url}/stylesheets/#{name}.css" media="<%=media.nil? ? 'all' : media %>" rel="stylesheet" type="text/css" />
+</def>
 
 <def tag="display_flash" attr="type">
   <% type ||= 'notice' %>
