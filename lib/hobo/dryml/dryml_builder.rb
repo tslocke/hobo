@@ -45,6 +45,7 @@ module Hobo::Dryml
 
 
     def render_page_source(src, local_names)
+      puts src
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
 
       ("def render_page(__page_this__, __local_assigns__); " +

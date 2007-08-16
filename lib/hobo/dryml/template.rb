@@ -501,7 +501,7 @@ module Hobo::Dryml
       attributes = tag_attributes(el)
       newlines = tag_newlines(el)
       
-      parameters = tag_parameters(el)
+      parameters = tag_newlines(el) + tag_parameters(el)
       
       is_param_default_call = el.attributes['restore']
       
@@ -786,7 +786,7 @@ module Hobo::Dryml
                   end
         
         x = gensym
-        if if_
+        y = if if_
           "(if !(#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
             "else (Hobo::Dryml.last_if = false; ''); end)"
         elsif unless_
@@ -795,6 +795,8 @@ module Hobo::Dryml
         elsif repeat
           "repeat_attribute(#{control}) { #{expression} }"
         end
+        puts y if if_ == "account.site_exists?"
+        y
       end
     end
     

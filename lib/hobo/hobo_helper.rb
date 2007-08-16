@@ -312,7 +312,7 @@ module Hobo
     def log_debug(*args)
       logger.debug("\n### DRYML Debug ###")
       logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
-      logger.debug("DRYML THIS = #{Hobo.dom_id(this)}")
+      logger.debug("DRYML THIS = #{Hobo.dom_id(this) rescue this.inspect}")
       logger.debug("###################\n")
       args.first unless args.empty?
     end

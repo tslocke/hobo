@@ -21,47 +21,25 @@
   <a merge_attrs/>
 </def>
   
-<def tag="belongs_to_editor">
-  <%= belongs_to_menu_editor(attributes) %>
-</def>
+<def tag="belongs_to_editor"><%= belongs_to_menu_editor(attributes) %></def>
 
-<def tag="editor" for="string">
-  <%= in_place_editor "in_place_textfield_bhv", attributes %>
-</def>
+<def tag="editor" for="string"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
-<def tag="editor" for="text">
-  <%= in_place_editor "in_place_textarea_bhv", attributes %>
-</def>
+<def tag="editor" for="text"><%= in_place_editor "in_place_textarea_bhv", attributes %></def>
   
-<def tag="editor" for="html">
-  <%= in_place_editor "in_place_html_textarea_bhv", attributes %>
-</def>
+<def tag="editor" for="html"><%= in_place_editor "in_place_html_textarea_bhv", attributes %></def>
 
-<def tag="editor" for="datetime">
-  <%= string_editor(attributes) %>
-</def>
+<def tag="editor" for="datetime"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
-<def tag="editor" for="date">
-  <%= string_editor(attributes) %>
-</def>
+<def tag="editor" for="date"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
-<def tag="editor" for="integer">
-  <%= in_place_editor "in_place_textfield_bhv", attributes %>
-</def>
+<def tag="editor" for="integer"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
-<def tag="editor" for="float">
-  <%= in_place_editor "in_place_textfield_bhv", attributes %>
-</def>
+<def tag="editor" for="float"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
-<def tag="editor" for="password">
-  <%= raise HoboError, "passwords cannot be edited in place" %>
-</def>
+<def tag="editor" for="password"><% raise HoboError, "passwords cannot be edited in place" %></def>
 
-<def tag="editor" for="boolean">
-  <%= boolean_checkbox_editor(attributes) %>
-</def>
-
-<!-------------------->
+<def tag="editor" for="boolean"><boolean_checkbox_editor merge_attrs/></def>
 
 
 <def tag="submit" attrs="label, image">

@@ -109,14 +109,14 @@ module Hobo::Dryml
     end
     
     
-    def add_classes!(options, *classes)
-      options[:class] = ([options[:class]] + classes).select{|x|x}.uniq.join(' ')
-      options
+    def add_classes!(attributes, *classes)
+      attributes[:class] = ([attributes[:class]] + classes).select{|x|x}.uniq.join(' ')
+      attributes
     end
 
 
-    def add_classes(options, *classes)
-      add_classes!({}.update(options), classes)
+    def add_classes(attributes, *classes)
+      add_classes!({}.update(attributes), classes)
     end
 
     
@@ -339,7 +339,7 @@ module Hobo::Dryml
       attributes.delete(:field)
       
       # positional arguments never appear in the attributes hash
-      stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
+      stripped_attributes = SymbolizingHash.new.update(attributes)
       locals.each {|a| stripped_attributes.delete(a.to_sym) }
       
       # Return locals declared as local variables (attrs="...")
