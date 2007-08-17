@@ -202,8 +202,8 @@
 </def>
 
 <def tag="display_flash" attr="type">
-  <% type ||= 'notice' %>
-  <div class="flash" if="&flash[type]"><%= flash[type] %></div>
+  <% type = type ? type.to_sym : :notice %>
+  <div class="flash" if="&flash[type]"><%= flash[type] %></div>!!!
 </def>
 
 <def tag="ajax_progress">

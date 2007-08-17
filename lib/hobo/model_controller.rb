@@ -646,7 +646,7 @@ module Hobo
           parse_datetime(value)
         end
       elsif field_type <= TrueClass
-        (value.is_a?(String) && value.strip == '0' || value.blank?) ? false : true
+        (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
       else
         # primitive field
         value
