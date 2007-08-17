@@ -189,6 +189,7 @@ module Hobo
         m.named_route("new_#{controller_name.singularize}_#{singular_name}",
                       "#{controller_name}/:id/#{collection_name}/new",
                       :action => "new_#{singular_name}") if new_method
+        puts "new_#{controller_name.singularize}_#{singular_name}" if new_method
       end
     end
 

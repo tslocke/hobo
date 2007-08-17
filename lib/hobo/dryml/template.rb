@@ -529,6 +529,7 @@ module Hobo::Dryml
                end
              end
 
+      call = apply_control_attributes(call, el)
       maybe_make_part_call(el, "<% _output(#{call}) %>")
     end
     

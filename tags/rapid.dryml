@@ -146,7 +146,7 @@
       href = if resource_type
                send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
              else
-               object_url(target, view, params)
+               object_url(target, action, params)
              end
       unless target.is_a?(Class)
         attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target) 

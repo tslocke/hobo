@@ -249,6 +249,12 @@ describe Template do
       should be_dom_equal_to('<p class="big small" id="y" a="b"/>')
   end
   
+  it "should support attribute merging of all extra attributes on static tags" do 
+    eval_dryml(%(<def tag="x"><p class="big" id="x" merge_attrs/></def>
+                 <x class='small' id='y' a='b'/>)).
+      should be_dom_equal_to('<p class="big small" id="y" a="b"/>')
+  end
+  
   
   # --- Block Tags --- #
   
@@ -518,7 +524,7 @@ describe Template do
   
   # --- Control Attributes --- #
   
-  it "should alow tags to be conditional with the 'if' attribute" do 
+  it "should alow static tags to be conditional with the 'if' attribute" do 
     eval_dryml("<p if='&false'/>").should == ""
     eval_dryml("<p if='&true'/>").should == "<p />"
 
@@ -526,7 +532,7 @@ describe Template do
     eval_dryml("<p if='&true'>hello</p>").should == "<p>hello</p>"
   end
   
-  it "should alow tags to be repeated with the 'repeat' attribute" do 
+  it "should alow static tags to be repeated with the 'repeat' attribute" do 
     eval_dryml('<img repeat="&[1,2,3]" src="#{this}" />').should == 
       '<img src="1" /><img src="2" /><img src="3" />'
     
@@ -535,6 +541,10 @@ describe Template do
       '<img src="1" /><img src="2" /><img src="3" />'
   end
   
+  it "should alow templates to be repeated with the 'repeat' attribute" do 
+    eval_dryml('<def tag="T"><%= this %></def><T repeat="&[1,2,3]"/>').should == '123'
+  end
+
   it "should allow <else> to be used with the if attribute" do
     eval_dryml("<p if='&false'/><%= Hobo::Dryml.last_if %>").should == "false"
   end
