@@ -151,7 +151,19 @@
       unless target.is_a?(Class)
         attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target) 
       end
-      content ||= name
+      
+      # Set default link text if none given
+      content ||= begin
+                    if action == "new" 
+                      if target.respond_to?(:proxy_reflection)
+                        "New #{target.proxy_reflection.klass.name.titleize}"
+                      else
+                        "New #{target.class.name.titleize}"
+                      end
+                    else
+                      name
+                    end
+                  end
     end
   end
   content_tag :a, content, attributes.update(:href => href)

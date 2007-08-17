@@ -254,6 +254,28 @@ class Hash
   
 end
 
+
+class HashWithIndifferentAccess
+  
+  def -(keys)
+    res = {}
+    keys = keys.map {|k| k.is_a?(Symbol) ? k.to_s : k }
+    each_pair { |k, v| res[k] = v unless k.in?(keys) }
+    res
+  end
+  
+  def &(keys)
+    res = {}
+    keys.each do |k|
+      k = k.to_s if k.is_a?(Symbol)
+      res[k] = self[k] if has_key?(k)
+    end
+    res    
+  end
+
+end
+
+
 class <<ActiveRecord::Base
   alias_method :[], :find
 end

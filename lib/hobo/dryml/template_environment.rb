@@ -123,6 +123,7 @@ module Hobo::Dryml
 
     
     def merge_attrs(attrs, overriding_attrs)
+      attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
       classes = overriding_attrs[:class]
       attrs = add_classes(attrs, *classes.split) if classes
       attrs.update(overriding_attrs - [:class])
