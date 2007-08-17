@@ -2,7 +2,7 @@
   <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
-      <title><%= title %></title>
+      <title param><%= title %></title>
       <stylesheet name="hobo_base"/>
       <stylesheet name="application"/>
       <%= javascript_include_tag :defaults %>

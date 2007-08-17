@@ -460,7 +460,7 @@ module Hobo
       permission_denied(options) and return unless Hobo.can_view?(current_user, @owner, collection)
       
       @association = options[:collection] || @owner.send(collection)
-      @this = options[:this] || @association.new_without_appending
+      @this = options[:this] || @association.new
       @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
 
       permission_denied(options) and return unless Hobo.can_create?(current_user, @this)

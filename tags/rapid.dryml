@@ -126,44 +126,33 @@
   
     return "(Not Available)" if target.nil? 
 
-    if false # DISABLED target.respond_to?(:new_record?) && target.new_record?
+    if action == "new"
       # Link to a new object form
       
-      return "" unless begin
-                         target.set_creator(current_user) if target.respond_to?(:current_user)
-                         can_create?(target)
+      new_class_name = if target.respond_to?(:proxy_reflection)
+                         target.proxy_reflection.klass.name
+                       else
+                         target.name
                        end
 
-      href = object_url(target.class, "new")
-      add_classes!(attributes, "new_#{target.class.name.underscore}_link")
-      content ||= "New #{target.class.name.titleize}"
+      href = object_url(target, "new")
+      add_classes!(attributes, "new_#{new_class_name.underscore}_link")
+      content ||= "New #{new_class_name.titleize}"
     else
       # Link to an existing object
       
-      return "" unless to ? can_view?(to) : can_view?
-
-      add_classes!(attributes, "#{target.class.name.underscore}_link")
       href = if resource_type
                send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
              else
                object_url(target, action, params)
              end
+      add_classes!(attributes, "#{target.class.name.underscore}_link")
       unless target.is_a?(Class)
         attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target) 
       end
       
       # Set default link text if none given
-      content ||= begin
-                    if action == "new" 
-                      if target.respond_to?(:proxy_reflection)
-                        "New #{target.proxy_reflection.klass.name.titleize}"
-                      else
-                        "New #{target.class.name.titleize}"
-                      end
-                    else
-                      name
-                    end
-                  end
+      content ||= name
     end
   end
   content_tag :a, content, attributes.update(:href => href)

@@ -224,7 +224,7 @@ module Hobo
         object = object.new
         object.set_creator(person)
       elsif Hobo.simple_has_many_association?(object)
-        object = object.new_without_appending
+        object = object.new
         object.set_creator(person)
       end
       check_permission(:create, person, object)
@@ -291,12 +291,12 @@ module Hobo
 
     # can_view? has special behaviour if it's passed a class or an
     # association-proxy -- it instantiates the class, or creates a new
-    # instance "in" the association (new_without_appending), and tests
-    # the permission of this object. This means the permission methods
-    # in models can't rely on the instance being properly initialised.
-    # But it's important that it works like this because, in the case
-    # of an association proxy, we don't want to loose the information
-    # that the object belongs_to the proxy owner.
+    # instance "in" the association, and tests the permission of this
+    # object. This means the permission methods in models can't rely
+    # on the instance being properly initialised.  But it's important
+    # that it works like this because, in the case of an association
+    # proxy, we don't want to loose the information that the object
+    # belongs_to the proxy owner.
     def can_view?(person, object, field=nil)
       if field
         field = field.to_sym if field.is_a? String
@@ -305,12 +305,8 @@ module Hobo
         # Special support for classes (can view instances?)
         if object.is_a?(Class) and object < ActiveRecord::Base
           object = object.new
-        elsif object.is_a?(Array)
-          if object.respond_to?(:new_without_appending)
-            object = object.new_without_appending
-          elsif object.respond_to?(:member_class)
-            object = object.member_class.new
-          end          
+        elsif Hobo.simple_has_many_association?(object)
+          object = object.new
         end
       end
       viewable = check_permission(:view, person, object, field)

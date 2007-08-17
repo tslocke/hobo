@@ -49,7 +49,6 @@ module ActiveRecord::Associations
       if @owner.new_record? && (refl = @owner.class.reverse_reflection(@reflection.name))
         bta = ActiveRecord::Associations::BelongsToAssociation.new(object, refl)
         bta.replace(@owner)
-        res
         object.instance_variable_set("@#{refl.name}", bta)
       end      
     end
