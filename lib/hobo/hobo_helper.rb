@@ -293,7 +293,7 @@ module Hobo
     end
      
      
-    def create(model)
+    def create_model(model)
       n = model.new
       n.set_creator(current_user)
       n
