@@ -18,7 +18,7 @@
 <def tag="form" attrs="message, update, hidden_fields, action, method"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  add_classes!(html_attrs, "#{'new_' if this.new_record?}#{this.class.name.underscore}")
+  add_classes!(html_attrs, "#{'new_' if this.new_record?}#{this.class.name.underscore}") unless this.nil?
   html_attrs[:action] = action || object_url(this, method)
 
   if update || !ajax_attrs.empty?
@@ -29,11 +29,11 @@
 
   body, field_names = with_form_context { tagbody.call }
 
-  method_hidden = hidden_field_tag("_method", "PUT") unless this.respond_to?(:new_record?) and this.new_record?
+  method_hidden = hidden_field_tag("_method", "PUT") unless (this.respond_to?(:new_record?) and this.new_record?) || action
 
   html_attrs[:method] = "post"
 
-  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if this.new_record?
+  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if this && this.new_record?
 
   body = [method_hidden, hiddens, body].join
     
