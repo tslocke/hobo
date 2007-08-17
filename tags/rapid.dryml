@@ -116,7 +116,7 @@
 %></def>
 
 
-<def tag="a" attrs="view, to, params, resource_type, href"><%=
+<def tag="a" attrs="action, to, params, resource_type, href"><%=
   content = tagbody.call if tagbody
   
   if href || attributes[:name]
@@ -126,7 +126,7 @@
   
     return "(Not Available)" if target.nil? 
 
-    if target.respond_to?(:new_record?) && target.new_record?
+    if false # DISABLED target.respond_to?(:new_record?) && target.new_record?
       # Link to a new object form
       
       return "" unless begin
@@ -175,6 +175,7 @@
     attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
 
     view_tag = find_polymorphic_tag("view")
+    
     if view_tag == "view" # i.e. it didn't find a type specific tag
       raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
     else
@@ -212,7 +213,7 @@
 
 <def tag="view" for="Hobo::Text"><%= h(this).gsub("\n", "<br/>") %></def>
 
-<def tag="view" for="Hobo::HtmlString"><%= this %></def>
+<def tag="view" for="html"><%= this %></def>
 
 <def tag="view" for="Hobo::MarkdownString"><%= this.to_html %></def>
 

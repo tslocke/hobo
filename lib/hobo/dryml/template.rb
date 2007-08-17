@@ -356,7 +356,7 @@ module Hobo::Dryml
           "tagbody, attributes, parameters = @_locals_stack.pop; " +
           "__res__; }); %>"
       else
-        "<% def #{name}(__attributes__={}, all_parameters={}, &__block__); " +
+        "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
           "parameters = all_parameters - #{param_names.inspect}; " +
           tag_method_body(el) +
           "; end %>"
@@ -378,7 +378,7 @@ module Hobo::Dryml
           "tagbody, attributes, parameters = @_locals_stack.pop; " +
           "__res__; }); %>"
       else
-        "<% def #{name}(__attributes__={}, &__block__); " +
+        "<% def #{name}(all_attributes={}, &__block__); " +
           "parameters = nil; " +
           tag_method_body(el) + 
           "; end %>"
@@ -386,7 +386,7 @@ module Hobo::Dryml
     end
               
     
-    def tag_method_body(el, attributes_var="__attributes__", block_var="__block__")
+    def tag_method_body(el, attributes_var="all_attributes", block_var="__block__")
       attrs = declared_attributes(el)
       
       # A statement to assign values to local variables named after the tag's attrs
@@ -529,8 +529,7 @@ module Hobo::Dryml
                end
              end
 
-      call = apply_control_attributes(call, el)
-      "<% _output(#{call}) %>"
+      maybe_make_part_call(el, "<% _output(#{call}) %>")
     end
     
     
@@ -584,13 +583,14 @@ module Hobo::Dryml
 
     
     def template_proc(el)
+      nl = tag_newlines(el)
       if (repl = el.attribute("replace"))
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
         default_tag_name = "#{el.dryml_name}__default"
 
-        "proc {|#{default_tag_name}| new_context { %>#{children_to_erb(el)}<% } }"
+        "proc {|#{default_tag_name}| new_context { %>#{children_to_erb(el)}<% } #{nl}}"
       else
         attributes = el.attributes.map do 
           |name, value| ":#{name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
@@ -598,7 +598,7 @@ module Hobo::Dryml
       
         if template_call?(el || modifiers.first)
           parameters = el ? tag_parameters(el) : "{}"
-          "proc { [{#{attributes * ', '}}, #{parameters}] }"
+          "proc { [{#{attributes * ', '}}, #{parameters}] #{nl}}"
         else
           if el && el.has_end_tag?
             old = @containing_tag_name
@@ -608,7 +608,7 @@ module Hobo::Dryml
 
             attributes << ":tagbody => proc {|#{el.dryml_name}_default_tagbody| new_context { %>#{body}<% } } " 
           end
-          "proc { {#{attributes * ', '}} }"
+          "proc { {#{attributes * ', '}} #{nl}}"
         end
       end
     end
@@ -653,14 +653,9 @@ module Hobo::Dryml
                end
              end
       
-      part_name = el.attributes['part']
       if el.children.empty?
         call = apply_control_attributes(call, el)
-        if part_name
-          "<div class='part_wrapper' id='#{part_name}'>" + part_element(el, "<%= #{call} #{newlines}%>") + "</div>"
-        else
-          "<%= #{call} #{newlines}%>"
-        end
+        maybe_make_part_call(el, "<%= #{call} #{newlines}%>")
       else
         old = @containing_tag_name
         @containing_tag_name = el.dryml_name
@@ -669,12 +664,17 @@ module Hobo::Dryml
         
         call_statement = "#{call} do |#{el.dryml_name}_default_tagbody| #{newlines}%>#{children}<% end"
         call = "<% _output(" + apply_control_attributes(call_statement, el) + ") %>"
-        if part_name
-          id = el.attributes['id'] || part_name
-          "<div class='part_wrapper' id='<%= #{attribute_to_ruby(id)} %>'>" + part_element(el, call) + "</div>"
-        else
-          call
-        end
+        maybe_make_part_call(el, call)
+      end
+    end
+    
+    def maybe_make_part_call(el, call)
+      part_name = el.attributes['part']
+      if part_name
+        part_id = part_name && "<%= #{attribute_to_ruby(el.attributes['id'] || part_name)} %>"
+        "<span class='part_wrapper' id='#{part_id}'>" + part_element(el, call) + "</span>"
+      else
+        call
       end
     end
     

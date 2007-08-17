@@ -300,13 +300,3 @@ class Proc
   end
   
 end
-
-class SymbolizingHash < HashWithIndifferentAccess
-  
-  protected 
-  
-  def convert_key(key)
-    key.is_a?(String) ? key.to_sym : key
-  end
-
-end

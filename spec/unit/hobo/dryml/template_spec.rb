@@ -62,26 +62,26 @@ describe Template do
   
   it "should compile defs with lower-case names as block tags" do 
     compile_def("<def tag='foo'></def>").should == 
-      "<% def foo(__attributes__={}, &__block__); " +
+      "<% def foo(all_attributes={}, &__block__); " +
       "parameters = nil; " +
-      "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
+      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
       "<% _erbout; end; end %>"
   end
   
   it "should compile attrs in defs as local variables" do 
     compile_def("<def tag='foo' attrs='a, b'></def>").should == 
-      "<% def foo(__attributes__={}, &__block__); " +
+      "<% def foo(all_attributes={}, &__block__); " +
       "parameters = nil; " +
-      "_tag_context(__attributes__, __block__) do |tagbody| " +
-      "a, b, attributes, = _tag_locals(__attributes__, [:a, :b]) %>" + 
+      "_tag_context(all_attributes, __block__) do |tagbody| " +
+      "a, b, attributes, = _tag_locals(all_attributes, [:a, :b]) %>" + 
       "<% _erbout; end; end %>"
   end
   
   it "should allow a default tagbody to be given inside the <tagbody> tag" do 
     compile_def("<def tag='foo'>123 <tagbody>blah</tagbody> 456</def>").should == 
-      "<% def foo(__attributes__={}, &__block__); " +
+      "<% def foo(all_attributes={}, &__block__); " +
       "parameters = nil; " +
-      "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
+      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
       "123 " +
       "<% _output(do_tagbody(tagbody, {}, proc { %>blah<% })) %>" +
       " 456" +
@@ -93,9 +93,9 @@ describe Template do
   it "should compile defs with cap names as templates" do 
     # Note the presence of the `parameters` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
-      "<% def Foo(__attributes__={}, all_parameters={}, &__block__); " +
+      "<% def Foo(all_attributes={}, all_parameters={}, &__block__); " +
       "parameters = all_parameters - []; " +
-      "_tag_context(__attributes__, __block__) do |tagbody| attributes, = _tag_locals(__attributes__, []) %>" + 
+      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
       "<% _erbout; end; end %>"
   end
   
@@ -304,9 +304,9 @@ describe Template do
 
       <def tag="T">plain template</def>
 
-      <def tag="StaticMerge"><p>a <b class="big" param>bold</b> word</p></def>
+      <def tag="StaticMerge"><p>a <b name="big" param>bold</b> word</p></def>
 
-      <def tag="EmptyStaticMerge"><img class="big" src="..." param/></def>
+      <def tag="EmptyStaticMerge"><img name="big" src="..." param/></def>
 
       <def tag="DefTagMerge">foo <defined param b="3">baa</defined>!</def>
 
@@ -322,17 +322,17 @@ describe Template do
   
   it "should add attributes to static tags when merging" do 
     eval_with_templates("<StaticMerge><b onclick='alert()'/></StaticMerge>").should == 
-      '<p>a <b class="big" onclick="alert()">bold</b> word</p>'    
+      '<p>a <b name="big" onclick="alert()">bold</b> word</p>'    
   end
   
   it "should override attributes on static tags when merging" do 
-    eval_with_templates("<StaticMerge><b class='small'/></StaticMerge>").should == 
-      '<p>a <b class="small">bold</b> word</p>'
+    eval_with_templates("<StaticMerge><b name='small'/></StaticMerge>").should == 
+      '<p>a <b name="small">bold</b> word</p>'
   end
   
   it "should replace tag bodies on static tags when merging" do
     eval_with_templates('<StaticMerge><b>BOLD</b></StaticMerge>').should == 
-      '<p>a <b class="big">BOLD</b> word</p>'
+      '<p>a <b name="big">BOLD</b> word</p>'
   end
   
   it "should add attributes to defined tags when merging" do 
@@ -352,22 +352,22 @@ describe Template do
   
   it "should leave non-merged tags unchanged" do
     eval_with_templates('<StaticMerge></StaticMerge>').should ==
-      '<p>a <b class="big">bold</b> word</p>'
+      '<p>a <b name="big">bold</b> word</p>'
   end
   
   it "should merge into static tags with no body" do
-    eval_with_templates("<EmptyStaticMerge><img class='small'/></EmptyStaticMerge>").should == 
-      '<img class="small" src="..." />'
+    eval_with_templates("<EmptyStaticMerge><img name='small'/></EmptyStaticMerge>").should == 
+      '<img name="small" src="..." />'
   end
     
   it "should merge template parameters into nested templates" do 
-    eval_with_templates('<NestedStaticMerge><StaticMerge><b class="small"/></StaticMerge></NestedStaticMerge>').should ==
-      'merge StaticMerge: <p>a <b class="small">bold</b> word</p>'
+    eval_with_templates('<NestedStaticMerge><StaticMerge><b name="small"/></StaticMerge></NestedStaticMerge>').should ==
+      'merge StaticMerge: <p>a <b name="small">bold</b> word</p>'
   end
   
   it "should merge the body of template parameters into nested templates" do 
     eval_with_templates('<NestedStaticMerge><StaticMerge><b>BOLD</b></StaticMerge></NestedStaticMerge>').should ==
-      'merge StaticMerge: <p>a <b class="big">BOLD</b> word</p>'
+      'merge StaticMerge: <p>a <b name="big">BOLD</b> word</p>'
   end
   
   it "should allow param names to be defined dynamically" do 
@@ -376,14 +376,14 @@ describe Template do
   end
   
   it "should allow params to be defined on other params" do 
-    eval_with_templates('<ParameterMerge><b class="small">foo</b></ParameterMerge>').should == 
-      'parameter merge: <p>a <b class="small">foo</b> word</p>'
+    eval_with_templates('<ParameterMerge><b name="small">foo</b></ParameterMerge>').should == 
+      'parameter merge: <p>a <b name="small">foo</b> word</p>'
     
   end
   
   it "should allow parameter bodies to be restored" do 
     eval_with_templates("<StaticMerge><b>very <default_tagbody/></b></StaticMerge>").should ==
-      '<p>a <b class="big">very bold</b> word</p>'
+      '<p>a <b name="big">very bold</b> word</p>'
 
   end
   
@@ -398,17 +398,17 @@ describe Template do
   
   it "should allow template parameters to be replaced and then re-instated" do 
     eval_with_templates('<StaticMerge><b replace>short <b restore/></b></StaticMerge>').should ==
-      '<p>a short <b class="big">bold</b> word</p>'
+      '<p>a short <b name="big">bold</b> word</p>'
   end
 
   it "should allow template parameters to be replaced and then re-instated with different attributes" do 
-    eval_with_templates('<StaticMerge><b replace>short <b restore class="small"/></b></StaticMerge>').should ==
-      '<p>a short <b class="small">bold</b> word</p>'
+    eval_with_templates('<StaticMerge><b replace>short <b restore name="small"/></b></StaticMerge>').should ==
+      '<p>a short <b name="small">bold</b> word</p>'
   end
 
   it "should allow template parameters to be replaced and then re-instated with a different tagbody" do 
     eval_with_templates('<StaticMerge><b replace>short <b restore>big</b></b></StaticMerge>').should ==
-      '<p>a short <b class="big">big</b> word</p>'
+      '<p>a short <b name="big">big</b> word</p>'
   end
 
   # --- Merge Params --- #

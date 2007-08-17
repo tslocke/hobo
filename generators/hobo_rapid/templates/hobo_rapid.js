@@ -47,6 +47,7 @@ var Hobo = {
         var i = 0
         if (updates.length > 0) {
             updates.each(function(dom_id) {
+                if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
                 params.push("render["+i+"][part]=" + hoboParts[dom_id][0])
                 params.push("render["+i+"][id]=" + dom_id)
                 params.push("render["+i+"][object]=" + hoboParts[dom_id][1])

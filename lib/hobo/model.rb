@@ -46,13 +46,15 @@ module Hobo
           @next_method_type = nil
         end
         
+        return
+        
         # avoid error when running model generators before
         # db exists
         return unless connected? 
-        
+
         aliased_name = "#{name}_without_hobo_type"
         return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
-        
+
         type_wrapper = self.field_type(name)
         if type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String
           aliased_name = "#{name}_without_hobo_type"
@@ -507,3 +509,33 @@ module Hobo
   end
 end
 
+
+# Hack AR to get Hobo type wrappers in
+
+module ActiveRecord::AttributeMethods::ClassMethods
+
+  # Define an attribute reader method.  Cope with nil column.
+  def define_read_method(symbol, attr_name, column)
+    cast_code = column.type_cast_code('v') if column
+    access_code = cast_code ? "(v=@attributes['#{attr_name}']) && #{cast_code}" : "@attributes['#{attr_name}']"
+
+    unless attr_name.to_s == self.primary_key.to_s
+      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) unless @attributes.has_key?('#{attr_name}'); ")
+    end
+
+    # This is the Hobo hook - add a type wrapper around the field
+    # value if we have a special type defined
+    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
+              type_wrapper.is_a?(Class) && type_wrapper < String
+            "val = begin; #{access_code}; end; " +
+              "if val.nil?; nil; " +
+              "elsif val.respond_to?(:hobo_undefined?) && val.hobo_undefined?; val; " + 
+              "else; #{type_wrapper}.new(val); end"
+          else
+            access_code
+          end
+    
+    evaluate_attribute_method(attr_name, 
+                              "def #{symbol}; @attributes_cache['#{attr_name}'] ||= begin; #{src}; end; end")
+  end
+end

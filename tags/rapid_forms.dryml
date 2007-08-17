@@ -157,7 +157,7 @@
 %></def>
 
 
-<def tag="create_button" attrs="model, update, label, message, fields"><%
+<def tag="create_button" attrs="model, update, label, message, fields"><%=
   raise HoboError.new("no update specified") unless update
 
   fields ||= {}

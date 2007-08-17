@@ -77,21 +77,17 @@ module Hobo
       basic = parts.join("/")
       
       controller = (controller_name.camelize + "Controller").constantize rescue nil
-      url = if action && controller && action.to_sym.in?(controller.web_methods)
-              basic + "/#{action}"
+      url = case action
+            when "new"
+              basic + "/new"
+            when "destroy"
+              basic + "?_method=DELETE"
+            when "update"
+              basic + "?_method=PUT"
+            when nil
+              basic
             else
-              case action
-              when "new"
-                basic + "/new"
-              when "destroy"
-                basic + "?_method=DELETE"
-              when "update"
-                basic + "?_method=PUT"
-              when nil
-                basic
-              else
-                basic + "/" + action
-              end
+              basic + "/" + action
             end
       params = make_params(*param_hashes)
       params.blank? ? url : url + "?" + params
@@ -286,8 +282,9 @@ module Hobo
     end
      
      
-    def transpose_with_field(field)
-      matrix = this.map {|obj| obj.send(field) }
+    def transpose_with_field(field, collection=nil)
+      collection ||= this
+      matrix = collection.map {|obj| obj.send(field) }
       max_length = matrix.every(:length).max
       matrix = matrix.map do |a|
         a + [nil] * (max_length - a.length)

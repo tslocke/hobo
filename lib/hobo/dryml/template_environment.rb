@@ -118,14 +118,14 @@ module Hobo::Dryml
 
 
     def add_classes(attributes, *classes)
-      add_classes!({}.update(attributes), classes)
+      add_classes!(HashWithIndifferentAccess.new(attributes), classes)
     end
 
     
     def merge_attrs(attrs, overriding_attrs)
-      classes = overriding_attrs.delete(:class)
+      classes = overriding_attrs[:class]
       attrs = add_classes(attrs, *classes.split) if classes
-      attrs.update(overriding_attrs)
+      attrs.update(overriding_attrs - [:class])
     end
     
     
@@ -341,7 +341,7 @@ module Hobo::Dryml
       attributes.delete(:field)
       
       # positional arguments never appear in the attributes hash
-      stripped_attributes = SymbolizingHash.new.update(attributes)
+      stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
       locals.each {|a| stripped_attributes.delete(a.to_sym) }
       
       # Return locals declared as local variables (attrs="...")
@@ -360,20 +360,20 @@ module Hobo::Dryml
     end
     
     
-    def call_block_tag_parameter(the_tag, options, overriding_proc, &b)
+    def call_block_tag_parameter(the_tag, attributes, overriding_proc, &b)
       if overriding_proc && overriding_proc.arity == 1
         # This is a 'replace' parameter
         
-        template_default = proc do |attributes, body_block|
+        template_default = proc do |attrs, body_block|
           tagbody_proc = body_block && proc {|_| new_context { body_block.call(b) } }
-          call_block_tag_parameter(the_tag, options, proc { attributes.update(:tagbody => tagbody_proc) }, &b)
+          call_block_tag_parameter(the_tag, attributes, proc { attrs.update(:tagbody => tagbody_proc) }, &b)
         end
         overriding_proc.call(template_default)
       else
         if overriding_proc
-          overriding_options = overriding_proc.call
-          tagbody = overriding_options.delete(:tagbody)
-          options = options.update(overriding_options)
+          overriding_attributes = overriding_proc.call
+          tagbody = overriding_attributes.delete(:tagbody)
+          attributes = merge_attrs(attributes, overriding_attributes)
         end
       
         if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
@@ -385,17 +385,17 @@ module Hobo::Dryml
                    nil
                  end
           if body.blank?
-            tag(the_tag, options)
+            tag(the_tag, attributes)
           else
-            content_tag(the_tag, body, options)
+            content_tag(the_tag, body, attributes)
           end
         else
           body = tagbody || b
           if the_tag.is_a?(String, Symbol)
-            send(the_tag, options, &body)
+            send(the_tag, attributes, &body)
           else
             # It's a proc - a template default
-            the_tag.call(options, body)
+            the_tag.call(attributes, body)
           end
         end
       end
@@ -413,7 +413,7 @@ module Hobo::Dryml
         if overriding_proc
           overriding_attributes, overriding_template_procs = overriding_proc.call
           
-          attributes = attributes.merge(overriding_attributes)
+          attributes = merge_attrs(attributes, overriding_attributes)
           template_procs = template_procs.merge(overriding_template_procs)
         end   
       
@@ -440,7 +440,7 @@ module Hobo::Dryml
       proc do
         general_attributes, general_template_procs = general_proc.call
         overriding_attributes, overriding_template_procs = overriding_proc.call
-        [general_attributes.merge(overriding_attributes), general_template_procs.merge(overriding_template_procs)]
+        [merge_attrs(general_attributes, overriding_attributes), general_template_procs.merge(overriding_template_procs)]
       end
     end
     

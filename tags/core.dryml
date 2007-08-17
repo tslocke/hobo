@@ -41,6 +41,7 @@
 
 
 <def tag="if" attrs="test"><%= 
+  test = all_attributes.fetch(:test, this)
   res = (cond = !test.blank?) ? tagbody.call : ""
   Hobo::Dryml.last_if = cond
   res
@@ -51,6 +52,7 @@
 
 
 <def tag="unless" attrs="test"><%= 
+  test = all_attributes.fetch(:test, this)     
   res = (cond = test.blank?) ? "" : tagbody.call
   Dryml.last_if = cond
   res
