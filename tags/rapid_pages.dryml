@@ -35,9 +35,16 @@
   </BasePage>
 </def>
 
+<def tag="PageForIndex"><Page merge/></def>
+<def tag="PageForNew"><Page merge/></def>
+<def tag="PageForShow"><Page merge/></def>
+<def tag="PageForNewInCollection"><Page merge/></def>
+<def tag="PageForShowCollection"><Page merge/></def>
+
 <def tag="IndexPage">
   <% model_name = @model.name.titleize %>
-  <Page title="All #{model_name.pluralize}" merge>
+  <PageForIndex title="All #{model_name.pluralize}" merge>
+    <body class="rapid_generic_page"/>
     <main>
       <section class="intro">
         <header>
@@ -47,26 +54,27 @@
 
       <panel param="main" class="main">
         <header param="main_header">
-          <heading><count label="&model_name"/></heading>
+          <h2><count label="&model_name"/></h2>
         </header>
         <section param="main_section">
           <Table param>
-            <tr><td><a/></td><td><delete_button/></td></tr>
+            <tr><td><a/></td><td><delete_button update="item_count"/></td></tr>
           </Table>
         </section>
         
         <section><page_nav param/></section>
 
-        <section param="new_link"><a to="&@model.new"/></section>
+        <section param="new_link"><a to="&@model" action="new"/></section>
 
       </panel>
     </main>
-  </Page>
+  </PageForIndex>
 </def>
 
 
 <def tag="NewPage">
-  <Page title="New #{human_type}" merge>
+  <PageForNew title="New #{human_type}" merge>
+    <body class="rapid_generic_page"/>
     <main>
       <section class="intro">
         <header>
@@ -86,7 +94,7 @@
         </section>
       </panel>
     </main>
-  </Page>
+  </PageForNew>
 </def>
 
 
@@ -95,7 +103,8 @@
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <Page merge>    
+  <PageForShow merge>    
+    <body class="rapid_generic_page"/>
     <main>
       <section class="intro">
         <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
@@ -105,23 +114,24 @@
       <panel param="main_panel">
         <header param="main_header">Details</header>
         <section>
-          <field_list skip="name"/>
+          <FieldList skip="name"/>
+          
         </section>
 
         <section param="new_links">
           <repeat with="&has_many_assocs">
-            <p><a to="this.new"/></p>
+            <p><a action="new"/></p>
           </repeat>
         </section>
       </panel>
     </main>
-  </Page>
+  </PageForShow>
 </def>
 
 
 <def tag="NewInCollectionPage">
-  <Page title="New #{human_type}" merge>
-
+  <PageForNewInCollection title="New #{human_type}" merge>
+    <body class="rapid_generic_page"/>
     <main>
       <section class="intro">
         <h1>New <human_type/></h1>
@@ -140,15 +150,14 @@
         </section>
       </panel>
     </main>
-  </Page>
+  </PageForNewInCollection>
 </def>
 
 
 <def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
-  <Page title="&title" merge>
-
-
+  <PageForShowCollection title="&title" merge>
+    <body class="rapid_generic_page"/>
     <main>
       <section class="intro">
         <h1><%= title %></h1>
@@ -179,7 +188,7 @@
         </if>
       </panel>
     </main>
-  </Page>
+  </PageForShowCollection>
 </def>
 
 <def tag="doctype" attrs="version"><%=
