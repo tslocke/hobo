@@ -33,6 +33,8 @@ module Hobo::RapidHelper
 
   def ajax_updater(url_or_form, message, update, options={})
     options ||= {}
+    options.symbolize_keys!
+    
     target = if url_or_form == :post_form
                target = "this"
              else

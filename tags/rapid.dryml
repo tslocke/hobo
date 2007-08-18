@@ -26,7 +26,8 @@
 <def tag="UL">
   <ul merge_attrs unless="&this.empty?">
     <repeat>
-      <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore}" hobo_model_id="#{dom_id this}">
+      <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore}"
+          hobo_model_id="#{dom_id this}">
         <tagbody><a/></tagbody>
       </li>
     </repeat>
@@ -36,7 +37,7 @@
 
 <def tag="Table">
   <table merge_attrs unless="&this.empty?">
-    <thead if="&parameters[:thead]" param/>
+    <thead if="&all_parameters[:thead]" param/>
     <tbody>
       <repeat>
         <tr param if="&can_view?"
@@ -45,7 +46,7 @@
         </tr>
       </repeat>      
     </tbody>
-    <tfoot if="&parameters[:tfoot]" param/>
+    <tfoot if="&all_parameters[:tfoot]" param/>
   </table>
 </def>
 
@@ -109,6 +110,10 @@
       count
     elsif this.is_a? Class and this < ActiveRecord::Base
       this.name.pluralize.titleize
+    elsif this.respond_to?(:name)
+      view(merge_attrs(attributes, {:field => 'name'}))
+    elsif this.respond_to?(:title)
+      view(merge_attrs(attributes, {:field => 'title'}))
     else
       this.to_s
     end
@@ -147,9 +152,6 @@
                object_url(target, action, params)
              end
       add_classes!(attributes, "#{target.class.name.underscore}_link")
-      unless target.is_a?(Class)
-        attributes[:hobo_model_id] = target == this ? this_field_dom_id : dom_id(target) 
-      end
       
       # Set default link text if none given
       content ||= name
@@ -315,14 +317,14 @@ in the future - use at your own risk. -->
   %>
   <tagbody with="&joins"/>
   <with with="&joins.new_without_appending">
-    <if_can_create>
-       <object_form update="&[update, part_id]" message="&action_name" hidden_fields="*">
+    <if test="can_create?">
+       <form update="&[update, part_id]" message="&action_name" hidden_fields="*">
          <p>
            <%= add_text %>:
            <belongs_to_autocompleting_field field="&source" where_not_in="&dom_id(add_to)" class="autosubmit"/>
          </p>
-       </object_form>
-    </if_can_create>
+       </form>
+    </if>
   </with>
 </def>
 

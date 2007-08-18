@@ -15,12 +15,21 @@
 %></def>
 
 
-<def tag="form" attrs="message, update, hidden_fields, action, method"><%= 
+<def tag="form" attrs="message, update, hidden_fields, action, method, web_method"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+   
+  html_attrs[:action] = action || object_url(this, web_method)
 
-  add_classes!(html_attrs, "#{'new_' if this.new_record?}#{this.class.name.underscore}") unless this.nil?
-  html_attrs[:action] = action || object_url(this, method)
-
+  new_record = this.respond_to?(:new_record?) && this.new_record?
+   
+  method = if method.nil?
+             (action.nil? && !new_record) ? "put" : "post"
+           else
+             method.downcase
+           end
+  http_method_hidden = hidden_field_tag("_method", "PUT") if method == "put"
+  html_attrs[:method] = method
+   
   if update || !ajax_attrs.empty?
     # add an onsubmit to convert to an ajax form if `update` is given
     function = ajax_updater(:post_form, message, update, ajax_attrs)
@@ -29,19 +38,21 @@
 
   body, field_names = with_form_context { tagbody.call }
 
-  method_hidden = hidden_field_tag("_method", "PUT") unless (this.respond_to?(:new_record?) and this.new_record?) || action
-
-  html_attrs[:method] = "post"
-
-  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if this && this.new_record?
-
-  body = [method_hidden, hiddens, body].join
-    
+  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
+     
+  body = [http_method_hidden, hiddens, body].join
+   
+  if web_method
+    add_classes!(html_attrs, "#{type_name}_#{web_method}_form")
+  else
+    add_classes!(html_attrs, "#{'new_' if new_record}#{type_name}")
+  end
+   
   content_tag("form", body, html_attrs)
 %></def>
 
 
-<def tag="input"><%=
+<def tag="input"><%=     
   if attributes[:type]
     tag :input, attributes
   elsif !can_edit?
@@ -54,7 +65,8 @@
         has_many_input(attributes)
       end
     else
-      attrs = attributes.merge(:name => param_name_for_this)
+      attrs = {}.update(attributes)
+      attrs[:name] ||= param_name_for_this
       the_input = call_polymorphic_tag('input', attrs) or
         raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
       if this_parent.errors[this_field]
