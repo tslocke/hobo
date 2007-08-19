@@ -1,8 +1,8 @@
 <include src="plugins/hobo/tags/rapid"/>
 
 <def tag="Page" attrs="title_prefix, title">
-  <% title ||= human_type + ": " + name %>
-  <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
+  <% title ||= human_type + ": " + name(:no_wrapper => true) %>
+  <doctype version="HTML 4.01 Transitional"/>
   <html>
     <head param="head">
       <title><%= title_prefix %><%= title %></title>
@@ -13,11 +13,7 @@
 
     <body onload="Hobo.applyEvents()" param="body">
 
-      <div id='ajax_progress'>
-        <div>
-          <span id="ajax_progress_text"></span><theme_image src="spinner.gif"/>
-        </div>
-      </div>
+      <ajax_progress/>
 
       <div id="page">
 
@@ -33,19 +29,14 @@
 
           <div id='header' param="header">
             <div class="logo" param="logo"><theme_image src="logo.gif"/></div>
-            <!--
             <div class="nav_bars" param="navigation">
-              <div class="nav" param="main_nav"><application_nav/></div>
-              <if test="&login_url rescue false">
-                <div class="account_nav" param="account_nav"><application_account_nav/></div>
-              </if>
+              <do param="main_nav"><magic_nav class="main_nav"/></do>
+              <if test="&defined_route? :login"><account_nav param/></if>
             </div>
             <clearer/>
--->          </div>
+          </div>
 
-          <if test="&flash[:notice]">
-            <div class="flash"><%= flash[:notice] %></div>
-          </if>
+          <display_flash/>
 
           <div param="intro"></div>
           <div param="main">
@@ -58,7 +49,6 @@
         </div></div></div></div></div></div></div></div></div>
       </div>
 
-      <div id="footer" param="footer"/>
     </body>
   </html>
 </def>

@@ -46,11 +46,9 @@
   <PageForIndex title="All #{model_name.pluralize}" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <section class="intro">
-        <header>
-          <heading><%= model_name.pluralize %></heading>
-        </header>
-      </section>
+      <header>
+        <heading><%= model_name.pluralize %></heading>
+      </header>
 
       <panel param="main" class="main">
         <header param="main_header">
@@ -76,14 +74,12 @@
   <PageForNew title="New #{human_type}" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <section class="intro">
-        <header>
-          <heading>New <human_type/></heading>
-        </header>
-      </section>
+      <header>
+        <heading>New <human_type/></heading>
+      </header>
 
       <panel param="main" class="main">
-        <header param="main_header">Details</header>
+        <header param="main_header"><h2>Details</h2></header>
         <section>
           <error_messages param="error_messages"/>
 
@@ -106,16 +102,15 @@
   <PageForShow merge>    
     <body class="rapid_generic_page"/>
     <main>
-      <section class="intro">
+      <header>
         <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
         <p><delete_button in_place="&false"/></p>
-      </section>
-      
+      </header>
+
       <panel param="main_panel">
-        <header param="main_header">Details</header>
+        <header param="main_header"><h2>Details</h2></header>
         <section>
-          <FieldList skip="name"/>
-          
+          <FieldList skip="name" tag="editor"/>
         </section>
 
         <section param="new_links">
@@ -133,18 +128,21 @@
   <PageForNewInCollection title="New #{human_type}" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <section class="intro">
+      <header>
         <h1>New <human_type/></h1>
         <h2>For: <a with="&@owner" /></h2>
-      </section>
+      </header>
+
       <panel param="main">
-        <header param="main_header">Details</header>
+        <header param="main_header">
+          <h2>Details</h2>
+        </header>
         <section>
           <error_messages param="error_messages"/>
 
           <form>
             <FieldList associations="belongs_to"/>
-            <submit label='Add to #{name(:with => @owner)}'
+            <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}'
                     param="submit_button"/>
           </form>
         </section>
@@ -159,10 +157,11 @@
   <PageForShowCollection title="&title" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <section class="intro">
+      <header>
         <h1><%= title %></h1>
         <h2>Back to <a with="&@owner"/></h2>
-      </section>
+      </header>
+
       <panel param="main">
         <header param="main_header">
           <count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/>
@@ -194,20 +193,25 @@
 <def tag="doctype" attrs="version"><%=
   case version.upcase
     when "HTML 4.01 STRICT"
-      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ' + 
+        '"http://www.w3.org/TR/html4/strict.dtd">'
     when "HTML 4.01 TRANSITIONAL"
-      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/html4/loose.dtd">'
     when "XHTML 1.0 STRICT"
-      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
     when "XHTML 1.0 TRANSITIONAL"
-      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
     when "XHTML 1.1"
-      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" ' + 
+        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
   end
 %></def>
 
 <def tag="stylesheet" attrs="name,media">
-  <link href="#{base_url}/stylesheets/#{name}.css" media="<%=media.nil? ? 'all' : media %>" rel="stylesheet" type="text/css" />
+  <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }" rel="stylesheet" type="text/css" />
 </def>
 
 <def tag="display_flash" attr="type">
@@ -227,15 +231,5 @@
   <div class="error_messages">
     <%= error_messages_for 'this' %>
   </div>
-</def>
-
-<!-- magic nav, just to get you started -->
-<!-- write your own navigation using the <navigation> tag -->
-<def tag="magic_nav">
-  <navigation merge_attrs>
-    <nav_item href="#{base_url}/">Home</nav_item>
-    <nav_item repeat="&Hobo.models[0..2]"><name/></nav_item>
-    <nav_item href="&search_url" if="&respond_to? :search_url">Search</nav_item>
-  </navigation>
 </def>
 

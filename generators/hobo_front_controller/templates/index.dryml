@@ -9,18 +9,13 @@
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
         <ul>
           <li>To customise this page: edit app/views/<%= file_name %>/index.dryml </li>
-
-          <li>To change the nav-bar: define &lt;application_nav&gt;<br/>
-            See vendor/plugins/hobo/tags/rapid.dryml for an example</li>
-
-          <li>To change the logo: define &lt;application_logo&gt;.</li>
         </ul>
       </div>
     </panel>
 
     <repeat with="&Hobo.models">
       <panel>
-        <heading><h2><%%= this.name.titlecase.pluralize %></h2></heading>
+        <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
         <section>
           <if test="&this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>

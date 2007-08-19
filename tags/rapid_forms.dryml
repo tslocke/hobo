@@ -115,7 +115,7 @@
 </def>
 
 <def tag="belongs_to_input">
-  <%= belongs_to_menu_field(attributes) %>
+  <%= belongs_to_menu_input(attributes) %>
 </def>
 
 <!--- Buttons --->
@@ -196,10 +196,10 @@
 
 
 <def tag="belongs_to_menu_input" attrs="include_none"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit_this?
+  raise HoboError.new("Not allowed to edit") unless can_edit?
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
-            [ name(:with => x), x.id ]
+            [ name(:with => x, :no_wrapper => true), x.id ]
           }
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
   %>

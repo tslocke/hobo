@@ -1,6 +1,6 @@
 <Page title="<%= app_name %>">
 
-  <body>
+  <main>
     <h1 class="front_page_title"><%= app_name %></h1>
 
     <panel>
@@ -37,7 +37,7 @@
         Edit app/views/<%= full_class_path %>/signup.dryml to customise this page
       </div>
     </panel>
-  </body>
+  </main>
 
 </Page>
 

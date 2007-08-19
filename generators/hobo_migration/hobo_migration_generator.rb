@@ -51,21 +51,32 @@ class HoboMigrationGenerator < Rails::Generator::Base
     end
     
     up = [renames, drops, creates, changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
-    
     down = [undo_renames, undo_drops, undo_creates, undo_changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
     
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
     
-    generate = !up.blank? && input("OK? [Yn]:").strip.downcase != "n"
+    return record {|m| } if up.blank?
     
     up.gsub!("\n", "\n    ")
     down.gsub!("\n", "\n    ")
     
-    record do |m|
-      m.migration_template 'migration.rb', 'db/migrate', 
-                           :assigns => { :up => up, :down => down, :migration_name => @migration_name.camelize }, 
-                           :migration_file_name => @migration_name if generate
+    action = input("What now: [g]enerate migrations, generate and [m]igrate now or [c]ancel?", %w(g m c))
+
+    if action == 'c'
+      # record nothing to keep the generator happy
+      record {|m| }
+    else
+      at_exit { system "rake db:migrate" } if action == 'm' 
+      
+      up.gsub!("\n", "\n    ")
+      down.gsub!("\n", "\n    ")
+
+      record do |m|
+        m.migration_template 'migration.rb', 'db/migrate', 
+                             :assigns => { :up => up, :down => down, :migration_name => @migration_name.camelize }, 
+                             :migration_file_name => @migration_name
+      end
     end
   end
   
@@ -101,14 +112,15 @@ class HoboMigrationGenerator < Rails::Generator::Base
   end
 
   def create_table(model)
-      (["create_table :#{model.table_name} do |t|"] +
-       model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f)} +
-       ["end"]) * "\n"
+    longest_field_name = model.field_specs.values.map { |f| f.sql_type.to_s.length }.max
+    (["create_table :#{model.table_name} do |t|"] +
+     model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f, longest_field_name)} +
+     ["end"]) * "\n"
   end
   
-  def create_field(field_spec)
+  def create_field(field_spec, field_name_width)
     args = [field_spec.name.inspect] + format_options(field_spec.options, field_spec.sql_type)
-    "  t.#{field_spec.sql_type} #{args * ', '}"
+    "  t.%-*s %s" % [field_name_width, field_spec.sql_type, args.join(', ')]
   end
   
   def change_table(model)
@@ -205,9 +217,16 @@ class HoboMigrationGenerator < Rails::Generator::Base
   end
   
   
-  def input(prompt)
+  def input(prompt, options=nil)
     print(prompt + " ")
-    STDIN.readline
+    if options
+      while !(response = STDIN.readline.strip.downcase).in?(options); 
+        print(prompt + " ")
+      end
+      response
+    else
+      STDIN.readline
+    end
   end
   
 end

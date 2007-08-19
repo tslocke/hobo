@@ -57,7 +57,7 @@
 
 
 <def tag="spinner">
-  <image src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
+  <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
 </def>
 
 

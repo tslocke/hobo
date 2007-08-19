@@ -298,6 +298,11 @@ module Hobo
       n.set_creator(current_user)
       n
     end
+    
+    
+    def defined_route?(r)
+      @view.respond_to?("#{r}_url")
+    end
      
      
     # debugging support

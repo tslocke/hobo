@@ -178,8 +178,11 @@ module Hobo::Dryml
       res
     end
     
-    def call_polymorphic_tag(name, attributes={}, &b)
-      tag = find_polymorphic_tag(name)
+    def call_polymorphic_tag(*args, &b)
+      attributes = extract_options_from_args!(args)
+      name, type = args
+      
+      tag = find_polymorphic_tag(name, type)
       if tag != name
         send(tag, attributes, &b)
       else

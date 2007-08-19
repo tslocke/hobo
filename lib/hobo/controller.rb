@@ -115,10 +115,16 @@ module Hobo
 
 
     def render_tags(objects, tag, options={})
+      for_type = options.delete(:for_type)
       add_variables_to_assigns
       dryml_renderer = Hobo::Dryml.empty_page_renderer(@template)
-      render :text => objects.map {|o| dryml_renderer.send(tag, options.merge(:obj => o))}.join +
-                      dryml_renderer.part_contexts_js
+      
+      results = objects.map do |o| 
+        tag = dryml_renderer.find_polymorphic_tag(tag, o.class) if for_type
+        dryml_renderer.send(tag, options.merge(:with => o))
+      end.join
+      
+      render :text => results + dryml_renderer.part_contexts_js
     end
 
 
@@ -127,7 +133,7 @@ module Hobo
       if results.empty?
         render :text => "<p>Your search returned no matches.</p>"
       else
-        render_tags(results, :name => "card", :for_type => true)
+        render_tags(results, :card, :for_type => true)
       end
     end
 

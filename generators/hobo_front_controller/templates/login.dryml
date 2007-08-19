@@ -37,6 +37,6 @@
         Edit app/views/<%= full_class_path %>/login.dryml to customise this page
       </div>
     </panel>
-  </:main>
+  </main>
 
 </Page>
