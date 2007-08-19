@@ -23,12 +23,16 @@
   new_record = this.respond_to?(:new_record?) && this.new_record?
    
   method = if method.nil?
-             (action.nil? && !new_record) ? "put" : "post"
+             (action || web_method || new_record) ? "post" : "put"
            else
              method.downcase
            end
-  http_method_hidden = hidden_field_tag("_method", "PUT") if method == "put"
-  html_attrs[:method] = method
+  if method == "put"
+    http_method_hidden = hidden_field_tag("_method", "PUT") 
+    html_attrs[:method] = "post"
+  else
+    html_attrs[:method] = method
+  end
    
   if update || !ajax_attrs.empty?
     # add an onsubmit to convert to an ajax form if `update` is given
