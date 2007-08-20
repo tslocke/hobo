@@ -2,18 +2,19 @@ module Hobo
 
   module Model
     
-    Hobo.field_types.update({ :html        => HtmlString,
-                              :markdown    => MarkdownString,
-                              :textile     => TextileString,
-                              :password    => PasswordString,
-                              :text        => Hobo::Text,
-                              :boolean     => TrueClass,
-                              :date        => Date,
-                              :datetime    => Time,
-                              :integer     => Fixnum,
-                              :big_integer => BigDecimal,
-                              :float       => Float,
-                              :string      => String
+    Hobo.field_types.update({ :html          => HtmlString,
+                              :markdown      => MarkdownString,
+                              :textile       => TextileString,
+                              :password      => PasswordString,
+                              :text          => Hobo::Text,
+                              :boolean       => TrueClass,
+                              :date          => Date,
+                              :datetime      => Time,
+                              :integer       => Fixnum,
+                              :big_integer   => BigDecimal,
+                              :float         => Float,
+                              :string        => String,
+                              :email_address => EmailAddress
                             })
     
     def self.included(base)
@@ -111,6 +112,10 @@ module Hobo
         refl = reflections[name]
         fkey = refl.primary_key_name
         field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer)
+        if refl.options[:polymorphic]
+          type_col = "#{name}_type"
+          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string)
+        end
         res
       end
       

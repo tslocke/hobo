@@ -11,6 +11,10 @@ class HoboMigrationGenerator < Rails::Generator::Base
   def manifest
     connection = ActiveRecord::Base.connection
     @types = connection.native_database_types
+    
+    # Force load of hobo models
+    Hobo.models
+    
     models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
     table_models = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)

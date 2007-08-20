@@ -13,6 +13,13 @@ module Hobo
       base.extend(ClassMethods)
 
       base.class_eval do
+        fields do
+          crypted_password          :string, :limit => 40
+          salt                      :string, :limit => 40
+          remember_token            :string
+          remember_token_expires_at :datetime
+        end
+        
         # Virtual attribute for the unencrypted password
         attr_accessor :password
 

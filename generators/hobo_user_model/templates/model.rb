@@ -5,11 +5,7 @@ class <%= class_name %> < ActiveRecord::Base
   include Hobo::AuthenticatedUser
 
   fields do
-    username                  :string
-    crypted_password          :string, :limit => 40
-    salt                      :string, :limit => 40
-    remember_token            :string
-    remember_token_expires_at :datetime
+    username :string
     timestamps
   end
   
