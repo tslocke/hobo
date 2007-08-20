@@ -166,7 +166,7 @@
     can_view?
    
   if this == nil
-    this_type <= String ? "" : "(Not Available)"
+    this_type.is_a?(Class) && this_type <= String ? "" : "(Not Available)"
   elsif this_type.respond_to?(:macro)
     if this_type.macro == :belongs_to
       belongs_to_view(attributes)

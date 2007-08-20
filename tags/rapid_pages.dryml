@@ -110,7 +110,7 @@
       <panel param="main_panel">
         <header param="main_header"><h2>Details</h2></header>
         <section>
-          <FieldList skip="name" tag="editor"/>
+          <FieldList skip="name" tag="editor" param/>
         </section>
 
         <section param="new_links">
