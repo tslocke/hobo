@@ -433,7 +433,7 @@ module Hobo::Dryml
     
     def default_tagbody_element(el)
       name = el.attributes['for'] || @containing_tag_name
-      "<% #{name}_default_tagbody.call %>"
+      "<% #{name}_default_tagbody && #{name}_default_tagbody.call %>"
     end
 
 
