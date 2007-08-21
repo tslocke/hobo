@@ -37,7 +37,7 @@ a:hover.no_hover { background: transparent; }
 
 /* Main Page Body Window */
 
-#header .logo { margin: 15px 10px 5px 10px; float: left; }
+#header .logo { position: absolute; top: 15px; left: 20px; }
 #header .logo a { background: transparent; }
 
 #header { 
@@ -45,15 +45,17 @@ a:hover.no_hover { background: transparent; }
     height: 80px;
 }
 
-.nav_bars { position: absolute; top: 15px; right: 0; width: auto; margin-right: 10px; }
+.nav { 
+    padding: 20px 15px 0 0;
+}
+
+.nav ul { margin: 0; padding: 0; float: right; }
+ul.account_nav { font-size: 80%; clear:right; }
 
 .nav li { list-style: none; margin: 0; padding: 0; float: left; padding: 5px; font-size: 130%; }
 .nav a { text-decoration: none;}
-.nav { overflow: hidden; width: 100%; margin: 0; padding: 0 }
-.nav ul { margin: 0; padding: 0; float: right; }
 
 .main_nav li { text-transform: uppercase; }
-.account.nav ul { font-size: 80%; }
 
 .flash { margin: 10px 30px; background: white; border: 2px solid #aaf; padding: 10px; text-align: center; }
 

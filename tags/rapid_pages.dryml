@@ -34,7 +34,7 @@
         <header id="page_header" param>
           <div class="logo" param="logo"><image src="logo.png"/></div>
           <nav param>
-            <magic_nav param="main_mav"/>
+            <magic_nav class="main_nav" param="main_mav"/>
             <account_nav if="&respond_to? :login_url" param/>
           </nav>
         </header>

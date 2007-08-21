@@ -29,14 +29,13 @@
 
           <div id='header' param="header">
             <div class="logo" param="logo"><theme_image src="logo.gif"/></div>
-            <div class="nav_bars" param="navigation">
-              <do param="main_nav"><magic_nav class="main_nav"/></do>
+            <nav param>
+              <magic_nav class="main_nav" param="main_nav"/>
               <if test="&defined_route? :login"><account_nav param/></if>
-            </div>
-            <clearer/>
+            </nav>
           </div>
 
-          <display_flash/>
+          <flash_message/>
 
           <div param="intro"></div>
           <div param="main">

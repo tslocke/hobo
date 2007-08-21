@@ -5,7 +5,7 @@
 <!--- General Navigation -->
   
 <def tag="navigation" attrs="current">
-  <ul>
+  <ul merge_attrs>
     <set_scoped current_navigation="&current">
       <tagbody/>
     </set_scoped>
@@ -24,7 +24,7 @@
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account_nav">
-  <ul>
+  <ul class="account_nav">
     <if test="&logged_in?">
       <li class='nav_item'>Logged in as <view:login with="&current_user"/></li>
       <li class='nav_item'><a href="&logout_url">Log out</a></li>
