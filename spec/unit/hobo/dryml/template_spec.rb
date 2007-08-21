@@ -31,13 +31,13 @@ describe Template do
   
   it "should support <default_tagbody/> inside the content of a block-tag" do 
     compile_dryml("<foo>!!<default_tagbody/>??</foo>").should == 
-      "<% _output(foo() do |foo_default_tagbody| %>!!<% foo_default_tagbody.call %>??<% end) %>"
+      "<% _output(foo() do |foo_default_tagbody| %>!!<% foo_default_tagbody && foo_default_tagbody.call %>??<% end) %>"
   end
   
   it "should support the 'for' attribute on <default_tagbody/>" do 
     compile_dryml("<x><y>123<default_tagbody for='x'/>456</y></x>").should == 
       "<% _output(x() do |x_default_tagbody| %><% _output(y() do |y_default_tagbody| %>" +
-      "123<% x_default_tagbody.call %>456" +
+      "123<% x_default_tagbody && x_default_tagbody.call %>456" +
       "<% end) %><% end) %>"
   end
   
@@ -119,7 +119,7 @@ describe Template do
   it "should compile a param tag-call with a body and a call to <default_tagbody/>" do 
     compile_in_template("<foo param>!!<default_tagbody/>!!</foo>").should == 
       "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |foo_default_tagbody| %>" +
-      "!!<% foo_default_tagbody.call %>!!<% end) %>"
+      "!!<% foo_default_tagbody && foo_default_tagbody.call %>!!<% end) %>"
   end
 
   it "should compile param template-calls as calls to `call_template_parameter`" do 

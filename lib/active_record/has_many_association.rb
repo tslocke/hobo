@@ -1,10 +1,14 @@
 module ActiveRecord::Associations
 
   class HasManyAssociation
+    
+    def hobo_has_many?
+      Hobo::Model.in?(@owner.class.included_modules)
+    end
 
     def build_with_reverse_reflection(*args)
       res = build_without_reverse_reflection(*args)
-      set_reverse_association(res)
+      set_reverse_association(res) if hobo_has_many?
       res
     end
     alias_method_chain :build, :reverse_reflection
@@ -12,8 +16,10 @@ module ActiveRecord::Associations
 
     def new(attributes = {})
       record = @reflection.klass.new(attributes)
-      set_belongs_to_association_for(record)
-      set_reverse_association(record)
+      if hobo_has_many?
+        set_belongs_to_association_for(record)
+        set_reverse_association(record)
+      end
       record
     end
     

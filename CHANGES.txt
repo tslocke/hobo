@@ -1,3 +1,101 @@
+=== Release 0.6 ===
+
+DRYML
+
+  Local tags are gone. We finally gave up on this feature as too
+  complex.
+
+  New feature - <set_scoped> allows a variable assignment that exists
+  only for the lifetime of the tag-body of <set_scoped/>. At the end
+  of the block, the previous value of the variable, if there will be
+  restored. This feature gives a lot of the power of local tags in a
+  less pure but far simpler mechanism.
+
+  New feature - polymorphic tags. Define with e.g.
+
+    <def tag="card" for_type="User"/>
+  
+    call with <card for_type/>
+
+    The actual tag called will be selected according to the type of
+    the current context.
+
+  Core tags moved from lib/hobo/core.rb to tags/core.dryml. This
+  follows on from the deprecating of def_tag
+
+  Fix: attrs_for now works with tags imported from a taglib
+
+  
+
+Hobo Models
+
+  The display_name method is not used anymore. Instead use the new
+  polymorphic tags.
+
+    <def tag="name" for="MyModel">...</def>
+
+    The <name> tag eventually falls back on to_s, so as an alternative
+    you can rename your display_name methods to to_s.
+
+  New semantics for #new and #build.
+
+    #new now does what new_without_appending used to do. That is, it
+    instantiates a new object exactly as if it was in the collection,
+    but it does not modify the collection itself.
+
+    #build is extended so that it sets the belongs_to association that
+    is the counterpart to the has_many.
+
+    For existing apps, just change any calls to #new_without_appending
+    to #new
+
+Front controller
+
+  All the templates are updated to use the new DRYML
+
+Migration generator
+
+  Now gives an option to generate and run the migration immediately
+
+Hobo Rapid
+
+  Now includes two CSS stylesheets. hobo_base.css provides some handy
+  reset rules to reduce cross-browser headaches, and hobo_rapid.css
+  provides default styling for some of the Rapid components.
+
+Hobo Rapid Javascript
+
+  Fix: problems with the save button in TinyMCE fighting with the
+  save-on-blur behaviour.
+
+Tabla theme
+
+  Tweaks to application.dryml and the stylesheet for new DRYML
+
+Hobo user model generator
+
+  Doesn't declare the authentication fields anymore, as these have
+  been moved to Hobo::Authenticated user. This is part of the move to
+  supporting multiple user models.
+
+Hobo controller & helpers
+
+  ControllerHelpers are now HoboHelper, and there's a change to the
+  way this is included in both the controller and the view.
+
+  #render_tags extended to support polymorphic tags
+
+  #site_search now renders the polymorphic <card> tag for each search
+  result.
+
+
+Core Extensions
+
+  ActiveSupport's HashWithIndifferentAccess is extended to keep it's
+  indifferent access semantics with Hobo's extensions to Hash.
+
+
+
 === Release 0.6-pre1 ===
 
 *NOTE* We are now using Edge Rails for all our tests. YMMV with other

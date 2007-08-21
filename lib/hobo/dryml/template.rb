@@ -164,16 +164,14 @@ module Hobo::Dryml
         default_tagbody_element(el)
         
       else
-        with_local_tag_redefines(el) do
-          if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param'] || el.attributes['restore']
-            if el.dryml_name =~ /^[A-Z]/
-              template_call(el)
-            else
-              tag_call(el)
-            end
+        if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param'] || el.attributes['restore']
+          if el.dryml_name =~ /^[A-Z]/
+            template_call(el)
           else
-            static_element_to_erb(el)
+            tag_call(el)
           end
+        else
+          static_element_to_erb(el)
         end
       end
     end
@@ -199,20 +197,6 @@ module Hobo::Dryml
     end
 
 
-    def with_local_tag_redefines(el)
-      def_tags = el.children.select {|e| e.is_a?(REXML::Element) && e.name == "def"}
-      
-      if def_tags.empty?
-        yield
-      else
-        def_names = def_tags.map {|e| Hobo::Dryml.unreserve(e.attributes["tag"]) }
-        "<% self.class.start_redefine_block(#{def_names.inspect}) #{tag_newlines(el)} %>" +
-          yield +
-          "<% self.class.end_redefine_block %>"
-      end
-    end
-    
-    
     def set_element(el)
       assigns = el.attributes.map do |name, value|
         dryml_exception(el, "invalid name in set") unless name =~ DRYML_NAME_RX
@@ -241,10 +225,6 @@ module Hobo::Dryml
 
 
     def def_element(el)
-      # If it's not a toplevel element, it's a redefine (a local tag)
-      # DISABLED
-      redefine = false # el.parent != el.document.root
-
       require_toplevel(el)
       require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
@@ -286,34 +266,26 @@ module Hobo::Dryml
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
 
-        if redefine
-          re_alias = "<% self.class.send(:alias_method, :#{new_name}, :#{old_name}) %>"
-        else
-          @builder.add_build_instruction(:alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
-        end
+        @builder.add_build_instruction(:alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
       end
       
       res = if alias_of
               "#{re_alias}<% #{tag_newlines(el)} %>"
             else
               src = if template_name?(name)
-                      template_method(name, re_alias, redefine, el)
+                      template_method(name, re_alias, el)
                     else
-                      tag_method(name, re_alias, redefine, el)
+                      tag_method(name, re_alias, el)
                     end
-              src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>" unless redefine
+              src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>"
               
               logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
               
-              if redefine
-                src
-              else
-                @builder.add_build_instruction(:def,
-                                               :src => restore_erb_scriptlets(src),
-                                               :line_num => element_line_num(el))
-                # keep line numbers matching up
-                "<% #{"\n" * src.count("\n")} %>"
-              end
+              @builder.add_build_instruction(:def,
+                                             :src => restore_erb_scriptlets(src),
+                                             :line_num => element_line_num(el))
+              # keep line numbers matching up
+              "<% #{"\n" * src.count("\n")} %>"
             end
       @def_name = old_def_name
       res
@@ -340,49 +312,21 @@ module Hobo::Dryml
     end
     
     
-    def template_method(name, re_alias, redefine, el)
+    def template_method(name, re_alias, el)
       param_names = param_names_in_template(el)
       
-      if redefine
-        prefix = @def_name.downcase
-
-        method_body = tag_method_body(el, "#{prefix}_attributes", "#{prefix}_block")
-        re_alias + 
-          "<% self.class.redefine_tag(:#{name}, " + 
-          "proc {|#{prefix}_attributes, #{prefix}_all_parameters, #{prefix}_block| " +
-          "@_locals_stack.push [tagbody, attributes, parameters]; " +
-          "parameters = #{prefix}_all_parameters - #{param_names.inspect}; " +
-          "__res__ = #{method_body}; " +
-          "tagbody, attributes, parameters = @_locals_stack.pop; " +
-          "__res__; }); %>"
-      else
-        "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
-          "parameters = all_parameters - #{param_names.inspect}; " +
-          tag_method_body(el) +
-          "; end %>"
-      end
+      "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
+        "parameters = all_parameters - #{param_names.inspect}; " +
+        tag_method_body(el) +
+        "; end %>"
     end
     
     
-    def tag_method(name, re_alias, redefine, el)
-      if redefine
-        prefix = @def_name.downcase
-
-        method_body = tag_method_body(el, "#{prefix}_attributes", "#{prefix}_block")
-        re_alias + 
-          "<% self.class.redefine_tag(:#{name}, " +
-          "proc {|#{prefix}_attributes, #{prefix}_block| " +
-          "@_locals_stack.push [tagbody, attributes, parameters]; " +
-          "parameters = nil; " +
-          "__res__ = #{method_body}; " +
-          "tagbody, attributes, parameters = @_locals_stack.pop; " +
-          "__res__; }); %>"
-      else
-        "<% def #{name}(all_attributes={}, &__block__); " +
-          "parameters = nil; " +
-          tag_method_body(el) + 
-          "; end %>"
-      end
+    def tag_method(name, re_alias, el)
+      "<% def #{name}(all_attributes={}, &__block__); " +
+        "parameters = nil; " +
+        tag_method_body(el) + 
+        "; end %>"
     end
               
     
@@ -399,7 +343,7 @@ module Hobo::Dryml
       "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
-        with_local_tag_redefines(el) { children_to_erb(el) } +
+        children_to_erb(el) +
         "<% _erbout; end"
     end
     
