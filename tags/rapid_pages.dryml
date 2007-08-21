@@ -3,9 +3,13 @@
   <html>
     <head param>
       <title param><%= title %></title>
-      <stylesheet name="hobo_base"/>
-      <stylesheet name="application"/>
-      <%= javascript_include_tag :defaults %>
+      <do param="stylesheets">
+        <stylesheet name="hobo_base"/>
+        <stylesheet name="application"/>
+      </do>
+      <do param="scripts">
+        <%= javascript_include_tag :defaults %>
+      </do>
     </head>
     <body onload="Hobo.applyEvents();" param>
     </body>
@@ -14,20 +18,27 @@
 
 <def tag="Page">
   <BasePage merge>
-    <head param>
-      <default_tagbody/>
+    <stylesheets>
+      <stylesheet name="hobo_base"/>
       <stylesheet name="hobo_rapid"/>
+      <stylesheet name="application"/>
+    </stylesheets>
+    <scripts>
+      <default_tagbody/>
       <hobo_rapid_javascripts param/>
-    </head>
+    </scripts>
+
     <body param>
       <div class="page_wrapper" param="wrapper">
         <ajax_progress/>
         <header id="page_header" param>
           <div class="logo" param="logo"><image src="logo.png"/></div>
-          <do param="navigation"><magic_nav/></do>
-          <account_nav if="&respond_to? :login_url" param/>
+          <nav param>
+            <magic_nav param="main_mav"/>
+            <account_nav if="&respond_to? :login_url" param/>
+          </nav>
         </header>
-        <display_flash/>
+        <flash_message param/>
         <div id="page_main" param="main"></div>
         <footer id="page_footer" param/>
       </div>
@@ -50,6 +61,8 @@
         <heading><%= model_name.pluralize %></heading>
       </header>
 
+      <nav param="top_page_nav"><page_nav/></nav>
+
       <panel param="main" class="main">
         <header param="main_header">
           <h2><count label="&model_name"/></h2>
@@ -60,10 +73,9 @@
           </Table>
         </section>
         
-        <section><page_nav param/></section>
+        <nav param="bottom_page_nav"><page_nav/></nav>
 
         <section param="new_link"><a to="&@model" action="new"/></section>
-
       </panel>
     </main>
   </PageForIndex>
@@ -166,7 +178,8 @@
         <header param="main_header">
           <count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/>
         </header>
-        <section><page_nav param/></section>
+
+        <nav param="top_page_nav"><page_nav/></nav>
 
         <section>
           <Table param="Table">
@@ -178,7 +191,7 @@
           </Table>
         </section>
 
-        <section><page_nav param/></section>
+        <nav param="bottom_page_nav"><page_nav param/></nav>
 
         <if test="&Hobo.simple_has_many_association?(@association)">
           <section param="new_link">
@@ -214,7 +227,7 @@
   <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }" rel="stylesheet" type="text/css" />
 </def>
 
-<def tag="display_flash" attr="type">
+<def tag="flash_message" attr="type">
   <% type = type ? type.to_sym : :notice %>
   <div class="flash" if="&flash[type]"><%= flash[type] %></div>
 </def>

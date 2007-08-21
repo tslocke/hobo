@@ -5,13 +5,11 @@
 <!--- General Navigation -->
   
 <def tag="navigation" attrs="current">
-  <nav merge_attrs>
-    <ul>
-      <set_scoped current_navigation="&current">
-        <tagbody/>
-      </set_scoped>
-    </ul>
-  </nav>
+  <ul>
+    <set_scoped current_navigation="&current">
+      <tagbody/>
+    </set_scoped>
+  </ul>
 </def>
 
 <def tag="nav_item">
@@ -26,31 +24,27 @@
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account_nav">
-  <nav class="account">
-    <ul>
-      <if test="&logged_in?">
-        <li class='nav_item'>Logged in as <view:login with="&current_user"/></li>
-        <li class='nav_item'><a href="&logout_url">Log out</a></li>
-      </if>
-      <else>
-        <li class='nav_item'><a href="&login_url">Log in</a></li>
-        <li if="&defined_route? :signup" class='nav_item'><a href="&signup_url">Sign up</a></li>
-      </else>
-    </ul>
-  </nav>
+  <ul>
+    <if test="&logged_in?">
+      <li class='nav_item'>Logged in as <view:login with="&current_user"/></li>
+      <li class='nav_item'><a href="&logout_url">Log out</a></li>
+    </if>
+    <else>
+      <li class='nav_item'><a href="&login_url">Log in</a></li>
+      <li if="&defined_route? :signup" class='nav_item'><a href="&signup_url">Sign up</a></li>
+    </else>
+  </ul>
 </def>
 
 
 <!--- Pagination Navigation -->
 
 <def tag="page_nav" attrs="params">
-  <nav if="&@pages.length > 1">
-    <page_n_of_count/> - 
-    <first_page_link params="&params">|&lt;</first_page_link>
-    <previous_page_link params="&params">Previous</previous_page_link>
-    <next_page_link params="&params">Next</next_page_link>
-    <last_page_link params="&params">&gt|</last_page_link>
-  </nav>
+  <page_n_of_count/> - 
+  <first_page_link params="&params">|&lt;</first_page_link>
+  <previous_page_link params="&params">Previous</previous_page_link>
+  <next_page_link params="&params">Next</next_page_link>
+  <last_page_link params="&params">&gt|</last_page_link>
 </def>
 
 
