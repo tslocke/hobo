@@ -70,7 +70,7 @@
 
 
 <def tag="first_page_link" attrs="params">
-  <a if="&@pages && @pages.current.first"
+  <a if="&@pages && @pages.first_page"
      href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
     <tagbody>&laquo; First page</tagbody>
   </a>
@@ -78,7 +78,7 @@
 
 
 <def tag="last_page_link" attrs="params">
-  <a if="&@pages && @pages.current.last"
+  <a if="&@pages && @pages.last_page"
      href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
     <tagbody>Last page &raquo;</tagbody>
   </a>
