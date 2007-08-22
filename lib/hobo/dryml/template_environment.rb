@@ -394,12 +394,12 @@ module Hobo::Dryml
             content_tag(the_tag, body, attributes)
           end
         else
-          body = tagbody || b
           if the_tag.is_a?(String, Symbol)
+            body = proc { |default| tagbody ? tagbody.call(proc { b.call(default) }) : b.call(default) }
             send(the_tag, attributes, &body)
           else
             # It's a proc - a template default
-            the_tag.call(attributes, body)
+            the_tag.call(attributes, tagbody || b)
           end
         end
       end

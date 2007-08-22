@@ -387,10 +387,14 @@ describe Template do
     
   end
   
-  it "should allow parameter bodies to be restored" do 
+  it "should allow parameter bodies to be restored with static tag params" do 
     eval_with_templates("<StaticMerge><b>very <default_tagbody/></b></StaticMerge>").should ==
       '<p>a <b name="big">very bold</b> word</p>'
+  end
 
+  it "should allow parameter bodies to be restored with defined tag params" do 
+    eval_with_templates("<DefTagMerge><defined>hum<default_tagbody/></defined></DefTagMerge>").should ==
+      'foo a is , b is 3, body is humbaa!'
   end
   
   
