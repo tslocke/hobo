@@ -219,7 +219,8 @@ module Hobo
      
      
     def theme_asset(path)
-      "#{base_url}/hobothemes/#{Hobo.current_theme}/#{path}"
+      theme_path = Hobo.current_theme ? "hobothemes/#{Hobo.current_theme}/" : ""
+      "#{base_url}/#{theme_path}#{path}"
     end
      
     def js_str(s)
