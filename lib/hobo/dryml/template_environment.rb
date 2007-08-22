@@ -395,7 +395,14 @@ module Hobo::Dryml
           end
         else
           if the_tag.is_a?(String, Symbol)
-            body = proc { |default| tagbody ? tagbody.call(proc { b.call(default) }) : b.call(default) }
+            body = proc do |default| 
+              if tagbody
+                tagbody.call(proc { b ? b.call(default) : "" })
+              else
+                b ? b.call(default) : ""
+              end
+            end
+            
             send(the_tag, attributes, &body)
           else
             # It's a proc - a template default
