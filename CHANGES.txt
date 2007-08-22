@@ -11,9 +11,11 @@ DRYML
   restored. This feature gives a lot of the power of local tags in a
   less pure but far simpler mechanism.
 
-  New feature - polymorphic tags. Define with e.g.
+  New feature - polymorphic tags. A tag can have many definitions for
+  different types of object. Define with e.g.
 
-    <def tag="card" for_type="User"/>
+    <def tag="card" for="User"/>...</def>
+    <def tag="card" for="BlogPost">...</def>
   
     call with <card for_type/>
 
@@ -25,7 +27,54 @@ DRYML
 
   Fix: attrs_for now works with tags imported from a taglib
 
-  
+  Gone: template parameter modifiers (e.g. <my_param.append>). The
+  only one left is 'replace' which is now written as '<my_param
+  replace>' and 'replace' is now a reserved attribute name. Two new
+  features - default tagbodies and restoring parameters - give the
+  same functionality but are more powerful because you can now _wrap_
+  a parameter in your own tag.
+
+  New feature - default tagbodies. Tags can provide a default tagbody
+  like this:
+
+    <def tag="foo">...<tagbody>this is the default</tagbody>...</def>
+
+    Callers can keep the default: <foo/>
+    replace it <foo>my tagbody</foo>
+    or wrap it in new content: <foo>&ldquo;<default_tagbody/>&rdquo;</foo>
+
+    You can give restore the default tagbody of an element further up
+    the hierarchy using the 'for' attribute. e.g:
+
+      <foo><baa>&ldquo;<default_tagbody for="foo"/>&rdquo;</baa></foo>
+
+  New feature: restoring replaced template parameters. For example -
+  wrapping a template param in an extra div:
+
+    <MyTemplate>
+      <my_param replace><div><my_param restore/></div></my_param>
+    </MyTemplate>
+
+  def@alias_current renamed to 'alias_current_as'
+
+  @if and @unless controll attributes always test for non-blank rather
+  than true. This is more convenient in DRYML where we generally want
+  to skip stuff if a collection is empty (empty enumerables are blank,
+  but not false)
+
+  An attribute that starts with an XML entity reference is *not*
+  considered a code attribute, even though it does start '&'
+  e.g. label="&raquo; Next"
+
+  #merge_attrs now always accumultates rather than
+  replaces css classes.
+
+  form, input and a have been removed from static_tags - these are now
+  defined tags.
+
+  Many core tags moved to Rapid. There are very ferw core tags now - just
+  the basic control tags (if, unless etc.)
+
 
 Hobo Models
 
@@ -49,34 +98,117 @@ Hobo Models
     For existing apps, just change any calls to #new_without_appending
     to #new
 
+  Refactored the rich type mechanism to make it easier to add new
+  types. To add a new type, e.g.:
+
+    class Isbn < String; COLUMN_TYPE = :string; end
+
+    Hobo.field_types[:isbn] = Isbn
+
+    You can then use :isbn as a field type in 'fields do', and
+    register a view with <def tag="view" for="isbn">
+
+
+  New rich type Hobo::EmailAddress < String
+
+    Doesn't have any special behaviour as yet, but we could do nifty
+    things with it in the future like auto anti-spam cloaking,
+    validations...
+
+  New method #nillable_field? tests if the underlying collumn can be
+  null.
+
+  New methods #created_date and #modified_date return
+  [created|modified]_at.to_date
+
+  Default to_s for all hobo_models
+
+
+Model controller
+
+  Boolean fields now get a false value when the param is either '0' or
+  'false'.
+
+
 Front controller
 
   All the templates are updated to use the new DRYML
+
 
 Migration generator
 
   Now gives an option to generate and run the migration immediately
 
+  Will create the "foo_type" column for belongs_to associations marked
+  as polymorphic.
+
+
 Hobo Rapid
+
+  lib/hobo/rapid.rb is gone. The tags are now in tags/rapid.dryml and
+  the helpers are in lib/hobo/rapid_helper.rb
 
   Now includes two CSS stylesheets. hobo_base.css provides some handy
   reset rules to reduce cross-browser headaches, and hobo_rapid.css
   provides default styling for some of the Rapid components.
+
+  Rapid split up into more separate dryml files: rapid,
+  rapid_document_tags, rapid_forms, rapid_pages, rapid_editing,
+  rapid_navigation, rapid_support
+
+  There are a great many changes to the Rapid tags, too much to
+  describe individually here. The most important changes are:
+
+    <show> becomes <view>. <view> is a polymorphic tag, so you can
+    <def tag="view" for="MyClass">
+
+    <edit> is gone. Use <editor> if you want a tag that gives an
+    in-place (ajax) editor, and degrades to <view> if the user does
+    not have edit permission. <editor> is a polymorphic tag, so you
+    can <def tag="editor" for="MyClass">
+
+    <form_field> is now <input>. If you give a type attributes, you
+    get a regular html input tag, if you don't you get a smart Hobo
+    form field appropriate for the type of the context. <input> is a
+    polymorphic tag, so you can <def tag="input" for="MyClass">
+
+    All the special form-field tags tags that ended _field now end
+    _input
+
+    <table_for> becomes <Table>
+
+    <ul_for> becomes <UL>
+
+    <object_form> and <remote_method_form> are now both handled by
+    <form>
+
+    <object_link> and <new_object_link> are now both handled by <a>
+
+    <object_table> becomes <FieldList>
+
+    <display_name> becomes <name>
+
+    Various small changes to the navigation tags - please see
+    rapid_navigation.dryml
+
 
 Hobo Rapid Javascript
 
   Fix: problems with the save button in TinyMCE fighting with the
   save-on-blur behaviour.
 
+
 Tabla theme
 
   Tweaks to application.dryml and the stylesheet for new DRYML
+
 
 Hobo user model generator
 
   Doesn't declare the authentication fields anymore, as these have
   been moved to Hobo::Authenticated user. This is part of the move to
   supporting multiple user models.
+
 
 Hobo controller & helpers
 
@@ -87,6 +219,18 @@ Hobo controller & helpers
 
   #site_search now renders the polymorphic <card> tag for each search
   result.
+
+
+Hobo module
+
+  New method Hobo.symbolic_type_name returns a symbol abbreviation for
+  a rich type. e.g. Hobo.symbolic_type_name(Hobo::Text) #=> :text
+
+  New method Hobo.type_name
+
+    Hobo.type_name(MyModule::MyClass) #=> "my_module__my_class"
+
+    Note the double underscore
 
 
 Core Extensions

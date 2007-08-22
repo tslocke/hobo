@@ -46,31 +46,6 @@ module Hobo
           set_field_type(name => @next_method_type)
           @next_method_type = nil
         end
-        
-        return
-        
-        # avoid error when running model generators before
-        # db exists
-        return unless connected? 
-
-        aliased_name = "#{name}_without_hobo_type"
-        return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
-
-        type_wrapper = self.field_type(name)
-        if type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String
-          aliased_name = "#{name}_without_hobo_type"
-          alias_method aliased_name, name
-          define_method name do
-            res = send(aliased_name)
-            if res.nil?
-              nil
-            elsif res.respond_to?(:hobo_undefined?) && res.hobo_undefined?
-              res
-            else
-              type_wrapper.new(res)
-            end
-          end
-        end
       end
       
       
@@ -444,17 +419,6 @@ module Hobo
     end
     
     
-    def method_missing(name, *args, &b)
-      val = super
-      if val.nil?
-        nil
-      else
-        type_wrapper = self.class.field_type(name)
-        (type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String) ? type_wrapper.new(val) : val
-      end
-    end
-
-
     def set_creator(user)
       self.creator ||= user if self.class.has_creator? and not user.guest?
     end
