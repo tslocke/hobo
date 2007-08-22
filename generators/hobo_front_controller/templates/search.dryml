@@ -1,6 +1,7 @@
-<page title="Search" onload="Hobo.doSearch('search_field')">
+<Page title="Search">
+  <body onload="Hobo.applyEvents(); Hobo.doSearch('search_field')"/>
 
-  <:main>
+  <main>
     <panel class="red" style="margin-top: 40px">
       <h2>Search</h2>
       <div class='search' style='margin:10px'>
@@ -11,8 +12,8 @@
 
     <panel class="hidden" id="search_results_panel">
       <h2>Results</h2>
-      <section id="search_results"></section>
+      <section id="search_results">&nbsp;</section>
     </panel>
-  </:main>
+  </main>
 
-</page>
+</Page>

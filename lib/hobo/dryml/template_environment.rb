@@ -1,51 +1,151 @@
 module Hobo::Dryml
 
   class TemplateEnvironment
-
+    
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
       end
       attr_accessor :load_time, :compiled_local_names
+      
+      # --- Local Tags --- #
+      
+      def start_redefine_block(method_names)
+        @_preserved_methods_for_redefine ||= []
+        @_redef_impl_names ||= []
+        
+        methods = {}
+        method_names.each {|m| methods[m] = m.in?(self.methods) && instance_method(m) }
+        @_preserved_methods_for_redefine.push(methods)
+        @_redef_impl_names.push []
+      end
+      
+      
+      def end_redefine_block
+        methods = @_preserved_methods_for_redefine.pop
+        methods.each_pair do |name, method|
+          if method
+            define_method(name, method)
+          else
+            remove_method(name)
+          end
+        end
+        to_remove = @_redef_impl_names.pop
+        to_remove.each {|m| remove_method(m) }
+      end
+      
+      
+      def redefine_nesting
+        @_preserved_methods_for_redefine.length
+      end
+      
+      
+      def redefine_tag(name, proc)
+        impl_name = "#{name}_redefined_#{redefine_nesting}"
+        define_method(impl_name, proc)
+        class_eval "def #{name}(options={}, &b); #{impl_name}(options, b); end"
+        @_redef_impl_names.push(impl_name)
+      end
+      
+      def redefine_template(name, proc)
+        impl_name = "#{name}_redefined_#{redefine_nesting}"
+        define_method(impl_name, proc)
+        class_eval "def #{name}(options={}, template_parameters={}, &b); " +
+          "#{impl_name}(options, template_parameters, b); end"
+        @_redef_impl_names.push(impl_name)
+      end
+
+      # --- end local tags --- #
+      
+      
+      def _register_tag_attrs(tag_name, attrs)
+        @tag_attrs ||= {}
+        @tag_attrs[tag_name] = attrs
+      end
+      
+      def tag_attrs
+        @tag_attrs ||= {}
+      end
+      
     end
 
     for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}
       include mod
     end
 
-    def initialize(view_name, view)
-      @view = view
-      @view_name = view_name
-      @erb_binding = binding
-      @part_contexts = {}
-      @stack = [nil]
+    def initialize(view_name=nil, view=nil)
+      unless view_name.nil? && view.nil?
+        @view = view
+        @_view_name = view_name
+        @_erb_binding = binding
+        @_part_contexts = {}
+        @_scoped_variables = ScopedVariables.new
 
-      # Make sure the "assigns" from the controller are available (instance variables)
-      if view
-        view.assigns.each do |key, value|
-          instance_variable_set("@#{key}", value)
-        end
+        # Make sure the "assigns" from the controller are available (instance variables)
+        if view
+          view.assigns.each do |key, value|
+            instance_variable_set("@#{key}", value)
+          end
 
-        # copy view instance variables over
-        view.instance_variables.each do |iv|
-          instance_variable_set(iv, @view.instance_variable_get(iv))
+          # copy view instance variables over
+          view.instance_variables.each do |iv|
+            instance_variable_set(iv, view.instance_variable_get(iv))
+          end
         end
       end
     end
 
-    attr_accessor :erb_binding, :part_contexts, :view_name
+    attr_accessor 
 
-    attr_reader :this_parent, :this_field, :this_type, :form_field_path, :form_this, :form_field_names
-    
-    def this; @_this; end
-    
-    def attr_extension(s)
-      AttributeExtensionString.new(s)
+    for attr in [:erb_binding, :part_contexts, :view_name,
+                 :this, :this_parent, :this_field, :this_type,
+                 :form_field_path, :form_this, :form_field_names]
+      class_eval "def #{attr}; @_#{attr}; end"
     end
     
     
+    def attrs_for(name)
+      self.class.tag_attrs[name.to_sym]
+    end
+    
+    
+    def add_classes!(attributes, *classes)
+      classes = classes.flatten.select{|x|x}.every(:to_s)
+      current = attributes[:class]
+      attributes[:class] = (current ? current.split + classes : classes).uniq.join(' ')
+      attributes
+    end
+
+
+    def add_classes(attributes, *classes)
+      add_classes!(HashWithIndifferentAccess.new(attributes), classes)
+    end
+
+    
+    def merge_attrs(attrs, overriding_attrs)
+      attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
+      classes = overriding_attrs[:class]
+      attrs = add_classes(attrs, *classes.split) if classes
+      attrs.update(overriding_attrs - [:class])
+    end
+    
+    
+    def scope
+      @_scoped_variables
+    end
+
+
+    def attr_extension(s)
+      AttributeExtensionString.new(s)
+    end
+
+    
     def this_field_dom_id
-      Hobo.dom_id(this_parent, this_field)
+      if this_parent && this_field
+        Hobo.dom_id(this_parent, this_field)
+      else
+        Hobo.dom_id(this)
+      end
     end
 
 
@@ -66,36 +166,81 @@ module Hobo::Dryml
       res = ''
       if part_this
         new_object_context(part_this) do
-          @part_contexts[dom_id] = [part_id, part_context_model_id]
+          @_part_contexts[dom_id] = [part_id, part_context_model_id]
           res = send("#{part_id}_part")
         end
       else
         new_context do
-          @part_contexts[dom_id] = [part_id, part_context_model_id]
+          @_part_contexts[dom_id] = [part_id, part_context_model_id]
           res = send("#{part_id}_part")
         end
       end
       res
     end
+    
+    def call_polymorphic_tag(*args, &b)
+      attributes = extract_options_from_args!(args)
+      name, type = args
+      
+      tag = find_polymorphic_tag(name, type)
+      if tag != name
+        send(tag, attributes, &b)
+      else
+        nil
+      end
+    end
 
+    
+    def find_polymorphic_tag(name, call_type=nil)
+      call_type ||= this_type
+      return name if call_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
+      call_type = TrueClass if call_type == FalseClass
 
+      while true
+        if call_type == ActiveRecord::Base || call_type == Object
+          return name
+        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
+          return poly_name
+        else
+          call_type = call_type.superclass
+        end
+      end
+    end
+    alias_method :find_polymorphic_template, :find_polymorphic_tag
+    
+    
+    def repeat_attribute(array, &b)
+      res = array.map { |x| new_object_context(x, &b) }.join
+      Hobo::Dryml.last_if = !array.empty?
+      res
+    end
+
+    
     def _erbout
-      @output
+      @_erb_output
+    end
+    
+    
+    def _output(s)
+      @_erb_output.concat(s)
     end
 
 
     def new_context
-      ctx = @output, @_this, @this_parent, @this_field, @this_type, @form_field_path
-      @output = ""
+      ctx = [ @_erb_output,
+              @_this, @_this_parent, @_this_field, @_this_type,
+              @_form_field_path]
+      @_erb_output = ""
       res = yield
-      @output, @_this, @this_parent, @this_field, @this_type, @form_field_path = ctx
+      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type,
+          @_form_field_path = ctx
       res.to_s
     end
 
 
     def new_object_context(new_this)
       new_context do
-        @this_parent,@this_field,@this_type = if new_this.respond_to?(:proxy_reflection)
+        @_this_parent,@_this_field,@_this_type = if new_this.respond_to?(:proxy_reflection)
                                                 refl = new_this.proxy_reflection
                                                 [new_this.proxy_owner, refl.name, refl]
                                               else
@@ -129,10 +274,9 @@ module Hobo::Dryml
                else
                  obj.class
                end
-        
 
-        @_this, @this_parent, @this_field, @this_type = obj, parent, field, type
-        @form_field_path += path if @form_field_path
+        @_this, @_this_parent, @_this_field, @_this_type = obj, parent, field, type
+        @_form_field_path += path if @_form_field_path
         yield
       end
     end
@@ -141,23 +285,25 @@ module Hobo::Dryml
     def _tag_context(options, tagbody_proc)
       tagbody = tagbody_proc && proc do |*args|
         res = ''
-        block_options = args.length > 0 && args.first
-        if block_options and block_options.has_key?(:obj)
-          new_object_context(block_options[:obj]) { res = tagbody_proc.call }
-        elsif block_options and block_options.has_key?(:attr)
-          new_field_context(block_options[:attr]) { res = tagbody_proc.call }
+        
+        block_options, default_tagbody = args
+        block_with = block_options && block_options[:with]
+        if block_options && block_options.has_key?(:field)
+          new_field_context(block_options[:field], block_with) { res = tagbody_proc.call(default_tagbody) }
+        elsif block_options && block_options.has_key?(:with)
+          new_object_context(block_with) { res = tagbody_proc.call(default_tagbody) }
         else
-          new_context { res = tagbody_proc.call }
+          new_context { res = tagbody_proc.call(default_tagbody) }
         end
         res
       end
       
-      obj = options[:obj] == "page" ? @this : options[:obj]
-
-      if options.has_key?(:attr)
-        new_field_context(options[:attr], obj) { yield tagbody }
-      elsif options.has_key?(:obj)
-        new_object_context(obj) { yield tagbody }
+      with = options[:with] == "page" ? @this : options[:with]
+      
+      if options.has_key?(:field)
+        new_field_context(options[:field], with) { yield tagbody }
+      elsif options.has_key?(:with)
+        new_object_context(with) { yield tagbody }
       else
         new_context { yield tagbody }
       end
@@ -165,18 +311,18 @@ module Hobo::Dryml
 
 
     def with_form_context
-      @form_this = this
-      @form_field_path = []
-      @form_field_names = []
+      @_form_this = this
+      @_form_field_path = []
+      @_form_field_names = []
       res = yield
-      field_names = @form_field_names
-      @form_this = @form_field_path = @form_field_names = nil
+      field_names = @_form_field_names
+      @_form_this = @_form_field_path = @_form_field_names = nil
       [res, field_names]
     end
     
     
     def register_form_field(name)
-      @form_field_names << name
+      @_form_field_names << name
     end
 
 
@@ -192,107 +338,131 @@ module Hobo::Dryml
     end
 
 
-    def _tag_locals(options, attrs, inner_tag_names)
-      options = Hobo::Dryml.hashify_options(options)
-      options.symbolize_keys!
-      #ensure obj and attr are not in options
-      options.delete(:obj)
-      options.delete(:attr)
+    def _tag_locals(attributes, locals)
+      attributes.symbolize_keys!
+      #ensure with and field are not in attributes
+      attributes.delete(:with)
+      attributes.delete(:field)
       
-      inner_tag_options, options = options.partition_hash(inner_tag_names.omap{to_sym})
-
-      # positional arguments never appear in the options hash
-      stripped_options = {}.update(options)
-      attrs.each {|a| stripped_options.delete(a.to_sym) }
-      attrs.map {|a| options[a.to_sym]} + [stripped_options, inner_tag_options]
+      # positional arguments never appear in the attributes hash
+      stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
+      locals.each {|a| stripped_attributes.delete(a.to_sym) }
+      
+      # Return locals declared as local variables (attrs="...")
+      locals.map {|a| attributes[a.to_sym]} + [stripped_attributes]
     end
     
     
-    def call_replaceable_tag(name, options, external_param, &b)
-      options.delete(:replace_option)
-      
-      if external_param.is_a? Hash
-        before = external_param.delete(:before_content)
-        after = external_param.delete(:after_content)
-        top = external_param.delete(:top_content)
-        bottom = external_param.delete(:bottom_content)
-        content = external_param.delete(:content)
-        options = Hobo::Dryml.merge_tag_options(options, external_param)
-      elsif !external_param.nil?
-        return external_param.to_s
-      end
-
-      tag = if respond_to?(name)
-              body = if content
-                       proc { content }
-                     elsif b  && (top || bottom)
-                       proc { top.to_s + b.call + bottom.to_s }
-                     else
-                       b
-                     end
-              send(name, options, &body)
+    def do_tagbody(tagbody, attributes, default_tagbody)
+      res = if tagbody
+              tagbody.call(attributes, default_tagbody)
             else
-              body = if content
-                       content
-                     elsif b
-                       top.to_s + new_context { b.call } + bottom.to_s
-                     else
-                       top.to_s + bottom.to_s
-                     end
-              content_tag(name, body, options)
+              default_tagbody ? new_context { default_tagbody.call } : ""
             end
-      before.to_s + tag.to_s + after.to_s
+      Hobo::Dryml.last_if = !!tagbody
+      res
     end
     
     
-    def call_replaceable_content_tag(name, options, external_param, &b)
-      options.delete(:content_option)
+    def call_block_tag_parameter(the_tag, attributes, overriding_proc, &b)
+      if overriding_proc && overriding_proc.arity == 1
+        # This is a 'replace' parameter
+        
+        template_default = proc do |attrs, body_block|
+          tagbody_proc = body_block && proc {|_| new_context { body_block.call(b) } }
+          call_block_tag_parameter(the_tag, attributes, proc { attrs.update(:tagbody => tagbody_proc) }, &b)
+        end
+        overriding_proc.call(template_default)
+      else
+        if overriding_proc
+          overriding_attributes = overriding_proc.call
+          tagbody = overriding_attributes.delete(:tagbody)
+          attributes = merge_attrs(attributes, overriding_attributes)
+        end
       
-      if external_param.is_a? Hash
-        content = external_param.delete(:content)
-        top     = external_param.delete(:top_content)
-        bottom  = external_param.delete(:bottom_content)
-        external_param.delete(:before_content)
-        external_param.delete(:after_content)
-        options = Hobo::Dryml.merge_tag_options(options, external_param)
-      elsif !external_param.nil?
-        content = external_param.to_s
+        if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+          body = if tagbody
+                   new_context { tagbody.call(proc {b.call(nil)}) }
+                 elsif b
+                   new_context { b.call(nil) }
+                 else
+                   nil
+                 end
+          if body.blank?
+            tag(the_tag, attributes)
+          else
+            content_tag(the_tag, body, attributes)
+          end
+        else
+          if the_tag.is_a?(String, Symbol)
+            body = proc do |default| 
+              if tagbody
+                tagbody.call(proc { b ? b.call(default) : "" })
+              else
+                b ? b.call(default) : ""
+              end
+            end
+            
+            send(the_tag, attributes, &body)
+          else
+            # It's a proc - a template default
+            the_tag.call(attributes, tagbody || b)
+          end
+        end
       end
+    end
+
+    def call_template_parameter(the_template, attributes, template_procs, overriding_proc)
+      if overriding_proc && overriding_proc.arity == 1
+        # It's a replace parameter
+        
+        template_default = proc do |attributes, parameters|
+          call_template_parameter(the_template, attributes, template_procs, proc { [attributes, parameters] })
+        end
+        overriding_proc.call(template_default)
+      else
+        if overriding_proc
+          overriding_attributes, overriding_template_procs = overriding_proc.call
+          
+          attributes = merge_attrs(attributes, overriding_attributes)
+          template_procs = template_procs.merge(overriding_template_procs)
+        end   
       
-      # If there's no body, and no content provided externally, remove
-      # the tag altogether
-      return if b.nil? and content.nil?
-
-      tag = if respond_to?(name)
-              body = if content
-                       proc { content }
-                     elsif b  && (top || bottom)
-                       proc { top.to_s + b.call + bottom.to_s }
-                     else
-                       b
-                     end
-              send(name, options, &body)
-            else
-              body = if content
-                       content
-                     elsif b
-                       top.to_s + new_context { b.call } + bottom.to_s
-                     else
-                       top.to_s + bottom.to_s
-                     end
-              content_tag(name, body, options)
-            end
-      tag.to_s
+        send(the_template, attributes, template_procs)
+      end
     end
-
-
-    def render_tag(tag_name, options)
-      (send(tag_name, options) + part_contexts_js).strip
+    
+    # Takes two procs that each returh hashes and returns a single
+    # proc that calls these in turn and merges the results into a
+    # single hash
+    def merge_option_procs(general_proc, overriding_proc)
+      if overriding_proc
+        proc { general_proc.call.merge(overriding_proc.call) }
+      else
+        general_proc
+      end
+    end
+    
+    # Same as merge_option_procs, except these procs return a pair of
+    # hashes rather than a single hash. The first hash is the tag
+    # attributes, the second is a hash of procs -- the template
+    # parameters.
+    def merge_template_parameter_procs(general_proc, overriding_proc)
+      proc do
+        general_attributes, general_template_procs = general_proc.call
+        overriding_attributes, overriding_template_procs = overriding_proc.call
+        [merge_attrs(general_attributes, overriding_attributes), general_template_procs.merge(overriding_template_procs)]
+      end
     end
     
     
-    def method_missing(name, *args)
-      @view.send(name, *args)
+    def render_tag(tag_name, attributes)
+      (send(tag_name, attributes) + part_contexts_js).strip
+    end
+    
+
+    def method_missing(name, *args, &b)
+      @view.send(name, *args, &b)
     end
     
 

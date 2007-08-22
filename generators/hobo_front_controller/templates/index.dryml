@@ -1,43 +1,37 @@
-<page title="<%= app_name %>">
+<Page title="<%= app_name %>">
 
-  <:intro>
-    <h1 class="front_page_title"><%= app_name %></h1>
-  </:intro>
-  
-  <:main>
+  <main>
+    <header>
+      <h1 class="front_page_title"><%= app_name %></h1>
+    </header>
     <panel>
       <div style="margin-left: 40px; ">
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
         <ul>
           <li>To customise this page: edit app/views/<%= file_name %>/index.dryml </li>
-
-          <li>To change the nav-bar: define &lt;application_nav&gt;<br/>
-            See vendor/plugins/hobo/tags/rapid.dryml for an example</li>
-
-          <li>To change the logo: define &lt;application_logo&gt;.</li>
         </ul>
       </div>
     </panel>
 
-    <repeat obj="#Hobo.models">
+    <repeat with="&Hobo.models">
       <panel>
-        <h2><%%= this.name.titlecase.pluralize %></h2>
+        <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
         <section>
-          <if q="#this.count == 0">
+          <if test="&this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>
-            <if q="#can_create?(this) and this != Hobo.user_model">
-              <p>Create a <new_object_link for="#this"/>.</p>
+            <if test="&can_create?(this) and this != Hobo.user_model">
+              <p>Create a <a to="&this.new"/>.</p>
             </if>
           </if>
           <else>
-            <repeat obj="#this.find(:all, :limit => 3)">
-              <if_can_view><object_card/></if_can_view>
+            <repeat with="&this.find(:all, :limit => 3)">
+              <card if="&can_view?"/>
             </repeat>
-            <p><object_link>More</object_link> (<count/>)</p>
+            <p><a>More</a> (<count/>)</p>
           </else>
         </section>
       </panel>
     </repeat>
-  </:main>
-
-</page>
+  </main>
+  
+</Page>

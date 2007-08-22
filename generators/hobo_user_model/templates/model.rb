@@ -3,14 +3,21 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_model
 
   include Hobo::AuthenticatedUser
+
+  fields do
+    username :string
+    timestamps
+  end
   
   set_login_attr :username
   
-  alias_attribute :display_name, :username
+  alias_attribute :to_s, :username
 
   # --- Hobo Permissions --- #
 
   def super_user?
+    # Return true to make this user exempt from permission restrictions
+    # e.g.
     # login == 'admin'
   end
 

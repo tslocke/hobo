@@ -1,175 +1,248 @@
-<def tag="page" attrs="title_prefix, title">
-  <%= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' %>
+<def tag="BasePage" attrs="title, doctype">
+  <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
-    <head>
-      <title><%= title_prefix %><%= title || human_type + ": " + display_name %></title>
-      <%= stylesheet_link_tag 'application' %>
-      <%= javascript_include_tag :defaults %>
-      <hobo_rapid_javascripts replace_option="rapid_javascripts" tiny_mce="#true"/>
+    <head param>
+      <title param><%= title %></title>
+      <do param="stylesheets">
+        <stylesheet name="hobo_base"/>
+        <stylesheet name="application"/>
+      </do>
+      <do param="scripts">
+        <%= javascript_include_tag :defaults %>
+      </do>
     </head>
-    <body onload="Hobo.applyEvents();" content_option="body">
-      <div content_option="header"/>
-      <div content_option="intro"/>
-      <div content_option="main"/>
-      <div content_option="footer"/>
+    <body onload="Hobo.applyEvents();" param>
     </body>
   </html>
 </def>
 
+<def tag="Page">
+  <BasePage merge>
+    <stylesheets>
+      <stylesheet name="hobo_base"/>
+      <stylesheet name="hobo_rapid"/>
+      <stylesheet name="application"/>
+    </stylesheets>
+    <scripts>
+      <default_tagbody/>
+      <hobo_rapid_javascripts param/>
+    </scripts>
 
-<def tag="index_page">
+    <body param>
+      <div class="page_wrapper" param="wrapper">
+        <ajax_progress/>
+        <header id="page_header" param>
+          <div class="logo" param="logo"><image src="logo.png"/></div>
+          <nav param>
+            <magic_nav class="main_nav" param="main_mav"/>
+            <account_nav if="&respond_to? :login_url" param/>
+          </nav>
+        </header>
+        <flash_message param/>
+        <div id="page_main" param="main"></div>
+        <footer id="page_footer" param/>
+      </div>
+    </body>
+  </BasePage>
+</def>
+
+<def tag="PageForIndex"><Page merge/></def>
+<def tag="PageForNew"><Page merge/></def>
+<def tag="PageForShow"><Page merge/></def>
+<def tag="PageForNewInCollection"><Page merge/></def>
+<def tag="PageForShowCollection"><Page merge/></def>
+
+<def tag="IndexPage">
   <% model_name = @model.name.titleize %>
-  <page title="All #{model_name.pluralize}" xattrs="">
+  <PageForIndex title="All #{model_name.pluralize}" merge>
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <heading><%= model_name.pluralize %></heading>
+      </header>
 
-    <:intro>
-      <h1><%= model_name.pluralize %></h1>
-    </:intro>
+      <nav param="top_page_nav"><page_nav/></nav>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count label="#model_name"/></h2>
-        <section>
-          <table_for replace_option="table">
-            <td><object_link/></td><td><delete_button class='text'/></td>
-          </table_for>
+      <panel param="main" class="main">
+        <header param="main_header">
+          <h2><count label="&model_name"/></h2>
+        </header>
+        <section param="main_section">
+          <Table param>
+            <tr><td><a/></td><td><delete_button update="item_count"/></td></tr>
+          </Table>
         </section>
         
-        <if q="#@pages.length > 1">
-          <section replace_option="page_nav">
-            <div class="page_links">
-              <page_nav/>
-            </div>
-          </section>
-        </if>
+        <nav param="bottom_page_nav"><page_nav/></nav>
 
-        <section_if replace_option="new_link">
-          <p><new_object_link for="#@model"/></p>
-        </section_if>
+        <section param="new_link"><a to="&@model" action="new"/></section>
       </panel>
-    </:main>
-  </page>
+    </main>
+  </PageForIndex>
 </def>
 
 
-<def tag="new_page">
-  <page title="New #{human_type}" xattrs="">
-    <:intro>
-      <h1>New <human_type/></h1>
-    </:intro>
+<def tag="NewPage">
+  <PageForNew title="New #{human_type}" merge>
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <heading>New <human_type/></heading>
+      </header>
 
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="pannel_heading">Details</h2>
+      <panel param="main" class="main">
+        <header param="main_header"><h2>Details</h2></header>
         <section>
-          <div class="error_messages" replace_option="error_messages">
-            <%= error_messages_for 'this' %>
-          </div>
+          <error_messages param="error_messages"/>
 
-          <object_form hidden_fields="*">
-            <object_table associations="belongs_to" replace_option="fields"/>
-            <submit label="Create" class="create_button" replace_option="submit_button"/>
-          </object_form>
+          <form>
+            <FieldList skip_associations="has_many"/>
+            <submit label="Create" param/>
+          </form>
         </section>
       </panel>
-    </:main>
-
-  </page>
+    </main>
+  </PageForNew>
 </def>
 
 
-<def tag="show_page">
+<def tag="ShowPage">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <page xattrs="">
+  <PageForShow merge>    
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
+        <p><delete_button in_place="&false"/></p>
+      </header>
 
-    <:intro>
-      <h1><human_type/><if q="#this.respond_to? :name">: <edit attr="name"/></if></h1>
-      <p><delete_button ajax="#false"/></p>
-    </:intro>
-    
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading">Details</h2>
+      <panel param="main_panel">
+        <header param="main_header"><h2>Details</h2></header>
         <section>
-          <object_table associations="*" skip_fields="name" replace_option="fields"/>
+          <FieldList skip="name" tag="editor" param/>
         </section>
 
-        <section_if replace_option="new_links">
-          <repeat obj="#has_many_assocs">
-            <p><new_object_link/></p>
+        <section param="new_links">
+          <repeat with="&has_many_assocs">
+            <p><a action="new"/></p>
           </repeat>
-        </section_if>
+        </section>
       </panel>
-    </:main>
-
-  </page>
+    </main>
+  </PageForShow>
 </def>
 
 
-<def tag="new_in_collection_page">
-  <page title="New #{human_type}" xattrs="">
+<def tag="NewInCollectionPage">
+  <PageForNewInCollection title="New #{human_type}" merge>
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <h1>New <human_type/></h1>
+        <h2>For: <a with="&@owner" /></h2>
+      </header>
 
-    <:intro>
-      <h1>New <human_type/></h1>
-      <h2>For: <object_link obj="#@owner" /></h2>
-    </:intro>
-
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading">Details</h2>
+      <panel param="main">
+        <header param="main_header">
+          <h2>Details</h2>
+        </header>
         <section>
-          <div class="error_messages" replace_option="error_messages">
-            <%= error_messages_for 'this' %>
-          </div>
+          <error_messages param="error_messages"/>
 
-          <object_form hidden_fields="*">
-            <object_table associations="belongs_to" replace_option="fields"/>
-            <submit label='#"Add to #{display_name(:obj => @owner, :no_span => true)}"'
-                    replace_option="submit_button"/>
-          </object_form>
+          <form>
+            <FieldList associations="belongs_to"/>
+            <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}'
+                    param="submit_button"/>
+          </form>
+        </section>
+      </panel>
+    </main>
+  </PageForNewInCollection>
+</def>
+
+
+<def tag="ShowCollectionPage">
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
+  <PageForShowCollection title="&title" merge>
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <h1><%= title %></h1>
+        <h2>Back to <a with="&@owner"/></h2>
+      </header>
+
+      <panel param="main">
+        <header param="main_header">
+          <count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/>
+        </header>
+
+        <nav param="top_page_nav"><page_nav/></nav>
+
+        <section>
+          <Table param="Table">
+            <tr>
+              <if test="can_view?">
+                <td><a/></td><td><delete_button/></td>
+              </if>
+            </tr>
+          </Table>
         </section>
 
-      </panel>
-    </:main>
+        <nav param="bottom_page_nav"><page_nav param/></nav>
 
-  </page>
-</def>
-
-
-<def tag="show_collection_page">
-  <% title = "#{@reflection.name.to_s.titleize} for #{display_name(:obj => @owner, :no_span => true)}" %>
-  <page title="#title" xattrs="">
-
-    <:intro>
-      <h1><%= title %></h1>
-      <h2>Back to <object_link obj="#@owner"/></h2>
-    </:intro>
-
-    <:main>
-      <panel replace_option="main_panel">
-        <h2 replace_option="panel_heading"><count label="#@reflection.klass.name.titleize"/></h2>
-        <section>
-          <table_for replace_option="table">
-            <if_can_view><td><object_link/></td><td><delete_button class='text'/></td></if_can_view>
-          </table_for>
-        </section>
-
-        <if q="#@pages.length > 1">
-          <section replace_option="page_nav">
-            <div class="page_links">
-              <page_nav/>
-            </div>
-          </section>
-        </if>
-
-        <if q="#Hobo.simple_has_many_association?(@association)">
-          <section replace_option="new_link">
-            <new_object_link for="#@association"/>
+        <if test="&Hobo.simple_has_many_association?(@association)">
+          <section param="new_link">
+            <a to="&@associaton.new"/>
           </section>
         </if>
       </panel>
-    </:main>
-  </page>
+    </main>
+  </PageForShowCollection>
 </def>
+
+<def tag="doctype" attrs="version"><%=
+  case version.upcase
+    when "HTML 4.01 STRICT"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ' + 
+        '"http://www.w3.org/TR/html4/strict.dtd">'
+    when "HTML 4.01 TRANSITIONAL"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/html4/loose.dtd">'
+    when "XHTML 1.0 STRICT"
+      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    when "XHTML 1.0 TRANSITIONAL"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    when "XHTML 1.1"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" ' + 
+        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+  end
+%></def>
+
+<def tag="stylesheet" attrs="name,media">
+  <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }" rel="stylesheet" type="text/css" />
+</def>
+
+<def tag="flash_message" attr="type">
+  <% type = type ? type.to_sym : :notice %>
+  <div class="flash" if="&flash[type]"><%= flash[type] %></div>
+</def>
+
+<def tag="ajax_progress">
+  <div id='ajax_progress'>
+    <div>
+      <span id="ajax_progress_text"></span><theme_image src="spinner.gif"/>
+    </div>
+  </div>
+</def>
+
+<def tag="error_messages">
+  <div class="error_messages">
+    <%= error_messages_for 'this' %>
+  </div>
+</def>
+

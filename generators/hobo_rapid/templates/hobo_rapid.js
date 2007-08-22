@@ -47,6 +47,7 @@ var Hobo = {
         var i = 0
         if (updates.length > 0) {
             updates.each(function(dom_id) {
+                if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
                 params.push("render["+i+"][part]=" + hoboParts[dom_id][0])
                 params.push("render["+i+"][id]=" + dom_id)
                 params.push("render["+i+"][object]=" + hoboParts[dom_id][1])
@@ -71,8 +72,8 @@ var Hobo = {
     ajaxRequest: function(url_or_form, message, updates, options) {
         options = Object.merge({ asynchronous:true,
                                  evalScripts:true,
-                                 resetForm: true,
-                                 refocusForm: true
+                                 resetForm: false,
+                                 refocusForm: false
                                }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
@@ -102,7 +103,7 @@ var Hobo = {
 
             if (options.onComplete)
                 options.onComplete.apply(this, arguments)
-            if (form && options) Form.focusFirstElement(form)
+            if (form && options.refocusForm) Form.focusFirstElement(form)
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method
@@ -221,7 +222,9 @@ var Hobo = {
         })
 
         select(".in_place_html_textarea_bhv").each(function (el) {
-            var ipe = Hobo._makeInPlaceEditor(el, {rows: 2, handleLineBreaks: false})
+            var options = {rows: 2, handleLineBreaks: false}
+            if (typeof(tinyMCE) != "undefined") options["submitOnBlur"] = false
+            var ipe = Hobo._makeInPlaceEditor(el, options) 
             if (typeof(tinyMCE) != "undefined") {
                 ipe.afterEnterEditMode = function() {
                     var id = this.form.id = Hobo.uid()
@@ -283,8 +286,10 @@ var Hobo = {
                                                         if (spinner) Hobo.hide(spinner)
                                                         if (search_results_panel) {
                                                             Hobo.show(search_results_panel)
-                                                         }
+                                                        }
+                                                        setTimeout(function() {Hobo.applyEvents(search_results)}, 1)
                                                     },
+                                                    method: "get",
                                                     parameters:"query=" + value });
         } else {
             Hobo.updateElement(search_results, '')
@@ -301,7 +306,7 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + escape(val)
+        return spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
     },
 
     fadeObjectElement: function(el) {

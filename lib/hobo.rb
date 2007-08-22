@@ -5,11 +5,20 @@ module Hobo
   class RawJs < String; end
 
   @models = []
-
+  @field_types = HashWithIndifferentAccess.new
+  
   class << self
 
-    attr_accessor :current_theme
+    attr_accessor :current_theme, :field_types
     attr_writer :developer_features
+    
+    def symbolic_type_name(type)
+      field_types.index(type)
+    end
+    
+    def type_name(type)
+      symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
+    end
 
     def developer_features?
       @developer_features
@@ -19,8 +28,8 @@ module Hobo
     def raw_js(s)
       RawJs.new(s)
     end
-
-
+    
+    
     def user_model=(model)
       @user_model = model && model.name
     end
@@ -39,7 +48,7 @@ module Hobo
     def models
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").map do |f|
-          f =~ /.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
         end
         @models_loaded = true
       end
@@ -124,12 +133,15 @@ module Hobo
     end
 
     def add_routes(map)
+      ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
-
+      require "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
+      
       for model in Hobo.models
         controller_name = "#{model.name.pluralize}Controller"
-        controller = controller_name.constantize if
+        controller = controller_name.constantize if (Object.const_defined? controller_name) || 
           File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
+          
         if controller
           web_name = model.name.underscore.pluralize.downcase
 
@@ -156,7 +168,7 @@ module Hobo
             
             for view in controller.show_actions
               map.named_route("#{web_name.singularize}_#{view}",
-                              "#{web_name}/:id;#{view}",
+                              "#{web_name}/:id/#{view}",
                               :controller => web_name,
                               :action => view.to_s,
                               :conditions => { :method => :get })
@@ -210,10 +222,10 @@ module Hobo
     def can_create?(person, object)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
-        object.created_by(person)
+        object.set_creator(person)
       elsif Hobo.simple_has_many_association?(object)
-        object = object.new_without_appending
-        object.created_by(person)
+        object = object.new
+        object.set_creator(person)
       end
       check_permission(:create, person, object)
     end
@@ -225,34 +237,49 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      setter = "#{field}="
+      setter = "#{field.to_s.sub /\?$/, ''}=" 
       return false unless can_view?(person, object, field) and object.respond_to?(setter)
       
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
       # has_many and polymorphic associations are not editable (for now)
-      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic])
+      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic] or refl.macro == :has_one)
+      
+      if object.respond_to?(:editable_by?)
+        check_permission(:edit, person, object, field.to_sym)
+      else
+        # Fake an edit test by setting the field in question to
+        # Hobo::Undefined and then testing for update permission
+        
+        current = object.send(field)
+        new = object.duplicate
 
-      current = object.send(field)
-      new = object.duplicate
-      new.send(setter, if current == true
-                         false
-                       elsif current == false
-                         true
-                       elsif refl and refl.macro == :belongs_to
-                         Hobo::Undefined.new(refl.klass)
-                       else
-                         Hobo::Undefined.new
-                       end)
-
-      begin
-        if object.new_record?
-          check_permission(:create, person, new)
-        else
-          check_permission(:update, person, object, new)
+        begin
+          # Setting the undefined value can sometimes result in an
+          # UndefinedAccessError. In that case we have no choice but
+          # return false.
+          new.send(setter, if current == true
+                             false
+                           elsif current == false
+                             true
+                           elsif refl and refl.macro == :belongs_to
+                             Hobo::Undefined.new(refl.klass)
+                           else
+                             Hobo::Undefined.new
+                           end)
+        rescue Hobo::UndefinedAccessError
+          raise HoboError, "#{object.class.name} does not support undefined assignements, define editable_by(user, field)"
         end
-      rescue Hobo::UndefinedAccessError
-        false
+        
+        begin
+          if object.new_record?
+            check_permission(:create, person, new)
+          else
+            check_permission(:update, person, object, new)
+          end
+        rescue Hobo::UndefinedAccessError
+          false
+        end
       end
     end
 
@@ -264,12 +291,12 @@ module Hobo
 
     # can_view? has special behaviour if it's passed a class or an
     # association-proxy -- it instantiates the class, or creates a new
-    # instance "in" the association (new_without_appending), and tests
-    # the permission of this object. This means the permission methods
-    # in models can't rely on the instance being properly initialised.
-    # But it's important that it works like this because, in the case
-    # of an association proxy, we don't want to loose the information
-    # that the object belongs_to the proxy owner.
+    # instance "in" the association, and tests the permission of this
+    # object. This means the permission methods in models can't rely
+    # on the instance being properly initialised.  But it's important
+    # that it works like this because, in the case of an association
+    # proxy, we don't want to loose the information that the object
+    # belongs_to the proxy owner.
     def can_view?(person, object, field=nil)
       if field
         field = field.to_sym if field.is_a? String
@@ -278,12 +305,8 @@ module Hobo
         # Special support for classes (can view instances?)
         if object.is_a?(Class) and object < ActiveRecord::Base
           object = object.new
-        elsif object.is_a?(Array)
-          if object.respond_to?(:new_without_appending)
-            object = object.new_without_appending
-          elsif object.respond_to?(:member_class)
-            object = object.member_class.new
-          end          
+        elsif Hobo.simple_has_many_association?(object)
+          object = object.new
         end
       end
       viewable = check_permission(:view, person, object, field)
@@ -309,10 +332,16 @@ module Hobo
     
     def static_tags
       @static_tags ||= begin
-                         path = File.join(File.dirname(__FILE__), "hobo/static_tags")
+                         path = if FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
+                                    "#{RAILS_ROOT}/config/dryml_static_tags.txt"
+                                else
+                                    File.join(File.dirname(__FILE__), "hobo/static_tags")
+                                end
                          File.readlines(path).omap{chop} 
                        end
     end
+    
+    attr_writer :static_tags
 
     
     private
@@ -327,6 +356,7 @@ module Hobo
                    when :create; :creatable_by?
                    when :update; :updatable_by?
                    when :delete; :deletable_by?
+                   when :edit;   :editable_by?
                    when :view;   :viewable_by?
                    end
       p = if object.respond_to?(obj_method)
@@ -349,5 +379,6 @@ module Hobo
     end
 
   end
+  
 
 end

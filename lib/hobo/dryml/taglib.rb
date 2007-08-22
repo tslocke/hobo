@@ -36,20 +36,42 @@ module Hobo::Dryml
     end
 
     def load
-      @module = Module.new
+      @module = Module.new do
+        @tag_attrs = {}
+        def self._register_tag_attrs(tag_name, attrs)
+          @tag_attrs[tag_name] = attrs
+        end
+        class << self
+          attr_reader :tag_attrs
+        end
+      end
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)
-      template.compile([], false)
+      template.compile([], [])
       @last_load_time = @file.mtime
     end
 
     def import_into(class_or_module, as)
       if as
-        raise NotImplementedError
-        as_class = Class.new(TemplateEnvironment) { include @module }
-        class_or_module.send(:define_method, as) { @module }
+        # Define a method on class_or_module named whatever 'as'
+        # is. The first time the method is called it creates and
+        # returns an object that provides the taglib's tags as
+        # methods. On subsequent calls the object is cached in an
+        # instance variable "@_#{as}_taglib"
+        
+        taglib_module = @module
+        ivar = "@_#{as}_taglib"
+        class_or_module.send(:define_method, as) do 
+          instance_variable_get(ivar) or begin
+                                           as_class = Class.new(TemplateEnvironment) { include taglib_module }
+                                           as_object = as_class.new
+                                           as_object.copy_instance_variables_from(self)
+                                           instance_variable_set(ivar, as_object)
+                                         end
+        end
       else
         class_or_module.send(:include, @module)
+        class_or_module.tag_attrs.update(@module.tag_attrs) if @module.respond_to?(:tag_attrs)
       end
     end
 

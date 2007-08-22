@@ -1,7 +1,9 @@
 class Hobo::TextileString < String
 
+  COLUMN_TYPE = :text
+
   def to_html
-    if text.blank?
+    if blank?
       ""
     else
       textilized = RedCloth.new(self, [ :hard_breaks ])
@@ -10,4 +12,12 @@ class Hobo::TextileString < String
     end
   end  
   
+end
+
+class RedCloth
+  # Patch for RedCloth.  Fixed in RedCloth r128 but _why hasn't released it yet.
+  # http://code.whytheluckystiff.net/redcloth/changeset/128
+  def hard_break( text ) 
+    text.gsub!( /(.)\n(?!\n|\Z| *([#*=]+(\s|$)|[{|]))/, "\\1<br />" ) if hard_breaks && RedCloth::VERSION == "3.0.4"
+  end 
 end

@@ -31,7 +31,7 @@ module Hobo
     end
 
     def method_missing(name, *args)
-      raise UndefinedAccessError.new("call to: #{name}")
+      raise UndefinedAccessError.new("call to: Hobo::Undefined##{name}")
     end
     
     undef_method :==

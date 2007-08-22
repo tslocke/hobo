@@ -15,6 +15,8 @@ require 'hobo/dryml/taglib'
 require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
+require 'hobo/plugins'
+
 require 'extensions/test_case' if RAILS_ENV == "test"
 
 
@@ -33,8 +35,10 @@ class ActionController::Base
 
 end
 
-def (ActiveRecord::Base).hobo_model
-  include Hobo::Model
+class ActiveRecord::Base
+  def self.hobo_model
+    include Hobo::Model
+  end
 end
 
 # Default settings

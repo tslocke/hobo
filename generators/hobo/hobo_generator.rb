@@ -15,17 +15,17 @@ class HoboGenerator < Rails::Generator::Base
     end
 
     record do |m|
-      m.directory File.join("app/views/hobolib")
-      m.directory File.join("app/views/hobolib/themes")
+      m.directory File.join("app/views/taglibs")
+      m.directory File.join("app/views/taglibs/themes")
       m.directory File.join("public/hobothemes")
-      m.file "application.dryml", File.join("app/views/hobolib/application.dryml")
+      m.file "application.dryml", File.join("app/views/taglibs/application.dryml")
       m.file "guest.rb", File.join("app/models/guest.rb")
     end
   end
 
   protected
     def banner
-      "Usage: #{$0} generate [--add-routes]"
+      "Usage: #{$0} #{spec.name} [--add-routes]"
     end
 
     def add_options!(opt)

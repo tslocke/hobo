@@ -1,6 +1,6 @@
 form.button-to { margin: 0; padding: 0; }
 
-.object_card { padding: 5px; margin: 5px; border: 1px dashed #ddd; background: #fbfbfb; }
+.card { padding: 5px; margin: 5px; border: 1px dashed #ddd; background: #fbfbfb; }
 
 /* Todo: Big cleanup of this stylesheet */
 
@@ -37,22 +37,31 @@ a:hover.no_hover { background: transparent; }
 
 /* Main Page Body Window */
 
-#header .logo { margin: 20px 10px 5px 20px; float: left; }
+#header .logo { position: absolute; top: 15px; left: 20px; }
 #header .logo a { background: transparent; }
 
-.nav_bars { margin: 20px 12px 5px 10px; float: right; padding: 0; }
-.nav a { font-size: 110%; }
-.nav_bars a { text-decoration: none; }
+#header { 
+    position: relative;
+    height: 80px;
+}
 
-.nav_item { display: inline; padding: 0 4px; margin: 0; }
+.nav { 
+    padding: 20px 15px 0 0;
+}
 
-.account_nav { margin-top: 5px; text-align: right; font-size: 95%; }
+.nav ul { margin: 0; padding: 0; float: right; }
+ul.account_nav { font-size: 80%; clear:right; }
+
+.nav li { list-style: none; margin: 0; padding: 0; float: left; padding: 5px; font-size: 130%; }
+.nav a { text-decoration: none;}
+
+.main_nav li { text-transform: uppercase; }
 
 .flash { margin: 10px 30px; background: white; border: 2px solid #aaf; padding: 10px; text-align: center; }
 
 #page {
     width:800px;
-    background-color:#FFFFFF;
+    background-color: white;
     margin-left:auto;
     margin-right:auto;
 }
@@ -157,6 +166,7 @@ img.nav_main.current { border-top: 1px solid grey; border-bottom: 1px solid grey
     font-size: 10px;
     text-align:center;
     margin:21px;
+    background-color:#D2D2D2;
 }
 
 
@@ -209,15 +219,15 @@ div.completions_popup ul li {
 
 th { text-align: left; padding: 5px; }
 
-.object_table { width:95%; }
-.object_table td { padding: 5px; vertical-align: middle; }
-.object_table td.field_label {
+.field_list { width:95%; }
+.field_list td { padding: 5px; vertical-align: middle; }
+.field_list th {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
-.object_table input[type=text] { width: 100%; }
-.object_table input, .object_table textarea { margin: -2px 0 0 0; }
-.object_table textarea { width: 100%; margin: 0; }
+.field_list input[type=text] { width: 100%; }
+.field_list input, .field_list textarea { margin: -2px 0 0 0; }
+.field_list textarea { width: 100%; margin: 0; }
 
 td span.in_place_textfield_bhv, td span.in_place_textarea_bhv, td span.in_place_html_textarea_bhv {
     display: block; border: 1px solid #ddd;

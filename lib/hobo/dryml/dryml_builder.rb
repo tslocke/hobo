@@ -1,14 +1,14 @@
 module Hobo::Dryml
   
   class DRYMLBuilder
-    
-    APPLICATION_TAGLIB = "hobolib/application"
-    CORE_TAGLIB = "plugins/hobo/tags/core"
 
     def initialize(template_path)
+      @template_path = template_path
       @build_instructions = Array.new
-      @template_path      = template_path
+      @part_names = []
     end
+    
+    attr_reader :template_path
 
 
     def set_environment(environment)
@@ -22,12 +22,20 @@ module Hobo::Dryml
 
 
     def clear_instructions
+      @part_names.clear
       @build_instructions.clear
     end
 
 
-    def add_build_instruction(params)
-      @build_instructions << params
+    def add_build_instruction(type, params)
+      @build_instructions << params.merge(:type => type)
+    end
+    
+    
+    def add_part(name, src, line_num)
+      raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
+      add_build_instruction(:part, :src => src, :line_num => line_num)
+      @part_names << name
     end
 
 
@@ -36,47 +44,57 @@ module Hobo::Dryml
     end
 
 
-    def get_render_page_source(src, local_names)
+    def render_page_source(src, local_names)
       locals = local_names.map{|l| "#{l} = __local_assigns__[:#{l}];"}.join(' ')
 
       ("def render_page(__page_this__, __local_assigns__); " +
             "#{locals} new_object_context(__page_this__) do " +
             src +
-           "; end + part_contexts_js; end")
+           "; _erbout; end + part_contexts_js; end")
+    end
+    
+    
+    def erb_process(erb_src)
+      # Strip off "_erbout = ''" from the beginning and "; _erbout"
+      # from the end, because we do things differently around
+      # here. (_erbout is defined as a method)
+      ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-("; _erbout".length)]
     end
 
 
     def build(local_names, auto_taglibs)
-      if auto_taglibs
-        import_taglib(CORE_TAGLIB)
-        import_taglib(APPLICATION_TAGLIB)
-        Hobo::MappingTags.apply_standard_mappings(@environment)
-      end
+
+      auto_taglibs.each{|t| import_taglib(t)}
     
-      @build_instructions.each do |build_instruction|
-        case build_instruction[:type]
-        when :def, :part
-          @environment.class_eval(build_instruction[:src], @template_path, build_instruction[:line_num])
+      @build_instructions.each do |instruction|
+        name = instruction[:name]
+        case instruction[:type]
+        when :def
+          src = erb_process(instruction[:src])
+          @environment.class_eval(src, template_path, instruction[:line_num])
+          
+        when :part
+          @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
           
         when :render_page
-          method_src = get_render_page_source(build_instruction[:src], local_names)
+          method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
-          @environment.class_eval(method_src, @template_path, build_instruction[:line_num])
+          @environment.class_eval(method_src, template_path, instruction[:line_num])
           
-        when :taglib
-          import_taglib(build_instruction[:name], build_instruction[:as])
+        when :include
+          import_taglib(name, instruction[:as])
           
         when :module
-          import_module(build_instruction[:name].constantize, build_instruction[:as])
+          import_module(name.constantize, instruction[:as])
           
         when :set_theme
-          set_theme(build_instruction[:name])
+          set_theme(name)
           
         when :alias_method
-          @environment.send(:alias_method, build_instruction[:new], build_instruction[:old])
+          @environment.send(:alias_method, instruction[:new], instruction[:old])
           
         else
-          raise HoboError.new("DRYML: Unknown build instruction type found when building #{@template_path}")
+          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, building #{template_path}")
         end
       end
       @last_build_time = Time.now
@@ -89,7 +107,7 @@ module Hobo::Dryml
              elsif path.include?("/")
                "app/views/#{path}"
              else
-               template_dir = File.dirname(@template_path)
+               template_dir = File.dirname(template_path)
                "#{template_dir}/#{path}"
              end
        base + ".dryml"
@@ -98,7 +116,7 @@ module Hobo::Dryml
 
     def import_taglib(src_path, as=nil)
       path = expand_template_path(src_path)
-      unless @template_path == path
+      unless template_path == path
         taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
         taglib.import_into(@environment, as)
       end
@@ -106,7 +124,7 @@ module Hobo::Dryml
 
 
     def import_module(mod, as=nil)
-      raise NotImplementedError.new if as
+      raise NotImplementedError if as
       @environment.send(:include, mod)
     end
   
@@ -114,12 +132,7 @@ module Hobo::Dryml
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
-        import_taglib("hobolib/themes/#{name}/application")
-        mapping_module = "#{name}_mapping"
-        if File.exists?(path = RAILS_ROOT + "/app/views/hobolib/themes/#{mapping_module}.rb")
-          load(path)
-          Hobo::MappingTags.apply_mappings(@environment)
-        end
+        import_taglib("taglibs/themes/#{name}/application")
       end
     end
   end

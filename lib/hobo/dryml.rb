@@ -1,6 +1,16 @@
 module Hobo::Dryml
+  
+  class DrymlSyntaxError < RuntimeError; end
 
-  class DrymlException < Exception; end
+  class DrymlException < Exception
+    def initialize(message, path=nil, line_num=nil)
+      if path && line_num
+        super(message + " -- at #{path}:#{line_num}")
+      else
+        super(message)
+      end
+    end
+  end
   
   class AttributeExtensionString < String;
     def drop_prefix; self[2..-1]; end
@@ -11,6 +21,9 @@ module Hobo::Dryml
   RESERVED_WORDS = %w{if for while do class else elsif unless case when module in}
 
   EMPTY_PAGE = "[tag-page]"
+
+  APPLICATION_TAGLIB = "taglibs/application"
+  CORE_TAGLIB = "plugins/hobo/tags/core"
 
   @renderer_classes = {}
 
@@ -41,8 +54,15 @@ module Hobo::Dryml
       end
 
       prepare_view!(view)
+      included_taglibs = if view.controller.class.respond_to? :included_taglibs
+                           view.controller.class.included_taglibs
+                         else
+                           []
+                         end
+
       if page == EMPTY_PAGE
-        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names, [ApplicationHelper]) if
+        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names,
+                                                        [Hobo::HoboHelper, ApplicationHelper], included_taglibs) if
           @tag_page_renderer_class.nil?
         @tag_page_renderer_class.new(page, view)
       else
@@ -56,7 +76,7 @@ module Hobo::Dryml
             (local_names - renderer_class.compiled_local_names).any? or # any new local names?
             renderer_class.load_time < src_file.mtime)                  # cache out of date?
           renderer_class = make_renderer_class(src_file.read, template_path, local_names,
-                                               default_imports_for_view(view))
+                                               default_imports_for_view(view), included_taglibs)
           renderer_class.load_time = src_file.mtime
           @renderer_classes[page] = renderer_class
         end
@@ -82,26 +102,30 @@ module Hobo::Dryml
 
     
     def default_imports_for_view(view)
-      [ApplicationHelper,
-       view.controller.class.name.sub(/Controller$/, "Helper").constantize]
+      imports = [Hobo::HoboHelper, ApplicationHelper]
+      controller_helper = view.controller.class.name.sub(/Controller$/, "Helper")
+      imports << controller_helper.constantize if Object.const_defined? controller_helper
+      imports
     end
 
     
-    def make_renderer_class(template_src, template_path, locals, imports)
+    def make_renderer_class(template_src, template_path, locals, imports, included_taglibs=[])
       renderer_class = Class.new(TemplateEnvironment)
-      compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
+      compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs)
       renderer_class
     end
 
     
-    def compile_renderer_class(renderer_class, template_src, template_path, locals, imports)
+    def compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs=[])
       template = Template.new(template_src, renderer_class, template_path)
       imports.each {|m| template.import_module(m)}
+
+      taglibs = [CORE_TAGLIB, APPLICATION_TAGLIB] + included_taglibs
 
       # the sum of all the names we've seen so far - eventually we'll be ready for all of 'em
       all_local_names = renderer_class.compiled_local_names | locals
 
-      template.compile(all_local_names)
+      template.compile(all_local_names, taglibs)
     end
 
     
@@ -114,48 +138,6 @@ module Hobo::Dryml
       end
     end
     
-    
-    def merge_tag_options(to, from)
-      res = to.merge({})
-      from.each_pair do |option, value|
-        res[option] = if value.is_a?(AttributeExtensionString) and to.has_key?(option)
-                        "#{to[option]} #{value.drop_prefix}"
-                      else
-                        value
-                      end
-      end
-      res
-    end
-
-    
-    def hashify_options(options, merge_into=nil)
-      result = merge_into || options
-      
-      options.each_pair do |key, val|
-        if key.is_a? Array
-          result.delete(key)
-          k = key.first
-          
-          if key.length == 2 and key.last.is_a? Fixnum
-            hashify_options(val) if val.is_a?(Hash)
-            result[k] ||= []
-            result[k][key.last] = val
-          else
-            existing = options[k]
-            v = if key.length == 1
-                  val.is_a?(Hash) ? hashify_options(val, existing) : val
-                else
-                  hashify_options({key[1..-1] => val}, existing)
-                end
-            result[k] = v
-          end          
-        else
-          hashify_options(val) if val.is_a?(Hash)
-        end
-      end
-      result
-    end
-
   end
 
 end

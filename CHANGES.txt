@@ -1,3 +1,514 @@
+=== Release 0.6 ===
+
+DRYML
+
+  Local tags are gone. We finally gave up on this feature as too
+  complex.
+
+  New feature - <set_scoped> allows a variable assignment that exists
+  only for the lifetime of the tag-body of <set_scoped/>. At the end
+  of the block, the previous value of the variable, if there will be
+  restored. This feature gives a lot of the power of local tags in a
+  less pure but far simpler mechanism.
+
+  New feature - polymorphic tags. A tag can have many definitions for
+  different types of object. Define with e.g.
+
+    <def tag="card" for="User"/>...</def>
+    <def tag="card" for="BlogPost">...</def>
+  
+    call with <card for_type/>
+
+    The actual tag called will be selected according to the type of
+    the current context.
+
+  Core tags moved from lib/hobo/core.rb to tags/core.dryml. This
+  follows on from the deprecating of def_tag
+
+  Fix: attrs_for now works with tags imported from a taglib
+
+  Gone: template parameter modifiers (e.g. <my_param.append>). The
+  only one left is 'replace' which is now written as '<my_param
+  replace>' and 'replace' is now a reserved attribute name. Two new
+  features - default tagbodies and restoring parameters - give the
+  same functionality but are more powerful because you can now _wrap_
+  a parameter in your own tag.
+
+  New feature - default tagbodies. Tags can provide a default tagbody
+  like this:
+
+    <def tag="foo">...<tagbody>this is the default</tagbody>...</def>
+
+    Callers can keep the default: <foo/>
+    replace it <foo>my tagbody</foo>
+    or wrap it in new content: <foo>&ldquo;<default_tagbody/>&rdquo;</foo>
+
+    You can give restore the default tagbody of an element further up
+    the hierarchy using the 'for' attribute. e.g:
+
+      <foo><baa>&ldquo;<default_tagbody for="foo"/>&rdquo;</baa></foo>
+
+  New feature: restoring replaced template parameters. For example -
+  wrapping a template param in an extra div:
+
+    <MyTemplate>
+      <my_param replace><div><my_param restore/></div></my_param>
+    </MyTemplate>
+
+  def@alias_current renamed to 'alias_current_as'
+
+  @if and @unless controll attributes always test for non-blank rather
+  than true. This is more convenient in DRYML where we generally want
+  to skip stuff if a collection is empty (empty enumerables are blank,
+  but not false)
+
+  An attribute that starts with an XML entity reference is *not*
+  considered a code attribute, even though it does start '&'
+  e.g. label="&raquo; Next"
+
+  #merge_attrs now always accumultates rather than
+  replaces css classes.
+
+  form, input and a have been removed from static_tags - these are now
+  defined tags.
+
+  Many core tags moved to Rapid. There are very ferw core tags now - just
+  the basic control tags (if, unless etc.)
+
+
+Hobo Models
+
+  The display_name method is not used anymore. Instead use the new
+  polymorphic tags.
+
+    <def tag="name" for="MyModel">...</def>
+
+    The <name> tag eventually falls back on to_s, so as an alternative
+    you can rename your display_name methods to to_s.
+
+  New semantics for #new and #build.
+
+    #new now does what new_without_appending used to do. That is, it
+    instantiates a new object exactly as if it was in the collection,
+    but it does not modify the collection itself.
+
+    #build is extended so that it sets the belongs_to association that
+    is the counterpart to the has_many.
+
+    For existing apps, just change any calls to #new_without_appending
+    to #new
+
+  Refactored the rich type mechanism to make it easier to add new
+  types. To add a new type, e.g.:
+
+    class Isbn < String; COLUMN_TYPE = :string; end
+
+    Hobo.field_types[:isbn] = Isbn
+
+    You can then use :isbn as a field type in 'fields do', and
+    register a view with <def tag="view" for="isbn">
+
+
+  New rich type Hobo::EmailAddress < String
+
+    Doesn't have any special behaviour as yet, but we could do nifty
+    things with it in the future like auto anti-spam cloaking,
+    validations...
+
+  New method #nillable_field? tests if the underlying collumn can be
+  null.
+
+  New methods #created_date and #modified_date return
+  [created|modified]_at.to_date
+
+  Default to_s for all hobo_models
+
+
+Model controller
+
+  Boolean fields now get a false value when the param is either '0' or
+  'false'.
+
+
+Front controller
+
+  All the templates are updated to use the new DRYML
+
+
+Migration generator
+
+  Now gives an option to generate and run the migration immediately
+
+  Will create the "foo_type" column for belongs_to associations marked
+  as polymorphic.
+
+
+Hobo Rapid
+
+  lib/hobo/rapid.rb is gone. The tags are now in tags/rapid.dryml and
+  the helpers are in lib/hobo/rapid_helper.rb
+
+  Now includes two CSS stylesheets. hobo_base.css provides some handy
+  reset rules to reduce cross-browser headaches, and hobo_rapid.css
+  provides default styling for some of the Rapid components.
+
+  Rapid split up into more separate dryml files: rapid,
+  rapid_document_tags, rapid_forms, rapid_pages, rapid_editing,
+  rapid_navigation, rapid_support
+
+  There are a great many changes to the Rapid tags, too much to
+  describe individually here. The most important changes are:
+
+    <show> becomes <view>. <view> is a polymorphic tag, so you can
+    <def tag="view" for="MyClass">
+
+    <edit> is gone. Use <editor> if you want a tag that gives an
+    in-place (ajax) editor, and degrades to <view> if the user does
+    not have edit permission. <editor> is a polymorphic tag, so you
+    can <def tag="editor" for="MyClass">
+
+    <form_field> is now <input>. If you give a type attributes, you
+    get a regular html input tag, if you don't you get a smart Hobo
+    form field appropriate for the type of the context. <input> is a
+    polymorphic tag, so you can <def tag="input" for="MyClass">
+
+    All the special form-field tags tags that ended _field now end
+    _input
+
+    <table_for> becomes <Table>
+
+    <ul_for> becomes <UL>
+
+    <object_form> and <remote_method_form> are now both handled by
+    <form>
+
+    <object_link> and <new_object_link> are now both handled by <a>
+
+    <object_table> becomes <FieldList>
+
+    <display_name> becomes <name>
+
+    Various small changes to the navigation tags - please see
+    rapid_navigation.dryml
+
+
+Hobo Rapid Javascript
+
+  Fix: problems with the save button in TinyMCE fighting with the
+  save-on-blur behaviour.
+
+
+Tabla theme
+
+  Tweaks to application.dryml and the stylesheet for new DRYML
+
+
+Hobo user model generator
+
+  Doesn't declare the authentication fields anymore, as these have
+  been moved to Hobo::Authenticated user. This is part of the move to
+  supporting multiple user models.
+
+
+Hobo controller & helpers
+
+  ControllerHelpers are now HoboHelper, and there's a change to the
+  way this is included in both the controller and the view.
+
+  #render_tags extended to support polymorphic tags
+
+  #site_search now renders the polymorphic <card> tag for each search
+  result.
+
+
+Hobo module
+
+  New method Hobo.symbolic_type_name returns a symbol abbreviation for
+  a rich type. e.g. Hobo.symbolic_type_name(Hobo::Text) #=> :text
+
+  New method Hobo.type_name
+
+    Hobo.type_name(MyModule::MyClass) #=> "my_module__my_class"
+
+    Note the double underscore
+
+
+Core Extensions
+
+  ActiveSupport's HashWithIndifferentAccess is extended to keep it's
+  indifferent access semantics with Hobo's extensions to Hash.
+
+
+
+=== Release 0.6-pre1 ===
+
+*NOTE* We are now using Edge Rails for all our tests. YMMV with other
+ Rails releases. If you do upgrade tp Edge Rails, you'll need to
+ install classic_pagination too (this dependency will probably go away
+ at some point)
+
+hobolib directory (app/views/hobolib) renamed to 'taglibs'
+
+
+DRYML
+
+  Hobo::DefineTags and def_tag are deprecated - they'll be phased out.
+
+  Code attributes changed from foo="#baa" to foo="&baa"
+
+  Changing the context:
+
+    obj="..." renamed to with="..."
+
+    attr="..." renamed to field="..."
+
+    Shorthand syntax <show:authtor.name/> equivalent to <show field="author.name"/>
+    Note that the ':' and field name(s) are optional on the close tag, e.g.:
+
+      <repeat:comments> ... </repeat>
+
+    (Be aware that your DRYML is no longer valid XML if you go for this option)
+
+  <taglib> renamed to <include>
+
+  part_id="..." renamed to part="..."
+
+  #{...} is now supported in attributes of static tags (i.e. plain HTML tags)
+
+  <include> (formerly <taglib>) now supports the 'as' attribute for
+  putting tags in namespaces.
+
+    <include src="my_taglib"/>, then... <my_tag/>
+    <include src="my_taglib" as="foo"/>, then... <foo.my_tag/>
+
+    (note that <foo.my_tag/> compiles to simple "foo.my_tag()", i.e. a
+    method call on an object, so you can do other stuff with this if
+    the mood takes you)
+
+  xattrs="..." renamed to merge_attrs="..."
+
+  New feature: template tags
+
+  Parameter tags (<:foo>...</:foo>) are gone. Replaced by template
+  parameters.
+
+  content_option and replace_option are gone. The 'param' attribute is
+  the new equivalent (part of template tags)
+
+  <else> can now be used in many places. e.g. after <repeat>, the else
+  content will be used if the repeated collection is empty.
+
+  Attributes can now have no RHS, e.g.
+
+    <logo small/> is equivalent to <logo small="&true"/>
+
+    (note your DRYML is not valid XML if you use this shorthand)
+
+  #attrs_for can be called for any tag and return the declared
+   attributes on the tag. e.g.
+
+    attrs_for(:foo) #=> [:a, :b] -- assuming <def tag="foo" attrs="a, b">
+
+  New feature: local tags, e.g.
+
+    <def tag="a">
+      <def tag="panel">...</def>
+      
+      ... Any call to panel in here, or in the tagbody of the call to
+      <a> will get the local definition. Note that local tags are full
+      closures and have access to state from the containing tag...
+    </def>
+
+  <set a="&1" b="&2"/> equivalent to <% a = 1; b = 2 %>
+
+  New feature: polymorphic tag calls. e.g. if the current context is a
+  User <card for_type/> will try to call <user_card/>, falling back on
+  just <card/> if no such tag exists.
+
+  New feature: control attributes
+
+    <p if="..."/> as a shorthand for <if q="..."><p/></if>
+    <p unless="..."/> as a shorthand for <unless q="..."><p/></unless>
+    <p repeat="..."/> as a shorthand for <repeat with="..."><p/></repeat>
+
+    Think of these as the dryml equivalent of the suffix 'if' and 'unless' in Ruby.
+
+    If you give the attributes a string, it is treated test for a
+    non-blank field, e.g.  if="address" is like 
+    <if q="&!this.address.blank?">
+
+    You can use <else> after tags with these attributes on them.
+
+  Fix: calling @view methods with a block now works
+
+  The list of tags considered 'static' (i.e. plain HTML tags) can now
+  be customised by putting your own list (one tag per line) in
+  config/dryml_static_tags.txt
+
+
+Hobo Controllers
+
+  New directive "include_taglib" allows a specific DRYML taglib to be
+  included in every action on this controller.
+
+  render_tag now supports custom render options, e.g.
+
+    render_tag :error_message, { :message => "uh oh" }, { :status => 500 }
+
+  Options passed to #hobo_index are now also forwarded to
+  #paginated_find, making it easier to change the page size etc.
+
+  #paginated_find now takes an :association parameter to provide a
+  custom association
+
+  Fix: :order option to paginated_find ignored in some situations.
+
+  Hobo controller actions now perform a #hobo_render if you give a
+  response block but the blog does not do a render or a redirect. So
+  e.g. if you just want to update the session you can leave hobo to
+  handle the response
+
+  Fix: hobo_create now checks for create permission if you pass a
+  custom :this parameter
+
+  POSTing and PUTing now support boolean values
+
+
+Hobo Models
+
+  #created_by renamed to #set_creator. This should help avoid name
+  clashes with column names etc.
+
+  Added field declarations on models. This replaces set_field_type and
+  also supports the migration generator.
+
+    fields do
+      name :string
+      body :html
+    end
+
+  Added return_type declaration for setting rich types on model
+  methods, e.g.
+
+    return_type :html
+    def my_method
+      ...
+    end
+
+    This allows DRYML to render the correct widget even when the
+    method is returning nil
+
+  Fix: def_scope was pretty much completely broken
+
+RSpec support and a test Rails app (in spec/rails-root) added to the
+repository.
+
+
+DRYML Core Tags
+
+  <dynamic_tag/> renamed to <call_tag/> 
+
+  <display_name/> displays "(not available)" if the context is nil
+
+  show@no_span renamed to show@no_wrapper, and for content such as
+  :html it now generates a div instead of a span.
+
+  count@unless_none -- nothing output when count is zero (can be
+  followed by an <else>)
+
+  <join> now uses <display_name> if no tagbody is given.
+
+  join@with renamed to join@separator
+
+
+DRYML Helpers
+
+  #param_name_for will strip a trailing '?' if there is one.
+  
+
+Hobo Rapid Tags
+  
+  <boolean_field> now also generates a hidden tag with the same name
+  and value '0' like the rails helper. This fixes HTMLs broken idea of
+  how to handle checkboxes (you get a 0 value if the checkbox is not
+  checked, instead of no parameter at all)
+
+  <object_form> no longer generates hidden fields for created_at and updated_at
+
+
+Hobo::TextileString now includes a monkey-patch to RedCloth
+
+
+Users & Authentication
+
+  Added: Hobo maintains a login_count attribute if one exists on your user model.
+
+
+Hobo Rapid Javascript
+
+  Ajax forms now default to not resseting and not refocussing after submission.
+
+  Fix: ajax behaviour (Hobo.applyEvents) now applied to the result of searches.
+
+  Fix: Ajax now using encodeURIComponent instead of escape. Fixes
+  problems with foreign characters.
+
+
+Tabla theme
+
+  Removed <application_logo/>
+
+  Added missing image plus.png
+
+
+Generators
+
+  New: hobo_migration generator. Creates fully implemented migrations
+  for you based on field declarations in your models
+
+    hobo_model and hobo_user_model generators updated accordingly --
+    they don't generate migrations any more.
+
+Routes
+
+  Routes with ';' have been changed to use '/' as per edge Rails.
+
+Permission System
+
+  Hobo.can_edit? can now handle feild names that end in '?'
+
+Hobo Module
+
+  Hobo.models now skips files whos names don't look like models
+  (e.g. editor backup files)
+
+
+Core Extensions:
+
+  Add: Enumerable#build_hash
+
+    (1..3).build_hash {|i| ["#{i} Xs", "X" * i]}
+    => {"1 Xs"=>"X", "3 Xs"=>"XXX", "2 Xs"=>"XX"}
+
+  Add: Enumerable#map_hash
+
+    (1..5).map_hash { |x| x**2 }
+    => {5=>25, 1=>1, 2=>4, 3=>9, 4=>16}
+
+  Add: Hash#-
+
+    {:a => 1, :b => 2} - [:a] #=> {:b = 2}
+
+  Add: Hash#&
+
+    {:a => 1, :b => 2} & [:a] #=> {:a = 2}
+
+
+Documentation
+
+  Added contributed rdoc to Hobo::AuthenticatedUser (thanks!)
+
+
 === Release 0.5.3 ===
 
 Core tags

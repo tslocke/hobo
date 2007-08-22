@@ -73,7 +73,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
 
   protected
     def banner
-      "Usage: #{$0} generate <controller-name> [--add-routes] [--no-user] [--delete-index]"
+      "Usage: #{$0} #{spec.name} <controller-name> [--add-routes] [--no-user] [--delete-index]"
     end
 
     def add_options!(opt)

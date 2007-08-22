@@ -2,12 +2,31 @@ module Hobo
 
   module Model
     
+    Hobo.field_types.update({ :html          => HtmlString,
+                              :markdown      => MarkdownString,
+                              :textile       => TextileString,
+                              :password      => PasswordString,
+                              :text          => Hobo::Text,
+                              :boolean       => TrueClass,
+                              :date          => Date,
+                              :datetime      => Time,
+                              :integer       => Fixnum,
+                              :big_integer   => BigDecimal,
+                              :float         => Float,
+                              :string        => String,
+                              :email_address => EmailAddress
+                            })
+    
     def self.included(base)
       Hobo.register_model(base)
       base.extend(ClassMethods)
-      base.set_field_type({})
+      base.class_eval do
+        @field_specs  = HashWithIndifferentAccess.new
+        set_field_type({})
+      end
       class << base
         alias_method_chain :has_many, :defined_scopes
+        alias_method_chain :belongs_to, :foreign_key_declaration
       end
     end
 
@@ -16,43 +35,72 @@ module Hobo
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
       
+      private
+      
+      def return_type(type)
+        @next_method_type = type
+      end
+      
       def method_added(name)
-        # avoid error when running model generators before
-        # db exists
-        return unless connected? 
-        
-        aliased_name = "#{name}_without_hobo_type"
-        return if name.to_s.ends_with?('without_hobo_type') or aliased_name.in?(instance_methods)
-        
-        type_wrapper = self.field_type(name)
-        if type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String
-          aliased_name = "#{name}_without_hobo_type"
-          alias_method aliased_name, name
-          define_method name do
-            res = send(aliased_name)
-            if res.nil?
-              nil
-            elsif res.respond_to?(:hobo_undefined?) && res.hobo_undefined?
-              res
-            else
-              type_wrapper.new(res)
-            end
-          end
+        if @next_method_type
+          set_field_type(name => @next_method_type)
+          @next_method_type = nil
         end
       end
       
+      
+      class FieldDeclarationsDsl
+        
+        def initialize(model)
+          @model = model
+        end
+        
+        attr_reader :model
+        
+        def timestamps
+          field(:created_at, :datetime)
+          field(:updated_at, :datetime)
+        end
+        
+        def field(name, *args)
+          type = args.shift
+          options = extract_options_from_args!(args)
+          @model.send(:set_field_type, name => type) unless
+            type.in?(@model.connection.native_database_types.keys - [:text])
+          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
+        end
+        
+        def method_missing(name, *args)
+          field(name, *args)
+        end
+        
+      end
+      
+      
+      def fields(&b)
+        FieldDeclarationsDsl.new(self).instance_eval(&b)
+      end
+      
+      
+      def belongs_to_with_foreign_key_declaration(name, *args, &block)
+        res = belongs_to_without_foreign_key_declaration(name, *args, &block)
+        refl = reflections[name]
+        fkey = refl.primary_key_name
+        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer)
+        if refl.options[:polymorphic]
+          type_col = "#{name}_type"
+          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string)
+        end
+        res
+      end
+      
+      
+      attr_reader :field_specs
+      public :field_specs
+      
       def set_field_type(types)
         types.each_pair do |field, type|
-          
-          # TODO: Make this extensible
-          type_class = case type
-                       when :html; HtmlString
-                       when :markdown; MarkdownString
-                       when :textile; TextileString
-                       when :password; PasswordString
-                       else type
-                       end
-          
+          type_class = Hobo.field_types[type] || type
           field_types[field] = type_class
         end
       end
@@ -75,10 +123,10 @@ module Hobo
         @hobo_never_show.concat(fields.omap{to_sym})
       end
 
-
       def never_show?(field)
         @hobo_never_show and field.to_sym.in?(@hobo_never_show)
       end
+      public :never_show?
 
       def set_creator_attr(attr)
         class_eval %{
@@ -143,11 +191,11 @@ module Hobo
           underscore
       end
 
-
+      public
+      
       def id_name?
         respond_to?(:find_by_id_name)
       end
-
 
       attr_reader :id_name_column
 
@@ -156,15 +204,24 @@ module Hobo
       def field_type(name)
         name = name.to_sym
         field_types[name] or
-          reflections[name] or
-          ((col = columns.find {|c| c.name == name.to_s}) and case col.type
-                                                              when :boolean
-                                                                TrueClass
-                                                              when :text
-                                                                Hobo::Text
-                                                              else
-                                                                col.klass
-                                                              end)
+          reflections[name] or begin
+                                 col = columns.find {|c| c.name == name.to_s} rescue nil
+                                 return nil if col.nil?
+                                 case col.type
+                                 when :boolean
+                                   TrueClass
+                                 when :text
+                                   Hobo::Text
+                                 else
+                                   col.klass
+                                 end
+                               end
+      end
+
+      
+      def nilable_field?(name)
+        col = columns.find {|c| c.name == name.to_s} rescue nil
+        col.nil? || col.null
       end
       
       
@@ -244,20 +301,35 @@ module Hobo
       
       class ScopedProxy
         def initialize(klass, scope={})
-          @klass, @scope = klass, scope
+          @klass = klass
+          
+          # If there's no :find, or :create specified, assume it's a find scope
+          @scope = if scope.has_key?(:find) || scope.has_key?(:create)
+                     scope
+                   else
+                     { :find => scope }
+                   end
         end
         
         def method_missing(name, *args, &block)
-          klass.with_scope(@scope) do
+          @klass.send(:with_scope, @scope) do
             @klass.send(name, *args, &block)
           end
+        end
+        
+        def all
+          self.find(:all)
+        end
+        
+        def first
+          self.find(:first)
         end
       end
       (Object.instance_methods + 
        Object.private_instance_methods +
        Object.protected_instance_methods).each do |m|
         ScopedProxy.send(:undef_method, m) unless
-          m.in?(%w{initialize method_missing}) || m.starts_with?('_')
+          m.in?(%w{initialize method_missing send}) || m.starts_with?('_')
       end
       
       attr_accessor :defined_scopes
@@ -278,24 +350,35 @@ module Hobo
         attr_accessor :reflections
         
         def method_missing(name, *args, &block)
-          scopes = proxy_reflection.klass.defined_scopes
-          scope = scopes && scopes[name.to_sym]
-          if scope
-            scope = scope.call(*args) if scope.is_a?(Proc)
-            
-            # Calling directly causes self to get loaded
+          scope = (proxy_reflection.klass.respond_to?(:defined_scopes) and
+                   scopes = proxy_reflection.klass.defined_scopes and 
+                   scopes[name.to_sym])
+          
+          scope = scope.call(*args) if scope.is_a?(Proc)
+          
+          # If there's no :find, or :create specified, assume it's a find scope
+          find_scope = if scope && (scope.has_key?(:find) || scope.has_key?(:create))
+                         scope[:find]
+                       else
+                         scope
+                       end
+          
+          if find_scope
+            # Calling instance_variable_get directly causes self to
+            # get loaded, hence this trick
             assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}")
+            
             unless assoc
               options = proxy_reflection.options
-              has_many_conditions = options.has_key?(:condition)
-              scope_conditions = scope.delete(:conditions)
+              has_many_conditions = options.has_key?(:conditions)
+              scope_conditions = find_scope.delete(:conditions)
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
                            else
                              scope_conditions || has_many_conditions
                            end
               
-              options = options.merge(scope).update(:conditions => conditions,
+              options = options.merge(find_scope).update(:conditions => conditions,
                                                     :class_name => proxy_reflection.klass.name,
                                                     :foreign_key => proxy_reflection.primary_key_name)
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
@@ -336,18 +419,7 @@ module Hobo
     end
     
     
-    def method_missing(name, *args, &b)
-      val = super
-      if val.nil?
-        nil
-      else
-        type_wrapper = self.class.field_type(name)
-        (type_wrapper && type_wrapper.is_a?(Class) && type_wrapper < String) ? type_wrapper.new(val) : val
-      end
-    end
-
-
-    def created_by(user)
+    def set_creator(user)
       self.creator ||= user if self.class.has_creator? and not user.guest?
     end
 
@@ -381,11 +453,58 @@ module Hobo
       CompositeModel.new_for([self, object])
     end
     
+    def created_date
+      created_at.to_date
+    end
     
+    def modified_date
+      modified_at.to_date
+    end
+
     def typed_id
       id ? "#{self.class.name.underscore}_#{self.id}" : nil
+    end
+    
+    def to_s
+      if respond_to? :title
+        title
+      elsif respond_to? :name
+        name
+      else
+        "#{self.class.name.humanize} #{id}"
+      end
     end
     
   end
 end
 
+
+# Hack AR to get Hobo type wrappers in
+
+module ActiveRecord::AttributeMethods::ClassMethods
+
+  # Define an attribute reader method.  Cope with nil column.
+  def define_read_method(symbol, attr_name, column)
+    cast_code = column.type_cast_code('v') if column
+    access_code = cast_code ? "(v=@attributes['#{attr_name}']) && #{cast_code}" : "@attributes['#{attr_name}']"
+
+    unless attr_name.to_s == self.primary_key.to_s
+      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) unless @attributes.has_key?('#{attr_name}'); ")
+    end
+
+    # This is the Hobo hook - add a type wrapper around the field
+    # value if we have a special type defined
+    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
+              type_wrapper.is_a?(Class) && type_wrapper < String
+            "val = begin; #{access_code}; end; " +
+              "if val.nil?; nil; " +
+              "elsif val.respond_to?(:hobo_undefined?) && val.hobo_undefined?; val; " + 
+              "else; #{type_wrapper}.new(val); end"
+          else
+            access_code
+          end
+    
+    evaluate_attribute_method(attr_name, 
+                              "def #{symbol}; @attributes_cache['#{attr_name}'] ||= begin; #{src}; end; end")
+  end
+end

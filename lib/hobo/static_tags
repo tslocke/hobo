@@ -1,4 +1,3 @@
-a
 abbr
 acronym
 address
@@ -30,7 +29,6 @@ em
 embed
 fieldset
 font
-form
 frame
 frameset
 h1
@@ -45,7 +43,6 @@ html
 i
 iframe
 img
-input
 ins
 isindex
 kbd

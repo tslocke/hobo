@@ -6,7 +6,7 @@ module Hobo
 
     class PermissionDeniedError < RuntimeError; end
 
-    VIEWLIB_DIR = "hobolib"
+    VIEWLIB_DIR = "taglibs"
     
     GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
 
@@ -16,17 +16,13 @@ module Hobo
         base.extend(ClassMethods)
         base.helper_method(:find_partial, :model, :current_user)
 
-        Hobo::ControllerHelpers.public_instance_methods.each {|m| base.hide_action(m)}
-
         for collection in base.collections
           add_collection_actions(base, collection.to_sym)
         end
 
         base.before_filter :set_no_cache_headers
-
-        base.class_eval do
-          alias_method_chain :redirect_to, :object_url
-        end
+        
+        Hobo::Controller.included_in_class(base)
       end
 
       def find_partial(klass, as)
@@ -36,7 +32,8 @@ module Hobo
 
       def template_path(dir, name, is_partial)
         fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-        unless Dir.entries("#{RAILS_ROOT}/app/views/#{dir}").grep(fileRx).empty?
+        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+        unless !File.exists?(full_dir) || Dir.entries(full_dir).grep(fileRx).empty?
           return "#{dir}/#{name}"
         end
       end
@@ -131,7 +128,7 @@ module Hobo
       def show_action(*names)
         show_actions.concat(names)
         for name in names
-          class_eval "def #{name}; show; end"
+          class_eval "def #{name}; hobo_show; end"
         end
       end
       
@@ -201,7 +198,7 @@ module Hobo
     def hobo_index(options = {})
       options = LazyHash.new(options)
       @model = model
-      @this = options[:collection] || paginated_find
+      @this = options[:collection] || paginated_find(options)
 
       instance_variable_set("@#{@model.name.pluralize.underscore}", @this)
       if block_given?
@@ -216,15 +213,18 @@ module Hobo
       options = extract_options_from_args!(args)
       
       total_number = options.delete(:total_number)
-      if args.empty?
-        total_number ||= count_with_data_filter
-      else
-        owner, collection_name = args
-        @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
-        total_number ||= @association.size
-        @reflection = @association.proxy_reflection
+      @association = options.delete(:association) or
+        if args.any?
+          owner, collection_name = args
+          @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
+        end
+        
+      if @association
+        total_number ||= @association.count
+        @reflection = @association.proxy_reflection if @association.respond_to?(:proxy_reflection)
       end
       
+      total_number ||= count_with_data_filter
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
       @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
@@ -237,7 +237,7 @@ module Hobo
       if @association
         @association.find(:all, options, &b)
       else
-        options[:order] = :default
+        options[:order] ||= :default
         find_with_data_filter(options, &b)
       end
     end
@@ -262,7 +262,8 @@ module Hobo
       if @this
         if Hobo.can_view?(current_user, @this)
           set_named_this!
-          block_given? ? yield : hobo_render
+          yield if block_given?
+          hobo_render unless performed?
         else
           permission_denied(options)
         end
@@ -273,40 +274,41 @@ module Hobo
     def hobo_new(options={})
       options = LazyHash.new(options)
       @this = options[:this] || model.new
-      @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
       
       if Hobo.can_create?(current_user, @this)
         set_named_this!
-        block_given? ? yield : hobo_render
+        yield if block_given?
+        hobo_render unless performed?
       else
         permission_denied(options)
       end
     end
     
-    
+
     def hobo_create(options={})
       options = LazyHash.new(options)
       
-      @this = (options[:this] || 
-               begin
-                 attributes = params[model.name.underscore]
-                 type_attr = params['type']
-                 create_model = if 'type'.in?(model.column_names) and 
-                                    type_attr and type_attr.in?(model.send(:subclasses).omap{name})
-                                  type_attr.constantize
-                                else
-                                  model
-                                end
-                 this = create_model.new
-                 @check_create_permission = [this]
-                 initialize_from_params(this, attributes)
-                 for obj in @check_create_permission
-                   permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
-                 end
-                 @check_create_permission = nil
-                 this
-               end)
-
+      if (@this = options[:this])
+        permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
+      else
+        attributes = params[model.name.underscore]
+        type_attr = params['type']
+        create_model = if 'type'.in?(model.column_names) and 
+                           type_attr and type_attr.in?(model.send(:subclasses).omap{name})
+                         type_attr.constantize
+                       else
+                         model
+                       end
+        @this = create_model.new
+        @check_create_permission = [@this]
+        initialize_from_params(@this, attributes)
+        for obj in @check_create_permission
+          permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
+        end
+        @check_create_permission = nil
+      end
+      
       set_named_this!
       if @this.save
         if block_given?
@@ -375,8 +377,9 @@ module Hobo
               overridable_response(options, :js_response) do
                 if changes.size == 1
                   # Decreasingly hacky support for the scriptaculous in-place-editor
-                  new_val = Hobo::Dryml.render_tag(@template, "show",
-                                                   :obj => @this, :attr => changes.keys.first, :no_span => true)
+                  new_val = Hobo::Dryml.render_tag(@template, "view",
+                                                   :with => @this, :field => changes.keys.first,
+                                                   :no_wrapper => true)
                   hobo_ajax_response(@this, :new_field_value => new_val)
                 else
                   hobo_ajax_response(@this)
@@ -457,8 +460,8 @@ module Hobo
       permission_denied(options) and return unless Hobo.can_view?(current_user, @owner, collection)
       
       @association = options[:collection] || @owner.send(collection)
-      @this = options[:this] || @association.new_without_appending
-      @this.created_by(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this = options[:this] || @association.new
+      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
 
       permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
       
@@ -533,7 +536,7 @@ module Hobo
         true
       else
         if page_kind.in? GENERIC_PAGE_TAGS
-          render_tag("#{page_kind}_page", :obj => @this)
+          render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
           true
         else
           false
@@ -586,7 +589,7 @@ module Hobo
 
     def initialize_from_params(obj, params)
       update_with_params(obj, params)
-      obj.created_by(current_user)
+      obj.set_creator(current_user)
       (@check_create_permission ||= []) << obj
       obj
     end
@@ -627,7 +630,9 @@ module Hobo
 
 
     def param_to_value(field_type, value)
-      if field_type <= Date
+      if field_type.nil?
+        value
+      elsif field_type <= Date
         if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
         elsif value.is_a? String
@@ -640,6 +645,8 @@ module Hobo
         elsif value.is_a? String
           parse_datetime(value)
         end
+      elsif field_type <= TrueClass
+        (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
       else
         # primitive field
         value

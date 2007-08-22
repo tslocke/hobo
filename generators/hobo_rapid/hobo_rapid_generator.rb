@@ -11,16 +11,17 @@ class HoboRapidGenerator < Hobo::Generator
     
     record do |m|
       m.file "hobo_rapid.js", "public/javascripts/hobo_rapid.js"
-      m.file "themes/default/default_mapping.rb", "app/views/hobolib/default_mapping.rb"
+      m.file "hobo_base.css", "public/stylesheets/hobo_base.css"
+      m.file "hobo_rapid.css", "public/stylesheets/hobo_rapid.css"
       create_all(m, "themes/default/public", "public/hobothemes/default")
-      create_all(m, "themes/default/views", "app/views/hobolib/themes/default")
+      create_all(m, "themes/default/views", "app/views/taglibs/themes/default")
     end
   end
   
   def import_tags
-    path = File.join(RAILS_ROOT, "app/views/hobolib/application.dryml")
+    path = File.join(RAILS_ROOT, "app/views/taglibs/application.dryml")
 
-    tag = "<taglib src=\"plugins/hobo/tags/rapid\"/>\n\n<set_theme name=\"default\"/>\n"
+    tag = "<include src=\"plugins/hobo/tags/rapid\"/>\n\n<set_theme name=\"default\"/>\n"
       
     src = File.read(path)
     return if src.include?(tag)
@@ -37,14 +38,14 @@ class HoboRapidGenerator < Hobo::Generator
 
   protected
     def banner
-      "Usage: #{$0} generate [--import-tags]"
+      "Usage: #{$0} #{spec.name} [--import-tags]"
     end
 
     def add_options!(opt)
       opt.separator ''
       opt.separator 'Options:'
       opt.on("--import-tags",
-             "Modify hobolib/application.dryml to import hobo-rapid and theme tags ") do |v|
+             "Modify taglibs/application.dryml to import hobo-rapid and theme tags ") do |v|
         options[:import_tags] = true
       end
     end
