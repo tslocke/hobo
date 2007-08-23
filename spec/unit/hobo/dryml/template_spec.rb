@@ -94,7 +94,7 @@ describe Template do
     # Note the presence of the `parameters` param, which block-tags don't have
     compile_def("<def tag='Foo'></def>").should == 
       "<% def Foo(all_attributes={}, all_parameters={}, &__block__); " +
-      "parameters = all_parameters - []; " +
+      "parameters = all_parameters & []; " +
       "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
       "<% _erbout; end; end %>"
   end

@@ -258,10 +258,6 @@ module Hobo::Dryml
       dryml_exception("def cannot have both alias_of and alias_current_as", el) if alias_of && alias_current
       dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
       
-      # If we're redefining, we need a statement in the method body
-      # that does the alias_method on the fly.
-      re_alias = ""
-      
       if alias_of || alias_current
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
@@ -273,9 +269,9 @@ module Hobo::Dryml
               "#{re_alias}<% #{tag_newlines(el)} %>"
             else
               src = if template_name?(name)
-                      template_method(name, re_alias, el)
+                      template_method(name, el)
                     else
-                      tag_method(name, re_alias, el)
+                      tag_method(name, el)
                     end
               src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>"
               
@@ -312,17 +308,17 @@ module Hobo::Dryml
     end
     
     
-    def template_method(name, re_alias, el)
+    def template_method(name, el)
       param_names = param_names_in_template(el)
       
       "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
-        "parameters = all_parameters - #{param_names.inspect}; " +
+        "parameters = all_parameters & #{param_names.inspect}; " +
         tag_method_body(el) +
         "; end %>"
     end
     
     
-    def tag_method(name, re_alias, el)
+    def tag_method(name, el)
       "<% def #{name}(all_attributes={}, &__block__); " +
         "parameters = nil; " +
         tag_method_body(el) + 
@@ -517,7 +513,7 @@ module Hobo::Dryml
       merge_params = el.attributes['merge_params'] || merge_attribute(el)
       if merge_params
         extra_params = if merge_params == "&true"
-                         "parameters"
+                         "all_parameters"
                         elsif is_code_attribute?(merge_params)
                           merge_params[1..-1]
                         else
