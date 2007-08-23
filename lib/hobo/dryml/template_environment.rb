@@ -123,6 +123,7 @@ module Hobo::Dryml
 
     
     def merge_attrs(attrs, overriding_attrs)
+      return {}.update(attrs) if overriding_attrs.nil?
       attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
       classes = overriding_attrs[:class]
       attrs = add_classes(attrs, *classes.split) if classes
@@ -162,17 +163,17 @@ module Hobo::Dryml
     end
 
 
-    def call_part(dom_id, part_id, part_this=nil)
+    def call_part(dom_id, part_id, part_this=nil, *locals)
       res = ''
       if part_this
         new_object_context(part_this) do
           @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part")
+          res = send("#{part_id}_part", *locals)
         end
       else
         new_context do
           @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part")
+          res = send("#{part_id}_part", *locals)
         end
       end
       res
@@ -437,7 +438,7 @@ module Hobo::Dryml
     # single hash
     def merge_option_procs(general_proc, overriding_proc)
       if overriding_proc
-        proc { general_proc.call.merge(overriding_proc.call) }
+        proc { merge_attrs(general_proc.call, overriding_proc.call) }
       else
         general_proc
       end
