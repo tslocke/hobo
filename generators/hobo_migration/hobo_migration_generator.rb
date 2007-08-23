@@ -15,13 +15,19 @@ class HoboMigrationGenerator < Rails::Generator::Base
     # Force load of hobo models
     Hobo.models
     
+    ignore_tables = Hobo::Migrations.ignore_tables + Hobo::Migrations.ignore.every(:pluralize)
+    ignore_models = Hobo::Migrations.ignore + Hobo::Migrations.ignore_models
+    
+    db_tables = connection.tables - ignore_tables
+    
     models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
+    models = models.reject {|m| m.name.underscore.in?(ignore_models) }
     table_models = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)
     
-    to_create = model_table_names - connection.tables
-    to_drop = connection.tables - model_table_names - ['schema_info']
-    to_change = connection.tables & model_table_names
+    to_create = model_table_names - db_tables
+    to_drop = db_tables - model_table_names - ['schema_info']
+    to_change = db_tables & model_table_names
     
     to_rename = rename_or_drop!(to_create, to_drop, "table")
     

@@ -128,17 +128,18 @@ module Hobo
     end
     
     
-    def type_name(type=nil)
-      Hobo.type_name(type || this.class)
+    def type_id(type=nil)
+      type ||= this_type
+      type == NilClass ? "" : Hobo.type_id(type || this.class)
     end
     
     
     def type_and_field(*args)
       if args.empty?
-        this_parent && this_field && "#{Hobo.type_name(this_parent.class)}_#{this_field}"
+        this_parent && this_field && "#{Hobo.type_id(this_parent.class)}_#{this_field}"
       else
         type, field = args
-        "#{type_name(type)}_#{field}"
+        "#{Hobo.type_id(type)}_#{field}"
       end
     end
      

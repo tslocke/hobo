@@ -386,13 +386,16 @@ module Hobo::Dryml
       part_name  = el.attributes['part']
       dom_id = el.attributes['id'] || part_name
       
-      part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
+      part_locals = el.attributes["part_locals"]
+      
+      part_src = "<% def #{part_name}_part(#{part_locals}) #{tag_newlines(el)}; new_context do %>" +
         content +
         "<% end; end %>"
       @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
-      "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
+      args = [attribute_to_ruby(dom_id), ":#{part_name}", "nil", part_locals].compact
+      "<%= call_part(#{args * ', '}) #{newlines} %>"
     end
     
     

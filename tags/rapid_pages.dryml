@@ -83,11 +83,11 @@
 
 
 <def tag="NewPage">
-  <PageForNew title="New #{human_type}" merge>
+  <PageForNew title="New #{type_name}" merge>
     <body class="rapid_generic_page"/>
     <main>
       <header>
-        <heading>New <human_type/></heading>
+        <heading>New <type_name title/></heading>
       </header>
 
       <panel param="main" class="main">
@@ -115,7 +115,7 @@
     <body class="rapid_generic_page"/>
     <main>
       <header>
-        <heading><human_type/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
+        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
         <p><delete_button in_place="&false"/></p>
       </header>
 
@@ -137,11 +137,11 @@
 
 
 <def tag="NewInCollectionPage">
-  <PageForNewInCollection title="New #{human_type}" merge>
+  <PageForNewInCollection title="New #{type_name}" merge>
     <body class="rapid_generic_page"/>
     <main>
       <header>
-        <h1>New <human_type/></h1>
+        <h1>New <type_name/></h1>
         <h2>For: <a with="&@owner" /></h2>
       </header>
 

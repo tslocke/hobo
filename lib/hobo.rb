@@ -16,7 +16,7 @@ module Hobo
       field_types.index(type)
     end
     
-    def type_name(type)
+    def type_id(type)
       symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
     end
 
@@ -91,6 +91,8 @@ module Hobo
       if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
         attr = obj.proxy_reflection.name
         obj = obj.proxy_owner
+      elsif obj.is_a?(Class)
+        return obj.name.underscore.gsub("/", "__")
       elsif !obj.respond_to?(:typed_id)
         if attr
           return dom_id(get_field(obj, attr))
@@ -133,7 +135,12 @@ module Hobo
     end
 
     def add_routes(map)
-      ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
+      begin 
+        ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
+      rescue
+        # No database, no routes
+        return
+      end
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
       require "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
       

@@ -35,14 +35,25 @@
 </def>
 
 
-<def tag="Table">
-  <table merge_attrs unless="&this.empty?">
-    <thead if="&all_parameters[:thead]" param/>
+<def tag="Table" attrs="fields">
+  <table merge_attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty?">
+    <thead if="&all_parameters[:thead] || fields" param>
+      <tr param="field_heading_row">
+        <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
+          <th><%= this.titleize %></th>
+        </with_field_names>
+      </tr>
+    </thead>
     <tbody>
       <repeat>
         <tr param if="&can_view?"
             class="#{scope.even_odd} #{this_type.name.underscore}"
             hobo_model_id="#{dom_id(this)}">
+          <if test="&fields">
+            <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
+              <td><view/></td>
+            </with_fields>
+          </if>
         </tr>
       </repeat>      
     </tbody>
@@ -68,7 +79,7 @@
 
 <def tag="card">
   <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card" unless="&poly"><human_type/>: <a/></div>
+  <div class="card" unless="&poly"><type_name/>: <a/></div>
 </def>
   
 
@@ -120,6 +131,19 @@
   end
 %></def>
 
+<def tag="type_name" attrs="type, plural, lowercase"><%=
+  type ||= if this.is_a?(Class)
+             this
+           elsif this.respond_to? :proxy_reflection
+             this.proxy_reflection.klass
+           else
+             this.class
+           end
+  name = type.name.titleize
+  name = name.pluralize if plural
+  name = name.downcase if lowercase
+  name
+%></def>
 
 <def tag="a" attrs="action, to, params, resource_type, href"><%=
   content = tagbody.call if tagbody
@@ -174,7 +198,7 @@
       has_many_view(attributes)
     end
   else
-    attrs = add_classes(attributes, "view", type_name, type_and_field)
+    attrs = add_classes(attributes, "view", type_id, type_and_field)
     attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
 
     view_tag = find_polymorphic_tag("view")
@@ -227,20 +251,6 @@
 <def tag="view" for="String"><%= h(this).gsub("\n", "<br/>") %></def>
 
 <def tag="view" for="TrueClass"><%= this ? 'Yes' : 'No' %></def>
-
-<def tag="human_type" attrs="style"><%= 
-      if can_view?
-        res = if this.respond_to? :proxy_reflection
-                this.proxy_reflection.klass.name.pluralize
-              elsif this.is_a? Class
-                this.name
-              else
-                this.class.name
-              end
-        res.underscore.humanize.send(style || :titleize)
-      end
-%></def>
-
 
 <def tag="count" attrs="label, prefix, unless_none"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
