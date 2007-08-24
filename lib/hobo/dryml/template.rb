@@ -266,7 +266,7 @@ module Hobo::Dryml
       end
       
       res = if alias_of
-              "#{re_alias}<% #{tag_newlines(el)} %>"
+              "<% #{tag_newlines(el)} %>"
             else
               src = if template_name?(name)
                       template_method(name, el)
