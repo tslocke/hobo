@@ -1,3 +1,141 @@
+=== Release 0.6.1 ===
+
+Multiple user models
+
+  Hobo now supports multiple user models, with independent sign-up /
+  log-in/out for each. 
+
+  The controller needs to declare hobo_user_controller instead of
+  hobo_model_controller (it still has all the hobo_model_controller
+  features). e.g.
+
+    class AdminsController; hobo_user_controller; end
+
+    Hobo routing will automatically give you
+
+      /admin_login
+      /admin_logout
+      /admin_signup
+
+    Note this controller will now filter loggin of passwords.
+
+  The model needs to include Hobo::AuthenticatedUser and declare a
+  login attribute with, e.g.
+
+    set_login_attr :email
+
+  The hobo_front_controller generator no longer generates anything
+  related to users - it's now just the fron page and search page.
+
+  There is a new hobo_user_model generator to create these
+  controllers.
+
+  The global value Hobo.user_model is gone
+
+  Rapid now has <LoginPage> and <SignupPage> templates. They're not so
+  customisable just now but you can of course replace them completely
+  with your own views.
+
+
+Misc fixes
+
+  Search was broken
+
+  The 'hobo' command tried to connect to the DB, which was a problem
+  as you'd had no chance to configure database.yml
+
+
+Rapid
+
+  Fix: reset_form and refocus form options
+
+  <Table> now supports @fields, allowing you to give a bunch of field
+  names and automatically have a table with a column for each of those
+  fields. There's also a <controls> param that can be used to have a
+  delete button and edit link on each row. As usual there's a ton of
+  customisation options - see the source.
+
+  <human_type> is now <type_name> and takes flags @plural and @lowercase
+
+  <editor> and <input> have better automatic css classes
+
+  Restored old behaviour where <page_nav/> would display nothing when
+  there's only one page.
+
+  Finally created <EditPage>
+
+  Small cleanups in the rapid pages
+
+  New tag <with_field_names/> used in <Table> to iterate over the
+  column headings.
+
+
+
+Migration generator
+
+  Fix: Edge Rails now dumps out in sexy format, which was freaking the
+  migration generator.
+
+  You can now configure the generator to completely ignore specified
+  tables and models. In environment.rb do
+
+    Hobo::Migrations.ignore = %w(red_fish blue_fish)
+
+    That will ignore the models RedFish and BlueFish, and the tables
+    red_fishes and blue_fishes
+
+    To ignore just tables, assign an array of their names to
+
+      Hobo::Migrations.ignore_tables
+
+    To ignore just models, assign an array of the class names to 
+
+      Hobo::Migrations.ignore_models
+
+New secure ajax parts mechanism
+
+  The new mechanism stores the part state in a base 64 encoded string,
+  complete with an SHA1 (by default) digest, so malicious tampering
+  with the part state is prevented.
+
+  Parts can now capture the state of local variables along with the
+  DRYML context. Give a list of locals you wish to capture in the
+  'part_locals' attribute. e.g.
+
+    <div part="my_part" part_locals="a, b"> ... </div>
+
+  (the inability to do this was a serious limitation of the previous
+  mechanism)
+
+
+Core extensions
+
+  Added Methodphitamine and removed omap, oselect, ofind, oany oall.
+
+    See http://jicksta.com/articles/2007/08/04/the-methodphitamine
+
+
+DRYML
+
+  merge_attrs fixed to not complain about nils
+
+  Fix: css classes were not accumulated in some template parameter
+  situations
+
+
+
+
+Hobo module
+
+  #type_name renamed to #type_id
+
+  #object_from_dom_id will now return classes when the id has no, er, id. As in
+
+    Hobo.object_from_dom_id("blog_post") #=> BlogPost
+
+  Similarly, #dom_id generates those kind of ID for classes
+
+
 === Release 0.6 ===
 
 DRYML

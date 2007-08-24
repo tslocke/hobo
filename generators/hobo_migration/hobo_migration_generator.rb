@@ -16,7 +16,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     Hobo.models
     
     ignore_tables = Hobo::Migrations.ignore_tables + Hobo::Migrations.ignore.every(:pluralize)
-    ignore_models = Hobo::Migrations.ignore + Hobo::Migrations.ignore_models
+    ignore_models = (Hobo::Migrations.ignore + Hobo::Migrations.ignore_models).every(:underscore)
     
     db_tables = connection.tables - ignore_tables
     
@@ -60,8 +60,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
       undo_changes << undo
     end
     
-    up = [renames, drops, creates, changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
-    down = [undo_renames, undo_drops, undo_creates, undo_changes * "\n\n"].select{|s|!s.blank?} * "\n\n"
+    up = [renames, drops, creates, changes].flatten.select{|s|!s.blank?} * "\n\n"
+    down = [undo_renames, undo_drops, undo_creates, undo_changes].flatten.select{|s|!s.blank?} * "\n\n"
     
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
@@ -216,14 +216,28 @@ class HoboMigrationGenerator < Rails::Generator::Base
     res.string.strip.gsub("\n  ", "\n")
   end
   
+  def column_options_from_reverted_table(table, column)
+    revert = revert_table(table)
+    if (md = revert.match(/\s*t\.column\s+"#{column}",\s+(:[a-zA-Z0-9_]+)(?:,\s+(.*?)$)?/m))
+      # Ugly migration
+      _, type, options = *md
+    elsif (md = revert.match(/\s*t\.([a-z_]+)\s+"#{column}"(?:,\s+(.*?)$)?/m))
+      # Sexy migration
+      _, type, options = *md
+      type = ":#{type}"
+    end
+    [type, options]
+  end
+  
   
   def change_column_back(table, column)
-    _, type, options = *revert_table(table).match(/\s*t\.column\s+"#{column}",\s+(:[a-zA-Z0-9_]+)(?:,\s+(.*?)$)?/m)
+    type, options = column_options_from_reverted_table(table, column)
     "change_column :#{table}, :#{column}, #{type}#{', ' + options.strip if options}"
   end
 
   def revert_column(table, column)
-    "add_column :#{table}, :#{column}, " + revert_table(table).match(/\s*t\.column\s+"#{column}",\s+(.*?)$/m)[1].strip
+    type, options = column_options_from_reverted_table(table, column)
+    "add_column :#{table}, :#{column}, #{type}#{', ' + options.strip if options}"
   end
   
   

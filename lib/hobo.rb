@@ -96,7 +96,7 @@ module Hobo
         attr = obj.proxy_reflection.name
         obj = obj.proxy_owner
       elsif obj.is_a?(Class)
-        return obj.name.underscore.gsub("/", "__")
+        return type_id(obj)
       elsif !obj.respond_to?(:typed_id)
         if attr
           return dom_id(get_field(obj, attr))
@@ -186,7 +186,6 @@ module Hobo
             end
             
             if controller < Hobo::UserController
-              puts controller
               map.named_route("#{web_name.singularize}_login", "#{web_name.singularize}_login",
                               :controller => web_name, :action => 'login')
               map.named_route("#{web_name.singularize}_logout", "#{web_name.singularize}_logout",
