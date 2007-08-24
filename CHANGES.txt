@@ -69,6 +69,9 @@ Rapid
   New tag <with_field_names/> used in <Table> to iterate over the
   column headings.
 
+  <view> for Time objects now supports @format - a strftime style
+  format string.
+
 
 
 Migration generator
@@ -121,8 +124,6 @@ DRYML
 
   Fix: css classes were not accumulated in some template parameter
   situations
-
-
 
 
 Hobo module
