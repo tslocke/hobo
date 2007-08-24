@@ -56,7 +56,6 @@ module Hobo
 
 
     def ajax_update_response(this, part_page, render_specs, results={})
-      before_ajax if respond_to? :before_ajax
       add_variables_to_assigns
       renderer = Hobo::Dryml.page_renderer(@template, [], part_page) if part_page
 
@@ -64,45 +63,20 @@ module Hobo
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
         for spec in render_specs
           function = spec[:function] || "_update"
-
-          if spec[:as] or spec[:part]
-            obj = if spec[:object] == "this" or spec[:object].blank?
-                    this
-                  elsif spec[:object] == "nil"
-                    nil
-                  else
-                    Hobo.object_from_dom_id(spec[:object])
-                  end
-
-            if spec[:as]
-              part_content = render(:partial => (Hobo::ModelController.find_partial(obj.class, spec[:as])),
-                                 :locals => { :this => obj })
-              page.call(function, spec[:id], part_content)
-              
-            elsif spec[:part]
-              dom_id = spec[:id] || spec[:part]
-              part_content = renderer.call_part(dom_id, spec[:part], obj)
-              page.call(function, dom_id, part_content)
-            end
-            
+          dom_id = spec[:id]
+          
+          if spec[:part_context]
+            part_name, part_this, locals = Dryml::PartContext.unmarshal(spec[:part_context], this, session)
+            part_content = renderer.call_part(dom_id, part_name, part_this, *locals)
+            page.call(function, dom_id, part_content)
           elsif spec[:result]
             result = results[spec[:result].to_sym]
             page.call(function, spec[:id], result)
-            
           else
             # spec didn't specify any action :-/
           end
         end
-        if renderer
-          renderer.part_contexts.each_pair do |dom_id, p|
-            part_id, model_id = p
-            page.assign "hoboParts.#{dom_id}", [part_id, model_id]
-            
-            # not sure why this isn't happending automatically
-            # but it's messing up ARTS, so chuck a newline in
-            page << "\n"
-          end
-        end
+        page << renderer.part_contexts_storage if renderer
       end
     end
 

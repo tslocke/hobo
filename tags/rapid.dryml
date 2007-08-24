@@ -35,13 +35,15 @@
 </def>
 
 
-<def tag="Table" attrs="fields">
+<def tag="Table" attrs="fields, field_tag">
+  <% field_tag ||= "view" %>
   <table merge_attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty?">
     <thead if="&all_parameters[:thead] || fields" param>
       <tr param="field_heading_row">
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
           <th><%= this.titleize %></th>
         </with_field_names>
+        <th if="&all_parameters[:controls]" class="controls"/>
       </tr>
     </thead>
     <tbody>
@@ -51,8 +53,9 @@
             hobo_model_id="#{dom_id(this)}">
           <if test="&fields">
             <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
-              <td><view/></td>
+              <td><call_tag tag="&field_tag"/></td>
             </with_fields>
+            <td class="controls" param="controls" if="&all_parameters[:controls]"><delete_button/></td>
           </if>
         </tr>
       </repeat>      

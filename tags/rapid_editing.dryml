@@ -173,7 +173,7 @@
       <tagbody/>
     </if>
     <else>
-      <%= options_for_select(base_class.send(:subclasses).omap{[name.titleize, name]}, this.class.name) %>
+      <%= options_for_select(base_class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
     </else>
   </select>
 </def>

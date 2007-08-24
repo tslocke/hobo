@@ -120,7 +120,7 @@ module Hobo
 
       def never_show(*fields)
         @hobo_never_show ||= []
-        @hobo_never_show.concat(fields.omap{to_sym})
+        @hobo_never_show.concat(fields.every(:to_sym))
       end
 
       def never_show?(field)
@@ -142,7 +142,7 @@ module Hobo
       def set_search_columns(*columns)
         class_eval %{
           def self.search_columns
-            %w{#{columns.omap{to_s} * ' '}}
+            %w{#{columns.every(:to_s) * ' '}}
           end
         }
       end
@@ -276,7 +276,7 @@ module Hobo
       end
 
       def search_columns
-        cols = columns.omap{name}
+        cols = columns.every(:name)
         %w{name title body content}.select{|c| c.in?(cols) }
       end
       

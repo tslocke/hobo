@@ -129,7 +129,7 @@ module Hobo
     
     
     def type_id(type=nil)
-      type ||= this_type
+      type ||= this.is_a?(Class) ? this : this_type
       type == NilClass ? "" : Hobo.type_id(type || this.class)
     end
     

@@ -312,7 +312,7 @@ module Hobo::Dryml
       param_names = param_names_in_template(el)
       
       "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
-        "parameters = all_parameters & #{param_names.inspect}; " +
+        "parameters = all_parameters - #{param_names.inspect}; " +
         tag_method_body(el) +
         "; end %>"
     end
@@ -513,7 +513,7 @@ module Hobo::Dryml
       merge_params = el.attributes['merge_params'] || merge_attribute(el)
       if merge_params
         extra_params = if merge_params == "&true"
-                         "all_parameters"
+                         "parameters"
                         elsif is_code_attribute?(merge_params)
                           merge_params[1..-1]
                         else

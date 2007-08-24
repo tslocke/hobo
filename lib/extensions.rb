@@ -70,12 +70,39 @@ class Module
 end
 
 module Kernel
-  
+
   def extract_options_from_args!(args) #:nodoc:
     args.last.is_a?(Hash) ? args.pop : {}
   end
   
+  def it() It.new end
+  alias its it
+
 end
+
+
+class It
+
+  undef_method(*(instance_methods - %w*__id__ __send__*))
+
+  def initialize
+    @methods = []
+  end
+
+  def method_missing(*args, &block)
+    @methods << [args, block] unless args == [:respond_to?, :to_proc]
+    self
+  end
+
+  def to_proc
+    lambda do |obj|
+      @methods.inject(obj) do |current,(args,block)|
+        current.send(*args, &block)
+      end
+    end
+  end
+end
+
 
 class Object
 
@@ -112,52 +139,12 @@ end
 
 module Enumerable
 
-  def omap(method = nil, &b)
-    if method
-      map(&method)
-    else
-      map {|x| x.instance_eval(&b)}
-    end
-  end
-
-  def oselect(method = nil, &b)
-    if method
-      select(&method)
-    else
-      select {|x| x.instance_eval(&b)}
-    end
-  end
-
-  def ofind(method=nil, &b)
-    if method
-      find(&method)
-    else
-      find {|x| x.instance_eval(&b)}
-    end
-  end
-
   def search(not_found=nil)
     each do |x|
       val = yield(x)
       return val if val
     end
     not_found
-  end
-
-  def oany?(method=nil, &b)
-    if method
-      any?(&method)
-    else
-      any? {|x| x.instance_eval(&b)}
-    end
-  end
-
-  def oall?(method=nil, &b)
-    if method
-      all?(&method)
-    else
-      all? {|x| x.instance_eval(&b)}
-    end
   end
 
   def every(proc)

@@ -149,8 +149,8 @@ module Hobo::Dryml
       end
     end
 
-
-    def part_context_model_id
+    
+    def context_id
       if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
         this_field_dom_id
       elsif this.respond_to?(:typed_id)
@@ -162,18 +162,18 @@ module Hobo::Dryml
       end
     end
 
-
-    def call_part(dom_id, part_id, part_this=nil, *locals)
+    
+    def call_part(dom_id, part_name, part_this=nil, *locals)
       res = ''
       if part_this
         new_object_context(part_this) do
-          @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part", *locals)
+          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          res = send("#{part_name}_part", *locals)
         end
       else
         new_context do
-          @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part", *locals)
+          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          res = send("#{part_name}_part", *locals)
         end
       end
       res
@@ -327,18 +327,6 @@ module Hobo::Dryml
     end
 
 
-    def part_contexts_js
-      return "" if part_contexts.empty?
-
-      assigns = part_contexts.map do |dom_id, p|
-        part_id, model_id = p
-        "hoboParts.#{dom_id} = ['#{part_id}', '#{model_id}']\n"
-      end
-
-      "<script>\nvar hoboParts = {}\n" + assigns.join + "</script>\n"
-    end
-
-
     def _tag_locals(attributes, locals)
       attributes.symbolize_keys!
       #ensure with and field are not in attributes
@@ -457,8 +445,18 @@ module Hobo::Dryml
     end
     
     
+    def part_contexts_storage_tag
+      "<script>\nvar hoboParts = {}\n#{part_contexts_storage}</script>\n"      
+    end
+    
+    
+    def part_contexts_storage
+      PartContext.client_side_storage(@_part_contexts, session)
+    end
+    
+    
     def render_tag(tag_name, attributes)
-      (send(tag_name, attributes) + part_contexts_js).strip
+      (send(tag_name, attributes) + part_contexts_storage_tag).strip
     end
     
 
