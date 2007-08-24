@@ -5,7 +5,7 @@ class <%= class_name %>Controller < ApplicationController
   def index; end
 
   def search
-    if request.post?
+    if params[:query]
       site_search(params[:query])
     end
   end
