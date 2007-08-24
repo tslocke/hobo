@@ -41,7 +41,7 @@
     <thead if="&all_parameters[:thead] || fields" param>
       <tr param="field_heading_row">
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
-          <th><%= this.titleize %></th>
+          <th param="#{this.underscore}_heading"><%= this.titleize %></th>
         </with_field_names>
         <th if="&all_parameters[:controls]" class="controls"/>
       </tr>
@@ -55,7 +55,10 @@
             <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
               <td><call_tag tag="&field_tag"/></td>
             </with_fields>
-            <td class="controls" param="controls" if="&all_parameters[:controls]"><delete_button/></td>
+            <td class="controls" param="controls" if="&all_parameters[:controls]">
+              <a param="edit_link">Edit</a>
+              <delete_button param/>
+            </td>
           </if>
         </tr>
       </repeat>      

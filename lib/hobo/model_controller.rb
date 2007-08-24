@@ -8,7 +8,7 @@ module Hobo
 
     VIEWLIB_DIR = "taglibs"
     
-    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
+    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
 
     class << self
 

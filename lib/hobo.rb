@@ -162,9 +162,8 @@ module Hobo
             map.connect "#{web_name}/:id", :controller => web_name, :action => 'show'
 
           elsif controller < Hobo::ModelController
-            
             map.resources web_name, :collection => { :completions => :get }
-            
+
             for collection in controller.collections
               new_method = Hobo.simple_has_many_association?(model.reflections[collection])
               Hobo.add_collection_routes(map, web_name, collection, new_method)
@@ -184,6 +183,16 @@ module Hobo
                               :controller => web_name,
                               :action => view.to_s,
                               :conditions => { :method => :get })
+            end
+            
+            if controller < Hobo::UserController
+              puts controller
+              map.named_route("#{web_name.singularize}_login", "#{web_name.singularize}_login",
+                              :controller => web_name, :action => 'login')
+              map.named_route("#{web_name.singularize}_logout", "#{web_name.singularize}_logout",
+                              :controller => web_name, :action => 'logout')
+              map.named_route("#{web_name.singularize}_signup", "#{web_name.singularize}_signup",
+                              :controller => web_name, :action => 'signup')
             end
           end
         end

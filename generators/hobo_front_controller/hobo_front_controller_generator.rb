@@ -51,10 +51,6 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
 
     route = ("  map.search  'search', :controller => '#{name}', :action => 'search'\n" +
              "  map.homepage '', :controller => '#{name}', :action => 'index'")
-    unless options[:no_user]
-      route += ("\n  map.login   'login',  :controller => '#{name}', :action => 'login'\n" +
-                "  map.logout  'logout',  :controller => '#{name}', :action => 'logout'\n" +
-                "  map.signup  'signup', :controller => '#{name}', :action => 'signup'")
     end
 
     route_src = File.read(routes_path)
@@ -81,8 +77,6 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
       opt.separator 'Options:'
       opt.on("--add-routes",
              "Modify config/routes.rb to support the front controller") { |v| options[:add_routes] = true }
-      opt.on("--no-user",
-             "Don't create the login and signup pages") { |v| options[:no_user] = true }
       opt.on("--delete-index",
              "Delete public/index.html") { |v| options[:delete_index] = true }
     end

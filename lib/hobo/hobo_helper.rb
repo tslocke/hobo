@@ -12,16 +12,16 @@ module Hobo
     def current_user
       # simple one-hit-per-request cache
       @current_user or
-        @current_user = if Hobo.user_model and session and id = session[:user]
-                               Hobo.user_model.find(id)
-                             else 
-                               Guest.new
-                             end 
+        @current_user = if session and id = session[:user]
+                          Hobo.object_from_dom_id(id)
+                        else 
+                          Guest.new
+                        end 
     end
      
      
     def logged_in?
-      not current_user.guest?
+      !(current_user.respond_to?(:guest?) && current_user.guest?)
     end
       
       

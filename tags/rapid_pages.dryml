@@ -49,6 +49,7 @@
 <def tag="PageForIndex"><Page merge/></def>
 <def tag="PageForNew"><Page merge/></def>
 <def tag="PageForShow"><Page merge/></def>
+<def tag="PageForEdit"><Page merge/></def>
 <def tag="PageForNewInCollection"><Page merge/></def>
 <def tag="PageForShowCollection"><Page merge/></def>
 
@@ -116,7 +117,7 @@
     <main>
       <header>
         <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
-        <p><delete_button in_place="&false"/></p>
+        <delete_button in_place="&false"/>
       </header>
 
       <panel param="main_panel">
@@ -125,14 +126,47 @@
           <FieldList skip="name" tag="editor" param/>
         </section>
 
-        <section param="new_links">
-          <repeat with="&has_many_assocs">
-            <p><a action="new"/></p>
-          </repeat>
-        </section>
+        <nav param="new_links">
+          <UL with="&has_many_assocs">
+            <li><a action="new"/></li>
+          </UL>
+        </nav>
       </panel>
     </main>
   </PageForShow>
+</def>
+
+
+<def tag="EditPage">
+  <% has_many_assocs = this.class.reflections.values.map do |refl|
+       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
+     end.compact
+  %>
+  <PageForEdit merge>    
+    <body class="rapid_generic_page"/>
+    <main>
+      <header>
+        <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
+        <delete_button in_place="&false"/>
+      </header>
+
+      <panel param="main_panel">
+        <header param="main_header"><h2>Details</h2></header>
+        <section>
+          <form>
+            <FieldList skip="name" tag="input" param/>
+            <submit label="Save"/>
+          </form>
+        </section>
+          
+        <section param="new_links">
+          <UL with="&has_many_assocs">
+            <li><a action="new"/></li>
+          </UL>
+        </section>
+      </panel>
+    </main>
+  </PageForEdit>
 </def>
 
 
@@ -202,6 +236,78 @@
     </main>
   </PageForShowCollection>
 </def>
+
+
+<def tag="LoginPage" attrs="remember_me">
+  <Page title="Login">
+    <main>
+      <h1>Log In</h1>
+
+      <panel>
+        <section>
+          <form action="&request.request_uri">
+            <table class="login_table">
+              <tr>
+                <td class="field_label"><label for="login">Login</label></td>
+                <td><input type="text" name="login" id="login"/></td>
+              </tr>
+
+              <tr>
+                <td class="field_label"><label for="password">Password</label></td>
+                <td><input type="password" name="password" id="password"/></td>
+              </tr>
+
+              <tr if="&remember_me">
+                <td class="field_label"><label for="remember_me">Remember me:</label></td>
+                <td><input type="checkbox" name="remember_me" id="remember_me"/></td>
+              </tr>
+            </table>
+
+            <p><submit label='Log in'/></p>
+          </form>
+        </section>
+      </panel>
+    </main>
+  </Page>
+</def>
+
+
+<def tag="SignupPage">
+  <Page title="Sign Up">
+
+    <main>
+      <h1>Sign Up</h1>
+
+      <panel>
+        <section>
+          <error_messages/>
+          <form action="&request.request_uri">
+            <table class="signup_table">
+              <tr>
+                <td class="field_label"><label for="login">Login</label></td>
+                <td><input type="text" name="user[login]"/></td>
+              </tr>
+
+              <tr>
+                <td class="field_label"><label for="password">Password</label></td>
+                <td><input type="password" name="user[password]"/></td>
+              </tr>
+
+              <tr>
+                <td class="field_label"><label for="password">Confirm Password</label></td>
+                <td><input type="password" name="user[password_confirmation]"/></td>
+              </tr>
+            </table>
+
+            <p><submit label='Sign Up'/></p>
+          </form>
+        </section>
+      </panel>
+    </main>
+
+  </Page>
+</def>
+
 
 <def tag="doctype" attrs="version"><%=
   case version.upcase

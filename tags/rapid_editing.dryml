@@ -88,8 +88,7 @@
     %>
     <select onchange="<%= f %>">
       <%= options_for_select(select_options.sort, this ? this.id : "") %>
-    </select>
-    <a if="&this">View</a>
+    </select>&nbsp;<a if="&this">View</a>
   </span>
 </def>
 

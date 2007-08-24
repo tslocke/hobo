@@ -36,12 +36,17 @@ module Hobo
     #
     #   skip_before_filter :login_required
     #
-    def login_required
-      if current_user.guest?
+    def login_required(user_model=nil)
+      if current_user.guest? 
+        auth_model = user_model || UserController.user_models.first
         username, passwd = get_auth_data
-        self.current_user = Hobo.user_model.authenticate(username, passwd) || :false if username && passwd
+        self.current_user = auth_model.authenticate(username, passwd) || :false if username && passwd && auth_model
       end
-      logged_in? && authorized? ? true : access_denied
+      if logged_in? && authorized? && (user_model.nil? || current_user.is_a?(user_model))
+        true
+      else
+        access_denied
+      end
     end
 
     # Redirect as appropriate when an access request fails.
@@ -84,15 +89,21 @@ module Hobo
     # When called with before_filter :login_from_cookie will check for an :auth_token
     # cookie and log the user back in if apropriate
     def login_from_cookie
-      return unless cookies[:auth_token] && !logged_in?
+      return unless (token = cookies[:auth_token]) && !logged_in?
       
-      user = Hobo.user_model.find_by_remember_token(cookies[:auth_token])
+      user_model = token[:user_model].constantize
+      user = user_model.find_by_remember_token(token)
       if user && user.remember_token?
         user.remember_me
-        self.current_user = user
-        cookies[:auth_token] = { :value => self.current_user.remember_token ,
-                                 :expires => self.current_user.remember_token_expires_at }
+        current_user = user
+        create_auth_cookie
       end
+    end
+    
+    def create_auth_cookie
+      cookies[:auth_token] = { :value => current_user.remember_token ,
+                               :expires => current_user.remember_token_expires_at,
+                               :user_model => current_user.model }
     end
 
     private
@@ -101,7 +112,11 @@ module Hobo
     def get_auth_data
       auth_key  = @@http_auth_headers.detect { |h| request.env.has_key?(h) }
       auth_data = request.env[auth_key].to_s.split unless auth_key.blank?
-      return auth_data && auth_data[0] == 'Basic' ? Base64.decode64(auth_data[1]).split(':')[0..1] : [nil, nil]
+      username, pw = if auth_data && auth_data[0] == 'Basic'
+                       Base64.decode64(auth_data[1]).split(':')[0..1]
+                     else
+                       [nil, nil]
+                     end
     end
 
   end
