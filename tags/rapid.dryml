@@ -240,7 +240,7 @@
 
 <def tag="view" for="Date"><%= this.to_s(:long) %></def>
 
-<def tag="view" for="Time"><%= this.to_s(:long) %></def>
+<def tag="view" for="Time" attrs="format"><%= format ? this.strftime(format) : this.to_s(:long) %></def>
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 

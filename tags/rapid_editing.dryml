@@ -86,7 +86,7 @@
                             this_type.primary_key_name => Hobo.raw_js('this.value')
                           } })
     %>
-    <select onchange="<%= f %>">
+    <select onchange="#{f}">
       <%= options_for_select(select_options.sort, this ? this.id : "") %>
     </select>&nbsp;<a if="&this">View</a>
   </span>

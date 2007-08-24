@@ -207,7 +207,7 @@
           }
   select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
   %>
-  <select name="<%= param_name_for_this(true) %>">
+  <select name="#{param_name_for_this(true)}">
     <%= options_for_select(select_options.sort, this ? this.id : "") %>
   </select>
 </def>
@@ -229,7 +229,7 @@
 
 
 <def tag="sti_type_input">
-  <select name="<%= param_name_for(form_this, form_field_path + ['type']) %>">
+  <select name="#{param_name_for(form_this, form_field_path + ['type'])}">
     <%= options_for_select(this.class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
   </select>
 </def>
