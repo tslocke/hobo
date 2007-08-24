@@ -19,7 +19,8 @@ module Hobo
         return "" if contexts.empty?
 
         contexts.map do |dom_id, context|
-          "hoboParts.#{dom_id} = '#{context.marshal(session)}'\n"
+          code = context.marshal(session).split("\n").map{|line| "'#{line}\\n'"}.join (" +\n    ")
+          "hoboParts.#{dom_id} = (#{code})\n"
         end.join
       end
       
@@ -43,7 +44,7 @@ module Hobo
       def marshal(session)
         context = [@part_name, @this_id, @locals]
         puts "STORE: " + context.inspect
-        data = Base64.encode64(Marshal.dump(context)).chop
+        data = Base64.encode64(Marshal.dump(context)).strip
         "#{data}--#{self.class.generate_digest(data, session)}"
       end
         
@@ -60,7 +61,7 @@ module Hobo
         
         # Unmarshal part context to a hash and verify its integrity.
         def unmarshal(client_store, this, session)
-          data, digest = CGI.unescape(client_store).split('--')
+          data, digest = CGI.unescape(client_store).strip.split('--')
 
           raise TamperedWithPartContext unless digest == generate_digest(data, session)
 
