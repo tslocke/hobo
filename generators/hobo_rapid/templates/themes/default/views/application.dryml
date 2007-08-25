@@ -1,7 +1,7 @@
 <include src="plugins/hobo/tags/rapid"/>
 
 <def tag="Page" attrs="title_prefix, title">
-  <% title ||= human_type + ": " + name(:no_wrapper => true) %>
+  <% title ||= type_name + ": " + name(:no_wrapper => true) %>
   <doctype version="HTML 4.01 Transitional"/>
   <html>
     <head param="head">
