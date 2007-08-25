@@ -21,7 +21,7 @@ module Hobo
      
      
     def logged_in?
-      !(current_user.respond_to?(:guest?) && current_user.guest?)
+      !current_user.guest?
     end
       
       

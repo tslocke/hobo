@@ -122,6 +122,10 @@ module Hobo
     def password_required?
       (crypted_password.blank? && password != nil) || !password.blank?
     end
+    
+    def guest?
+      false
+    end
 
   end
 
