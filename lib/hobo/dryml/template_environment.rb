@@ -7,61 +7,13 @@ module Hobo::Dryml
         subclass.compiled_local_names = []
       end
       attr_accessor :load_time, :compiled_local_names
-      
-      # --- Local Tags --- #
-      
-      def start_redefine_block(method_names)
-        @_preserved_methods_for_redefine ||= []
-        @_redef_impl_names ||= []
-        
-        methods = {}
-        method_names.each {|m| methods[m] = m.in?(self.methods) && instance_method(m) }
-        @_preserved_methods_for_redefine.push(methods)
-        @_redef_impl_names.push []
-      end
-      
-      
-      def end_redefine_block
-        methods = @_preserved_methods_for_redefine.pop
-        methods.each_pair do |name, method|
-          if method
-            define_method(name, method)
-          else
-            remove_method(name)
-          end
-        end
-        to_remove = @_redef_impl_names.pop
-        to_remove.each {|m| remove_method(m) }
-      end
-      
-      
-      def redefine_nesting
-        @_preserved_methods_for_redefine.length
-      end
-      
-      
-      def redefine_tag(name, proc)
-        impl_name = "#{name}_redefined_#{redefine_nesting}"
-        define_method(impl_name, proc)
-        class_eval "def #{name}(options={}, &b); #{impl_name}(options, b); end"
-        @_redef_impl_names.push(impl_name)
-      end
-      
-      def redefine_template(name, proc)
-        impl_name = "#{name}_redefined_#{redefine_nesting}"
-        define_method(impl_name, proc)
-        class_eval "def #{name}(options={}, template_parameters={}, &b); " +
-          "#{impl_name}(options, template_parameters, b); end"
-        @_redef_impl_names.push(impl_name)
-      end
-
-      # --- end local tags --- #
-      
+           
       
       def _register_tag_attrs(tag_name, attrs)
         @tag_attrs ||= {}
         @tag_attrs[tag_name] = attrs
       end
+     
       
       def tag_attrs
         @tag_attrs ||= {}
@@ -446,7 +398,8 @@ module Hobo::Dryml
     
     
     def part_contexts_storage_tag
-      "<script>\nvar hoboParts = {}\n#{part_contexts_storage}</script>\n"      
+      storage = part_contexts_storage
+      storage.blank? ? "" : "<script>\nvar hoboParts = {}\n#{storage}</script>\n"
     end
     
     
@@ -457,6 +410,11 @@ module Hobo::Dryml
     
     def render_tag(tag_name, attributes)
       (send(tag_name, attributes) + part_contexts_storage_tag).strip
+    end
+    
+    
+    def session
+      @view ? @view.session : {}
     end
     
 

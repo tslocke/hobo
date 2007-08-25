@@ -19,7 +19,7 @@ module Hobo
         return "" if contexts.empty?
 
         contexts.map do |dom_id, context|
-          code = context.marshal(session).split("\n").map{|line| "'#{line}\\n'"}.join (" +\n    ")
+          code = context.marshal(session).split("\n").map{|line| "'#{line}\\n'"}.join(" +\n    ")
           "hoboParts.#{dom_id} = (#{code})\n"
         end.join
       end
