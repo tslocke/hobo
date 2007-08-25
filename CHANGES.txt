@@ -17,7 +17,7 @@ Multiple user models
       /admin_logout
       /admin_signup
 
-    Note this controller will now filter loggin of passwords.
+    Note this controller will now filter logging of passwords.
 
   The model needs to include Hobo::AuthenticatedUser and declare a
   login attribute with, e.g.
