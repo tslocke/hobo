@@ -68,9 +68,6 @@ class HoboMigrationGenerator < Rails::Generator::Base
     
     return record {|m| } if up.blank?
     
-    up.gsub!("\n", "\n    ")
-    down.gsub!("\n", "\n    ")
-    
     action = input("What now: [g]enerate migrations, generate and [m]igrate now or [c]ancel?", %w(g m c))
 
     if action == 'c'
