@@ -19,8 +19,8 @@
         <section>
           <if test="&this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>
-            <if test="&can_create?(this) and this != Hobo.user_model">
-              <p>Create a <a to="&this.new"/>.</p>
+            <if test="&can_create?(this)">
+              <p>Create a <a to="&this" action="new"/>.</p>
             </if>
           </if>
           <else>

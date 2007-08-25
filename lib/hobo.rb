@@ -16,7 +16,7 @@ module Hobo
       field_types.index(type)
     end
     
-    def type_name(type)
+    def type_id(type)
       symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
     end
 
@@ -52,7 +52,7 @@ module Hobo
         end
         @models_loaded = true
       end
-      @models.omap{constantize}
+      @models.every(:constantize)
     end
 
     
@@ -64,21 +64,25 @@ module Hobo
     def object_from_dom_id(dom_id)
       return nil if dom_id == 'nil'
 
-      _, name, id, attr = *dom_id.match(/^([a-z_]+)_([0-9]+(?:_[0-9]+)*)(_[a-z_]+)?$/)
+      _, name, id, attr = *dom_id.match(/^([a-z_]+)(?:_([0-9]+(?:_[0-9]+)*))?(?:_([a-z_]+))?$/)
       raise ArgumentError.new("invalid model-reference in dom id") unless name
       if name
         model_class = name.camelize.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
         return nil unless model_class
-        attr = attr[1..-1] if attr
-        obj = if false and attr and model_class.reflections[attr.to_sym].klass.superclass == ActiveRecord::Base
-                # DISABLED - Eager loading is broken - doesn't support ordering
-                # http://dev.rubyonrails.org/ticket/3438
-                # Don't do this for STI subclasses - it breaks!
-                model_class.find(id, :include => attr)
-              else
-                model_class.find(id)
-              end
-        attr ? obj.send(attr) : obj
+        
+        if id
+          obj = if false and attr and model_class.reflections[attr.to_sym].klass.superclass == ActiveRecord::Base
+                  # DISABLED - Eager loading is broken - doesn't support ordering
+                  # http://dev.rubyonrails.org/ticket/3438
+                  # Don't do this for STI subclasses - it breaks!
+                  model_class.find(id, :include => attr)
+                else
+                  model_class.find(id)
+                end
+          attr ? obj.send(attr) : obj
+        else
+          model_class
+        end
       end
     end
 
@@ -91,6 +95,8 @@ module Hobo
       if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
         attr = obj.proxy_reflection.name
         obj = obj.proxy_owner
+      elsif obj.is_a?(Class)
+        return type_id(obj)
       elsif !obj.respond_to?(:typed_id)
         if attr
           return dom_id(get_field(obj, attr))
@@ -133,7 +139,13 @@ module Hobo
     end
 
     def add_routes(map)
-      ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
+      begin 
+        ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
+      rescue
+        # No database, no routes
+        return
+      end
+
       require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
       require "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
       
@@ -150,9 +162,8 @@ module Hobo
             map.connect "#{web_name}/:id", :controller => web_name, :action => 'show'
 
           elsif controller < Hobo::ModelController
-            
             map.resources web_name, :collection => { :completions => :get }
-            
+
             for collection in controller.collections
               new_method = Hobo.simple_has_many_association?(model.reflections[collection])
               Hobo.add_collection_routes(map, web_name, collection, new_method)
@@ -172,6 +183,15 @@ module Hobo
                               :controller => web_name,
                               :action => view.to_s,
                               :conditions => { :method => :get })
+            end
+            
+            if controller < Hobo::UserController
+              map.named_route("#{web_name.singularize}_login", "#{web_name.singularize}_login",
+                              :controller => web_name, :action => 'login')
+              map.named_route("#{web_name.singularize}_logout", "#{web_name.singularize}_logout",
+                              :controller => web_name, :action => 'logout')
+              map.named_route("#{web_name.singularize}_signup", "#{web_name.singularize}_signup",
+                              :controller => web_name, :action => 'signup')
             end
           end
         end
@@ -337,7 +357,7 @@ module Hobo
                                 else
                                     File.join(File.dirname(__FILE__), "hobo/static_tags")
                                 end
-                         File.readlines(path).omap{chop} 
+                         File.readlines(path).every(:chop)
                        end
     end
     

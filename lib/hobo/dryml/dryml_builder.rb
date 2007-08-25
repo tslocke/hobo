@@ -50,7 +50,7 @@ module Hobo::Dryml
       ("def render_page(__page_this__, __local_assigns__); " +
             "#{locals} new_object_context(__page_this__) do " +
             src +
-           "; _erbout; end + part_contexts_js; end")
+           "; _erbout; end + part_contexts_storage_tag; end")
     end
     
     

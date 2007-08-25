@@ -7,61 +7,13 @@ module Hobo::Dryml
         subclass.compiled_local_names = []
       end
       attr_accessor :load_time, :compiled_local_names
-      
-      # --- Local Tags --- #
-      
-      def start_redefine_block(method_names)
-        @_preserved_methods_for_redefine ||= []
-        @_redef_impl_names ||= []
-        
-        methods = {}
-        method_names.each {|m| methods[m] = m.in?(self.methods) && instance_method(m) }
-        @_preserved_methods_for_redefine.push(methods)
-        @_redef_impl_names.push []
-      end
-      
-      
-      def end_redefine_block
-        methods = @_preserved_methods_for_redefine.pop
-        methods.each_pair do |name, method|
-          if method
-            define_method(name, method)
-          else
-            remove_method(name)
-          end
-        end
-        to_remove = @_redef_impl_names.pop
-        to_remove.each {|m| remove_method(m) }
-      end
-      
-      
-      def redefine_nesting
-        @_preserved_methods_for_redefine.length
-      end
-      
-      
-      def redefine_tag(name, proc)
-        impl_name = "#{name}_redefined_#{redefine_nesting}"
-        define_method(impl_name, proc)
-        class_eval "def #{name}(options={}, &b); #{impl_name}(options, b); end"
-        @_redef_impl_names.push(impl_name)
-      end
-      
-      def redefine_template(name, proc)
-        impl_name = "#{name}_redefined_#{redefine_nesting}"
-        define_method(impl_name, proc)
-        class_eval "def #{name}(options={}, template_parameters={}, &b); " +
-          "#{impl_name}(options, template_parameters, b); end"
-        @_redef_impl_names.push(impl_name)
-      end
-
-      # --- end local tags --- #
-      
+           
       
       def _register_tag_attrs(tag_name, attrs)
         @tag_attrs ||= {}
         @tag_attrs[tag_name] = attrs
       end
+     
       
       def tag_attrs
         @tag_attrs ||= {}
@@ -123,6 +75,7 @@ module Hobo::Dryml
 
     
     def merge_attrs(attrs, overriding_attrs)
+      return {}.update(attrs) if overriding_attrs.nil?
       attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
       classes = overriding_attrs[:class]
       attrs = add_classes(attrs, *classes.split) if classes
@@ -148,8 +101,8 @@ module Hobo::Dryml
       end
     end
 
-
-    def part_context_model_id
+    
+    def context_id
       if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
         this_field_dom_id
       elsif this.respond_to?(:typed_id)
@@ -161,18 +114,18 @@ module Hobo::Dryml
       end
     end
 
-
-    def call_part(dom_id, part_id, part_this=nil)
+    
+    def call_part(dom_id, part_name, part_this=nil, *locals)
       res = ''
       if part_this
         new_object_context(part_this) do
-          @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part")
+          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          res = send("#{part_name}_part", *locals)
         end
       else
         new_context do
-          @_part_contexts[dom_id] = [part_id, part_context_model_id]
-          res = send("#{part_id}_part")
+          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          res = send("#{part_name}_part", *locals)
         end
       end
       res
@@ -326,18 +279,6 @@ module Hobo::Dryml
     end
 
 
-    def part_contexts_js
-      return "" if part_contexts.empty?
-
-      assigns = part_contexts.map do |dom_id, p|
-        part_id, model_id = p
-        "hoboParts.#{dom_id} = ['#{part_id}', '#{model_id}']\n"
-      end
-
-      "<script>\nvar hoboParts = {}\n" + assigns.join + "</script>\n"
-    end
-
-
     def _tag_locals(attributes, locals)
       attributes.symbolize_keys!
       #ensure with and field are not in attributes
@@ -437,7 +378,7 @@ module Hobo::Dryml
     # single hash
     def merge_option_procs(general_proc, overriding_proc)
       if overriding_proc
-        proc { general_proc.call.merge(overriding_proc.call) }
+        proc { merge_attrs(general_proc.call, overriding_proc.call) }
       else
         general_proc
       end
@@ -456,8 +397,24 @@ module Hobo::Dryml
     end
     
     
+    def part_contexts_storage_tag
+      storage = part_contexts_storage
+      storage.blank? ? "" : "<script>\nvar hoboParts = {}\n#{storage}</script>\n"
+    end
+    
+    
+    def part_contexts_storage
+      PartContext.client_side_storage(@_part_contexts, session)
+    end
+    
+    
     def render_tag(tag_name, attributes)
-      (send(tag_name, attributes) + part_contexts_js).strip
+      (send(tag_name, attributes) + part_contexts_storage_tag).strip
+    end
+    
+    
+    def session
+      @view ? @view.session : {}
     end
     
 

@@ -258,10 +258,6 @@ module Hobo::Dryml
       dryml_exception("def cannot have both alias_of and alias_current_as", el) if alias_of && alias_current
       dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
       
-      # If we're redefining, we need a statement in the method body
-      # that does the alias_method on the fly.
-      re_alias = ""
-      
       if alias_of || alias_current
         old_name = alias_current ? name : alias_of
         new_name = alias_current ? alias_current : name
@@ -270,12 +266,12 @@ module Hobo::Dryml
       end
       
       res = if alias_of
-              "#{re_alias}<% #{tag_newlines(el)} %>"
+              "<% #{tag_newlines(el)} %>"
             else
               src = if template_name?(name)
-                      template_method(name, re_alias, el)
+                      template_method(name, el)
                     else
-                      tag_method(name, re_alias, el)
+                      tag_method(name, el)
                     end
               src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>"
               
@@ -312,7 +308,7 @@ module Hobo::Dryml
     end
     
     
-    def template_method(name, re_alias, el)
+    def template_method(name, el)
       param_names = param_names_in_template(el)
       
       "<% def #{name}(all_attributes={}, all_parameters={}, &__block__); " +
@@ -322,7 +318,7 @@ module Hobo::Dryml
     end
     
     
-    def tag_method(name, re_alias, el)
+    def tag_method(name, el)
       "<% def #{name}(all_attributes={}, &__block__); " +
         "parameters = nil; " +
         tag_method_body(el) + 
@@ -386,13 +382,16 @@ module Hobo::Dryml
       part_name  = el.attributes['part']
       dom_id = el.attributes['id'] || part_name
       
-      part_src = "<% def #{part_name}_part #{tag_newlines(el)}; new_context do %>" +
+      part_locals = el.attributes["part_locals"]
+      
+      part_src = "<% def #{part_name}_part(#{part_locals}) #{tag_newlines(el)}; new_context do %>" +
         content +
         "<% end; end %>"
       @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
-      "<%= call_part(#{attribute_to_ruby(dom_id)}, :#{part_name}) #{newlines} %>"
+      args = [attribute_to_ruby(dom_id), ":#{part_name}", "nil", part_locals].compact
+      "<%= call_part(#{args * ', '}) #{newlines} %>"
     end
     
     

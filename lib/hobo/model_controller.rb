@@ -8,7 +8,7 @@ module Hobo
 
     VIEWLIB_DIR = "taglibs"
     
-    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection]
+    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
 
     class << self
 
@@ -295,7 +295,7 @@ module Hobo
         attributes = params[model.name.underscore]
         type_attr = params['type']
         create_model = if 'type'.in?(model.column_names) and 
-                           type_attr and type_attr.in?(model.send(:subclasses).omap{name})
+                           type_attr and type_attr.in?(model.send(:subclasses).every(:name))
                          type_attr.constantize
                        else
                          model
@@ -556,7 +556,7 @@ module Hobo
 
 
     def with_data_filter(operation, *args, &block)
-      filter_param = params.keys.ofind {starts_with? "where_"}
+      filter_param = params.keys.find &it.starts_with?("where_")
       proc = filter_param && self.class.data_filter(filter_param[6..-1].to_sym)
       if proc
         filter_args = params[filter_param]

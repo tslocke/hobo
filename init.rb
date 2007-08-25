@@ -24,6 +24,12 @@ ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler
 
 class ActionController::Base
 
+  def self.hobo_user_controller(model=nil)
+    include Hobo::ModelController
+    self.model = model if model
+    include Hobo::UserController
+  end
+
   def self.hobo_model_controller(model=nil)
     include Hobo::ModelController
     self.model = model if model
@@ -42,7 +48,5 @@ class ActiveRecord::Base
 end
 
 # Default settings
-
-Hobo.user_model ||= (User rescue (Person rescue nil))
 
 Hobo.developer_features = ["development", "test"].include?(RAILS_ENV) if Hobo.developer_features? == nil

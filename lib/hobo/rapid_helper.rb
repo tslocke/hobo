@@ -9,8 +9,8 @@ module Hobo::RapidHelper
     js_options['form']          = options[:form] if options[:form]
     js_options['params']        = make_params_js(options[:params]) if options[:params]
     js_options['resultUpdate']  = js_result_updates(options[:result_update]) if options[:result_update]
-    js_options['resetForm']     = false if options[:reset_form] == false
-    js_options['refocusForm']   = false if options[:refocus_form] == false
+    js_options['resetForm']     = options[:reset_form] if options.has_key?(:reset_form)
+    js_options['refocusForm']   = options[:refocus_form] if options.has_key?(:refocus_form)
     
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
@@ -26,7 +26,7 @@ module Hobo::RapidHelper
   def js_result_updates(updates)
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
-    pairs = comma_split(updates).omap{split(/\s*=\s*/)}
+    pairs = comma_split(updates).map &it.split(/\s*=\s*/)
     '[' + pairs.map{|p| "{id: #{js_str(p[0])}, result: #{js_str(p[1])}}"}.join(", ") + ']'
   end
 

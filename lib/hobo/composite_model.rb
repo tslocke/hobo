@@ -12,7 +12,7 @@ module Hobo
       end
         
       def compose(*models)
-        @models = models.omap{to_s.camelize}
+        @models = models.map &it.to_s.camelize
         attr_reader *models
         CompositeModel.composites ||= {}
         CompositeModel.composites[@models.sort] = self.name
@@ -57,7 +57,7 @@ module Hobo
     
     def id
       objects = self.class.models.map {|m| instance_variable_get("@#{m.underscore}")}
-      objects.omap{id}.join("_")
+      objects.every(:id).join("_")
     end
       
   end

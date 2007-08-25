@@ -40,11 +40,13 @@
 <!--- Pagination Navigation -->
 
 <def tag="page_nav" attrs="params">
-  <page_n_of_count/> - 
-  <first_page_link params="&params">|&lt;</first_page_link>
-  <previous_page_link params="&params">Previous</previous_page_link>
-  <next_page_link params="&params">Next</next_page_link>
-  <last_page_link params="&params">&gt|</last_page_link>
+  <if test="&@pages.length > 1">
+    <page_n_of_count/> - 
+    <first_page_link params="&params">|&lt;</first_page_link>
+    <previous_page_link params="&params">Previous</previous_page_link>
+    <next_page_link params="&params">Next</next_page_link>
+    <last_page_link params="&params">&gt|</last_page_link>
+  </if>
 </def>
 
 

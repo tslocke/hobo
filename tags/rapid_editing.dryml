@@ -8,7 +8,7 @@
       has_many_editor(attributes)
     end
   else
-    attrs = add_classes(attributes, "#{type_and_field}", "#{type_name}", "editor")
+    attrs = add_classes(attributes, "#{type_and_field}", "#{type_id}", "editor")
     call_polymorphic_tag("editor", attrs) or
       raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
                             "(#{this.inspect}:#{this_type})")
@@ -86,10 +86,9 @@
                             this_type.primary_key_name => Hobo.raw_js('this.value')
                           } })
     %>
-    <select onchange="<%= f %>">
+    <select onchange="#{f}">
       <%= options_for_select(select_options.sort, this ? this.id : "") %>
-    </select>
-    <a if="&this">View</a>
+    </select>&nbsp;<a if="&this">View</a>
   </span>
 </def>
 
@@ -173,7 +172,7 @@
       <tagbody/>
     </if>
     <else>
-      <%= options_for_select(base_class.send(:subclasses).omap{[name.titleize, name]}, this.class.name) %>
+      <%= options_for_select(base_class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
     </else>
   </select>
 </def>
