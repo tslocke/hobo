@@ -132,9 +132,30 @@ class Object
   def class_def name, &blk
     class_eval { define_method name, &blk }
   end
+  
+  def _?()
+    self
+  end
 
 end
 
+
+class NilClass
+  def _?()
+    SafeNil.instance
+  end
+end
+
+
+class SafeNil
+  def self.instance
+    @instance ||= SafeNil.new
+  end
+  
+  def method_missing(*args, &b)
+    nil.send(*args, &b) rescue nil
+  end
+end
 
 
 module Enumerable
