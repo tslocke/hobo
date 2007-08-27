@@ -23,7 +23,8 @@ module Hobo
                               elsif options[:length]
                                 :string
                               else
-                                Hobo.field_types[type]::COLUMN_TYPE or raise UnknownSqlTypeError, type
+                                field_type = Hobo.field_types[type]
+                                field_type && field_type::COLUMN_TYPE or raise UnknownSqlTypeError, [model, name, type]
                               end
                             end
     end
