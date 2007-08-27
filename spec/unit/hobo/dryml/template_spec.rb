@@ -26,18 +26,18 @@ describe Template do
   end
   
   it "should compile content of a block-tag call as a Ruby block" do 
-    compile_dryml("<foo>the body</foo>").should == "<% _output(foo() do |foo_default_tagbody| %>the body<% end) %>"
+    compile_dryml("<foo>the body</foo>").should == "<% _output(foo() do |_foo_default_tagbody| %>the body<% end) %>"
   end
   
   it "should support <default_tagbody/> inside the content of a block-tag" do 
     compile_dryml("<foo>!!<default_tagbody/>??</foo>").should == 
-      "<% _output(foo() do |foo_default_tagbody| %>!!<% foo_default_tagbody && foo_default_tagbody.call %>??<% end) %>"
+      "<% _output(foo() do |_foo_default_tagbody| %>!!<% _foo_default_tagbody && _foo_default_tagbody.call %>??<% end) %>"
   end
   
   it "should support the 'for' attribute on <default_tagbody/>" do 
     compile_dryml("<x><y>123<default_tagbody for='x'/>456</y></x>").should == 
-      "<% _output(x() do |x_default_tagbody| %><% _output(y() do |y_default_tagbody| %>" +
-      "123<% x_default_tagbody && x_default_tagbody.call %>456" +
+      "<% _output(x() do |_x_default_tagbody| %><% _output(y() do |_y_default_tagbody| %>" +
+      "123<% _x_default_tagbody && _x_default_tagbody.call %>456" +
       "<% end) %><% end) %>"
   end
   
@@ -113,13 +113,13 @@ describe Template do
 
   it "should compile a param tag-call with a body" do 
     compile_in_template("<foo param>abc</foo>").should == 
-      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |foo_default_tagbody| %>abc<% end) %>"
+      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |_foo_default_tagbody| %>abc<% end) %>"
   end
   
   it "should compile a param tag-call with a body and a call to <default_tagbody/>" do 
     compile_in_template("<foo param>!!<default_tagbody/>!!</foo>").should == 
-      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |foo_default_tagbody| %>" +
-      "!!<% foo_default_tagbody && foo_default_tagbody.call %>!!<% end) %>"
+      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |_foo_default_tagbody| %>" +
+      "!!<% _foo_default_tagbody && _foo_default_tagbody.call %>!!<% end) %>"
   end
 
   it "should compile param template-calls as calls to `call_template_parameter`" do 
@@ -150,7 +150,7 @@ describe Template do
   it "should compile template parameters with param and a tag body" do
     compile_in_template("<Foo><abc param>ha!</abc></Foo>").should == 
       '<% _output(Foo({}, {:abc => merge_option_procs(' +
-      'proc { {:tagbody => proc {|abc_default_tagbody| new_context { %>ha!<% } } } }, all_parameters[:abc]), })) %>'
+      'proc { {:tagbody => proc {|_abc_default_tagbody| new_context { %>ha!<% } } } }, all_parameters[:abc]), })) %>'
   end
   
   it "should compile template parameters which are template calls themselves" do 
@@ -161,7 +161,7 @@ describe Template do
   it "should compile template parameters which are templates themselves with their own parameters" do 
     compile_in_template("<Foo><Baa param><x>hello</x></Baa></Foo>").should == 
       '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(' + 
-      'proc { [{}, {:x => proc { {:tagbody => proc {|x_default_tagbody| new_context { %>hello<% } } } }, }] }, all_parameters[:Baa]), })) %>'
+      'proc { [{}, {:x => proc { {:tagbody => proc {|_x_default_tagbody| new_context { %>hello<% } } } }, }] }, all_parameters[:Baa]), })) %>'
   end
 
   # --- Compilation: Calling Templates --- # 
@@ -177,13 +177,13 @@ describe Template do
   it "should compile template parameters as procs" do 
     compile_dryml("<Foo><x>hello</x><y>world</y></Foo>").should ==
       '<% _output(Foo({}, {' + 
-      ':x => proc { {:tagbody => proc {|x_default_tagbody| new_context { %>hello<% } } } }, ' +
-      ':y => proc { {:tagbody => proc {|y_default_tagbody| new_context { %>world<% } } } }, })) %>'
+      ':x => proc { {:tagbody => proc {|_x_default_tagbody| new_context { %>hello<% } } } }, ' +
+      ':y => proc { {:tagbody => proc {|_y_default_tagbody| new_context { %>world<% } } } }, })) %>'
   end
   
   it "should compile template parameters with attributes" do
     compile_dryml("<Foo><abc x='1'>hello</abc></Foo>").should ==
-      '<% _output(Foo({}, {:abc => proc { {:x => "1", :tagbody => proc {|abc_default_tagbody| new_context { %>hello<% } } } }, })) %>'
+      '<% _output(Foo({}, {:abc => proc { {:x => "1", :tagbody => proc {|_abc_default_tagbody| new_context { %>hello<% } } } }, })) %>'
   end
   
   it "should allow :foo as a shorthand for field='foo' on template tags" do 
@@ -204,27 +204,27 @@ describe Template do
     # template, the second is the sub-template procs
     compile_dryml("<Foo><Baa x='1'><a>hello</a></Baa></Foo>").should ==
       '<% _output(Foo({}, ' +
-      '{:Baa => proc { [{:x => "1"}, {:a => proc { {:tagbody => proc {|a_default_tagbody| new_context { %>hello<% } } } }, }] }, })) %>'
+      '{:Baa => proc { [{:x => "1"}, {:a => proc { {:tagbody => proc {|_a_default_tagbody| new_context { %>hello<% } } } }, }] }, })) %>'
   end
 
   it "should compile 'replace' parameters" do
     compile_dryml("<Page><head replace>abc</head></Page>").should == 
-      '<% _output(Page({}, {:head => proc {|head__default| new_context { %>abc<% } }, })) %>'
+      '<% _output(Page({}, {:head => proc {|_head__default| new_context { %>abc<% } }, })) %>'
   end
     
   it "should compile 'replace' parameters with a default parameter call" do
     compile_dryml("<Page><head replace>abc <head restore>blah</head></head></Page>").should == 
       
-      '<% _output(Page({}, {:head => proc {|head__default| new_context { %>abc ' +
-      '<% _output(head__default.call_with_block({}) do |head_default_tagbody| %>blah<% end) %>' +
+      '<% _output(Page({}, {:head => proc {|_head__default| new_context { %>abc ' +
+      '<% _output(_head__default.call_with_block({}) do |_head_default_tagbody| %>blah<% end) %>' +
       '<% } }, })) %>'
   end
   
   it "should compile 'replace' template parameters with a default parameter call" do
     compile_dryml("<Page><Head replace>abc <Head restore/></Head></Page>").should == 
       
-      '<% _output(Page({}, {:Head => proc {|Head__default| new_context { %>abc ' +
-      '<% _output(Head__default.call({}, {})) %>' +
+      '<% _output(Page({}, {:Head => proc {|_Head__default| new_context { %>abc ' +
+      '<% _output(_Head__default.call({}, {})) %>' +
       '<% } }, })) %>'
   end
   
