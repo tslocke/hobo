@@ -127,9 +127,9 @@
       count
     elsif this.is_a? Class and this < ActiveRecord::Base
       this.name.pluralize.titleize
-    elsif this.respond_to?(:name)
+    elsif this.respond_to?(:name) && can_view?(this, :name)
       view(merge_attrs(attributes, {:field => 'name'}))
-    elsif this.respond_to?(:title)
+    elsif this.respond_to?(:title) && can_view?(this, :title)
       view(merge_attrs(attributes, {:field => 'title'}))
     else
       this.to_s

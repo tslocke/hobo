@@ -97,7 +97,7 @@
           <error_messages param="error_messages"/>
 
           <form>
-            <FieldList skip_associations="has_many"/>
+            <FieldList skip_associations="has_many" param/>
             <submit label="Create" param/>
           </form>
         </section>
