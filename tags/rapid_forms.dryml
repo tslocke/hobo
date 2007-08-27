@@ -98,12 +98,14 @@
   <%= text_area_tag(name, this, add_classes(attributes, :tiny_mce)) %>
 </def>
 
-<def tag="input" for="date">
-  <%= select_date(this || Time.now, :prefix => param_name_for_this) %>
+<def tag="input" for="date" attrs="order">
+  <% order = order.nil? ? [:year, :month, :day] : (order.split(',').map &it.to_sym) -%>
+  <%= select_date(this || Time.now, :prefix => param_name_for_this, :order => order) %>
 </def>
 
-<def tag="input" for="datetime">
-  <%= select_datetime(this || Time.now, :prefix => param_name_for_this) %>
+<def tag="input" for="datetime" attrs="order">
+  <% order = order.nil? ? [:year, :month, :day, :hour, :minute] : (order.split(',').map &it.to_sym) -%>
+  <%= select_datetime(this || Time.now, :prefix => param_name_for_this, :order => order) %>
 </def>
 
 <def tag="input" for="integer" attrs="name">
