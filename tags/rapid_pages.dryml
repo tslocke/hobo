@@ -239,31 +239,31 @@
 
 
 <def tag="LoginPage" attrs="remember_me">
-  <Page title="Login">
+  <Page title="Login" merge>
     <main>
-      <h1>Log In</h1>
+      <h1 param="login_title">Log In</h1>
 
       <panel>
-        <section>
-          <form action="&request.request_uri">
+        <section param>
+          <form action="&request.request_uri" param>
             <table class="login_table">
               <tr>
-                <td class="field_label"><label for="login">Login</label></td>
-                <td><input type="text" name="login" id="login"/></td>
+                <td class="field_label"><label param="login_label" for="login">Login</label></td>
+                <td><input param="login_input" type="text" name="login" id="login"/></td>
               </tr>
 
               <tr>
-                <td class="field_label"><label for="password">Password</label></td>
-                <td><input type="password" name="password" id="password"/></td>
+                <td class="field_label"><label param="password_label" for="password">Password</label></td>
+                <td><input param="password_input" type="password" name="password" id="password"/></td>
               </tr>
 
               <tr if="&remember_me">
-                <td class="field_label"><label for="remember_me">Remember me:</label></td>
-                <td><input type="checkbox" name="remember_me" id="remember_me"/></td>
+                <td class="field_label"><label param="remember_me_label" for="remember_me">Remember me:</label></td>
+                <td><input param="remember_me_input" type="checkbox" name="remember_me" id="remember_me"/></td>
               </tr>
             </table>
 
-            <p><submit label='Log in'/></p>
+            <p><submit param label='Log in'/></p>
           </form>
         </section>
       </panel>
@@ -273,7 +273,7 @@
 
 
 <def tag="SignupPage">
-  <Page title="Sign Up">
+  <Page title="Sign Up" merge>
 
     <main>
       <h1>Sign Up</h1>
