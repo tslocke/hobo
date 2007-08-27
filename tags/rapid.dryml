@@ -8,7 +8,7 @@
 <include src="rapid_navigation"/>
 
 <def tag="FieldList" attrs="tag">
-  <% tag ||= (this.respond_to?(:new_record?) && this.new_record?) ? "input" : "editor" %>
+  <% tag ||= scope.in_form ? "input" : "editor" %>
   <field_list merge_attrs="&attributes - attrs_for(:with_fields)">
     <with_fields merge_attrs="&attributes & attrs_for(:with_fields)">
       <field_list_item>

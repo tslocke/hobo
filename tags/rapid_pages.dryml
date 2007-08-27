@@ -85,7 +85,7 @@
 
 <def tag="NewPage">
   <PageForNew title="New #{type_name}" merge>
-    <body class="rapid_generic_page"/>
+    <body class="rapid_generic_page new_page new_#{type_name.underscore}"/>
     <main>
       <header>
         <heading>New <type_name title/></heading>
@@ -113,7 +113,7 @@
      end.compact
   %>
   <PageForShow merge>    
-    <body class="rapid_generic_page"/>
+    <body class="rapid_generic_page show_page show_#{type_name.underscore}"/>
     <main>
       <header>
         <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
@@ -143,11 +143,11 @@
      end.compact
   %>
   <PageForEdit merge>    
-    <body class="rapid_generic_page"/>
+    <body class="rapid_generic_page edit_page edit_#{type_name.underscore}"/>
     <main>
       <header>
         <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
-        <delete_button in_place="&false"/>
+        <delete_button in_place="&false" param/>
       </header>
 
       <panel param="main_panel">

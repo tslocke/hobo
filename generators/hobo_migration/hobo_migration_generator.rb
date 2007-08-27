@@ -85,6 +85,9 @@ class HoboMigrationGenerator < Rails::Generator::Base
                              :migration_file_name => @migration_name
       end
     end
+  rescue Hobo::FieldSpec::UnknownSqlTypeError => e
+    puts "Invalid field type '#{e.message[2]}' for #{e.message[0]}.#{e.message[1]}"
+    record {|m| }
   end
   
   def rename_or_drop!(to_create, to_drop, kind_str, name_prefix="")
@@ -203,7 +206,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
       next if k == :limit && (type == :decimal || v == @types[type][:limit])
       next if k == :null && v == true
       "#{k.inspect} => #{v.inspect}" 
-      end.compact
+    end.compact
   end
   
   
