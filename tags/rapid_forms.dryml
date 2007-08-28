@@ -59,10 +59,10 @@
 %></def>
 
 
-<def tag="input"><%=     
+<def tag="input" attrs="or_view"><%=     
   if attributes[:type]
     tag :input, attributes
-  elsif !can_edit?
+  elsif or_view && !can_edit?
     view
   else
     if this_type.respond_to?(:macro)

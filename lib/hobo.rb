@@ -219,7 +219,7 @@ module Hobo
 
 
     def simple_has_many_association?(array_or_reflection)
-      refl = array_or_reflection.is_a?(Array) ? array_or_reflection.proxy_reflection : array_or_reflection
+      refl = array_or_reflection.respond_to?(:proxy_reflection) ? array_or_reflection.proxy_reflection : array_or_reflection
       return false unless refl.is_a?(ActiveRecord::Reflection::AssociationReflection)
       refl.macro == :has_many and
         (not refl.through_reflection) and
@@ -233,6 +233,24 @@ module Hobo
       else
         object.send(field)
       end
+    end
+    
+    
+    def get_field_path(object, path)
+      path = if path.is_a? Array
+               path
+             elsif path.is_a? String
+               path.split('.')
+             else
+               [path]
+             end
+ 
+      field, parent = nil
+      path.each do |field|
+        parent = object
+        object = get_field(parent, field)
+      end
+      [parent, field, object]
     end
     
     
@@ -319,6 +337,12 @@ module Hobo
     # proxy, we don't want to loose the information that the object
     # belongs_to the proxy owner.
     def can_view?(person, object, field=nil)
+      # Field can be a dot separated path
+      if field && field.is_a?(String) && (path = field.split(".")).length > 1
+        _, _, object = get_field_path(object, path[0..-2])
+        field = path.last
+      end
+      
       if field
         field = field.to_sym if field.is_a? String
         return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)

@@ -194,11 +194,11 @@ module Hobo::Dryml
     def new_object_context(new_this)
       new_context do
         @_this_parent,@_this_field,@_this_type = if new_this.respond_to?(:proxy_reflection)
-                                                refl = new_this.proxy_reflection
-                                                [new_this.proxy_owner, refl.name, refl]
-                                              else
-                                                [nil, nil, new_this.class]
-                                              end
+                                                   refl = new_this.proxy_reflection
+                                                   [new_this.proxy_owner, refl.name, refl]
+                                                 else
+                                                   [nil, nil, new_this.class]
+                                                 end
         @_this = new_this
         yield
       end
@@ -207,19 +207,14 @@ module Hobo::Dryml
 
     def new_field_context(field_path, tag_this=nil)
       new_context do
-        path = if field_path.is_a? Array
-                 field_path
-               elsif field_path.is_a? String
-                 field_path.split('.')
-               else
-                 [field_path]
-               end
-
-        obj = tag_this || this
-        for field in path
-          parent = obj
-          obj = Hobo.get_field(parent, field)
-        end
+      path = if field_path.is_a? Array
+               field_path
+             elsif field_path.is_a? String
+               field_path.split('.')
+             else
+               [field_path]
+             end
+        parent, field, obj = Hobo.get_field_path(tag_this || this, path)
 
         type = if (obj.nil? or obj.respond_to?(:proxy_reflection)) and
                    parent.class.respond_to?(:field_type) and field_type = parent.class.field_type(field)

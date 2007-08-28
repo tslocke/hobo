@@ -53,7 +53,7 @@
             hobo_model_id="#{dom_id(this)}">
           <if test="&fields">
             <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
-              <td><call_tag tag="&field_tag"/></td>
+              <td param="#{this_field.to_s.sub('?', '').gsub('.', '_')}_view"><call_tag tag="&field_tag"/></td>
             </with_fields>
             <td class="controls" param="controls" if="&all_parameters[:controls]">
               <a param="edit_link">Edit</a>

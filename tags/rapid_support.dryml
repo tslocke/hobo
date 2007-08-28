@@ -40,6 +40,7 @@
                 end
 
   field_names -= comma_split(skip) if skip
+  field_names.map! {|f| f.gsub("." , "_") }
 %>
   <repeat with="&field_names"><tagbody/></repeat>
 </def>
