@@ -288,7 +288,8 @@ module Hobo
                              Hobo::Undefined.new
                            end)
         rescue Hobo::UndefinedAccessError
-          raise HoboError, "#{object.class.name} does not support undefined assignements, define editable_by(user, field)"
+          raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " + 
+                            "define editable_by?(user, field)")
         end
         
         begin
