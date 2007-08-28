@@ -98,7 +98,7 @@ module Hobo
         dryml_renderer.send(tag, options.merge(:with => o))
       end.join
       
-      render :text => results + dryml_renderer.part_contexts_js
+      render :text => results + dryml_renderer.part_contexts_storage
     end
 
 
