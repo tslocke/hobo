@@ -11,6 +11,7 @@ class HoboRapidGenerator < Hobo::Generator
     
     record do |m|
       m.file "hobo_rapid.js", "public/javascripts/hobo_rapid.js"
+      m.file "lowpro.js", "public/javascripts/lowpro.js"
       m.file "hobo_base.css", "public/stylesheets/hobo_base.css"
       m.file "hobo_rapid.css", "public/stylesheets/hobo_rapid.css"
       create_all(m, "themes/default/public", "public/hobothemes/default")
