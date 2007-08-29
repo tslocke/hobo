@@ -154,6 +154,8 @@ module Hobo
       end
 
     end
+    
+    include HttpParameters
 
     # --- ACTIONS --- #
 
@@ -291,6 +293,7 @@ module Hobo
       
       if (@this = options[:this])
         permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
+        valid = @this.save
       else
         attributes = params[model.name.underscore]
         type_attr = params['type']
@@ -301,16 +304,14 @@ module Hobo
                          model
                        end
         @this = create_model.new
-        @check_create_permission = [@this]
-        initialize_from_params(@this, attributes)
-        for obj in @check_create_permission
-          permission_denied(options) and return unless Hobo.can_create?(current_user, obj)
-        end
-        @check_create_permission = nil
+        status = secure_change_transaction { initialize_record(@this, attributes) }
+        permission_denied(options) and return if status == :not_allowed
+        valid = status == :valid
       end
       
       set_named_this!
-      if @this.save
+      
+      if valid
         if block_given?
           yield 
         else
@@ -335,6 +336,7 @@ module Hobo
       end
     end
     
+    
     def hobo_edit(options={})
       hobo_show(options)
     end    
@@ -346,22 +348,15 @@ module Hobo
       @this = find_instance_or_not_found(options, :this)
       return unless @this
       
-      original = @this.duplicate
-      
-      changes = params[model.name.underscore]
-      
-      if changes
-        # The 'duplicate' call above can set these, but they can
-        # conflict with the changes so we clear them
-        @this.send(:clear_aggregation_cache)
-        @this.send(:clear_association_cache)
-        
-        update_with_params(@this, changes)
-        permission_denied(options) and return unless Hobo.can_update?(current_user, original, @this)
-      end
+      status = secure_change_transaction { update_record(@this, params[model.name.underscore]) }
       
       set_named_this!
-      if changes.nil? || @this.save
+      case status
+      when :not_allowed
+        permission_denied(options)
+        return
+        
+      when :valid
         # Ensure current_user isn't out of date
         @current_user = @this if @this == current_user
         
@@ -392,7 +387,7 @@ module Hobo
           end
         end
           
-      else
+      when :invlaid
         # Validation errors
         respond_to do |wants|
           wants.html do
@@ -587,73 +582,40 @@ module Hobo
     end
     
 
-    def initialize_from_params(obj, params)
-      update_with_params(obj, params)
-      obj.set_creator(current_user)
-      (@check_create_permission ||= []) << obj
-      obj
-    end
 
 
-    def update_with_params(object, params)
+    def XXupdate_with_params(object, params)
       return unless params
 
       params.each_pair do |field,value|
         field = field.to_sym
         refl = object.class.reflections[field]
-        ar_value = if refl
-                     if refl.macro == :belongs_to
-                       associated_record(object, refl, value)
-
-                     elsif Hobo.simple_has_many_association?(refl) and object.new_record?
-                       # only populate has_many relationships for new records. For existing
-                       # records, AR updates the DB immediately, bypassing Hobo's permission check
-                       if value.is_a? Array
-                         value.map {|x| associated_record(object, refl, x) }
+        is_has_many = refl && Hobo.simple_has_many_association?(refl)
+        
+        if is_has_many
+          items = if value.is_a? Array
+                    value.map {|x| associated_record(object, refl, x) }
+                  else
+                    value.keys.every(:to_i).sort.map{|i| associated_record(object, refl, value[i.to_s]) }
+                  end
+          object.send(field).target[0..-1] = items
+        else
+          ar_value = if refl
+                       if refl.macro == :belongs_to
+                         associated_record(object, refl, value)
                        else
-                         value.keys.every(:to_i).sort.map{|i| associated_record(object, refl, value[i.to_s]) }
+                         raise HoboError, "association #{object.class}.#{refl.name} is not settable via parameters"
                        end
                      else
-                       raise HoboError.new("association #{refl.name} is not settable via parameters")
+                       param_to_value(object.class.field_type(field), value)
                      end
-                   else
-                     param_to_value(object.class.field_type(field), value)
-                   end
-        object.send("#{field}=".to_sym, ar_value)
+          object.send("#{field}=".to_sym, ar_value)
+        end
       end
     end
 
     
-    def parse_datetime(s)
-      defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
-    end
-
-
-    def param_to_value(field_type, value)
-      if field_type.nil?
-        value
-      elsif field_type <= Date
-        if value.is_a? Hash
-          Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
-        elsif value.is_a? String
-          dt = parse_datetime(value)
-          dt && dt.to_date
-        end
-      elsif field_type <= Time
-        if value.is_a? Hash
-          Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
-        elsif value.is_a? String
-          parse_datetime(value)
-        end
-      elsif field_type <= TrueClass
-        (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
-      else
-        # primitive field
-        value
-      end
-    end
-
-    def associated_record(owner, refl, value)
+    def XXassociated_record(owner, refl, value)
       if value.is_a? String
         if value.starts_with?('@')
           Hobo.object_from_dom_id(value[1..-1])
@@ -674,7 +636,7 @@ module Hobo
     end
 
 
-    def object_from_param(param)
+    def XXobject_from_param(param)
       Hobo.object_from_dom_id(param)
     end
 
