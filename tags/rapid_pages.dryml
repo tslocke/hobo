@@ -1,4 +1,5 @@
 <def tag="BasePage" attrs="title, doctype">
+  <% title ||= request.request_uri %>
   <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
