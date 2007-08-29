@@ -195,42 +195,44 @@
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
-  if this == nil
-    this_type.is_a?(Class) && this_type <= String ? "" : "(Not Available)"
-  elsif this_type.respond_to?(:macro)
-    if this_type.macro == :belongs_to
-      belongs_to_view(attributes)
-    elsif this_type.macro == :has_many
-      has_many_view(attributes)
-    end
-  else
-    attrs = add_classes(attributes, "view", type_id, type_and_field)
-    attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
-
-    view_tag = find_polymorphic_tag("view")
-    
-    if view_tag == "view" # i.e. it didn't find a type specific tag
-      raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
-    else
-      view_attrs = attrs_for(view_tag)
-      the_view = send(view_tag, attrs & view_attrs)
-      
-      the_view = if_blank if if_blank && the_view.blank?
-      
-      if no_wrapper
-        the_view
-      else
-        wrapper = if inline
-                    :span
-                  elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
-                    :div
-                  else
-                    :span
-                  end
-        content_tag(wrapper, the_view, attrs - view_attrs)
-      end
-    end
-  end
+  res = if this == nil
+          this_type.is_a?(Class) && this_type <= String ? "" : "(Not Available)"
+        elsif this_type.respond_to?(:macro)
+          if this_type.macro == :belongs_to
+            belongs_to_view(attributes)
+          elsif this_type.macro == :has_many
+            has_many_view(attributes)
+          end
+        else
+          attrs = add_classes(attributes, "view", type_id, type_and_field)
+          attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
+         
+          view_tag = find_polymorphic_tag("view")
+          
+          if view_tag == "view" # i.e. it didn't find a type specific tag
+            raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+          else
+            view_attrs = attrs_for(view_tag)
+            the_view = send(view_tag, attrs & view_attrs)
+            
+            the_view = if_blank if if_blank && the_view.blank?
+            
+            if no_wrapper
+              the_view
+            else
+              wrapper = if inline
+                          :span
+                        elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
+                          :div
+                        else
+                          :span
+                        end
+              content_tag(wrapper, the_view, attrs - view_attrs)
+            end
+          end
+        end
+   Hobo::Dryml.last_if = !res.blank?
+   res
 %></def>
 
     

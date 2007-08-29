@@ -492,6 +492,10 @@ describe Template do
     eval_dryml("<set x='&1' y='&2'/><%= x + y %>").should == '3'
   end
   
+  it "should support assignment to dotted names with <set>" do
+    eval_dryml("<set s='&Struct.new(:a).new'/><set s.a='&10'/><%= s.a %>").should == '10'
+  end
+  
   it 'should interpolate #{...} blocks in attributes of any tag' do 
     tag = '<def tag="t" attrs="x"><%= x %></def>'
     
