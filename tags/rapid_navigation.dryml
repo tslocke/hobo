@@ -30,8 +30,9 @@
       <li class='nav_item'><a href="&logout_url">Log out</a></li>
     </if>
     <else>
-      <li class='nav_item'><a href="&login_url">Log in</a></li>
-      <li if="&defined_route? :signup" class='nav_item'><a href="&signup_url">Sign up</a></li>
+      <set user="&Hobo::UserController.user_models.first"/>
+      <li class='nav_item'><a href="&login_url(user)">Log in</a></li>
+      <li if="&signup_url(user)" class='nav_item'><a href="&signup_url(user)">Sign up</a></li>
     </else>
   </ul>
 </def>

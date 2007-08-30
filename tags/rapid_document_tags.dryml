@@ -18,29 +18,29 @@
 <!-- section represents a generic document or application section. -->
 <def tag="section">
   <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="section" merge_attrs if="&body"><tagbody/></div>
+  <div class="section" merge_attrs if="&body"><%= body %></div>
 </def>
 
 <def tag="aside">
   <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="aside" merge_attrs if="&body"><tagbody/></div>
+  <div class="aside" merge_attrs if="&body"><%= body %></div>
 </def>
 
 <def tag="header">
   <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="header" merge_attrs if="&body"><tagbody/></div>
+  <div class="header" merge_attrs if="&body"><%= body %></div>
 </def>
 
 <def tag="footer">
   <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="footer" merge_attrs if="&body"><tagbody/></div>
+  <div class="footer" merge_attrs if="&body"><%= body %></div>
 </def>
 
 <!-- article represents an independent piece of content of a --> 
 <!-- document, such as a blog entry or newspaper article.    -->
 <def tag="article">
   <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="article" merge_attrs if="&body"><tagbody/></div>
+  <div class="article" merge_attrs if="&body"><%= body %></div>
 </def>
 
 <!-- temporary tag -->

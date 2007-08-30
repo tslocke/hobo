@@ -31,7 +31,7 @@ class Test::Unit::TestCase
 
     def logs_in_as(user, password)
       @current_user = user
-      post login_url, :login => user.login, :password => password
+      post login_url(user), :login => user.login, :password => password
       assert_response :redirect, "#{user.login} failed to log in"
       get homepage_url
       assert_response :success

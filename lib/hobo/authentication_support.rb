@@ -6,7 +6,21 @@ module Hobo
     def logged_in?
       not current_user.guest?
     end
+    
+    # Login url for a given user record or user class
+    def login_url(user_or_class)
+      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
+      send("#{c.name.underscore}_login_url") rescue nil
+    end
+    
 
+    # Sign-up url for a given user record or user class
+    def signup_url(user_or_class)
+      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
+      send("#{c.name.underscore}_signup_url") rescue nil
+    end
+
+  
     # Check if the user is authorized.
     #
     # Override this method in your controllers if you want to restrict access
@@ -37,15 +51,15 @@ module Hobo
     #   skip_before_filter :login_required
     #
     def login_required(user_model=nil)
+      auth_model = user_model || UserController.user_models.first
       if current_user.guest? 
-        auth_model = user_model || UserController.user_models.first
         username, passwd = get_auth_data
         self.current_user = auth_model.authenticate(username, passwd) || :false if username && passwd && auth_model
       end
       if logged_in? && authorized? && (user_model.nil? || current_user.is_a?(user_model))
         true
       else
-        access_denied
+        access_denied(auth_model)
       end
     end
 
@@ -57,11 +71,11 @@ module Hobo
     # behavior in case the user is not authorized
     # to access the requested action.  For example, a popup window might
     # simply close itself.
-    def access_denied
+    def access_denied(user_model)
       respond_to do |accepts|
         accepts.html do
           store_location
-          redirect_to login_url
+          redirect_to(login_url(user_model))
         end
         accepts.xml do
           headers["Status"]           = "Unauthorized"

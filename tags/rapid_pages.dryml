@@ -36,7 +36,7 @@
           <div class="logo" param="logo"><image src="logo.png"/></div>
           <nav param>
             <magic_nav class="main_nav" param="main_mav"/>
-            <account_nav if="&respond_to? :login_url" param/>
+            <account_nav if="&Hobo::UserController.user_models.first" param/>
           </nav>
         </header>
         <flash_message param/>

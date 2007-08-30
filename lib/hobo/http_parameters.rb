@@ -3,6 +3,7 @@ module Hobo
   module HttpParameters
     
     class PermissionDeniedError; end
+    class InvalidError; end
     
     def initialize_record(record, params)
       update_record(record, params)
@@ -196,12 +197,17 @@ module Hobo
     def secure_change_transaction(options)
       valid = nil
       begin
-        ActiveRecord::Base.transaction { yield }
-        valid = check_permissions_and_apply_changes
+        ActiveRecord::Base.transaction do
+          yield 
+          valid = check_permissions_and_apply_changes
+          raise InvalidError unless valid
+        end
       rescue Permission_denied
         return :not_allowed
+      rescue InvalidError
+        return :invalid
       end
-      valid ? :valid : :invalid
+      :valid
     end
     
   end
