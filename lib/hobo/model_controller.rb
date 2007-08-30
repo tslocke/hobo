@@ -8,7 +8,7 @@ module Hobo
     class UserPermissionError < StandardError
       attr :models
       def initialize(models)
-        @models = models
+        @models = models || []
       end
     end
     
@@ -496,19 +496,19 @@ module Hobo
     end
 
 
-    def permission_denied(options=nil)
-      if options and options[:permission_denied_response]
+    def permission_denied(options={})
+      if options[:permission_denied_response]
         # do nothing (callback handled by LazyHash)
       elsif respond_to? :permission_denied_response
         permission_denied_response
       else
-        message = options._?[:message] || "Permission Denied"
+        message = options[:message] || "Permission Denied"
         render :text => message, :status => 403
       end
     end
     
-    def not_found(options=nil)
-      if options && options[:not_found_response]
+    def not_found(options={})
+      if options[:not_found_response]
         # do nothing (callback handled by LazyHash)
       elsif respond_to? :not_found_response
         not_found_response
