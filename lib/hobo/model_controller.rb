@@ -5,7 +5,13 @@ module Hobo
     include Hobo::Controller
 
     class PermissionDeniedError < RuntimeError; end
-
+    class UserPermissionError < StandardError
+      attr :models
+      def initialize(models)
+        @models = models
+      end
+    end
+    
     VIEWLIB_DIR = "taglibs"
     
     GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
@@ -496,7 +502,8 @@ module Hobo
       elsif respond_to? :permission_denied_response
         permission_denied_response
       else
-        render :text => "Permission Denied", :status => 403
+        message = options._?[:message] || "Permission Denied"
+        render :text => message, :status => 403
       end
     end
     
@@ -527,15 +534,28 @@ module Hobo
       
       template = Hobo::ModelController.find_model_template(page_model, page_kind)
 
-      if template
-        render :template => template
-        true
-      else
-        if page_kind.in? GENERIC_PAGE_TAGS
-          render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
+      begin
+        if template
+          render :template => template
           true
         else
-          false
+          if page_kind.in? GENERIC_PAGE_TAGS
+            render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
+            true
+          else
+            false
+          end
+        end
+      rescue ActionView::TemplateError => wrapper
+        e = wrapper.original_exception if wrapper.respond_to? :original_exception
+        if e.is_a? Hobo::ModelController::UserPermissionError
+          if current_user.guest?
+            redirect_to login_url(e.models.first || UserController.user_models.first)
+          else
+            permission_denied(:message => e.message)
+          end
+        else
+          raise
         end
       end
     end
@@ -581,6 +601,7 @@ module Hobo
     def count_with_data_filter(opts={}, &b)
       with_data_filter(:count, opts, &b)
     end
+
     
 
 

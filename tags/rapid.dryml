@@ -346,4 +346,12 @@ in the future - use at your own risk. -->
   </with>
 </def>
 
+<def tag="login_required" attrs="type,message"><%
+  models = comma_split(type).map &it.titleize.constantize
+  message ||= "Permission Denied"
+  if (!models.empty? && !models.include?(@current_user.class)) || (models.empty? && @current_user.guest?)
+    raise Hobo::ModelController::UserPermissionError.new(models), message
+  end
+-%><tagbody/></def>
+
 
