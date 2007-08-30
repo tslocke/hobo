@@ -7,20 +7,7 @@ module Hobo
       not current_user.guest?
     end
     
-    # Login url for a given user record or user class
-    def login_url(user_or_class)
-      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
-      send("#{c.name.underscore}_login_url") rescue nil
-    end
     
-
-    # Sign-up url for a given user record or user class
-    def signup_url(user_or_class)
-      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
-      send("#{c.name.underscore}_signup_url") rescue nil
-    end
-
-  
     # Check if the user is authorized.
     #
     # Override this method in your controllers if you want to restrict access

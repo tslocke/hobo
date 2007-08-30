@@ -7,8 +7,12 @@ module Hobo
     class << self
       attr_reader :user_models
       
+      def default_user_model
+      end
+      
       def included(base)
         base.filter_parameter_logging "password"
+        base.skip_before_filter :login_required, :only => [:login]
         user_models << base.model
       end
     end
@@ -27,21 +31,28 @@ module Hobo
       
       if request.post?
         user = model.authenticate(params[:login], params[:password])
-        if user
-          self.current_user = user
-          if params[:remember_me] == "1"
-            current_user.remember_me
-            create_auth_cookie
-          end
-          redirect_back_or_default(options[:redirect_to])
-          flash[:notice] = options[:success_notice]
-        else
+        if user.nil?
           flash[:notice] = options[:failure_notice]
-          hobo_render
+        else
+          old_user = current_user
+          self.current_user = user
+          
+          # If supplied, a block can be used to test if this user is
+          # allowed to log in (e.g. the account may be disabled)
+          if block_given? && !yield
+            # block returned false - cancel this login
+            self.current_user = old_user
+          else
+            if params[:remember_me] == "1"
+              current_user.remember_me
+              create_auth_cookie
+            end
+            flash[:notice] ||= options[:success_notice]
+            redirect_back_or_default(options[:redirect_to]) unless performed?
+          end
         end
-      else
-        hobo_render
       end
+      hobo_render unless performed?
     end
 
     

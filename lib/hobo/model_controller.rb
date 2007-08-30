@@ -348,7 +348,8 @@ module Hobo
       @this = find_instance_or_not_found(options, :this)
       return unless @this
       
-      status = secure_change_transaction { update_record(@this, params[model.name.underscore]) }
+      changes = params[model.name.underscore]
+      status = secure_change_transaction { update_record(@this, changes) }
       
       set_named_this!
       case status

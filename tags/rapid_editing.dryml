@@ -11,7 +11,7 @@
     attrs = add_classes(attributes, "#{type_and_field}", "#{type_id}", "editor")
     call_polymorphic_tag("editor", attrs) or
       raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
-                            "(#{this.inspect}:#{this_type})")
+                          "(#{this.inspect}:#{this_type})")
   end
 %></def>
   

@@ -307,6 +307,33 @@ module Hobo
     end
      
      
+    # Login url for a given user record or user class
+    def login_url(user_or_class)
+      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
+      send("#{c.name.underscore}_login_url") rescue nil
+    end
+    
+
+    # Login url for a given user record or user class
+    def logout_url(user_or_class=nil)
+      c = if user_or_class.nil?
+            current_user.class
+          elsif user_or_class.is_a?(Class)
+            user_or_class
+          else
+            user_or_class.class
+          end
+      send("#{c.name.underscore}_logout_url") rescue nil
+    end
+    
+
+    # Sign-up url for a given user record or user class
+    def signup_url(user_or_class)
+      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
+      send("#{c.name.underscore}_signup_url") rescue nil
+    end
+
+  
     # debugging support
      
     def abort_with(*args)

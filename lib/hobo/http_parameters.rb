@@ -6,9 +6,9 @@ module Hobo
     class InvalidError; end
     
     def initialize_record(record, params)
-      update_record(record, params)
+      update_without_tracking(record, params)
       record.set_creator(current_user)
-      (@check_create_permission ||= []) << record
+      (@to_create ||= []) << record
       record
     end
 
@@ -22,8 +22,13 @@ module Hobo
       @this.send(:clear_aggregation_cache)
       @this.send(:clear_association_cache)
       
-      (@check_update_permission ||= []) << [original, record]
+      (@to_update ||= []) << [original, record]
 
+      update_without_tracking(record, params)
+    end
+    
+    
+    def update_without_tracking(record, params)
       params && params.each_pair do |field_name, value|
         field = if (create = field =~ /^\+/)
                   field_name[1..-1].to_sym
@@ -174,27 +179,30 @@ module Hobo
     def check_permissions_and_apply_changes
       valid = true
       for old, new in @to_update
-        raise PermissionDeniedError unless Hobo.can_update?(current_user, record)
-        valid ||= new.save
-      end
+        raise PermissionDeniedError unless Hobo.can_update?(current_user, old, new)
+        new_valid = new.save
+        valid &&= new_valid
+      end if @to_update
       
       for record in @to_create
         raise PermissionDeniedError unless Hobo.can_create?(current_user, record)
         # check if it's new because it might have already been saved as a result of the updates
-        valid ||= record.save if record.new_record?
-      end
+        record_valid = record.save if record.new_record?
+        valid &&= record_valid
+      end if @to_create
 
       for record in @to_delete
         raise PermissionDeniedError unless Hobo.can_delete?(current_user, record)
         record.destroy
-      end
+      end if @to_delete
+      
       valid
     ensure
       @to_update = @to_create = @to_delete = nil
     end
     
     
-    def secure_change_transaction(options)
+    def secure_change_transaction
       valid = nil
       begin
         ActiveRecord::Base.transaction do
@@ -202,7 +210,7 @@ module Hobo
           valid = check_permissions_and_apply_changes
           raise InvalidError unless valid
         end
-      rescue Permission_denied
+      rescue PermissionDeniedError
         return :not_allowed
       rescue InvalidError
         return :invalid

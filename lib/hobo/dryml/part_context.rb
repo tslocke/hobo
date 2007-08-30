@@ -43,9 +43,9 @@ module Hobo
       
       def marshal(session)
         context = [@part_name, @this_id, @locals]
-        puts "STORE: " + context.inspect
         data = Base64.encode64(Marshal.dump(context)).strip
-        "#{data}--#{self.class.generate_digest(data, session)}"
+        digest = self.class.generate_digest(data, session)
+        "#{data}--#{digest}"
       end
         
 
@@ -66,11 +66,8 @@ module Hobo
           raise TamperedWithPartContext unless digest == generate_digest(data, session)
 
           part_name, this_id, locals = Marshal.load(Base64.decode64(data))
-          puts "RESTORE: " + [part_name, this_id, locals].inspect
 
-          x = [part_name, restore_part_this(this_id, this), restore_locals(locals)]
-          puts this_id, x.inspect
-          x
+          [part_name, restore_part_this(this_id, this), restore_locals(locals)]
         end
       
         def restore_part_this(this_id, this)

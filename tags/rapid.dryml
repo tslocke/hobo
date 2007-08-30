@@ -195,7 +195,7 @@
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
-  res = if this == nil
+  res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : "(Not Available)"
         elsif this_type.respond_to?(:macro)
           if this_type.macro == :belongs_to
