@@ -110,6 +110,10 @@ module Hobo
       save(false)
     end
 
+    def guest?
+      false
+    end
+
     protected
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
@@ -123,10 +127,6 @@ module Hobo
       (crypted_password.blank? && password != nil) || !password.blank?
     end
     
-    def guest?
-      false
-    end
-
   end
 
 end
