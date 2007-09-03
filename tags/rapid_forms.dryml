@@ -72,7 +72,7 @@
         has_many_input(attributes)
       end
     else
-      attrs = add_classes(attributes, "#{type_and_field}", "#{type_id}")
+      attrs = add_classes(attributes, type_and_field, type_id)
       attrs[:name] ||= param_name_for_this
       the_input = call_polymorphic_tag('input', attrs) or
         raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
@@ -204,16 +204,20 @@
 %></def>
 
 
-<def tag="belongs_to_menu_input" attrs="include_none"><%
+<def tag="belongs_to_menu_input" attrs="include_none, none_message, options"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
+   
+  none_message ||= "(No #{this_type.name.to_s.titleize})"
+  options ||= this_type.klass.find(:all).select {|x| can_view?(x)}
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map { |x|
+  select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
-          }
-  select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil? || include_none
+          }.sort
+  select_options.insert(0, [none_message, ""]) if this.nil? || include_none
+  attributes = add_classes(attributes, "input", type_and_field)
   %>
-  <select name="#{param_name_for_this(true)}">
-    <%= options_for_select(select_options.sort, this ? this.id : "") %>
+  <select name="#{param_name_for_this(true)}" merge_attrs>
+    <%= options_for_select(select_options, this ? this.id : "") %>
   </select>
 </def>
 

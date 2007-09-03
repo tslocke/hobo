@@ -202,6 +202,7 @@ module Hobo::Dryml
         dryml_exception(el, "invalid name in set") unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
         "#{name} = #{attribute_to_ruby(value)}; "
       end.join
+      code = apply_control_attributes("begin; #{assigns}; end", el)
       "<% #{assigns}#{tag_newlines(el)} %>"
     end
     

@@ -122,7 +122,7 @@ module Hobo
       self.crypted_password = encrypt(password)
     end
 
-    # Is a password required for login? (or do we have an empty password?
+    # Is a password required for login? (or do we have an empty password?)
     def password_required?
       (crypted_password.blank? && password != nil) || !password.blank?
     end

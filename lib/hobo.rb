@@ -283,7 +283,7 @@ module Hobo
       # has_many and polymorphic associations are not editable (for now)
       return false if refl and (refl.macro == :has_many or refl.options[:polymorphic] or refl.macro == :has_one)
       
-      if object.respond_to?(:editable_by?)
+      if object.has_hobo_method?(:editable_by?)
         check_permission(:edit, person, object, field.to_sym)
       else
         # Fake an edit test by setting the field in question to
@@ -366,10 +366,10 @@ module Hobo
     
     
     def can_call?(person, object, method)
-      return true if person.respond_to?(:super_user?) && person.super_user?
+      return true if person.has_hobo_method?(:super_user?) && person.super_user?
 
       m = "#{method}_callable_by?"
-      object.respond_to?(m) && object.send(m, person)
+      object.has_hobo_method?(m) && object.send(m, person)
     end 
     
     # --- end permissions -- #
@@ -393,7 +393,7 @@ module Hobo
 
 
     def check_permission(permission, person, object, *args)
-      return true if person.respond_to?(:super_user?) and person.super_user?
+      return true if person.has_hobo_method?(:super_user?) and person.super_user?
       
       return true if permission == :view && !(object.is_a?(ActiveRecord::Base) || object.is_a?(Hobo::CompositeModel))
 
@@ -404,7 +404,7 @@ module Hobo
                    when :edit;   :editable_by?
                    when :view;   :viewable_by?
                    end
-      p = if object.respond_to?(obj_method)
+      p = if object.has_hobo_method?(obj_method)
             begin
               object.send(obj_method, person, *args)
             rescue Hobo::UndefinedAccessError
@@ -414,7 +414,7 @@ module Hobo
             object.class.send(obj_method, person, *args)
           elsif !object.is_a?(Class) # No user fallback for class-level permissions
             person_method = "can_#{permission}?".to_sym
-            if person.respond_to?(person_method)
+            if person.has_hobo_method?(person_method)
               person.send(person_method, object, *args)
             else
               # The object does not define permissions - you can only view it

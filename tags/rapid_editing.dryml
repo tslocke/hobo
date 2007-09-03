@@ -14,6 +14,9 @@
                           "(#{this.inspect}:#{this_type})")
   end
 %></def>
+
+
+<def tag="editor_or_view"><editor or_view merge_attrs/></def>
   
 
 <def tag="has_many_editor">

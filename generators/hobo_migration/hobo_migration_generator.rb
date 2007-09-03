@@ -74,15 +74,19 @@ class HoboMigrationGenerator < Rails::Generator::Base
       # record nothing to keep the generator happy
       record {|m| }
     else
-      at_exit { system "rake db:migrate" } if action == 'm' 
+      puts "\n(you can type spaces instead of '_' -- every little helps)"
+      migration_name = input("Migration filename [#@migration_name]:").strip.gsub(' ', '_')
+      migration_name = @migration_name if migration_name.blank?
+      
+      at_exit { system "rake db:migrate" } if action == 'm'
       
       up.gsub!("\n", "\n    ")
       down.gsub!("\n", "\n    ")
 
       record do |m|
         m.migration_template 'migration.rb', 'db/migrate', 
-                             :assigns => { :up => up, :down => down, :migration_name => @migration_name.camelize }, 
-                             :migration_file_name => @migration_name
+                             :assigns => { :up => up, :down => down, :migration_name => migration_name.camelize }, 
+                             :migration_file_name => migration_name
       end
     end
   rescue Hobo::FieldSpec::UnknownSqlTypeError => e

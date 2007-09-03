@@ -1,9 +1,11 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-one:
+--- 
+test_user: 
+  name: test_user
+  salt: 1e78644c4949587e4df62fa5b0831afbce0d0103
+  crypted_password: 1587b9efa783b59bae1d4972f338167be9438539
   id: 1
-  created_at: 2007-06-21 13:10:55
-  updated_at: 2007-06-21 13:10:55
-two:
+another_user: 
+  name: another_user
+  salt: 1e78644c4949587e4df62fa5b0831afbce0d0103
+  crypted_password: 1587b9efa783b59bae1d4972f338167be9438539
   id: 2
-  created_at: 2007-06-21 13:10:55
-  updated_at: 2007-06-21 13:10:55

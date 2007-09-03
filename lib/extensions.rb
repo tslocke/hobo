@@ -282,7 +282,7 @@ class HashWithIndifferentAccess
   end
   
   def partition_hash(keys=nil)
-    keys = keys.map {|k| k.is_a?(Symbol) ? k.to_s : k }
+    keys = keys._?.map {|k| k.is_a?(Symbol) ? k.to_s : k }
     yes = {}
     no = {}
     each do |k,v|

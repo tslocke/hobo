@@ -28,6 +28,8 @@ module Hobo
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
       end
+      # respond_to? is slow on AR objects, use this instead where possible
+      base.send(:alias_method, :has_hobo_method?, :respond_to_without_attributes?)
     end
 
     module ClassMethods
@@ -371,7 +373,7 @@ module Hobo
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options.has_key?(:conditions)
-              scope_conditions = find_scope.delete(:conditions)
+              scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
                            else
@@ -379,8 +381,8 @@ module Hobo
                            end
               
               options = options.merge(find_scope).update(:conditions => conditions,
-                                                    :class_name => proxy_reflection.klass.name,
-                                                    :foreign_key => proxy_reflection.primary_key_name)
+                                                         :class_name => proxy_reflection.klass.name,
+                                                         :foreign_key => proxy_reflection.primary_key_name)
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
                                                                       name,
                                                                       options,
@@ -407,7 +409,7 @@ module Hobo
       
       
       def has_many_with_defined_scopes(name, *args, &block)
-        options = extract_options_from_args!(args)
+        options = args.extract_options!
         if options.has_key?(:extend) || block
           # Normal has_many
           has_many_without_defined_scopes(name, *args + [options], &block)

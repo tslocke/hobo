@@ -1,16 +1,4 @@
-class Guest
-
-  def to_s
-    "Guest"
-  end
-
-  def guest?
-    true
-  end
-
-  def super_user?
-    false
-  end
+class Guest < Hobo::Guest
 
   def can_update?(obj, field)
     false

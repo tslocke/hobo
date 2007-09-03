@@ -2,8 +2,8 @@ module Hobo
   
   module HttpParameters
     
-    class PermissionDeniedError; end
-    class InvalidError; end
+    class PermissionDeniedError < RuntimeError; end
+    class InvalidError < RuntimeError; end
     
     def initialize_record(record, params)
       update_without_tracking(record, params)
@@ -96,29 +96,31 @@ module Hobo
     
     
     def update_has_many(record, refl, items)
-      items.each_pair do |id, value|
-        if id =~ /^\+/
-          # home[people][+1][name]=blah Create new Person with fkey refing to this home and set name (PUT POST)
-          new_for_has_many(record, refl, value)
+      new_items, changed_items = items.partition_hash {|k,v| k =~ /^\+/}
+      
+      new_items.keys.sort_by{|k|k.to_i}.each do |k|
+        # home[people][+1][name]=blah Create new Person with fkey refing to this home and set name (PUT POST)
+        fields = new_items[k]
+        new_for_has_many(record, refl, fields)
+      end
+      
+      changed_items.each_pair do |id, value|
+        # Change to existing record - only valid on PUTs
+        raise HoboError, "invalid HTTP parameter" unless params[:action] == "put"
+        
+        target = id =~ /_/ ? Hobo.object_from_dom_id(id) : relf.klass.find(id)
+        # Ensure the target is actually in this has_many
+        raise HoboError, "invalid http parameter" unless target.send(refl.primary_key) == record.id
+        
+        if value.downcase == "delete"
+          # home[people][45]=delete  Delete Person[45] (PUT)
+          delete_record(target)
           
         else
-          # Change to existing record - only valid on PUTs
-          raise HoboError, "invalid HTTP parameter" unless params[:action] == "put"
+          # home[people][45][name]=blah  Update Person[45].name (PUT)
+          raise HoboError, "invalid http parameter" unless value.is_a?(Hash) # field/value pairs
+          update_record(target, value)
           
-          target = id =~ /_/ ? Hobo.object_from_dom_id(id) : relf.klass.find(id)
-          # Ensure the target is actually in this has_many
-          raise HoboError, "invalid http parameter" unless target.send(refl.primary_key) == record.id
-          
-          if value.downcase == "delete"
-            # home[people][45]=delete  Delete Person[45] (PUT)
-            delete_record(target)
-            
-          else
-            # home[people][45][name]=blah  Update Person[45].name (PUT)
-            raise HoboError, "invalid http parameter" unless value.is_a?(Hash) # field/value pairs
-            update_record(target, value)
-            
-          end
         end
       end
     end
@@ -128,7 +130,7 @@ module Hobo
       # home[people][+1][name]=blah Create new Person with fkey refing to this home and set name (PUT POST)
 
       new_record = record.send(refl.name).new
-      initialize_record(new_record, fields)
+      initialize_record(new_record, value)
       record.send("#{refl.name}").target << new_record
     end
     

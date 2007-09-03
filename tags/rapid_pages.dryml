@@ -33,7 +33,6 @@
       <div class="page_wrapper" param="wrapper">
         <ajax_progress/>
         <header id="page_header" param>
-          <div class="logo" param="logo"><image src="logo.png"/></div>
           <nav param>
             <magic_nav class="main_nav" param="main_mav"/>
             <account_nav if="&Hobo::UserController.user_models.first" param/>
@@ -66,8 +65,8 @@
       <nav param="top_page_nav"><page_nav/></nav>
 
       <panel param="main" class="main">
-        <header param="main_header">
-          <h2><count label="&model_name"/></h2>
+        <header param="main_header" with="&@model">
+          <h2><count part="item_count"/></h2>
         </header>
         <section param="main_section">
           <Table param>
@@ -117,14 +116,14 @@
     <body class="rapid_generic_page show_page show_#{type_name.underscore}"/>
     <main>
       <header>
-        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
+        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name or_view/></if></heading>
         <delete_button in_place="&false"/>
       </header>
 
       <panel param="main_panel">
         <header param="main_header"><h2>Details</h2></header>
         <section>
-          <FieldList skip="name" tag="editor" param/>
+          <FieldList skip="name" tag="editor_or_view" param/>
         </section>
 
         <nav param="new_links">
@@ -342,7 +341,7 @@
 <def tag="ajax_progress">
   <div id='ajax_progress'>
     <div>
-      <span id="ajax_progress_text"></span><theme_image src="spinner.gif"/>
+      <span id="ajax_progress_text"></span>
     </div>
   </div>
 </def>

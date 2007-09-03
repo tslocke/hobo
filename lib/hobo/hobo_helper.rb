@@ -15,7 +15,7 @@ module Hobo
         @current_user = if session and id = session[:user]
                           Hobo.object_from_dom_id(id)
                         else 
-                          Guest.new
+                          ::Guest.new
                         end 
     end
      

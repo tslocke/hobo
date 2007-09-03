@@ -21,7 +21,7 @@
   field_names.each do |field| %><with field="&field"><tagbody/></with><% end
 %></def>
 
-<def tag="with_field_names" attrs="fields, skip, skip_associations, include_timestamps"><%
+<def tag="with_field_names" attrs="fields, skip, skip_associations, include_timestamps"><%=
   field_names = if fields.nil?
                   columns = this.content_columns.every(:name)
                   columns -= %w{created_at updated_at created_on updated_on} unless include_timestamps
@@ -41,7 +41,12 @@
 
   field_names -= comma_split(skip) if skip
   field_names.map! {|f| f.gsub("." , "_") }
+  scope.new_scope do
+    field_names.map do |n|
+      scope.field_name = n
+      tagbody.call
+    end
+  end
 %>
-  <repeat with="&field_names"><tagbody/></repeat>
 </def>
 

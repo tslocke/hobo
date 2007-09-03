@@ -43,6 +43,11 @@ module Hobo
     end
     
     
+    def has_hobo_method?(name)
+      respond_to?(name)
+    end
+    
+    
     def compose_with(object, use=nil)
       self_classes = use ? use.models : self.class.models
       from_self = (self_classes - [object.class.name]).map {|classname| send(classname.underscore)}

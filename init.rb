@@ -45,6 +45,11 @@ class ActiveRecord::Base
   def self.hobo_model
     include Hobo::Model
   end
+  def self.hobo_user_model(login_attr)
+    include Hobo::Model
+    include Hobo::AuthenticatedUser
+    set_login_attr login_attr
+  end
 end
 
 # Default settings

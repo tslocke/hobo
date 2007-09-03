@@ -41,7 +41,7 @@
     <thead if="&all_parameters[:thead] || fields" param>
       <tr param="field_heading_row">
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
-          <th param="#{this.underscore}_heading"><%= this.titleize %></th>
+          <th param="#{scope.field_name.underscore}_heading"><%= scope.field_name.titleize %></th>
         </with_field_names>
         <th if="&all_parameters[:controls]" class="controls"/>
       </tr>
@@ -359,3 +359,4 @@ in the future - use at your own risk. -->
 -%><tagbody/></def>
 
 
+<def tag="you_have"><if test="&this == current_user">You have</if><else><name/> has</else></def>
