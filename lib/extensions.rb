@@ -283,8 +283,8 @@ class HashWithIndifferentAccess
   
   def partition_hash(keys=nil)
     keys = keys._?.map {|k| k.is_a?(Symbol) ? k.to_s : k }
-    yes = {}
-    no = {}
+    yes = HashWithIndifferentAccess.new
+    no = HashWithIndifferentAccess.new
     each do |k,v|
       if block_given? ? yield(k,v) : keys.include?(k)
         yes[k] = v

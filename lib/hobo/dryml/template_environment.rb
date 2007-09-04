@@ -197,7 +197,9 @@ module Hobo::Dryml
                                                    refl = new_this.proxy_reflection
                                                    [new_this.proxy_owner, refl.name, refl]
                                                  else
-                                                   [nil, nil, new_this.class]
+                                                   # In dryml, TrueClass is the 'boolean' class
+                                                   t = new_this.class == FalseClass ? TrueClass : new_this.class
+                                                   [nil, nil, t]
                                                  end
         @_this = new_this
         yield
@@ -219,10 +221,13 @@ module Hobo::Dryml
         type = if (obj.nil? or obj.respond_to?(:proxy_reflection)) and
                    parent.class.respond_to?(:field_type) and field_type = parent.class.field_type(field)
                  field_type
+               elsif obj == false
+                 # In dryml, TrueClass is the 'boolean' class
+                 TrueClass
                else
                  obj.class
                end
-
+        
         @_this, @_this_parent, @_this_field, @_this_type = obj, parent, field, type
         @_form_field_path += path if @_form_field_path
         yield

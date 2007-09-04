@@ -66,23 +66,23 @@
 
 <def tag="next_page_link" attrs="params">
   <a if="&@pages && @pages.current.next"
-     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+     href="&url_for({ :page => @pages.current.next }.merge(params || {}))">
     <tagbody>Next page &raqou;</tagbody>
   </a>
 </def>
 
 
 <def tag="first_page_link" attrs="params">
-  <a if="&@pages && @pages.first_page"
-     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+  <a if="&@pages && @pages.first_page && @pages.current != @pages.first_page"
+     href="&url_for({ :page => @pages.first_page }.merge(params || {}))">
     <tagbody>&laquo; First page</tagbody>
   </a>
 </def>
 
 
 <def tag="last_page_link" attrs="params">
-  <a if="&@pages && @pages.last_page"
-     href="&url_for({ :page => @pages.current.previous }.merge(params || {}))">
+  <a if="&@pages && @pages.last_page && @pages.current != @pages.last_page"
+     href="&url_for({ :page => @pages.last_page }.merge(params || {}))">
     <tagbody>Last page &raquo;</tagbody>
   </a>
 </def>

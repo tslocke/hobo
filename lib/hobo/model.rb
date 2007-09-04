@@ -66,10 +66,13 @@ module Hobo
         
         def field(name, *args)
           type = args.shift
-          options = extract_options_from_args!(args)
+          options = args.extract_options!
           @model.send(:set_field_type, name => type) unless
             type.in?(@model.connection.native_database_types.keys - [:text])
           @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
+          
+          @model.send(:validates_presence_of, name) if :required.in?(args)
+          @model.send(:validates_uniqueness_of, name) if :unique.in?(args)
         end
         
         def method_missing(name, *args)
@@ -104,6 +107,13 @@ module Hobo
         types.each_pair do |field, type|
           type_class = Hobo.field_types[type] || type
           field_types[field] = type_class
+          
+          if "validate".in?(type_class.instance_methods)
+            self.validate do |record|
+              v = record.send(field).validate
+              record.errors.add(field, v) if v.is_a?(String)
+            end
+          end
         end
       end
       

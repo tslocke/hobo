@@ -1,5 +1,5 @@
-<def tag="editor" attrs="or_view"><%= 
-  if or_view && !can_edit?
+<def tag="editor" ><%= 
+  if !can_edit?
     view(attributes)
   elsif this_type.respond_to?(:macro)
     if this_type.macro == :belongs_to
@@ -15,9 +15,6 @@
   end
 %></def>
 
-
-<def tag="editor_or_view"><editor or_view merge_attrs/></def>
-  
 
 <def tag="has_many_editor">
   <% #TODO: Implement %>

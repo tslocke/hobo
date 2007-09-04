@@ -7,7 +7,7 @@ Multiple user models
 
   The controller needs to declare hobo_user_controller instead of
   hobo_model_controller (it still has all the hobo_model_controller
-  features). e.g.
+  features). e.g.A
 
     class AdminsController; hobo_user_controller; end
 

@@ -5,13 +5,12 @@
             else
               comma_split(fields)
             end
-  hiddens -= comma_split(skip)
   pname = this.class.name.underscore
   hidden_tags = hiddens.map do |h|
     val = this.send(h)
     name = "#{pname}[#{h}]"
-    hidden_field_tag(name, val.to_s) if val
-  end.join("\n")
+    hidden_field_tag(name, val.to_s) if val && name.not_in?(skip)
+  end.compact.join("\n")
 %></def>
 
 
@@ -59,10 +58,10 @@
 %></def>
 
 
-<def tag="input" attrs="or_view"><%=     
+<def tag="input"><%=     
   if attributes[:type]
     tag :input, attributes
-  elsif or_view && !can_edit?
+  elsif !can_edit?
     view
   else
     if this_type.respond_to?(:macro)
