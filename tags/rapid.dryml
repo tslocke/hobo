@@ -191,7 +191,7 @@
 %></def>
 
         
-<def tag="view" attrs="inline, block, if_blank, no_wrapper"><%=
+<def tag="view" attrs="inline, block, if_blank, no_wrapper, truncate"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
@@ -216,6 +216,9 @@
             the_view = send(view_tag, attrs & view_attrs)
             
             the_view = if_blank if if_blank && the_view.blank?
+
+            truncate = 30 if truncate == true
+            the_view = self.truncate(the_view, truncate.to_i) if truncate
             
             if no_wrapper
               the_view
