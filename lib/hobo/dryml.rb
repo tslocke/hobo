@@ -26,6 +26,7 @@ module Hobo::Dryml
   CORE_TAGLIB = "plugins/hobo/tags/core"
 
   @renderer_classes = {}
+  @tag_page_renderer_classes = {}
 
   class << self
 
@@ -33,7 +34,7 @@ module Hobo::Dryml
     
     def clear_cache
       @renderer_classes = {}
-      @tag_page_renderer_class = nil
+      @tag_page_renderer_classes = {}
     end
 
     def render_tag(view, tag, options={})
@@ -61,10 +62,9 @@ module Hobo::Dryml
                          end
 
       if page == EMPTY_PAGE
-        @tag_page_renderer_class =  make_renderer_class("", EMPTY_PAGE, local_names,
-                                                        [Hobo::HoboHelper, ApplicationHelper], included_taglibs) if
-          @tag_page_renderer_class.nil?
-        @tag_page_renderer_class.new(page, view)
+        @tag_page_renderer_classes[view.controller.class.name] ||= make_renderer_class("", EMPTY_PAGE, local_names,
+                                                        [Hobo::HoboHelper, ApplicationHelper], included_taglibs)
+        @tag_page_renderer_classes[view.controller.class.name].new(page, view)
       else
         page ||= view.instance_variable_get('@hobo_template_path')
         template_path = "app/views/" + page + ".dryml"
