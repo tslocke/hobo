@@ -218,7 +218,7 @@ module Hobo
     
 
     def paginated_find(*args, &b)
-      options = extract_options_from_args!(args)
+      options = args.extract_options!
       
       total_number = options.delete(:total_number)
       @association = options.delete(:association) or
@@ -242,10 +242,26 @@ module Hobo
         :offset => @pages.current.offset,
       }.merge(options)
       
+      unless options.has_key?(:order)
+        _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
+        if field
+          @sort_field = field
+          @sort_direction = desc ? "desc" : "asc"
+          
+          table, column = if field =~ /^(.*)\.(.*)$/
+                           [$1.camelize.constantize.table_name, $2]
+                         else
+                           [model.table_name, field]
+                         end
+          options[:order] = "#{table}.#{column} #{@sort_direction}"
+        elsif !@association
+          options[:order] = :default
+        end
+      end
+      
       if @association
         @association.find(:all, options, &b)
       else
-        options[:order] ||= :default
         find_with_data_filter(options, &b)
       end
     end
@@ -394,7 +410,7 @@ module Hobo
           end
         end
           
-      when :invlaid
+      when :invalid
         # Validation errors
         respond_to do |wants|
           wants.html do

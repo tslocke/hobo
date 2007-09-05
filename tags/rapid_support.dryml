@@ -40,10 +40,10 @@
                 end
 
   field_names -= comma_split(skip) if skip
-  field_names.map! {|f| f.gsub("." , "_") }
   scope.new_scope do
     field_names.map do |n|
-      scope.field_name = n
+      scope.field_name = n.gsub("." , "_")
+      scope.field_path = n
       tagbody.call
     end
   end

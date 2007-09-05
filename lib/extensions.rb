@@ -266,14 +266,14 @@ end
 class HashWithIndifferentAccess
   
   def -(keys)
-    res = {}
+    res = HashWithIndifferentAccess.new
     keys = keys.map {|k| k.is_a?(Symbol) ? k.to_s : k }
     each_pair { |k, v| res[k] = v unless k.in?(keys) }
     res
   end
   
   def &(keys)
-    res = {}
+    res = HashWithIndifferentAccess.new
     keys.each do |k|
       k = k.to_s if k.is_a?(Symbol)
       res[k] = self[k] if has_key?(k)

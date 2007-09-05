@@ -6,6 +6,7 @@
 <include src="rapid_editing"/>
 <include src="rapid_forms"/>
 <include src="rapid_navigation"/>
+<include src="rapid_plus"/>
 
 <def tag="FieldList" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "editor" %>
@@ -41,7 +42,7 @@
     <thead if="&all_parameters[:thead] || fields" param>
       <tr param="field_heading_row">
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
-          <th param="#{scope.field_name.underscore}_heading"><%= scope.field_name.titleize %></th>
+          <th param="#{scope.field_name}_heading"><%= scope.field_name.titleize %></th>
         </with_field_names>
         <th if="&all_parameters[:controls]" class="controls"/>
       </tr>
@@ -161,6 +162,7 @@
     target = to || this
   
     if target.nil?
+      Hobo::Dryml.last_if = false
       "(Not Available)"
     elsif action == "new"
       # Link to a new object form

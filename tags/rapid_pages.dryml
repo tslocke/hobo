@@ -153,6 +153,7 @@
       <panel param="main_panel">
         <header param="main_header"><h2>Details</h2></header>
         <section>
+          <error_messages param="error_messages"/>
           <form>
             <FieldList skip="name" tag="input" param/>
             <submit label="Save"/>

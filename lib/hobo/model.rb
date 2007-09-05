@@ -243,21 +243,19 @@ module Hobo
 
 
       def find(*args, &b)
-        if args.first.in?([:all, :first])
-          if args.last.is_a? Hash
-            options = args.last
-            args[-1] = options = options.merge(:order => default_order) if options[:order] == :default
-          else
-            options = {}
-          end
+        options = args.extract_options!
+        if args.first.in?([:all, :first]) && options[:order] == :default
+          options = if default_order.blank?
+                      options - [:order]
+                    else
+                      options.merge(:order => "#{table_name}.#{default_order}")
+                    end
+        end
           
-          if b
-            super(args.first, options.merge(:conditions => conditions(&b)))
-          else
-            super(*args)
-          end
+        if b
+          super(args.first, options.merge(:conditions => conditions(&b)))
         else
-          super(*args)
+          super(*args + [options])
         end
       end
       
