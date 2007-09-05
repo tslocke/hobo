@@ -155,27 +155,33 @@
   content = tagbody.call if tagbody
   
   if href || attributes[:name]
-    # Regular link - skip all this stuff
+    # Regular link
+    content_tag(:a, content, attributes.update(:href => href))
   else
     target = to || this
   
-    return "(Not Available)" if target.nil? 
-
-    if action == "new"
+    if target.nil?
+      "(Not Available)"
+    elsif action == "new"
       # Link to a new object form
       new_record = target.new
       new_record.set_creator(current_user)
-      return "" unless can_create?(new_record)
-      
-      new_class_name = if target.respond_to?(:proxy_reflection)
-                         target.proxy_reflection.klass.name
-                       else
-                         target.name
-                       end
+      if can_create?(new_record)
+        
+        new_class_name = if target.respond_to?(:proxy_reflection)
+                           target.proxy_reflection.klass.name
+                         else
+                           target.name
+                         end
 
-      href = object_url(target, "new")
-      add_classes!(attributes, "new_#{new_class_name.underscore}_link")
-      content ||= "New #{new_class_name.titleize}"
+        href = object_url(target, "new")
+        add_classes!(attributes, "new_#{new_class_name.underscore}_link")
+        content ||= "New #{new_class_name.titleize}"
+        content_tag(:a, content, attributes.update(:href => href))
+      else
+        Hobo::Dryml.last_if = false
+        ""
+      end
     else
       # Link to an existing object
       
@@ -188,10 +194,11 @@
       
       # Set default link text if none given
       content ||= name
+      content_tag(:a, content, attributes.update(:href => href))
     end
   end
-  content_tag :a, content, attributes.update(:href => href)
 %></def>
+
 
         
 <def tag="view" attrs="inline, block, if_blank, no_wrapper, truncate"><%=
