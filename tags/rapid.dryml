@@ -163,6 +163,9 @@
 
     if action == "new"
       # Link to a new object form
+      new_record = target.new
+      new_record.set_creator(current_user)
+      return "" unless can_create?(new_record)
       
       new_class_name = if target.respond_to?(:proxy_reflection)
                          target.proxy_reflection.klass.name
