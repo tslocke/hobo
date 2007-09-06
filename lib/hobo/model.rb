@@ -385,6 +385,7 @@ module Hobo
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options.has_key?(:conditions)
+              source = proxy_reflection.source_reflection
               scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
@@ -395,17 +396,13 @@ module Hobo
               options = options.merge(find_scope).update(:conditions => conditions,
                                                          :class_name => proxy_reflection.klass.name,
                                                          :foreign_key => proxy_reflection.primary_key_name)
-
-              source = proxy_reflection.source_reflection
-              if source
-                options[:through] = proxy_reflection.options[:through]
-                options[:source] = source.name
-              end
+              options[:source] = source.name if source
 
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
                                                                       name,
                                                                       options,
-                                                                      proxy_reflection.klass)
+                                                                      proxy_owner.class)
+              
               @reflections ||= {}
               @reflections[name] = r
               
@@ -414,7 +411,7 @@ module Hobo
                       else
                         ActiveRecord::Associations::HasManyAssociation
                       end.new(self.proxy_owner, r)
-              
+
               # Calling directly causes self to get loaded
               Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}_scope", assoc)
             end
