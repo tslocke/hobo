@@ -376,11 +376,12 @@ module Hobo
           if find_scope
             # Calling instance_variable_get directly causes self to
             # get loaded, hence this trick
-            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}")
+            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}_scope")
             
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options.has_key?(:conditions)
+              through = options.has_key?(:through)
               scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
@@ -391,6 +392,8 @@ module Hobo
               options = options.merge(find_scope).update(:conditions => conditions,
                                                          :class_name => proxy_reflection.klass.name,
                                                          :foreign_key => proxy_reflection.primary_key_name)
+              options[:source] = proxy_reflection.source_reflection.name if through
+
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
                                                                       name,
                                                                       options,
@@ -405,7 +408,7 @@ module Hobo
                       end.new(self.proxy_owner, r)
               
               # Calling directly causes self to get loaded
-              Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}", assoc)
+              Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}_scope", assoc)
             end
             assoc
           else
