@@ -237,10 +237,14 @@ module Hobo
       end
       
       
-      def conditions(&b)
-        ModelQueries.new(self).instance_eval(&b).to_sql
+      def conditions(*args, &b)
+        if args.empty
+          ModelQueries.new(self).instance_eval(&b).to_sql
+        else
+          ModelQueries.new(self).instance_exec(*args, &b).to_sql
+        end
       end
-
+      
 
       def find(*args, &b)
         options = args.extract_options!
@@ -381,7 +385,6 @@ module Hobo
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options.has_key?(:conditions)
-              through = options.has_key?(:through)
               scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
                              "(#{scope_conditions}) AND (#{has_many_conditions})"
@@ -392,7 +395,12 @@ module Hobo
               options = options.merge(find_scope).update(:conditions => conditions,
                                                          :class_name => proxy_reflection.klass.name,
                                                          :foreign_key => proxy_reflection.primary_key_name)
-              options[:source] = proxy_reflection.source_reflection.name if through
+
+              source = proxy_reflection.source_reflection
+              if source
+                options[:through] = proxy_reflection.options[:through]
+                options[:source] = source.name
+              end
 
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
                                                                       name,
@@ -401,7 +409,7 @@ module Hobo
               @reflections ||= {}
               @reflections[name] = r
               
-              assoc = if options.has_key?(:through)
+              assoc = if source
                         ActiveRecord::Associations::HasManyThroughAssociation
                       else
                         ActiveRecord::Associations::HasManyAssociation
