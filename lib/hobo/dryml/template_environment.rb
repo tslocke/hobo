@@ -409,7 +409,11 @@ module Hobo::Dryml
     
     
     def render_tag(tag_name, attributes)
-      (send(tag_name, attributes) + part_contexts_storage_tag).strip
+      if respond_to?(tag_name)
+        (send(tag_name, attributes) + part_contexts_storage_tag).strip
+      else
+        false
+      end
     end
     
     

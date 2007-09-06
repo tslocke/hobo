@@ -555,12 +555,8 @@ module Hobo
           render :template => template
           true
         else
-          if page_kind.in? GENERIC_PAGE_TAGS
-            render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
-            true
-          else
-            false
-          end
+          # This returns false if no such tag exists
+          render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
         end
       rescue ActionView::TemplateError => wrapper
         e = wrapper.original_exception if wrapper.respond_to? :original_exception
