@@ -306,7 +306,7 @@ Hobo Rapid
     not have edit permission. <editor> is a polymorphic tag, so you
     can <def tag="editor" for="MyClass">
 
-    <form_field> is now <input>. If you give a type attributes, you
+    <form_field> is now <input>. If you give a type attribute, you
     get a regular html input tag, if you don't you get a smart Hobo
     form field appropriate for the type of the context. <input> is a
     polymorphic tag, so you can <def tag="input" for="MyClass">

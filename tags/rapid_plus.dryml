@@ -1,9 +1,12 @@
-<def tag="TablePlus" attrs="sort_field, sort_direction, sort_columns" debug_source>
+<def tag="TablePlus" attrs="sort_field, sort_direction, sort_columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
   <div class="table_plus" merge_attrs="&attributes - attrs_for(:with_fields) - attrs_for(:Table)">
     <div class="header" param="header">
       <div class="search">
-        Search <input class="search_field" type="text"/>
+        <form param="search_form" method="get" action="">
+          <hidden_fields for_query_string skip="page, search_form"/>
+          Search <input class="search_field" type="text" name="search" value="&params[:search]"/>
+        </form>
       </div>
     </div>
 

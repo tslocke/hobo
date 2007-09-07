@@ -155,7 +155,7 @@
         <section>
           <error_messages param="error_messages"/>
           <form>
-            <FieldList skip="name" tag="input" param/>
+            <FieldList skip="name" param/>
             <submit label="Save"/>
           </form>
         </section>
@@ -188,7 +188,7 @@
           <error_messages param="error_messages"/>
 
           <form>
-            <FieldList associations="belongs_to"/>
+            <FieldList skip_associations="has_many"/>
             <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}'
                     param="submit_button"/>
           </form>
@@ -230,7 +230,7 @@
 
         <if test="&Hobo.simple_has_many_association?(@association)">
           <section param="new_link">
-            <a to="&@associaton.new"/>
+            <a to="&@association" action="new"/>
           </section>
         </if>
       </panel>

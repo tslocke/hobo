@@ -105,9 +105,10 @@ module Hobo
       end
 
 
-      def autocomplete_for(attr, options={})
-        opts = { :limit => 15 }.update(options)
-        @completers ||= {}
+      def autocomplete_for(attr, options={}, &b)
+        options = options.reverse_merge(:limit => 15)
+        options[:data_filters_block] = b
+        @completers ||= HashWithIndifferentAccess.new
         @completers[attr.to_sym] = opts
       end
 
@@ -115,12 +116,6 @@ module Hobo
       def autocompleter(name)
         (@completers && @completers[name]) ||
           (superclass.respond_to?(:autocompleter) && superclass.autocompleter(name))
-      end
-
-
-      def def_data_filter(name, &b)
-        @data_filters ||= {}
-        @data_filters[name] = b
       end
       
       
@@ -145,12 +140,6 @@ module Hobo
       end
       
       
-      def data_filter(name)
-        (@data_filters && @data_filters[name]) ||
-          (superclass.respond_to?(:data_filter) && superclass.data_filter(name))
-      end
-
-
       def find_instance(id)
         if model.id_name? and id !~ /^\d+$/
           model.find_by_id_name(id)
@@ -174,11 +163,13 @@ module Hobo
     def destroy; hobo_destroy; end
     
     def completions
-      attr = params[:for]
-      opts = attr && self.class.autocompleter(attr.to_sym)
+      opts = self.class.autocompleter(params[:for])
       if opts
+        # Eval any defined filters
+        instance_eval(&opts[:data_filters_block]) if opts[:data_filters_block]
+        conditions = data_filter_conditions
         q = params[:query]
-        items = find_with_data_filter(opts) { send("#{attr}_contains", q) }
+        items = model.find(:all) { all?(send("#{attr}_contains", q), conditions && block(conditions)) }
 
         render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
       else
@@ -187,9 +178,33 @@ module Hobo
     end
 
 
-    ###### END OF ACTIONS ######
+    # --- END OF ACTIONS --- #
 
     protected
+    
+    def data_filter(name, &b)
+      @data_filters ||= HashWithIndifferentAccess.new
+      @data_filters[name] = b
+    end
+    
+    def search(*columns)
+      data_filter :search do |query|
+        columns_match = columns.map do |c|
+          if c.is_a?(Symbol)
+            send("#{c}_contains", query)
+          elsif c.is_a?(Hash)
+            c.map do |k, v| 
+              related = send(k)
+              v = [v] unless v.is_a?(Array)
+              v.map { |related_col| related.send("#{related_col}_contains", query) }
+            end
+          end
+        end.flatten
+        any?(*columns_match)
+      end
+    end
+    
+    attr_accessor :data_filters
     
     def overridable_response(options, key)
       if options.has_key?(key)
@@ -219,20 +234,33 @@ module Hobo
 
     def paginated_find(*args, &b)
       options = args.extract_options!
+      filter_conditions = data_filter_conditions
+      conditions_proc = if b && filter_conditions
+                          proc { block(b) & block(filter_conditions) }
+                        else
+                          b || filter_conditions
+                        end
       
-      total_number = options.delete(:total_number)
-      @association = options.delete(:association) or
+      @association = options.delete(:association) ||
         if args.any?
           owner, collection_name = args
           @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
         end
-        
-      if @association
-        total_number ||= @association.count
-        @reflection = @association.proxy_reflection if @association.respond_to?(:proxy_reflection)
-      end
+      @reflection = @association.proxy_reflection if @association._?.respond_to?(:proxy_reflection)
       
-      total_number ||= count_with_data_filter
+      total_number = options.delete(:total_number) ||
+        begin
+          # If there is a conditions block, it may depend on the includes
+          count_options = conditions_proc ? { :include => options[:include] } : {}
+          if @association
+            @association.count(count_options, &conditions_proc)
+          else
+            model.count(count_options, &conditions_proc)
+          end  
+        end
+      
+      puts total_number
+      
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
       @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
@@ -253,16 +281,16 @@ module Hobo
                          else
                            [model.table_name, field]
                          end
-          options[:order] = "#{table}.#{column} #{@sort_direction}"
+         options[:order] = "#{table}.#{column} #{@sort_direction}"
         elsif !@association
           options[:order] = :default
         end
       end
       
       if @association
-        @association.find(:all, options, &b)
+        @association.find(:all, options, &conditions_proc) 
       else
-        find_with_data_filter(options, &b)
+        model.find(:all, options, &conditions_proc)
       end
     end
     
@@ -576,47 +604,22 @@ module Hobo
     def model
       self.class.model
     end
-
+    
 
     def find_template
       Hobo::ModelController.find_model_template(model, params[:action])
     end
 
-
-    def with_data_filter(operation, *args, &block)
-      filter_param = params.keys.find &it.starts_with?("where_")
-      proc = filter_param && self.class.data_filter(filter_param[6..-1].to_sym)
-      if proc
-        filter_args = params[filter_param]
-        filter_args = [filter_args] unless filter_args.is_a? Array
-        model.send(operation, *args) do
-          if block
-            instance_eval(&block) & instance_exec(*filter_args, &proc)
-          else
-            instance_exec(*filter_args, &proc)
-          end
-        end
-      else
-        if block
-          model.send(operation, *args) { instance_eval(&block) }
-        else
-          model.send(operation, *args)
-        end
-      end
+    
+    def data_filter_conditions
+      active_filters = data_filters && (params.keys & data_filters.keys)
+      filters = data_filters
+      params = self.params
+      proc do
+        all?(*active_filters.map {|f| instance_exec(params[f], &filters[f])})
+      end unless active_filters.blank?
     end
     
-    def find_with_data_filter(opts={}, &b)
-      with_data_filter(:find, :all, opts, &b)
-    end
-    
-    
-    def count_with_data_filter(opts={}, &b)
-      with_data_filter(:count, opts, &b)
-    end
-
-    
-
-
 
     def XXupdate_with_params(object, params)
       return unless params

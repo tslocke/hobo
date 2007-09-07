@@ -141,15 +141,10 @@ module Hobo
       public :never_show?
 
       def set_creator_attr(attr)
-        class_eval %{
-          def creator
-            #{attr};
-          end
-          def creator=(x)
-            self.#{attr} = x;
-          end
-        }
+        @creator_attr = attr.to_sym
       end 
+      attr_reader :creator_attr
+      public :creator_attr
 
       def set_search_columns(*columns)
         class_eval %{
@@ -238,7 +233,7 @@ module Hobo
       
       
       def conditions(*args, &b)
-        if args.empty
+        if args.empty?
           ModelQueries.new(self).instance_eval(&b).to_sql
         else
           ModelQueries.new(self).instance_exec(*args, &b).to_sql
@@ -256,8 +251,13 @@ module Hobo
                     end
         end
           
-        if b
-          super(args.first, options.merge(:conditions => conditions(&b)))
+        if b && !(block_conditions = conditions(&b)).blank?
+          c = if !options[:conditions].blank?
+                "(#{options[:conditons]}) and (#{block_conditions})"
+              else
+                block_conditions
+              end
+          super(args.first, options.merge(:conditions => c))
         else
           super(*args + [options])
         end
@@ -285,8 +285,8 @@ module Hobo
         end
       end
 
-      def has_creator?
-        instance_methods.include?('creator=') and instance_methods.include?('creator')
+      def creator_type
+        reflections[@creator_attr]._?.klass
       end
 
       def search_columns
@@ -438,7 +438,7 @@ module Hobo
     
     
     def set_creator(user)
-      self.creator ||= user if self.class.has_creator? and not user.guest?
+      self.send("#{self.class.creator_attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
     end
 
 

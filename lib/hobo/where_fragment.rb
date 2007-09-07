@@ -7,7 +7,12 @@ module Hobo
     end
 
     def &(rhs)
-      WhereFragment.new("(#{to_sql}) and (#{rhs.to_sql})")
+      # If either is nil, just return the other
+      if self.to_sql && rhs.to_sql
+        WhereFragment.new("(#{to_sql}) and (#{rhs.to_sql})")
+      else
+        self.to_sql || rhs.to_sql
+      end
     end
 
     def |(rhs)

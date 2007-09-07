@@ -333,6 +333,19 @@ module Hobo
       send("#{c.name.underscore}_signup_url") rescue nil
     end
 
+    def query_params
+      query = request.request_uri.match(/(?:\?(.+))/)._?[1]
+      if query
+        params = query.split('&')
+        pairs = params.map do |param|
+          pair = param.split('=')
+          pair.length == 1 ? pair + [''] : pair
+        end
+        Hash[*pairs.flatten]
+      else
+        {}
+      end
+    end
   
     # debugging support
      

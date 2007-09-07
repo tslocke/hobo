@@ -27,7 +27,24 @@ module Hobo
     def not_in(association)
       not_(is_in(association))
     end
+    
+    
+    def sql(s)
+      WhereFragment.new(s)
+    end
+    
+    def block(b)
+      b && instance_eval(&b)
+    end
+    
+    
+    def all?(*args)
+      args.inject { |m, a| m & a }
+    end
 
+    def any?(*args)
+      args.inject { |m, a| m | a }
+    end
 
     def method_missing(name, *args)
       check_column = proc do |col|
@@ -46,28 +63,32 @@ module Hobo
           val = args[0]
         end
         return (if val.nil?
-                  WhereFragment.new("#{field} IS NULL")
+                  WhereFragment.new("#{_query_table}.#{field} IS NULL")
                 else
-                  WhereFragment.new("#{field} = ?", val)
+                  WhereFragment.new("#{_query_table}.#{field} = ?", val)
                 end)
       end
 
       m, field = *name.to_s.match(/^(.*)_contains$/)
       if m
         check_column[field]
-        return WhereFragment.new("#{field} like ?", "%#{args[0]}%")
+        return WhereFragment.new("#{_query_table}.#{field} like ?", "%#{args[0]}%")
       end
 
       m, field = *name.to_s.match(/^(.*)_starts$/)
       if m
         check_column[field]
-        return WhereFragment.new("#{field} like ?", "#{args[0]}%")
+        return WhereFragment.new("#{_query_table}.#{field} like ?", "#{args[0]}%")
       end
 
       m, field = *name.to_s.match(/^(.*)_ends$/)
       if m
         check_column[field]
-        return WhereFragment.new("#{field} like ?", "%#{args[0]}")
+        return WhereFragment.new("#{_query_table}.#{field} like ?", "%#{args[0]}")
+      end
+      
+      if (refl = model.reflections[name.to_sym]) && refl.macro == :belongs_to
+        return ModelQueries.new(refl.klass)
       end
 
       return WhereFragment.new(@model.send(name, *args))
@@ -85,6 +106,10 @@ module Hobo
       else
         Object.instance_method(:instance_variable_get).bind(assoc).call("@finder_sql")
       end
+    end
+    
+    def _query_table
+      model.table_name
     end
 
   end

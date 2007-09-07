@@ -1,16 +1,17 @@
-<def tag="hidden_fields" attrs="fields, skip"><%= 
-  hiddens = case fields
-            when '*', nil
-              this.class.column_names - ['type', 'created_at', 'updated_at']
-            else
-              comma_split(fields)
-            end
-  pname = this.class.name.underscore
-  hidden_tags = hiddens.map do |h|
-    val = this.send(h)
-    name = "#{pname}[#{h}]"
-    hidden_field_tag(name, val.to_s) if val && name.not_in?(skip)
-  end.compact.join("\n")
+<def tag="hidden_fields" attrs="fields, skip, for_query_string"><%= 
+  pairs = if for_query_string
+            query_params.to_a
+          else
+            hiddens = case fields
+                      when '*', nil
+                        this.class.column_names - ['type', 'created_at', 'updated_at']
+                      else
+                        comma_split(fields)
+                      end
+            pname = this.class.name.underscore
+            hiddens.map { |h| [ "#{pname}[#{h}]", this.send(h) ] }
+          end
+  pairs.map {|n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip)}.compact.join("\n")
 %></def>
 
 

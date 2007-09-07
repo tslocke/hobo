@@ -10,9 +10,6 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = File.dirname(__FILE__) + "/fixtures/"
-  config.before(:each, :behaviour_type => :controller) do
-    raise_controller_errors
-  end
 
   # You can declare fixtures for each behaviour like this:
   #   describe "...." do
@@ -26,3 +23,4 @@ Spec::Runner.configure do |config|
   # If you declare global fixtures, be aware that they will be declared
   # for all of your examples, even those that don't use them.
 end
+

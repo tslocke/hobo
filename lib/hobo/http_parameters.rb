@@ -16,7 +16,7 @@ module Hobo
     def update_record(record, params)
       return if params.blank?
       
-      original = @this.duplicate
+      original = record.duplicate
       # 'duplicate' can set these, but they can
       # conflict with the changes so we clear them
       @this.send(:clear_aggregation_cache)
@@ -30,7 +30,7 @@ module Hobo
     
     def update_without_tracking(record, params)
       params && params.each_pair do |field_name, value|
-        field = if (create = field =~ /^\+/)
+        field = if (create = field_name =~ /^\+/)
                   field_name[1..-1].to_sym
                 else
                   field_name.to_sym
@@ -86,7 +86,7 @@ module Hobo
       else
         # Update state of current belongs_to target
         # person[home][address]=blah  Update existing home.address (PUT)
-        raise HoboError, "invalid HTTP parameter" unless params[:action] == "put"
+        raise HoboError, "invalid HTTP parameter" unless params[:action] == "update"
         
         target = record.send(refl.name)
         raise HoboError, "invalid HTTP parameter" if target.nil?
@@ -106,13 +106,13 @@ module Hobo
       
       changed_items.each_pair do |id, value|
         # Change to existing record - only valid on PUTs
-        raise HoboError, "invalid HTTP parameter" unless params[:action] == "put"
+        raise HoboError, "invalid HTTP parameter" unless params[:action] == "update"
         
-        target = id =~ /_/ ? Hobo.object_from_dom_id(id) : relf.klass.find(id)
+        target = id =~ /_/ ? Hobo.object_from_dom_id(id) : refl.klass.find(id)
         # Ensure the target is actually in this has_many
-        raise HoboError, "invalid http parameter" unless target.send(refl.primary_key) == record.id
+        raise HoboError, "invalid http parameter" unless target.send(refl.primary_key_name) == record.id
         
-        if value.downcase == "delete"
+        if value.is_a?(String) && value.downcase == "delete"
           # home[people][45]=delete  Delete Person[45] (PUT)
           delete_record(target)
           
@@ -136,7 +136,7 @@ module Hobo
     
     
     def delete_record(record)
-      raise HoboError, "invalid HTTP parameter" unless params[:action] == "put"
+      raise HoboError, "invalid HTTP parameter" unless params[:action] == "update"
       (@to_delete ||= []) << record
     end
     
