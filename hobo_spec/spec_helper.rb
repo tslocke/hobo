@@ -1,9 +1,5 @@
 ENV['RAILS_ENV'] ||= 'mysql'
-require File.dirname(__FILE__) + '/rails_root/config/environment.rb'
-
-# Run the migrations
-ActiveRecord::Migrator.migrate("#{RAILS_ROOT}/db/migrate")
-
+require File.dirname(__FILE__) + '/rails_root/config/environment'
 require 'spec/rails'
 
 Spec::Runner.configure do |config|

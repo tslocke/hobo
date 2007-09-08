@@ -46215,3 +46215,1474 @@ Completed in 0.01688 (59 reqs/sec) | Rendering: 0.00087 (5%) | DB: 0.00576 (34%)
   [4;36;1mPost Load (0.000211)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
   [4;35;1mComment Load (0.000214)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
   [4;36;1mSQL (0.000956)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.097394)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.079974)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000135)[0m   [0;1mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post"}, "action"=>"create", "controller"=>"posts"}
+Completed in 0.01422 (70 reqs/sec) | Rendering: 0.00009 (0%) | DB: 0.17750 (1248%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post]
+  [4;35;1mPost Load (0.024462)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post') LIMIT 1[0m
+  [4;36;1mSQL (0.000216)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000108)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000324)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000306)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000299)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', 1, '2007-09-08 09:55:25')[0m
+Redirected to http://test.host/posts/356
+Completed in 0.00495 (201 reqs/sec) | DB: 0.02572 (519%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc]
+  [4;35;1mPost Load (0.000368)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mSQL (0.033441)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000145)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000379)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "author"=>"fred"}, "+2"=>{"body"=>"yeah cool", "author"=>"jim"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000353)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000283)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', 1, '2007-09-08 09:55:25')[0m
+  [4;35;1mSQL (0.000192)[0m   [0mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'nice post', 'fred', 357, '2007-09-08 09:55:25')[0m
+  [4;36;1mSQL (0.000171)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'yeah cool', 'jim', 357, '2007-09-08 09:55:25')[0m
+  [4;35;1mComment Update (0.024988)[0m   [0mUPDATE comments SET `created_at` = '2007-09-08 09:55:25', `body` = 'nice post', `updated_at` = '2007-09-08 09:55:25', `post_id` = 357, `author` = 'fred' WHERE `id` = 161[0m
+Redirected to http://test.host/posts/357
+Completed in 0.04409 (22 reqs/sec) | DB: 0.06032 (136%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B2%5D%5Bauthor%5D=jim&post%5Bcomments%5D%5B%2B2%5D%5Bbody%5D=yeah+cool&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000379)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mComment Load (0.000244)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 357) [0m
+  [4;36;1mSQL (0.000678)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000094)[0m   [0mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "post"=>"@post_2", "author"=>"fred"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000373)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 2) [0m
+  [4;35;1mUser Load (0.000233)[0m   [0mSELECT * FROM users WHERE (users.`id` = 2) [0m
+Completed in 0.00456 (219 reqs/sec) | Rendering: 0.00009 (1%) | DB: 0.00200 (43%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B1%5D%5Bpost%5D=%40post_2&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000303)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000128)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000092)[0m   [0;1mBEGIN[0m
+  [4;35;1mAdministrator Load (0.000258)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_1", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000289)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mAdministrator Load (0.000245)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mSQL (0.000262)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', 1, '2007-09-08 09:55:25')[0m
+Redirected to http://test.host/posts/358
+Completed in 0.00550 (181 reqs/sec) | DB: 0.00158 (28%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_1]
+  [4;35;1mPost Load (0.000350)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000234)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mUser Load (0.000191)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.001692)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000136)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000344)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"CANNOT CREATE", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000284)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Completed in 0.00264 (378 reqs/sec) | Rendering: 0.00008 (3%) | DB: 0.00323 (122%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=CANNOT+CREATE&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000363)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000131)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000097)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000282)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_2", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000315)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 2) [0m
+  [4;35;1mUser Load (0.000222)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000264)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', 1, '2007-09-08 09:55:25')[0m
+Redirected to http://test.host/posts/359
+Completed in 0.00551 (181 reqs/sec) | DB: 0.00167 (30%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_2]
+  [4;35;1mPost Load (0.000326)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000209)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000610)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000092)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000281)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"category"=>"News"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mCategory Columns (0.001945)[0m   [0;1mSHOW FIELDS FROM categories[0m
+  [4;35;1mCategory Load (0.001114)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'News') LIMIT 1[0m
+  [4;36;1mUser Load (0.000251)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000345)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', 1, '2007-09-08 09:55:25')[0m
+  [4;36;1mSQL (0.000207)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(360, 1)[0m
+  [4;35;1mCategorisation Update (0.000209)[0m   [0mUPDATE categorisations SET `category_id` = 1, `post_id` = 360 WHERE `id` = 116[0m
+Redirected to http://test.host/posts/360
+Completed in 0.05657 (17 reqs/sec) | DB: 0.00559 (9%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=News&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000307)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000328)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 360)) [0m
+  [4;36;1mSQL (0.000678)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000080)[0m   [0mBEGIN[0m
+  [4;36;1mAdministrator Load (0.000336)[0m   [0;1mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 09:55:25) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"+category"=>{"name"=>"Off Topic"}}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mAdministrator Load (0.000316)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mCategory Load (0.000261)[0m   [0;1mSELECT * FROM categories WHERE (categories.name = 'Off Topic') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000223)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'Category') LIMIT 1[0m
+  [4;36;1mSQL (0.000234)[0m   [0;1mINSERT INTO categories (`name`, `updated_at`, `created_at`) VALUES('Off Topic', '2007-09-08 09:55:25', '2007-09-08 09:55:25')[0m
+  [4;35;1mSQL (0.000231)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 09:55:25', 'body of test post', 'test post abc', NULL, '2007-09-08 09:55:25')[0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(361, 49)[0m
+  [4;35;1mCategorisation Update (0.000223)[0m   [0mUPDATE categorisations SET `category_id` = 49, `post_id` = 361 WHERE `id` = 117[0m
+Redirected to http://test.host/posts/361
+Completed in 0.01195 (83 reqs/sec) | DB: 0.00340 (28%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5B%2Bcategory%5D%5Bname%5D=Off+Topic&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000322)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000269)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 361)) [0m
+  [4;36;1mSQL (0.000684)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000093)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000312)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"title"=>"nice new title"}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;35;1mPost Load (0.000348)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mUser Load (0.000421)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000451)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'nice new title', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 09:55:25' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00657 (152 reqs/sec) | DB: 0.00290 (44%) | 302 Found [http://test.host/posts/1?post%5Btitle%5D=nice+new+title]
+  [4;36;1mPost Load (0.000300)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mSQL (0.018803)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000142)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000408)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"1"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000291)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000219)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000231)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mPost Update (0.000372)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 09:55:25' WHERE `id` = 1[0m
+  [4;35;1mUser Load (0.000255)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Update (0.000296)[0m   [0;1mUPDATE comments SET `created_at` = '2007-08-31 14:08:25', `body` = 'changed comment', `updated_at` = '2007-09-08 09:55:25', `post_id` = 1, `author` = 'mr x' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.01042 (95 reqs/sec) | DB: 0.02132 (204%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B1%5D%5Bbody%5D=changed+comment]
+  [4;35;1mPost Load (0.000289)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000268)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000743)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000156)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000306)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000364)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000260)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000244)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000133)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000090)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000352)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"2"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000306)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000221)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000229)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000317)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 09:55:25' WHERE `id` = 1[0m
+  [4;36;1mPost Load (0.000235)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000202)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Destroy (0.000197)[0m   [0;1m DELETE FROM comments
+ WHERE `id` = 2
+[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00904 (110 reqs/sec) | DB: 0.00491 (54%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B2%5D=delete]
+  [4;35;1mPost Load (0.000270)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000228)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000614)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000090)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000282)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000281)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000237)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000240)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000117)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000163)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000307)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 09:55:25) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"+1"=>{"author"=>"Jim"}}, "categorisations"=>{"+1"=>{"category"=>"General"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000269)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000199)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000294)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'General') LIMIT 1[0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mComment Load (0.000269)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mCategorisation Load (0.000177)[0m   [0;1mSELECT * FROM categorisations WHERE (categorisations.post_id = 1) [0m
+  [4;35;1mPost Update (0.000272)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 09:55:25' WHERE `id` = 1[0m
+  [4;36;1mSQL (0.000208)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 09:55:25', NULL, 'Jim', 1, '2007-09-08 09:55:25')[0m
+  [4;35;1mSQL (0.000154)[0m   [0mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(1, 2)[0m
+  [4;36;1mPost Load (0.000228)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000173)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Rendering posts/edit
+Completed in 0.01486 (67 reqs/sec) | Rendering: 0.00079 (5%) | DB: 0.00507 (34%) | 200 OK [http://test.host/posts/1?post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=General&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=Jim]
+  [4;36;1mPost Load (0.000288)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000241)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 1)) [0m
+  [4;36;1mPost Load (0.000176)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mComment Load (0.000191)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mSQL (0.000902)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000143)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000302)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled /app/views/taglibs/simple.dryml in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  [4;36;1mSQL (0.000140)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000233)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000140)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000237)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000140)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000234)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000138)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000234)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000140)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000244)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000137)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000235)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000137)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000239)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000106)[0m   [0;1mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post"}, "action"=>"create", "controller"=>"posts"}
+Completed in 0.01426 (70 reqs/sec) | Rendering: 0.00008 (0%) | DB: 0.00048 (3%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post]
+  [4;35;1mPost Load (0.000393)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post') LIMIT 1[0m
+  [4;36;1mSQL (0.000125)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000081)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000249)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000291)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000236)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', 1, '2007-09-08 10:10:35')[0m
+Redirected to http://test.host/posts/362
+Completed in 0.00416 (240 reqs/sec) | DB: 0.00137 (33%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc]
+  [4;35;1mPost Load (0.000383)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mSQL (0.000854)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000152)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000323)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "author"=>"fred"}, "+2"=>{"body"=>"yeah cool", "author"=>"jim"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000371)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000321)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', 1, '2007-09-08 10:10:35')[0m
+  [4;35;1mSQL (0.000215)[0m   [0mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'nice post', 'fred', 363, '2007-09-08 10:10:35')[0m
+  [4;36;1mSQL (0.000190)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'yeah cool', 'jim', 363, '2007-09-08 10:10:35')[0m
+  [4;35;1mComment Update (0.000278)[0m   [0mUPDATE comments SET `created_at` = '2007-09-08 10:10:35', `body` = 'nice post', `updated_at` = '2007-09-08 10:10:35', `post_id` = 363, `author` = 'fred' WHERE `id` = 164[0m
+Redirected to http://test.host/posts/363
+Completed in 0.02023 (49 reqs/sec) | DB: 0.00309 (15%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B2%5D%5Bauthor%5D=jim&post%5Bcomments%5D%5B%2B2%5D%5Bbody%5D=yeah+cool&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000359)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mComment Load (0.000238)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 363) [0m
+  [4;36;1mSQL (0.013420)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000132)[0m   [0mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "post"=>"@post_2", "author"=>"fred"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000369)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 2) [0m
+  [4;35;1mUser Load (0.000232)[0m   [0mSELECT * FROM users WHERE (users.`id` = 2) [0m
+Completed in 0.00466 (214 reqs/sec) | Rendering: 0.00009 (1%) | DB: 0.01475 (316%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B1%5D%5Bpost%5D=%40post_2&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000361)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000129)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000098)[0m   [0;1mBEGIN[0m
+  [4;35;1mAdministrator Load (0.000605)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_1", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000315)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mAdministrator Load (0.000223)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mSQL (0.000260)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', 1, '2007-09-08 10:10:35')[0m
+Redirected to http://test.host/posts/364
+Completed in 0.00533 (187 reqs/sec) | DB: 0.00199 (37%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_1]
+  [4;35;1mPost Load (0.000340)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000207)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mUser Load (0.000185)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000908)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000115)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000301)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"CANNOT CREATE", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000274)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Completed in 0.00253 (395 reqs/sec) | Rendering: 0.00008 (3%) | DB: 0.00233 (92%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=CANNOT+CREATE&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000305)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000129)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000089)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000256)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_2", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000267)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 2) [0m
+  [4;35;1mUser Load (0.000210)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000254)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', 1, '2007-09-08 10:10:35')[0m
+Redirected to http://test.host/posts/365
+Completed in 0.00530 (188 reqs/sec) | DB: 0.00151 (28%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_2]
+  [4;35;1mPost Load (0.000327)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000210)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000866)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000114)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000303)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"category"=>"News"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mCategory Columns (0.001697)[0m   [0;1mSHOW FIELDS FROM categories[0m
+  [4;35;1mCategory Load (0.000296)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'News') LIMIT 1[0m
+  [4;36;1mUser Load (0.000230)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000323)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', 1, '2007-09-08 10:10:35')[0m
+  [4;36;1mSQL (0.000176)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(366, 1)[0m
+  [4;35;1mCategorisation Update (0.000198)[0m   [0mUPDATE categorisations SET `category_id` = 1, `post_id` = 366 WHERE `id` = 121[0m
+Redirected to http://test.host/posts/366
+Completed in 0.05742 (17 reqs/sec) | DB: 0.00474 (8%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=News&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000652)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000267)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 366)) [0m
+  [4;36;1mSQL (0.000804)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000075)[0m   [0mBEGIN[0m
+  [4;36;1mAdministrator Load (0.000259)[0m   [0;1mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:10:35) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"+category"=>{"name"=>"Off Topic"}}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mAdministrator Load (0.000394)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mCategory Load (0.000313)[0m   [0;1mSELECT * FROM categories WHERE (categories.name = 'Off Topic') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000241)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'Category') LIMIT 1[0m
+  [4;36;1mSQL (0.001665)[0m   [0;1mINSERT INTO categories (`name`, `updated_at`, `created_at`) VALUES('Off Topic', '2007-09-08 10:10:35', '2007-09-08 10:10:35')[0m
+  [4;35;1mSQL (0.000369)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:10:35', 'body of test post', 'test post abc', NULL, '2007-09-08 10:10:35')[0m
+  [4;36;1mSQL (0.000211)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(367, 50)[0m
+  [4;35;1mCategorisation Update (0.000420)[0m   [0mUPDATE categorisations SET `category_id` = 50, `post_id` = 367 WHERE `id` = 122[0m
+Redirected to http://test.host/posts/367
+Completed in 0.01478 (67 reqs/sec) | DB: 0.00567 (38%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5B%2Bcategory%5D%5Bname%5D=Off+Topic&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000364)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000329)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 367)) [0m
+  [4;36;1mSQL (0.000577)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000081)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000251)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:35) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"title"=>"nice new title"}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;35;1mPost Load (0.000266)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mUser Load (0.000177)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000636)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'nice new title', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:10:35' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00589 (169 reqs/sec) | DB: 0.00268 (45%) | 302 Found [http://test.host/posts/1?post%5Btitle%5D=nice+new+title]
+  [4;36;1mPost Load (0.000262)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mSQL (0.000468)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000073)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000220)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:35) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"1"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000226)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000168)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000176)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mPost Update (0.000273)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:10:35' WHERE `id` = 1[0m
+  [4;35;1mUser Load (0.000182)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Update (0.000235)[0m   [0;1mUPDATE comments SET `created_at` = '2007-08-31 14:08:25', `body` = 'changed comment', `updated_at` = '2007-09-08 10:10:35', `post_id` = 1, `author` = 'mr x' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00790 (126 reqs/sec) | DB: 0.00228 (28%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B1%5D%5Bbody%5D=changed+comment]
+  [4;35;1mPost Load (0.000225)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000199)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000583)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000074)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000322)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:35) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000243)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000282)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000193)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000104)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000067)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000294)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:35) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"2"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000406)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000302)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000228)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.001860)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:10:35' WHERE `id` = 1[0m
+  [4;36;1mPost Load (0.000257)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000183)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Destroy (0.000310)[0m   [0;1m DELETE FROM comments
+ WHERE `id` = 2
+[0m
+Redirected to http://test.host/posts/1
+Completed in 0.01060 (94 reqs/sec) | DB: 0.00613 (57%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B2%5D=delete]
+  [4;35;1mPost Load (0.000292)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000247)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000779)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000090)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000291)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:35) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000382)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000245)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000399)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000211)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000074)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000294)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:10:36) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"+1"=>{"author"=>"Jim"}}, "categorisations"=>{"+1"=>{"category"=>"General"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000260)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000196)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000265)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'General') LIMIT 1[0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mComment Load (0.000248)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mCategorisation Load (0.000171)[0m   [0;1mSELECT * FROM categorisations WHERE (categorisations.post_id = 1) [0m
+  [4;35;1mPost Update (0.000261)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:10:36' WHERE `id` = 1[0m
+  [4;36;1mSQL (0.000204)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:10:36', NULL, 'Jim', 1, '2007-09-08 10:10:36')[0m
+  [4;35;1mSQL (0.000154)[0m   [0mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(1, 2)[0m
+  [4;36;1mPost Load (0.000226)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000167)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Rendering posts/edit
+Completed in 0.01462 (68 reqs/sec) | Rendering: 0.00084 (5%) | DB: 0.00546 (37%) | 200 OK [http://test.host/posts/1?post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=General&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=Jim]
+  [4;36;1mPost Load (0.000288)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000238)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 1)) [0m
+  [4;36;1mPost Load (0.000170)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mComment Load (0.000188)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mSQL (0.000884)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000139)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000248)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled /app/views/taglibs/simple.dryml in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  [4;36;1mSQL (0.000139)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000234)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000137)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000280)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000139)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000234)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000146)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000233)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000137)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000239)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000137)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000239)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000118)[0m   [0;1mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post"}, "action"=>"create", "controller"=>"posts"}
+Completed in 0.01420 (70 reqs/sec) | Rendering: 0.00008 (0%) | DB: 0.00049 (3%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post]
+  [4;35;1mPost Load (0.000394)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post') LIMIT 1[0m
+  [4;36;1mSQL (0.000126)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000082)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000251)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000283)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000247)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'body of test post', 'test post abc', 1, '2007-09-08 10:15:15')[0m
+Redirected to http://test.host/posts/368
+Completed in 0.00417 (239 reqs/sec) | DB: 0.00138 (33%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc]
+  [4;35;1mPost Load (0.000295)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mSQL (0.000658)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000102)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000284)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "author"=>"fred"}, "+2"=>{"body"=>"yeah cool", "author"=>"jim"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000327)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000271)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'body of test post', 'test post abc', 1, '2007-09-08 10:15:15')[0m
+  [4;35;1mSQL (0.000186)[0m   [0mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'nice post', 'fred', 369, '2007-09-08 10:15:15')[0m
+  [4;36;1mSQL (0.000161)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'yeah cool', 'jim', 369, '2007-09-08 10:15:15')[0m
+  [4;35;1mComment Update (0.000250)[0m   [0mUPDATE comments SET `created_at` = '2007-09-08 10:15:15', `body` = 'nice post', `updated_at` = '2007-09-08 10:15:15', `post_id` = 369, `author` = 'fred' WHERE `id` = 167[0m
+Redirected to http://test.host/posts/369
+Completed in 0.01613 (61 reqs/sec) | DB: 0.00253 (15%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B2%5D%5Bauthor%5D=jim&post%5Bcomments%5D%5B%2B2%5D%5Bbody%5D=yeah+cool&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000298)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mComment Load (0.000196)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 369) [0m
+  [4;36;1mSQL (0.000636)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000078)[0m   [0mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "post"=>"@post_2", "author"=>"fred"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000356)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 2) [0m
+  [4;35;1mUser Load (0.000226)[0m   [0mSELECT * FROM users WHERE (users.`id` = 2) [0m
+Completed in 0.00456 (219 reqs/sec) | Rendering: 0.00008 (1%) | DB: 0.00179 (39%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B1%5D%5Bpost%5D=%40post_2&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000300)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000127)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000088)[0m   [0;1mBEGIN[0m
+  [4;35;1mAdministrator Load (0.000253)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_1", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000285)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mAdministrator Load (0.000224)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mSQL (0.000260)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'body of test post', 'test post abc', 1, '2007-09-08 10:15:15')[0m
+Redirected to http://test.host/posts/370
+Completed in 0.00535 (187 reqs/sec) | DB: 0.00154 (28%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_1]
+  [4;35;1mPost Load (0.000331)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000211)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mUser Load (0.000183)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000674)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000092)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000261)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"CANNOT CREATE", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000303)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Completed in 0.00278 (360 reqs/sec) | Rendering: 0.00009 (3%) | DB: 0.00206 (74%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=CANNOT+CREATE&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000342)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000117)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000082)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000286)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_2", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000268)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 2) [0m
+  [4;35;1mUser Load (0.000211)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000267)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'body of test post', 'test post abc', 1, '2007-09-08 10:15:15')[0m
+Redirected to http://test.host/posts/371
+Completed in 0.00536 (186 reqs/sec) | DB: 0.00157 (29%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_2]
+  [4;35;1mPost Load (0.000314)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000210)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000657)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000092)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000264)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"category"=>"News"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mCategory Columns (0.001890)[0m   [0;1mSHOW FIELDS FROM categories[0m
+  [4;35;1mCategory Load (0.000296)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'News') LIMIT 1[0m
+  [4;36;1mUser Load (0.000236)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000354)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:15', 'body of test post', 'test post abc', 1, '2007-09-08 10:15:15')[0m
+  [4;36;1mSQL (0.000207)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(372, 1)[0m
+  [4;35;1mCategorisation Update (0.000205)[0m   [0mUPDATE categorisations SET `category_id` = 1, `post_id` = 372 WHERE `id` = 126[0m
+Redirected to http://test.host/posts/372
+Completed in 0.05482 (18 reqs/sec) | DB: 0.00472 (8%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=News&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000302)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000255)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 372)) [0m
+  [4;36;1mSQL (0.000657)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000080)[0m   [0mBEGIN[0m
+  [4;36;1mAdministrator Load (0.000283)[0m   [0;1mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:15:15) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"+category"=>{"name"=>"Off Topic"}}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mAdministrator Load (0.000346)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mCategory Load (0.000277)[0m   [0;1mSELECT * FROM categories WHERE (categories.name = 'Off Topic') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000197)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'Category') LIMIT 1[0m
+  [4;36;1mSQL (0.000244)[0m   [0;1mINSERT INTO categories (`name`, `updated_at`, `created_at`) VALUES('Off Topic', '2007-09-08 10:15:15', '2007-09-08 10:15:15')[0m
+  [4;35;1mSQL (0.000235)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:15:16', 'body of test post', 'test post abc', NULL, '2007-09-08 10:15:16')[0m
+  [4;36;1mSQL (0.000203)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(373, 51)[0m
+  [4;35;1mCategorisation Update (0.000245)[0m   [0mUPDATE categorisations SET `category_id` = 51, `post_id` = 373 WHERE `id` = 127[0m
+Redirected to http://test.host/posts/373
+Completed in 0.01218 (82 reqs/sec) | DB: 0.00332 (27%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5B%2Bcategory%5D%5Bname%5D=Off+Topic&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000329)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000272)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 373)) [0m
+  [4;36;1mSQL (0.000651)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000095)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000284)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"title"=>"nice new title"}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;35;1mPost Load (0.000347)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mUser Load (0.000299)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000528)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'nice new title', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:15:16' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00645 (155 reqs/sec) | DB: 0.00281 (43%) | 302 Found [http://test.host/posts/1?post%5Btitle%5D=nice+new+title]
+  [4;36;1mPost Load (0.000308)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mSQL (0.000686)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000100)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000276)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"1"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000284)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000215)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000231)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mPost Update (0.000345)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:15:16' WHERE `id` = 1[0m
+  [4;35;1mUser Load (0.000242)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Update (0.000295)[0m   [0;1mUPDATE comments SET `created_at` = '2007-08-31 14:08:25', `body` = 'changed comment', `updated_at` = '2007-09-08 10:15:16', `post_id` = 1, `author` = 'mr x' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.01020 (98 reqs/sec) | DB: 0.00298 (29%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B1%5D%5Bbody%5D=changed+comment]
+  [4;35;1mPost Load (0.000279)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000233)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.056206)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000162)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000339)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000282)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000216)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000230)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000133)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000088)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000252)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"2"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000254)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000207)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000241)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000319)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:15:16' WHERE `id` = 1[0m
+  [4;36;1mPost Load (0.000250)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000200)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Destroy (0.000216)[0m   [0;1m DELETE FROM comments
+ WHERE `id` = 2
+[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00925 (108 reqs/sec) | DB: 0.06011 (649%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B2%5D=delete]
+  [4;35;1mPost Load (0.000320)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000241)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000742)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000093)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000289)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000274)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000217)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000238)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000133)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000163)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000303)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:15:16) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"+1"=>{"author"=>"Jim"}}, "categorisations"=>{"+1"=>{"category"=>"General"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000288)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000205)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000270)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'General') LIMIT 1[0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mComment Load (0.000255)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mCategorisation Load (0.000173)[0m   [0;1mSELECT * FROM categorisations WHERE (categorisations.post_id = 1) [0m
+  [4;35;1mPost Update (0.000268)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:15:16' WHERE `id` = 1[0m
+  [4;36;1mSQL (0.000206)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:15:16', NULL, 'Jim', 1, '2007-09-08 10:15:16')[0m
+  [4;35;1mSQL (0.000155)[0m   [0mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(1, 2)[0m
+  [4;36;1mPost Load (0.000226)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000167)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Rendering posts/edit
+Completed in 0.01470 (68 reqs/sec) | Rendering: 0.00080 (5%) | DB: 0.00523 (35%) | 200 OK [http://test.host/posts/1?post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=General&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=Jim]
+  [4;36;1mPost Load (0.000289)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mCategory Load (0.000236)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 1)) [0m
+  [4;36;1mPost Load (0.000172)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mComment Load (0.000184)[0m   [0mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;36;1mSQL (0.000919)[0m   [0;1mROLLBACK[0m
+  [4;36;1mSQL (0.000138)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000236)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled /app/views/taglibs/simple.dryml in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  [4;36;1mSQL (0.000155)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000262)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000138)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000238)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000140)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000239)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000138)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000241)[0m   [0mSELECT version FROM schema_info[0m
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000134)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  [4;36;1mSQL (0.000138)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+AdministratorsController: missing default helper path administrators_helper
+CategorisationsController: missing default helper path categorisations_helper
+CategoriesController: missing default helper path categories_helper
+CommentsController: missing default helper path comments_helper
+PostsController: missing default helper path posts_helper
+UsersController: missing default helper path users_helper
+Spec::Rails::DSL::HelperEvalContextController: missing default helper path spec/rails/dsl/helper_eval_context_helper
+Spec::Rails::DSL::ViewExampleController: missing default helper path spec/rails/dsl/view_example_helper
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled /app/views/taglibs/simple.dryml in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.05s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.04s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.01s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  DRYML: Compiled TEST in 0.00s
+  [4;35;1mSQL (0.000126)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.000148)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000261)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"+1"=>{"author"=>"Jim"}}, "categorisations"=>{"+1"=>{"category"=>"General"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000345)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000211)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCategory Columns (0.003889)[0m   [0mSHOW FIELDS FROM categories[0m
+  [4;36;1mCategory Load (0.000346)[0m   [0;1mSELECT * FROM categories WHERE (categories.`name` = 'General') LIMIT 1[0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000306)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mCategorisation Load (0.000214)[0m   [0mSELECT * FROM categorisations WHERE (categorisations.post_id = 1) [0m
+  [4;36;1mPost Update (0.000435)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:28:05' WHERE `id` = 1[0m
+  [4;35;1mSQL (0.000222)[0m   [0mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:28:05', NULL, 'Jim', 1, '2007-09-08 10:28:05')[0m
+  [4;36;1mSQL (0.000258)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(1, 2)[0m
+  [4;35;1mPost Load (0.000281)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mUser Load (0.000195)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Rendering posts/edit
+Completed in 0.04439 (22 reqs/sec) | Rendering: 0.00092 (2%) | DB: 0.00724 (16%) | 200 OK [http://test.host/posts/1?post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=General&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=Jim]
+  [4;35;1mPost Load (0.000308)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCategory Load (0.000445)[0m   [0;1mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 1)) [0m
+  [4;35;1mPost Load (0.000307)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000214)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000650)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000123)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000360)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000297)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000232)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000241)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000134)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000088)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000269)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"2"=>"delete"}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000263)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000216)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000234)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mPost Update (0.000325)[0m   [0mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:28:05' WHERE `id` = 1[0m
+  [4;36;1mPost Load (0.000239)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000199)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Destroy (0.000192)[0m   [0;1m DELETE FROM comments
+ WHERE `id` = 2
+[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00915 (109 reqs/sec) | DB: 0.00534 (58%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B2%5D=delete]
+  [4;35;1mPost Load (0.000275)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000250)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.021004)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000129)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000341)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"3"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000300)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000229)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000242)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 3) [0m
+  [4;35;1mSQL (0.000135)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000098)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000294)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"comments"=>{"1"=>{"body"=>"changed comment"}}}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000277)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000219)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Load (0.000231)[0m   [0;1mSELECT * FROM comments WHERE (comments.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mPost Update (0.000334)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'Simple post', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:28:05' WHERE `id` = 1[0m
+  [4;35;1mUser Load (0.000255)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mComment Update (0.000301)[0m   [0;1mUPDATE comments SET `created_at` = '2007-08-31 14:08:25', `body` = 'changed comment', `updated_at` = '2007-09-08 10:28:05', `post_id` = 1, `author` = 'mr x' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.01031 (96 reqs/sec) | DB: 0.02491 (241%) | 302 Found [http://test.host/posts/1?post%5Bcomments%5D%5B1%5D%5Bbody%5D=changed+comment]
+  [4;35;1mPost Load (0.000292)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mComment Load (0.000240)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 1) [0m
+  [4;35;1mSQL (0.000656)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000092)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000282)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#update (for 0.0.0.0 at 2007-09-08 10:28:05) [PUT]
+  Session ID: 
+  Parameters: {"post"=>{"title"=>"nice new title"}, "action"=>"update", "id"=>"1", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000272)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;35;1mUser Load (0.000249)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mPost Update (0.000376)[0m   [0;1mUPDATE posts SET `created_at` = '2007-08-31 10:41:58', `title` = 'nice new title', `body` = 'Body of the post', `user_id` = 1, `updated_at` = '2007-09-08 10:28:05' WHERE `id` = 1[0m
+Redirected to http://test.host/posts/1
+Completed in 0.00622 (160 reqs/sec) | DB: 0.00246 (39%) | 302 Found [http://test.host/posts/1?post%5Btitle%5D=nice+new+title]
+  [4;35;1mPost Load (0.000349)[0m   [0mSELECT * FROM posts WHERE (posts.`id` = 1) [0m
+  [4;36;1mSQL (0.001596)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000153)[0m   [0mBEGIN[0m
+  [4;36;1mAdministrator Load (0.000407)[0m   [0;1mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"+category"=>{"name"=>"Off Topic"}}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mAdministrator Load (0.000338)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mCategory Load (0.000368)[0m   [0;1mSELECT * FROM categories WHERE (categories.name = 'Off Topic') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000192)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'Category') LIMIT 1[0m
+  [4;36;1mSQL (0.000490)[0m   [0;1mINSERT INTO categories (`name`, `updated_at`, `created_at`) VALUES('Off Topic', '2007-09-08 10:28:05', '2007-09-08 10:28:05')[0m
+  [4;35;1mSQL (0.000230)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', NULL, '2007-09-08 10:28:05')[0m
+  [4;36;1mSQL (0.000174)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(374, 52)[0m
+  [4;35;1mCategorisation Update (0.000187)[0m   [0mUPDATE categorisations SET `category_id` = 52, `post_id` = 374 WHERE `id` = 132[0m
+Redirected to http://test.host/posts/374
+Completed in 0.05280 (18 reqs/sec) | DB: 0.00448 (8%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5B%2Bcategory%5D%5Bname%5D=Off+Topic&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000296)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000238)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 374)) [0m
+  [4;36;1mSQL (0.000588)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000081)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000252)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "categorisations"=>{"+1"=>{"category"=>"News"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mCategory Load (0.000288)[0m   [0mSELECT * FROM categories WHERE (categories.`name` = 'News') LIMIT 1[0m
+  [4;36;1mUser Load (0.000188)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000239)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', 1, '2007-09-08 10:28:05')[0m
+  [4;36;1mSQL (0.000202)[0m   [0;1mINSERT INTO categorisations (`post_id`, `category_id`) VALUES(375, 1)[0m
+  [4;35;1mCategorisation Update (0.000187)[0m   [0mUPDATE categorisations SET `category_id` = 1, `post_id` = 375 WHERE `id` = 133[0m
+Redirected to http://test.host/posts/375
+Completed in 0.00767 (130 reqs/sec) | DB: 0.00256 (33%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcategorisations%5D%5B%2B1%5D%5Bcategory%5D=News&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000284)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mCategory Load (0.000232)[0m   [0mSELECT categories.* FROM categories INNER JOIN categorisations ON categories.id = categorisations.category_id WHERE ((categorisations.post_id = 375)) [0m
+  [4;36;1mSQL (0.000605)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000076)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000240)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_2", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000246)[0m   [0mSELECT * FROM users WHERE (users.`id` = 2) [0m
+  [4;36;1mUser Load (0.000176)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000221)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', 1, '2007-09-08 10:28:05')[0m
+Redirected to http://test.host/posts/376
+Completed in 0.00448 (223 reqs/sec) | DB: 0.00208 (46%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_2]
+  [4;36;1mPost Load (0.000312)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mUser Load (0.000177)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000580)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000077)[0m   [0mBEGIN[0m
+  [4;36;1mUser Load (0.000236)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"CANNOT CREATE", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;35;1mUser Load (0.000239)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+Completed in 0.00219 (457 reqs/sec) | Rendering: 0.00007 (3%) | DB: 0.00162 (74%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=CANNOT+CREATE&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000276)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000087)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000074)[0m   [0;1mBEGIN[0m
+  [4;35;1mAdministrator Load (0.000230)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"user"=>"@user_1", "body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000239)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mAdministrator Load (0.000189)[0m   [0mSELECT * FROM administrators WHERE (administrators.`id` = 1) [0m
+  [4;36;1mSQL (0.000231)[0m   [0;1mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', 1, '2007-09-08 10:28:05')[0m
+Redirected to http://test.host/posts/377
+Completed in 0.00447 (223 reqs/sec) | DB: 0.00133 (29%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc&post%5Buser%5D=%40user_1]
+  [4;35;1mPost Load (0.000335)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mUser Load (0.000190)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mUser Load (0.000154)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;36;1mSQL (0.000580)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000103)[0m   [0mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "post"=>"@post_2", "author"=>"fred"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mPost Load (0.000373)[0m   [0;1mSELECT * FROM posts WHERE (posts.`id` = 2) [0m
+  [4;35;1mUser Load (0.000227)[0m   [0mSELECT * FROM users WHERE (users.`id` = 2) [0m
+Completed in 0.00484 (206 reqs/sec) | Rendering: 0.00008 (1%) | DB: 0.00196 (40%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B1%5D%5Bpost%5D=%40post_2&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000306)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000128)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000089)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000256)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc", "comments"=>{"+1"=>{"body"=>"nice post", "author"=>"fred"}, "+2"=>{"body"=>"yeah cool", "author"=>"jim"}}}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000294)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000333)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', 1, '2007-09-08 10:28:05')[0m
+  [4;36;1mSQL (0.000212)[0m   [0;1mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'nice post', 'fred', 378, '2007-09-08 10:28:05')[0m
+  [4;35;1mSQL (0.000168)[0m   [0mINSERT INTO comments (`updated_at`, `body`, `author`, `post_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'yeah cool', 'jim', 378, '2007-09-08 10:28:05')[0m
+  [4;36;1mComment Update (0.000226)[0m   [0;1mUPDATE comments SET `created_at` = '2007-09-08 10:28:05', `body` = 'nice post', `updated_at` = '2007-09-08 10:28:05', `post_id` = 378, `author` = 'fred' WHERE `id` = 171[0m
+Redirected to http://test.host/posts/378
+Completed in 0.05187 (19 reqs/sec) | DB: 0.00201 (3%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Bcomments%5D%5B%2B1%5D%5Bauthor%5D=fred&post%5Bcomments%5D%5B%2B1%5D%5Bbody%5D=nice+post&post%5Bcomments%5D%5B%2B2%5D%5Bauthor%5D=jim&post%5Bcomments%5D%5B%2B2%5D%5Bbody%5D=yeah+cool&post%5Btitle%5D=test+post+abc]
+  [4;35;1mPost Load (0.000309)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;36;1mComment Load (0.000203)[0m   [0;1mSELECT * FROM comments WHERE (comments.post_id = 378) [0m
+  [4;35;1mSQL (0.033985)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000129)[0m   [0;1mBEGIN[0m
+  [4;35;1mUser Load (0.000352)[0m   [0mSELECT * FROM users WHERE (users.`id` = 1) [0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post abc"}, "action"=>"create", "controller"=>"posts"}
+  [4;36;1mUser Load (0.000295)[0m   [0;1mSELECT * FROM users WHERE (users.`id` = 1) [0m
+  [4;35;1mSQL (0.000261)[0m   [0mINSERT INTO posts (`updated_at`, `body`, `title`, `user_id`, `created_at`) VALUES('2007-09-08 10:28:05', 'body of test post', 'test post abc', 1, '2007-09-08 10:28:05')[0m
+Redirected to http://test.host/posts/379
+Completed in 0.00468 (213 reqs/sec) | DB: 0.03553 (759%) | 302 Found [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post+abc]
+  [4;36;1mPost Load (0.000332)[0m   [0;1mSELECT * FROM posts WHERE (posts.`title` = 'test post abc') LIMIT 1[0m
+  [4;35;1mSQL (0.000584)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000110)[0m   [0;1mBEGIN[0m
+
+
+Processing PostsController#create (for 0.0.0.0 at 2007-09-08 10:28:05) [POST]
+  Session ID: 
+  Parameters: {"post"=>{"body"=>"body of test post", "title"=>"test post"}, "action"=>"create", "controller"=>"posts"}
+Completed in 0.00162 (615 reqs/sec) | Rendering: 0.00008 (4%) | DB: 0.00103 (63%) | 403 Forbidden [http://test.host/posts?post%5Bbody%5D=body+of+test+post&post%5Btitle%5D=test+post]
+  [4;35;1mPost Load (0.000369)[0m   [0mSELECT * FROM posts WHERE (posts.`title` = 'test post') LIMIT 1[0m
+  [4;36;1mSQL (0.000116)[0m   [0;1mROLLBACK[0m

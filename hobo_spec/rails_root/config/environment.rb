@@ -4,7 +4,7 @@ Rails::Initializer.run do |config|
   config.log_level = :debug
   config.cache_classes = true
   config.whiny_nils = true
-  config.load_paths << "#{File.dirname(__FILE__)}/../../../lib/"
+  config.load_paths << "#{File.dirname(__FILE__)}/../../../hobo/lib/"
   
   config.action_controller.session = {
     :session_key => '_hobo_test_session',
