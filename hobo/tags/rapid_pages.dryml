@@ -116,14 +116,14 @@
     <body class="rapid_generic_page show_page show_#{type_name.underscore}"/>
     <main>
       <header>
-        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name or_view/></if></heading>
+        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
         <delete_button in_place="&false"/>
       </header>
 
       <panel param="main_panel">
         <header param="main_header"><h2>Details</h2></header>
         <section>
-          <FieldList skip="name" tag="editor_or_view" param/>
+          <FieldList skip="name" tag="editor" param/>
         </section>
 
         <nav param="new_links">
