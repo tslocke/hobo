@@ -1,6 +1,7 @@
 dir = File.dirname(__FILE__)
 require 'application'
 
+# Diabled by Tom
 #silence_warnings { RAILS_ENV = "test" }
 require 'action_controller/test_process'
 require 'action_controller/integration'
