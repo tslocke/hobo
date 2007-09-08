@@ -1,0 +1,40 @@
+<def tag="TablePlus" attrs="sort_field, sort_direction, sort_columns" >
+  <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
+  <div class="table_plus" merge_attrs="&attributes - attrs_for(:with_fields) - attrs_for(:Table)">
+    <div class="header" param="header">
+      <div class="search">
+        <form param="search_form" method="get" action="">
+          <hidden_fields for_query_string skip="page, search_form"/>
+          Search <input class="search_field" type="text" name="search" value="&params[:search]"/>
+        </form>
+      </div>
+    </div>
+
+    <Table merge_attrs="&attributes & attrs_for(:Table)" merge_params>
+      <field_heading_row>
+        <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
+          <% col = sort_columns[scope.field_path] || scope.field_path
+             sort = sort_field == col && sort_direction == 'asc' ?
+                      "-#{col}" : col
+             sort_url = url_for(params.merge(:sort => sort) - [:page]) %>
+                          
+          <th>
+            <a href="&sort_url" param="#{scope.field_name}_heading"><%= scope.field_name.titleize %></a>
+            <if test="&col == sort_field">
+              <do param="up_arrow" if="&sort_direction == 'desc'">&uarr;</do>
+              <do param="down_arrow" if="&sort_direction == 'asc'">&darr;</do>
+            </if>
+          </th>
+        </with_field_names>
+        <th if="&all_parameters[:controls]" class="controls"/>
+      </field_heading_row>
+    </Table>    
+    <else>
+      <do param="empty_message"/>
+    </else>
+   
+    <nav class="page">
+      <page_nav/>
+    </nav>
+  </div>
+</def>
