@@ -1,3 +1,291 @@
+=== Release 0.6.2 ===
+
+Specs
+
+  Moved out of the plugin source into a separate directory in the
+  hierarchy. If you check out hobo/trunk you'll get two directories:
+  hobo and hobo_spec. You can run "rake" from the hobo directory and
+  it should work as long as hobo_spec is along side. Note the
+  hobo_spec tree contains an svn external to edge rails.
+
+
+New rake task dump_fixtures (which really should be nicely
+namespaced). This will dump the current database into test
+fixtures. The nice part is that it won't overwrite symbolic names
+you've given to rows in your fixtures, so you can round-trip with it:
+rake db:fixtures:load, run up the app and create some new data, rake
+dump_fixtures. 
+
+
+Migration generator
+
+  Fixed indentation bug in generated code.
+
+  Now prompts for the name of the generated migration after the
+  generated code is displayed.
+
+  Better error message for invlaid field types declared in models.
+
+
+Tabla theme
+
+  Fixed reference to non-existent human_type helper.
+
+
+Hobo users
+
+  Various fixes to the new (in 0.6.1) multiple user model support.
+
+  The filter "login_required" can now be passed a user model (class),
+  e.g.
+
+    before_filter {|controller| controller.login_required(Administrator) }
+
+
+
+  The named routes "login", "logout" and "signup" are no longer
+  defined. Instead there are helpers login_url, signup_url and
+  logout_url, all of which are passed a user model (class) as
+  parameter.
+
+  New declaration 'hobo_user_model' can be used in place of hobo_model
+  and removes the need to include Hobo::AuthenticatedUser. Can be
+  passed the name of the login field, which removes the need to call
+  set_login_attr. Can also be passed a block in which to do
+  validations of the login attr (just as you can with set_login_attr).
+
+  Guest model should now extend Hobo::Guest, which provides #guest
+  (true!) and #super_user (false)
+
+  User models now inherit #guest? (returns false). No need to define
+  it yourself.
+
+
+Hobo models
+
+  Optimisation. Where possible we've replaced calls to #respond_to?
+  (which is slow on AR records) with the new class method
+  #has_hobo_method? which is an alias for
+  #respond_to_without_attributes?
+
+  "fields do" now supports shorthands for common validations
+  validates_uniqueness_of and validates_presence_of, e.g.:
+
+    fields do
+      name :string, :required, :unique
+    end
+
+    If you need to change the validation method, just go back to the
+    old way.
+
+  The creator attribute mechanism is updated to cope with multiple
+  user models. Hobo will not try to set the creator attribute if the
+  expected type is not the same as the type of the logged in user.
+
+  Various enhancements to composable query blocks
+
+  MyModel.has_creator? replaced with MyModel.creator_type which
+  returns the expected user class or nil if there is no creator
+  attribute.
+
+  Fix: def_scope was broken with has_many :through associations.
+
+
+Integration test helpers
+
+  #logs_in_as updated to cope with multiple user types.
+
+
+Core extensions
+
+  New method Object._? can be used to avoid an extra test for nil, e.g.
+
+    string_or_nil._?.length
+
+    is equivalent to 
+
+    string_or_nil && string_or_nil.length
+
+  Hobo extensions to HashWithIndifferentAccess fixed to always return
+  indifferent hashes.
+
+  
+Hobo controller
+
+  Fix to #render_tags (problem with part contexts javascript)
+
+  Fix to include_taglib declaration (was not working in production
+  mode).
+
+
+Hobo model controller
+
+  Largely re-written handling of http PUT and POST (update &
+  create). The new mechanism is more secure, more featureful and is
+  transactional. If your put/post affects multiple database rows, they
+  will either all happen or none will. See the model_controller_spec
+  for some good examples of what is allowed / possible.
+
+  def_data_filter is gone. Instead you can declare data filters from
+  within the action methods:
+
+    def index
+      data_filter :search do |query|
+        name_contains(query) | address_contains(query)
+      end
+      hobo_index
+    end
+
+    Declare data filters for autocompleters in the same way by giving
+    a block to autocomplete_for
+
+  #index now supports a "sort" parameter. The value should be
+  <field-name> or <model>.<field-name>. Precede with a '-' to sort in
+  descending order. e.g.
+
+    http://host/users?sort=-username
+
+    Provide the :order parameter to hobo_index to disable.
+
+  The mechanism to call a tag <ShowPage> if there is no show.dryml is
+  extended to work with any action name. So e.g. you can define
+  <FooPage> as an application wide page for any action "foo".
+
+
+Hobo user controller
+
+  Options can now be given as procs, in which case they are called
+  only when needed and hence have access to things like current_user
+  (e.g. the redirect destination for a logged in user can take into
+  account who the user is)
+
+  #hobo_login can be given a block -- a place to check if the users
+  account is available. Return false to prevent the user from loggin
+  in.
+
+
+Hobo module
+
+  #can_view? can now be given dotted field paths. E.g:
+
+    Hobo.can_view(current_user, post, "author.name")
+
+
+Hobo Rapid
+
+  Adding low_pro.js (from the UJS project). First step towards
+  complete adoption of unobstrusive JavaScript.
+
+  Fix to client side of new ajax mechanism. Had problems with not URL
+  encoding part state.
+
+  New taglib rapid_plus, home of tags with an extra level of
+  functionality. First and only tag: <TablePlus> a table with
+  automatic support for sorting by clicking on column headings, and
+  filtering rows via a search field.
+
+  <Table> now supports tempalte parameters for each cell when given a
+  'fields' attribute, e.g. <name_view> <address_view> (<name_cell>
+  might seem like a better name, but we wanted to be compatible with
+  <FieldList> so it's easy to flip back and forth).
+
+  <name> tag now respects view permission.
+
+  <a action="new"> now only renders the link if the current user has
+  the required create permission.
+
+  <view> now supports attribute 'truncate'
+
+  <view for_type="Date"> now supports a 'format' attribute - a
+  strftime style format string.
+
+  New tag <restricted_page>. Sometimes permissions are a view layer
+  concern - you actually want to say "these colors, this logo,
+  etc. are only to be seen by the administrator".
+
+    <restricted_page login_required="Administrator"/>
+
+  New tag <you_have>. An easy way to say either "You have 3 posts in
+  this thread" or "Fred Blogs has 3 posts in this thread", depending
+  on whether Fred Blogs is the current user.
+
+  Fixes to the tags in rapid_documents to avoid evaling tagbody twice.
+
+  <hidden_fields> fixed (was outputing hidden fields even when the
+  field existed in the form). Also now support "for_query_string"
+  attribute, to output hidden fields for the name/value pairs in the
+  current query string.
+
+  <form> now sets a scoped variable "in_form" so tags can behave
+  differently when they are inside a form (FieldList does this).
+
+  <input> for datetime and date now supports the same attributes as
+  the equivalent rails helpers. e.g. you can change the order of the
+  fields.
+
+  <belongs_to_menu_input> can now be passed an array of records in the
+  "options" attribute (instead of retrieving the entire target table
+  from the DB).
+
+  Fixes to page navigation
+
+  <account_nav> upgraded to cope with multiple user models.
+
+  Rapid pages:
+
+    Various new template params made available, including many on
+    login and signup pages.
+
+    <Page> updated for multiple user models
+
+    <IndexPage> fix to ajax updating of record count
+
+    New css classes added to <NewPage> and <EditPage>
+
+    <error_messages> added to <EditPage>
+
+    Fix to new link in <ShowCollectionPage>
+
+    <image> tag removed from default ajax progress.
+    
+        
+
+
+
+Dryml
+
+  Important change ommitted from 0.6 changelog - attributes passed to
+  the tag that are not in the tags declared attributes are available
+  in a local variable "attributes" (used to be called "options").
+
+  <set> can now assign to dotted named (object attributes) as well as
+  locals, and can have controll attributes on it (e.g. if)
+
+  Fix to replacing template parameters that are themselves templates.
+
+  When a boolean is in context, this_type is now always TrueClass
+  (never FalseClass even if the value is false). TrueClass is the Hobo
+  boolean type.
+
+  #render_tag on a page renderer object (Dryml internals) now returns
+  false. This alows Hobo's controller to say "call this tag if it
+  exists, otherwise..."
+
+
+Rich types
+
+  Registered rich types can now provide there own validations that get
+  added to the model automatically. E.g. Hobo::EmailAddress
+  automatically validates the content as a valid email address.
+
+
+Hobo helpers
+
+  New helper query_params returns a hash of parameters extracted from
+  the query string only (#params returns route-based parameters
+  too). Only works with simple name=value parameters.
+
+
 === Release 0.6.1 ===
 
 Multiple user models

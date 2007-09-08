@@ -7,9 +7,6 @@ module Hobo
     class << self
       attr_reader :user_models
       
-      def default_user_model
-      end
-      
       def included(base)
         base.filter_parameter_logging "password"
         base.skip_before_filter :login_required, :only => [:login]
