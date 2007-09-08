@@ -1,0 +1,49 @@
+<def tag="field_list"><table class="field_list"><tagbody/></table></def>
+
+<def tag="field_list_item"><tr merge_attrs><tagbody/></tr></def>
+
+<def tag="item_label"><th merge_attrs><tagbody/></th></def>
+
+<def tag="item_value"><td merge_attrs><tagbody/></td></def>
+
+
+<def tag="heading">
+  <%= content_tag "h#{scope.heading_level || '1'}", tagbody.call, attributes %>
+</def>
+
+<def tag="nav">
+  <div class="nav" merge_attrs><tagbody/></div>
+</def>  
+
+<!-- section represents a generic document or application section. -->
+<def tag="section">
+  <set body="&tagbody ? tagbody.call : ''"/>
+  <div class="section" merge_attrs if="&body"><%= body %></div>
+</def>
+
+<def tag="aside">
+  <set body="&tagbody ? tagbody.call : ''"/>
+  <div class="aside" merge_attrs if="&body"><%= body %></div>
+</def>
+
+<def tag="header">
+  <set body="&tagbody ? tagbody.call : ''"/>
+  <div class="header" merge_attrs if="&body"><%= body %></div>
+</def>
+
+<def tag="footer">
+  <set body="&tagbody ? tagbody.call : ''"/>
+  <div class="footer" merge_attrs if="&body"><%= body %></div>
+</def>
+
+<!-- article represents an independent piece of content of a --> 
+<!-- document, such as a blog entry or newspaper article.    -->
+<def tag="article">
+  <set body="&tagbody ? tagbody.call : ''"/>
+  <div class="article" merge_attrs if="&body"><%= body %></div>
+</def>
+
+<!-- temporary tag -->
+<def tag="panel">
+  <div class="panel" merge_attrs><tagbody/></div>
+</def>

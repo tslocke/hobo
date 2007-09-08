@@ -1,0 +1,7 @@
+---
+post1_in_general:
+  category_id: 1
+  post_id: 1
+post2_in_news:
+  category_id: 2
+  post_id: 2
