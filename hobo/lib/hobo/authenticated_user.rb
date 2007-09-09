@@ -57,6 +57,7 @@ module Hobo
           validates_uniqueness_of attr, :case_sensitive => false
         end
       end
+      def login_attr; @login_attr; end
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)

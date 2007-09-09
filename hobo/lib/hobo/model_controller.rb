@@ -278,8 +278,9 @@ module Hobo
           
           table, column = if field =~ /^(.*)\.(.*)$/
                            [$1.camelize.constantize.table_name, $2]
-                         else
-                           [model.table_name, field]
+                          else
+                            sort_model = @association ? @association.member_class : model
+                           [sort_model.table_name, field]
                          end
          options[:order] = "#{table}.#{column} #{@sort_direction}"
         elsif !@association
