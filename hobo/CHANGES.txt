@@ -49,8 +49,6 @@ Hobo users
 
     before_filter {|controller| controller.login_required(Administrator) }
 
-
-
   The named routes "login", "logout" and "signup" are no longer
   defined. Instead there are helpers login_url, signup_url and
   logout_url, all of which are passed a user model (class) as
@@ -61,6 +59,9 @@ Hobo users
   passed the name of the login field, which removes the need to call
   set_login_attr. Can also be passed a block in which to do
   validations of the login attr (just as you can with set_login_attr).
+
+  User models now have a class method login_attr that returns the name
+  of the login attribute, e.g. :username
 
   Guest model should now extend Hobo::Guest, which provides #guest
   (true!) and #super_user (false)
