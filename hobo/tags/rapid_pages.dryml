@@ -87,7 +87,7 @@
   <PageForNew title="New #{type_name}" merge>
     <body class="rapid_generic_page new_page new_#{type_name.underscore}"/>
     <main>
-      <header>
+      <header param>
         <heading>New <type_name title/></heading>
       </header>
 
@@ -175,9 +175,9 @@
   <PageForNewInCollection title="New #{type_name}" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <header>
-        <h1>New <type_name/></h1>
-        <h2>For: <a with="&@owner" /></h2>
+      <header param>
+        <h1 param>New <type_name/></h1>
+        <h2 param>For: <a with="&@owner" /></h2>
       </header>
 
       <panel param="main">
@@ -189,8 +189,7 @@
 
           <form>
             <FieldList skip_associations="has_many"/>
-            <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}'
-                    param="submit_button"/>
+            <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
           </form>
         </section>
       </panel>
@@ -241,6 +240,7 @@
 
 <def tag="LoginPage" attrs="remember_me">
   <Page title="Login" merge>
+    <body class="login_page" param/>
     <main>
       <h1 param="login_title">Log In</h1>
 
@@ -249,7 +249,9 @@
           <form action="&request.request_uri" param>
             <table class="login_table">
               <tr>
-                <td class="field_label"><label param="login_label" for="login">Login</label></td>
+                <td class="field_label">
+                  <label param="login_label" for="login"><%= @user_model.login_attr.to_s.titleize %></label>
+                </td>
                 <td><input param="login_input" type="text" name="login" id="login"/></td>
               </tr>
 
@@ -275,6 +277,7 @@
 
 <def tag="SignupPage">
   <Page title="Sign Up" merge>
+    <body class="signup_page" param/>
 
     <main>
       <h1>Sign Up</h1>

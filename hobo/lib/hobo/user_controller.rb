@@ -21,6 +21,7 @@ module Hobo
     def logout; hobo_logout; end
     
     def hobo_login(options={})
+      @user_model = model
       options = LazyHash.new(options)
       options.reverse_merge!(:success_notice => "You have logged in.",
                              :failure_notice => "You did not provide a valid login and password.",

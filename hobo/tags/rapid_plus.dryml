@@ -10,7 +10,8 @@
       </div>
     </div>
 
-    <Table merge_attrs="&attributes & attrs_for(:Table)" merge_params>
+    <Table merge_attrs="&attributes & (attrs_for(:Table) + attrs_for(:with_fields))"
+           merge_params>
       <field_heading_row>
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path

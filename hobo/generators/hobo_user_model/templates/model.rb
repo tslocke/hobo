@@ -1,15 +1,11 @@
 class <%= class_name %> < ActiveRecord::Base
 
-  hobo_model
-
-  include Hobo::AuthenticatedUser
+  hobo_user_model :username
 
   fields do
     username :string
     timestamps
   end
-  
-  set_login_attr :username
   
   alias_attribute :to_s, :username
 
@@ -56,10 +52,6 @@ class <%= class_name %> < ActiveRecord::Base
 
   def can_view?(obj, field)
     true
-  end
-
-  def guest?
-    false
   end
 
 end
