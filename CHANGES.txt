@@ -36,6 +36,14 @@ Hobo users
 
   Various fixes to the new (in 0.6.1) multiple user model support.
 
+  If the model name is "User", the routes generated are simply:
+
+    /login  
+    /logout
+    /signup
+
+   (as opposed to /user_login etc.)
+
   The filter "login_required" can now be passed a user model (class),
   e.g.
 

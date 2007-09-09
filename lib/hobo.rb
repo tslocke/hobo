@@ -186,11 +186,12 @@ module Hobo
             end
             
             if controller < Hobo::UserController
-              map.named_route("#{web_name.singularize}_login", "#{web_name.singularize}_login",
+              prefix = web_name == "users" ? "" : "#{web_name.singularize}_"
+              map.named_route("#{web_name.singularize}_login", "#{prefix}login",
                               :controller => web_name, :action => 'login')
-              map.named_route("#{web_name.singularize}_logout", "#{web_name.singularize}_logout",
+              map.named_route("#{web_name.singularize}_logout", "#{prefix}logout",
                               :controller => web_name, :action => 'logout')
-              map.named_route("#{web_name.singularize}_signup", "#{web_name.singularize}_signup",
+              map.named_route("#{web_name.singularize}_signup", "#{prefix}signup",
                               :controller => web_name, :action => 'signup')
             end
           end

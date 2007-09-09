@@ -40,7 +40,7 @@ module ActiveRecord::Associations
     
     def find_with_block(*args, &b)
       if b
-        options = extract_options_from_args!(args)
+        options = args.extract_options!
         args << options.merge(:conditions => member_class.conditions(&b))
         find_without_block(*args)
       else
