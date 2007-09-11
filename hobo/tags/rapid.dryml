@@ -152,7 +152,7 @@
   name
 %></def>
 
-<def tag="a" attrs="action, to, params, resource_type, href"><%=
+<def tag="a" attrs="action, to, params, href, format"><%=
   content = tagbody.call if tagbody
   
   if href || attributes[:name]
@@ -186,13 +186,16 @@
       end
     else
       # Link to an existing object
+
+      if target.is_a?(Array) && !target.respond_to?(:proxy_reflection)
+        # Not much to go on here - last guess is that this is an index page
+        target = @member_class
+      end
       
-      href = if resource_type
-               send("formatted_#{model.to_s.downcase}_url", this, resource_type.downcase)
-             else
-               object_url(target, action, params)
-             end
+      href = object_url(target, action, params)
       add_classes!(attributes, "#{target.class.name.underscore}_link")
+      
+      href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
       
       # Set default link text if none given
       content ||= name

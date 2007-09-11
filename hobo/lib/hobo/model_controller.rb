@@ -15,6 +15,8 @@ module Hobo
     VIEWLIB_DIR = "taglibs"
     
     GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
+    
+    PAGINATE_FORMATS = [ Mime::HTML ]
 
     class << self
 
@@ -206,32 +208,33 @@ module Hobo
     
     attr_accessor :data_filters
     
-    def overridable_response(options, key)
-      if options.has_key?(key)
-        options[key]
-        true
-      else
-        yield if block_given?
-        false
-      end
+
+    # --- Action implementation helpers --- #
+    
+    def find_instance(id=nil)
+      res = self.class.find_instance(id || params[:id])
+      instance_variable_set("@#{model.name.underscore}", res)
+      res
     end
     
-    # --- action implementations --- #
     
-    def hobo_index(options = {})
-      options = LazyHash.new(options)
-      @model = model
-      @this = options[:collection] || paginated_find(options)
+    def set_named_this!
+      instance_variable_set("@#{model.name.underscore}", @this)      
+    end
 
-      instance_variable_set("@#{@model.name.pluralize.underscore}", @this)
-      if block_given?
-        yield
-      else
-        hobo_render
+    
+    def response_block(&b)
+      if b
+        if b.arity == 1
+          respond_to {|wants| yield(wants) }
+        else
+          yield
+        end
+        performed?
       end
     end
-    
 
+    
     def paginated_find(*args, &b)
       options = args.extract_options!
       filter_conditions = data_filter_conditions
@@ -248,27 +251,28 @@ module Hobo
         end
       @reflection = @association.proxy_reflection if @association._?.respond_to?(:proxy_reflection)
       
-      total_number = options.delete(:total_number) ||
-        begin
-          # If there is a conditions block, it may depend on the includes
-          count_options = conditions_proc ? { :include => options[:include] } : {}
-          if @association
-            @association.count(count_options, &conditions_proc)
-          else
-            model.count(count_options, &conditions_proc)
-          end  
-        end
-      
-      puts total_number
-      
+      model_or_assoc, @member_class = if @association
+                                        [@association, @association.member_class]
+                                      else
+                                        [model, model]
+                                      end
+
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
-      @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
+      paginate = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
+      if paginate
+        total_number = options.delete(:total_number) ||
+          begin
+            # If there is a conditions block, it may depend on the includes
+            count_options = conditions_proc ? { :include => options[:include] } : {}
+            model_or_assoc.count(count_options, &conditions_proc)
+          end
+        
+        @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
 
-      options = {
-        :limit  => @pages.items_per_page,
-        :offset => @pages.current.offset,
-      }.merge(options)
+        options = options.reverse_merge(:limit  => @pages.items_per_page,
+                                        :offset => @pages.current.offset)
+      end
       
       unless options.has_key?(:order)
         _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
@@ -277,301 +281,256 @@ module Hobo
           @sort_direction = desc ? "desc" : "asc"
           
           table, column = if field =~ /^(.*)\.(.*)$/
-                           [$1.camelize.constantize.table_name, $2]
+                            [$1.camelize.constantize.table_name, $2]
                           else
-                            sort_model = @association ? @association.member_class : model
-                           [sort_model.table_name, field]
+                            [@member_class.table_name, field]
                          end
-         options[:order] = "#{table}.#{column} #{@sort_direction}"
+          options[:order] = "#{table}.#{column} #{@sort_direction}"
         elsif !@association
           options[:order] = :default
         end
       end
       
-      if @association
-        @association.find(:all, options, &conditions_proc) 
-      else
-        model.find(:all, options, &conditions_proc)
-      end
+      model_or_assoc.find(:all, options, &conditions_proc) 
     end
-    
+
     
     def find_instance_or_not_found(options, this_option)
-      x = begin
-            options[this_option] || find_instance
-          rescue ActiveRecord::RecordNotFound
-            nil
-          end
-      
-      not_found unless x
-      x
+      begin
+        options[this_option] || find_instance
+      rescue ActiveRecord::RecordNotFound
+        not_found
+        false
+      end
     end
     
+    def set_status(status)
+      @status = status
+    end
     
-    def hobo_show(options={})
+    def invalid?; @status == :invalid; end
+      
+    def valid?; @status == :valid; end
+
+    def not_allowed?; @status == :not_allowed; end
+    
+    
+    # --- Action implementations --- #
+
+    def hobo_index(options = {}, &b)
+      options = LazyHash.new(options)
+      @model = model
+      @this = options[:collection] || paginated_find(options)
+      instance_variable_set("@#{@model.name.pluralize.underscore}", @this)
+      response_block(&b) or hobo_render
+    end
+    
+
+    def hobo_show(options={}, &b)
       options = LazyHash.new(options)
       
-      @this = find_instance_or_not_found(options, :this)
-      if @this
+      @this = find_instance_or_not_found(options, :this) and
         if Hobo.can_view?(current_user, @this)
           set_named_this!
-          yield if block_given?
-          hobo_render unless performed?
+          response_block(&b) or hobo_render
         else
-          permission_denied(options)
+          permission_denied
         end
-      end
     end
 
 
-    def hobo_new(options={})
+    def hobo_new(options={}, &b)
       options = LazyHash.new(options)
       @this = options[:this] || model.new
-      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this.set_creator(current_user) if options.fetch(:set_creator, true)
       
-      if Hobo.can_create?(current_user, @this)
-        set_named_this!
-        yield if block_given?
-        hobo_render unless performed?
-      else
-        permission_denied(options)
-      end
+      set_status(:not_allowed) unless Hobo.can_create?(current_user, @this)
+      response_block(&b) or 
+        if not_allowed?
+          permission_denied
+        else
+          hobo_render
+        end
     end
     
 
-    def hobo_create(options={})
+    def hobo_create(options={}, &b)
       options = LazyHash.new(options)
       
       if (@this = options[:this])
-        permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
+        permission_denied and return unless Hobo.can_create?(current_user, @this)
         valid = @this.save
       else
         attributes = params[model.name.underscore]
-        type_attr = params['type']
-        create_model = if 'type'.in?(model.column_names) and 
-                           type_attr and type_attr.in?(model.send(:subclasses).every(:name))
+        
+        create_model = if 'type'.in?(model.column_names) &&
+                           (type_attr = params['type']) &&
+                           type_attr.in?(model.send(:subclasses).every(:name))
                          type_attr.constantize
                        else
                          model
                        end
         @this = create_model.new
-        status = secure_change_transaction { initialize_record(@this, attributes) }
-        permission_denied(options) and return if status == :not_allowed
-        valid = status == :valid
+        set_status(secure_change_transaction { initialize_record(@this, attributes) })
       end
       
       set_named_this!
       
-      if valid
-        if block_given?
-          yield 
-        else
+      response_block(&b) or
+        if valid?
           respond_to do |wants|
-            wants.html { overridable_response(options, :html_response)  || redirect_to(object_url(@this)) }
-            wants.js   { overridable_response(options, :js_response) || hobo_ajax_response || render(:text => "") }
+            wants.html { redirect_to(object_url(@this)) }
+            wants.js   { hobo_ajax_response || render(:text => "") }
           end
-        end
-      else
-        # Validation errors
-        unless options[:invalid_response]
+        elsif invalid?
           respond_to do |wants|
-            wants.html { overridable_response(options, :invalid_html_response) || hobo_render(:new) }
-            wants.js do
-              (overridable_response(options, :invalid_js_response) ||
-               render(:status => 500,
-                      :text => ("There was a problem creating that #{create_model.name}.\n" +
-                                @this.errors.full_messages.join("\n"))))
-            end
+            wants.html { hobo_render(:new) }
+            wants.js   { render(:status => 500,
+                                :text => ("There was a problem creating that #{create_model.name}.\n" +
+                                          @this.errors.full_messages.join("\n"))) }
           end
+        elsif not_allowed?
+          permission_denied
         end
-      end
+    end
+    
+
+    def hobo_edit(options={}, &b)
+      hobo_show(options, &b)
     end
     
     
-    def hobo_edit(options={})
-      hobo_show(options)
-    end    
-    
-    
-    def hobo_update(options={})
+    def hobo_update(options={}, &b)
       options = LazyHash.new(options)
       
-      @this = find_instance_or_not_found(options, :this)
-      return unless @this
+      @this = find_instance_or_not_found(options, :this) or return
       
       changes = params[model.name.underscore]
-      status = secure_change_transaction { update_record(@this, changes) }
+      set_status(secure_change_transaction { update_record(@this, changes) })
+      # Ensure current_user isn't out of date
+      @current_user = @this if @this == current_user
       
       set_named_this!
-      case status
-      when :not_allowed
-        permission_denied(options)
-        return
-        
-      when :valid
-        # Ensure current_user isn't out of date
-        @current_user = @this if @this == current_user
-        
-        if block_given?
-          yield
+      
+      response_block(&b) or 
+        if valid?
+          respond_to do |wants|
+            wants.html { redirect_to(object_url(@this)) }
+            wants.js do
+              if changes.size == 1
+                # Decreasingly hacky support for the scriptaculous in-place-editor
+                new_val = Hobo::Dryml.render_tag(@template, "view",
+                                                 :with => @this, :field => changes.keys.first,
+                                                 :no_wrapper => true)
+                hobo_ajax_response(@this, :new_field_value => new_val)
+              else
+                hobo_ajax_response(@this)
+              end
+               
+              # Maybe no ajax requests were made
+              render :nothing => true unless performed?
+            end
+          end
+        elsif invalid?
+          respond_to do |wants|
+            wants.html { render(:action => :edit) }
+            wants.js   { render(:status => 500,
+                                :text => ("There was a problem with that change.\n" +
+                                          @this.errors.full_messages.join("\n"))) }
+          end
+        elsif not_allowed?
+          permission_denied
+        end
+    end
+    
+    
+    def hobo_destroy(options={}, &b)
+      options = LazyHash.new(options)
+      @this = find_instance_or_not_found(options, :this) or return
+      
+      set_named_this!
+
+      set_status(:not_allowed) unless Hobo.can_delete?(current_user, @this)
+      @this.destroy unless not_allowed?
+
+      response_block(&b) or
+        if not_allowed?
+          permission_denied
         else
           respond_to do |wants|
-            wants.html do
-              overridable_response(options, :html_response) || redirect_to(object_url(@this))
-            end
-
-            wants.js do
-              overridable_response(options, :js_response) do
-                if changes.size == 1
-                  # Decreasingly hacky support for the scriptaculous in-place-editor
-                  new_val = Hobo::Dryml.render_tag(@template, "view",
-                                                   :with => @this, :field => changes.keys.first,
-                                                   :no_wrapper => true)
-                  hobo_ajax_response(@this, :new_field_value => new_val)
-                else
-                  hobo_ajax_response(@this)
-                end
-                
-                # Maybe no ajax requests were made
-                render :nothing => true unless performed?
-              end
-            end
+            wants.html { redirect_to(:action => "index") }
+            wants.js   { hobo_ajax_response || render(:text => "") }
           end
         end
-          
-      when :invalid
-        # Validation errors
-        respond_to do |wants|
-          wants.html do
-            overridable_response(options, :invalid_html_response) || render(:action => :edit)
-          end
-
-          wants.js do
-            overridable_response(options, :invalid_js_response) do
-              render(:status => 500,
-                     :text => ("There was a problem with that change.\n" +
-                               @this.errors.full_messages.join("\n")))
-            end
-          end
-        end
-      end
     end
+
     
-    
-    def hobo_destroy(options={})
+    def hobo_show_collection(collection, options={}, &b)
       options = LazyHash.new(options)
-      @this = find_instance_or_not_found(options, :this)
-      return unless @this
       
-      set_named_this!
-      permission_denied(options) and return unless Hobo.can_delete?(current_user, @this)
-
-      @this.destroy
-
-      if block_given?
-        yield
+      @owner = find_instance_or_not_found(options, :owner) or return
+      
+      if collection.is_a?(Array)
+        @this = collection
+        @reflection = collection.proxy_reflection if collection.respond_to?(:proxy_reflection)
       else
-        respond_to do |wants|
-          wants.html { overridable_response(options, :html_response) || redirect_to(:action => "index") }
-          wants.js   { overridable_response(options, :js_response) || hobo_ajax_response || render(:text => "") }
-        end
+        toplevel_collection = collection.to_s.split(".").first
+        set_status(:not_allowed) unless Hobo.can_view?(current_user, @owner, toplevel_collection)
+        @this = paginated_find(@owner, collection, options) unless not_allowed?
       end
-    end
-
-    def hobo_show_collection(collection, options={})
-      options = LazyHash.new(options)
       
-      @owner = find_instance_or_not_found(options, :owner)
-      return unless @owner
-      
-      toplevel_collection = collection.to_s.split(".").first
-      if Hobo.can_view?(current_user, @owner, toplevel_collection)
-        @this = options[:collection] || @this = paginated_find(@owner, collection, options)
-        
-        if block_given?
-          yield
+      response_block(&b) or 
+        if not_allowed?
+          permission_denied
         else
-          hobo_render(params[:action]) or hobo_render(:show_collection, @reflection.klass)
+          hobo_render(params[:action]) or (@reflection and hobo_render(:show_collection, @reflection.klass))
         end
-      else
-        permission_denied(options)
-      end
     end
     
     
-    def hobo_new_in_collection(collection, options={})
+    def hobo_new_in_collection(collection, options={}, &b)
       options = LazyHash.new(options)
-      @owner = find_instance_or_not_found(options, :owner)
-      return unless @owner
       
-      permission_denied(options) and return unless Hobo.can_view?(current_user, @owner, collection)
-      
-      @association = options[:collection] || @owner.send(collection)
+      @owner = find_instance_or_not_found(options, :owner) or return
+      @association = collection.is_a?(Array) ? collection : @owner.send(collection)
       @this = options[:this] || @association.new
-      @this.set_creator(current_user) unless options.has_key?(:set_creator) && !options[:set_creator]
+      @this.set_creator(current_user) if options.fetch(:set_creator, true)
 
-      permission_denied(options) and return unless Hobo.can_create?(current_user, @this)
+      set_status(:not_allowed) unless Hobo.can_create?(current_user, @this)
       
-      if block_given?
-        yield
-      else
-        hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
-      end
+      response_block(&b) or
+        if not_allowed?
+          permission_denied
+        else
+          hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
+        end
     end
     
     
-    # --- end action implementations --- #
+    # --- Response helpers --- #
 
-    # --- filters --- #
-    
-    def prepare_web_method(method)
-      @this = find_instance
-      permission_denied unless Hobo.can_call?(current_user, @this, method)
-    end
-    
-    # --- end filters --- #
-    
-
-    def set_no_cache_headers
-      headers["Pragma"] = "no-cache"
-      #headers["Cache-Control"] = ["must-revalidate", "no-cache", "no-store"]
-      #headers["Cache-Control"] = "no-cache"
-      headers["Cache-Control"] = "no-store"
-      headers["Expires"] ='0'
-    end
-
-
-    def permission_denied(options={})
-      if options[:permission_denied_response]
-        # do nothing (callback handled by LazyHash)
-      elsif respond_to? :permission_denied_response
+    def permission_denied
+      if respond_to? :permission_denied_response
         permission_denied_response
+      elsif render_tag("PermissionDeniedPage", { :with => @this }, :status => 403)
+        # cool
       else
         message = options[:message] || "Permission Denied"
         render :text => message, :status => 403
       end
     end
     
-    def not_found(options={})
-      if options[:not_found_response]
-        # do nothing (callback handled by LazyHash)
-      elsif respond_to? :not_found_response
+    
+    def not_found
+      if respond_to? :not_found_response
         not_found_response
+      elsif render_tag("NotFoundPage", { :with => @this }, :status => 404)
+        # cool
       else
         render(:text => "Can't find #{model.name.titleize}: #{params[:id]}", :status => 404)
       end
     end
-
-    def find_instance(id=nil)
-      res = self.class.find_instance(id || params[:id])
-      instance_variable_set("@#{model.name.underscore}", res)
-      res
-    end
     
-    def set_named_this!
-      instance_variable_set("@#{model.name.underscore}", @this)      
-    end
-
 
     def hobo_render(page_kind = nil, page_model=nil)
       page_kind ||= params[:action].to_sym
@@ -601,17 +560,31 @@ module Hobo
       end
     end
 
+    
+    # --- filters --- #
+    
+    def prepare_web_method(method)
+      @this = find_instance
+      permission_denied unless Hobo.can_call?(current_user, @this, method)
+    end
+    
+    
+    def set_no_cache_headers
+      headers["Pragma"] = "no-cache"
+      #headers["Cache-Control"] = ["must-revalidate", "no-cache", "no-store"]
+      #headers["Cache-Control"] = "no-cache"
+      headers["Cache-Control"] = "no-store"
+      headers["Expires"] ='0'
+    end
+
+    # --- end filters --- #
+    
 
     def model
       self.class.model
     end
     
 
-    def find_template
-      Hobo::ModelController.find_model_template(model, params[:action])
-    end
-
-    
     def data_filter_conditions
       active_filters = data_filters && (params.keys & data_filters.keys)
       filters = data_filters
@@ -621,63 +594,6 @@ module Hobo
       end unless active_filters.blank?
     end
     
-
-    def XXupdate_with_params(object, params)
-      return unless params
-
-      params.each_pair do |field,value|
-        field = field.to_sym
-        refl = object.class.reflections[field]
-        is_has_many = refl && Hobo.simple_has_many_association?(refl)
-        
-        if is_has_many
-          items = if value.is_a? Array
-                    value.map {|x| associated_record(object, refl, x) }
-                  else
-                    value.keys.every(:to_i).sort.map{|i| associated_record(object, refl, value[i.to_s]) }
-                  end
-          object.send(field).target[0..-1] = items
-        else
-          ar_value = if refl
-                       if refl.macro == :belongs_to
-                         associated_record(object, refl, value)
-                       else
-                         raise HoboError, "association #{object.class}.#{refl.name} is not settable via parameters"
-                       end
-                     else
-                       param_to_value(object.class.field_type(field), value)
-                     end
-          object.send("#{field}=".to_sym, ar_value)
-        end
-      end
-    end
-
-    
-    def XXassociated_record(owner, refl, value)
-      if value.is_a? String
-        if value.starts_with?('@')
-          Hobo.object_from_dom_id(value[1..-1])
-        elsif refl.klass.id_name?
-          refl.klass.find_by_id_name(value)
-        else
-          nil
-        end
-      else
-        if refl.macro == :belongs_to
-          new_from_params(refl.klass, value)
-        else
-          obj = owner.send(refl.name).new
-          initialize_from_params(obj, value)
-          obj
-        end
-      end
-    end
-
-
-    def XXobject_from_param(param)
-      Hobo.object_from_dom_id(param)
-    end
-
   end
 
 end
