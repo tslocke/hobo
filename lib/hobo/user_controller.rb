@@ -82,8 +82,9 @@ module Hobo
       current_user.forget_me if logged_in?
       cookies.delete :auth_token
       reset_session
-      flash[:notice] = options[:notice]
-      redirect_back_or_default(options[:redirect_to])
+      yield if block_given?
+      flash[:notice] ||= options[:notice]
+      redirect_back_or_default(options[:redirect_to]) unless performed?
     end
     
   end
