@@ -41,7 +41,7 @@
 <!--- Pagination Navigation -->
 
 <def tag="page_nav" attrs="params">
-  <if test="&@pages.length > 1">
+  <if test="&@pages && @pages.length > 1">
     <page_n_of_count/> - 
     <first_page_link params="&params">|&lt;</first_page_link>
     <previous_page_link params="&params">Previous</previous_page_link>

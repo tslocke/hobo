@@ -1,4 +1,3 @@
-
 Object.extend = function(destination) {
     $A(arguments).slice(1).each(function (src) {
         for (var property in src) {
