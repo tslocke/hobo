@@ -16,7 +16,7 @@ module Hobo
     
     GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
     
-    PAGINATE_FORMATS = [ Mime::HTML ]
+    PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
 
     class << self
 
@@ -236,6 +236,7 @@ module Hobo
 
     
     def paginated_find(*args, &b)
+      
       options = args.extract_options!
       filter_conditions = data_filter_conditions
       conditions_proc = if b && filter_conditions
@@ -259,6 +260,7 @@ module Hobo
 
       page_size = options.delete(:page_size) || 20
       page = options.delete(:page) || params[:page]
+      
       paginate = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
       if paginate
         total_number = options.delete(:total_number) ||
