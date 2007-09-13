@@ -511,7 +511,7 @@ module Hobo
     
     # --- Response helpers --- #
 
-    def permission_denied
+    def permission_denied(options={})
       if respond_to? :permission_denied_response
         permission_denied_response
       elsif render_tag("PermissionDeniedPage", { :with => @this }, :status => 403)

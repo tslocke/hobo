@@ -8,7 +8,7 @@ module Hobo
       raise ArgumentError, "you cannot provide a field spec for the primary key" if name == model.primary_key
       self.model = model
       self.name = name.to_sym
-      self.type = type.to_sym
+      self.type = type.is_a?(String) ? type.to_sym : type
       self.options = options
       self.position = model.field_specs.length
     end
@@ -17,13 +17,11 @@ module Hobo
     
     def sql_type
       options[:sql_type] or begin
-                              sql_types = model.connection.native_database_types.keys - [:primary_key]
-                              if type.in?(sql_types)
+                              native_types = model.connection.native_database_types.keys - [:primary_key]
+                              if type.in?(native_types)
                                 type
-                              elsif options[:length]
-                                :string
                               else
-                                field_type = Hobo.field_types[type]
+                                field_type = type.is_a?(Class) ? type : Hobo.field_types[type]
                                 field_type && field_type::COLUMN_TYPE or raise UnknownSqlTypeError, [model, name, type]
                               end
                             end

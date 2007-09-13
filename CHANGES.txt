@@ -24,7 +24,7 @@ Migration generator
   Now prompts for the name of the generated migration after the
   generated code is displayed.
 
-  Better error message for invlaid field types declared in models.
+  Better error message for inalid field types declared in models.
 
 
 Tabla theme

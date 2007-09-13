@@ -123,6 +123,14 @@
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
+
+<def tag="input" for="Hobo::EnumString">
+  <select name="#{param_name_for_this}">
+    <%= options_for_select(this_type.values.map {|v| [v.titleize, v] }, this) %>
+  </select>
+</def>
+
+
 <def tag="belongs_to_input">
   <%= belongs_to_menu_input(attributes) %>
 </def>
@@ -171,7 +179,7 @@
     else
       fade = true if fade.nil?
       attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade ? 'true' : 'false'})"
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade})"
       tag(:input, attributes)
     end
   end
