@@ -21,3 +21,5 @@ class RedCloth
     text.gsub!( /(.)\n(?!\n|\Z| *([#*=]+(\s|$)|[{|]))/, "\\1<br />" ) if hard_breaks && RedCloth::VERSION == "3.0.4"
   end 
 end
+
+Hobo.field_types[:textile] = Hobo::TextileString

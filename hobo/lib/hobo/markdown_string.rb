@@ -7,3 +7,5 @@ class Hobo::MarkdownString < String
   end
 
 end
+
+Hobo.field_types[:markdown] = Hobo::MarkdownString

@@ -1,3 +1,4 @@
+# Monkey patches, ooh ooh
 require 'extensions'
 require 'rexml'
 require 'active_record/has_many_association'
@@ -9,6 +10,7 @@ require 'hobo'
 require 'hobo/dryml'
 
 require 'hobo/model'
+require 'hobo/field_declaration_dsl'
 
 require 'hobo/dryml/template'
 require 'hobo/dryml/taglib'
@@ -18,6 +20,15 @@ require 'hobo/dryml/template_handler'
 require 'hobo/plugins'
 
 require 'extensions/test_case' if RAILS_ENV == "test"
+
+# Rich data types
+require "hobo/html_string"
+require "hobo/markdown_string"
+require "hobo/textile_string"
+require "hobo/password_string"
+require "hobo/text"
+require "hobo/email_address"
+require "hobo/enum_string"
 
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)

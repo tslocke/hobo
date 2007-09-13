@@ -7,3 +7,5 @@ class Hobo::EmailAddress < String
   end
 
 end
+
+Hobo.field_types[:email_address] = Hobo::EmailAddress

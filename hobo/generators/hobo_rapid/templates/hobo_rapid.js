@@ -45,7 +45,8 @@ var Hobo = {
         var params = []
         var i = 0
         if (updates.length > 0) {
-            updates.each(function(dom_id) {
+            updates.each(function(id_or_el) {
+                var dom_id = $(id_or_el).id
                 if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
                 params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[dom_id]))
                 params.push("render["+i+"][id]=" + dom_id)
@@ -399,6 +400,14 @@ var Hobo = {
 
     backgroundColor: function(el) {
         return Hobo.rgbColorToHex(Hobo.getStyle(el, 'background-color'))
+    },
+
+    partFor: function(el) {
+        while (el) {
+            if (el.id && hoboParts[el.id]) { return el }
+            el = el.parentNode
+        }
+        return null
     }
 
 }

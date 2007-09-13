@@ -1,10 +1,16 @@
 <def tag="call_tag" attrs="tag">
-  <%= send(tag, attributes) %>
+  <%= send(tag, attributes, &tagbody) %>
 </def>
 
 
 <def tag="CallTemplate" attrs="template">
   <%= send(template, attributes, all_parameters) %>
+</def>
+
+
+<def tag="wrap" attrs="tag, when">
+  <% body = tagbody.call %>
+  <%= when_ ? call_tag(tag, attributes, &proc { body }) : body %>
 </def>
 
     

@@ -2,19 +2,13 @@ module Hobo
 
   module Model
     
-    Hobo.field_types.update({ :html          => HtmlString,
-                              :markdown      => MarkdownString,
-                              :textile       => TextileString,
-                              :password      => PasswordString,
-                              :text          => Hobo::Text,
-                              :boolean       => TrueClass,
+    Hobo.field_types.update({ :boolean       => TrueClass,
                               :date          => Date,
                               :datetime      => Time,
                               :integer       => Fixnum,
                               :big_integer   => BigDecimal,
                               :float         => Float,
-                              :string        => String,
-                              :email_address => EmailAddress
+                              :string        => String
                             })
     
     def self.included(base)
@@ -48,37 +42,6 @@ module Hobo
           set_field_type(name => @next_method_type)
           @next_method_type = nil
         end
-      end
-      
-      
-      class FieldDeclarationsDsl
-        
-        def initialize(model)
-          @model = model
-        end
-        
-        attr_reader :model
-        
-        def timestamps
-          field(:created_at, :datetime)
-          field(:updated_at, :datetime)
-        end
-        
-        def field(name, *args)
-          type = args.shift
-          options = args.extract_options!
-          @model.send(:set_field_type, name => type) unless
-            type.in?(@model.connection.native_database_types.keys - [:text])
-          @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
-          
-          @model.send(:validates_presence_of, name) if :required.in?(args)
-          @model.send(:validates_uniqueness_of, name) if :unique.in?(args)
-        end
-        
-        def method_missing(name, *args)
-          field(name, *args)
-        end
-        
       end
       
       
@@ -507,7 +470,8 @@ module ActiveRecord::AttributeMethods::ClassMethods
     access_code = cast_code ? "(v=@attributes['#{attr_name}']) && #{cast_code}" : "@attributes['#{attr_name}']"
 
     unless attr_name.to_s == self.primary_key.to_s
-      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) unless @attributes.has_key?('#{attr_name}'); ")
+      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) " +
+                                       "unless @attributes.has_key?('#{attr_name}'); ")
     end
 
     # This is the Hobo hook - add a type wrapper around the field
@@ -515,9 +479,8 @@ module ActiveRecord::AttributeMethods::ClassMethods
     src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
               type_wrapper.is_a?(Class) && type_wrapper < String
             "val = begin; #{access_code}; end; " +
-              "if val.nil?; nil; " +
-              "elsif val.respond_to?(:hobo_undefined?) && val.hobo_undefined?; val; " + 
-              "else; #{type_wrapper}.new(val); end"
+              "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
+              "else; self.class.field_type(:#{attr_name}).new(val); end"
           else
             access_code
           end
@@ -525,4 +488,18 @@ module ActiveRecord::AttributeMethods::ClassMethods
     evaluate_attribute_method(attr_name, 
                               "def #{symbol}; @attributes_cache['#{attr_name}'] ||= begin; #{src}; end; end")
   end
+  
+  def define_write_method(attr_name)
+    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(attr_name)) &&
+              type_wrapper.is_a?(Class) && type_wrapper < String
+            "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
+              "else; self.class.field_type(:#{attr_name}).new(val); end"
+          else
+            "val"
+          end
+    evaluate_attribute_method(attr_name, "def #{attr_name}=(val); " + 
+                              "write_attribute('#{attr_name}', #{src});end", "#{attr_name}=")
+    
+  end
+
 end

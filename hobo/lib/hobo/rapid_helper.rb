@@ -19,7 +19,14 @@ module Hobo::RapidHelper
   def js_updates(updates)
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
-    '[' + comma_split(updates).map{|u| js_str(u)}.join(', ') + ']'
+    updates = comma_split(updates).map do |u|
+      if u.to_s == "self"
+        "Hobo.partFor(this)"
+      else
+        js_str(u)
+      end
+    end
+    "[#{updates * ', '}]"
   end
   
   
