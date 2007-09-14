@@ -25,7 +25,7 @@ module Hobo
       options = LazyHash.new(options)
       options.reverse_merge!(:success_notice => "You have logged in.",
                              :failure_notice => "You did not provide a valid login and password.",
-                             :redirect_to => {:action => "index"})
+                             :redirect_to => base_url)
       
       if request.post?
         user = model.authenticate(params[:login], params[:password])
@@ -57,7 +57,7 @@ module Hobo
     def hobo_signup(options={})
       options = LazyHash.new(options)
       options.reverse_merge!(:notice => "Thanks for signing up!",
-                             :redirect_to => {:action => "index"})
+                             :redirect_to => base_url)
       if request.post?
         begin
           @user = model.new(params[:user])
@@ -77,7 +77,7 @@ module Hobo
     
     def hobo_logout(options={})
       options = options.reverse_merge(:notice => "You have been logged out.",
-                                      :redirect_to => {:action => "index"})
+                                      :redirect_to => base_url)
         
       current_user.forget_me if logged_in?
       cookies.delete :auth_token
