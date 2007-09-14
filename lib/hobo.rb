@@ -138,84 +138,12 @@ module Hobo
       results
     end
 
-    def add_routes(map)
-      begin 
-        ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
-      rescue
-        # No database, no routes
-        return
-      end
-
-      require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
-      require "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
-      
-      for model in Hobo.models
-        controller_name = "#{model.name.pluralize}Controller"
-        controller = controller_name.constantize if (Object.const_defined? controller_name) || 
-          File.exists?("#{RAILS_ROOT}/app/controllers/#{controller_name.underscore}.rb")
-          
-        if controller
-          web_name = model.name.underscore.pluralize.downcase
-
-          # Simple support for composite models, we might later need a CompositeModelController
-          if model < Hobo::CompositeModel
-            map.connect "#{web_name}/:id", :controller => web_name, :action => 'show'
-
-          elsif controller < Hobo::ModelController
-            map.resources web_name, :collection => { :completions => :get }
-
-            for collection in controller.collections
-              new_method = Hobo.simple_has_many_association?(model.reflections[collection])
-              Hobo.add_collection_routes(map, web_name, collection, new_method)
-            end
-            
-            for method in controller.web_methods
-              map.named_route("#{web_name.singularize}_#{method}",
-                              "#{web_name}/:id/#{method}",
-                              :controller => web_name,
-                              :action => method.to_s,
-                              :conditions => { :method => :post })
-            end
-            
-            for view in controller.show_actions
-              map.named_route("#{web_name.singularize}_#{view}",
-                              "#{web_name}/:id/#{view}",
-                              :controller => web_name,
-                              :action => view.to_s,
-                              :conditions => { :method => :get })
-            end
-            
-            if controller < Hobo::UserController
-              prefix = web_name == "users" ? "" : "#{web_name.singularize}_"
-              map.named_route("#{web_name.singularize}_login", "#{prefix}login",
-                              :controller => web_name, :action => 'login')
-              map.named_route("#{web_name.singularize}_logout", "#{prefix}logout",
-                              :controller => web_name, :action => 'logout')
-              map.named_route("#{web_name.singularize}_signup", "#{prefix}signup",
-                              :controller => web_name, :action => 'signup')
-            end
-          end
-        end
-      end
-    end
-    
-    
-    def add_collection_routes(map, controller_name, collection_name, new_method)
-      singular_name = collection_name.to_s.singularize
-      map.with_options :controller => controller_name, :conditions => { :method => :get } do |m|
-        m.named_route("#{controller_name.singularize}_#{collection_name}",
-                      "#{controller_name}/:id/#{collection_name}",
-                      :action => "show_#{collection_name}")
-
-        m.named_route("new_#{controller_name.singularize}_#{singular_name}",
-                      "#{controller_name}/:id/#{collection_name}/new",
-                      :action => "new_#{singular_name}") if new_method
-      end
+    def add_routes(m)
+      Hobo::ModelRouter.add_routes(m)
     end
 
-
-    def all_controllers
-      Hobo.models.map {|m| m.name.underscore.pluralize}
+    def all_models
+      Hobo.models.map { |m| m.name.underscore }
     end
 
 
@@ -229,6 +157,7 @@ module Hobo
     
     
     def get_field(object, field)
+      return nil if object.nil?
       if field.to_s =~ /\d+/
         object[field.to_i]
       else
@@ -248,6 +177,7 @@ module Hobo
  
       field, parent = nil
       path.each do |field|
+        return nil if object.nil?
         parent = object
         object = get_field(parent, field)
       end

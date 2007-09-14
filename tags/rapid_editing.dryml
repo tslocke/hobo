@@ -60,8 +60,7 @@
      end
      id ||= this_field_dom_id + "_completer"
      url = object_url(completer_model, "completions",
-                      { :for => completer_attr },
-                      attributes.select_hash {|k,v| k.to_s.starts_with? "where_"})
+                      { :for => completer_attr }.update(attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}))
   %>
   <input type="text" name="#{name}" id="#{id}" class="autocomplete_bhv"
          autocomplete_url="#{url}" value="#{value}"

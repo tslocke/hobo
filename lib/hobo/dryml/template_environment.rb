@@ -19,6 +19,8 @@ module Hobo::Dryml
         @tag_attrs ||= {}
       end
       
+      alias_method :_alias_tag_chain, :alias_tag_chain
+      
     end
 
     for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}

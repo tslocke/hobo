@@ -36,14 +36,14 @@ ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler
 class ActionController::Base
 
   def self.hobo_user_controller(model=nil)
+    @model = model if model
     include Hobo::ModelController
-    self.model = model if model
     include Hobo::UserController
   end
 
   def self.hobo_model_controller(model=nil)
+    @model = model if model
     include Hobo::ModelController
-    self.model = model if model
   end
 
   def self.hobo_controller(model=nil)

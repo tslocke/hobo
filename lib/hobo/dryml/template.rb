@@ -230,7 +230,7 @@ module Hobo::Dryml
       require_attribute(el, "tag", DRYML_NAME_RX)
       require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
       require_attribute(el, "alias_of", DRYML_NAME_RX, true)
-      require_attribute(el, "alias_current_as", DRYML_NAME_RX, true)
+      require_attribute(el, "extend_with", DRYML_NAME_RX, true)
       
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
@@ -254,26 +254,28 @@ module Hobo::Dryml
       @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
 
       alias_of = el.attributes['alias_of']
-      alias_current = el.attributes['alias_current_as']
+      extend_with = el.attributes['extend_with']
 
-      dryml_exception("def cannot have both alias_of and alias_current_as", el) if alias_of && alias_current
+      dryml_exception("def cannot have both alias_of and extend_with", el) if alias_of && extend_with
       dryml_exception("def with alias_of must be empty", el) if alias_of and el.size > 0
       
-      if alias_of || alias_current
-        old_name = alias_current ? name : alias_of
-        new_name = alias_current ? alias_current : name
-
-        @builder.add_build_instruction(:alias_method, :new => new_name.to_sym, :old => old_name.to_sym)
-      end
+      
+      @builder.add_build_instruction(:alias_method,
+                                     :new => name.to_sym, :old => alias_of.to_sym) if alias_of
       
       res = if alias_of
               "<% #{tag_newlines(el)} %>"
             else
-              src = if template_name?(name)
-                      template_method(name, el)
-                    else
-                      tag_method(name, el)
-                    end
+              src = ""
+              if extend_with
+                src << "<% _alias_tag_chain :#{name}, :#{extend_with} %>"
+                name = extended_name(name, extend_with)
+              end
+              src << if template_name?(name)
+                       template_method(name, el)
+                     else
+                       tag_method(name, el)
+                     end
               src << "<% _register_tag_attrs(:#{name}, #{declared_attributes(el).inspect}) %>"
               
               logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug_source"]
@@ -286,6 +288,15 @@ module Hobo::Dryml
             end
       @def_name = old_def_name
       res
+    end
+    
+    
+    def extended_name(name, feature)
+      if template_name?(name)
+        "#{name}With#{feature.camelize}"
+      else
+        "#{name}_with_#{feature}"
+      end
     end
     
     
@@ -456,7 +467,7 @@ module Hobo::Dryml
                to_call = if is_param_default_call
                            # The tag is available in a local variable
                            # holding a proc
-                           el.dryml_name
+                           name
                          elsif (call_type = polymorphic_call_type(el))
                            "find_polymorphic_template(:#{name}, #{call_type})"
                          else
@@ -580,7 +591,7 @@ module Hobo::Dryml
                to_call = if is_param_default_call
                            # The tag is available in a local variable
                            # holding a proc
-                           el.dryml_name
+                           name
                          elsif (call_type = polymorphic_call_type(el))
                            "find_polymorphic_tag(:#{name}, #{call_type})"
                          else

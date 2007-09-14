@@ -94,7 +94,8 @@ module Hobo::Dryml
           @environment.send(:alias_method, instruction[:new], instruction[:old])
           
         else
-          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, building #{template_path}")
+          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, " + 
+                                 "building #{template_path}")
         end
       end
       @last_build_time = Time.now

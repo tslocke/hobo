@@ -34,23 +34,24 @@ module Hobo
       end
 
       def find_partial(klass, as)
-        find_model_template(klass, as, true)
+        find_model_template(klass, as, :is_parital => true)
       end
 
 
       def template_path(dir, name, is_partial)
         fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
-        unless !File.exists?(full_dir) || Dir.entries(full_dir).grep(fileRx).empty?
+          full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+        if File.exists?(full_dir) && Dir.entries(full_dir).grep(fileRx).any?
           return "#{dir}/#{name}"
         end
       end
 
 
-      def find_model_template(klass, name, is_partial=false)
+      def find_model_template(klass, name, options={})
         while klass and klass != ActiveRecord::Base
           dir = klass.name.underscore.pluralize
-          path = template_path(dir, name, is_partial)
+          dir = File.join(options[:subsite], dir) if options[:subsite]
+          path = template_path(dir, name, options[:is_partial])
           return path if path
 
           klass = klass.superclass
@@ -236,7 +237,6 @@ module Hobo
 
     
     def paginated_find(*args, &b)
-      
       options = args.extract_options!
       filter_conditions = data_filter_conditions
       conditions_proc = if b && filter_conditions
@@ -538,7 +538,7 @@ module Hobo
       page_kind ||= params[:action].to_sym
       page_model ||= model
       
-      template = Hobo::ModelController.find_model_template(page_model, page_kind)
+      template = ModelController.find_model_template(page_model, page_kind, :subsite => subsite)
 
       begin
         if template
