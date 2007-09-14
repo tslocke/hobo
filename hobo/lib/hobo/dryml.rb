@@ -24,6 +24,8 @@ module Hobo::Dryml
 
   APPLICATION_TAGLIB = "taglibs/application"
   CORE_TAGLIB = "plugins/hobo/tags/core"
+  
+  DEFAULT_IMPORTS = [Hobo::HoboHelper, ApplicationHelper]
 
   @renderer_classes = {}
   @tag_page_renderer_classes = {}
@@ -55,15 +57,12 @@ module Hobo::Dryml
       end
 
       prepare_view!(view)
-      included_taglibs = if view.controller.class.respond_to? :included_taglibs
-                           view.controller.class.included_taglibs
-                         else
-                           []
-                         end
+      included_taglibs = ([subsite_taglib(view)] + controller_taglibs(view)).compact
 
       if page == EMPTY_PAGE
-        @tag_page_renderer_classes[view.controller.class.name] ||= make_renderer_class("", EMPTY_PAGE, local_names,
-                                                        [Hobo::HoboHelper, ApplicationHelper], included_taglibs)
+        @tag_page_renderer_classes[view.controller.class.name] ||= 
+          make_renderer_class("", EMPTY_PAGE, local_names,
+                              DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[view.controller.class.name].new(page, view)
       else
         page ||= view.instance_variable_get('@hobo_template_path')
@@ -76,12 +75,28 @@ module Hobo::Dryml
             (local_names - renderer_class.compiled_local_names).any? or # any new local names?
             renderer_class.load_time < src_file.mtime)                  # cache out of date?
           renderer_class = make_renderer_class(src_file.read, template_path, local_names,
-                                               default_imports_for_view(view), included_taglibs)
+                                               DEFAULT_IMPORTS, included_taglibs)
           renderer_class.load_time = src_file.mtime
           @renderer_classes[page] = renderer_class
         end
         renderer_class.new(page, view)
       end
+    end
+    
+    
+    def controller_taglibs(view)
+      if view.controller.class.respond_to? :included_taglibs
+        view.controller.class.included_taglibs
+      else
+        []
+      end      
+    end
+    
+    
+    def subsite_taglib(view)
+      md = view.controller.class.name.match(/([^:]+):/)
+      subsite = md && md[1].underscore
+      "taglibs/#{subsite}" if subsite && File.exists?("#{RAILS_ROOT}/app/views/taglibs/#{subsite}.dryml")
     end
 
 
@@ -97,15 +112,6 @@ module Hobo::Dryml
           view.instance_variable_set(var, view.controller.instance_variable_get(var))
         end
       end
-
-    end
-
-    
-    def default_imports_for_view(view)
-      imports = [Hobo::HoboHelper, ApplicationHelper]
-      controller_helper = view.controller.class.name.sub(/Controller$/, "Helper")
-      imports << controller_helper.constantize if Object.const_defined? controller_helper
-      imports
     end
 
     

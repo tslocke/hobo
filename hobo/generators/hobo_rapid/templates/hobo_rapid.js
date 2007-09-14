@@ -299,7 +299,7 @@ var Hobo = {
 
     putUrl: function(el) {
         spec = Hobo.parseFieldId(el)
-        return urlBase + "/" + controllerNames[spec.name] + "/" + spec.id + "?_method=PUT"
+        return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
     },
 
         
@@ -408,6 +408,10 @@ var Hobo = {
             el = el.parentNode
         }
         return null
+    },
+
+    pluralise: function(s) {
+        return pluralisations[s] || s + "s"
     }
 
 }

@@ -37,13 +37,29 @@ module Hobo::Dryml
 
     def load
       @module = Module.new do
+        
         @tag_attrs = {}
-        def self._register_tag_attrs(tag_name, attrs)
-          @tag_attrs[tag_name] = attrs
-        end
+        @tag_aliases = {}
+        
         class << self
+          
+          def included(base)
+            @tag_aliases.each do |tag, feature|
+              base.send(:alias_tag_chain, tag, feature)
+            end
+          end
+
+          def _register_tag_attrs(tag, attrs)
+            @tag_attrs[tag] = attrs
+          end
           attr_reader :tag_attrs
+          
+          def _alias_tag_chain(tag, feature)
+            @tag_aliases[tag] = feature
+          end
+          
         end
+        
       end
       @file.rewind
       template = Template.new(@file.read, @module, @file.path)

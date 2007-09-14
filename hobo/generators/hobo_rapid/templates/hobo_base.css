@@ -52,8 +52,7 @@ blockquote, q {
 	quotes: "" "";
 }
 
-body,ul,ol,dl,h1,h2,h3,h4,h5,h6,td,th,
-caption,pre,p,blockquote,input,textarea {
+body {
   font-family: "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
   font-size: 12px;
 }

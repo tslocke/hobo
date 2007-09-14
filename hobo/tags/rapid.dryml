@@ -27,6 +27,7 @@
 
 <def tag="item"><% scope.items << tagbody.call %></def>
 
+<def tag="nil_view"><%= scope.nil_view || "(Not Available)" %></def>
 
 <def tag="UL">
   <ul merge_attrs unless="&this.empty?">
@@ -97,10 +98,12 @@
 <def tag="hobo_rapid_javascripts" attrs="tiny_mce"><%=
     res = javascript_include_tag("hobo_rapid")
     res += '<script type="text/javascript">'
-    unless Hobo.all_controllers.empty?
-      res += "var controllerNames = {" +
-        Hobo.all_controllers.map {|c| "#{c.singularize}: '#{c}'"}.join(', ') +
-        "}; "
+    unless Hobo.all_models.empty?
+      # Tell JS code how to pluralize names, unless they follow the simple rule
+      names = Hobo.all_models.map do |m|
+        "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+      end.compact
+      res += "var pluralisations = {#{names * ', '}}; "
     end
     res += "urlBase = '#{base_url}'; hoboPartPage = '#{view_name}'</script>"
     
@@ -123,7 +126,7 @@
 
 <def tag="name"><%= 
   if this.nil?
-    "(not available)"
+    nil_view
   else
     name_tag = find_polymorphic_tag("name")
     if name_tag != "name"
@@ -156,7 +159,8 @@
   name
 %></def>
 
-<def tag="a" attrs="action, to, params, href, format"><%=
+
+<def tag="a" attrs="action, to, params, href, format, subsite"><%=
   content = tagbody.call if tagbody
   
   if href || attributes[:name]
@@ -167,7 +171,7 @@
   
     if target.nil?
       Hobo::Dryml.last_if = false
-      "(Not Available)"
+      nil_view
     elsif action == "new"
       # Link to a new object form
       new_record = target.new
@@ -180,7 +184,7 @@
                            target.name
                          end
 
-        href = object_url(target, "new")
+        href = object_url(target, "new", :subsite => subsite)
         add_classes!(attributes, "new_#{new_class_name.underscore}_link")
         content ||= "New #{new_class_name.titleize}"
         content_tag(:a, content, attributes.update(:href => href))
@@ -196,7 +200,7 @@
         target = @member_class
       end
       
-      href = object_url(target, action, params)
+      href = object_url(target, action, params._?.merge(:subsite => subsite))
       add_classes!(attributes, "#{target.class.name.underscore}_link")
       
       href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
@@ -208,14 +212,13 @@
   end
 %></def>
 
-
         
 <def tag="view" attrs="inline, block, if_blank, no_wrapper, truncate"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
   res = if this.nil? && if_blank.nil?
-          this_type.is_a?(Class) && this_type <= String ? "" : "(Not Available)"
+          this_type.is_a?(Class) && this_type <= String ? "" : nil_view
         elsif this_type.respond_to?(:macro)
           if this_type.macro == :belongs_to
             belongs_to_view(attributes)

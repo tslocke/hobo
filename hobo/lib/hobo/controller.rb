@@ -27,7 +27,7 @@ module Hobo
         @included_taglibs << if options[:from_plugin]
                                'plugins/' + options[:from_plugin] + '/taglibs/' + src
                              else
-                               src
+                               src.to_s
                              end
       end
     end

@@ -37,22 +37,33 @@ module Hobo
         obj.class.name.underscore.pluralize
       end
     end
+    
+    
+    def subsite
+      params[:controller].match(/([^\/]+)\//)._?[1]
+    end
      
      
-    def object_url(obj, action=nil, *param_hashes)
+    def object_url(*args)
+      params = args.extract_options!
+      obj, action = args
+      
       action &&= action.to_s
       
       controller_name = controller_for(obj)
       
+      subsite = params._?[:subsite] || self.subsite
+      base = subsite ? "/" + subsite + base_url : base_url
+      
       parts = if obj.is_a? Class
-                [base_url, controller_name]
+                [base, controller_name]
                 
               elsif obj.is_a? Hobo::CompositeModel
-                [base_url, controller_name, obj.id]
+                [base, controller_name, obj.id]
                 
               elsif obj.is_a? ActiveRecord::Base
                 if obj.new_record?
-                  [base_url, controller_name]
+                  [base, controller_name]
                 else
                   raise HoboError.new("invalid object url: new for existing object") if action == "new"
      
@@ -63,7 +74,7 @@ module Hobo
                          obj.id
                        end
                   
-                  [base_url, controller_name, id]
+                  [base, controller_name, id]
                 end
                 
               elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
@@ -89,8 +100,12 @@ module Hobo
             else
               basic + "/" + action
             end
-      params = make_params(*param_hashes)
-      params.blank? ? url : url + "?" + params
+
+      if params
+        params = make_params(params - [:subsite])
+        url = "#{url}?#{params}" unless params.blank?
+      end
+      url
     end
      
      

@@ -24,12 +24,28 @@ class Module
     aliased_target, punctuation = target.to_s.sub(/([?!=])$/, ''), $1
     yield(aliased_target, punctuation) if block_given?
     without = "#{aliased_target}_without_#{feature}#{punctuation}"
-    unless without.in?(instance_methods)
+    unless instance_methods.include?(without)
       alias_method without, target
       alias_method target, "#{aliased_target}_with_#{feature}#{punctuation}"
     end
   end
 
+  
+  def alias_tag_chain(tag, feature)
+    if tag.to_s =~ /^[A-Z]/
+      without = "#{tag}Without#{feature.to_s.camelize}"
+      with    = "#{tag}With#{feature.to_s.camelize}"
+    else
+      without = "#{tag}_without_#{feature}"
+      with    = "#{tag}_with_#{feature}"
+    end
+    
+    unless instance_methods.include?(without)
+      alias_method without, tag
+      alias_method tag, with
+    end
+  end
+  
   
   # Fix delegate so it doesn't go bang if 'to' is nil
   def delegate(*methods)
@@ -46,7 +62,7 @@ class Module
       EOS
     end
   end
-  
+    
   private
   
   def bool_attr_accessor(*args)
