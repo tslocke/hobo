@@ -74,8 +74,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
       # record nothing to keep the generator happy
       record {|m| }
     else
-      puts "\n(you can type spaces instead of '_' -- every little helps)"
-      migration_name = input("Migration filename [#@migration_name]:").strip.gsub(' ', '_')
+      puts "\nMigration filename:", "(you can type spaces instead of '_' -- every little helps)"
+      migration_name = input("Filename [#@migration_name]:").strip.gsub(' ', '_')
       migration_name = @migration_name if migration_name.blank?
       
       at_exit { system "rake db:migrate" } if action == 'm'

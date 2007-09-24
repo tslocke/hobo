@@ -164,12 +164,11 @@ end
 
 
 class SafeNil
-  def self.instance
-    @instance ||= SafeNil.new
-  end
+  include Singleton
   
-  def method_missing(*args, &b)
-    nil.send(*args, &b) rescue nil
+  def method_missing(method, *args, &b)
+    return nil unless nil.respond_to? method
+    nil.send(method, *args, &b) rescue nil
   end
 end
 
