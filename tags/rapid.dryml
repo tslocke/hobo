@@ -302,7 +302,7 @@
         end
   end
    
-  Dryml.last_if = c > 0 if unless_none
+  Hobo::Dryml.last_if = c > 0 if unless_none
   if unless_none && c == 0
     ""
   else
