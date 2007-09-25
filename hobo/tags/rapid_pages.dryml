@@ -19,12 +19,12 @@
 
 <def tag="Page">
   <BasePage merge>
-    <stylesheets>
+    <stylesheets param>
       <stylesheet name="hobo_base"/>
       <stylesheet name="hobo_rapid"/>
       <stylesheet name="application"/>
     </stylesheets>
-    <scripts>
+    <scripts param="scripts">
       <default_tagbody/>
       <hobo_rapid_javascripts param/>
     </scripts>
@@ -58,7 +58,7 @@
   <PageForIndex title="All #{model_name.pluralize}" merge>
     <body class="rapid_generic_page"/>
     <main>
-      <header>
+      <header param>
         <heading><%= model_name.pluralize %></heading>
       </header>
 

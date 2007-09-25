@@ -30,8 +30,8 @@ module Hobo
     
     def update_without_tracking(record, params)
       params && params.each_pair do |field_name, value|
-        field = if (create = field_name =~ /^\+/)
-                  field_name[1..-1].to_sym
+        field = if (create = field_name =~ /^new_/)
+                  field_name[4..-1].to_sym
                 else
                   field_name.to_sym
                 end
