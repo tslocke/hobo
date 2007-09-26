@@ -1,8 +1,8 @@
 module ::Hobo::Plugins
   class HoboPlugin
 
-    def initialize(opt=nil)
-      @opt = opt || Hash.new
+    def initialize(opt={})
+      @opt = opt
       set_up_options(self.class::PLUGIN_DEFAULTS)
 
       send @opt[:setup_using] || :default
@@ -61,7 +61,7 @@ module ::Hobo::Plugins
           @plugin_opt
         end
         def self.has_feature(name)
-          !@plugin_opt[name].nil? && @plugin_opt[name] != false
+          @plugin_opt[name]
         end
         def sym
           self.class.sym
