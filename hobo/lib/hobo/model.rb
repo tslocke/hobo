@@ -214,16 +214,23 @@ module Hobo
                     end
         end
           
-        if b && !(block_conditions = conditions(&b)).blank?
-          c = if !options[:conditions].blank?
-                "(#{options[:conditons]}) and (#{block_conditions})"
+        res = if b && !(block_conditions = conditions(&b)).blank?
+                c = if !options[:conditions].blank?
+                      "(#{options[:conditons]}) and (#{block_conditions})"
+                    else
+                      block_conditions
+                    end
+                super(args.first, options.merge(:conditions => c))
               else
-                block_conditions
+                super(*args + [options])
               end
-          super(args.first, options.merge(:conditions => c))
-        else
-          super(*args + [options])
+        if args.first == :all
+          def res.member_class
+            @member_class
+          end
+          res.instance_variable_set("@member_class", self)
         end
+        res
       end
       
       
