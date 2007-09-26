@@ -59,7 +59,7 @@ module Hobo
                 [base, controller_name]
                 
               elsif obj.is_a? Hobo::CompositeModel
-                [base, controller_name, obj.id]
+                [base, controller_name, obj.to_param]
                 
               elsif obj.is_a? ActiveRecord::Base
                 if obj.new_record?
@@ -71,7 +71,7 @@ module Hobo
                   id = if klass.id_name?
                          obj.id_name(true)
                        else
-                         obj.id
+                         obj.to_param
                        end
                   
                   [base, controller_name, id]

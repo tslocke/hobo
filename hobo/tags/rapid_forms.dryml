@@ -46,8 +46,17 @@
   end
 
   hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
-     
-  body = [http_method_hidden, hiddens, body].join
+  
+  auth_token = if request_forgery_protection_token.nil?
+                 ''
+               else
+                 tag(:input, :type => "hidden", 
+                     :name => request_forgery_protection_token.to_s,
+                     :value => form_authenticity_token)
+               end
+
+   
+  body = [http_method_hidden, auth_token, hiddens, body].join
    
   if web_method
     add_classes!(html_attrs, "#{type_id}_#{web_method}_form")

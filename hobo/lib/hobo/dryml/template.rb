@@ -39,7 +39,7 @@ module Hobo::Dryml
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
 
-      unless @template_path == EMPTY_PAGE
+      unless @template_path.ends_with?(EMPTY_PAGE)
         filename = RAILS_ROOT + (@template_path.starts_with?("/") ? @template_path : "/" + @template_path)
         mtime = File.stat(filename).mtime rescue nil
       end
