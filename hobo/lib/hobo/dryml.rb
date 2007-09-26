@@ -56,17 +56,17 @@ module Hobo::Dryml
         clear_cache
         Taglib.clear_cache
       end
+      page ||= view.instance_variable_get('@hobo_template_path')
 
       prepare_view!(view)
       included_taglibs = ([subsite_taglib(page)] + controller_taglibs(page)).compact
 
       if page.ends_with?(EMPTY_PAGE)
-        controller = controller_for(page)
-        @tag_page_renderer_classes[controller.class.name] ||= 
+        controller_class = controller_class_for(page)
+        @tag_page_renderer_classes[controller_class.name] ||= 
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
-        @tag_page_renderer_classes[controller.class.name].new(page, view)
+        @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
-        page ||= view.instance_variable_get('@hobo_template_path')
         template_path = "app/views/" + page + ".dryml"
         src_file = File.new(File.join(RAILS_ROOT, template_path))
         renderer_class = @renderer_classes[page]
@@ -85,15 +85,15 @@ module Hobo::Dryml
     end
     
     
-    def controller_for(page)
+    def controller_class_for(page)
       (page.sub(/\/[^\/]+$/, "").camelize + "Controller").constantize
     end
     
     
     def controller_taglibs(page)
-      controller = controller_for(page)
-      if controller.class.respond_to? :included_taglibs
-        controller.class.included_taglibs
+      controller_class = controller_class_for(page)
+      if controller_class.respond_to? :included_taglibs
+        controller_class.included_taglibs
       else
         []
       end      
