@@ -105,7 +105,8 @@
       end.compact
       res += "var pluralisations = {#{names * ', '}}; "
     end
-    res += "urlBase = '#{base_url}'; hoboPartPage = '#{view_name}'</script>"
+    base = [base_url, subsite].compact.join("/")
+    res += "urlBase = '#{base}'; hoboPartPage = '#{view_name}'</script>"
     
     if tiny_mce
       res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
