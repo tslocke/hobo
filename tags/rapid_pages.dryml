@@ -17,6 +17,7 @@
   </html>
 </def>
 
+
 <def tag="Page">
   <BasePage merge>
     <stylesheets param>
@@ -32,19 +33,24 @@
     <body param>
       <div class="page_wrapper" param="wrapper">
         <ajax_progress/>
-        <header id="page_header" param>
+        <header class="page_header" param>
           <nav param>
-            <magic_nav class="main_nav" param="main_mav"/>
+            <magic_nav class="main_nav" param="main_nav"/>
             <account_nav if="&Hobo::UserController.user_models.first" param/>
           </nav>
         </header>
-        <flash_message param/>
-        <div id="page_main" param="main"></div>
-        <footer id="page_footer" param/>
+        <section class="page_content" param="content">
+          <header class="content_header" param="content_header"/>
+          <flash_message param/>
+          <section class="content_body" param="content_body"/>
+          <footer class="content_footer" param="content_footer"/>
+        </section>
+        <footer class="page_footer" param/>
       </div>
     </body>
   </BasePage>
 </def>
+
 
 <def tag="PageForIndex"><Page merge/></def>
 <def tag="PageForNew"><Page merge/></def>
@@ -53,56 +59,48 @@
 <def tag="PageForNewInCollection"><Page merge/></def>
 <def tag="PageForShowCollection"><Page merge/></def>
 
+
 <def tag="IndexPage">
   <% model_name = @model.name.titleize %>
   <PageForIndex title="All #{model_name.pluralize}" merge>
-    <body class="rapid_generic_page"/>
-    <main>
-      <header param>
-        <heading><%= model_name.pluralize %></heading>
-      </header>
+    <body class="index_page" param/>
+    <content_header>
+      <heading param><%= model_name.pluralize %></heading>
+      <sub_heading param><count part="item_count"/></sub_heading>
+    </content_header>
 
-      <nav param="top_page_nav"><page_nav/></nav>
-
-      <panel param="main" class="main">
-        <header param="main_header" with="&@model">
-          <h2><count part="item_count"/></h2>
-        </header>
-        <section param="main_section">
-          <Table param>
-            <tr><td><a/></td><td><delete_button update="item_count"/></td></tr>
-          </Table>
-        </section>
-        
-        <nav param="bottom_page_nav"><page_nav/></nav>
-
-        <section param="new_link"><a to="&@model" action="new"/></section>
-      </panel>
-    </main>
+    <content_body>
+      <nav param="top_pagination_nav"><page_nav/></nav>
+      
+      <Table param>
+        <tr><td><a/></td><td><delete_button update="item_count"/></td></tr>
+      </Table>
+      
+      <nav param="bottom_pagination_nav"><page_nav/></nav>
+    </content_body>
+    
+    <content_footer>
+      <a to="&@model" action="new" param="new_link"/>
+    </content_footer>
   </PageForIndex>
 </def>
 
 
 <def tag="NewPage">
   <PageForNew title="New #{type_name}" merge>
-    <body class="rapid_generic_page new_page new_#{type_name.underscore}"/>
-    <main>
-      <header param>
-        <heading>New <type_name title/></heading>
-      </header>
+    <body class="new_page new_#{type_name.underscore}" param/>
+    <content_header>
+      <heading param>New <type_name title/></heading>
+    </content_header>
 
-      <panel param="main" class="main">
-        <header param="main_header"><h2>Details</h2></header>
-        <section>
-          <error_messages param="error_messages"/>
+    <content_body>
+      <error_messages param/>
 
-          <form>
-            <FieldList skip_associations="has_many" param/>
-            <submit label="Create" param/>
-          </form>
-        </section>
-      </panel>
-    </main>
+      <form param>
+        <FieldList skip_associations="has_many" param/>
+        <submit label="Create" param/>
+      </form>
+    </content_body>
   </PageForNew>
 </def>
 
@@ -113,26 +111,21 @@
      end.compact
   %>
   <PageForShow merge>    
-    <body class="rapid_generic_page show_page show_#{type_name.underscore}"/>
-    <main>
-      <header>
-        <heading><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
-        <delete_button in_place="&false"/>
-      </header>
+    <body class="show_page show_#{type_name.underscore}" param/>
+    <content_header>
+      <heading param><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
+      <delete_button in_place="&false" param/>
+    </content_header>
+    
+    <content_body>
+      <FieldList skip="name" tag="editor" param/>
 
-      <panel param="main_panel">
-        <header param="main_header"><h2>Details</h2></header>
-        <section>
-          <FieldList skip="name" tag="editor" param/>
-        </section>
-
-        <nav param="new_links">
-          <UL with="&has_many_assocs">
-            <li><a action="new"/></li>
-          </UL>
-        </nav>
-      </panel>
-    </main>
+      <nav param="new_links">
+        <UL with="&has_many_assocs">
+          <li><a action="new"/></li>
+        </UL>
+      </nav>
+    </content_body>
   </PageForShow>
 </def>
 
@@ -143,57 +136,45 @@
      end.compact
   %>
   <PageForEdit merge>    
-    <body class="rapid_generic_page edit_page edit_#{type_name.underscore}"/>
-    <main>
-      <header>
-        <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
-        <delete_button in_place="&false" param/>
-      </header>
+    <body class="edit_page edit_#{type_name.underscore}" param/>
+    <content_header>
+      <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
+      <delete_button in_place="&false" param/>
+    </content_header>
 
-      <panel param="main_panel">
-        <header param="main_header"><h2>Details</h2></header>
-        <section>
-          <error_messages param="error_messages"/>
-          <form>
-            <FieldList skip="name" param/>
-            <submit label="Save"/>
-          </form>
-        </section>
+    <content_body>
+      <error_messages param/>
+      <form param>
+        <FieldList skip="name" param/>
+        <submit label="Save"/>
+      </form>
           
-        <section param="new_links">
-          <UL with="&has_many_assocs">
-            <li><a action="new"/></li>
-          </UL>
-        </section>
-      </panel>
-    </main>
+      <nav param="new_links">
+        <UL with="&has_many_assocs">
+          <li><a action="new"/></li>
+        </UL>
+      </nav>
+    </content_body>
   </PageForEdit>
 </def>
 
 
 <def tag="NewInCollectionPage">
   <PageForNewInCollection title="New #{type_name}" merge>
-    <body class="rapid_generic_page"/>
-    <main>
-      <header param>
-        <h1 param>New <type_name/></h1>
-        <h2 param>For: <a with="&@owner" /></h2>
-      </header>
+    <body class="new_in_collection_page new_#{type_name(:with => @owner)}_#{type_name}_page" param/>
+    <content_header>
+      <heading param>New <type_name/></heading>
+      <sub_heading>For: <a with="&@owner" /></sub_heading>
+    </content_header>
 
-      <panel param="main">
-        <header param="main_header">
-          <h2>Details</h2>
-        </header>
-        <section>
-          <error_messages param="error_messages"/>
+    <content_body>
+      <error_messages/>
 
-          <form>
-            <FieldList skip_associations="has_many"/>
-            <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
-          </form>
-        </section>
-      </panel>
-    </main>
+      <form param>
+        <FieldList skip_associations="has_many" param/>
+        <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
+      </form>
+    </content_body>
   </PageForNewInCollection>
 </def>
 
@@ -201,39 +182,31 @@
 <def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
   <PageForShowCollection title="&title" merge>
-    <body class="rapid_generic_page"/>
-    <main>
-      <header>
-        <h1><%= title %></h1>
-        <h2>Back to <a with="&@owner"/></h2>
-      </header>
+    <body class="show_collection_page show_#{type_name(:with => @owner)_#{type_name(:pluralize => true)}_page"
+          param/>
+    <content_header>
+      <nav>Back to <a with="&@owner"/></nav>
+      <heading><%= title %></heading>
+      <sub_heading><count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/></sub_heading>
+    </content_header>
 
-      <panel param="main">
-        <header param="main_header">
-          <count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/>
-        </header>
+    <content_body>
+      <nav param="top_pagination_nav"><page_nav/></nav>
 
-        <nav param="top_page_nav"><page_nav/></nav>
-
-        <section>
-          <Table param="Table">
-            <tr>
-              <if test="can_view?">
-                <td><a/></td><td><delete_button/></td>
-              </if>
-            </tr>
-          </Table>
-        </section>
-
-        <nav param="bottom_page_nav"><page_nav param/></nav>
-
-        <if test="&Hobo.simple_has_many_association?(@association)">
-          <section param="new_link">
-            <a to="&@association" action="new"/>
-          </section>
-        </if>
-      </panel>
-    </main>
+      <Table param="Table">
+        <tr>
+          <if test="can_view?">
+            <td><a/></td><td><delete_button/></td>
+          </if>
+        </tr>
+      </Table>
+      
+      <nav param="bottom_pagination_nav"><page_nav param/></nav>
+      
+      <nav if="&Hobo.simple_has_many_association?(@association)" param="new_link">
+        <a to="&@association" action="new"/>
+      </nav>
+    </content_body>
   </PageForShowCollection>
 </def>
 
@@ -241,36 +214,32 @@
 <def tag="LoginPage" attrs="remember_me">
   <Page title="Login" merge>
     <body class="login_page" param/>
-    <main>
-      <h1 param="login_title">Log In</h1>
+    <nav replace/>
+    <content_header>
+      <heading param>Log In</heading>
+    </content_header>
 
-      <panel>
-        <section param>
-          <form action="&request.request_uri" param>
-            <table class="login_table">
-              <tr>
-                <td class="field_label">
-                  <label param="login_label" for="login"><%= @user_model.login_attr.to_s.titleize %></label>
-                </td>
-                <td><input param="login_input" type="text" name="login" id="login"/></td>
-              </tr>
+    <content_body>
+      <form action="&request.request_uri" param>
+        <field_list>
+          <field_list_item>
+            <item_label param="login_label"><%= @user_model.login_attr.to_s.titleize %></item_label>
+            <item_value><input type="text" name="login" id="login" param="login_input" /></item_value>
+          </field_list_item>
 
-              <tr>
-                <td class="field_label"><label param="password_label" for="password">Password</label></td>
-                <td><input param="password_input" type="password" name="password" id="password"/></td>
-              </tr>
+          <field_list_item>
+            <item_label param="password_label">Password</item_label>
+            <item_value><input type="password" name="password" id="password" param="password_input"/></item_value>
+          </field_list_item>
 
-              <tr if="&remember_me">
-                <td class="field_label"><label param="remember_me_label" for="remember_me">Remember me:</label></td>
-                <td><input param="remember_me_input" type="checkbox" name="remember_me" id="remember_me"/></td>
-              </tr>
-            </table>
-
-            <p><submit param label='Log in'/></p>
-          </form>
-        </section>
-      </panel>
-    </main>
+          <field_list_item if="&remember_me">
+            <item_label class="field_label" param="remember_me_label">Remember me:</item_label>
+            <item_value><input type="checkbox" name="remember_me" id="remember_me" param="remember_me_input"></item_value>
+          </field_list_item>
+        </field_list>
+        <submit label='Log in' param/>
+      </form>
+    </content_body>
   </Page>
 </def>
 
@@ -278,36 +247,33 @@
 <def tag="SignupPage">
   <Page title="Sign Up" merge>
     <body class="signup_page" param/>
+    <nav replace/>
+    <content_header>
+      <heading param>Sign Up</heading>
+    </content_header>
+    
+    <content_body>
+      <error_messages/>
+      <form action="&request.request_uri">
+        <field_list>
+          <field_list_item>
+            <item_label>Login</item_label>
+            <item_value><input type="text" name="user[login]" param="login_input"/></item_value>
+          </field_list_item>
 
-    <main>
-      <h1>Sign Up</h1>
+          <field_list_item>
+            <item_label>Password</item_label>
+            <item_value><input type="password" name="user[password]" param="password_input"/></item_value>
+          </field_list_item>
 
-      <panel>
-        <section>
-          <error_messages/>
-          <form action="&request.request_uri">
-            <table class="signup_table">
-              <tr>
-                <td class="field_label"><label for="login">Login</label></td>
-                <td><input type="text" name="user[login]"/></td>
-              </tr>
-
-              <tr>
-                <td class="field_label"><label for="password">Password</label></td>
-                <td><input type="password" name="user[password]"/></td>
-              </tr>
-
-              <tr>
-                <td class="field_label"><label for="password">Confirm Password</label></td>
-                <td><input type="password" name="user[password_confirmation]"/></td>
-              </tr>
-            </table>
-
-            <p><submit label='Sign Up'/></p>
-          </form>
-        </section>
-      </panel>
-    </main>
+          <field_list_item>
+            <item_label>Confirm Password</item_label>
+            <item_value><input type="password" name="user[password_confirmation]"/></item_value>
+          </field_list_item>
+        </field_list>
+        <submit label='Sign Up'/>
+      </form>
+    </content_body>
 
   </Page>
 </def>
