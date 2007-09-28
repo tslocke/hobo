@@ -64,12 +64,12 @@
   <% model_name = @model.name.titleize %>
   <PageForIndex title="All #{model_name.pluralize}" merge>
     <body class="index_page" param/>
-    <content_header>
+    <content_header param>
       <heading param><%= model_name.pluralize %></heading>
       <sub_heading param><count part="item_count"/></sub_heading>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <nav param="top_pagination_nav"><page_nav/></nav>
       
       <Table param>
@@ -79,7 +79,7 @@
       <nav param="bottom_pagination_nav"><page_nav/></nav>
     </content_body>
     
-    <content_footer>
+    <content_footer param>
       <a to="&@model" action="new" param="new_link"/>
     </content_footer>
   </PageForIndex>
@@ -89,11 +89,11 @@
 <def tag="NewPage">
   <PageForNew title="New #{type_name}" merge>
     <body class="new_page new_#{type_name.underscore}" param/>
-    <content_header>
+    <content_header param>
       <heading param>New <type_name title/></heading>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <error_messages param/>
 
       <form param>
@@ -112,12 +112,12 @@
   %>
   <PageForShow merge>    
     <body class="show_page show_#{type_name.underscore}" param/>
-    <content_header>
+    <content_header param>
       <heading param><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
       <delete_button in_place="&false" param/>
     </content_header>
     
-    <content_body>
+    <content_body param>
       <FieldList skip="name" tag="editor" param/>
 
       <nav param="new_links">
@@ -137,12 +137,12 @@
   %>
   <PageForEdit merge>    
     <body class="edit_page edit_#{type_name.underscore}" param/>
-    <content_header>
+    <content_header param>
       <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
       <delete_button in_place="&false" param/>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <error_messages param/>
       <form param>
         <FieldList skip="name" param/>
@@ -162,12 +162,12 @@
 <def tag="NewInCollectionPage">
   <PageForNewInCollection title="New #{type_name}" merge>
     <body class="new_in_collection_page new_#{type_name(:with => @owner)}_#{type_name}_page" param/>
-    <content_header>
+    <content_header param>
       <heading param>New <type_name/></heading>
       <sub_heading>For: <a with="&@owner" /></sub_heading>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <error_messages/>
 
       <form param>
@@ -184,13 +184,13 @@
   <PageForShowCollection title="&title" merge>
     <body class="show_collection_page show_#{type_name(:with => @owner)}_#{type_name(:pluralize => true)}_page"
           param/>
-    <content_header>
+    <content_header param>
       <nav>Back to <a with="&@owner"/></nav>
       <heading><%= title %></heading>
       <sub_heading><count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/></sub_heading>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <nav param="top_pagination_nav"><page_nav/></nav>
 
       <Table param="Table">
@@ -215,11 +215,11 @@
   <Page title="Login" merge>
     <body class="login_page" param/>
     <nav replace/>
-    <content_header>
+    <content_header param>
       <heading param>Log In</heading>
     </content_header>
 
-    <content_body>
+    <content_body param>
       <form action="&request.request_uri" param>
         <field_list>
           <field_list_item>
@@ -248,11 +248,11 @@
   <Page title="Sign Up" merge>
     <body class="signup_page" param/>
     <nav replace/>
-    <content_header>
+    <content_header param>
       <heading param>Sign Up</heading>
     </content_header>
     
-    <content_body>
+    <content_body param_name_for_this>
       <error_messages/>
       <form action="&request.request_uri">
         <field_list>
