@@ -63,7 +63,7 @@
 <def tag="IndexPage">
   <% model_name = @model.name.titleize %>
   <PageForIndex title="All #{model_name.pluralize}" merge>
-    <body class="index_page" param/>
+    <body class="index_page #{@model.name.underscore.pluralize}" param/>
     <content_header param>
       <heading param><%= model_name.pluralize %></heading>
       <sub_heading param><count part="item_count"/></sub_heading>
@@ -88,7 +88,7 @@
 
 <def tag="NewPage">
   <PageForNew title="New #{type_name}" merge>
-    <body class="new_page new_#{type_name.underscore}" param/>
+    <body class="new_page #{type_name.underscore}" param/>
     <content_header param>
       <heading param>New <type_name title/></heading>
     </content_header>
@@ -111,7 +111,7 @@
      end.compact
   %>
   <PageForShow merge>    
-    <body class="show_page show_#{type_name.underscore}" param/>
+    <body class="show_page #{type_name.underscore}" param/>
     <content_header param>
       <heading param><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
       <delete_button in_place="&false" param/>
@@ -136,7 +136,7 @@
      end.compact
   %>
   <PageForEdit merge>    
-    <body class="edit_page edit_#{type_name.underscore}" param/>
+    <body class="edit_page #{type_name.underscore}" param/>
     <content_header param>
       <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
       <delete_button in_place="&false" param/>
@@ -161,7 +161,7 @@
 
 <def tag="NewInCollectionPage">
   <PageForNewInCollection title="New #{type_name}" merge>
-    <body class="new_in_collection_page new_#{type_name(:with => @owner)}_#{type_name}_page" param/>
+    <body class="new_in_collection_page #{type_name(:with => @owner)} #{type_name}" param/>
     <content_header param>
       <heading param>New <type_name/></heading>
       <sub_heading>For: <a with="&@owner" /></sub_heading>
@@ -182,7 +182,7 @@
 <def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
   <PageForShowCollection title="&title" merge>
-    <body class="show_collection_page show_#{type_name(:with => @owner)}_#{type_name(:pluralize => true)}_page"
+    <body class="show_collection_page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
           param/>
     <content_header param>
       <nav>Back to <a with="&@owner"/></nav>
