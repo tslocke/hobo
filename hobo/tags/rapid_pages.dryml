@@ -182,7 +182,7 @@
 <def tag="ShowCollectionPage">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
   <PageForShowCollection title="&title" merge>
-    <body class="show_collection_page show_#{type_name(:with => @owner)_#{type_name(:pluralize => true)}_page"
+    <body class="show_collection_page show_#{type_name(:with => @owner)}_#{type_name(:pluralize => true)}_page"
           param/>
     <content_header>
       <nav>Back to <a with="&@owner"/></nav>
@@ -234,7 +234,7 @@
 
           <field_list_item if="&remember_me">
             <item_label class="field_label" param="remember_me_label">Remember me:</item_label>
-            <item_value><input type="checkbox" name="remember_me" id="remember_me" param="remember_me_input"></item_value>
+            <item_value><input type="checkbox" name="remember_me" id="remember_me" param="remember_me_input"/></item_value>
           </field_list_item>
         </field_list>
         <submit label='Log in' param/>
