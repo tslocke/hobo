@@ -381,7 +381,12 @@ module Hobo::Dryml
     # single hash
     def merge_option_procs(general_proc, overriding_proc)
       if overriding_proc
-        proc { merge_attrs(general_proc.call, overriding_proc.call) }
+        if overriding_proc.arity == 1
+          # The override is a replace parameter - just pass it on
+          overriding_proc
+        else
+          proc { merge_attrs(general_proc.call, overriding_proc.call) }
+        end
       else
         general_proc
       end
