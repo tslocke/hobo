@@ -301,7 +301,7 @@ module Hobo::Dryml
     
     
     def template_call?(el)
-      template_name?(el.name)
+      template_name?(el.dryml_name)
     end
     
     
@@ -419,9 +419,9 @@ module Hobo::Dryml
       
       res = param_name == "&true" ? el.dryml_name : param_name
 
-      dryml_exception("param name for a template call must be capitalised", el) if
+      dryml_exception("param '#{res}' is for a template call must be capitalised", el) if
         res && template_call?(el) && !template_name?(res)
-      dryml_exception("param name for a block-tag call must not be capitalised", el) if
+      dryml_exception("param '#{res}' is for a block-tag call and must not be capitalised", el) if
         res && !template_call?(el) && template_name?(res)
       
       res
