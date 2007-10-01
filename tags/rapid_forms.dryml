@@ -267,3 +267,44 @@
     <tagbody/>
   </select>
 </def>
+
+
+<def tag="has_many_checkbox_editor" attrs="model, update, message"><%=
+  raise HoboError.new("no update specified") unless update
+
+  fields = attributes.delete_if{|k,v|!k.ends_with? "_id"}
+  conditions = fields.map{|k,v|"#{k}=#{v}"}.join " AND "
+
+  klass = model.is_a?(String) ? model.constantize : model
+  obj = klass.find(:first, :conditions => conditions)
+
+  checkbox_attrs = {:type =>'checkbox'}
+  
+  if obj == nil
+    new = klass.new(fields)
+    permission = if can_create?(new)
+      message ||= "Setting #{new.class.name.titleize}"
+      class_name = new.class.name.underscore
+      checkbox_attrs[:onclick] = ajax_updater(object_url(new.class), message, update,
+                          ({:params => { class_name => fields }} unless fields.empty?))
+    end
+  else
+    permission = if can_delete?(obj)
+      checkbox_attrs[:checked] = 'checked'
+      message ||= "Unsetting #{obj.class.name.titleize}"
+      class_name = obj.class.name.underscore
+      checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), message, update, {:method => 'delete'})                          
+    end
+  end
+  tag :input, add_classes(attributes.merge(checkbox_attrs),
+                          "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox") if permission
+%></def>
+
+<def tag="HasManyCheckboxEditors">
+  <Table>
+    <tr>
+      <td><has_many_checkbox_editor param="editor" merge_attrs/></td>
+      <td><name param/></td>
+    </tr>
+  </Table>
+</def>
