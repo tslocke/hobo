@@ -308,27 +308,27 @@ module Hobo::Dryml
     end
     
     
-    def call_block_tag_parameter(the_tag, attributes, overriding_proc, &b)
+    def call_block_tag_parameter(the_tag, attributes, overriding_proc, &default_tagbody)
       if overriding_proc && overriding_proc.arity == 1
         # This is a 'replace' parameter
         
         template_default = proc do |attrs, body_block|
-          tagbody_proc = body_block && proc {|_| new_context { body_block.call(b) } }
-          call_block_tag_parameter(the_tag, attributes, proc { attrs.update(:tagbody => tagbody_proc) }, &b)
+          tagbody_proc = body_block && proc {|_| new_context { body_block.call(default_tagbody) } }
+          call_block_tag_parameter(the_tag, attributes, proc { attrs.update(:tagbody => tagbody_proc) }, &default_tagbody)
         end
         overriding_proc.call(template_default)
       else
         if overriding_proc
           overriding_attributes = overriding_proc.call
-          tagbody = overriding_attributes.delete(:tagbody)
+          overriding_tagbody = overriding_attributes.delete(:tagbody)
           attributes = merge_attrs(attributes, overriding_attributes)
         end
       
         if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
-          body = if tagbody
-                   new_context { tagbody.call(proc {b.call(nil)}) }
-                 elsif b
-                   new_context { b.call(nil) }
+          body = if overriding_tagbody
+                   new_context { overriding_tagbody.call(proc { default_tagbody.call(nil) }) }
+                 elsif default_tagbody
+                   new_context { default_tagbody.call(nil) }
                  else
                    nil
                  end
@@ -340,17 +340,17 @@ module Hobo::Dryml
         else
           if the_tag.is_a?(String, Symbol)
             body = proc do |default| 
-              if tagbody
-                tagbody.call(proc { b ? b.call(default) : "" })
+              if overriding_tagbody
+                overriding_tagbody.call(proc { default_tagbody ? default_tagbody.call(default) : "" })
               else
-                b ? b.call(default) : ""
+                default_tagbody ? default_tagbody.call(default) : ""
               end
             end
             
             send(the_tag, attributes, &body)
           else
             # It's a proc - a template default
-            the_tag.call(attributes, tagbody || b)
+            the_tag.call(attributes, overriding_tagbody || default_tagbody)
           end
         end
       end
@@ -385,7 +385,22 @@ module Hobo::Dryml
           # The override is a replace parameter - just pass it on
           overriding_proc
         else
-          proc { merge_attrs(general_proc.call, overriding_proc.call) }
+          proc do 
+            overriding_params = overriding_proc.call
+            defined_params = general_proc.call
+            
+            params = defined_params.merge(overriding_params)
+            
+            # The overrider should provide its tagbody as the new
+            # <default_tagbody/>
+            if overriding_params[:tagbody] && defined_params[:tagbody]
+              params[:tagbody] = proc do |default|
+                overriding_params[:tagbody].call(proc { _output(defined_params[:tagbody].call(default)) })
+              end
+            end
+
+            params
+          end
         end
       else
         general_proc

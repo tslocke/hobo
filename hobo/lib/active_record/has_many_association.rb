@@ -28,10 +28,10 @@ module ActiveRecord::Associations
       if loaded?
         target.include?(record)
       else
-        find(record.id) && true rescue false
+        (r = find(record.id)) && r == record rescue false
       end
     end
-
+    
     
     def member_class
       proxy_reflection.klass

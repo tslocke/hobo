@@ -1,7 +1,7 @@
 dir = File.dirname(__FILE__)
 require 'application'
 
-# Diabled by Tom
+# Disabled by Tom
 #silence_warnings { RAILS_ENV = "test" }
 require 'action_controller/test_process'
 require 'action_controller/integration'
@@ -18,7 +18,8 @@ require File.expand_path("#{dir}/rails/version")
 require File.expand_path("#{dir}/rails/extensions")
 require File.expand_path("#{dir}/rails/matchers")
 
-Test::Unit.run = true
+# Disabled by Tom
+#Test::Unit.run = true
 
 module Spec
   # = Spec::Rails

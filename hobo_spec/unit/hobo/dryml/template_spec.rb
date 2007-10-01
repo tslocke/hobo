@@ -54,8 +54,8 @@ describe Template do
   end
 
   it "should compile block-tag calls with merge_attrs" do
-    compile_dryml("<foo merge_attrs/>").should == "<%= foo({}.merge((attributes) || {})) %>"
-    compile_dryml("<foo a='1' merge_attrs/>").should == '<%= foo({:a => "1"}.merge((attributes) || {})) %>'
+    compile_dryml("<foo merge_attrs/>").should == "<%= foo(merge_attrs({},(attributes) || {})) %>"
+    compile_dryml("<foo a='1' merge_attrs/>").should == '<%= foo(merge_attrs({:a => "1"},(attributes) || {})) %>'
   end
 
   # --- Compilation: Defining Block Tags --- #
@@ -228,6 +228,7 @@ describe Template do
       '<% } }, })) %>'
   end
   
+
   # --- Tag Evalutation Examples --- #
   
   
@@ -396,7 +397,13 @@ describe Template do
     eval_with_templates("<DefTagMerge><defined>hum<default_tagbody/></defined></DefTagMerge>").should ==
       'foo a is , b is 3, body is humbaa!'
   end
+
   
+  it "should insert the correct default_tagbody in nested merged template parameters" do 
+    eval_dryml("<def tag='T1'><p param>t1 default</p></def>" +
+               "<def tag='T2'><T1 merge><p param><default_tagbody/> - t2 default</p></T1></def>" +
+               "<T2><p><default_tagbody/></p></T2>").should == "<p>t1 default - t2 default</p>"
+  end
   
   
   # --- Replacing Template Parameters --- #
@@ -420,6 +427,7 @@ describe Template do
     eval_with_templates('<StaticMerge><b replace>short <b restore>big</b></b></StaticMerge>').should ==
       '<p>a short <b name="big">big</b> word</p>'
   end
+  
 
   # --- Merge Params --- #
   

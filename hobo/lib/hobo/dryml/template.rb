@@ -9,7 +9,7 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    SPECIAL_ATTRIBUTES = %w(param merge_attrs for_type if unless repeat part restore)
+    SPECIAL_ATTRIBUTES = %w(param merge merge_params merge_attrs for_type if unless repeat part restore)
 
     @build_cache = {}
     
@@ -655,7 +655,7 @@ module Hobo::Dryml
                         else
                           dryml_exception("invalid merge_attrs", el)
                         end
-        "{#{items}}.merge((#{extra_attributes}) || {})"
+        "merge_attrs({#{items}},(#{extra_attributes}) || {})"
       else
         "{#{items}}"
       end

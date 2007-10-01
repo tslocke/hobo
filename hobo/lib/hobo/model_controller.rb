@@ -332,11 +332,15 @@ module Hobo
       options = LazyHash.new(options)
       
       @this = find_instance_or_not_found(options, :this) and
-        if Hobo.can_view?(current_user, @this)
+        begin
+          set_status(:not_allowed) unless Hobo.can_view?(current_user, @this)
           set_named_this!
-          response_block(&b) or hobo_render
-        else
-          permission_denied
+          response_block(&b) or
+            if not_allowed?
+              permission_denied
+            else
+              hobo_render
+            end
         end
     end
 
@@ -347,6 +351,7 @@ module Hobo
       @this.set_creator(current_user) if options.fetch(:set_creator, true)
       
       set_status(:not_allowed) unless Hobo.can_create?(current_user, @this)
+      set_named_this!
       response_block(&b) or 
         if not_allowed?
           permission_denied
@@ -496,6 +501,7 @@ module Hobo
       @owner = find_instance_or_not_found(options, :owner) or return
       @association = collection.is_a?(Array) ? collection : @owner.send(collection)
       @this = options[:this] || @association.new
+      set_named_this!
       @this.set_creator(current_user) if options.fetch(:set_creator, true)
 
       set_status(:not_allowed) unless Hobo.can_create?(current_user, @this)
@@ -504,9 +510,15 @@ module Hobo
         if not_allowed?
           permission_denied
         else
-          hobo_render("new_#{collection.to_s.singularize}") or hobo_render(:new_in_collection, @this.class)
+          hobo_render("new_#{collection.to_s.singularize}") or hobo_render("new_in_collection", @this.class)
         end
     end
+    
+    #def hobo_create_in_collection(collection, options={}, &b)
+    #  hobo_create do
+    #    hobo_new_in_collection(collection, :this => @this, &b)
+    #  end
+    #end
     
     
     # --- Response helpers --- #

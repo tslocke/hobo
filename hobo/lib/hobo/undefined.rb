@@ -2,8 +2,9 @@ module Hobo
 
   class Undefined
 
-    def initialize(klass=Object)
-      @klass = klass
+    def initialize(*args)
+      options = args.extract_options!
+      @klass = args.first || Object
     end
 
     def hobo_undefined?
