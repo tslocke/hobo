@@ -133,9 +133,10 @@
 </def>
 
 
-<def tag="input" for="Hobo::EnumString">
+<def tag="input" for="Hobo::EnumString" attrs="labels">
+  <% labels ||= {} %>
   <select name="#{param_name_for_this}" merge_attrs>
-    <%= options_for_select(this_type.values.map {|v| [v.titleize, v] }, this) %>
+    <%= options_for_select(this_type.values.map {|v| [labels.fetch(v.to_sym, v.titleize), v] }, this) %>
   </select>
 </def>
 

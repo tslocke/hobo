@@ -156,6 +156,23 @@ class Object
 end
 
 
+class TrueClass
+  
+  def implies(x)
+    x 
+  end
+  
+end
+
+class FalseClass
+  
+  def implies(x)
+    true
+  end
+  
+end
+
+
 class NilClass
   def _?()
     SafeNil.instance

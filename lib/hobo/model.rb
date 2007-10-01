@@ -73,7 +73,7 @@ module Hobo
           
           if "validate".in?(type_class.instance_methods)
             self.validate do |record|
-              v = record.send(field).validate
+              v = record.send(field)._?.validate
               record.errors.add(field, v) if v.is_a?(String)
             end
           end
@@ -170,7 +170,6 @@ module Hobo
       attr_reader :id_name_column
 
       
-      
       def field_type(name)
         name = name.to_sym
         field_types[name] or
@@ -189,9 +188,8 @@ module Hobo
       end
 
       
-      def nilable_field?(name)
-        col = columns.find {|c| c.name == name.to_s} rescue nil
-        col.nil? || col.null
+      def column(name)
+        columns.find {|c| c.name == name.to_s} rescue nil
       end
       
       

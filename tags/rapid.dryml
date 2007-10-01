@@ -286,7 +286,8 @@
 
 <def tag="view" for="TrueClass"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="count" attrs="label, prefix, unless_none"><%=
+<def tag="count" attrs="label, prefix, unless_none, if_any"><%=
+  if_any = unless_none if if_any.nil?
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
   if this.is_a?(Class) and this < ActiveRecord::Base

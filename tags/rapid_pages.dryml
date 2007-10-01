@@ -25,7 +25,8 @@
       <stylesheet name="hobo_rapid"/>
       <stylesheet name="application"/>
     </stylesheets>
-    <scripts param="scripts">
+
+    <scripts param>
       <default_tagbody/>
       <hobo_rapid_javascripts param/>
     </scripts>
