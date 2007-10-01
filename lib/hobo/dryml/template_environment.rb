@@ -379,31 +379,31 @@ module Hobo::Dryml
     # Takes two procs that each returh hashes and returns a single
     # proc that calls these in turn and merges the results into a
     # single hash
-    def merge_option_procs(general_proc, overriding_proc)
-      if overriding_proc
+    def merge_block_tag_parameter(general_proc, overriding_proc)
+      if overriding_proc.nil?
+        general_proc
+      else
         if overriding_proc.arity == 1
           # The override is a replace parameter - just pass it on
           overriding_proc
         else
           proc do 
-            overriding_params = overriding_proc.call
-            defined_params = general_proc.call
+            overriding_attrs = overriding_proc.call
+            defined_attrs = general_proc.call
             
-            params = defined_params.merge(overriding_params)
+            attrs = merge_attrs(defined_attrs, overriding_attrs)
             
             # The overrider should provide its tagbody as the new
             # <default_tagbody/>
-            if overriding_params[:tagbody] && defined_params[:tagbody]
-              params[:tagbody] = proc do |default|
-                overriding_params[:tagbody].call(proc { _output(defined_params[:tagbody].call(default)) })
+            if overriding_attrs[:tagbody] && defined_attrs[:tagbody]
+              attrs[:tagbody] = proc do |default|
+                overriding_attrs[:tagbody].call(proc { _output(defined_attrs[:tagbody].call(default)) })
               end
             end
 
-            params
+            attrs
           end
         end
-      else
-        general_proc
       end
     end
     
@@ -411,7 +411,7 @@ module Hobo::Dryml
     # hashes rather than a single hash. The first hash is the tag
     # attributes, the second is a hash of procs -- the template
     # parameters.
-    def merge_template_parameter_procs(general_proc, overriding_proc)
+    def merge_template_parameter(general_proc, overriding_proc)
       proc do
         general_attributes, general_template_procs = general_proc.call
         overriding_attributes, overriding_template_procs = overriding_proc.call
