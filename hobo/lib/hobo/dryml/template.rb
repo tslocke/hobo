@@ -512,9 +512,9 @@ module Hobo::Dryml
           param_name = get_param_name(e)
           if param_name
             if template_call?(e)
-              ":#{e.name} => merge_template_parameter_procs(#{template_proc(e)}, all_parameters[:#{param_name}]), "
+              ":#{e.name} => merge_template_parameter(#{template_proc(e)}, all_parameters[:#{param_name}]), "
             else
-              ":#{e.name} => merge_option_procs(#{template_proc(e)}, all_parameters[:#{param_name}]), "
+              ":#{e.name} => merge_block_tag_parameter(#{template_proc(e)}, all_parameters[:#{param_name}]), "
             end
           else
             ":#{e.name} => #{template_proc(e)}, "
