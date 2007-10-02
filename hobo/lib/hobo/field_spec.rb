@@ -44,7 +44,11 @@ module Hobo
     end
     
     def default
-      options[:default]
+      if null == false && options[:default].nil? && sql_type.in?([:string, :text])
+        ""
+      else
+        options[:default]
+      end
     end
     
     def different_to?(col_spec)
