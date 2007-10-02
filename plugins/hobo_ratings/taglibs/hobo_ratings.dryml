@@ -1,0 +1,9 @@
+<def tag="view" for="Hobo::Rating">
+  <div class="view #{this.class.name.underscore}">
+    <% (1..this.out_of).each do |i| -%>
+    <span if="&this >= i" class="selected">*</span>
+    <span if="&this < i" class="unselected">-</span>
+    <% end %>
+  </div>
+</def>
+
