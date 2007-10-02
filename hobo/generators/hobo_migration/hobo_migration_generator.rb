@@ -62,11 +62,14 @@ class HoboMigrationGenerator < Rails::Generator::Base
     
     up = [renames, drops, creates, changes].flatten.select{|s|!s.blank?} * "\n\n"
     down = [undo_renames, undo_drops, undo_creates, undo_changes].flatten.select{|s|!s.blank?} * "\n\n"
-    
+
+    if up.blank?
+      puts "Database and models match -- nothing to change"
+      return record {|m| } 
+    end
+      
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
-    
-    return record {|m| } if up.blank?
     
     action = input("What now: [g]enerate migrations, generate and [m]igrate now or [c]ancel?", %w(g m c))
 
