@@ -75,7 +75,7 @@ textarea.tall { height: 350px; }
 
 
 /* rails error message */
-.errorExplanation {
+.error_messages {
 	font-family: "Lucida Grande", arial, sans-serif;
 	background: #9d0018;
 	border: 1px solid #7a0013;
@@ -83,11 +83,11 @@ textarea.tall { height: 350px; }
 	color: white;
 	margin-bottom: 20px;
 }
-.errorExplanation h2 {
+.error_messages h2 {
 	text-transform: none;
 	letter-spacing: normal;
 	color: white;
 }
-.errorExplanation li {
+.error_messages li {
 	margin-left: 20px;
 }
