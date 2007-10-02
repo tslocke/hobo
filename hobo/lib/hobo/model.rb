@@ -352,7 +352,7 @@ module Hobo
             
             unless assoc
               options = proxy_reflection.options
-              has_many_conditions = options.has_key?(:conditions)
+              has_many_conditions = options[:conditions]
               source = proxy_reflection.source_reflection
               scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
@@ -431,8 +431,9 @@ module Hobo
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
-    def changed_fields?(other, *fields)
-      fields.all?{|f| self.send(f) != other.send(f)}
+    def only_changed_fields?(other, *changed_fields)
+      all_cols = self.columns.every(:name)
+      all_cols.all?{|c| c.in?(changed_fields) || self.send(f) == other.send(f) }
     end
     
     def compose_with(object, use=nil)
