@@ -33,7 +33,7 @@
   <ul merge_attrs unless="&this.empty?">
     <repeat>
       <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore}"
-          hobo_model_id="#{dom_id this}">
+          merge_attrs="&{:hobo_model_id => dom_id(this)} if this.respond_to?(:typed_id)">
         <tagbody><a/></tagbody>
       </li>
     </repeat>
