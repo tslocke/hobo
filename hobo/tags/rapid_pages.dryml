@@ -95,7 +95,7 @@
     </content_header>
 
     <content_body param>
-      <error_messages param/>
+      <ErrorMessages param/>
 
       <form param>
         <FieldList skip_associations="has_many" param/>
@@ -144,7 +144,7 @@
     </content_header>
 
     <content_body param>
-      <error_messages param/>
+      <ErrorMessages param/>
       <form param>
         <FieldList skip="name" param/>
         <submit label="Save"/>
@@ -169,7 +169,7 @@
     </content_header>
 
     <content_body param>
-      <error_messages/>
+      <ErrorMessages/>
 
       <form param>
         <FieldList skip_associations="has_many" param/>
@@ -254,7 +254,7 @@
     </content_header>
     
     <content_body param_name_for_this>
-      <error_messages/>
+      <ErrorMessages/>
       <form action="&request.request_uri">
         <field_list>
           <field_list_item>
@@ -317,9 +317,4 @@
   </div>
 </def>
 
-<def tag="error_messages">
-  <div class="error_messages">
-    <%= error_messages_for 'this' %>
-  </div>
-</def>
 

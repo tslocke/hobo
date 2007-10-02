@@ -74,26 +74,27 @@
   elsif !can_edit?
     view
   else
-    if this_type.respond_to?(:macro)
-      if this_type.macro == :belongs_to
-        belongs_to_input(attributes)
-      elsif this_type.macro == :has_many
-        has_many_input(attributes)
-      end
+    the_input = if this_type.respond_to?(:macro)
+                  if this_type.macro == :belongs_to
+                    belongs_to_input(attributes)
+                  elsif this_type.macro == :has_many
+                    has_many_input(attributes)
+                  end
+                else
+                  attrs = add_classes(attributes, type_and_field, type_id)
+                  attrs[:name] ||= param_name_for_this
+                  the_input = call_polymorphic_tag('input', attrs) or
+                    raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+                end
+    if this_parent.errors[this_field]
+      "<div class='field_with_errors'>#{the_input}</div>"
     else
-      attrs = add_classes(attributes, type_and_field, type_id)
-      attrs[:name] ||= param_name_for_this
-      the_input = call_polymorphic_tag('input', attrs) or
-        raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
-      if this_parent.errors[this_field]
-        "<div class='field_with_errors'>#{the_input}</div>"
-      else
-        the_input
-      end
+      the_input
     end
   end
 %></def>
 
+     
 <def tag="input" for="text" attrs="name">
   <%= text_area_tag(name, this, attributes) %>
 </def>
@@ -231,7 +232,7 @@
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }.sort
-  select_options.insert(0, [none_message, ""]) if this.nil? || include_none
+  select_options.insert(0, [none_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
   %>
   <select name="#{param_name_for_this(true)}" merge_attrs>
@@ -266,6 +267,19 @@
   <select name="#{param_name_for_this}">
     <tagbody/>
   </select>
+</def>
+
+      
+<def tag="ErrorMessages">
+  <section class="error_messages" merge_attrs if="&this.errors.length > 0">
+    <h2 param="heading">
+      <count:errors label='error' param/> prohibited this <type_name lowercase param/> from being saved
+    </h2>
+    <p param="message">There were problems with the following fields:</p>
+    <UL:errors.full_messages param>
+      <li param><%= this %></li>
+    </UL>
+  </section>
 </def>
 
 
@@ -308,3 +322,4 @@
     </tr>
   </Table>
 </def>
+
