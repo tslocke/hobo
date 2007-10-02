@@ -93,7 +93,7 @@ module Kernel
   
   def it() It.new end
   alias its it
-
+  
 end
 
 
@@ -156,23 +156,6 @@ class Object
 end
 
 
-class TrueClass
-  
-  def implies(x)
-    x 
-  end
-  
-end
-
-class FalseClass
-  
-  def implies(x)
-    true
-  end
-  
-end
-
-
 class NilClass
   def _?()
     SafeNil.instance
@@ -187,6 +170,35 @@ class SafeNil
     return nil unless nil.respond_to? method
     nil.send(method, *args, &b) rescue nil
   end
+end
+
+alias DelegateClass_without_safe_nil DelegateClass 
+def DelegateClass(klass)
+  c = DelegateClass_without_safe_nil(klass)
+  c.class_eval do 
+    def _?
+      self
+    end
+  end
+  c
+end
+
+
+
+class TrueClass
+  
+  def implies(x)
+    x 
+  end
+  
+end
+
+class FalseClass
+  
+  def implies(x)
+    true
+  end
+  
 end
 
 
