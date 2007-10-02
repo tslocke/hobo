@@ -2,14 +2,16 @@ module Hobo
 
   module Model
     
-    Hobo.field_types.update({ :boolean       => TrueClass,
-                              :date          => Date,
-                              :datetime      => Time,
-                              :integer       => Fixnum,
-                              :big_integer   => BigDecimal,
-                              :float         => Float,
-                              :string        => String
-                            })
+    PLAIN_TYPES = { :boolean       => TrueClass,
+                    :date          => Date,
+                    :datetime      => Time,
+                    :integer       => Fixnum,
+                    :big_integer   => BigDecimal,
+                    :float         => Float,
+                    :string        => String
+                  }
+    
+    Hobo.field_types.update(PLAIN_TYPES)
     
     def self.included(base)
       Hobo.register_model(base)
@@ -46,7 +48,12 @@ module Hobo
       
       
       def fields(&b)
-        FieldDeclarationsDsl.new(self).instance_eval(&b)
+        dsl = FieldDeclarationsDsl.new(self)
+        if b.arity == 1
+          yield dsl
+        else
+          dsl.instance_eval(&b)
+        end
       end
       
       
@@ -186,7 +193,7 @@ module Hobo
                                  end
                                end
       end
-
+      
       
       def column(name)
         columns.find {|c| c.name == name.to_s} rescue nil
@@ -483,10 +490,10 @@ module ActiveRecord::AttributeMethods::ClassMethods
     # This is the Hobo hook - add a type wrapper around the field
     # value if we have a special type defined
     src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
-              type_wrapper.is_a?(Class) && type_wrapper < String
+              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
             "val = begin; #{access_code}; end; " +
               "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; self.class.field_type(:#{attr_name}).new(val); end"
+              "else; puts(self.class.field_type(:#{attr_name})); self.class.field_type(:#{attr_name}).new(val); end"
           else
             access_code
           end
@@ -497,7 +504,7 @@ module ActiveRecord::AttributeMethods::ClassMethods
   
   def define_write_method(attr_name)
     src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(attr_name)) &&
-              type_wrapper.is_a?(Class) && type_wrapper < String
+              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
             "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
               "else; self.class.field_type(:#{attr_name}).new(val); end"
           else
