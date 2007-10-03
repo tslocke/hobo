@@ -84,7 +84,8 @@ module Hobo::RapidHelper
     attributes = add_classes(attributes, behaviour_class)
     attributes.update(:hobo_model_id => this_field_dom_id,
                       :hobo_blank_message => blank_message,
-                      :if_blank => blank_message)
+                      :if_blank => blank_message,
+                      :no_wrapper => false)
 
     update = attributes.delete(:update)
     attributes[:hobo_update] = update if update 
