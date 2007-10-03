@@ -439,6 +439,7 @@ module Hobo
     end
     
     def only_changed_fields?(other, *changed_fields)
+      changed_fields = changed_fields.every(:to_s)
       all_cols = self.class.columns.every(:name)
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
