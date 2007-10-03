@@ -494,7 +494,7 @@ module ActiveRecord::AttributeMethods::ClassMethods
               type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
             "val = begin; #{access_code}; end; " +
               "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; puts(self.class.field_type(:#{attr_name})); self.class.field_type(:#{attr_name}).new(val); end"
+              "else; self.class.field_type(:#{attr_name}).new(val); end"
           else
             access_code
           end
