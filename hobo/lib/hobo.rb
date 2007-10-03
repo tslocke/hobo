@@ -212,13 +212,18 @@ module Hobo
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
       # has_many and polymorphic associations are not editable (for now)
-      return false if refl and (refl.macro == :has_many or refl.options[:polymorphic] or refl.macro == :has_one)
+      return false if refl and (refl.options[:polymorphic] or refl.macro == :has_one)
       
       if object.has_hobo_method?(:editable_by?)
         check_permission(:edit, person, object, field.to_sym)
+      elsif object.has_hobo_method?("#{field}_editable_by?")
+        object.send("#{field}_editable_by?", person)
       else
         # Fake an edit test by setting the field in question to
         # Hobo::Undefined and then testing for update permission
+        
+        # This technique is not suitable for has_many associations
+        return false if refl._?.macro == :has_many
         
         current = object.send(field)
         new = object.duplicate
