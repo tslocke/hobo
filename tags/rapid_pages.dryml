@@ -9,7 +9,7 @@
         <stylesheet name="application"/>
       </do>
       <do param="scripts">
-        <%= javascript_include_tag :defaults %>
+        <javascript name="&:defaults"/>
       </do>
     </head>
     <body onload="Hobo.applyEvents();" param>
@@ -302,6 +302,10 @@
 
 <def tag="stylesheet" attrs="name,media">
   <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }" rel="stylesheet" type="text/css" />
+</def>
+
+<def tag="javascript" attrs="name">
+  <%= javascript_include_tag name %>
 </def>
 
 <def tag="flash_message" attr="type">
