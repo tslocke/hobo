@@ -7,3 +7,13 @@
   </div>
 </def>
 
+
+<def tag="editor" for="Hobo::Rating">
+  <div class="editor #{this.class.name.underscore} hobo_ratings_editor">
+    <% (1..this.out_of).each do |i| -%>
+    <span if="&this >= i" class="selected">*</span>
+    <span if="&this < i" class="unselected">-</span>
+    <% end %>
+  </div>
+</def>
+
