@@ -229,16 +229,16 @@
 %></def>
 
 
-<def tag="belongs_to_menu_input" attrs="include_none, none_message, options"><%
+<def tag="belongs_to_menu_input" attrs="include_none, blank_message, options"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
-  none_message ||= "(No #{this_type.name.to_s.titleize})"
+  blank_message ||= "(No #{this_type.name.to_s.titleize})"
   options ||= this_type.klass.find(:all).select {|x| can_view?(x)}
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }.sort
-  select_options.insert(0, [none_message, ""]) if include_none || (this.nil? && include_none != false)
+  select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
   %>
   <select name="#{param_name_for_this(true)}" merge_attrs>
