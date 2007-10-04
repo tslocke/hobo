@@ -17,7 +17,7 @@
           <do param="label"><%= this_field.to_s.titleize %></do>
         </item_label>
         <item_value param="#{this_field.to_s.sub('?', '')}_view">
-          <do param="view"><call_tag tag="&tag" /></do>
+          <do param="view"><call_tag tag="&tag" param="#{this_field.to_s.sub('?', '')}_tag"/></do>
         </item_value>
       </field_list_item>
     </with_fields>
