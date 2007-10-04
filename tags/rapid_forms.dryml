@@ -35,6 +35,7 @@
   end
    
   if update || !ajax_attrs.empty?
+    message ||= "Creating #{this.class.name.titleize}" if new_record
     # add an onsubmit to convert to an ajax form if `update` is given
     function = ajax_updater(:post_form, message, update, ajax_attrs)
     html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
@@ -74,14 +75,19 @@
   elsif !can_edit?
     view
   else
+    attrs = add_classes(attributes, type_and_field)
     the_input = if this_type.respond_to?(:macro)
                   if this_type.macro == :belongs_to
-                    belongs_to_input(attributes)
+                    belongs_to_input(attrs)
                   elsif this_type.macro == :has_many
-                    has_many_input(attributes)
+                    if this_type.options[:through]
+                      has_many_through_input(attrs)
+                    else
+                      has_many_input(attrs)
+                    end
                   end
                 else
-                  attrs = add_classes(attributes, type_and_field, type_id)
+                  add_classes!(attrs, type_id)
                   attrs[:name] ||= param_name_for_this
                   the_input = call_polymorphic_tag('input', attrs) or
                     raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
@@ -283,43 +289,26 @@
 </def>
 
 
-<def tag="has_many_checkbox_editor" attrs="model, update, message"><%=
-  raise HoboError.new("no update specified") unless update
-
-  fields = attributes.delete_if{|k,v|!k.ends_with? "_id"}
-  conditions = fields.map{|k,v|"#{k}=#{v}"}.join " AND "
-
-  klass = model.is_a?(String) ? model.constantize : model
-  obj = klass.find(:first, :conditions => conditions)
-
-  checkbox_attrs = {:type =>'checkbox'}
-  
-  if obj == nil
-    new = klass.new(fields)
-    permission = if can_create?(new)
-      message ||= "Setting #{new.class.name.titleize}"
-      class_name = new.class.name.underscore
-      checkbox_attrs[:onclick] = ajax_updater(object_url(new.class), message, update,
-                          ({:params => { class_name => fields }} unless fields.empty?))
-    end
-  else
-    permission = if can_delete?(obj)
-      checkbox_attrs[:checked] = 'checked'
-      message ||= "Unsetting #{obj.class.name.titleize}"
-      class_name = obj.class.name.underscore
-      checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), message, update, {:method => 'delete'})                          
-    end
-  end
-  tag :input, add_classes(attributes.merge(checkbox_attrs),
-                          "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox") if permission
-%></def>
-
-<def tag="HasManyCheckboxEditors">
-  <Table>
-    <tr>
-      <td><has_many_checkbox_editor param="editor" merge_attrs/></td>
-      <td><name param/></td>
-    </tr>
-  </Table>
+<def tag="has_many_through_input" attrs="targets, remove_label">
+  <%
+  all ||= this.member_class.find(:all)
+  values = this
+  %>
+  <div class="input has_many_through" merge_attrs>
+    <div style="display:none" class="button_proto">
+      <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+    </div>
+    <div class="items">
+      <div class="item" repeat>
+        <name/>
+        <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+      </div>
+    </div>
+    <select name="#{param_name_for_this(true)}">
+      <option value="">Add a <%= this_field.titleize.singularize %></option>
+      <option repeat="&all.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
+              merge_attrs="&{:style => 'display:none'} if this.in?(values)" 
+              value="#{this.id}"><name/></option>
+    </select>
+  </div>
 </def>
-

@@ -58,13 +58,16 @@ module Hobo
       
       
       def belongs_to_with_foreign_key_declaration(name, *args, &block)
-        res = belongs_to_without_foreign_key_declaration(name, *args, &block)
+        options = args.extract_options!
+        res = belongs_to_without_foreign_key_declaration(name, *args + [options], &block)
         refl = reflections[name]
         fkey = refl.primary_key_name
-        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer)
+        column_options = {}
+        column_options[:null] = options[:null] if options.has_key?(:null)
+        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer, column_options)
         if refl.options[:polymorphic]
           type_col = "#{name}_type"
-          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string)
+          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, :null => false)
         end
         res
       end
