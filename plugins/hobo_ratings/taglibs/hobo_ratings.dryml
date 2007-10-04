@@ -1,19 +1,29 @@
+<def tag="hobo_rating_spans">
+  <% (1..this_type.out_of).each do |i| -%>
+  <span if="&this._? >= i" class="selected rating#{i}">*</span>
+  <else>
+    <span class="unselected rating#{i}">-</span>
+  </else>
+  <% end %>
+</def>
+
 <def tag="view" for="Hobo::Rating">
-  <div class="view #{this.class.name.underscore}">
-    <% (1..this.out_of).each do |i| -%>
-    <span if="&this >= i" class="selected">*</span>
-    <span if="&this < i" class="unselected">-</span>
-    <% end %>
+  <div class="view #{this_type.name.underscore} hobo_rating">
+    <hobo_rating_spans/>
   </div>
 </def>
 
 
 <def tag="editor" for="Hobo::Rating">
-  <div class="editor #{this.class.name.underscore} hobo_ratings_editor">
-    <% (1..this.out_of).each do |i| -%>
-    <span if="&this >= i" class="selected">*</span>
-    <span if="&this < i" class="unselected">-</span>
-    <% end %>
+  <div class="#{this_type.name.underscore} hobo_rating">
+    <hobo_rating_spans/>
   </div>
 </def>
 
+
+<def tag="input" for="Hobo::Rating" attrs="name">
+  <div class="input #{this_type.name.underscore} hobo_rating">
+    <hobo_rating_spans/>
+    <input type="hidden" name="#{name}" value="#{this}"/>
+  </div>
+</def>
