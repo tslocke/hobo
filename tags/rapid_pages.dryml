@@ -9,7 +9,7 @@
         <stylesheet name="application"/>
       </do>
       <do param="scripts">
-        <javascript name="&:defaults"/>
+        <javascript name="prototype,effects,dragdrop,controls,application"/>
       </do>
     </head>
     <body onload="Hobo.applyEvents();" param>
@@ -27,7 +27,7 @@
     </stylesheets>
 
     <scripts param>
-      <default_tagbody/>
+      <javascript name="prototype,effects,dragdrop,controls,lowpro,hobo_rapid,application"/>
       <hobo_rapid_javascripts param/>
     </scripts>
 
@@ -305,7 +305,14 @@
 </def>
 
 <def tag="javascript" attrs="name">
-  <%= javascript_include_tag name %>
+  <if test="&name.is_a?(String)">
+    <repeat with="&comma_split(name)">
+      <%= javascript_include_tag this %>
+    </repeat>
+  </if>
+  <else>
+    <%= javascript_include_tag name %>
+  </else>
 </def>
 
 <def tag="flash_message" attr="type">

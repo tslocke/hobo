@@ -96,8 +96,7 @@
   
 
 <def tag="hobo_rapid_javascripts" attrs="tiny_mce"><%=
-    res = javascript_include_tag("lowpro") + javascript_include_tag("hobo_rapid")
-    res += '<script type="text/javascript">'
+    res = '<script type="text/javascript">'
     unless Hobo.all_models.empty?
       # Tell JS code how to pluralize names, unless they follow the simple rule
       names = Hobo.all_models.map do |m|
