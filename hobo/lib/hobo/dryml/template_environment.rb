@@ -422,7 +422,7 @@ module Hobo::Dryml
     
     def part_contexts_storage_tag
       storage = part_contexts_storage
-      storage.blank? ? "" : "<script>\nvar hoboParts = {}\n#{storage}</script>\n"
+      storage.blank? ? "" : "<script>\n#{storage}</script>\n"
     end
     
     
