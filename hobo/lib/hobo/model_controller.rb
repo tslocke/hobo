@@ -190,8 +190,10 @@ module Hobo
       @data_filters[name] = b
     end
     
-    def search(*columns)
-      data_filter :search do |query|
+    def search(*args)
+      options = args.extract_options!
+      columns = args
+      data_filter (options[:param] || :search) do |query|
         columns_match = columns.map do |c|
           if c.is_a?(Symbol)
             send("#{c}_contains", query)
