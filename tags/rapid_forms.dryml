@@ -304,7 +304,7 @@
         <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
       </div>
     </div>
-    <select name="#{param_name_for_this(true)}">
+    <select>
       <option value="">Add a <%= this_field.titleize.singularize %></option>
       <option repeat="&all.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
               merge_attrs="&{:style => 'display:none'} if this.in?(values)" 
