@@ -1,4 +1,4 @@
-<def tag="field_list"><table class="field_list"><tagbody/></table></def>
+<def tag="field_list"><table class="field_list" merge_attrs><tagbody/></table></def>
 
 <def tag="field_list_item"><tr merge_attrs><tagbody/></tr></def>
 
