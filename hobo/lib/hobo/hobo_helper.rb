@@ -140,6 +140,8 @@ module Hobo
       else
         Hobo.dom_id(*args)
       end
+    rescue ArgumentError
+      ""
     end
     
     

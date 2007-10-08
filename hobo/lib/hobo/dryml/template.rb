@@ -9,7 +9,11 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
-    SPECIAL_ATTRIBUTES = %w(param merge merge_params merge_attrs for_type if unless repeat part restore)
+    SPECIAL_ATTRIBUTES = %w(param merge merge_params merge_attrs 
+                            for_type 
+                            if unless repeat 
+                            part part_locals
+                            restore)
 
     @build_cache = {}
     

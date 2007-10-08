@@ -25,7 +25,6 @@ module Hobo
         alias_method_chain :belongs_to, :foreign_key_declaration
       end
       # respond_to? is slow on AR objects, use this instead where possible
-      base.send(:alias_method, :has_hobo_method?, :respond_to_without_attributes?)
     end
 
     module ClassMethods
@@ -519,4 +518,8 @@ module ActiveRecord::AttributeMethods::ClassMethods
     
   end
 
+end
+
+class ActiveRecord::Base
+  alias_method :has_hobo_method?, :respond_to_without_attributes?
 end

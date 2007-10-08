@@ -41,9 +41,9 @@
 </def>
 
 
-<def tag="Table" attrs="fields, field_tag">
+<def tag="Table" attrs="fields, field_tag, empty">
   <% field_tag ||= "view" %>
-  <table merge_attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty?">
+  <table merge_attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty? && !empty">
     <thead if="&all_parameters[:thead] || fields" param>
       <tr param="field_heading_row">
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
@@ -385,4 +385,14 @@ in the future - use at your own risk. -->
 -%><tagbody/></def>
 
 
-<def tag="you_have"><if test="&this == current_user">You have</if><else><name/> has</else></def>
+<def tag="you_have" attrs="lowercase">
+  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %> have</if><else><name/> has</else>
+</def>
+
+<def tag="you_are" attrs="lowercase">
+  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %> are</if><else><name/> is</else>
+</def>
+
+<def tag="you" attrs="lowercase">
+  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %></if><else><tagbody><name/></tagbody></else>
+</def>

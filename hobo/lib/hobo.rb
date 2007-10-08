@@ -88,7 +88,7 @@ module Hobo
 
     def dom_id(obj, attr=nil)
       if obj.nil?
-        raise HoboError, "Tried to get dom id of nil.#{attr}" if attr
+        raise ArgumentError, "Tried to get dom id of nil.#{attr}" if attr
         return 'nil'
       end
 
@@ -281,10 +281,10 @@ module Hobo
       
       if field
         field = field.to_sym if field.is_a? String
-        return false if object.is_a?(ActiveRecord::Base) and object.class.never_show?(field)
+        return false if object.is_a?(ActiveRecord::Base) && object.has_hobo_method?(:never_show) && object.class.never_show?(field)
       else
         # Special support for classes (can view instances?)
-        if object.is_a?(Class) and object < ActiveRecord::Base
+        if object.is_a?(Class) and object < Hobo::Model
           object = object.new
         elsif Hobo.simple_has_many_association?(object)
           object = object.new
@@ -292,7 +292,7 @@ module Hobo
       end
       viewable = check_permission(:view, person, object, field)
       if viewable and field and
-          ( (field_val = get_field(object, field)).is_a?(ActiveRecord::Base) or field_val.is_a?(Array) )
+          ( (field_val = get_field(object, field)).is_a?(Hobo::Model) or field_val.is_a?(Array) )
         # also ask the current value if it is viewable
         can_view?(person, field_val)
       else

@@ -28,7 +28,7 @@ module Hobo
       def initialize(part_name, this_id, locals)
         @part_name = part_name
         @this_id = this_id
-        @locals = locals.map {|l| pre_marshal(l) }
+        @locals = locals.map { |l| pre_marshal(l) }
       end
       
       
@@ -66,6 +66,7 @@ module Hobo
           raise TamperedWithPartContext unless digest == generate_digest(data, session)
 
           part_name, this_id, locals = Marshal.load(Base64.decode64(data))
+          RAILS_DEFAULT_LOGGER.info("Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}")
 
           [part_name, restore_part_this(this_id, this), restore_locals(locals)]
         end
