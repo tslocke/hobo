@@ -372,23 +372,12 @@ in the future - use at your own risk. -->
   </with>
 </def>
 
-<def tag="restricted_page" attrs="require_login,error_message"><%
-  allowed = if require_login == false
-              true
-            elsif require_login == true
-              logged_in?
-            else
-              models = comma_split(require_login).map &it.titleize.constantize
-              current_user.is_a?(*models)
-            end
-  raise Hobo::ModelController::UserPermissionError.new(models), (error_message || "Permission Denied") unless allowed
--%><tagbody/></def>
-
 
 <def tag="you" attrs="have, are">
   <if test="&this == current_user">you <%= if have then 'have' elsif are then 'are' end %></if>
   <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
 </def>
+
 
 <def tag="You" attrs="have, are">
   <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
