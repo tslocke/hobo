@@ -385,14 +385,12 @@ in the future - use at your own risk. -->
 -%><tagbody/></def>
 
 
-<def tag="you_have" attrs="lowercase">
-  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %> have</if><else><name/> has</else>
+<def tag="you" attrs="have, are">
+  <if test="&this == current_user">you <%= if have then 'have' elsif are then 'are' end %></if>
+  <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
 </def>
 
-<def tag="you_are" attrs="lowercase">
-  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %> are</if><else><name/> is</else>
-</def>
-
-<def tag="you" attrs="lowercase">
-  <if test="&this == current_user"><%= lowercase ? 'you' : 'You' %></if><else><tagbody><name/></tagbody></else>
+<def tag="You" attrs="have, are">
+  <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
+  <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
 </def>
