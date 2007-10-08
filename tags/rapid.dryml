@@ -139,7 +139,7 @@
       view(merge_attrs(attributes, {:field => 'name'}))
     elsif this.respond_to?(:title) && can_view?(this, :title)
       view(merge_attrs(attributes, {:field => 'title'}))
-    else
+    elsif can_view?(this)
       this.to_s
     end
   end
