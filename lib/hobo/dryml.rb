@@ -92,11 +92,7 @@ module Hobo::Dryml
     
     def controller_taglibs(page)
       controller_class = controller_class_for(page)
-      if controller_class.respond_to? :included_taglibs
-        controller_class.included_taglibs
-      else
-        []
-      end      
+      (controller_class.respond_to?(:included_taglibs) && controller_class.included_taglibs) || []
     end
     
     
