@@ -1,7 +1,11 @@
 module ::Hobo::Plugins
-  class HoboComments < HoboPlugin
+  class HoboAlerts < HoboPlugin
     PLUGIN_DEFAULTS = {
-      :user => :user
+      :alert => :alert,
+      :user => :user,
+      :subject => :subject,
+      :polymorphic_user    => false,
+      :polymorphic_subject => false
     }
     PLUGIN_SYMBOLS = [:alert]
 
@@ -17,16 +21,22 @@ module ::Hobo::Plugins
     def alert_model
       hobo_model :Alert do
         fields do
-          message :text
-          link    :string
+          name :string
           timestamps
         end
-        belongs_to sym[:user]
-        alias_method :user, sym[:target] unless sym[:target] == :user
+        belongs_to(sym[:user],    sym[:polymorphic_user]    ? { :polymorphic => true } : {})
+        belongs_to(sym[:subject], sym[:polymorphic_subject] ? { :polymorphic => true } : {})
+        
+        alias_method :user,    sym[:user]    unless sym[:user]    == :user
+        alias_method :subject, sym[:subject] unless sym[:subject] == :subject
+        
+        def self.alert(users, subject, name)
+          users.each { |u| create(:user => u, :subject => subject, :name => name) }
+        end
         
         def creatable_by?(user);         false; end
         def updatable_by?(user, new);    false; end
-        def deletable_by?(user);         false; end
+        def deletable_by?(deleter);      deleter == user; end
         def viewable_by?(viewer, field); viewer == user;  end
       end
     end

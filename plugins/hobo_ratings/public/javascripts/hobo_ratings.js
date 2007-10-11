@@ -24,15 +24,13 @@ Hobo.RatingsBase = {
     },
 
     toggle : function (el) {
-        select = el.match('.unselected')
-
-        if (select) {
+        if (el.match('.unselected')) {
             this.rating = this.ratingFor(el)
             while (el) {
                 this.select(el)
                 el = el.previous('span')
             }
-        } else {
+        } else if (el.match('.selected')) {
             var n = el.next('span')
             if (n && n.hasClassName("selected")) { el = n }
             this.rating = this.ratingFor(el) - 1
