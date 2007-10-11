@@ -9,7 +9,10 @@
                         comma_split(fields)
                       end
             pname = this.class.name.underscore
-            hiddens.map { |h| [ "#{pname}[#{h}]", this.send(h) ] }
+            hiddens.map do |field| 
+              val = this.send(field)
+              ["#{pname}[#{field}]", val] unless val.nil? || (this.new_record? && val == this.class.column(field).default)
+            end.compact
           end
   pairs.map {|n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip)}.compact.join("\n")
 %></def>
@@ -184,19 +187,19 @@
                                     { :type => "button" }
                                   end)
     label ||= "Remove"
-    confirm ||= "Are you sure?"
+    confirm = "Are you sure?" if confirm.nil?
     
     add_classes!(attributes,
-                 image ? "image_button_input" : "button_input",
+                 image ? "image_button" : "button",
                  "delete_button delete_#{this.class.name.underscore}_button")
     url = object_url(this, "destroy")
     if in_place == false
-      attributes[:confirm] = confirm
+      attributes[:confirm] = confirm if confirm
       button_to(label, url, attributes)
     else
       fade = true if fade.nil?
       attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, #{fade})"
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm}})"
       tag(:input, attributes)
     end
   end
@@ -289,26 +292,30 @@
 </def>
 
 
-<def tag="has_many_through_input" attrs="targets, remove_label">
+<def tag="name_array_input" attrs="targets, remove_label">
   <%
   all ||= this.member_class.find(:all)
   values = this
   %>
   <div class="input has_many_through" merge_attrs>
-    <div style="display:none" class="button_proto">
-      <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+    <div style="display:none" class="item_proto">
+      <div class="item">
+        <span></span>
+        <input type="hidden" name="#{param_name_for_this}[]" />
+        <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+      </div>
     </div>
     <div class="items">
       <div class="item" repeat>
-        <name/>
+        <span><%= this %></span>
+        <input type="hidden" name="#{param_name_for_this}[]" value="#{this}"/>
         <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
       </div>
     </div>
     <select>
       <option value="">Add a <%= this_field.titleize.singularize %></option>
       <option repeat="&all.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              merge_attrs="&{:style => 'display:none'} if this.in?(values)" 
-              value="#{this.id}"><name/></option>
+              merge_attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
     </select>
   </div>
 </def>
