@@ -40,7 +40,7 @@ module Hobo
     COLUMN_TYPE = :string
     
     def validate
-      "must be one of #{self.class.values * ', '}" unless self.in? self.class.values
+      "must be one of #{self.class.values * ', '}" unless self.in?(self.class.values)
     end
     
   end

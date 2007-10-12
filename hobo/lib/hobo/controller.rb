@@ -42,8 +42,9 @@ module Hobo
       end
     end
 
-    def hobo_ajax_response(this=nil, results={})
-      this ||= @this
+    def hobo_ajax_response(*args)
+      results = args.extract_options!
+      this = args.first || @this
       part_page = params[:part_page]
       r = params[:render]
       if r
@@ -128,4 +129,13 @@ module Hobo
     end
 
   end
+end
+
+
+class ActionController::Base
+  
+  def home_page
+    ""
+  end
+  
 end

@@ -164,7 +164,7 @@
   func = ajax_updater(object_url(this) + "/#{method}", message, update,
                       ajax_attributes.merge(:params => params, :result_update => result_update))
   html_attributes.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
-  tag(:input, add_classes(html_attributes, "button_input remote_method_button #{method}_button"))
+  tag(:input, add_classes(html_attributes, "button remote_method_button #{method}_button"))
 %></def>
   
 
@@ -175,7 +175,7 @@
                       :params => { this.class.name.underscore => fields }.merge(params || {}),
                       :method => :put)
   tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                          "button_input update_button update_#{this.class.name.underscore}_button") %>
+                          "button update_button update_#{this.class.name.underscore}_button") %>
 </def>
 
 
@@ -199,7 +199,7 @@
     else
       fade = true if fade.nil?
       attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm}})"
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
       tag(:input, attributes)
     end
   end
@@ -227,7 +227,7 @@
     func = ajax_updater(object_url(new.class), message, update,
                         ({:params => { class_name => fields }} unless fields.empty?))
     tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                            "button_input create_button create_#{class_name}_button")
+                            "button create_button create_#{class_name}_button")
   end
 %></def>
 

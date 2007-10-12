@@ -153,7 +153,6 @@ module Hobo
 
     end
     
-    include HttpParameters
 
     # --- ACTIONS --- #
 
@@ -299,13 +298,22 @@ module Hobo
     end
 
     
-    def find_instance_or_not_found(options, this_option)
+    def find_instance_or_not_found(this)
       begin
-        options[this_option] || find_instance
+        this || find_instance
       rescue ActiveRecord::RecordNotFound
         not_found
         false
       end
+    end
+    
+    def save_and_set_status!(record)
+      status = if Hobo.can_create?(current_user, record)
+                 record.save ? :valid : :invalid
+               else
+                 :not_allowed
+               end
+      set_status(status)
     end
     
     def set_status(status)
@@ -330,10 +338,11 @@ module Hobo
     end
     
 
-    def hobo_show(options={}, &b)
+    def hobo_show(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
       
-      @this = find_instance_or_not_found(options, :this) and
+      @this = find_instance_or_not_found(args.first) and
         begin
           set_status(:not_allowed) unless Hobo.can_view?(current_user, @this)
           set_named_this!
@@ -347,9 +356,10 @@ module Hobo
     end
 
 
-    def hobo_new(options={}, &b)
+    def hobo_new(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
-      @this = options[:this] || model.new
+      @this = args.first || model.new
       @this.set_creator(current_user) if options.fetch(:set_creator, true)
       
       set_status(:not_allowed) unless Hobo.can_create?(current_user, @this)
@@ -363,26 +373,22 @@ module Hobo
     end
     
 
-    def hobo_create(options={}, &b)
+    def hobo_create(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
       
-      if (@this = options[:this])
-        permission_denied and return unless Hobo.can_create?(current_user, @this)
-        valid = @this.save
-      else
-        attributes = params[model.name.underscore]
-        
-        create_model = if 'type'.in?(model.column_names) &&
-                           (type_attr = params['type']) &&
-                           type_attr.in?(model.send(:subclasses).every(:name))
-                         type_attr.constantize
-                       else
-                         model
-                       end
-        @this = create_model.new
-        set_status(secure_change_transaction { initialize_record(@this, attributes) })
-      end
-      
+      @this = args.first || 
+        begin
+          create_model = if 'type'.in?(model.column_names) &&
+                             (type_attr = params['type']) &&
+                             type_attr.in?(model.send(:subclasses).every(:name))
+                           type_attr.constantize
+                         else
+                           model
+                         end
+          create_model.new(params[model.name.underscore])
+        end
+      save_and_set_status!(@this)
       set_named_this!
       
       response_block(&b) or
@@ -404,23 +410,25 @@ module Hobo
     end
     
 
-    def hobo_edit(options={}, &b)
-      hobo_show(options, &b)
+    def hobo_edit(*args, &b)
+      hobo_show(*args, &b)
     end
     
     
-    def hobo_update(options={}, &b)
+    def hobo_update(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
       
-      @this = find_instance_or_not_found(options, :this) or return
+      @this = find_instance_or_not_found(args.first) or return
       
       changes = params[model.name.underscore]
-      set_status(secure_change_transaction { update_record(@this, changes) })
+      @this.attributes = changes
+      save_and_set_status!(@this)
+
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
       set_named_this!
-      
       response_block(&b) or 
         if valid?
           respond_to do |wants|
@@ -453,9 +461,10 @@ module Hobo
     end
     
     
-    def hobo_destroy(options={}, &b)
+    def hobo_destroy(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
-      @this = find_instance_or_not_found(options, :this) or return
+      @this = find_instance_or_not_found(args.first) or return
       
       set_named_this!
 
@@ -477,7 +486,7 @@ module Hobo
     def hobo_show_collection(collection, options={}, &b)
       options = LazyHash.new(options)
       
-      @owner = find_instance_or_not_found(options, :owner) or return
+      @owner = find_instance_or_not_found(options[:owner]) or return
       
       if collection.is_a?(Array)
         @this = collection
@@ -500,7 +509,7 @@ module Hobo
     def hobo_new_in_collection(collection, options={}, &b)
       options = LazyHash.new(options)
       
-      @owner = find_instance_or_not_found(options, :owner) or return
+      @owner = find_instance_or_not_found(options[:owner]) or return
       @association = collection.is_a?(Array) ? collection : @owner.send(collection)
       @this = options[:this] || @association.new
       set_named_this!
@@ -525,6 +534,7 @@ module Hobo
     
     # --- Response helpers --- #
 
+    
     def permission_denied(options={})
       if respond_to? :permission_denied_response
         permission_denied_response
@@ -543,7 +553,7 @@ module Hobo
       elsif render_tag("NotFoundPage", { :with => @this }, :status => 404)
         # cool
       else
-        render(:text => "Can't find #{model.name.titleize}: #{params[:id]}", :status => 404)
+        render(:text => "The page you requested cannot be found.", :status => 404)
       end
     end
     

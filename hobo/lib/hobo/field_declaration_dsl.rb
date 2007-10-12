@@ -20,18 +20,16 @@ module Hobo
         type.in?(@model.connection.native_database_types.keys - [:text])
       @model.field_specs[name] = FieldSpec.new(@model, name, type, options)
       
-      if :required.in?(args)
-        @model.send(:validates_presence_of, name)
-        raise HoboError, "inconsistent field declaration: required field should not allow null" if
-          options[:null]
-        options[:null] = false
-      end
+      @model.send(:validates_presence_of, name)   if :required.in?(args)
       @model.send(:validates_uniqueness_of, name) if :unique.in?(args)
     end
     
     def method_missing(name, *args)
       field(name, *args)
     end
+    
+    undef_method :type
+    
     
   end
   

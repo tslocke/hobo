@@ -6,6 +6,7 @@ class <%= class_name %> < ActiveRecord::Base
 <% for attribute in attributes -%>
     <%= attribute.name %> :<%= attribute.type %>
 <% end -%>
+    timestamps
   end
 
 

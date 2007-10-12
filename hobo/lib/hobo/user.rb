@@ -2,7 +2,9 @@ require 'digest/sha1'
 
 module Hobo
 
-  module AuthenticatedUser
+  module User
+    
+    AUTHENTICATION_FIELDS = [:salt, :crypted_password, :remember_token, :remember_token_expires_at]
 
     # Extend the base class with AuthenticatedUser functionality
     # This includes:
@@ -29,7 +31,9 @@ module Hobo
       
         before_save :encrypt_password
         
-        never_show :salt, :crypted_password, :remember_token, :remember_token_expires_at
+        never_show *AUTHENTICATION_FIELDS
+        
+        attr_protected *AUTHENTICATION_FIELDS
         
         set_field_type :password => :password, :password_confirmation => :password
         
