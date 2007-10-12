@@ -163,8 +163,13 @@ module Hobo
      
     def map_this
       res = []
-      this.each_index {|i| new_field_context(i) { res << yield } }
-      Dryml.last_if = !this.empty?
+      empty = true
+      if this.respond_to?(:each_index)
+        this.each_index {|i| empty = false; new_field_context(i) { res << yield } }
+      else
+        this.map {|e| empty = false; new_object_context(e) { res << yield } }
+      end
+      Dryml.last_if = !empty
       res
     end
     alias_method :collect_this, :map_this

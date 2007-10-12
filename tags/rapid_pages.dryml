@@ -53,6 +53,18 @@
 </def>
 
 
+<def tag="Page" extend_with="aside">
+  <PageWithoutAside merge>
+    <content>
+      <section class="main_content" param="main_content">
+        <default_tagbody for="content"/>
+      </section>
+      <aside class="aside_content" param/>
+    </content>
+  </PageWithoutAside>
+</def>
+      
+
 <def tag="PageForIndex"><Page merge/></def>
 <def tag="PageForNew"><Page merge/></def>
 <def tag="PageForShow"><Page merge/></def>
@@ -132,10 +144,6 @@
 
 
 <def tag="EditPage">
-  <% has_many_assocs = this.class.reflections.values.map do |refl|
-       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
-     end.compact
-  %>
   <PageForEdit merge>    
     <body class="edit_page #{type_name.underscore}" param/>
     <content_header param>
@@ -146,15 +154,10 @@
     <content_body param>
       <ErrorMessages param/>
       <form param>
-        <FieldList skip="name" param/>
+        <FieldList skip_associations="has_many" param/>
         <submit label="Save"/>
       </form>
           
-      <nav param="new_links">
-        <UL with="&has_many_assocs">
-          <li><a action="new"/></li>
-        </UL>
-      </nav>
     </content_body>
   </PageForEdit>
 </def>
@@ -253,25 +256,13 @@
       <heading param>Sign Up</heading>
     </content_header>
     
-    <content_body param_name_for_this>
+    <content_body param>
       <ErrorMessages/>
-      <form action="&request.request_uri">
-        <field_list>
-          <field_list_item>
-            <item_label>Login</item_label>
-            <item_value><input type="text" name="user[login]" param="login_input"/></item_value>
-          </field_list_item>
+      <form action="&request.request_uri" param>
+        <FieldList fields="login, password, password_confirmation" param>
+          <password_confirmation_label>Confirm Password</password_confirmation_label>
+        </FieldList>
 
-          <field_list_item>
-            <item_label>Password</item_label>
-            <item_value><input type="password" name="user[password]" param="password_input"/></item_value>
-          </field_list_item>
-
-          <field_list_item>
-            <item_label>Confirm Password</item_label>
-            <item_value><input type="password" name="user[password_confirmation]"/></item_value>
-          </field_list_item>
-        </field_list>
         <submit label='Sign Up'/>
       </form>
     </content_body>
@@ -279,6 +270,22 @@
   </Page>
 </def>
 
+
+<def tag="PermissionDeniedPage">
+  <Page>
+    <content_header param>
+      <heading param>That operation is not allowed</heading>
+    </content_header>
+  </Page>
+</def>
+
+<def tag="NotFoundPage">
+  <Page>
+    <content_header param>
+      <heading param>The page you were looking for could not be found</heading>
+    </content_header>
+  </Page>
+</def>
 
 <def tag="doctype" attrs="version"><%=
   case version.upcase

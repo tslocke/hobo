@@ -58,7 +58,7 @@ class ActiveRecord::Base
   end
   def self.hobo_user_model(login_attr=nil, &b)
     include Hobo::Model
-    include Hobo::AuthenticatedUser
+    include Hobo::User
     set_login_attr(login_attr, &b) if login_attr
   end
 end

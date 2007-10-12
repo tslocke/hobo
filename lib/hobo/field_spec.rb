@@ -44,16 +44,11 @@ module Hobo
     end
     
     def default
-      if null == false && options[:default].nil? && sql_type.in?([:string, :text])
-        ""
-      else
-        options[:default]
-      end
+      options[:default]
     end
     
     def different_to?(col_spec)
       [:limit, :precision, :scale, :null, :default].any? do |k|
-        # puts "#{col_spec.send(k).inspect} --- #{self.send(k).inspect} : #{col_spec.send(k) != self.send(k)}"
         col_spec.send(k) != self.send(k)
       end || sql_type != col_spec.type
     end

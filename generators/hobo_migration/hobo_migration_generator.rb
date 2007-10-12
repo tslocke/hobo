@@ -21,7 +21,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     db_tables = connection.tables - ignore_tables
     
     models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
-    models = models.reject {|m| m.name.underscore.in?(ignore_models) }
+    models = models.select {|m| m.name.underscore.not_in?(ignore_models) && m < Hobo::Model }
     table_models = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)
     
@@ -192,7 +192,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
         change_spec[:precision] = spec.precision if !spec.precision.nil?
         change_spec[:scale]     = spec.scale if !spec.scale.nil?
         change_spec[:null]      = false unless spec.null
-        change_spec[:default]   = spec.default if !spec.default.nil?
+        change_spec[:default]   = spec.default
         
         changes << "change_column :#{table_name}, :#{c}, " + 
           ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")

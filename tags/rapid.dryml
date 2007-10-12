@@ -241,6 +241,7 @@
 
             truncate = 30 if truncate == true
             the_view = self.truncate(the_view, truncate.to_i) if truncate
+            the_view = the_view.strip
             
             if no_wrapper
               the_view

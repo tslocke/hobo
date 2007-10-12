@@ -19,12 +19,12 @@ module Hobo
       base.class_eval do
         @field_specs  = HashWithIndifferentAccess.new
         set_field_type({})
+        alias_method_chain :attributes=, :hobo_type_conversion
       end
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
       end
-      # respond_to? is slow on AR objects, use this instead where possible
     end
 
     module ClassMethods
@@ -66,7 +66,7 @@ module Hobo
         field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer, column_options)
         if refl.options[:polymorphic]
           type_col = "#{name}_type"
-          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, :null => false)
+          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
         end
         res
       end
@@ -413,6 +413,12 @@ module Hobo
       end
     end
     
+    def attributes_with_hobo_type_conversion=(attributes)
+      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
+      self.attributes_without_hobo_type_conversion = converted
+    end
+      
+
     
     def set_creator(user)
       self.send("#{self.class.creator_attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
@@ -437,11 +443,12 @@ module Hobo
 
 
     def same_fields?(other, *fields)
+      fields = fields.flatten
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
     def only_changed_fields?(other, *changed_fields)
-      changed_fields = changed_fields.every(:to_s)
+      changed_fields = changed_fields.flatten.every(:to_s)
       all_cols = self.class.columns.every(:name)
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
@@ -469,6 +476,42 @@ module Hobo
         name
       else
         "#{self.class.name.humanize} #{id}"
+      end
+    end
+    
+    private
+    
+    def parse_datetime(s)
+      defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
+    end
+
+    def convert_type_for_mass_assignment(field_type, value)
+      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) and field_type.macro.in?([:belongs_to, :has_one])
+        if value.is_a?(String) && value.starts_with?('@')
+          Hobo.object_from_dom_id(value[1..-1])
+        else
+          value
+        end
+      elsif !field_type.is_a?(Class)
+        value
+      elsif field_type <= Date
+        if value.is_a? Hash
+          Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          dt = parse_datetime(value)
+          dt && dt.to_date
+        end
+      elsif field_type <= Time
+        if value.is_a? Hash
+          Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
+        elsif value.is_a? String
+          parse_datetime(value)
+        end
+      elsif field_type <= TrueClass
+        (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
+      else
+        # primitive field
+        value
       end
     end
     

@@ -262,9 +262,9 @@ class Hash
     res
   end
   
-  def map_hash
+  def map_hash(&b)
     res = {}
-    each {|k,v| res[k] = yield(k,v) }
+    each {|k,v| res[k] = b.arity == 1 ? yield(v) : yield(k, v) }
     res
   end
 

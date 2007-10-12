@@ -25,7 +25,7 @@ module Hobo
       options = LazyHash.new(options)
       options.reverse_merge!(:success_notice => "You have logged in.",
                              :failure_notice => "You did not provide a valid login and password.",
-                             :redirect_to => base_url)
+                             :disabled_notice => "You account is not currently available.")
       
       if request.post?
         user = model.authenticate(params[:login], params[:password])
@@ -40,13 +40,14 @@ module Hobo
           if block_given? && !yield
             # block returned false - cancel this login
             self.current_user = old_user
+            flash[:notice] ||= options[:disabled_notice]
           else
             if params[:remember_me] == "1"
               current_user.remember_me
               create_auth_cookie
             end
             flash[:notice] ||= options[:success_notice]
-            redirect_back_or_default(options[:redirect_to]) unless performed?
+            redirect_back_or_default(options[:redirect_to] || home_page) unless performed?
           end
         end
       end
@@ -56,20 +57,22 @@ module Hobo
     
     def hobo_signup(options={})
       options = LazyHash.new(options)
-      options.reverse_merge!(:notice => "Thanks for signing up!",
-                             :redirect_to => base_url)
+      options.reverse_merge!(:notice => "Thanks for signing up!")
       if request.post?
         begin
-          @user = model.new(params[:user])
+          @user = model.new(params[model.name.underscore])
           @this = @user
-          @user.save!
-          self.current_user = @user
-          redirect_back_or_default(options[:redirect_to])
-          flash[:notice] = options[:notice]
-        rescue ActiveRecord::RecordInvalid
-          hobo_render
+          permission_denied && return unless Hobo.can_create?(current_user, @user)
+          if @user.save
+            self.current_user = @user
+            flash[:notice] = options[:notice]
+            redirect_back_or_default(options[:redirect_to] || home_page)
+          else
+            hobo_render
+          end
         end
       else
+        @this = @user = model.new
         hobo_render
       end
     end
