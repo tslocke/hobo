@@ -4,3 +4,9 @@
     <call_tag:subject tag="#{this.name}_alert" param="message"/>
   </div>
 </def>
+
+<def tag="Alerts">
+  <div class="#{this.member_class.name.underscore.pluralize">
+    <Alert repeat merge/>
+  </div>
+</def>
