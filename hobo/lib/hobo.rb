@@ -98,11 +98,13 @@ module Hobo
       elsif obj.is_a?(Class)
         return type_id(obj)
       elsif !obj.respond_to?(:typed_id)
-        if attr
-          return dom_id(get_field(obj, attr))
-        else
-          raise ArgumentError, "Can't create dom id for #{obj.inspect}"
-        end
+        return (if attr
+                  dom_id(get_field(obj, attr))
+                elsif obj.respond_to?(:id)
+                  "#{obj.class.name.underscore}_#{obj.id}"
+                else
+                  raise ArgumentError, "Can't create dom id for #{obj.inspect}"
+                end)
       end
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
