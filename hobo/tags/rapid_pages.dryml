@@ -168,7 +168,7 @@
     <body class="new_in_collection_page #{type_name(:with => @owner)} #{type_name}" param/>
     <content_header param>
       <heading param>New <type_name/></heading>
-      <sub_heading>For: <a with="&@owner" /></sub_heading>
+      <sub_heading param>For: <a with="&@owner" /></sub_heading>
     </content_header>
 
     <content_body param>
