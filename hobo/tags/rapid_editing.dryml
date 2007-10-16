@@ -42,14 +42,6 @@
 <def tag="editor" for="boolean"><boolean_checkbox_editor merge_attrs/></def>
 
 
-<def tag="submit" attrs="label, image">
-  <input if="&image" type="image" src="&image" merge_attrs class="image_input submit_button"/>
-  <else>
-    <input type="submit" value="#{label}" merge_attrs class="button_input submit_button"/>
-  </else>
-</def>
-
-
 <def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
   <% refl = this_type
      if refl.respond_to?(:macro) && refl.macro == :belongs_to
