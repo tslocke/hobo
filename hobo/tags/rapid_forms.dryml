@@ -319,3 +319,8 @@
     </select>
   </div>
 </def>
+
+
+<def tag="after_submit" attrs="uri">
+  <input type="hidden" value="&uri" name="after_submit"/>
+</def>

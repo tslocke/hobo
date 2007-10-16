@@ -134,33 +134,33 @@ describe Template do
   
   it "should compile template parameters with param" do
     compile_in_template("<Foo><abc param/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, all_parameters[:abc]), })) %>'
+      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {} }, all_parameters[:abc]), })) %>'
   end
   
   it "should compile template parameters with named params" do
     compile_in_template("<Foo><abc param='x'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {} }, all_parameters[:x]), })) %>'
+      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {} }, all_parameters[:x]), })) %>'
   end
   
   it "should compile template parameters with param and attributes" do
     compile_in_template("<Foo><abc param='x' a='b'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(proc { {:a => "b"} }, all_parameters[:x]), })) %>'
+      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {:a => "b"} }, all_parameters[:x]), })) %>'
   end
   
   it "should compile template parameters with param and a tag body" do
     compile_in_template("<Foo><abc param>ha!</abc></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_option_procs(' +
+      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(' +
       'proc { {:tagbody => proc {|_abc_default_tagbody| new_context { %>ha!<% } } } }, all_parameters[:abc]), })) %>'
   end
   
   it "should compile template parameters which are template calls themselves" do 
     compile_in_template("<Foo><Baa param x='1'/></Foo>").should == 
-      '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(proc { [{:x => "1"}, {}] }, all_parameters[:Baa]), })) %>'
+      '<% _output(Foo({}, {:Baa => merge_template_parameter(proc { [{:x => "1"}, {}] }, all_parameters[:Baa]), })) %>'
   end
 
   it "should compile template parameters which are templates themselves with their own parameters" do 
     compile_in_template("<Foo><Baa param><x>hello</x></Baa></Foo>").should == 
-      '<% _output(Foo({}, {:Baa => merge_template_parameter_procs(' + 
+      '<% _output(Foo({}, {:Baa => merge_template_parameter(' + 
       'proc { [{}, {:x => proc { {:tagbody => proc {|_x_default_tagbody| new_context { %>hello<% } } } }, }] }, all_parameters[:Baa]), })) %>'
   end
 
@@ -398,14 +398,19 @@ describe Template do
       'foo a is , b is 3, body is humbaa!'
   end
 
-  
   it "should insert the correct default_tagbody in nested merged template parameters" do 
     eval_dryml("<def tag='T1'><p param>t1 default</p></def>" +
                "<def tag='T2'><T1 merge><p param><default_tagbody/> - t2 default</p></T1></def>" +
                "<T2><p><default_tagbody/></p></T2>").should == "<p>t1 default - t2 default</p>"
   end
   
-  
+  it "should accumulate attributes through nested merged template parameters" do 
+    eval_dryml("<def tag='T1'><p class='c1' c='c' param/></def>" +
+               "<def tag='T2'><T1 merge/></def>" +
+               "<def tag='T3'><T2 merge><p class='c2' b='b' param/></T2></def>" +
+               "<T3><p class='call' a='a'/></T3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'/>")
+  end
+
   # --- Replacing Template Parameters --- #
   
   it "should allow template parameters to be replaced" do 

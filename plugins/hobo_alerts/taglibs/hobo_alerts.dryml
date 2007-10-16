@@ -6,7 +6,7 @@
 </def>
 
 <def tag="Alerts">
-  <div class="#{this.member_class.name.underscore.pluralize">
+  <div class="#{this.member_class.name.underscore.pluralize}" if="any?">
     <Alert repeat merge/>
   </div>
 </def>
