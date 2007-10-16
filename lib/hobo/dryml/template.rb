@@ -401,7 +401,7 @@ module Hobo::Dryml
       
       part_locals = el.attributes["part_locals"]
       
-      part_src = "<% def #{part_name}_part(#{part_locals}) #{tag_newlines(el)}; new_context do %>" +
+      part_src = "<% def #{part_name}_part(#{part_locals._?.gsub('@', '')}) #{tag_newlines(el)}; new_context do %>" +
         content +
         "<% end; end %>"
       @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))

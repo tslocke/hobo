@@ -145,7 +145,7 @@
 
 <def tag="EditPage">
   <PageForEdit merge>    
-    <body class="edit_page #{type_name.underscore}" param/>
+    <body class="edit_page #{this.class.name.underscore}" param/>
     <content_header param>
       <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
       <delete_button in_place="&false" param/>

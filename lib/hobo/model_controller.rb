@@ -122,10 +122,15 @@ module Hobo
       end
       
       
-      def web_method(web_name, method_name=nil)
-        method_name ||= web_name
+      def web_method(web_name, options={}, &block)
         web_methods << web_name.to_sym
-        before_filter(:only => [web_name]) {|controller| controller.send(:prepare_web_method, method_name)}
+        method = options[:method] || web_name
+        define_method web_name do
+          @this = find_instance(options) unless options[:no_find]
+          permission_denied unless Hobo.can_call?(current_user, @this, method)
+          instance_eval(&block)
+          hobo_ajax_response unless performed?
+        end
       end
       
       
@@ -143,11 +148,11 @@ module Hobo
       end
       
       
-      def find_instance(id)
+      def find_instance(id, options={})
         if model.id_name? and id !~ /^\d+$/
-          model.find_by_id_name(id)
+          model.find_by_id_name(id, options)
         else
-          model.find(id)
+          model.find(id, options)
         end
       end
 
@@ -213,8 +218,9 @@ module Hobo
 
     # --- Action implementation helpers --- #
     
-    def find_instance(id=nil)
-      res = self.class.find_instance(id || params[:id])
+    def find_instance(*args)
+      options = args.extract_options!
+      res = self.class.find_instance(args.first || params[:id], options)
       instance_variable_set("@#{model.name.underscore}", res)
       res
     end
@@ -394,7 +400,7 @@ module Hobo
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(object_url(@this)) }
+            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         elsif invalid?
@@ -432,7 +438,7 @@ module Hobo
       response_block(&b) or 
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(object_url(@this)) }
+            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
             wants.js do
               if changes.size == 1
                 # Decreasingly hacky support for the scriptaculous in-place-editor
@@ -588,12 +594,6 @@ module Hobo
 
     
     # --- filters --- #
-    
-    def prepare_web_method(method)
-      @this = find_instance
-      permission_denied unless Hobo.can_call?(current_user, @this, method)
-    end
-    
     
     def set_no_cache_headers
       headers["Pragma"] = "no-cache"
