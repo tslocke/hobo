@@ -317,8 +317,13 @@ module Hobo
       end
     end
     
-    def save_and_set_status!(record)
-      status = if Hobo.can_create?(current_user, record)
+    def save_and_set_status!(record, original=nil)
+      can = if record.new_record?
+              Hobo.can_create?(current_user, record)
+            else
+              Hobo.can_update?(current_user, record, original)
+            end
+      status = if can
                  record.save ? :valid : :invalid
                else
                  :not_allowed
@@ -431,10 +436,15 @@ module Hobo
       options = LazyHash.new(options)
       
       @this = find_instance_or_not_found(args.first) or return
+      original = @this.duplicate
+      # 'duplicate' can cause these to be set, but they can conflict
+      # with the changes so we clear them
+      @this.send(:clear_aggregation_cache)
+      @this.send(:clear_association_cache)
       
       changes = params[model.name.underscore]
       @this.attributes = changes
-      save_and_set_status!(@this)
+      save_and_set_status!(@this, original)
 
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
