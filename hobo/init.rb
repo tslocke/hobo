@@ -29,6 +29,7 @@ require "hobo/password_string"
 require "hobo/text"
 require "hobo/email_address"
 require "hobo/enum_string"
+require "hobo/percentage"
 
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
