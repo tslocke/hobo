@@ -198,18 +198,22 @@ module Hobo
       options = args.extract_options!
       columns = args
       data_filter (options[:param] || :search) do |query|
-        columns_match = columns.map do |c|
-          if c.is_a?(Symbol)
-            send("#{c}_contains", query)
-          elsif c.is_a?(Hash)
-            c.map do |k, v| 
-              related = send(k)
-              v = [v] unless v.is_a?(Array)
-              v.map { |related_col| related.send("#{related_col}_contains", query) }
+        words = query.split
+        terms = words.map do |word|
+          cols = columns.map do |c|
+            if c.is_a?(Symbol)
+              send("#{c}_contains", word)
+            elsif c.is_a?(Hash)
+              c.map do |k, v| 
+                related = send(k)
+                v = [v] unless v.is_a?(Array)
+                v.map { |related_col| related.send("#{related_col}_contains", word) }
+              end
             end
-          end
-        end.flatten
-        any?(*columns_match)
+          end.flatten
+          any?(*cols)
+        end
+        all?(*terms)
       end
     end
     
