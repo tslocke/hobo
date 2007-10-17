@@ -512,12 +512,14 @@ module Hobo
     end
     
     
-    def hobo_new_in_collection(collection, options={}, &b)
+    def hobo_new_in_collection(collection, *args, &b)
+      options = args.extract_options!
+      this = args.first
       options = LazyHash.new(options)
       
       @owner = find_instance_or_not_found(options[:owner]) or return
       @association = collection.is_a?(Array) ? collection : @owner.send(collection)
-      @this = options[:this] || @association.new
+      @this = this || @association.new
       set_named_this!
       @this.set_creator(current_user) if options.fetch(:set_creator, true)
 

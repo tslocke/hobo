@@ -283,7 +283,7 @@ module Hobo
       
       if field
         field = field.to_sym if field.is_a? String
-        return false if object.is_a?(ActiveRecord::Base) && object.has_hobo_method?(:never_show) && object.class.never_show?(field)
+        return false if object.class.respond_to?(:never_show?) && object.class.never_show?(field)
       else
         # Special support for classes (can view instances?)
         if object.is_a?(Class) and object < Hobo::Model

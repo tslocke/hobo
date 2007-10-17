@@ -108,7 +108,7 @@ module Hobo
       end
 
       def never_show?(field)
-        @hobo_never_show and field.to_sym.in?(@hobo_never_show)
+        @hobo_never_show && field.to_sym.in?(@hobo_never_show)
       end
       public :never_show?
 
@@ -449,7 +449,7 @@ module Hobo
     
     def only_changed_fields?(other, *changed_fields)
       changed_fields = changed_fields.flatten.every(:to_s)
-      all_cols = self.class.columns.every(:name)
+      all_cols = self.class.columns.every(:name) - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
     

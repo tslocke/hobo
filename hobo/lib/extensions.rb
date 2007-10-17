@@ -212,8 +212,8 @@ module Enumerable
     not_found
   end
 
-  def every(proc)
-    map(&proc)
+  def every(method, *args)
+    map { |x| x.send(method, *args) }
   end
   
   def map_with_index
