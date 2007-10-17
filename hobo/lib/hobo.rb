@@ -160,7 +160,7 @@ module Hobo
     
     def get_field(object, field)
       return nil if object.nil?
-      if field.to_s =~ /\d+/
+      if field.to_s =~ /^\d+$/
         object[field.to_i]
       else
         object.send(field)
