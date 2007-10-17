@@ -160,6 +160,10 @@
   </select>
 </def>
 
+<def tag="input" for="percentage" attrs="name">
+  <%= text_field_tag(name, this, attributes.merge(:size => '3', :maxlength => '3')) %>%
+</def>
+
 
 <def tag="belongs_to_input">
   <%= belongs_to_menu_input(attributes) %>
