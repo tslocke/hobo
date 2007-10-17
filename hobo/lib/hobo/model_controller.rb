@@ -394,6 +394,7 @@ module Hobo
                          end
           create_model.new(params[model.name.underscore])
         end
+      @this.set_creator(current_user) if options.fetch(:set_creator, true)
       save_and_set_status!(@this)
       set_named_this!
       
