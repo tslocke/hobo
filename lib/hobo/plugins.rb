@@ -37,7 +37,7 @@ module ::Hobo::Plugins
     end
 
     def hobo_model(name, &b)
-      make_class @opt[name], ActiveRecord::Base do
+      make_class(@opt ? @opt[name] : name, ActiveRecord::Base) do
         hobo_model
         class_eval &b if b
       end

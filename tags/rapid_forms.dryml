@@ -11,10 +11,12 @@
             pname = this.class.name.underscore
             hiddens.map do |field| 
               val = this.send(field)
-              ["#{pname}[#{field}]", val] unless val.nil? || (this.new_record? && val == this.class.column(field).default)
+              ["#{pname}[#{field}]", val] unless val.nil? || 
+                                                   field.to_sym.in?(this.class.attr_protected) || 
+                                                   (this.new_record? && val == this.class.column(field).default)
             end.compact
           end
-  pairs.map {|n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip)}.compact.join("\n")
+  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip) }.compact.join("\n")
 %></def>
 
 
@@ -168,11 +170,17 @@
 <def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  message ||= method.titleize
-  func = ajax_updater(object_url(this) + "/#{method}", message, update,
-                      ajax_attributes.merge(:params => params, :result_update => result_update))
-  html_attributes.update(:type =>'button', :onclick => "var e = this; " + func, :value => label)
-  tag(:input, add_classes(html_attributes, "button remote_method_button #{method}_button"))
+  url = object_url(this) + "/#{method}"
+  add_classes!(html_attributes, "button remote_method_button #{method}_button")
+  if update || result_update
+    message ||= method.titleize
+    func = ajax_updater(url, message, update,
+                        ajax_attributes.merge(:params => params, :result_update => result_update))
+    html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
+    tag(:input, html_attributes)
+  else
+    button_to(label, url, html_attributes)
+  end
 %></def>
   
 
