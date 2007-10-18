@@ -410,7 +410,10 @@ module Hobo
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
+            wants.html do
+              flash[:notice] = options[:success_notice] || "The #{model.name.titleize} was created successfully"
+              redirect_to(params[:after_submit] || object_url(@this))
+            end
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         elsif invalid?
@@ -453,7 +456,10 @@ module Hobo
       response_block(&b) or 
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
+            wants.html do
+              flash[:notice] = options[:success_notice] || "Changes to the #{model.name.titleize} were saved"
+              redirect_to(params[:after_submit] || object_url(@this))
+            end
             wants.js do
               if changes.size == 1
                 # Decreasingly hacky support for the scriptaculous in-place-editor
