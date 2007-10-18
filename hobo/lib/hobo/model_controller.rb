@@ -411,7 +411,7 @@ module Hobo
         if valid?
           respond_to do |wants|
             wants.html do
-              flash[:notice] = options[:success_notice] || "The #{model.name.titleize} was created successfully"
+              flash[:notice] ||= options[:success_notice] || "The #{model.name.titleize} was created successfully"
               redirect_to(params[:after_submit] || object_url(@this))
             end
             wants.js   { hobo_ajax_response || render(:text => "") }
@@ -457,7 +457,7 @@ module Hobo
         if valid?
           respond_to do |wants|
             wants.html do
-              flash[:notice] = options[:success_notice] || "Changes to the #{model.name.titleize} were saved"
+              flash[:notice] ||= options[:success_notice] || "Changes to the #{model.name.titleize} were saved"
               redirect_to(params[:after_submit] || object_url(@this))
             end
             wants.js do
