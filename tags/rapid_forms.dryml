@@ -342,5 +342,5 @@
 
 
 <def tag="after_submit" attrs="uri">
-  <input type="hidden" value="&uri" name="after_submit"/>
+  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit"/>
 </def>
