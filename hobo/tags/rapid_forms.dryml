@@ -153,10 +153,11 @@
 </def>
 
 
-<def tag="input" for="Hobo::EnumString" attrs="labels">
+<def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
   <% labels ||= {} %>
+  <% titleize = true if titleize.nil? %>
   <select name="#{param_name_for_this}" merge_attrs>
-    <%= options_for_select(this_type.values.map {|v| [labels.fetch(v.to_sym, v.titleize), v] }, this) %>
+    <%= options_for_select(this_type.values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }, this) %>
   </select>
 </def>
 
@@ -256,7 +257,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  options ||= this_type.klass.find(:all).select {|x| can_view?(x)}
+  options ||= this_type.klass.find(:all, :conditions => this_type.options[:conditions]).select {|x| can_view?(x)}
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
