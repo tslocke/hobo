@@ -53,25 +53,25 @@ module Hobo
     end
 
     
-    def hobo_signup(options={})
-      options = LazyHash.new(options)
-      options.reverse_merge!(:notice => "Thanks for signing up!")
+    def hobo_signup(&b)
       if request.post?
-        begin
-          @user = model.new(params[model.name.underscore])
-          @this = @user
-          permission_denied && return unless Hobo.can_create?(current_user, @user)
-          if @user.save
-            self.current_user = @user
-            flash[:notice] = options[:notice]
-            redirect_back_or_default(options[:redirect_to] || home_page)
-          else
+        @user = model.new(params[model.name.underscore])
+        @this = @user
+        save_and_set_status!(@user)
+        self.current_user = @user if valid?
+        response_block(&b) or
+          if valid?
+            flash[:notice] ||= "Thanks for signing up!"
+            redirect_back_or_default(home_page)
+          elsif invalid?
             hobo_render
+          elsif not_allowed?
+            permission_denied
           end
-        end
       else
         @this = @user = model.new
-        hobo_render
+        yield if block_given?
+        hobo_render unless performed?
       end
     end
 

@@ -125,10 +125,15 @@ module Hobo
       def web_method(web_name, options={}, &block)
         web_methods << web_name.to_sym
         method = options[:method] || web_name
+        got_block = block_given?
         define_method web_name do
           @this = find_instance(options) unless options[:no_find]
           permission_denied unless Hobo.can_call?(current_user, @this, method)
-          instance_eval(&block)
+          if got_block
+            instance_eval(&block)
+          else
+            @this.send(method)
+          end
           hobo_ajax_response unless performed?
         end
       end
@@ -503,7 +508,10 @@ module Hobo
           permission_denied
         else
           respond_to do |wants|
-            wants.html { redirect_to(:action => "index") }
+            wants.html do
+              flash[:notice] ||= "The #{model.name.titleize} was deleted"
+              redirect_to(:action => "index")
+            end
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         end

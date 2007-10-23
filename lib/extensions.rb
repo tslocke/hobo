@@ -215,7 +215,7 @@ module Enumerable
   def every(method, *args)
     map { |x| x.send(method, *args) }
   end
-  
+    
   def map_with_index
     res = []
     each_with_index {|x, i| res << yield(x, i)}

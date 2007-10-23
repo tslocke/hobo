@@ -184,7 +184,7 @@
                            target.name
                          end
 
-        href = object_url(target, "new", :subsite => subsite)
+        href = object_url(target, "new", params._?.merge(:subsite => subsite))
         add_classes!(attributes, "new_#{new_class_name.underscore}_link")
         content ||= "New #{new_class_name.titleize}"
         content_tag(:a, content, attributes.update(:href => href))

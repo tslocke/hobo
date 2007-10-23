@@ -11,12 +11,10 @@ module Hobo
      
     def current_user
       # simple one-hit-per-request cache
-      @current_user or
-        @current_user = if session and id = session[:user]
-                          Hobo.object_from_dom_id(id)
-                        else 
-                          ::Guest.new
-                        end 
+      @current_user ||= begin
+                          id = session._?[:user]
+                          (id && Hobo.object_from_dom_id(id) rescue nil) || ::Guest.new
+                        end
     end
      
      
@@ -52,8 +50,8 @@ module Hobo
       
       controller_name = controller_for(obj)
       
-      subsite = params._?[:subsite] || self.subsite
-      base = subsite ? "/" + subsite + base_url : base_url
+      subsite = params[:subsite] || self.subsite
+      base = subsite ? "/#{subsite}#{base_url}" : base_url
       
       parts = if obj.is_a? Class
                 [base, controller_name]
@@ -85,27 +83,17 @@ module Hobo
               else
                 raise HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
               end
-      basic = parts.join("/")
-      
-      controller = (controller_name.camelize + "Controller").constantize rescue nil
-      url = case action
-            when "new"
-              basic + "/new"
-            when "destroy"
-              basic + "?_method=DELETE"
-            when "update"
-              basic + "?_method=PUT"
-            when nil
-              basic
-            else
-              basic + "/" + action
-            end
+      url = parts.join("/")
 
-      if params
-        params = make_params(params - [:subsite])
-        url = "#{url}?#{params}" unless params.blank?
+      case action
+      when nil       # do nothing
+      when "destroy" then params["_method"] = "DELETE"
+      when "update"  then params["_method"] = "PUT"
+      else url += "/#{action}" 
       end
-      url
+
+      params = make_params(params - [:subsite])
+      params.blank? ? url : "#{url}?#{params}"
     end
      
      

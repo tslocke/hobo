@@ -32,16 +32,18 @@ module Hobo
       end
     end
 
+    
     protected
     
-    def redirect_to_with_object_url(destination, view=nil)
+    def redirect_to_with_object_url(destination, *args)
       if destination.is_a?(String, Hash, Symbol)
         redirect_to_without_object_url(destination)
       else
-        redirect_to_without_object_url(object_url(destination, view))
+        redirect_to_without_object_url(object_url(destination, *args))
       end
     end
 
+    
     def hobo_ajax_response(*args)
       results = args.extract_options!
       this = args.first || @this
