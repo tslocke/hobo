@@ -123,7 +123,7 @@
 </def>
   
 <def tag="input" for="password" attrs="name">
-  <%= password_field_tag(name, this) %>
+  <%= password_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="html" attrs="name">
@@ -175,7 +175,7 @@
 <def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  url = object_url(this) + "/#{method}"
+  url = object_url(this, method)
   add_classes!(html_attributes, "button remote_method_button #{method}_button")
   if update || result_update
     message ||= method.titleize

@@ -272,7 +272,7 @@
 
 
 <def tag="PermissionDeniedPage">
-  <Page>
+  <Page merge>
     <content_header param>
       <heading param>That operation is not allowed</heading>
     </content_header>
@@ -280,7 +280,7 @@
 </def>
 
 <def tag="NotFoundPage">
-  <Page>
+  <Page merge>
     <content_header param>
       <heading param>The page you were looking for could not be found</heading>
     </content_header>

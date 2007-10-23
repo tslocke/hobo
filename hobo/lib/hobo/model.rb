@@ -365,7 +365,7 @@ module Hobo
               source = proxy_reflection.source_reflection
               scope_conditions = find_scope[:conditions]
               conditions = if has_many_conditions && scope_conditions
-                             "(#{scope_conditions}) AND (#{has_many_conditions})"
+                             "(#{sanitize_sql scope_conditions}) AND (#{sanitize_sql has_many_conditions})"
                            else
                              scope_conditions || has_many_conditions
                            end
