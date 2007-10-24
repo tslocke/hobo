@@ -24,14 +24,14 @@ module ::Hobo::Plugins
           name :string
           timestamps
         end
-        belongs_to(sym[:user],    sym[:polymorphic_user]    ? { :polymorphic => true } : {})
-        belongs_to(sym[:subject], sym[:polymorphic_subject] ? { :polymorphic => true } : {})
+        belongs_to(sym[:user],    :polymorphic => sym[:polymorphic_user])
+        belongs_to(sym[:subject], :polymorphic => sym[:polymorphic_subject])
         
         alias_method :user,    sym[:user]    unless sym[:user]    == :user
         alias_method :subject, sym[:subject] unless sym[:subject] == :subject
         
         def self.alert(users, subject, name)
-          users.each { |u| create(:user => u, :subject => subject, :name => name) }
+          users.each { |u| create(:user => u, :subject => subject, :name => name.to_s) }
         end
         
         def creatable_by?(user);         false; end
