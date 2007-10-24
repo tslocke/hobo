@@ -348,6 +348,12 @@ module Hobo
 
     def not_allowed?; @status == :not_allowed; end
     
+    def wants_html?
+      res = false
+      respond_to {|wants| wants.html { res = true } }
+      res
+    end
+    
     
     # --- Action implementations --- #
 
@@ -414,7 +420,7 @@ module Hobo
       save_and_set_status!(@this)
       set_named_this!
       
-      flash[:notice] = "The #{model.name.titleize.downcase} was created successfully" if valid?
+      flash[:notice] = "The #{model.name.titleize.downcase} was created successfully" if wants_html? && valid? 
       
       response_block(&b) or
         if valid?
@@ -458,7 +464,7 @@ module Hobo
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if valid?
+      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if wants_html? && valid?
       
       set_named_this!
       response_block(&b) or 
@@ -505,7 +511,7 @@ module Hobo
       set_status(:not_allowed) unless Hobo.can_delete?(current_user, @this)
       unless not_allowed?
         @this.destroy 
-        flash[:notice] = "The #{model.name.titleize.downcase} was deleted"
+        flash[:notice] = "The #{model.name.titleize.downcase} was deleted" if wants_html?
       end
 
       response_block(&b) or
