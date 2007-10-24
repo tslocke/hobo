@@ -414,13 +414,12 @@ module Hobo
       save_and_set_status!(@this)
       set_named_this!
       
+      flash[:notice] = "The #{model.name.titleize.downcase} was created successfully" if valid?
+      
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html do
-              flash[:notice] ||= "The #{model.name.titleize} was created successfully"
-              redirect_to(params[:after_submit] || object_url(@this))
-            end
+            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         elsif invalid?
@@ -459,12 +458,13 @@ module Hobo
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
+      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if valid?
+      
       set_named_this!
       response_block(&b) or 
         if valid?
           respond_to do |wants|
             wants.html do
-              flash[:notice] ||= "Changes to the #{model.name.titleize} were saved"
               redirect_to(params[:after_submit] || object_url(@this))
             end
             wants.js do
@@ -503,17 +503,17 @@ module Hobo
       set_named_this!
 
       set_status(:not_allowed) unless Hobo.can_delete?(current_user, @this)
-      @this.destroy unless not_allowed?
+      unless not_allowed?
+        @this.destroy 
+        flash[:notice] = "The #{model.name.titleize.downcase} was deleted"
+      end
 
       response_block(&b) or
         if not_allowed?
           permission_denied
         else
           respond_to do |wants|
-            wants.html do
-              flash[:notice] ||= "The #{model.name.titleize} was deleted"
-              redirect_to(:action => "index")
-            end
+            wants.html { redirect_to(:action => "index") }
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         end
