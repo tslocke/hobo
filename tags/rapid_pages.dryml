@@ -324,7 +324,7 @@
 
 <def tag="flash_message" attrs="type">
   <% type = type ? type.to_sym : :notice %>
-  <div class="flash" if="&flash[type]"><%= flash[type] %></div>
+  <div class="flash #{type}" if="&flash[type]" merge_attrs><%= flash[type] %></div>
 </def>
 
 <def tag="ajax_progress">
