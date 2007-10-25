@@ -73,6 +73,10 @@ module Hobo
         map.connect "#{plural}/:id", :controller => plural, :action => 'show'
 
       elsif controller < Hobo::ModelController
+        # index routes need to be firstso the index names don't get
+        # taken as IDs
+        index_action_routes 
+
         if subsite
           map.namespace(subsite) do |m|
             m.resources plural, :collection => { :completions => :get }
@@ -112,6 +116,14 @@ module Hobo
       end
     end
     
+    
+    def index_action_routes
+      controller.index_actions.each do |view|
+        named_route("#{view}_#{plural}", "#{plural}/#{view}",
+                    :action => view.to_s, :conditions => { :method => :get })
+      end
+    end
+
     
     def show_action_routes
       controller.show_actions.each do |view|

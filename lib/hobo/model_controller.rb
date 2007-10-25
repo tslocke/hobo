@@ -94,6 +94,10 @@ module Hobo
         @show_actions ||= superclass.respond_to?(:show_actions) ? superclass.show_actions : []
       end
       
+      def index_actions
+        @index_actions ||= superclass.respond_to?(:index_actions) ? superclass.index_actions : []
+      end
+      
       def collections
         # By default, all has_many associations are published
         @collections ||= if superclass.respond_to?(:collections)
@@ -148,6 +152,12 @@ module Hobo
         end
       end
       
+      def index_action(*names)
+        index_actions.concat(names)
+        for name in names
+          class_eval "def #{name}; hobo_index; end"
+        end
+      end
       
       def publish_collection(*names)
         collections.concat(names)
@@ -201,11 +211,11 @@ module Hobo
       @data_filters[name] = b
     end
     
-    def search(*args)
-      options = args.extract_options!
-      columns = args
-      data_filter (options[:param] || :search) do |query|
-        words = query.split
+    def search(search_string, *columns)
+      return nil if search_string.blank?
+      
+      model.conditions do
+        words = search_string.split
         terms = words.map do |word|
           cols = columns.map do |c|
             if c.is_a?(Symbol)
@@ -264,7 +274,10 @@ module Hobo
                         end
       
       @association = options.delete(:association) ||
-        if args.any?
+        if args.length == 1
+          scopes = args.first
+          @association = scopes.to_s.split(".").inject(model) { |m, name| m.send(name) }
+        elsif args.length == 2
           owner, collection_name = args
           @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
         end
@@ -328,7 +341,7 @@ module Hobo
       can = if record.new_record?
               Hobo.can_create?(current_user, record)
             else
-              Hobo.can_update?(current_user, record, original)
+              Hobo.can_update?(current_user, original, record)
             end
       status = if can
                  record.save ? :valid : :invalid
@@ -337,30 +350,32 @@ module Hobo
                end
       set_status(status)
     end
-    
+
     def set_status(status)
       @status = status
     end
-    
+
     def invalid?; @status == :invalid; end
-      
+    
     def valid?; @status == :valid; end
 
     def not_allowed?; @status == :not_allowed; end
     
-    def wants_html?
-      res = false
-      respond_to {|wants| wants.html { res = true } }
-      res
-    end
-    
     
     # --- Action implementations --- #
 
-    def hobo_index(options = {}, &b)
+    def hobo_index(*args, &b)
+      options = args.extract_options!
       options = LazyHash.new(options)
       @model = model
-      @this = options[:collection] || paginated_find(options)
+      collection = args.first
+      @this = if collection.blank?
+                paginated_find(options)
+              elsif collection.is_a?(String, Symbol)
+                paginated_find(collection, options) # a scope name
+              else
+                collection
+              end
       instance_variable_set("@#{@model.name.pluralize.underscore}", @this)
       response_block(&b) or hobo_render
     end
@@ -420,7 +435,7 @@ module Hobo
       save_and_set_status!(@this)
       set_named_this!
       
-      flash[:notice] = "The #{model.name.titleize.downcase} was created successfully" if wants_html? && valid? 
+      flash[:notice] = "The #{model.name.titleize.downcase} was created successfully" if !request.xhr? && valid? 
       
       response_block(&b) or
         if valid?
@@ -464,7 +479,7 @@ module Hobo
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if wants_html? && valid?
+      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if !request.xhr? && valid?
       
       set_named_this!
       response_block(&b) or 
@@ -511,7 +526,7 @@ module Hobo
       set_status(:not_allowed) unless Hobo.can_delete?(current_user, @this)
       unless not_allowed?
         @this.destroy 
-        flash[:notice] = "The #{model.name.titleize.downcase} was deleted" if wants_html?
+        flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
       end
 
       response_block(&b) or
