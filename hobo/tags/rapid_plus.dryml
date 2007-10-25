@@ -7,7 +7,7 @@
           <hidden_fields for_query_string skip="page, search_form"/>
           Search 
           <input class="search_field" type="search" name="search" value="&params[:search]"/>
-          <submit label="Go" param="search_submit"/>
+          <submit label="Go" class="search_button" param="search_submit"/>
         </form>
       </div>
     </div>

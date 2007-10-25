@@ -204,9 +204,9 @@ module Hobo
       
       def conditions(*args, &b)
         if args.empty?
-          ModelQueries.new(self).instance_eval(&b).to_sql
+          ModelQueries.new(self).instance_eval(&b)._?.to_sql
         else
-          ModelQueries.new(self).instance_exec(*args, &b).to_sql
+          ModelQueries.new(self).instance_exec(*args, &b)._?.to_sql
         end
       end
       
@@ -223,7 +223,7 @@ module Hobo
           
         res = if b && !(block_conditions = conditions(&b)).blank?
                 c = if !options[:conditions].blank?
-                      "(#{options[:conditons]}) and (#{block_conditions})"
+                      "(#{sanitize_sql options[:conditions]}) AND (#{sanitize_sql block_conditions})"
                     else
                       block_conditions
                     end
@@ -315,6 +315,11 @@ module Hobo
         def first
           self.find(:first)
         end
+        
+        def member_class
+          @klass
+        end
+        
       end
       (Object.instance_methods + 
        Object.private_instance_methods +
@@ -362,8 +367,10 @@ module Hobo
             unless assoc
               options = proxy_reflection.options
               has_many_conditions = options[:conditions]
+              has_many_conditions = nil if has_many_conditions.blank?
               source = proxy_reflection.source_reflection
               scope_conditions = find_scope[:conditions]
+              scope_conditions = nil if scope_conditions.blank?
               conditions = if has_many_conditions && scope_conditions
                              "(#{sanitize_sql scope_conditions}) AND (#{sanitize_sql has_many_conditions})"
                            else
