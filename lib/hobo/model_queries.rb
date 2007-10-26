@@ -54,7 +54,7 @@ module Hobo
 
       m, field = *name.to_s.match(/^(.*)_is$/)
       if m
-        if (refl = model.reflections[field.to_sym]) and refl.macro == :belongs_to
+        if (refl = model.reflections[field.to_sym]) && refl.macro == :belongs_to
           field = refl.primary_key_name
           val = args[0] && args[0].id
           raise HoboError.new("don't use self in query blocks") if val == self

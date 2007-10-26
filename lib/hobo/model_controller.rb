@@ -211,7 +211,13 @@ module Hobo
       @data_filters[name] = b
     end
     
-    def search(search_string, *columns)
+    def search(*args)
+      if args.first.is_a?(Class)
+        model, search_string, *columns = args
+      else
+        model = self.model
+        search_string, *columns = args
+      end
       return nil if search_string.blank?
       
       model.conditions do
