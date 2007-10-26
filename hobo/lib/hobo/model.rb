@@ -291,7 +291,7 @@ module Hobo
       
       
       class ScopedProxy
-        def initialize(klass, scope={})
+        def initialize(klass, scope)
           @klass = klass
           
           # If there's no :find, or :create specified, assume it's a find scope
@@ -302,9 +302,14 @@ module Hobo
                    end
         end
         
+        
         def method_missing(name, *args, &block)
-          @klass.send(:with_scope, @scope) do
-            @klass.send(name, *args, &block)
+          if name.to_sym.in?(@klass.defined_scopes.keys)
+            proxy = @klass.send(name, *args)
+            proxy.instance_variable_set("@parent_scope", self)
+            proxy
+          else
+            _apply_scope { @klass.send(name, *args, &block) }
           end
         end
         
@@ -320,12 +325,23 @@ module Hobo
           @klass
         end
         
+        private
+        def _apply_scope
+          if @parent_scope
+            @parent_scope.send(:_apply_scope) do
+              @scope ? @klass.send(:with_scope, @scope) { yield } : yield
+            end
+          else
+            @scope ? @klass.send(:with_scope, @scope) { yield } : yield
+          end
+        end
+        
       end
       (Object.instance_methods + 
        Object.private_instance_methods +
        Object.protected_instance_methods).each do |m|
         ScopedProxy.send(:undef_method, m) unless
-          m.in?(%w{initialize method_missing send}) || m.starts_with?('_')
+          m.in?(%w{initialize method_missing send instance_variable_set instance_variable_get puts}) || m.starts_with?('_')
       end
       
       attr_accessor :defined_scopes
@@ -377,9 +393,9 @@ module Hobo
                              scope_conditions || has_many_conditions
                            end
               
-              options = options.merge(find_scope).update(:conditions => conditions,
-                                                         :class_name => proxy_reflection.klass.name,
+              options = options.merge(find_scope).update(:class_name => proxy_reflection.klass.name,
                                                          :foreign_key => proxy_reflection.primary_key_name)
+              options[:conditions] = conditions unless conditions.blank?
               options[:source] = source.name if source
 
               r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
