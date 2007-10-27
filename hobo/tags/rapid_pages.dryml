@@ -307,8 +307,9 @@
   end
 %></def>
 
-<def tag="stylesheet" attrs="name,media">
-  <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }" rel="stylesheet" type="text/css" />
+<def tag="stylesheet" attrs="name, media">
+  <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }"
+        rel="stylesheet" type="text/css" />
 </def>
 
 <def tag="javascript" attrs="name">

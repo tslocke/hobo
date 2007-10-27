@@ -12,8 +12,7 @@
       </div>
     </div>
 
-    <Table merge_attrs="&attributes & (attrs_for(:Table) + attrs_for(:with_fields))"
-           merge_params>
+    <Table merge_attrs="&attributes & (attrs_for(:Table) + attrs_for(:with_fields))" merge_params>
       <field_heading_row>
         <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path
@@ -21,8 +20,9 @@
                       "-#{col}" : col
              sort_url = url_for(params.merge(:sort => sort) - [:page]) %>
                           
-          <th>
-            <a href="&sort_url" param="#{scope.field_name}_heading"><%= scope.field_name.titleize %></a>
+          <th param="#{scope.field_name}_heading">
+            <a href="&sort_url" class="column_sort" 
+               param="#{scope.field_name}_heading_link"><%= scope.field_name.titleize %></a>
             <if test="&col == sort_field">
               <do param="up_arrow" if="&sort_direction == 'desc'">&uarr;</do>
               <do param="down_arrow" if="&sort_direction == 'asc'">&darr;</do>
@@ -37,7 +37,7 @@
     </else>
    
     <nav class="page">
-      <page_nav/>
+      <page_nav param/>
     </nav>
   </div>
 </def>
