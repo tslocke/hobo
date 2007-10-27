@@ -23,7 +23,7 @@ module Hobo
     def hobo_login(options={})
       options = LazyHash.new(options)
       options.reverse_merge!(:success_notice => "You have logged in.",
-                             :failure_notice => "You did not provide a valid login and password.",
+                             :failure_notice => "You did not provide a valid #{model.login_attr.to_s.titleize.downcase} and password.",
                              :disabled_notice => "You account is not currently available.")
       
       if request.post?
@@ -49,6 +49,8 @@ module Hobo
             redirect_back_or_default(options[:redirect_to] || home_page) unless performed?
           end
         end
+      else
+        hobo_render unless performed?
       end
     end
 
