@@ -299,6 +299,7 @@ module Hobo
       page = options.delete(:page) || params[:page]
       
       paginate = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
+      options.delete(:paginate)
       if paginate
         total_number = options.delete(:total_number) ||
           begin
