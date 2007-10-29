@@ -342,6 +342,10 @@ module Hobo
       c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
       send("#{c.name.underscore}_signup_url") rescue nil
     end
+    
+    def current_page_url
+      request.request_uri.match(/^([^?]*)/)._?[1]
+    end
 
     def query_params
       query = request.request_uri.match(/(?:\?(.+))/)._?[1]
