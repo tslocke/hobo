@@ -167,6 +167,7 @@
   
   if href || attributes[:name]
     # Regular link
+    href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if params
     content_tag(:a, content, attributes.update(:href => href))
   else
     target = to || this
