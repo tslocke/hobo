@@ -351,9 +351,9 @@ module Hobo
           pair = param.split('=')
           pair.length == 1 ? pair + [''] : pair
         end
-        Hash[*pairs.flatten]
+        HashWithIndifferentAccess[*pairs.flatten]
       else
-        {}
+        HashWithIndifferentAccess.new
       end
     end
   

@@ -160,8 +160,10 @@
 %></def>
 
 
-<def tag="a" attrs="action, to, params, href, format, subsite"><%=
+<def tag="a" attrs="action, to, params, query_params, href, format, subsite"><%=
   content = tagbody.call if tagbody
+   
+  params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
   
   if href || attributes[:name]
     # Regular link
