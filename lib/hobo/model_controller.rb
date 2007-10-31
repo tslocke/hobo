@@ -159,17 +159,25 @@ module Hobo
       end
       
       
-      def show_action(*names)
+      def show_action(*names, &block)
         show_actions.concat(names)
         for name in names
-          class_eval "def #{name}; hobo_show; end"
+          if block
+            define_method name, &block
+          else
+            define_method name { hobo_show }
+          end
         end
       end
       
       def index_action(*names)
         index_actions.concat(names)
         for name in names
-          class_eval "def #{name}; hobo_index; end"
+          if block
+            define_method name, &block
+          else
+            define_method name { hobo_index }
+          end
         end
       end
       
