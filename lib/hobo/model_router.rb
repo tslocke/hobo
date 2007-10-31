@@ -142,7 +142,7 @@ module Hobo
     
     
     def named_route(name, route, options={})
-      if controller.public_methods.include?(options[:action])
+      if controller.public_instance_methods.include?(options[:action].to_s)
         options.reverse_merge!(:controller => route_with_subsite(plural))
         map.named_route(name_with_subsite(name), route_with_subsite(route), options)
       end
