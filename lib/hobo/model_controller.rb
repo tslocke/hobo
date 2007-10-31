@@ -20,7 +20,7 @@ module Hobo
 
       def included(base)
         base.class_eval do 
-          @controller_options[:actions] ||= :all
+          @actions ||= {}
           
           extend ClassMethods
           helper_method :find_partial, :model, :current_user
@@ -167,20 +167,20 @@ module Hobo
         show_actions.concat(names)
         for name in names
           if block
-            define_method name, &block
+            define_method(name, &block)
           else
-            define_method name { hobo_show }
+            define_method(name) { hobo_show }
           end
         end
       end
       
-      def index_action(*names)
+      def index_action(*names, &block)
         index_actions.concat(names)
         for name in names
           if block
-            define_method name, &block
+            define_method(name, &block)
           else
-            define_method name { hobo_index }
+            define_method(name) { hobo_index }
           end
         end
       end
