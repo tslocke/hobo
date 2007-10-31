@@ -155,7 +155,11 @@ module Hobo
       
       def actions(*args)
         # @actions is either an array - the actions to provide, or a hash: { :except => [...] }
-        @actions = args.first == :all ? args.extract_options! : args
+        @actions = case args.first
+                     when :all  then args.extract_options!
+                     when :none then []
+                     else args
+                   end
       end
       
       
