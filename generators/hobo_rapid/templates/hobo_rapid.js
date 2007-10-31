@@ -46,11 +46,15 @@ var Hobo = {
         var i = 0
         if (updates.length > 0) {
             updates.each(function(id_or_el) {
-                var dom_id = $(id_or_el).id
-                if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
-                params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[dom_id]))
-                params.push("render["+i+"][id]=" + dom_id)
-                i += 1
+                var el = $(id_or_el)
+                if (el) { // ignore update of parts that do not exist
+                    var dom_id
+                    dom_id = el.id
+                    if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
+                    params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[dom_id]))
+                    params.push("render["+i+"][id]=" + dom_id)
+                    i += 1
+                }
             })
             params.push("part_page=" + hoboPartPage)
         }
@@ -314,13 +318,15 @@ var Hobo = {
                           afterFinish: function (ef) { ef.element.remove() } });
     },
 
-    removeButton: function(el, url, updates, fade) {
-        if (fade == null) { fade = true; }
-        if (confirm("Are you sure?")) {
+    removeButton: function(el, url, updates, options) {
+        if (options.fade == null) { options.fade = true; }
+        if (options.confirm == null) { options.fade = "Are you sure?"; }
+
+        if (options.confirm == false || confirm(options.confirm)) {
             objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
             function complete() {
-                if (fade) { Hobo.fadeObjectElement(el) }
+                if (options.fade) { Hobo.fadeObjectElement(el) }
                 Hobo.hideSpinner()
             }
             if (updates && updates.length > 0) {
@@ -450,3 +456,50 @@ Field.scrollFreeActivate = function(field) {
       } catch(e) {}
   }, 1);
 }
+
+Element.Methods.$$ = function(e, css) {
+    return new Selector(css).findElements(e)
+}
+
+// --- has_many_through_input --- //
+
+HasManyThroughInput = Behavior.create({
+
+    initialize : function() {
+        // onchange doesn't bubble in IE6 so...
+        Event.observe(this.element.down('select'), 'change', this.addOne.bind(this))
+    },
+
+    addOne : function() {
+        var select = this.element.down('select')
+        var selected = select.options[select.selectedIndex]
+        if (selected.style.display != "none" & selected.value != "") {
+            var newItem = strToDom(this.element.down('.item_proto').innerHTML)
+            this.element.down('.items').appendChild(newItem);
+            newItem.down('span').innerHTML = selected.innerHTML
+            newItem.down('input[type=hidden]').value = selected.innerHTML
+            selected.style.display = 'none'
+            select.value = ""
+        }
+    },
+
+    onclick : function(e) {
+        var el = Event.element(e);
+        Event.stop(e);
+        if (el.match(".remove_item")) { this.removeOne(el.parentNode) }
+    },
+
+    removeOne : function(el) {
+        new Effect.BlindUp(el, 
+                           { duration: 0.3,
+                             afterFinish: function (ef) { ef.element.remove() } } ) 
+        var label = el.down('span').innerHTML
+        var option = $A(this.element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
+        option.style.display = 'block'
+    }
+
+})
+
+Event.addBehavior({
+    'div.has_many_through.input' : HasManyThroughInput()
+});

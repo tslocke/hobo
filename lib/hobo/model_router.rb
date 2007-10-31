@@ -73,23 +73,23 @@ module Hobo
         map.connect "#{plural}/:id", :controller => plural, :action => 'show'
 
       elsif controller < Hobo::ModelController
-        # index routes need to be firstso the index names don't get
+        # index routes need to be first so the index names don't get
         # taken as IDs
         index_action_routes 
-
-        if subsite
-          map.namespace(subsite) do |m|
-            m.resources plural, :collection => { :completions => :get }
-          end
-        else
-          map.resources plural, :collection => { :completions => :get }
-        end
-
+        resource_routes
         collection_routes
         web_method_routes
         show_action_routes
         user_routes if controller < Hobo::UserController
       end
+    end
+    
+    
+    def resource_routes
+      named_route(plural,             plural,               :action => "index")
+      named_route("new_#{singular}",  "#{plural}/new",      :action => "new")
+      named_route("edit_#{singular}", "#{plural}/:id/edit", :action => "edit")
+      named_route(singular,           "#{plural}/:id",      :action => "show")
     end
     
     
@@ -141,18 +141,20 @@ module Hobo
     end
     
     
-    def named_route(name, route, options)
-      options.reverse_merge!(:controller => prefix_route(plural))
-      map.named_route(prefix_name(name), prefix_route(route), options)
+    def named_route(name, route, options={})
+      if controller.public_methods.include?(options[:action])
+        options.reverse_merge!(:controller => route_with_subsite(plural))
+        map.named_route(name_with_subsite(name), route_with_subsite(route), options)
+      end
     end
     
    
-    def prefix_name(name)
+    def name_with_subsite(name)
       subsite ? "#{subsite}_#{name}" : name 
     end
     
     
-    def prefix_route(route)
+    def route_with_subsite(route)
       subsite ? "#{subsite}/#{route}" : route
     end
         
