@@ -20,7 +20,7 @@ module Hobo
 
       def included(base)
         base.class_eval do 
-          @actions ||= {}
+          @auto_actions ||= {}
           
           extend ClassMethods
           helper_method :find_partial, :model, :current_user
@@ -153,13 +153,13 @@ module Hobo
       end
       
       
-      def actions(*args)
-        # @actions is either an array - the actions to provide, or a hash: { :except => [...] }
-        @actions = case args.first
-                     when :all  then args.extract_options!
-                     when :none then []
-                     else args
-                   end
+      def auto_actions(*args)
+        # @auto_actions is either an array - the actions to provide, or a hash: { :except => [...] }
+        @auto_actions = case args.first
+                          when :all  then args.extract_options!
+                          when :none then []
+                          else args
+                        end
       end
       
       
@@ -201,8 +201,8 @@ module Hobo
             
       def include_action?(name)
         name = name.to_sym
-        @actions.is_a?(Array) && name.in?(action) or
-          name.not_in?(@actions.fetch(:except, []))
+        @auto_actions.is_a?(Array) && name.in?(action) or
+          name.not_in?(@auto_actions.fetch(:except, []))
       end
 
     end
