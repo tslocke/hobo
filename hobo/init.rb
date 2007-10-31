@@ -36,18 +36,20 @@ ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler
 
 class ActionController::Base
 
-  def self.hobo_user_controller(model=nil)
-    @model = model if model
+  def self.hobo_user_controller(*args)
+    @controller_options = args.extract_options!
+    @model = args.first
     include Hobo::ModelController
     include Hobo::UserController
   end
 
-  def self.hobo_model_controller(model=nil)
-    @model = model if model
+  def self.hobo_model_controller(*args)
+    @controller_options = args.extract_options!
+    @model = args.first
     include Hobo::ModelController
   end
 
-  def self.hobo_controller(model=nil)
+  def self.hobo_controller
     include Hobo::Controller
   end
 
@@ -66,4 +68,4 @@ end
 
 # Default settings
 
-Hobo.developer_features = ["development", "test"].include?(RAILS_ENV) if Hobo.developer_features? == nil
+Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?

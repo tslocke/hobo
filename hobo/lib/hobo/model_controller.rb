@@ -14,22 +14,31 @@ module Hobo
     
     VIEWLIB_DIR = "taglibs"
     
-    GENERIC_PAGE_TAGS = [:index, :show, :new, :edit, :show_collection, :new_in_collection, :login, :signup]
-    
     PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
 
     class << self
 
       def included(base)
-        base.extend(ClassMethods)
-        base.helper_method(:find_partial, :model, :current_user)
-
-        for collection in base.collections
-          add_collection_actions(base, collection.to_sym)
+        base.class_eval do 
+          @controller_options[:actions] ||= :all
+          
+          extend ClassMethods
+          helper_method :find_partial, :model, :current_user
+          before_filter :set_no_cache_headers
+          
+          def index;   hobo_index   end if include_action?(:index) 
+          def show;    hobo_show    end if include_action?(:show) 
+          def new;     hobo_new     end if include_action?(:new) 
+          def create;  hobo_create  end if include_action?(:create) 
+          def edit;    hobo_edit    end if include_action?(:edit) 
+          def update;  hobo_update  end if include_action?(:updare) 
+          def destroy; hobo_destroy end if include_action?(:destroy) 
+          
+          def completions; hobo_completions end if include_action?(:completions)
+          
+          base.collections.each { |c| add_collection_actions(c.to_sym) }
         end
 
-        base.before_filter :set_no_cache_headers
-        
         Hobo::Controller.included_in_class(base)
       end
 
@@ -59,32 +68,32 @@ module Hobo
         nil
       end
       
-      
-      def add_collection_actions(controller_class, name)
-        defined_methods = controller_class.instance_methods
-        
-        show_collection_method = "show_#{name}".to_sym
-        unless show_collection_method.in?(defined_methods)
-          controller_class.send(:define_method, show_collection_method) do
-            hobo_show_collection(name)
-          end  
-        end
-          
-        if Hobo.simple_has_many_association?(controller_class.model.reflections[name])
-          new_method = "new_#{name.to_s.singularize}"
-          if new_method.not_in?(defined_methods)
-            controller_class.send(:define_method, new_method) do
-              hobo_new_in_collection(name)
-            end
-          end
-        end
-      end
-      
     end
 
     module ClassMethods
 
       attr_writer :model
+      
+      def add_collection_actions(name)
+        defined_methods = instance_methods
+        
+        show_collection_method = "show_#{name}".to_sym
+        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
+          define_method show_collection_method do
+            hobo_show_collection(name)
+          end
+        end
+          
+        if Hobo.simple_has_many_association?(model.reflections[name])
+          new_method = "new_#{name.to_s.singularize}"
+          if new_method.not_in?(defined_methods) && include_action?(new_method)
+            define_method new_method do
+              hobo_new_in_collection(name)
+            end
+          end
+        end
+      end
+
       
       def web_methods
         @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
@@ -172,37 +181,18 @@ module Hobo
           model.find(id, options)
         end
       end
-
-    end
-    
-
-    # --- ACTIONS --- #
-
-    def index;   hobo_index; end
-    def show;    hobo_show; end
-    def new;     hobo_new; end
-    def create;  hobo_create; end
-    def edit;    hobo_edit; end
-    def update;  hobo_update; end
-    def destroy; hobo_destroy; end
-    
-    def completions
-      opts = self.class.autocompleter(params[:for])
-      if opts
-        # Eval any defined filters
-        instance_eval(&opts[:data_filters_block]) if opts[:data_filters_block]
-        conditions = data_filter_conditions
-        q = params[:query]
-        items = model.find(:all) { all?(send("#{attr}_contains", q), conditions && block(conditions)) }
-
-        render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
-      else
-        render :text => "No completer for #{attr}", :status => 404
+            
+      def include_action?(name)
+        name = name.to_sym
+        actions = @controller_options[:actions]
+        except  = @controller_options.fetch(:except, [])
+        except = [except] unless except.is_a?(Array)
+        actions == :all && name.not_in?(except) or
+          actions.is_a?(Array) && name.in?(actions)
       end
+
     end
-
-
-    # --- END OF ACTIONS --- #
+    
 
     protected
     
@@ -590,6 +580,22 @@ module Hobo
         else
           hobo_render("new_#{collection.to_s.singularize}") or hobo_render("new_in_collection", @this.class)
         end
+    end
+    
+
+    def hobo_completions
+      opts = self.class.autocompleter(params[:for])
+      if opts
+        # Eval any defined filters
+        instance_eval(&opts[:data_filters_block]) if opts[:data_filters_block]
+        conditions = data_filter_conditions
+        q = params[:query]
+        items = model.find(:all) { all?(send("#{attr}_contains", q), conditions && block(conditions)) }
+
+        render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
+      else
+        render :text => "No completer for #{attr}", :status => 404
+      end
     end
     
     #def hobo_create_in_collection(collection, options={}, &b)
