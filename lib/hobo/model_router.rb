@@ -88,10 +88,10 @@ module Hobo
     def resource_routes
       # We re-implement resource routing - routes are not created for
       # actions that the controller does not provide
-      named_route(plural,               plural,               :action => "index")
-      named_route("new_#{singular}",    "#{plural}/new",      :action => "new")
-      named_route("edit_#{singular}",   "#{plural}/:id/edit", :action => "edit")
-      named_route(singular,             "#{plural}/:id",      :action => "show")
+      named_route(plural,               plural,               :action => "index",  :conditions => { :method => :get })
+      named_route("new_#{singular}",    "#{plural}/new",      :action => "new",    :conditions => { :method => :get })
+      named_route("edit_#{singular}",   "#{plural}/:id/edit", :action => "edit",   :conditions => { :method => :get })
+      named_route(singular,             "#{plural}/:id",      :action => "show",   :conditions => { :method => :get })
       named_route("update_#{singular}", "#{plural}/:id",      :action => "update", :conditions => { :method => :put })
       named_route("create_#{singular}", plural,               :action => "create", :conditions => { :method => :post })
     end
