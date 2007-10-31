@@ -93,8 +93,7 @@ module Hobo
           end
         end
       end
-
-      
+            
       def web_methods
         @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
       end
@@ -154,6 +153,12 @@ module Hobo
       end
       
       
+      def actions(*args)
+        # @actions is either an array - the actions to provide, or a hash: { :except => [...] }
+        @actions = args.first == :all ? args.extract_options! : args
+      end
+      
+      
       def show_action(*names)
         show_actions.concat(names)
         for name in names
@@ -184,11 +189,8 @@ module Hobo
             
       def include_action?(name)
         name = name.to_sym
-        actions = @controller_options[:actions]
-        except  = @controller_options.fetch(:except, [])
-        except = [except] unless except.is_a?(Array)
-        actions == :all && name.not_in?(except) or
-          actions.is_a?(Array) && name.in?(actions)
+        @actions.is_a?(Array) && name.in?(action) or
+          name.not_in?(@actions.fetch(:except, []))
       end
 
     end
