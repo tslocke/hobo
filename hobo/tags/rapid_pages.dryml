@@ -216,7 +216,7 @@
 
 
 <def tag="LoginPage" attrs="remember_me">
-  <Page title="Login" merge>
+  <Page title="Log In" merge>
     <body class="login_page" param/>
     <nav replace/>
     <content_header param>
