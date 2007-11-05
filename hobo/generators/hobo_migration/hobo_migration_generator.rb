@@ -15,16 +15,18 @@ class HoboMigrationGenerator < Rails::Generator::Base
     # Force load of hobo models
     Hobo.models
     
-    ignore_tables = Hobo::Migrations.ignore_tables + Hobo::Migrations.ignore.every(:pluralize)
     ignore_models = (Hobo::Migrations.ignore + Hobo::Migrations.ignore_models).every(:underscore)
     
-    db_tables = connection.tables - ignore_tables
+    all_models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
+    models, ignore_models = all_models.partition do |m|
+      m.name.underscore.not_in?(ignore_models) && m < Hobo::Model
+    end
+    ignore_tables = ignore_models.every(:table_name)
     
-    models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
-    models = models.select {|m| m.name.underscore.not_in?(ignore_models) && m < Hobo::Model }
-    table_models = models.index_by {|m| m.table_name}
+    models_by_table_name = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)
-    
+    db_tables = connection.tables - ignore_tables
+
     to_create = model_table_names - db_tables
     to_drop = db_tables - model_table_names - ['schema_info']
     to_change = db_tables & model_table_names
@@ -46,7 +48,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     end * "\n\n"
 
     creates = to_create.map do |t|
-      create_table(table_models[t])
+      create_table(models_by_table_name[t])
     end * "\n\n"
     undo_creates = to_create.map do |t|
       "drop_table :#{t}"
@@ -55,7 +57,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     changes = []
     undo_changes = []
     to_change.each do |t|
-      change, undo = change_table(table_models[t])
+      change, undo = change_table(models_by_table_name[t])
       changes << change
       undo_changes << undo
     end
