@@ -15,11 +15,11 @@ class HoboMigrationGenerator < Rails::Generator::Base
     # Force load of hobo models
     Hobo.models
     
-    ignore_models = (Hobo::Migrations.ignore + Hobo::Migrations.ignore_models).every(:underscore)
+    ignore_model_names = Hobo::Migrations.ignore.every(:underscore)
     
     all_models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
     models, ignore_models = all_models.partition do |m|
-      m.name.underscore.not_in?(ignore_models) && m < Hobo::Model
+      m.name.underscore.not_in?(ignore_model_names) && m < Hobo::Model
     end
     ignore_tables = ignore_models.every(:table_name)
     
