@@ -49,7 +49,7 @@ module Hobo
 
       def template_path(dir, name, is_partial)
         fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-          full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
         if File.exists?(full_dir) && Dir.entries(full_dir).grep(fileRx).any?
           return "#{dir}/#{name}"
         end
@@ -187,7 +187,7 @@ module Hobo
       
       def publish_collection(*names)
         collections.concat(names)
-        names.each {|n| ModelController.add_collection_actions(self, n)}
+        names.each {|n| add_collection_actions(n)}
       end
       
       
@@ -258,7 +258,7 @@ module Hobo
     
     
     def set_named_this!
-      instance_variable_set("@#{model.name.underscore}", @this)      
+      instance_variable_set("@#{@this.class.name.underscore}", @this)      
     end
 
     
@@ -339,7 +339,7 @@ module Hobo
     end
 
     
-    def find_instance_or_not_found(this)
+    def find_instance_or_not_found(this=nil)
       begin
         this || find_instance
       rescue ActiveRecord::RecordNotFound
@@ -534,7 +534,7 @@ module Hobo
       
       set_named_this!
 
-      set_status(:not_allowed) unless Hobo.can_delete?(current_user, @this)
+      set_status(Hobo.can_delete?(current_user, @this) ? :valid : :not_allowed)
       unless not_allowed?
         @this.destroy 
         flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?

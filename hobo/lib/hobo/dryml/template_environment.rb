@@ -34,7 +34,6 @@ module Hobo::Dryml
         @_erb_binding = binding
         @_part_contexts = {}
         @_scoped_variables = ScopedVariables.new
-        @_part_id = []
 
         # Make sure the "assigns" from the controller are available (instance variables)
         if view

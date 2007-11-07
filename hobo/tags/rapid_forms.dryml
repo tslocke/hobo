@@ -152,6 +152,12 @@
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
+<def tag="input" for="big_integer" attrs="name">
+  <%= text_field_tag(name, this, attributes) %>
+</def>
+
+
+
 
 <def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
   <% labels ||= {} %>

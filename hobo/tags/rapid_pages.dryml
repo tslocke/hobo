@@ -27,7 +27,7 @@
     </stylesheets>
 
     <scripts param>
-      <javascript name="prototype,effects,dragdrop,controls,lowpro,hobo_rapid,application"/>
+      <javascript name="prototype, effects, dragdrop, controls, lowpro, hobo_rapid, application"/>
       <hobo_rapid_javascripts param/>
     </scripts>
 
@@ -308,18 +308,20 @@
 %></def>
 
 <def tag="stylesheet" attrs="name, media">
-  <link href="#{base_url}/stylesheets/#{name}.css" media="#{ media || 'all' }"
-        rel="stylesheet" type="text/css" />
+  <repeat with="&comma_split(name)">
+    <link href="#{base_url}/stylesheets/#{this}.css" media="#{ media || 'all' }"
+          rel="stylesheet" type="text/css" />
+  </repeat>
 </def>
 
 <def tag="javascript" attrs="name">
-  <if test="&name.is_a?(String)">
+  <if test="&name.is_a?(Symbol)">
+    <%= javascript_include_tag name %>
+  </if>
+  <else>
     <repeat with="&comma_split(name)">
       <%= javascript_include_tag this %>
     </repeat>
-  </if>
-  <else>
-    <%= javascript_include_tag name %>
   </else>
 </def>
 
@@ -329,7 +331,7 @@
 </def>
 
 <def tag="ajax_progress">
-  <div id='ajax_progress'>
+  <div id="ajax_progress">
     <div>
       <span id="ajax_progress_text"></span>
     </div>

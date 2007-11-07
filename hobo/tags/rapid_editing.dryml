@@ -41,6 +41,8 @@
 
 <def tag="editor" for="boolean"><boolean_checkbox_editor merge_attrs/></def>
 
+<def tag="editor" for="big_integer"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
+
 
 <def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
   <% refl = this_type
