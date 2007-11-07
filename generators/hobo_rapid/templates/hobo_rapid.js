@@ -418,7 +418,13 @@ var Hobo = {
 
     pluralise: function(s) {
         return pluralisations[s] || s + "s"
+    },
+
+    addUrlParams: function(params) {
+        params = $H(window.location.search.toQueryParams()).merge(params)
+        return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
     }
+
 
 }
 
@@ -448,6 +454,16 @@ Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     return false
 }
 
+// Fix Safari in-place-editor bug
+Ajax.InPlaceEditor.prototype.removeForm = function() {
+    if(this.form) {
+        if (this.form.parentNode) {
+            try { Element.remove(this.form); } catch (e) {}
+        }
+        this.form = null;
+    }
+}
+
 // Silence errors from IE :-(
 Field.scrollFreeActivate = function(field) {
   setTimeout(function() {
@@ -456,6 +472,7 @@ Field.scrollFreeActivate = function(field) {
       } catch(e) {}
   }, 1);
 }
+
 
 Element.Methods.$$ = function(e, css) {
     return new Selector(css).findElements(e)
