@@ -52,8 +52,8 @@
   </BasePage>
 </def>
 
-
-<def tag="Page" extend_with="aside">
+<def tag="PageWithoutAside" alias_of="Page"/>
+<def tag="PageWithAside">
   <PageWithoutAside merge>
     <content>
       <section class="main_content" param="main_content">
