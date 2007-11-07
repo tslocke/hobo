@@ -64,6 +64,8 @@ module Hobo
       objects = self.class.models.map {|m| instance_variable_get("@#{m.underscore}")}
       objects.every(:id).join("_")
     end
+    
+    alias_method :to_param, :id
       
   end
 

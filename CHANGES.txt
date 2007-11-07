@@ -1,3 +1,403 @@
+=== Release 0.6.3 ===
+
+New feature: subsites, i.e. namespaced routes, plus support in the
+controller and view layers. Subsites are created automatically for any
+directories found in app/controllers. Links default to the current
+subsite unless you give a subite="..." attribute. The taglib
+app/views/<subsite>/<subsite-name>.dryml is automatically included in
+every page in the subsite.
+
+
+
+Migration generator
+
+  Automatically ignores non-Hobo models (and associated tables) 
+
+  Hobo::Migrations.ignore_models is now deprecated.
+
+    Use Hobo::Migrations.ignore to list models that should be
+    ignored. The associated tables are ignored too (rarely needed, as
+    these are probably not Hobo models anyway)
+
+    Hobo::Migrations.ignore_tables is still supported
+
+  Fix: problems with going back to a nil default from a non-nil
+  default.
+
+
+Hobo model generator
+
+  In line with Rails 2.0, the timestamps declaration is now included
+  by default (it's generally something every model should have).
+
+
+hobo_base.css
+
+  Removed over-zealous styling of too many elements.
+
+
+hobo_rapid.css
+
+  Change of class names for validation errors.
+
+
+hobo_rapid.js
+
+  Now silently ignores update to non-existent part. This is convenient
+  when parts are being added dynamically, but may prove to be a
+  mistake :-)
+
+  Global variable controllerNames is gone. Now use calls to
+  Hobo.pluralise. (Gee I guess we should really standardise on
+  American spellings)
+
+  The 'fade' parameter to removeButton is now an option. Confirmation
+  is now optional too.
+
+  Hobo.partFor returns the part containing a given element. Used in
+  the new update="self" feature.
+
+  LowPro behaviour HasManyThroughInput. This is badly named and will
+  change.
+
+
+Hobo user model
+
+  The module is renamed from Hobo::AuthenticatedUser to just
+  Hobo::User
+
+
+Core extensions
+
+  alias_tag_chain is like alias_method_chain but for DRYML tags
+
+  SafeNil
+
+    Now more efficient (thanks to "steve d" --
+    http://coderrr.wordpress.com)
+
+    Fix when used with DelegateClass
+
+  New method #implies on booleans. Borrowed from Eiffel. Useful in
+  permission methods.
+
+    true.implies false #=> false
+    true.implies true  #=> true
+    false.implies x    #=> true
+
+  Hash#map_hash. The block is passed only the value if the arity is 1.
+
+
+DRYML
+
+  The ability to define tags in Ruby is now removed
+
+  Tag extension: <def tag="Page" extend_with="navigation">
+
+    This encapsulates the alias_method_chain pattern. The tag can make
+    a call to <PageWithoutNavigation> to get the old behaviour.
+
+    alias_current_as is gone -- replaced by extend_with
+
+  Fix: some DRYML attributes were leaking through to the output HTML
+
+  part_locals can now be passed instance variable names,
+  e.g. part_locals="@user". Note that inside the part this creates a
+  local variable "user". Don't user @user inside the part. It's just a
+  convenience to avoid the need to do <set user="&@user"/>
+  
+  Fix: failure to accumulate CSS class names when merging attributes.
+
+  DRYML now gives the type returned by #field_type (when available)
+  over this.class
+
+  Fix: when overriding a parameter, the <default_tagbody/> of the new
+  parameter would incorrectly provide the old tagbody which should
+  have been overridden.
+
+  hoboParts variable is now set by <hobo_rapid_javascripts> rather
+  than being hard wired in the output from the DRYML compiler.
+
+  Fix: caching problems with tags imported by the include_tablib
+  directive.
+
+
+AJAX Parts
+
+  Calls to parts, along with the part-state variables are now logged.
+
+  Can now say part="self" when a tag wants to update the part it is
+  contained in (useful for re-usable tags).
+
+
+Rich data types
+
+  All rich data types now register themselves with Hobo, e.g.
+
+    class Hobo::EmailAddress < String
+      COLUMN_TYPE = :string
+      ...
+    end
+
+    Hobo.field_types[:email_address] = Hobo::EmailAddress
+
+  New type builder - enum_string. e.g.
+
+    fields do
+      gender enum_string(:male, :female)
+    end
+
+    You can then do, e.g. if current_user.gender.male?
+
+    (You also automatically get select menu's in your views)
+
+
+Hobo models
+
+  In fields declaration: 
+
+    Got rid of weird thing where providing :length meant the type defaulted to :string
+
+    Can now give classes as well as symbolic names for column types.
+
+  Mass attribute assignment extended to support some features that
+  were in the model controller. e.g. Dates can be represented as
+  Hashes of month, day etc. Chronic will be used to parse dates if
+  available. Object references (e.g. belongs_to relationships) can be
+  set with "@<typed-id>" as before. 
+
+  "fields do" can optionally be used with a parameter if you don't
+  like the instance_eval hackery:
+
+    fields do |f|
+      f.name :string
+    end
+
+  belongs_to can be given :null => false, which is passed through to
+  the migration generator.
+
+  New method #column returns the meta-data for the named column.
+
+  #find now returns arrays with a #member_class method
+
+  def_scope
+
+    Chained scopes on a class didn't work at all -- now fixed,
+    e.g. Posts.recent.by_author.find(:all)
+
+    Fix: def_scope with sql parameter interpolation was broken.
+
+
+  #changed_fields, which was next to useless, replaced with
+  #only_changed_fields, which is used to assert that only the given
+  fields have changed.
+
+
+Helpers
+
+  #subsite returns the name of the current subsite.
+
+  #object_url can now be passed the siubsite, e.g. :subsite => "admin"
+
+  #object_url can only be passed a single hash of options now (could
+  be passed any ammount before)
+
+  #dom_id now returns "" when a dom_id cannot be generated (used to
+  raise an error)
+    
+  #map_this now works with ranges (used by DRYML's repeat)
+
+  #current_page_url returns request.request_uri without the query string
+
+  #query_params now returns a HashWithIndifferentAccess
+
+  Hobo.dom_id now works better with non-hobo models
+
+
+Permission System
+
+  Fix: view permission was causing errors with non-hobo models. Now
+  defaults to viewable.
+
+
+Hobo Controller
+
+  include_tablib accepts symbols as well as strings
+
+  #redirect_to now forwards all params to object_url when not given a
+  String, Symbol or Hash
+
+  #hobo_ajax_response no longer need be passed a dryml this
+
+
+Model controller
+
+  Multiple model creates / updates are gone from the controller
+  layer. Hobo now uses good ol' Rails mass attribute
+  assignment. Coping with multiple object updates should be handled in
+  the model layer. Some features from the model controller have been
+  moved to the model layer, and more will be added in the future.
+
+  Automatic pagination is now only applied to appropriate
+  mime-types. Add mime-types to Hobo::ModelController.PAGINATE_FORMATS
+  to have them paginated.
+
+  New declaration 'auto_actions' allows you to select which actions
+  Hobo provides for you automatically. 
+
+    auto_actions :show, :index
+
+    or
+
+    auto_action :all, :except => [ :new_comment ]
+
+  New declaration 'index_action' declares a new index-like action
+  (similar to show_action)
+
+  index_action, show_action and web_method can now all be given
+  blocks, rather than defining a method of the same name:
+
+    show_action :summary do
+      hobo_show Post.find(params[:id], :include => :comments)
+    end
+
+  Web methods now automatically respond with hobo_ajax_response if the
+  method does not respond.
+
+  #search
+
+    Now less magic (i.e. doesn't operate by side-effecting). It now
+    returns a condition string suitable to be passed to :conditions.
+
+    Can be given a model as the first argument to search on a
+    different model (e.g. for show-collection actions).
+
+  Fix: :paginate => false was broken
+
+  #create, #update and #destroy now set flash messages by default
+  (only on "wants.html" requests)
+
+  <PermissionDeniedPage> used as the default permission denied
+  response.
+
+  <NotFoundPage> used as the default 404 response.
+
+  
+
+User controller
+
+  Added various customisation options to login and signup
+
+  On login, redirect to #home_page -- you can override this on your
+  controllers.
+
+  The actual name of the login attribute (e.g. "email", "username") is
+  now used in flash messages.
+
+  hobo_logout can now be given a block to customise the response.
+
+  Fixes for validation errors on signup.
+
+
+Routing
+
+  Routes for non-existent actions are not generated.
+
+
+Tag library: Core tags
+
+  <wrap> will wrap its content in ther tag specified by tag="..." if
+  when="..." is true.
+
+  Fix: <unless> -- was behaving like <if>
+
+
+Tag library: Rapid
+
+  <FieldList> now has params <label> and <view> that wrap every label
+  and view. Also <foo_tag> where "foo" is a field-name, is the actual
+  tag that renders the field (e.g. <view> or <edit>)
+
+  <nil_view> can be overridden to customise the way Hobo renders nil
+  values.
+
+  <Table> new attribute 'empty' -- when given the table is rendered
+  even when there are items in the collection.
+
+  <name> now respects view permission properly
+
+  <view> now does a #strip to the output
+
+  <count> -- new attribute if_any - set to true to output nothing if
+  the count is zero.
+
+
+Tag library: Rapid documents
+
+  The 'document' tags like <section>, <aside> output nothing when the
+  content is blank. Now they can ge given the 'empty' attribute
+  causing the tag to be output even if the content is blank.
+
+  New tag <sub_heading>
+
+
+Tag library: Rapid forms
+
+  <hidden_fields> will now not output hidden fields for attributes
+  on new records that are in their default state.
+
+  <form> now has a default ajax message for creating new objects.
+
+  <form> now supports forgery protection
+
+  <input> -- better handling of the 'field with errors' wrapper
+
+  <input> for passwords now accepts extra html attributes
+
+  New <input> for enum-strings - a select menu.
+
+  New <input> for big decimals 
+
+  <remote_method_button> now supports non ajax remote method calls
+  (when no update="..." is given)
+
+  css classes on buttons renamed from "button_input" to "button"
+
+  <update_button> now supports confirm="&false"
+
+  <belongs_to_menu_input>
+
+    none_message attribute renamed to blank_message
+
+    Conditions on belongs_to are now observed (only eligible records
+    are in the menu)
+
+  New <ErrorMessages> template tag - like the error_messages_for
+  helper with added Hobo goodness.
+
+
+Tag library: Rapid navigation
+
+  <page_nav> now hides without errors if there is no @pages object
+
+  <nav_item> now ignores nested tags when selecting the current nav
+  item.
+
+
+Tag library: Rapid pages
+
+  Significant re-factoring of all page tags -- see source :-)
+
+  <javascript name="a, b, c"> tag - like helper javascript_include_tag
+
+  New pages <NotFoundPage> and <PermissionDeinedPage>
+
+
+Tag library: Rapid support
+
+  <TablePlus> various new params
+
+
 === Release 0.6.2 ===
 
 Specs

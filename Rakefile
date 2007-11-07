@@ -25,8 +25,8 @@ PLUGIN_DIR = File.dirname(__FILE__)
 
 rspec_base = File.expand_path(PLUGIN_DIR + '/spec/rails_root/vendor/plugins/rspec/lib')
 $LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base)
-require 'spec/rake/spectask'
-require 'spec/translator'
+require '../hobo_spec/rails_root/vendor/plugins/rspec/lib/spec/rake/spectask'
+require '../hobo_spec/rails_root/vendor/plugins/rspec/lib/spec/translator'
 
 spec_prereq = :noop # File.exist?(File.join(PLUGIN_DIR, 'config', 'database.yml')) ? "db:test:prepare" : :noop
 task :noop do

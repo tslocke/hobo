@@ -198,9 +198,9 @@
     else
       # Link to an existing object
 
-      if target.is_a?(Array) && !target.respond_to?(:proxy_reflection)
+      if target.is_a?(Array) && !target.respond_to?(:proxy_reflection) && target.respond_to?(:member_class)
         # Not much to go on here - last guess is that this is an index page
-        target = @member_class
+        target = target.member_class
       end
       
       href = object_url(target, action, params._?.merge(:subsite => subsite))

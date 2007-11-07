@@ -213,7 +213,7 @@ module Hobo
       
       refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
       
-      # has_many and polymorphic associations are not editable (for now)
+      # has_one and polymorphic associations are not editable (for now)
       return false if refl and (refl.options[:polymorphic] or refl.macro == :has_one)
       
       if object.has_hobo_method?(:editable_by?)
