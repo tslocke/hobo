@@ -21,7 +21,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     models, ignore_models = all_models.partition do |m|
       m.name.underscore.not_in?(ignore_model_names) && m < Hobo::Model
     end
-    ignore_tables = ignore_models.every(:table_name)
+    ignore_tables = ignore_models.every(:table_name) | Hobo::Migrations.ignore_tables
     
     models_by_table_name = models.index_by {|m| m.table_name}
     model_table_names = models.every(:table_name)
