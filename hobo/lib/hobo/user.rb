@@ -51,7 +51,10 @@ module Hobo
       
       def set_login_attr(attr)
         @login_attr = attr = attr.to_sym
-        alias_attribute(:login, attr) unless attr == :login
+        unless attr == :login
+          alias_attribute(:login, attr)
+          set_field_type :login => field_type(attr)
+        end
         
         if block_given?
           yield

@@ -7,7 +7,7 @@
 
                   if skip_associations == "has_many"
                     assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.every(:name)
-                    columns - assocs
+                    columns + assocs
                   elsif skip_associations
                     columns
                   else
@@ -30,7 +30,7 @@
 
                   if skip_associations == "has_many"
                     assocs = this.reflections.values.reject {|r| r.macro == :has_many }.every(:name)
-                    columns - assocs
+                    columns + assocs
                   elsif skip_associations
                     columns
                   else

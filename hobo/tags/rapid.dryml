@@ -189,7 +189,7 @@
 
         href = object_url(target, "new", params._?.merge(:subsite => subsite))
         add_classes!(attributes, "new_#{new_class_name.underscore}_link")
-        content ||= "New #{new_class_name.titleize}"
+        content = "New #{new_class_name.titleize}" if content.blank?
         content_tag(:a, content, attributes.update(:href => href))
       else
         Hobo::Dryml.last_if = false
@@ -209,7 +209,7 @@
       href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
       
       # Set default link text if none given
-      content ||= name
+      content = name if content.blank?
       content_tag(:a, content, attributes.update(:href => href))
     end
   end

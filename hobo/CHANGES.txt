@@ -7,6 +7,13 @@ subsite unless you give a subite="..." attribute. The taglib
 app/views/<subsite>/<subsite-name>.dryml is automatically included in
 every page in the subsite.
 
+Change to hobo command:
+
+  hobo [...options...] app-name
+
+  instead of
+
+  hobo app-name [...options...]
 
 
 Migration generator
@@ -59,12 +66,6 @@ hobo_rapid.js
 
   LowPro behaviour HasManyThroughInput. This is badly named and will
   change.
-
-
-Hobo user model
-
-  The module is renamed from Hobo::AuthenticatedUser to just
-  Hobo::User
 
 
 Core extensions
@@ -156,7 +157,8 @@ Hobo models
 
   In fields declaration: 
 
-    Got rid of weird thing where providing :length meant the type defaulted to :string
+    Got rid of weird thing where providing :length meant the type
+    defaulted to :string
 
     Can now give classes as well as symbolic names for column types.
 
@@ -191,6 +193,12 @@ Hobo models
   #changed_fields, which was next to useless, replaced with
   #only_changed_fields, which is used to assert that only the given
   fields have changed.
+
+
+Hobo user model
+
+  The module is renamed from Hobo::AuthenticatedUser to just
+  Hobo::User
 
 
 Helpers

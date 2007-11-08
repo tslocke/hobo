@@ -1,9 +1,7 @@
 <Page title="<%= app_name %>">
 
-  <main>
-    <header>
-      <h1 class="front_page_title"><%= app_name %></h1>
-    </header>
+  <content_header>
+    <h1 class="front_page_title"><%= app_name %></h1>
     <panel>
       <div style="margin-left: 40px; ">
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
@@ -12,7 +10,10 @@
         </ul>
       </div>
     </panel>
+  </content_header>
 
+
+  <content_body>
     <repeat with="&Hobo.models">
       <panel>
         <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
@@ -32,6 +33,6 @@
         </section>
       </panel>
     </repeat>
-  </main>
+  </content_body>
   
 </Page>
