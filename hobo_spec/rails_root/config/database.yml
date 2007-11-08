@@ -20,3 +20,10 @@ mysql:
   password:
   database: hobo_test
 
+test:
+  adapter: mysql
+  host: localhost
+  username: root
+  password:
+  database: hobo_test
+
