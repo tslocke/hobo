@@ -59,7 +59,7 @@ ul.account_nav { font-size: 80%; clear:right; }
 
 .flash { margin: 10px 30px; background: white; border: 2px solid #aaf; padding: 10px; text-align: center; }
 
-#page {
+.page_wrapper  {
     width:800px;
     background-color: white;
     margin-left:auto;

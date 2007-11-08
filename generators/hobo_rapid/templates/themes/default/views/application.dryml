@@ -1,6 +1,28 @@
 <include src="plugins/hobo/tags/rapid"/>
 
-<def tag="Page" attrs="title_prefix, title">
+<def tag="Page" extend_with="theme">
+  <PageWithoutTheme merge>
+    <wrapper>
+      <div id="page_top">
+        <div id="page_right">
+          <div id="page_bottom">
+            <div id="page_left">
+              <div id="page_corner02">
+                <div id="page_corner04">
+                  <div id="page_corner03">
+                    <div id="page_corner01">
+                      <div id="page_inner_top">
+                        <default_tagbody/>
+      </div></div></div></div></div></div></div></div></div>
+    </wrapper>
+
+    <stylesheets><default_tagbody/><theme_stylesheet/></stylesheets>
+
+  </PageWithoutTheme>
+</def>
+
+
+<def tag="OldPage" attrs="title_prefix, title">
   <% title ||= type_name + ": " + name(:no_wrapper => true) %>
   <doctype version="HTML 4.01 Transitional"/>
   <html>
