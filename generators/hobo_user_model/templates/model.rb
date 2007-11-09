@@ -1,11 +1,13 @@
 class <%= class_name %> < ActiveRecord::Base
 
-  hobo_user_model :username
+  hobo_user_model
 
   fields do
     username :string
     timestamps
   end
+
+  set_login_attr :username
   
   alias_attribute :to_s, :username
 

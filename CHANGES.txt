@@ -7,6 +7,10 @@ subsite unless you give a subite="..." attribute. The taglib
 app/views/<subsite>/<subsite-name>.dryml is automatically included in
 every page in the subsite.
 
+The out-of-box app is not in great shape in this release, mostly due
+to problems with the theme. We haven't fixed it because the theme
+system going to change radically in Hobo 0.7
+
 Change to hobo command:
 
   hobo [...options...] app-name
@@ -199,6 +203,10 @@ Hobo user model
 
   The module is renamed from Hobo::AuthenticatedUser to just
   Hobo::User
+
+  It is no longer possible to set the login attribute by passing a
+  symbol to hobo_user_model. Go back to using set_login_attr. Didn't
+  work out. It happens sometimes.
 
 
 Helpers
