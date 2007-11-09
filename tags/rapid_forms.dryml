@@ -308,10 +308,7 @@
       
 <def tag="ErrorMessages">
   <section class="error_messages" merge_attrs if="&this.errors.length > 0">
-    <h2 param="heading">
-      <count:errors label='error' param/> prohibited this <type_name lowercase param/> from being saved
-    </h2>
-    <p param="message">There were problems with the following fields:</p>
+    <h2 param="heading">In order to proceed please correct the following:</h2>
     <UL:errors.full_messages param>
       <li param><%= this %></li>
     </UL>
