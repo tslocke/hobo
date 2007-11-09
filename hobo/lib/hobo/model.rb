@@ -80,7 +80,7 @@ module Hobo
           type_class = Hobo.field_types[type] || type
           field_types[field] = type_class
           
-          if "validate".in?(type_class.instance_methods)
+          if type_class && "validate".in?(type_class.instance_methods)
             self.validate do |record|
               v = record.send(field)._?.validate
               record.errors.add(field, v) if v.is_a?(String)
@@ -148,20 +148,20 @@ module Hobo
             end
           }
         end
-
+        
         key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
         finder = if insenstive
-          "find(:first, :conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase])"
+          "find(:first, options.merge(:conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase]))"
         else
-          "find_by_#{id_name_field}(#{key})"
+          "find_by_#{id_name_field}(#{key}, options)"
         end
 
         class_eval %{
-          def self.find_by_id_name(id_name)
+          def self.find_by_id_name(id_name, options)
             #{finder}
           end
         }
-
+        
         model = self
         validate do
           erros.add id_name_field, "is taken" if model.find_by_id_name(name)
@@ -183,7 +183,7 @@ module Hobo
         name = name.to_sym
         field_types[name] or
           reflections[name] or begin
-                                 col = columns.find {|c| c.name == name.to_s} rescue nil
+                                 col = column(name)
                                  return nil if col.nil?
                                  case col.type
                                  when :boolean
@@ -238,6 +238,11 @@ module Hobo
           res.instance_variable_set("@member_class", self)
         end
         res
+      end
+      
+      
+      def all(options={})
+        find(:all, options.reverse_merge(:order => :default))
       end
       
       
@@ -435,6 +440,7 @@ module Hobo
         end
       end
     end
+    
     
     def attributes_with_hobo_type_conversion=(attributes)
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
