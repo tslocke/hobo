@@ -79,7 +79,7 @@
     <body class="index_page #{@model.name.underscore.pluralize}" param/>
     <content_header param>
       <heading param><%= model_name.pluralize %></heading>
-      <sub_heading param><count part="item_count"/></sub_heading>
+      <p class="note" param>There <count part="item_count" prefix="are" with="&@model"/></p>
     </content_header>
 
     <content_body param>
