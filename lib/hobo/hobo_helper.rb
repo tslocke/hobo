@@ -248,17 +248,6 @@ module Hobo
     end
      
      
-    def render_params(*args)
-      parts = args.map{|x| x.split(/, */) if x}.compact.flatten
-      { :part_page => view_name,
-        :render => parts.map do |part_id|
-          { :object => Hobo::RawJs.new("hoboParts.#{part_id}"),
-            :part => part_id }
-        end
-      }
-    end
-     
-     
     def nl_to_br(s)
       s.to_s.gsub("\n", "<br/>") if s
     end

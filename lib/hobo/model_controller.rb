@@ -208,7 +208,7 @@ module Hobo
           name.in?(@auto_actions) || (collection_action && :collections.in?(@auto_actions))
         else
           # Black list
-          except = @auto_actions.fetch(:except, [])
+          except = Array(@auto_actions[:except])
           name.not_in?(except) || (collection_action && :collections.not_in?(except))
         end
       end
@@ -381,6 +381,21 @@ module Hobo
     def not_allowed?; @status == :not_allowed; end
     
     
+    def re_render_form(default_action)
+      if params[:page_path]
+        controller, view = Controller.controller_and_view_for(params[:page_path])
+        hobo_render(view, model_for(controller))
+      else
+        hobo_render(default_action)
+      end
+    end
+    
+    
+    def model_for(controller_name)
+      "#{controller_name.camelize}Controller".constantize.model
+    end
+    
+    
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
@@ -464,7 +479,7 @@ module Hobo
           end
         elsif invalid?
           respond_to do |wants|
-            wants.html { hobo_render(:new) }
+            wants.html { re_render_form(:new) }
             wants.js   { render(:status => 500,
                                 :text => ("There was a problem creating that #{create_model.name}.\n" +
                                           @this.errors.full_messages.join("\n"))) }
@@ -524,10 +539,10 @@ module Hobo
           end
         elsif invalid?
           respond_to do |wants|
-            wants.html { render(:action => :edit) }
-            wants.js   { render(:status => 500,
-                                :text => ("There was a problem with that change.\n" +
-                                          @this.errors.full_messages.join("\n"))) }
+          wants.html { re_render_form(:edit) }
+            wants.js { render(:status => 500,
+                              :text => ("There was a problem with that change.\n" + 
+                                        @this.errors.full_messages.join("\n"))) }
           end
         elsif not_allowed?
           permission_denied
