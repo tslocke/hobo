@@ -1,30 +1,11 @@
 LowPro = {};
-LowPro.Version = '0.4.1';
+LowPro.Version = '0.5';
 
 if (!Element.addMethods) 
   Element.addMethods = function(o) { Object.extend(Element.Methods, o) };
 
 // Simple utility methods for working with the DOM
 DOM = {
-  insertAfter : function(element, node, otherNode) {
-    element = $(element);
-    if (otherNode.nextSibling)
-      return element.insertBefore(node, otherNode.nextSibling);
-    else
-      return element.appendChild(node);
-  },
-  addBefore : function(element, node) {
-    element = $(element);
-    return element.parentNode.insertBefore(node, element);
-  },
-  addAfter : function(element, node) {
-    element = $(element);
-    return $(element.parentNode).insertAfter(node, element);
-  },
-  replaceElement : function(element, node) {
-    $(element).parentNode.replaceChild(node, element);
-    return node;
-  },
   prependChild : function(element, node) {
     $(element).insertBefore(node, element.firstChild);
   },
@@ -42,24 +23,6 @@ Element.addMethods(DOM);
 
 // DOMBuilder for prototype
 DOM.Builder = {
-  IE_TRANSLATIONS : {
-    'class' : 'className',
-    'for' : 'htmlFor'
-  },
-  cache: {},
-  ieAttrSet : function(attrs, attr, el) {
-    var trans;
-    if (trans = this.IE_TRANSLATIONS[attr]) el[trans] = attrs[attr];
-    else if (attr == 'style') el.style.cssText = attrs[attr];
-    else if (attr.match(/^on/)) el[attr] = new Function(attrs[attr]);
-    else el.setAttribute(attr, attrs[attr]);
-  },
-  getElement : function(tag) {
-    var element = DOM.Builder.cache[tag];
-    if (element == null) 
-      element = DOM.Builder.cache[tag] = document.createElement(tag);
-    return element.cloneNode(false);
-  },
 	tagFunc : function(tag) {
 	  return function() {
 	    var attrs, children; 
@@ -77,20 +40,7 @@ DOM.Builder = {
   },
 	create : function(tag, attrs, children) {
 		attrs = attrs || {}; children = children || []; tag = tag.toLowerCase();
-		var isIE = navigator.userAgent.match(/MSIE/);
-		var el = (isIE && attrs.name) ? 
-		  document.createElement("<" + tag + " name=" + attrs.name + ">") : 
-		  DOM.Builder.getElement(tag);
-		
-		for (var attr in attrs) {
-		  if (attrs[attr] === true) attrs[attr] = attr;
-		  if (typeof attrs[attr] != 'function') {
-		    if (isIE) this.ieAttrSet(attrs, attr, el);
-		    else el.setAttribute(attr, attrs[attr].toString());
-		  } else if (attr.match(/^on(.+)$/)) {
-		    Event.observe(el, RegExp.$1, attrs[attr]);
-		  };
-	  }
+		var el = new Element(tag, attrs);
 	  
 		for (var i=0; i<children.length; i++) {
 			if (typeof children[i] == 'string') 
@@ -121,141 +71,16 @@ DOM.Builder.fromHTML = function(html) {
   return root.childNodes[0];
 };
 
-String.prototype.toElement = function() {
-  return DOM.Builder.fromHTML(this);
-};
-
-(function() {
-  var old$ = $;
-  $ = function(element) {
-    if (element && element.toElement && element.match(/^<(.+)>$/)) 
-      return $(element.toElement());
-    return old$.apply(this, arguments);
-  }
-})();
 
 
-
-// Adapted from DOM Ready extension by Dan Webb
-// http://www.vivabit.com/bollocks/2006/06/21/a-dom-ready-extension-for-prototype
-// which was based on work by Matthias Miller, Dean Edwards and John Resig
+// Wraps the 1.6 contentloaded event for backwards compatibility
 //
 // Usage:
 //
 // Event.onReady(callbackFunction);
 Object.extend(Event, {
-  _domReady : function() {
-    if (arguments.callee.done) return;
-    arguments.callee.done = true;
-
-    if (Event._timer)  clearInterval(Event._timer);
-    
-    Event._readyCallbacks.each(function(f) { f() });
-    Event._readyCallbacks = null;
-    
-  },
   onReady : function(f) {
-    if (!this._readyCallbacks) {
-      var domReady = this._domReady;
-      
-      if (domReady.done) return f();
-      
-      if (document.addEventListener)
-        document.addEventListener("DOMContentLoaded", domReady, false);
-        
-        /*@cc_on @*/
-        /*@if (@_win32)
-            var dummy = location.protocol == "https:" ?  "https://javascript:void(0)" : "javascript:void(0)";
-            document.write("<script id=__ie_onload defer src='" + dummy + "'><\/script>");
-            document.getElementById("__ie_onload").onreadystatechange = function() {
-                if (this.readyState == "complete") { domReady(); }
-            };
-        /*@end @*/
-        
-        if (/WebKit/i.test(navigator.userAgent)) { 
-          this._timer = setInterval(function() {
-            if (/loaded|complete/.test(document.readyState)) domReady(); 
-          }, 10);
-        }
-        
-        Event.observe(window, 'load', domReady);
-        Event._readyCallbacks =  [];
-    }
-    Event._readyCallbacks.push(f);
-  }
-});
-
-// Extend Element with observe and stopObserving.
-if (typeof Element.Methods.observe == 'undefined') Element.addMethods({
-  observe : function(el, event, callback) {
-    Event.observe(el, event, callback);
-  },
-  stopObserving : function(el, event, callback) {
-    Event.stopObserving(el, event, callback);
-  }
-});
-
-// Replace out existing event observe code with Dean Edwards' addEvent
-// http://dean.edwards.name/weblog/2005/10/add-event/
-Object.extend(Event, {
-  _observeAndCache : function(el, type, func) {
-    if (!func.$$guid) func.$$guid = Event._guid++;
-  	if (!el.events) el.events = {};
-  	var handlers = el.events[type];
-  	if (!handlers) {
-  		handlers = el.events[type] = {};
-  		if (el["on" + type]) {
-  			handlers[0] = el["on" + type];
-  		}
-  	}
-  	handlers[func.$$guid] = func;
-  	el["on" + type] = Event._handleEvent;
-  	
-  	if (!Event.observers) Event.observers = [];
-  	Event.observers.push([el, type, func, false]);
-	},
-	stopObserving : function(el, type, func) {
-	  el = $(el);
-    if (el.events && el.events[type]) delete el.events[type][func.$$guid];
-    
-    for (var i = 0; i < Event.observers.length; i++) {
-      if (Event.observers[i] &&
-          Event.observers[i][0] == el && 
-          Event.observers[i][1] == type && 
-          Event.observers[i][2] == func) delete Event.observers[i];
-    }
-  },
-  _handleEvent : function(e) {
-    var returnValue = true;
-    e = e || Event._fixEvent(window.event);
-    var handlers = this.events[e.type], el = $(this);
-    for (var i in handlers) {
-    	el.$$handleEvent = handlers[i];
-    	if (el.$$handleEvent(e) === false) returnValue = false;
-    }
-    if (returnValue == false) e.preventDefault();
-  	return returnValue;
-  },
-  _fixEvent : function(e) {
-    e.preventDefault = Event._preventDefault;
-    e.stopPropagation = Event._stopPropagation;
-    return e;
-  },
-  _preventDefault : function() { this.returnValue = false },
-  _stopPropagation : function() { this.cancelBubble = true },
-  _guid : 1
-});
-
-// Allows you to trigger an event element.  
-Object.extend(Event, {
-  trigger : function(element, event, fakeEvent) {
-    element = $(element);
-    fakeEvent = fakeEvent || { type :  event };
-    if(element.events && element.events[event]) { 	
-      $H(element.events[event]).each(function(cache) {
-        cache[1].call(element, fakeEvent);
-    	});
-    }
+    document.observe('contentloaded', f);
   }
 });
 
@@ -366,9 +191,7 @@ Behavior = {
     var behavior = function() { 
       var behavior = arguments.callee;
       if (this == window || $H(this).values().include(behavior)) {
-        var args = [];
-        for (var i = 0; i < arguments.length; i++) 
-          args.push(arguments[i]);
+        var args = $A(arguments);
           
         return function() {
           var initArgs = [this].concat(args);
@@ -401,5 +224,4 @@ Behavior = {
     }
   }
 };
-
 
