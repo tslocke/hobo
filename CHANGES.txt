@@ -261,11 +261,16 @@ Model controller
   New declaration 'auto_actions' allows you to select which actions
   Hobo provides for you automatically. 
 
+    # White list
     auto_actions :show, :index
 
     or
 
+    # Black list
     auto_action :all, :except => [ :new_comment ]
+
+    You can use :collections to add/remove all collection actions in
+    either the black or white list.
 
   New declaration 'index_action' declares a new index-like action
   (similar to show_action)
@@ -297,7 +302,6 @@ Model controller
   response.
 
   <NotFoundPage> used as the default 404 response.
-
   
 
 User controller
@@ -673,9 +677,7 @@ Hobo Rapid
 
     <image> tag removed from default ajax progress.
     
-        
-
-
+       
 
 Dryml
 

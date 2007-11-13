@@ -89,13 +89,13 @@ module Hobo
       # We re-implement resource routing - routes are not created for
       # actions that the controller does not provide
       named_route(plural,                plural,               :action => "index",   :conditions => { :method => :get })
-
-      named_route("new_#{singular}",     "#{plural}/new",      :action => "new",     :conditions => { :method => :get })
-      named_route("edit_#{singular}",    "#{plural}/:id/edit", :action => "edit",    :conditions => { :method => :get })
-      named_route(singular,              "#{plural}/:id",      :action => "show",    :conditions => { :method => :get })
-
+                                                                                                                          
+      named_route("new_#{singular}",     "#{plural}/new",      :action => "new",     :conditions => { :method => :get })  
+      named_route("edit_#{singular}",    "#{plural}/:id/edit", :action => "edit",    :conditions => { :method => :get })  
+      named_route(singular,              "#{plural}/:id",      :action => "show",    :conditions => { :method => :get })  
+                                                                                                                          
       named_route("create_#{singular}",  plural,               :action => "create",  :conditions => { :method => :post })
-      named_route("update_#{singular}",  "#{plural}/:id",      :action => "update",  :conditions => { :method => :put })
+      named_route("update_#{singular}",  "#{plural}/:id",      :action => "update",  :conditions => { :method => :put }) 
       named_route("destroy_#{singular}", "#{plural}/:id",      :action => "destroy", :conditions => { :method => :delete })
     end
     
@@ -151,7 +151,11 @@ module Hobo
     def named_route(name, route, options={})
       if controller.public_instance_methods.include?(options[:action].to_s)
         options.reverse_merge!(:controller => route_with_subsite(plural))
-        map.named_route(name_with_subsite(name), route_with_subsite(route), options)
+        name = name_with_subsite(name)
+        route = route_with_subsite(route)
+        map.named_route(name, route, options)
+        format_route = options.delete(:format) != false
+        map.named_route("formatted_#{name}", "#{route}.:format", options) if format_route
       end
     end
     

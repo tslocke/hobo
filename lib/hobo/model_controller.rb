@@ -25,18 +25,6 @@ module Hobo
           extend ClassMethods
           helper_method :find_partial, :model, :current_user
           before_filter :set_no_cache_headers
-          
-          def index;   hobo_index   end if include_action?(:index) 
-          def show;    hobo_show    end if include_action?(:show) 
-          def new;     hobo_new     end if include_action?(:new) 
-          def create;  hobo_create  end if include_action?(:create) 
-          def edit;    hobo_edit    end if include_action?(:edit) 
-          def update;  hobo_update  end if include_action?(:updare) 
-          def destroy; hobo_destroy end if include_action?(:destroy) 
-          
-          def completions; hobo_completions end if include_action?(:completions)
-          
-          base.collections.each { |c| add_collection_actions(c.to_sym) }
         end
 
         Hobo::Controller.included_in_class(base)
@@ -78,7 +66,7 @@ module Hobo
         defined_methods = instance_methods
         
         show_collection_method = "show_#{name}".to_sym
-        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
+        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method, true)
           define_method show_collection_method do
             hobo_show_collection(name)
           end
@@ -86,7 +74,7 @@ module Hobo
           
         if Hobo.simple_has_many_association?(model.reflections[name])
           new_method = "new_#{name.to_s.singularize}"
-          if new_method.not_in?(defined_methods) && include_action?(new_method)
+          if new_method.not_in?(defined_methods) && include_action?(new_method, true)
             define_method new_method do
               hobo_new_in_collection(name)
             end
@@ -154,12 +142,26 @@ module Hobo
       
       
       def auto_actions(*args)
-        # @auto_actions is either an array - the actions to provide, or a hash: { :except => [...] }
+        # auto_actions is either an array - the actions to provide, or a hash: { :except => [...] }
         @auto_actions = case args.first
                           when :all  then args.extract_options!
                           when :none then []
                           else args
                         end
+
+        self.class_eval do
+          def index;   hobo_index   end if include_action?(:index) 
+          def show;    hobo_show    end if include_action?(:show) 
+          def new;     hobo_new     end if include_action?(:new) 
+          def create;  hobo_create  end if include_action?(:create) 
+          def edit;    hobo_edit    end if include_action?(:edit) 
+          def update;  hobo_update  end if include_action?(:update) 
+          def destroy; hobo_destroy end if include_action?(:destroy) 
+          
+          def completions; hobo_completions end if include_action?(:completions)
+          
+          collections.each { |c| add_collection_actions(c.to_sym) } 
+        end
       end
       
       
@@ -199,10 +201,16 @@ module Hobo
         end
       end
             
-      def include_action?(name)
+      def include_action?(name, collection_action=false)
         name = name.to_sym
-        @auto_actions.is_a?(Array) && name.in?(action) or
-          name.not_in?(@auto_actions.fetch(:except, []))
+        if @auto_actions.is_a?(Array)
+          # White list
+          name.in?(@auto_actions) || (collection_action && :collections.in?(@auto_actions))
+        else
+          # Black list
+          except = @auto_actions.fetch(:except, [])
+          name.not_in?(except) || (collection_action && :collections.not_in?(except))
+        end
       end
 
     end
