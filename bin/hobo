@@ -54,23 +54,13 @@ until ARGV.empty?
   end 
 end
 
-FileUtils.mkdir_p(app_path) unless File.exists?(app_path)
-(puts "App directory is not a directory!"; exit 1) unless File.directory?(app_path)
+puts "\nGenerating Rails app...\n"
+system("rails #{app_path}")
 
 Dir.chdir(app_path) do
   gen = "ruby #{File.join('script', 'generate')}"
   plugin = "ruby #{File.join('script', 'plugin')}"
   
-  puts "\nChecking out Rails 2.0 PR...\n"
-  system("svn co http://dev.rubyonrails.org/svn/rails/tags/rel_2-0-0_PR vendor/rails") or
-    begin
-      puts "Could not check out Edge Rails - maybe svn is not installed?"
-      exit 1
-    end
-
-  puts "\nGenerating Edge Rails application...\n"
-  command("ruby #{File.join('vendor', 'rails', 'railties', 'bin', 'rails')} .")
-          
   puts "\nInstalling classic_pagination\n"
   command(plugin, "install svn://errtheblog.com/svn/plugins/classic_pagination")
   

@@ -4,19 +4,27 @@ module Hobo
 
     include AuthenticationSupport
     
-    def self.included(base)
-      if base.is_a?(Class)
-        included_in_class(base)
+    class << self
+      
+      def included(base)
+        if base.is_a?(Class)
+          included_in_class(base)
+        end
       end
-    end
-    
-    def self.included_in_class(klass)
-      klass.extend(ClassMethods)
-      klass.class_eval do
-        alias_method_chain :redirect_to, :object_url
-        @included_taglibs = []
+      
+      def included_in_class(klass)
+        klass.extend(ClassMethods)
+        klass.class_eval do
+          alias_method_chain :redirect_to, :object_url
+          @included_taglibs = []
+        end
+        Hobo::HoboHelper.add_to_controller(klass)
       end
-      Hobo::HoboHelper.add_to_controller(klass)
+      
+      def controller_and_view_for(page_path)
+        page_path.match(/(.*)\/([^\/]+)/)[1..2]
+      end
+      
     end
 
     module ClassMethods
@@ -47,10 +55,10 @@ module Hobo
     def hobo_ajax_response(*args)
       results = args.extract_options!
       this = args.first || @this
-      part_page = params[:part_page]
+      page_path = params[:page_path]
       r = params[:render]
       if r
-        ajax_update_response(this, part_page, r.values, results)
+        ajax_update_response(this, page_path, r.values, results)
         true
       else
         false
@@ -58,9 +66,9 @@ module Hobo
     end
 
 
-    def ajax_update_response(this, part_page, render_specs, results={})
+    def ajax_update_response(this, page_path, render_specs, results={})
       add_variables_to_assigns
-      renderer = Hobo::Dryml.page_renderer(@template, [], part_page) if part_page
+      renderer = Hobo::Dryml.page_renderer(@template, [], page_path) if page_path
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"

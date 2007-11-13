@@ -61,8 +61,9 @@
                      :value => form_authenticity_token)
                end
 
+  page_path_hidden = hidden_field_tag("page_path", view_name) 
    
-  body = [http_method_hidden, auth_token, hiddens, body].join
+  body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
    
   if web_method
     add_classes!(html_attrs, "#{type_id}_#{web_method}_form")

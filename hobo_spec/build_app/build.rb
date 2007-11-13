@@ -23,14 +23,16 @@ def edit(filename)
 end
 
 FileUtils.rm_rf(APP_NAME)
+system "mysqladmin -f drop new_hobo_app_development"
+
 
 sh '../../bin/hobo --hobo-src ../../hobo', APP_NAME
 
 # sh 'cp -R new_hobo_app.bak new_hobo_app'
 
-Dir.chdir(APP_NAME) do
-  gen = "ruby #{File.join('script', 'generate')}"
+puts "\nCreating POD app"
 
+Dir.chdir(APP_NAME) do
   gen "hobo_model advert title:string body:text"
   gen "hobo_model_controller advert"
   
@@ -122,7 +124,6 @@ end
 END
   end
 
-  sh "mysqladmin drop   new_hobo_app_development"
   sh "mysqladmin create new_hobo_app_development"
   
   gen "hobo_migration"

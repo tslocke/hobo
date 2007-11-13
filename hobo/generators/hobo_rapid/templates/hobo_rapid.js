@@ -56,7 +56,7 @@ var Hobo = {
                     i += 1
                 }
             })
-            params.push("part_page=" + hoboPartPage)
+            params.push("page_path=" + hoboPagePath)
         }
 
         if (resultUpdates) {
