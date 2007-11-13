@@ -11,6 +11,8 @@ The out-of-box app is not in great shape in this release, mostly due
 to problems with the theme. We haven't fixed it because the theme
 system going to change radically in Hobo 0.7
 
+New version of lowpro, compatible with Prototype 1.6 (rev 267)
+
 Change to hobo command:
 
   hobo [...options...] app-name
@@ -253,6 +255,11 @@ Model controller
   assignment. Coping with multiple object updates should be handled in
   the model layer. Some features from the model controller have been
   moved to the model layer, and more will be added in the future.
+
+  Attempts to automatically re-render the correct page after a
+  validation error on create / update using a form parameter
+  "page_path", which the <form> tag provides in a hidden
+  field. Previously assumed the form came from the new / edit action.
 
   Automatic pagination is now only applied to appropriate
   mime-types. Add mime-types to Hobo::ModelController.PAGINATE_FORMATS
