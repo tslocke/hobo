@@ -1,0 +1,94 @@
+#!/usr/bin/env ruby 
+
+require 'fileutils'
+Signal.trap("INT") { puts; exit }
+
+hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
+
+USAGE = "USAGE: hobo [ --user-model <model-name-or-false> ] [ --svn ] [--db] [--hobo-src <path to hobo src>] <app-path>"
+
+HOBO_REPO = "svn://hobocentral.net/hobo/trunk/hobo"
+
+
+### Nasty stuff needed for Windows :-( ###
+require 'rbconfig'
+
+if Config::CONFIG["arch"] =~ /win32/
+  require "win32/registry"
+  def system(command)
+    win = Win32API.new("crtdll", "system", ['P'], 'L').Call(command)
+  end
+end 
+### end nasty stuff ###
+
+
+def command(*s)
+  ok = system(s.join(' '))
+  exit(1) unless ok
+end
+
+if ARGV.length == 0 || ARGV.include?("--help")
+  puts USAGE
+  exit 1
+end
+
+app_path = ARGV.pop
+
+user_model = "user"
+hobo_svn = create_db = false
+
+until ARGV.empty?
+  case ARGV.shift
+  when "--user-model"
+    arg = ARGV.shift
+    user_model = arg == "false" ? nil : arg
+  when "--svn"
+    hobo_svn = true
+  when "--db"
+    create_db = true
+  when "--hobo-src"
+    hobo_src = "../" + ARGV.shift
+  else
+    puts USAGE
+    exit 1
+  end 
+end
+
+puts "\nGenerating Rails app...\n"
+system("rails #{app_path}")
+
+Dir.chdir(app_path) do
+  gen = "ruby #{File.join('script', 'generate')}"
+  plugin = "ruby #{File.join('script', 'plugin')}"
+  
+  puts "\nInstalling classic_pagination\n"
+  command(plugin, "install svn://errtheblog.com/svn/plugins/classic_pagination")
+  
+  if hobo_svn
+    puts "\nInstalling Hobo plugin via svn checkout...\n"
+    command("svn co #{HOBO_REPO} vendor/plugins/hobo")
+  else
+    puts "\nInstalling Hobo plugin...\n"
+    FileUtils.cp_r hobo_src, "vendor/plugins/hobo"
+  end
+
+  puts "\nInitialising Hobo...\n"  
+  command(gen, "hobo --add-routes")
+
+  puts "\nInstalling Hobo Rapid and default theme...\n"
+  command("#{gen} hobo_rapid --import-tags")
+
+  if user_model
+    puts "\nCreating #{user_model} model and controller...\n"
+    command("#{gen} hobo_user_model #{user_model}")
+    command("#{gen} hobo_user_controller #{user_model}")
+  end
+  
+  puts "\nCreating standard pages...\n"
+  command("#{gen} hobo_front_controller front --delete-index --add-routes")
+  
+  if create_db
+    puts "\nCreating databases"
+    command("rake db:create:all")
+  end
+end

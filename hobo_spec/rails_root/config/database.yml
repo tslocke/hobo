@@ -1,0 +1,29 @@
+sqlite:
+  adapter: sqlite
+  dbfile: hobo_test.sqlite.db
+
+sqlite3:
+  adapter: sqlite3
+  dbfile: hobo_test.sqlite3.db
+
+postgresql:
+  adapter: postgresql
+  username: postgres
+  password: postgres
+  database: hobo_test
+  min_messages: ERROR
+
+mysql:
+  adapter: mysql
+  host: localhost
+  username: root
+  password:
+  database: hobo_test
+
+test:
+  adapter: mysql
+  host: localhost
+  username: root
+  password:
+  database: hobo_test
+

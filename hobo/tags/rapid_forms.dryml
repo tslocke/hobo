@@ -1,0 +1,351 @@
+<def tag="hidden_fields" attrs="fields, skip, for_query_string"><%= 
+  pairs = if for_query_string
+            query_params.to_a
+          else
+            hiddens = case fields
+                      when '*', nil
+                        this.class.column_names - ['type', 'created_at', 'updated_at']
+                      else
+                        comma_split(fields)
+                      end
+            pname = this.class.name.underscore
+            hiddens.map do |field| 
+              val = this.send(field)
+              ["#{pname}[#{field}]", val] unless val.nil? || 
+                                                   field.to_sym.in?(this.class.attr_protected) || 
+                                                   (this.new_record? && val == this.class.column(field).default)
+            end.compact
+          end
+  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip) }.compact.join("\n")
+%></def>
+
+
+<def tag="form" attrs="message, update, hidden_fields, action, method, web_method"><%= 
+  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+   
+  html_attrs[:action] = action || object_url(this, web_method)
+
+  new_record = this.respond_to?(:new_record?) && this.new_record?
+   
+  method = if method.nil?
+             (action || web_method || new_record) ? "post" : "put"
+           else
+             method.downcase
+           end
+  if method == "put"
+    http_method_hidden = hidden_field_tag("_method", "PUT") 
+    html_attrs[:method] = "post"
+  else
+    html_attrs[:method] = method
+  end
+   
+  if update || !ajax_attrs.empty?
+    message ||= "Creating #{this.class.name.titleize}" if new_record
+    # add an onsubmit to convert to an ajax form if `update` is given
+    function = ajax_updater(:post_form, message, update, ajax_attrs)
+    html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+  end
+
+  body, field_names = scope.new_scope do
+    scope[:in_form] = true
+    with_form_context { tagbody.call }
+  end
+
+  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
+  
+  auth_token = if request_forgery_protection_token.nil?
+                 ''
+               else
+                 tag(:input, :type => "hidden", 
+                     :name => request_forgery_protection_token.to_s,
+                     :value => form_authenticity_token)
+               end
+
+  page_path_hidden = hidden_field_tag("page_path", view_name) 
+   
+  body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
+   
+  if web_method
+    add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
+  else
+    add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
+  end
+   
+  content_tag("form", body, html_attrs)
+%></def>
+
+
+<def tag="submit" attrs="label, image">
+  <input if="&image" type="image" src="&image" merge_attrs class="image_button submit_button"/>
+  <else>
+    <input type="submit" value="#{label}" merge_attrs class="button submit_button"/>
+  </else>
+</def>
+
+
+<def tag="input"><%=     
+  if attributes[:type]
+    tag :input, attributes
+  elsif !can_edit?
+    view
+  else
+    attrs = add_classes(attributes, type_and_field)
+    the_input = if this_type.respond_to?(:macro)
+                  if this_type.macro == :belongs_to
+                    belongs_to_input(attrs)
+                  elsif this_type.macro == :has_many
+                    if this_type.options[:through]
+                      has_many_through_input(attrs)
+                    else
+                      has_many_input(attrs)
+                    end
+                  end
+                else
+                  add_classes!(attrs, type_id)
+                  attrs[:name] ||= param_name_for_this
+                  the_input = call_polymorphic_tag('input', attrs) or
+                    raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+                end
+    if this_parent.errors[this_field]
+      "<div class='field_with_errors'>#{the_input}</div>"
+    else
+      the_input
+    end
+  end
+%></def>
+
+     
+<def tag="input" for="text" attrs="name">
+  <%= text_area_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="boolean" attrs="name">
+  <%= check_box_tag(name, '1', this, attributes) + hidden_field_tag(name, '0') %>
+</def>
+  
+<def tag="input" for="password" attrs="name">
+  <%= password_field_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="html" attrs="name">
+  <%= text_area_tag(name, this, add_classes(attributes, :tiny_mce)) %>
+</def>
+
+<def tag="input" for="date" attrs="order">
+  <% order = order.nil? ? [:year, :month, :day] : comma_split(order).every(:to_sym) -%>
+  <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+</def>
+
+<def tag="input" for="datetime" attrs="order">
+  <% order = order.nil? ? [:year, :month, :day, :hour, :minute] : comma_split(order).every(:to_sym) -%>
+  <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+</def>
+
+<def tag="input" for="integer" attrs="name">
+  <%= text_field_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="float" attrs="name">
+  <%= text_field_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="string" attrs="name">
+  <%= text_field_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="big_integer" attrs="name">
+  <%= text_field_tag(name, this, attributes) %>
+</def>
+
+
+
+
+<def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
+  <% labels ||= {} %>
+  <% titleize = true if titleize.nil? %>
+  <select name="#{param_name_for_this}" merge_attrs>
+    <%= options_for_select(this_type.values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }, this) %>
+  </select>
+</def>
+
+<def tag="input" for="percentage" attrs="name">
+  <%= text_field_tag(name, this, attributes.merge(:size => '3', :maxlength => '3')) %>%
+</def>
+
+
+<def tag="belongs_to_input">
+  <%= belongs_to_menu_input(attributes) %>
+</def>
+
+<!--- Buttons --->
+
+<def tag="remote_method_button" attrs="method, update, result_update, params, label, message"><%= 
+  ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+
+  url = object_url(this, method)
+  add_classes!(html_attributes, "button remote_method_button #{method}_button")
+  if update || result_update
+    message ||= method.titleize
+    func = ajax_updater(url, message, update,
+                        ajax_attributes.merge(:params => params, :result_update => result_update))
+    html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
+    tag(:input, html_attributes)
+  else
+    button_to(label, url, html_attributes)
+  end
+%></def>
+  
+
+<def tag="update_button" attrs="label, message, update, fields, params"><%=
+  raise HoboError.new("no update specified") unless update
+  message ||= label
+  func = ajax_updater(object_url(this), message, update,
+                      :params => { this.class.name.underscore => fields }.merge(params || {}),
+                      :method => :put)
+  tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+                          "button update_button update_#{this.class.name.underscore}_button") %>
+</def>
+
+
+<def tag="delete_button" attrs="label, message, update, in_place, image, confirm, fade"><%=
+  if can_delete?
+    attributes = attributes.merge(if image
+                                    { :type => "image", :src => "#{base_url}/images/#{image}" }
+                                  else
+                                    { :type => "button" }
+                                  end)
+    label ||= "Remove"
+    confirm = "Are you sure?" if confirm.nil?
+    
+    add_classes!(attributes,
+                 image ? "image_button" : "button",
+                 "delete_button delete_#{this.class.name.underscore}_button")
+    url = object_url(this, "destroy")
+    if in_place == false
+      attributes[:confirm] = confirm if confirm
+      button_to(label, url, attributes)
+    else
+      fade = true if fade.nil?
+      attributes[:value] = label
+      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
+      tag(:input, attributes)
+    end
+  end
+%></def>
+
+
+<def tag="create_button" attrs="model, update, label, message, fields"><%=
+  raise HoboError.new("no update specified") unless update
+
+  fields ||= {}
+  class_or_assoc = if model
+                     model.is_a?(String) ? model.constantize : model
+                   elsif Hobo.simple_has_many_association?(this)
+                     fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
+                     this
+                   else
+                     raise HoboError.new("invalid context for <create_button>")
+                   end
+  new = class_or_assoc.new(fields)
+  new.set_creator(current_user)
+  if can_create?(new)
+    label ||= "New #{new.class.name.titleize}"
+    message ||= label
+    class_name = new.class.name.underscore
+    func = ajax_updater(object_url(new.class), message, update,
+                        ({:params => { class_name => fields }} unless fields.empty?))
+    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+                            "button create_button create_#{class_name}_button")
+  end
+%></def>
+
+
+<def tag="belongs_to_menu_input" attrs="include_none, blank_message, options"><%
+  raise HoboError.new("Not allowed to edit") unless can_edit?
+   
+  blank_message ||= "(No #{this_type.name.to_s.titleize})"
+  options ||= this_type.klass.find(:all, :conditions => this_type.options[:conditions]).select {|x| can_view?(x)}
+  #Todo: switch to autocompleter for id_name when too many records, and id_name supported
+  select_options = options.map { |x|
+            [ name(:with => x, :no_wrapper => true), x.id ]
+          }.sort
+  select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
+  attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
+  %>
+  <select name="#{param_name_for_this(true)}" merge_attrs>
+    <%= options_for_select(select_options, this ? this.id : "") %>
+  </select>
+</def>
+
+
+<def tag="belongs_to_autocompleting_input">
+<% refl = this_type
+   completer_model ||= refl.klass
+   completer_attr ||= refl.klass.id_name_column
+   id ||= this_field_dom_id + "_completer"
+   where_attributes = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
+   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_attributes))
+  %>
+
+  <input type="text" id="#{id}" class="autocomplete_bhv" autocomplete_url="#{url}"
+         name="#{param_name_for_this}" merge_attrs/>
+  <div id="#{id}_completions" class="completions_popup" style="display:none"></div>
+</def>
+
+
+<def tag="sti_type_input">
+  <select name="#{param_name_for(form_this, form_field_path + ['type'])}">
+    <%= options_for_select(this.class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
+  </select>
+</def>
+
+      
+<def tag="select_input">
+  <select name="#{param_name_for_this}">
+    <tagbody/>
+  </select>
+</def>
+
+      
+<def tag="ErrorMessages">
+  <section class="error_messages" merge_attrs if="&this.errors.length > 0">
+    <h2 param="heading">In order to proceed please correct the following:</h2>
+    <UL:errors.full_messages param>
+      <li param><%= this %></li>
+    </UL>
+  </section>
+</def>
+
+
+<def tag="name_array_input" attrs="targets, remove_label">
+  <%
+  all ||= this.member_class.find(:all)
+  values = this
+  %>
+  <div class="input has_many_through" merge_attrs>
+    <div style="display:none" class="item_proto">
+      <div class="item">
+        <span></span>
+        <input type="hidden" name="#{param_name_for_this}[]" />
+        <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item" repeat>
+        <span><%= this %></span>
+        <input type="hidden" name="#{param_name_for_this}[]" value="#{this}"/>
+        <input type="button" class="remove_item" value="#{remove_label || 'Remove'}"/>
+      </div>
+    </div>
+    <select>
+      <option value="">Add a <%= this_field.titleize.singularize %></option>
+      <option repeat="&all.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
+              merge_attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
+    </select>
+  </div>
+</def>
+
+
+<def tag="after_submit" attrs="uri">
+  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit"/>
+</def>

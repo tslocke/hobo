@@ -1,0 +1,341 @@
+<def tag="BasePage" attrs="title, doctype">
+  <% title ||= request.request_uri %>
+  <doctype version="&doctype || 'HTML 4.01 STRICT'"/>
+  <html>
+    <head param>
+      <title param><%= title %></title>
+      <do param="stylesheets">
+        <stylesheet name="hobo_base"/>
+        <stylesheet name="application"/>
+      </do>
+      <do param="scripts">
+        <javascript name="prototype,effects,dragdrop,controls,application"/>
+      </do>
+    </head>
+    <body onload="Hobo.applyEvents();" param>
+    </body>
+  </html>
+</def>
+
+
+<def tag="Page">
+  <BasePage merge>
+    <stylesheets param>
+      <stylesheet name="hobo_base"/>
+      <stylesheet name="hobo_rapid"/>
+      <stylesheet name="application"/>
+    </stylesheets>
+
+    <scripts param>
+      <javascript name="prototype, effects, dragdrop, controls, lowpro, hobo_rapid, application"/>
+      <hobo_rapid_javascripts param/>
+    </scripts>
+
+    <body param>
+      <div class="page_wrapper" param="wrapper">
+        <ajax_progress/>
+        <header class="page_header" param>
+          <nav param>
+            <magic_nav class="main_nav" param="main_nav"/>
+            <account_nav if="&Hobo::UserController.user_models.first" param/>
+          </nav>
+        </header>
+        <section class="page_content" param="content">
+          <header class="content_header" param="content_header"/>
+          <flash_message param/>
+          <section class="content_body" param="content_body"/>
+          <footer class="content_footer" param="content_footer"/>
+        </section>
+        <footer class="page_footer" param/>
+      </div>
+    </body>
+  </BasePage>
+</def>
+
+<def tag="PageWithoutAside" alias_of="Page"/>
+<def tag="PageWithAside">
+  <PageWithoutAside merge>
+    <content>
+      <section class="main_content" param="main_content">
+        <default_tagbody for="content"/>
+      </section>
+      <aside class="aside_content" param/>
+    </content>
+  </PageWithoutAside>
+</def>
+      
+
+<def tag="PageForIndex"><Page merge/></def>
+<def tag="PageForNew"><Page merge/></def>
+<def tag="PageForShow"><Page merge/></def>
+<def tag="PageForEdit"><Page merge/></def>
+<def tag="PageForNewInCollection"><Page merge/></def>
+<def tag="PageForShowCollection"><Page merge/></def>
+
+
+<def tag="IndexPage">
+  <% model_name = @model.name.titleize %>
+  <PageForIndex title="All #{model_name.pluralize}" merge>
+    <body class="index_page #{@model.name.underscore.pluralize}" param/>
+    <content_header param>
+      <heading param><%= model_name.pluralize %></heading>
+      <p class="note" param>There <count part="item_count" prefix="are" with="&@model"/></p>
+    </content_header>
+
+    <content_body param>
+      <nav param="top_pagination_nav"><page_nav/></nav>
+      
+      <Table param>
+        <tr><td><a/></td><td><delete_button update="item_count"/></td></tr>
+      </Table>
+      
+      <nav param="bottom_pagination_nav"><page_nav/></nav>
+    </content_body>
+    
+    <content_footer param>
+      <a to="&@model" action="new" param="new_link"/>
+    </content_footer>
+  </PageForIndex>
+</def>
+
+
+<def tag="NewPage">
+  <PageForNew title="New #{type_name}" merge>
+    <body class="new_page #{type_name.underscore}" param/>
+    <content_header param>
+      <heading param>New <type_name title/></heading>
+    </content_header>
+
+    <content_body param>
+      <ErrorMessages param/>
+
+      <form param>
+        <FieldList skip_associations="has_many" param/>
+        <submit label="Create" param/>
+      </form>
+    </content_body>
+  </PageForNew>
+</def>
+
+
+<def tag="ShowPage">
+  <% has_many_assocs = this.class.reflections.values.map do |refl|
+       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
+     end.compact
+  %>
+  <PageForShow merge>    
+    <body class="show_page #{type_name.underscore}" param/>
+    <content_header param>
+      <heading param><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
+      <delete_button in_place="&false" param/>
+    </content_header>
+    
+    <content_body param>
+      <FieldList skip="name" tag="editor" param/>
+
+      <nav param="new_links">
+        <UL with="&has_many_assocs">
+          <li><a action="new"/></li>
+        </UL>
+      </nav>
+    </content_body>
+  </PageForShow>
+</def>
+
+
+<def tag="EditPage">
+  <PageForEdit merge>    
+    <body class="edit_page #{this.class.name.underscore}" param/>
+    <content_header param>
+      <heading><type_name/><if test="&this.respond_to? :name">: <name/></if></heading>
+      <delete_button in_place="&false" param/>
+    </content_header>
+
+    <content_body param>
+      <ErrorMessages param/>
+      <form param>
+        <FieldList skip_associations="has_many" param/>
+        <submit label="Save"/>
+      </form>
+          
+    </content_body>
+  </PageForEdit>
+</def>
+
+
+<def tag="NewInCollectionPage">
+  <PageForNewInCollection title="New #{type_name}" merge>
+    <body class="new_in_collection_page #{type_name(:with => @owner)} #{type_name}" param/>
+    <content_header param>
+      <heading param>New <type_name/></heading>
+      <sub_heading param>For: <a with="&@owner" /></sub_heading>
+    </content_header>
+
+    <content_body param>
+      <ErrorMessages/>
+
+      <form param>
+        <FieldList skip_associations="has_many" param/>
+        <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
+      </form>
+    </content_body>
+  </PageForNewInCollection>
+</def>
+
+
+<def tag="ShowCollectionPage">
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
+  <PageForShowCollection title="&title" merge>
+    <body class="show_collection_page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
+          param/>
+    <content_header param>
+      <nav>Back to <a with="&@owner"/></nav>
+      <heading><%= title %></heading>
+      <sub_heading><count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/></sub_heading>
+    </content_header>
+
+    <content_body param>
+      <nav param="top_pagination_nav"><page_nav/></nav>
+
+      <Table param="Table">
+        <tr>
+          <if test="can_view?">
+            <td><a/></td><td><delete_button/></td>
+          </if>
+        </tr>
+      </Table>
+      
+      <nav param="bottom_pagination_nav"><page_nav param/></nav>
+      
+      <nav if="&Hobo.simple_has_many_association?(@association)" param="new_link">
+        <a to="&@association" action="new"/>
+      </nav>
+    </content_body>
+  </PageForShowCollection>
+</def>
+
+
+<def tag="LoginPage" attrs="remember_me">
+  <Page title="Log In" merge>
+    <body class="login_page" param/>
+    <nav replace/>
+    <content_header param>
+      <heading param>Log In</heading>
+    </content_header>
+
+    <content_body param>
+      <form action="&request.request_uri" param>
+        <field_list>
+          <field_list_item>
+            <item_label param="login_label"><%= model.login_attr.to_s.titleize %></item_label>
+            <item_value><input type="text" name="login" id="login" param="login_input" /></item_value>
+          </field_list_item>
+
+          <field_list_item>
+            <item_label param="password_label">Password</item_label>
+            <item_value><input type="password" name="password" id="password" param="password_input"/></item_value>
+          </field_list_item>
+
+          <field_list_item if="&remember_me">
+            <item_label class="field_label" param="remember_me_label">Remember me:</item_label>
+            <item_value><input type="checkbox" name="remember_me" id="remember_me" param="remember_me_input"/></item_value>
+          </field_list_item>
+        </field_list>
+        <submit label='Log in' param/>
+      </form>
+    </content_body>
+  </Page>
+</def>
+
+
+<def tag="SignupPage">
+  <Page title="Sign Up" merge>
+    <body class="signup_page" param/>
+    <nav replace/>
+    <content_header param>
+      <heading param>Sign Up</heading>
+    </content_header>
+    
+    <content_body param>
+      <ErrorMessages/>
+      <form action="&request.request_uri" param>
+        <FieldList fields="login, password, password_confirmation" param>
+          <password_confirmation_label>Confirm Password</password_confirmation_label>
+        </FieldList>
+
+        <submit label='Sign Up'/>
+      </form>
+    </content_body>
+
+  </Page>
+</def>
+
+
+<def tag="PermissionDeniedPage">
+  <Page merge>
+    <content_header param>
+      <heading param>That operation is not allowed</heading>
+    </content_header>
+  </Page>
+</def>
+
+<def tag="NotFoundPage">
+  <Page merge>
+    <content_header param>
+      <heading param>The page you were looking for could not be found</heading>
+    </content_header>
+  </Page>
+</def>
+
+<def tag="doctype" attrs="version"><%=
+  case version.upcase
+    when "HTML 4.01 STRICT"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ' + 
+        '"http://www.w3.org/TR/html4/strict.dtd">'
+    when "HTML 4.01 TRANSITIONAL"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/html4/loose.dtd">'
+    when "XHTML 1.0 STRICT"
+      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    when "XHTML 1.0 TRANSITIONAL"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    when "XHTML 1.1"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" ' + 
+        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+  end
+%></def>
+
+<def tag="stylesheet" attrs="name, media">
+  <repeat with="&comma_split(name)">
+    <link href="#{base_url}/stylesheets/#{this}.css" media="#{ media || 'all' }"
+          rel="stylesheet" type="text/css" />
+  </repeat>
+</def>
+
+<def tag="javascript" attrs="name">
+  <if test="&name.is_a?(Symbol)">
+    <%= javascript_include_tag name %>
+  </if>
+  <else>
+    <repeat with="&comma_split(name)">
+      <%= javascript_include_tag this %>
+    </repeat>
+  </else>
+</def>
+
+<def tag="flash_message" attrs="type">
+  <% type = type ? type.to_sym : :notice %>
+  <div class="flash #{type}" if="&flash[type]" merge_attrs><%= flash[type] %></div>
+</def>
+
+<def tag="ajax_progress">
+  <div id="ajax_progress">
+    <div>
+      <span id="ajax_progress_text"></span>
+    </div>
+  </div>
+</def>
+
+
