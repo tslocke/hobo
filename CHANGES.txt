@@ -1,3 +1,13 @@
+=== Release 0.6.4 ===
+
+Fix: In-place-editors were not working with the new version of
+Scriptaculous
+
+The default fade effect on in-place-editors is now disabled
+
+<ShowPage> now has a title
+
+
 === Release 0.6.3 ===
 
 New feature: subsites, i.e. namespaced routes, plus support in the
