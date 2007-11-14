@@ -186,10 +186,12 @@ var Hobo = {
                     old = val
                     return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
                 },
-                highlightcolor: '#ffffff',
-                highlightendcolor: Hobo.backgroundColor(el),
                 onFailure: function(resp) { alert(resp.responseText); el.innerHTML = old },
-                evalScripts: true
+                evalScripts: true,
+                htmlResponse: false,
+                ajaxOptions: { method: "put" },
+                onEnterHover: null,
+                onLeaveHover: null
                }
         Object.extend(opts, options)
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
@@ -383,29 +385,12 @@ var Hobo = {
         Hobo.applyEvents(id)
     },
 
-    rgbColorToHex: function(color) {
-        parts = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)/.exec(color)
-        function hexPart(s) {
-            var res = (s * 1).toString(16)
-            return res.length == 1 ? '0' + res : res
-        }
-        if (parts) {
-            return '#' + hexPart(parts[1]) + hexPart(parts[2]) + hexPart(parts[3])
-        } else {
-            return color
-        }
-    },
-
     getStyle: function(el, styleProp) {
         if (el.currentStyle)
             var y = el.currentStyle[styleProp];
         else if (window.getComputedStyle)
             var y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
         return y;
-    },
-
-    backgroundColor: function(el) {
-        return Hobo.rgbColorToHex(Hobo.getStyle(el, 'background-color'))
     },
 
     partFor: function(el) {
@@ -441,27 +426,11 @@ Element.findContaining = function(el, tag) {
     return null;
 }
 
-// Fix scriptaculous - don't remove <p> tags please!
-Ajax.InPlaceEditor.prototype.convertHTMLLineBreaks = function(string) {
-    return string.replace(/<br>/gi, "\n").replace(/<br\/>/gi, "\n");
-}
-
-
 origEnterEditMode = Ajax.InPlaceEditor.prototype.enterEditMode
 Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
     if (this.afterEnterEditMode) this.afterEnterEditMode()
     return false
-}
-
-// Fix Safari in-place-editor bug
-Ajax.InPlaceEditor.prototype.removeForm = function() {
-    if(this.form) {
-        if (this.form.parentNode) {
-            try { Element.remove(this.form); } catch (e) {}
-        }
-        this.form = null;
-    }
 }
 
 // Silence errors from IE :-(
