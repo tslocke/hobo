@@ -123,7 +123,7 @@
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <PageForShow merge>    
+  <PageForShow merge title="#{name :no_wrapper => true}">
     <body class="show_page #{type_name.underscore}" param/>
     <content_header param>
       <heading param><type_name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
