@@ -1,6 +1,6 @@
 <def tag="Alert">
   <div class="alert #{this.subject._?.class.name.underscore} #{this.name.underscore}" hobo_model_id="#{dom_id}" merge_attrs>
-    <delete_button confirm="&false" param/>
+    <delete_button confirm="&false" param subsite=""/>
     <call_tag:subject tag="#{this.name}_alert" param="message"/>
   </div>
 </def>

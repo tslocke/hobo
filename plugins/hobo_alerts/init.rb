@@ -43,6 +43,7 @@ module ::Hobo::Plugins
 
     def alerts_controller
       resource_controller :AlertsController do
+        auto_actions :destroy
       end
     end
   end
