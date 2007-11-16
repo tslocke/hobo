@@ -73,7 +73,7 @@ module Hobo
         if u && u.authenticated?(password)
           if u.respond_to?(:last_login_at) || u.respond_to?(:login_count)
             u.last_login_at = Time.now if u.respond_to?(:last_login_at)
-            u.login_count = (u.logins_count.to_i + 1) if u.respond_to?(:login_count)
+            u.login_count = (u.login_count.to_i + 1) if u.respond_to?(:login_count)
             u.save
           end
           u
