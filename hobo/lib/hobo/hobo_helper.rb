@@ -51,7 +51,7 @@ module Hobo
       
       subsite = params[:subsite] || self.subsite
       
-      return nil if action.nil? && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
+      return nil if action.nil? && params[:if_available] && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
       
       base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
@@ -240,7 +240,7 @@ module Hobo
       if s.is_a? Hobo::RawJs
         s.to_s
       else
-        "'" + s.gsub("'"){"\\'"} + "'"
+        "'" + s.to_s.gsub("'"){"\\'"} + "'"
       end
     end
      
