@@ -204,7 +204,7 @@
       end
       
       content = name if content.blank?
-      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => true))
       if href.nil?
         # This object is registered with ModelRouter as not linkable
         content

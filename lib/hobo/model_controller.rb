@@ -130,12 +130,16 @@ module Hobo
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
           @this = find_instance(opts) unless opts[:no_find]
-          permission_denied unless Hobo.can_call?(current_user, @this, method)
-          if got_block
+          set_status(Hobo.can_call?(current_user, @this, method) ? :valid : :not_allowed)
+          # TODO - block should get to handle permission denied?
+          if not_allowed?
+            permission_denied
+          elsif got_block
             instance_eval(&block)
           else
             @this.send(method)
           end
+          
           hobo_ajax_response unless performed?
         end
       end
