@@ -207,7 +207,7 @@
 </def>
 
 
-<def tag="delete_button" attrs="label, message, update, in_place, image, confirm, fade"><%=
+<def tag="delete_button" attrs="label, message, update, in_place, image, confirm, fade, subsite"><%=
   if can_delete?
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
@@ -220,7 +220,7 @@
     add_classes!(attributes,
                  image ? "image_button" : "button",
                  "delete_button delete_#{this.class.name.underscore}_button")
-    url = object_url(this, "destroy")
+    url = object_url(this, "destroy", :subsite => subsite)
     if in_place == false
       attributes[:confirm] = confirm if confirm
       button_to(label, url, attributes)
