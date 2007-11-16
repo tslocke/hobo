@@ -51,7 +51,8 @@ module Hobo
       
       subsite = params[:subsite] || self.subsite
       
-      return nil if action.nil? && params[:if_available] && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
+      if_available = params.delete(:if_available)
+      return nil if action.nil? && if_available && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
       
       base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
