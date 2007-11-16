@@ -381,9 +381,11 @@ module Hobo
                        end
           
           if find_scope
+            scope_name = "@#{name.to_s.gsub('?','')}_scope"
+
             # Calling instance_variable_get directly causes self to
             # get loaded, hence this trick
-            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}_scope")
+            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call(scope_name)
             
             unless assoc
               options = proxy_reflection.options
@@ -418,7 +420,7 @@ module Hobo
                       end.new(self.proxy_owner, r)
 
               # Calling directly causes self to get loaded
-              Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}_scope", assoc)
+              Kernel.instance_method(:instance_variable_set).bind(self).call(scope_name, assoc)
             end
             assoc
           else
