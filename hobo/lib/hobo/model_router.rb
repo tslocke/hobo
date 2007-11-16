@@ -9,11 +9,11 @@ module Hobo
     class << self
       
       def linkable(subsite, klass, is_linkable)
-        @linkable[subsite][klass] = is_linkable
+        @linkable[subsite][klass.name] = is_linkable
       end
       
       def linkable?(subsite, klass)
-        @linkable[subsite][klass]
+        @linkable[subsite][klass.name]
       end
       
       def add_routes(map)

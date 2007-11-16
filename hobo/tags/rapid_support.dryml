@@ -1,4 +1,4 @@
-<def tag="with_fields" attrs="fields, skip, skip_associations, include_timestamps"><%
+<def tag="with_fields" attrs="fields, skip, skip_associations, include_timestamps, force_all"><%
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
                   columns = klass.content_columns.every(:name)
@@ -18,7 +18,7 @@
                   comma_split(fields)
                 end
   field_names -= comma_split(skip) if skip
-  field_names = field_names.select {|f| can_view?(this, f)}
+  field_names = field_names.select {|f| can_view?(this, f)} unless force_all
   field_names.each do |field| %><with field="&field"><tagbody/></with><% end
 %></def>
 
