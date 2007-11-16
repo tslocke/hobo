@@ -58,7 +58,7 @@
             class="#{scope.even_odd} #{this_type.name.underscore}"
             hobo_model_id="#{dom_id(this)}">
           <if test="&fields">
-            <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
+            <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)" force_all>
               <td param="#{this_field.to_s.sub('?', '').gsub('.', '_')}_view"><call_tag tag="&field_tag"/></td>
             </with_fields>
             <td class="controls" param="controls" if="&all_parameters[:controls]">
@@ -204,7 +204,7 @@
       end
       
       content = name if content.blank?
-      href = object_url(target, action, params._?.merge(:subsite => subsite))
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
       if href.nil?
         # This object is registered with ModelRouter as not linkable
         content
@@ -294,8 +294,7 @@
 
 <def tag="view" for="TrueClass"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="count" attrs="label, prefix, unless_none, if_any"><%=
-  if_any = unless_none if if_any.nil?
+<def tag="count" attrs="label, prefix, if_any"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
   if this.is_a?(Class) and this < ActiveRecord::Base
@@ -312,8 +311,8 @@
         end
   end
    
-  Hobo::Dryml.last_if = c > 0 if unless_none
-  if unless_none && c == 0
+  Hobo::Dryml.last_if = c > 0 if if_any
+  if if_any && c == 0
     ""
   else
     main = label.blank? ? c : pluralize(c, label)
@@ -391,4 +390,15 @@ in the future - use at your own risk. -->
 <def tag="You" attrs="have, are">
   <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
   <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
+</def>
+
+<def tag="your">
+  <if test="&this == current_user">your</if>
+  <else><tagbody><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></tagbody></else>
+</def>
+
+
+<def tag="Your">
+  <if test="&this == current_user">Your</if>
+  <else><tagbody><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></tagbody></else>
 </def>
