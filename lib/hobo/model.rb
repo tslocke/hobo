@@ -157,7 +157,7 @@ module Hobo
         end
 
         class_eval %{
-          def self.find_by_id_name(id_name, options)
+          def self.find_by_id_name(id_name, options={})
             #{finder}
           end
         }

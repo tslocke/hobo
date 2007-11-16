@@ -209,7 +209,7 @@ module Hobo
         else
           # Black list
           except = Array(@auto_actions[:except])
-          name.not_in?(except) || (collection_action && :collections.not_in?(except))
+          return !(name.in?(except) || (collection_action && :collections.in?(except)))
         end
       end
 

@@ -45,13 +45,15 @@ module Hobo
     def object_url(*args)
       params = args.extract_options!
       obj, action = args
-      
       action &&= action.to_s
       
       controller_name = controller_for(obj)
       
       subsite = params[:subsite] || self.subsite
-      base = subsite ? "/#{subsite}#{base_url}" : base_url
+      
+      return nil if action.nil? && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
+      
+      base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
       parts = if obj.is_a? Class
                 [base, controller_name]
