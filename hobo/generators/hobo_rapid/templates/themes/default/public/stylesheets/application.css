@@ -16,18 +16,18 @@ a img { border: none; }
 
 .clearer { clear:both; font-size: 1px; }
 
-body { margin: 10px 0 25px 0; background-color: #d2d2d2; }
+html, body { background-color: #d2d2d2; }
+body { margin: 10px 0 25px 0; }
 
 a { color: #677077; text-decoration: underline; padding:1px; cursor:pointer; }
 a:visited { color: #677077; }
 a:hover, a:active { color: #FFFFFF; text-decoration: none; background: #4b5257; }
 a:hover.no_hover { background: transparent; }
 
-.front_page_title {
-    margin: 20px 0 15px 6px;
+.content_header h1 {
+		margin: 0; margin-bottom: 15px;
     background:url(../images/banner.gif) no-repeat top left;
     text-align: left;
-    padding-left: 20px;
     height: 32px;
     font-size: 28pt;
     padding: 65px 0 15px 20px;
@@ -37,10 +37,10 @@ a:hover.no_hover { background: transparent; }
 
 /* Main Page Body Window */
 
-#header .logo { position: absolute; top: 15px; left: 20px; }
-#header .logo a { background: transparent; }
+.page_header .logo { position: absolute; top: 15px; left: 20px; }
+.page_header .logo a { background: transparent; }
 
-#header { 
+.page_header { 
     position: relative;
     height: 80px;
 }
@@ -50,9 +50,9 @@ a:hover.no_hover { background: transparent; }
 }
 
 .nav ul { margin: 0; padding: 0; float: right; }
-ul.account_nav { font-size: 80%; clear:right; }
+ul.account_nav { font-size: 80%; clear:right; padding-top: 8px; }
 
-.nav li { list-style: none; margin: 0; padding: 0; float: left; padding: 5px; font-size: 130%; }
+.nav li { list-style: none; float: left; margin: 0; padding: 0; padding-left: 10px; font-size: 110%; }
 .nav a { text-decoration: none;}
 
 .main_nav li { text-transform: uppercase; }
@@ -138,7 +138,7 @@ p { margin-left: 10px; }
 
 .panel li { margin: 6pt 0; }
 
-.section { border-top: 6px solid white; padding: 5px 20px 5px 6px; }
+.section { border-top: 6px solid white; }
 
 ul.purple li { background-image: url(../images/txt_list_img_purple.gif); }
 ul.green li { background-image: url(../images/txt_list_img_green.gif); }
@@ -245,7 +245,7 @@ textarea.tall { height: 350px; }
 
 /* MESSY LOAD OF JUNK BELOW HERE---------------------------------------- */
 
-input.button_input {
+input.button {
     border: 1px solid black;
     border-top-color: #fff;
     border-left-color: #fff;
@@ -255,7 +255,7 @@ input.button_input {
     padding: 2px; 
 }
 
-input.button_input.text {
+input.button.text {
     background: transparent; border: none;
     padding: 0 0 0 0; margin: -2px 0 0 0;
     color: #677077; text-decoration: underline; cursor:pointer;
