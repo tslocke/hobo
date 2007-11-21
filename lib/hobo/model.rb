@@ -24,6 +24,7 @@ module Hobo
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
+        alias_method_chain :acts_as_list, :fields
       end
     end
 
@@ -70,8 +71,14 @@ module Hobo
         end
         res
       end
-      
-      
+
+
+      def acts_as_list_with_fields(options = {})
+        fields { |f| f.send(options._?[:column] || "position", :integer) }
+        acts_as_list_without_fields(options)
+      end
+
+
       attr_reader :field_specs
       public :field_specs
       

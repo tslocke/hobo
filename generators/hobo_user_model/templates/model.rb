@@ -20,7 +20,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   def creatable_by?(creator)
-    false
+    true
   end
 
   def updatable_by?(updater, new)
