@@ -538,12 +538,16 @@ module Hobo
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
+        else
+          value
         end
       elsif field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           parse_datetime(value)
+        else
+          value
         end
       elsif field_type <= TrueClass
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
