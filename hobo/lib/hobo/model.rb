@@ -24,7 +24,7 @@ module Hobo
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
-        alias_method_chain :acts_as_list, :fields
+        alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
       end
     end
 
