@@ -7,6 +7,12 @@ class HoboMigrationGenerator < Rails::Generator::Base
                                               "hobo_migration_#{i+1}"
                                             end
   end
+  
+  def table_model_classes
+    ActiveRecord::Base.send(:subclasses).
+      reject {|c| c.name.starts_with?("CGI::") }.
+      select {|c| c.superclass == ActiveRecord::Base}
+  end
 
   def manifest
     connection = ActiveRecord::Base.connection
@@ -17,8 +23,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     
     ignore_model_names = Hobo::Migrations.ignore.every(:underscore)
     
-    all_models = ActiveRecord::Base.send(:subclasses).reject {|c| c.name.starts_with?("CGI::") }
-    models, ignore_models = all_models.partition do |m|
+    models, ignore_models = table_model_classes.partition do |m|
       m.name.underscore.not_in?(ignore_model_names) && m < Hobo::Model
     end
     ignore_tables = ignore_models.every(:table_name) | Hobo::Migrations.ignore_tables

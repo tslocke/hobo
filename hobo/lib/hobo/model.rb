@@ -17,14 +17,17 @@ module Hobo
       Hobo.register_model(base)
       base.extend(ClassMethods)
       base.class_eval do
-        @field_specs  = HashWithIndifferentAccess.new
-        set_field_type({})
         alias_method_chain :attributes=, :hobo_type_conversion
       end
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
+        def inherited(klass)
+          fields do
+            field(klass.inheritance_column, :string)
+          end
+        end
       end
     end
 
@@ -79,7 +82,9 @@ module Hobo
       end
 
 
-      attr_reader :field_specs
+      def field_specs
+        @field_specs ||= HashWithIndifferentAccess.new
+      end
       public :field_specs
       
       def set_field_type(types)
