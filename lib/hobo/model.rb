@@ -25,6 +25,7 @@ module Hobo
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
         def inherited(klass)
           fields do
+            Hobo.register_model(klass)
             field(klass.inheritance_column, :string)
           end
         end
