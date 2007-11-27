@@ -19,7 +19,7 @@ module Hobo::Dryml
         @tag_attrs ||= {}
       end
       
-      alias_method :_alias_tag_chain, :alias_tag_chain
+      alias_method :delayed_alias_method_chain, :alias_method_chain
       
     end
 
@@ -161,7 +161,6 @@ module Hobo::Dryml
         end
       end
     end
-    alias_method :find_polymorphic_template, :find_polymorphic_tag
     
     
     def repeat_attribute(array, &b)
@@ -236,30 +235,15 @@ module Hobo::Dryml
     end
 
 
-    def _tag_context(options, tagbody_proc)
-      tagbody = tagbody_proc && proc do |*args|
-        res = ''
-        
-        block_options, default_tagbody = args
-        block_with = block_options && block_options[:with]
-        if block_options && block_options.has_key?(:field)
-          new_field_context(block_options[:field], block_with) { res = tagbody_proc.call(default_tagbody) }
-        elsif block_options && block_options.has_key?(:with)
-          new_object_context(block_with) { res = tagbody_proc.call(default_tagbody) }
-        else
-          new_context { res = tagbody_proc.call(default_tagbody) }
-        end
-        res
-      end
+    def _tag_context(attributes)
+      with = attributes[:with] == "page" ? @this : attributes[:with]
       
-      with = options[:with] == "page" ? @this : options[:with]
-      
-      if options.has_key?(:field)
-        new_field_context(options[:field], with) { yield tagbody }
-      elsif options.has_key?(:with)
-        new_object_context(with) { yield tagbody }
+      if attributes.has_key?(:field)
+        new_field_context(attributes[:field], with) { yield }
+      elsif attributes.has_key?(:with)
+        new_object_context(with) { yield }
       else
-        new_context { yield tagbody }
+        new_context { yield }
       end
     end
 
@@ -306,27 +290,62 @@ module Hobo::Dryml
     end
     
     
-    def call_block_tag_parameter(the_tag, attributes, overriding_proc, &default_tagbody)
-      if overriding_proc && overriding_proc.arity == 1
-        # This is a 'replace' parameter
-        
-        template_default = proc do |attrs, body_block|
-          tagbody_proc = body_block && proc {|_| new_context { body_block.call(default_tagbody) } }
-          call_block_tag_parameter(the_tag, attributes, proc { attrs.update(:tagbody => tagbody_proc) }, &default_tagbody)
+    def call_tag_parameter_with_default_content(the_tag, attributes, default_content, overriding_content_proc)
+      if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+        body = if overriding_content_proc
+                 new_context { overriding_content_proc.call(proc { default_content._?.call(nil) }) }
+               elsif default_content
+                 new_context { default_content.call(nil) }
+               else
+                 nil
+               end
+        if body.blank?
+          tag(the_tag, attributes)
+        else
+          content_tag(the_tag, body, attributes)
         end
-        overriding_proc.call(template_default)
       else
-        if overriding_proc
-          overriding_attributes = overriding_proc.call
-          overriding_tagbody = overriding_attributes.delete(:tagbody)
-          attributes = merge_attrs(attributes, overriding_attributes)
+        if the_tag.is_a?(String, Symbol)
+          send(the_tag, attributes, { :default => proc {|_| overriding_content_proc.call(default_content) } })
         end
+      end
+    end
+    
+    
+    def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
+      debugger
+      overriding_proc = caller_parameters[param_name]
+      
+      if param_name == :default && overriding_proc
+        # :default content is handled specially
+        
+        call_tag_parameter_with_default_content(the_tag, attributes, parameters[:default], overriding_proc)
+        
+      elsif overriding_proc && overriding_proc.arity == 1
+        # This is a 'replace' or default parameter
+        
+        tag_default = proc do |attrs, params|
+          call_tag_parameter(the_tag, attributes, parameters, proc { [attributes, parameters] })
+        end
+        overriding_proc.call(tag_default)
+        
+      else
+        # Regular param call, may or may not match a caller parameter
+        
+        if overriding_proc
+          overriding_attributes, overriding_parameters = overriding_proc.call
+          overriding_default_content = overriding_parameters.delete(:default)
+          attributes = merge_attrs(attributes, overriding_attributes)
+          parameters = parameters.merge(overriding_parameters)
+        end
+        
+        default_content = parameters[:default]
       
         if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
-          body = if overriding_tagbody
-                   new_context { overriding_tagbody.call(proc { default_tagbody.call(nil) }) }
-                 elsif default_tagbody
-                   new_context { default_tagbody.call(nil) }
+          body = if overriding_default_content
+                   new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
+                 elsif default_content
+                   new_context { default_content.call(nil) }
                  else
                    nil
                  end
@@ -337,15 +356,17 @@ module Hobo::Dryml
           end
         else
           if the_tag.is_a?(String, Symbol)
-            body = proc do |default| 
-              if overriding_tagbody
-                overriding_tagbody.call(proc { default_tagbody ? default_tagbody.call(default) : "" })
-              else
-                default_tagbody ? default_tagbody.call(default) : ""
-              end
-            end
+            # It's a defined DRYML tag
             
-            send(the_tag, attributes, &body)
+            #body = proc do |default|
+            #  if overriding_default_content
+            #    overriding_default_content.call(proc { default_content ? default_content.call(default) : "" })
+            #  else
+            #    default_content ? default_content.call(default) : ""
+            #  end
+            #end
+            
+            send(the_tag, attributes, parameters)
           else
             # It's a proc - a template default
             the_tag.call(attributes, overriding_tagbody || default_tagbody)
@@ -354,23 +375,23 @@ module Hobo::Dryml
       end
     end
 
-    def call_template_parameter(the_template, attributes, template_procs, overriding_proc)
+    def call_tag_parameter_XX(the_tag, attributes, param_procs, overriding_proc)
       if overriding_proc && overriding_proc.arity == 1
         # It's a replace parameter
         
-        template_default = proc do |attributes, parameters|
-          call_template_parameter(the_template, attributes, template_procs, proc { [attributes, parameters] })
+        tag_default = proc do |attributes, parameters|
+          call_tag_parameter(the_tag, attributes, param_procs)
         end
-        overriding_proc.call(template_default)
+        overriding_proc.call(tag_default)
       else
         if overriding_proc
-          overriding_attributes, overriding_template_procs = overriding_proc.call
+          overriding_attributes, overriding_param_procs = overriding_proc.call
           
           attributes = merge_attrs(attributes, overriding_attributes)
-          template_procs = template_procs.merge(overriding_template_procs)
+          param_procs = param_procs.merge(overriding_param_procs)
         end   
       
-        send(the_template, attributes, template_procs)
+        send(the_tag, attributes, param_procs)
       end
     end
     
@@ -405,11 +426,10 @@ module Hobo::Dryml
       end
     end
     
-    # Same as merge_option_procs, except these procs return a pair of
-    # hashes rather than a single hash. The first hash is the tag
-    # attributes, the second is a hash of procs -- the template
-    # parameters.
-    def merge_template_parameter(general_proc, overriding_proc)
+    # Takes two procs that each return a pair of hashes (attributes
+    # and parameters). Returns a single proc that also returns a pair
+    # of hashes - the merged atributes and parameters.
+    def merge_tag_parameter(general_proc, overriding_proc)
       proc do
         general_attributes, general_template_procs = general_proc.call
         overriding_attributes, overriding_template_procs = overriding_proc.call

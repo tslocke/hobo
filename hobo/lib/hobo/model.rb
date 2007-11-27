@@ -121,7 +121,7 @@ module Hobo
       end
 
       def never_show?(field)
-        @hobo_never_show && field.to_sym.in?(@hobo_never_show)
+        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
       public :never_show?
 

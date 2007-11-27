@@ -70,6 +70,7 @@ module Hobo::Dryml
         name = instruction[:name]
         case instruction[:type]
         when :def
+          # puts instruction[:src] + "\n\n"
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
           
@@ -77,6 +78,7 @@ module Hobo::Dryml
           @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
           
         when :render_page
+          # puts instruction[:src]
           method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
           @environment.class_eval(method_src, template_path, instruction[:line_num])
