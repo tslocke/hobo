@@ -1,0 +1,10 @@
+<def tag="Page" extend_with="theme">
+  <PageWithoutTheme merge>
+    <stylesheets param>
+      <stylesheet name="hobo_base"/>
+      <theme_stylesheet/>
+      <theme_stylesheet name="rapid_ui"/>
+      <stylesheet name="application"/>
+    </stylesheets>
+  </PageWithoutTheme>
+</def>  
