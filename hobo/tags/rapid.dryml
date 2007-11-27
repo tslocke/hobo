@@ -327,8 +327,9 @@
 %></def>
 
 
-<def tag="theme_stylesheet">
-  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
+<def tag="theme_stylesheet" attrs="name">
+  <% name ||= 'application' -%>
+  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/<%= name %>.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 
