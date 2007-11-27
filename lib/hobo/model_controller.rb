@@ -112,7 +112,7 @@ module Hobo
         options = options.reverse_merge(:limit => 15)
         options[:data_filters_block] = b
         @completers ||= HashWithIndifferentAccess.new
-        @completers[attr.to_sym] = opts
+        @completers[attr.to_sym] = options
       end
 
 

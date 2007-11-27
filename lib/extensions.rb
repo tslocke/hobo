@@ -31,22 +31,6 @@ class Module
   end
 
   
-  def alias_tag_chain(tag, feature)
-    if tag.to_s =~ /^[A-Z]/
-      without = "#{tag}Without#{feature.to_s.camelize}"
-      with    = "#{tag}With#{feature.to_s.camelize}"
-    else
-      without = "#{tag}_without_#{feature}"
-      with    = "#{tag}_with_#{feature}"
-    end
-    
-    unless instance_methods.include?(without)
-      alias_method without, tag
-      alias_method tag, with
-    end
-  end
-  
-  
   # Fix delegate so it doesn't go bang if 'to' is nil
   def delegate(*methods)
     options = methods.pop

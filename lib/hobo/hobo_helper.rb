@@ -53,7 +53,9 @@ module Hobo
       
       # TODO - what if you want if_available as a query param?
       if_available = params.delete(:if_available)
-      return nil if action.nil? && if_available && Hobo::ModelRouter.linkable?(subsite, obj.class) == false
+      return nil if 
+        (action.nil? && if_available &&     !linkable?(obj.class, :show, subsite)) ||
+        (action.nil? && obj.is_a?(Class) && !linkable?(obj, :index, subsite))
       
       base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
@@ -353,6 +355,11 @@ module Hobo
         HashWithIndifferentAccess.new
       end
     end
+    
+    def linkable?(obj, action, subsite=self.subsite)
+      Hobo::ModelRouter.linkable?(subsite, obj, action)
+    end
+    
   
     # debugging support
      

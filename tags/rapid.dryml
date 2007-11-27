@@ -274,9 +274,9 @@
 
 <def tag="has_many_view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
 
-<def tag="view" for="Date" attrs="format"><%= format ? this.strftime(format) : this.to_s(:long) %></def>
+<def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
-<def tag="view" for="Time" attrs="format"><%= format ? this.strftime(format) : this.to_s(:long) %></def>
+<def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
