@@ -284,7 +284,7 @@ module Hobo::Dryml
                 name = "#{name}-with-#{extend_with}"
               end
               src << tag_method(name, el) +
-                "<% _register_tag_attrs('#{name}', #{declared_attributes(el).inspect}) %>"
+                "<% _register_tag_attrs(:#{ruby_name name}, #{declared_attributes(el).inspect}) %>"
               
               logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug-source"]
               
@@ -377,7 +377,7 @@ module Hobo::Dryml
     
     
     def call_name(el)
-      dryml_exception("invalid tag name", el) unless el.dryml_name =~ DRYML_NAME_RX
+      dryml_exception("invalid tag name", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
       Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
     end
 
@@ -408,15 +408,15 @@ module Hobo::Dryml
       
       parameters = tag_newlines(el) + parameter_tags_hash(el)
       
-      is_param_default_call = el.attributes['restore']
+      is_param_restore = el.attributes['restore']
       
       call = if param_name
                param_name = attribute_to_ruby(param_name, :symbolize => true)
                args = "#{attributes}, #{parameters}, all_parameters, #{param_name}"
-               to_call = if is_param_default_call
+               to_call = if is_param_restore
                            # The tag is available in a local variable
                            # holding a proc
-                           name
+                           param_restore_local_name(name)
                          elsif (call_type = polymorphic_call_type(el))
                            "find_polymorphic_tag(:#{name.underscore}, #{call_type})"
                          else
@@ -424,9 +424,9 @@ module Hobo::Dryml
                          end
                "call_tag_parameter(#{to_call}, #{args})"
              else
-               if is_param_default_call
+               if is_param_restore
                  # The tag is a proc available in a local variable
-                 "#{param_content_local_name name}.call(#{attributes}, #{parameters})"
+                 "#{param_restore_local_name(name)}.call(#{attributes}, #{parameters})"
                elsif (call_type = polymorphic_call_type(el))
                  "send(find_polymorphic_tag(:#{name.underscore}, #{call_type}), #{attributes}, #{parameters})"
                else
@@ -500,7 +500,7 @@ module Hobo::Dryml
         end
       end
       
-      merge_params = el.attributes['merge_params'] || merge_attribute(el)
+      merge_params = el.attributes['merge-params'] || merge_attribute(el)
       if merge_params
         extra_params = if merge_params == "&true"
                          "parameters"
@@ -521,6 +521,11 @@ module Hobo::Dryml
     end
     
     
+    def param_restore_local_name(name)
+      "_#{name}_restore"
+    end
+    
+    
     def param_proc(el)
       param_name = el.dryml_name
       nl = tag_newlines(el)
@@ -529,7 +534,7 @@ module Hobo::Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
-        "proc { |#{param_content_local_name(param_name)}| new_context { %>#{children_to_erb(el)}<% } #{nl}}"
+        "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{children_to_erb(el)}<% } #{nl}}"
       else
         attributes = el.attributes.map do 
           |name, value| ":#{name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
@@ -565,7 +570,7 @@ module Hobo::Dryml
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
-      items << ":field => \"#{el.name}\"" if el.name != el.expanded_name
+      items << ":field => \"#{el.name}\"" if el.name != el.dryml_name
       
       items = items.join(", ")
       

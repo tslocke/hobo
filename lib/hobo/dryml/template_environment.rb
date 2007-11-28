@@ -279,17 +279,6 @@ module Hobo::Dryml
     end
     
     
-    def do_tagbody(tagbody, attributes, default_tagbody)
-      res = if tagbody
-              tagbody.call(attributes, default_tagbody)
-            else
-              default_tagbody ? new_context { default_tagbody.call } : ""
-            end
-      Hobo::Dryml.last_if = !!tagbody
-      res
-    end
-    
-    
     def call_tag_parameter_with_default_content(the_tag, attributes, default_content, overriding_content_proc)
       if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_content_proc
@@ -305,15 +294,17 @@ module Hobo::Dryml
           content_tag(the_tag, body, attributes)
         end
       else
-        if the_tag.is_a?(String, Symbol)
-          send(the_tag, attributes, { :default => proc {|_| overriding_content_proc.call(default_content) } })
-        end
+        d = if overriding_content_proc
+              proc { |default| overriding_content_proc.call(proc { default_content._?.call(default) }) }
+            else
+              proc { |default| default_content._?.call(default) }
+            end
+        send(the_tag, attributes, { :default => d })
       end
     end
     
     
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
-      debugger
       overriding_proc = caller_parameters[param_name]
       
       if param_name == :default && overriding_proc
@@ -322,83 +313,74 @@ module Hobo::Dryml
         call_tag_parameter_with_default_content(the_tag, attributes, parameters[:default], overriding_proc)
         
       elsif overriding_proc && overriding_proc.arity == 1
-        # This is a 'replace' or default parameter
+        # The caller is replacing this parameter. Don't call the tag
+        # at all, just the overriding proc, but pass the restorable
+        # tag as a parameter to the overriding proc
         
-        tag_default = proc do |attrs, params|
-          call_tag_parameter(the_tag, attributes, parameters, proc { [attributes, parameters] })
+        tag_restore = proc do |restore_attrs, restore_params|
+          # Call the replaced tag with the attributes and parameters
+          # as given in the original tag definition, and with the
+          # specialisation given on the 'restore' call
+          override_and_call_tag(the_tag, attributes, parameters, restore_attrs, restore_params)
         end
-        overriding_proc.call(tag_default)
+        overriding_proc.call(tag_restore)
         
       else
-        # Regular param call, may or may not match a caller parameter
+        overriding_attributes, overriding_parameters = overriding_proc._?.call
+        override_and_call_tag(the_tag, attributes, parameters, overriding_attributes, overriding_parameters)
+      end     
+    end
+    
+    
+    def override_and_call_tag(the_tag, general_attributes, general_parameters, overriding_attributes, overriding_parameters)
+      attributes = overriding_attributes ? merge_attrs(general_attributes, overriding_attributes) : general_attributes
+      if overriding_parameters
+        overriding_default_content = overriding_parameters.delete(:default)
+        parameters = general_parameters.merge(overriding_parameters)
+      else
+        parameters = general_parameters
+      end
         
-        if overriding_proc
-          overriding_attributes, overriding_parameters = overriding_proc.call
-          overriding_default_content = overriding_parameters.delete(:default)
-          attributes = merge_attrs(attributes, overriding_attributes)
-          parameters = parameters.merge(overriding_parameters)
-        end
-        
-        default_content = parameters[:default]
+      default_content = parameters[:default]
       
-        if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
-          body = if overriding_default_content
-                   new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
-                 elsif default_content
-                   new_context { default_content.call(nil) }
-                 else
-                   nil
-                 end
-          if body.blank?
-            tag(the_tag, attributes)
-          else
-            content_tag(the_tag, body, attributes)
-          end
+      if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+        body = if overriding_default_content
+                 new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
+               elsif default_content
+                 new_context { default_content.call(nil) }
+               else
+                 nil
+               end
+        if body.blank?
+          tag(the_tag, attributes)
         else
-          if the_tag.is_a?(String, Symbol)
-            # It's a defined DRYML tag
-            
-            #body = proc do |default|
-            #  if overriding_default_content
-            #    overriding_default_content.call(proc { default_content ? default_content.call(default) : "" })
-            #  else
-            #    default_content ? default_content.call(default) : ""
-            #  end
-            #end
-            
-            send(the_tag, attributes, parameters)
-          else
-            # It's a proc - a template default
-            the_tag.call(attributes, overriding_tagbody || default_tagbody)
-          end
+          content_tag(the_tag, body, attributes)
+        end
+      else
+        d = if overriding_default_content
+              proc { |default| overriding_default_content.call(proc { default_content._?.call(default) }) }
+            else
+              proc { |default| default_content._?.call(default) }
+            end
+        parameters = parameters.merge(:default => d)
+        
+        if the_tag.is_a?(String, Symbol)
+          # It's a defined DRYML tag
+          send(the_tag, attributes, parameters)
+        else
+          # It's a proc - restoring a replaced parameter
+          the_tag.call(attributes, parameters)
         end
       end
     end
 
-    def call_tag_parameter_XX(the_tag, attributes, param_procs, overriding_proc)
-      if overriding_proc && overriding_proc.arity == 1
-        # It's a replace parameter
-        
-        tag_default = proc do |attributes, parameters|
-          call_tag_parameter(the_tag, attributes, param_procs)
-        end
-        overriding_proc.call(tag_default)
-      else
-        if overriding_proc
-          overriding_attributes, overriding_param_procs = overriding_proc.call
-          
-          attributes = merge_attrs(attributes, overriding_attributes)
-          param_procs = param_procs.merge(overriding_param_procs)
-        end   
-      
-        send(the_tag, attributes, param_procs)
-      end
-    end
-    
-    # Takes two procs that each returh hashes and returns a single
-    # proc that calls these in turn and merges the results into a
-    # single hash
-    def merge_block_tag_parameter(general_proc, overriding_proc)
+
+    # This proc is used where 'param' is declared on a tag that is
+    # itself a parameter tag.  Takes two procs that each return a pair
+    # of hashes (attributes and parameters). Returns a single proc
+    # that also returns a pair of hashes - the merged atributes and
+    # parameters.
+    def merge_tag_parameter(general_proc, overriding_proc)
       if overriding_proc.nil?
         general_proc
       else
@@ -407,37 +389,35 @@ module Hobo::Dryml
           overriding_proc
         else
           proc do 
-            overriding_attrs = overriding_proc.call
-            defined_attrs = general_proc.call
+            overriding_attrs, overriding_parameters = overriding_proc.call
+            general_attrs, general_parameters = general_proc.call
             
-            attrs = merge_attrs(defined_attrs, overriding_attrs)
+            attrs  = merge_attrs(general_attrs, overriding_attrs)
+            overriding_default = overriding_parameters.delete(:default)
+            params = general_parameters.merge(overriding_parameters)
             
-            # The overrider should provide its tagbody as the new
-            # <default_tagbody/>
-            if overriding_attrs[:tagbody] && defined_attrs[:tagbody]
-              attrs[:tagbody] = proc do |default|
-                overriding_attrs[:tagbody].call(proc { _output(defined_attrs[:tagbody].call(default)) })
-              end
+            # The overrider should provide its :default as the new
+            # 'default_content'
+            if overriding_default
+              params[:default] = 
+                if general_parameters[:default]
+                  proc do |default|
+                    overriding_default.call(proc { new_context { _output(general_parameters[:default].call(default)) } } )
+                  end
+                else
+                  proc do |default|
+                    overriding_default.call(default)
+                  end
+                end
             end
 
-            attrs
+            [attrs, params]
           end
         end
       end
     end
     
-    # Takes two procs that each return a pair of hashes (attributes
-    # and parameters). Returns a single proc that also returns a pair
-    # of hashes - the merged atributes and parameters.
-    def merge_tag_parameter(general_proc, overriding_proc)
-      proc do
-        general_attributes, general_template_procs = general_proc.call
-        overriding_attributes, overriding_template_procs = overriding_proc.call
-        [merge_attrs(general_attributes, overriding_attributes), general_template_procs.merge(overriding_template_procs)]
-      end
-    end
-    
-    
+
     def part_contexts_storage_tag
       storage = part_contexts_storage
       storage.blank? ? "" : "<script>\n#{storage}</script>\n"
@@ -464,7 +444,11 @@ module Hobo::Dryml
     
 
     def method_missing(name, *args, &b)
-      @view.send(name, *args, &b)
+      if @view
+        @view.send(name, *args, &b)
+      else
+        raise NoMethodError, name.to_s
+      end
     end
     
 
