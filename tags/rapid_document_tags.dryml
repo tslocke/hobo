@@ -12,7 +12,8 @@
 </def>
 
 <def tag="sub_heading">
-  <%= content_tag "h#{scope.heading_level.to_i + 1|| '2'}", tagbody.call, attributes.merge(:class => "subheading") %>
+  <%= content_tag "h#{scope.heading_level ? scope.heading_level.to_i + 1 : '2'}", 
+                  tagbody.call, attributes.merge(:class => "subheading") %>
 </def>
 
 <def tag="nav">
