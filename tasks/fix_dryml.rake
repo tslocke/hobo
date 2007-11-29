@@ -59,7 +59,7 @@ def fix_element(e, template_param)
     end
     
 
-    if e.name == "def" && name.in?(%w(tag attrs alias_of)) && value
+    if e.name == "def" && name.in?(%w(tag attrs alias_of extend_with)) && value
       s.sub!(/#{Regexp.escape(value)}$/) {|v| v.underscore.dasherize}
     end
     
