@@ -523,7 +523,7 @@ module Hobo::Dryml
     
     
     def param_restore_local_name(name)
-      "_#{name}_restore"
+      "_#{name.underscore}_restore"
     end
     
     
