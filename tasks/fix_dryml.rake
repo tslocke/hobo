@@ -54,7 +54,7 @@ def fix_element(e, template_param)
     # dasherize the values of various attributes
     if value && (name.in?(%w(param part update)) ||
                  (classes? && name == 'class') ||
-                 (ids? && name == 'id')
+                 (ids? && name == 'id'))
       s.sub!(/#{Regexp.escape(value)}$/) {|v| v.dasherize}
     end
     
