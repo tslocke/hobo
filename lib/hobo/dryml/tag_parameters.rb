@@ -15,8 +15,8 @@ module Hobo
       end
       
       def method_missing(name, default_content="")
-        if name =~ /\?$/
-          has_key?(name[0..-2])
+        if name.to_s =~ /\?$/
+          has_key?(name.to_s[0..-2].to_sym)
         else
           self[name]._?.call(default_content) || ""
         end
