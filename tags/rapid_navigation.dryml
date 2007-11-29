@@ -5,34 +5,34 @@
 <!--- General Navigation -->
   
 <def tag="navigation" attrs="current">
-  <ul merge_attrs>
-    <set_scoped current_navigation="&current">
-      <tagbody/>
-    </set_scoped>
+  <ul merge-attrs>
+    <set-scoped current-navigation="&current">
+      <do param="default"/>
+    </set-scoped>
   </ul>
 </def>
 
-<def tag="nav_item">
-  <set body="&tagbody.call"/>
-  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
-      merge_attrs="&attributes - attrs_for(:a)">
-    <a merge_attrs="&attributes & attrs_for(:a)"><%= body %></a>
+<def tag="nav-item">
+  <set body="&parameters.default"/>
+  <li class="#{'current' if (c = scope.current-navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
+      merge-attrs="&attributes - attrs_for(:a)">
+    <a merge-attrs="&attributes & attrs_for(:a)"><%= body %></a>
   </li>
 </def>
 
 
 <!--- Account Navigation (log in / out / signup) -->
 
-<def tag="account_nav">
-  <ul class="account_nav">
+<def tag="account-nav">
+  <ul class="account-nav">
     <if test="&logged_in?">
-      <li class='nav_item'>Logged in as <view:login with="&current_user"/></li>
-      <li class='nav_item'><a href="&logout_url">Log out</a></li>
+      <li class='nav-item'>Logged in as <view:login with="&current_user"/></li>
+      <li class='nav-item'><a href="&logout_url">Log out</a></li>
     </if>
     <else>
       <set user="&Hobo::UserController.user_models.first"/>
-      <li class='nav_item'><a href="&login_url(user)">Log in</a></li>
-      <li if="&signup_url(user)" class='nav_item'><a href="&signup_url(user)">Sign up</a></li>
+      <li class='nav-item'><a href="&login_url(user)">Log in</a></li>
+      <li if="&signup_url(user)" class='nav-item'><a href="&signup_url(user)">Sign up</a></li>
     </else>
   </ul>
 </def>
@@ -40,59 +40,59 @@
 
 <!--- Pagination Navigation -->
 
-<def tag="page_nav" attrs="params">
+<def tag="page-nav" attrs="params">
   <if test="&@pages && @pages.length > 1">
-    <page_n_of_count/> - 
-    <first_page_link params="&params">|&lt;</first_page_link>
-    <previous_page_link params="&params">Previous</previous_page_link>
-    <next_page_link params="&params">Next</next_page_link>
-    <last_page_link params="&params">&gt|</last_page_link>
+    <page-n-of-count/> - 
+    <first-page-link params="&params">|&lt;</first-page-link>
+    <previous-page-link params="&params">Previous</previous-page-link>
+    <next-page-link params="&params">Next</next-page-link>
+    <last-page-link params="&params">&gt|</last-page-link>
   </if>
 </def>
 
 
-<def tag="page_n_of_count">
+<def tag="page-n-of-count">
   Page <%= @pages.current_page.number %> of <%= @pages.length %>
 </def>
 
 
-<def tag="previous_page_link">
+<def tag="previous-page-link">
   <a if="&@pages && @pages.current.previous"
      href="&url_for(params.merge(:page => @pages.current.previous))">
-    <tagbody>&laquo; Previous page</tagbody>
+    <do param="default">&laquo; Previous page</do>
   </a>
 </def>
 
 
-<def tag="next_page_link">
+<def tag="next-page-link">
   <a if="&@pages && @pages.current.next"
      href="&url_for(params.merge(:page => @pages.current.next))">
-    <tagbody>Next page &raqou;</tagbody>
+    <do param="default">Next page &raqou;</do>
   </a>
 </def>
 
 
-<def tag="first_page_link">
+<def tag="first-page-link">
   <a if="&@pages && @pages.first_page && @pages.current != @pages.first_page"
      href="&url_for(params.merge(:page => @pages.first_page))">
-    <tagbody>&laquo; First page</tagbody>
+    <do param="default">&laquo; First page</do>
   </a>
 </def>
 
 
-<def tag="last_page_link">
+<def tag="last-page-link">
   <a if="&@pages && @pages.last_page && @pages.current != @pages.last_page"
      href="&url_for(params.merge(:page => @pages.last_page))">
-    <tagbody>Last page &raquo;</tagbody>
+    <do param="default">Last page &raquo;</do>
   </a>
 </def>
 
 <!-- magic nav, just to get you started -->
 <!-- write your own navigation using the <navigation> tag -->
-<def tag="magic_nav">
-  <navigation merge_attrs>
-    <nav_item href="#{base_url}/">Home</nav_item>
-    <nav_item repeat="&Hobo.models[0..2]"><name/></nav_item>
-    <nav_item href="&search_url" if="&defined_route? :search">Search</nav_item>
+<def tag="magic-nav">
+  <navigation merge-attrs>
+    <nav-item href="#{base_url}/">Home</nav-item>
+    <nav-item repeat="&Hobo.models.select{|m| [0..2]"><name/></nav-item>
+    <nav-item href="&search_url" if="&defined_route? :search">Search</nav-item>
   </navigation>
 </def>

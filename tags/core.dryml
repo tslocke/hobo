@@ -1,15 +1,10 @@
-<def tag="call_tag" attrs="tag">
-  <%= send(tag, attributes, &tagbody) %>
-</def>
-
-
-<def tag="CallTemplate" attrs="template">
-  <%= send(template, attributes, all_parameters) %>
+<def tag="call-tag" attrs="tag">
+  <%= send(tag, attributes, parameters) %>
 </def>
 
 
 <def tag="wrap" attrs="tag, when">
-  <% body = tagbody.call %>
+  <% body = parameters.default %>
   <%= when_ ? call_tag(tag, attributes, &proc { body }) : body %>
 </def>
 
@@ -19,18 +14,18 @@
 </def>
 
 
-<def tag="repeat" attrs="even_odd, join"><%= 
+<def tag="repeat" attrs="even-odd, join"><%= 
   if !this.blank? 
     if even_odd
       map_this do
         klass = [attributes[:class], cycle("even", "odd")].compact.join(' ')
-        content_tag(even_odd, tagbody.call, attributes.merge(:class => klass, :hobo_model_id => dom_id(this)))
+        content_tag(even_odd, parameters.default, attributes.merge(:class => klass, :hobo_model_id => dom_id(this)))
       end.join(join)
     else
       scope.new_scope do
         scope[:even_odd] = "odd"
         map_this do
-          res = tagbody.call
+          res = parameters.default
           scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
           res
         end.join(join)
@@ -42,24 +37,24 @@
 %></def>
 
 
-<def tag="do"><tagbody/></def>
-<def tag="with"><tagbody/></def>
+<def tag="do"><%= all_parameters[:default].call("") %></def>
+<def tag="with"><%= all_parameters[:default].call("") %></def>
 
 
 <def tag="if" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)
-  res = (cond = !test.blank?) ? tagbody.call : ""
+  res = (cond = !test.blank?) ? parameters.default : ""
   Hobo::Dryml.last_if = cond
   res
 %></def>
 
 
-<def tag="else"><tagbody unless="&Hobo::Dryml.last_if"/></def>
+<def tag="else"><%= parameters.default unless Hobo::Dryml.last_if %></def>
 
 
 <def tag="unless" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)     
-  res = (cond = test.blank?) ? tagbody.call : ""
+  res = (cond = test.blank?) ? parameters.default : ""
   Hobo::Dryml.last_if = cond
   res
 %></def>

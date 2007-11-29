@@ -384,6 +384,8 @@ end
 
 module Hobo::Dryml
 
+  
+  # A REXML source that keeps track of where in the buffer it is
   class RexSource < REXML::Source
     
     def initialize(src)
