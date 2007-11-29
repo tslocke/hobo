@@ -313,21 +313,22 @@ module Hobo::Dryml
       param_names = param_names_in_definition(el)
       
       "<% def #{ruby_name name}(all_attributes={}, all_parameters={}); " +
-        "parameters = all_parameters - #{param_names.inspect.underscore}; " +
+        "parameters = Hobo::Dryml::TagParameters.new(all_parameters, #{param_names.inspect.underscore}); " +
+        "all_parameters = Hobo::Dryml::TagParameters.new(all_parameters); " +
         tag_method_body(el) +
         "; end %>"
     end
     
         
-    def tag_method_body(el, attributes_var="all_attributes")
+    def tag_method_body(el)
       attrs = declared_attributes(el)
       
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `attributes` is supposed to be there!
       setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "attributes, = " +
-        "_tag_locals(#{attributes_var}, #{attrs.inspect.underscore})"
+        "_tag_locals(all_attributes, #{attrs.inspect.underscore})"
 
-      start = "_tag_context(#{attributes_var}) do #{setup_locals}"
+      start = "_tag_context(all_attributes) do #{setup_locals}"
       
       "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
@@ -346,7 +347,7 @@ module Hobo::Dryml
 
     def part_element(el, content)
       require_attribute(el, "part", DRYML_NAME_RX)
-      part_name  = el.attributes['part']
+      part_name  = ruby_name(el.attributes['part'])
       dom_id = el.attributes['id'] || part_name
       
       part_locals = el.attributes["part_locals"]
@@ -566,7 +567,7 @@ module Hobo::Dryml
       attributes = el.attributes
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}'", el) unless n =~ DRYML_NAME_RX
-        ":#{n} => #{attribute_to_ruby(v)}" unless n.in?(SPECIAL_ATTRIBUTES)
+        ":#{ruby_name n} => #{attribute_to_ruby(v)}" unless n.in?(SPECIAL_ATTRIBUTES)
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
