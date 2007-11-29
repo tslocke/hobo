@@ -284,7 +284,7 @@ module Hobo::Dryml
                 name = "#{name}-with-#{extend_with}"
               end
               src << tag_method(name, el) +
-                "<% _register_tag_attrs(:#{ruby_name name}, #{declared_attributes(el).inspect}) %>"
+                "<% _register_tag_attrs(:#{ruby_name name}, #{declared_attributes(el).inspect.underscore}) %>"
               
               logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug-source"]
               
@@ -325,7 +325,7 @@ module Hobo::Dryml
       
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `attributes` is supposed to be there!
-      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a)}, "}.join + "attributes, = " +
+      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a).underscore}, "}.join + "attributes, = " +
         "_tag_locals(all_attributes, #{attrs.inspect.underscore})"
 
       start = "_tag_context(all_attributes) do #{setup_locals}"
