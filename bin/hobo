@@ -57,10 +57,13 @@ end
 puts "\nGenerating Rails app...\n"
 system("rails #{app_path}")
 
+
 Dir.chdir(app_path) do
   gen = "ruby #{File.join('script', 'generate')}"
   plugin = "ruby #{File.join('script', 'plugin')}"
-  
+
+  FileUtils.touch("public/stylesheets/application.css")
+
   puts "\nInstalling classic_pagination\n"
   command(plugin, "install svn://errtheblog.com/svn/plugins/classic_pagination")
   
@@ -93,8 +96,3 @@ Dir.chdir(app_path) do
   end
 end
 
-puts <<-END
-NOTE: If you intend to use the in-place-editors, the new form authenticity
-features (CSRF protection) are not supported. You'll need to comment out the 
-'protect_from_forgery' declaration in app/controllers/application.rb
-END

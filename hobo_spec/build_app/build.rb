@@ -28,8 +28,6 @@ system "mysqladmin -f drop new_hobo_app_development"
 
 sh '../../bin/hobo --hobo-src ../../hobo', APP_NAME
 
-# sh 'cp -R new_hobo_app.bak new_hobo_app'
-
 puts "\nCreating POD app"
 
 Dir.chdir(APP_NAME) do
