@@ -126,7 +126,7 @@ module Hobo
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
       return if password.blank?
-      self.salt = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{login}--") if new_record?
+      self.salt = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{login}--") if salt.blank?
       self.crypted_password = encrypt(password)
     end
 

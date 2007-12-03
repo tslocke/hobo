@@ -10,10 +10,10 @@ class HoboRapidGenerator < Hobo::Generator
     end
     
     record do |m|
-      m.file "hobo_rapid.js", "public/javascripts/hobo_rapid.js"
+      m.file "hobo-rapid.js", "public/javascripts/hobo-rapid.js"
       m.file "lowpro.js", "public/javascripts/lowpro.js"
-      m.file "hobo_base.css", "public/stylesheets/hobo_base.css"
-      m.file "hobo_rapid.css", "public/stylesheets/hobo_rapid.css"
+      m.file "reset.css", "public/stylesheets/reset.css"
+      m.file "hobo-rapid.css", "public/stylesheets/hobo-rapid.css"
       create_all(m, "themes/default/public", "public/hobothemes/default")
       create_all(m, "themes/default/views", "app/views/taglibs/themes/default")
     end
@@ -22,7 +22,7 @@ class HoboRapidGenerator < Hobo::Generator
   def import_tags
     path = File.join(RAILS_ROOT, "app/views/taglibs/application.dryml")
 
-    tag = "<include src=\"plugins/hobo/tags/rapid\"/>\n\n<set_theme name=\"default\"/>\n"
+    tag = "<include src=\"plugins/hobo/tags/rapid\"/>\n\n<set-theme name=\"default\"/>\n"
       
     src = File.read(path)
     return if src.include?(tag)

@@ -199,7 +199,7 @@ module Hobo::Dryml
     def set_element(el)
       assigns = el.attributes.map do |name, value|
         dryml_exception(el, "invalid name in set") unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
-        "#{name} = #{attribute_to_ruby(value)}; "
+        "#{ruby_name name} = #{attribute_to_ruby(value)}; "
       end.join
       code = apply_control_attributes("begin; #{assigns}; end", el)
       "<% #{assigns}#{tag_newlines(el)} %>"
@@ -217,7 +217,7 @@ module Hobo::Dryml
     
     def declared_attributes(def_element)
       attrspec = def_element.attributes["attrs"]
-      attr_names = attrspec ? attrspec.split(/\s*,\s*/).every(:to_sym) : []
+      attr_names = attrspec ? attrspec.split(/\s*,\s*/).map{ |n| n.underscore.to_sym } : []
       invalids = attr_names & ([:with, :field, :this] + SPECIAL_ATTRIBUTES.every(:to_sym))
       dryml_exception("invalid attrs in def: #{invalids * ', '}", def_element) unless invalids.empty?
       attr_names
@@ -326,7 +326,7 @@ module Hobo::Dryml
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `attributes` is supposed to be there!
       setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a).underscore}, "}.join + "attributes, = " +
-        "_tag_locals(all_attributes, #{attrs.inspect.underscore})"
+        "_tag_locals(all_attributes, #{attrs.inspect})"
 
       start = "_tag_context(all_attributes) do #{setup_locals}"
       
@@ -347,10 +347,11 @@ module Hobo::Dryml
 
     def part_element(el, content)
       require_attribute(el, "part", DRYML_NAME_RX)
-      part_name  = ruby_name(el.attributes['part'])
+      part_name  = el.attributes['part']
       dom_id = el.attributes['id'] || part_name
+      part_name = ruby_name(part_name)
       
-      part_locals = el.attributes["part_locals"]
+      part_locals = el.attributes["part-locals"]
       
       part_src = "<% def #{part_name}_part(#{part_locals._?.gsub('@', '')}) #{tag_newlines(el)}; new_context do %>" +
         content +
@@ -538,7 +539,7 @@ module Hobo::Dryml
         "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{children_to_erb(el)}<% } #{nl}}"
       else
         attributes = el.attributes.map do 
-          |name, value| ":#{name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
+          |name, value| ":#{ruby_name name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
         end.compact
         
         nested_parameters_hash = parameter_tags_hash(el)
@@ -556,7 +557,7 @@ module Hobo::Dryml
       part_name = el.attributes['part']
       if part_name
         part_id = part_name && "<%= #{attribute_to_ruby(el.attributes['id'] || part_name)} %>"
-        "<span class='part_wrapper' id='#{part_id}'>" + part_element(el, call) + "</span>"
+        "<span class='part-wrapper' id='#{part_id}'>" + part_element(el, call) + "</span>"
       else
         call
       end
@@ -567,7 +568,10 @@ module Hobo::Dryml
       attributes = el.attributes
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}'", el) unless n =~ DRYML_NAME_RX
-        ":#{ruby_name n} => #{attribute_to_ruby(v)}" unless n.in?(SPECIAL_ATTRIBUTES)
+       
+        unless n.in?(SPECIAL_ATTRIBUTES)
+          ":#{ruby_name n} => #{attribute_to_ruby(v)}"
+        end
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
@@ -595,7 +599,7 @@ module Hobo::Dryml
       attrs = el.attributes.map do |n, v|
         next if n.in? SPECIAL_ATTRIBUTES
         val = restore_erb_scriptlets(v).gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
-        %(:#{n} => "#{val}")
+        %('#{n}' => "#{val}")
       end.compact
       
       # If there's a part but no id, the id defaults to the part name
@@ -617,7 +621,7 @@ module Hobo::Dryml
       if el.children.empty?
         dryml_exception("part attribute on empty static tag", el) if part
 
-        "<%= " + apply_control_attributes("tag(:#{el.name}, #{attrs} #{tag_newlines(el)})", el) + " %>"
+        "<%= " + apply_control_attributes("element(:#{el.name}, #{attrs} #{tag_newlines(el)})", el) + " %>"
       else
         if part
           body = part_element(el, children_to_erb(el))
@@ -625,7 +629,7 @@ module Hobo::Dryml
           body = children_to_erb(el)               
         end
 
-        output_tag = "tag(:#{el.name}, #{attrs}, true) + new_context { %>#{body}</#{el.name}><% }"
+        output_tag = "element(:#{el.name}, #{attrs}, new_context { %>#{body}<% })"
         "<% _output(" + apply_control_attributes(output_tag, el) + ") %>"
       end
     end

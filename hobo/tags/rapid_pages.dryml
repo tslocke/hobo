@@ -5,7 +5,7 @@
     <head param>
       <title param><%= title %></title>
       <do param="stylesheets">
-        <stylesheet name="hobo_base"/>
+        <stylesheet name="reset"/>
         <stylesheet name="application"/>
       </do>
       <do param="scripts">
@@ -21,13 +21,13 @@
 <def tag="page">
   <base-page merge>
     <stylesheets: param>
-      <stylesheet name="hobo_base"/>
-      <stylesheet name="hobo_rapid"/>
+      <stylesheet name="reset"/>
+      <stylesheet name="hobo-rapid"/>
       <stylesheet name="application"/>
     </stylesheets>
 
     <scripts: param>
-      <javascript name="prototype, effects, dragdrop, controls, lowpro, hobo_rapid, application"/>
+      <javascript name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
       <hobo-rapid-javascripts param/>
     </scripts>
 
@@ -79,7 +79,7 @@
     <body: class="index-page #{@model.name.underscore.pluralize}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
-      <p class="note" param>There <count part="item-count" prefix="are" with="&@model"/></p>
+      <p class="note" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
     </content-header>
 
     <content-body: param>
@@ -225,22 +225,22 @@
 
     <content-body: param>
       <form action="&request.request_uri" param>
-        <field-list>
-          <field-list-item>
+        <labelled-item-list>
+          <labelled-item>
             <item-label param="login-label"><%= model.login_attr.to_s.titleize %></item-label>
             <item-value><input type="text" name="login" id="login" param="login-input" /></item-value>
-          </field-list-item>
+          </labelled-item>
 
-          <field-list-item>
+          <labelled-item>
             <item-label param="password-label">Password</item-label>
             <item-value><input type="password" name="password" id="password" param="password-input"/></item-value>
-          </field-list-item>
+          </labelled-item>
 
-          <field-list-item if="&remember_me">
+          <labelled-item if="&remember_me">
             <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
             <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
-          </field-list-item>
-        </field-list>
+          </labelled-item>
+        </labelled-item-list>
         <submit label='Log in' param/>
       </form>
     </content-body>

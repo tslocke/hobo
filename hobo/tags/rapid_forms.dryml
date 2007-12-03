@@ -56,9 +56,9 @@
   auth_token = if request_forgery_protection_token.nil?
                  ''
                else
-                 tag(:input, :type => "hidden", 
-                     :name => request_forgery_protection_token.to_s,
-                     :value => form_authenticity_token)
+                 element(:input, :type => "hidden", 
+                         :name => request_forgery_protection_token.to_s,
+                         :value => form_authenticity_token)
                end
 
   page_path_hidden = hidden_field_tag("page_path", view_name) 
@@ -71,7 +71,7 @@
     add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
   end
    
-  content_tag("form", body, html_attrs)
+  element("form", html_attrs, body)
 %></def>
 
 
@@ -85,7 +85,7 @@
 
 <def tag="input"><%=     
   if attributes[:type]
-    tag :input, attributes
+    element :input, attributes
   elsif !can_edit?
     view
   else
@@ -107,7 +107,7 @@
                     raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
                 end
     if this_parent.errors[this_field]
-      "<div class='field_with_errors'>#{the_input}</div>"
+      "<div class='field-with-errors'>#{the_input}</div>"
     else
       the_input
     end
@@ -183,13 +183,13 @@
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
   url = object_url(this, method)
-  add_classes!(html_attributes, "button remote_method_button #{method}_button")
+  add_classes!(html_attributes, "button remote-method-button #{method}-button")
   if update || result_update
     message ||= method.titleize
     func = ajax_updater(url, message, update,
                         ajax_attributes.merge(:params => params, :result_update => result_update))
     html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
-    tag(:input, html_attributes)
+    element(:input, html_attributes)
   else
     button_to(label, url, html_attributes)
   end
@@ -202,13 +202,13 @@
   func = ajax_updater(object_url(this), message, update,
                       :params => { this.class.name.underscore => fields }.merge(params || {}),
                       :method => :put)
-  tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                          "button update_button update_#{this.class.name.underscore}_button") %>
+  element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+                          "button update-button update-#{this.class.name.underscore}-button") %>
 </def>
 
 
 <def tag="delete-button" attrs="label, message, update, in-place, image, confirm, fade, subsite"><%=
-  if can_delete?
+  if (Hobo::Dryml.last_if = can_delete?)
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
                                   else
@@ -218,8 +218,8 @@
     confirm = "Are you sure?" if confirm.nil?
     
     add_classes!(attributes,
-                 image ? "image_button" : "button",
-                 "delete_button delete_#{this.class.name.underscore}_button")
+                 image ? "image-button" : "button",
+                 "delete-button delete-#{this.class.name.underscore.dasherize}-button")
     url = object_url(this, "destroy", :subsite => subsite)
     if in_place == false
       attributes[:confirm] = confirm if confirm
@@ -228,8 +228,10 @@
       fade = true if fade.nil?
       attributes[:value] = label
       attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
-      tag(:input, attributes)
+      element(:input, attributes)
     end
+  else
+    ""
   end
 %></def>
 
@@ -244,7 +246,7 @@
                      fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
                      this
                    else
-                     raise HoboError.new("invalid context for <create_button>")
+                     raise HoboError.new("invalid context for <create-button>")
                    end
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
@@ -254,8 +256,8 @@
     class_name = new.class.name.underscore
     func = ajax_updater(object_url(new.class), message, update,
                         ({:params => { class_name => fields }} unless fields.empty?))
-    tag :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                            "button create_button create_#{class_name}_button")
+    element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+                            "button create-button create-#{class_name}-button")
   end
 %></def>
 
@@ -310,7 +312,7 @@
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">In order to proceed please correct the following:</h2>
-    <ul:errors.full-messages param>
+    <ul:errors.full_messages param>
       <li param><%= this %></li>
     </ul>
   </section>

@@ -1,6 +1,6 @@
-<def tag="field-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
+<def tag="labelled-item-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
 
-<def tag="field-list-item"><tr merge-attrs><do param="default"/></tr></def>
+<def tag="labelled-item"><tr merge-attrs><do param="default"/></tr></def>
 
 <def tag="item-label"><th merge-attrs><do param="default"/></th></def>
 
@@ -8,13 +8,14 @@
 
 
 <def tag="heading">
-  <%= content_tag "h#{scope.heading_level || '1'}", parameters.default, attributes %>
+   <%= element("h#{scope.heading_level || '1'}", attributes, parameters.default) %>
 </def>
 
-<def tag="sub-heading">
-  <%= content_tag "h#{scope.heading_level ? scope.heading_level.to_i + 1 : '2'}", 
-                  parameters.default, attributes.merge(:class => "subheading") %>
-</def>
+<def tag="sub-heading"><%= 
+  element("h#{scope.heading_level ? scope.heading_level.to_i + 1 : '2'}",
+          attributes.merge(:class => "subheading"),
+          parameters.default)
+%></def>
 
 <def tag="nav">
   <div class="nav" merge-attrs><do param="default"/></div>

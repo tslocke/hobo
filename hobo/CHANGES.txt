@@ -1,3 +1,173 @@
+=== Release 0.7 ===
+
+Hobo 0.7 is tested against Rails 1.99.1 (aka Rais 2.0 RC2)
+
+DRYML
+
+  Switched to dashes instead of underscores for tag and attributes
+  names. These are converted to underscores in the underlying ruby
+  code.
+
+  Unification of tempalte tags and non-template tags. There is now
+  only one type of tag and two different ways to call a tag:
+
+    <my-tag>content directly inside the tag</my-tag>
+
+    <my-tag>
+      <a-parameter:>Content inside a named parameter (note the colon)</a-parameter>
+      <another-parameter:>Some more content</another-parameter>
+    </my-tag>
+
+    Note that these styles cannot be mixed. If there is a parameter
+    inside a tag call, there must be only parameters (and whitespace,
+    which is not output)
+
+    In the first style, the call is implicitly equivalent to:
+
+        <my-tag>
+          <default:>content directly inside the tag</default>
+        </my-tag>
+
+    And by the same token, <tagbody/> is now written:
+
+      <do param="default"/>
+
+    The tagbody local variable is gone too. "if tagbody" is now
+    "if all_parameters.default?" and "tagbody.call" is now
+    "all_parameters.default"
+
+
+  A rake task hobo:fixdryml has been added which does a pretty good
+  job of converting Hobo 0.6 DRYML source-code to the new style. It
+  will change every file in app/views/**/*.dryml, and keeps a backup
+  copy of app/views in app_views_before_fixdryml. If you pass it CSS=y
+  and ID=y it will 'dasherize' css classes and IDs too, which is the
+  new Hobo concention. You can also pass DIR=... if you want to point
+  it somewhere other than app/views. It won't fix anything in erb
+  scriptlets, e.g. use of the tagbody local variable. Expect to do
+  some manual fixes after running the task (good job you've got that
+  thourough test suite eh?)
+
+  The add_classes helper now automatically dasherizes all class names.
+
+  New helper 'element'. Use in place of Rails' tag and content_tag
+  helper. It dasherizes attributes given as symbols.
+
+  
+Migration generator
+
+  Better support for STI. It no longer wants to generate tables for
+  the subclasses. Stil needed: a way of integrating fields declared in
+  the subclasses -- they are currently ignored by the generator.
+
+
+Hobo Rapid
+
+  In place editiing (and Ajax in general) will now provide the form
+  authentication token (CSRF protection) if available. No need to
+  disable protect_from_forgery any more.
+
+
+  Stylesheets:
+
+    Removed list-style: none from hobo_abse.css
+
+
+  Javascript:
+
+    Dasherized all css classes and dom IDs used.
+
+    Upgraded to latest low_pro.js
+
+  
+  New theme 'Clean'
+
+  New helper 'linkable?' can be given a record or class, and tells you
+  if Hobo has a route for it. Only works for 'show' and 'index'
+  actions so far.
+
+  Tag library
+
+    \\'/;p <a> now automatically knows not to generate (broken) links to
+    things that are not 'linkable?'. Outputs just the link content
+    instead.
+
+    We used to have <FieldList> and <field_list>. We now have
+    <field-list> and <labelled-item-list>
+
+    <UL> is now <ul>, and only has the iteration behaviour if you give
+    a <li:> parameter. Otherwise it's just like a static tag.
+
+    <Table> is now <table> and only has the special behaviour if you
+    give a 'fields' attribute or '<tr:>' parameter. Otherwise it's
+    just like a static tag.
+
+    <view> for dates and times no longer break when the context is
+    nil.
+
+    <count> - unless-none attribute is gone. user if-any
+
+    <theme-stylesheet> now takes a 'name' attribute
+
+    <delete-button> takes a 'subsite' attribute
+    
+
+Rake tasks
+
+  New task hobo:fixdryml (see DRYML section above)
+
+  dump_fixtures is now hobo:fixtures:dump
+
+
+
+
+Hobo models
+
+  Automatically declares the field 'position :integer' if the model
+  acts_as_list.
+
+  never_show declarations are now inherited
+
+  Fix: def_scope was broken when the scope name ended '?'
+
+  Fix: Hobo broke the 'guard_protected_attributes' optional parameter
+  to attributes=. (this was breaking attachment_fu)
+
+  Fix: assigning Date and Time objects in mass-assignment was broken.
+
+
+User model
+
+  Newly generated user models (hobo_user_model generator) now give
+  create permission to all by default (to enable signup).
+
+  logins_count renamed to login_count (Hobo manages this feild for you
+  if it exists).
+
+
+Core extensions
+
+  Module#alias_tag_chain, which never should have been there is
+  gone. (It's not needed now that camel-case tags have gone).
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 === Release 0.6.4 ===
 
 Fix: In-place-editors were not working with the new version of
