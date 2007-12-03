@@ -1,43 +1,43 @@
-<def tag="TablePlus" attrs="sort_field, sort_direction, sort_columns" >
+<def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
-  <div class="table_plus" merge_attrs="&attributes - attrs_for(:with_fields) - attrs_for(:Table)">
+  <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
-        <form param="search_form" method="get" action="">
-          <hidden_fields for_query_string skip="page, search_form"/>
+        <form param="search-form" method="get" action="">
+          <hidden-fields for-query-string skip="page, search_form"/>
           Search 
-          <input class="search_field" type="search" name="search" value="&params[:search]"/>
-          <submit label="Go" class="search_button" param="search_submit"/>
+          <input class="search-field" type="search" name="search" value="&params[:search]"/>
+          <submit label="Go" class="search-button" param="search-submit"/>
         </form>
       </div>
     </div>
 
-    <Table merge_attrs="&attributes & (attrs_for(:Table) + attrs_for(:with_fields))" merge_params>
-      <field_heading_row>
-        <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
+    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" merge-params>
+      <field-heading-row:>
+        <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
              sort_url = url_for(params.merge(:sort => sort) - [:page]) %>
                           
-          <th param="#{scope.field_name}_heading">
-            <a href="&sort_url" class="column_sort" 
-               param="#{scope.field_name}_heading_link"><%= scope.field_name.titleize %></a>
+          <th param="#{scope.field-name}-heading">
+            <a href="&sort_url" class="column-sort" 
+               param="#{scope.field-name}-heading-link"><%= scope.field_name.titleize %></a>
             <if test="&col == sort_field">
-              <do param="up_arrow" if="&sort_direction == 'desc'">&uarr;</do>
-              <do param="down_arrow" if="&sort_direction == 'asc'">&darr;</do>
+              <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
+              <do param="down-arrow" if="&sort_direction == 'asc'">&darr;</do>
             </if>
           </th>
-        </with_field_names>
+        </with-field-names>
         <th if="&all_parameters[:controls]" class="controls"/>
-      </field_heading_row>
-    </Table>    
+      </field-heading-row>
+    </table>    
     <else>
-      <do param="empty_message"/>
+      <do param="empty-message"/>
     </else>
    
     <nav class="page">
-      <page_nav param/>
+      <page-nav param/>
     </nav>
   </div>
 </def>

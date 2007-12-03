@@ -45,7 +45,7 @@ module Hobo::Dryml
           
           def included(base)
             @tag_aliases.each do |tag, feature|
-              base.send(:alias_tag_chain, tag, feature)
+              base.send(:alias_method_chain, tag, feature)
             end
           end
 
@@ -54,7 +54,7 @@ module Hobo::Dryml
           end
           attr_reader :tag_attrs
           
-          def _alias_tag_chain(tag, feature)
+          def delayed_alias_method_chain(tag, feature)
             @tag_aliases[tag] = feature
           end
           

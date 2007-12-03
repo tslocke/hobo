@@ -34,9 +34,10 @@ module REXML
     
     class BaseParser
       
+      DRYML_NAME_STR= "#{NCNAME_STR}(?::(?:#{NCNAME_STR})?)?"
       DRYML_ATTRIBUTE_PATTERN = /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
-      
-      DRYML_TAG_MATCH = /^<((?>#{NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
+      DRYML_TAG_MATCH = /^<((?>#{DRYML_NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
+      DRYML_CLOSE_MATCH = /^\s*<\/(#{DRYML_NAME_STR})\s*>/um
       
       attr_writer :dryml_mode
       def dryml_mode?
@@ -171,7 +172,7 @@ module REXML
             if @source.buffer[1] == ?/
               last_tag, line_no = @tags.pop
               #md = @source.match_to_consume('>', CLOSE_MATCH)
-              md = @source.match(CLOSE_MATCH, true)
+              md = @source.match(dryml_mode? ? DRYML_CLOSE_MATCH : CLOSE_MATCH, true)
               
               valid_end_tag = if dryml_mode?
                                 last_tag =~ /^#{Regexp.escape(md[1])}(:.*)?/
@@ -339,6 +340,10 @@ module REXML
       @has_end_tag
     end
     
+    def parameter_tag?
+      expanded_name =~ /:$/
+    end
+    
   end
   
   class Attribute
@@ -379,6 +384,8 @@ end
 
 module Hobo::Dryml
 
+  
+  # A REXML source that keeps track of where in the buffer it is
   class RexSource < REXML::Source
     
     def initialize(src)

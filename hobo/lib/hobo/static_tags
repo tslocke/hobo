@@ -74,7 +74,6 @@ strong
 style
 sub
 sup
-table
 tbody
 td
 textarea
@@ -85,5 +84,4 @@ title
 tr
 tt
 u
-ul
 var

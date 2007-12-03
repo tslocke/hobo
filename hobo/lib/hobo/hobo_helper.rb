@@ -45,13 +45,19 @@ module Hobo
     def object_url(*args)
       params = args.extract_options!
       obj, action = args
-      
       action &&= action.to_s
       
       controller_name = controller_for(obj)
       
       subsite = params[:subsite] || self.subsite
-      base = subsite ? "/#{subsite}#{base_url}" : base_url
+      
+      # TODO - what if you want if_available as a query param?
+      if_available = params.delete(:if_available)
+      return nil if if_available && 
+        ((action.nil? && obj.respond_to?(:typed_id) && !linkable?(obj.class, :show, subsite)) ||
+         (action.nil? && obj.is_a?(Class) &&           !linkable?(obj, :index, subsite)))
+      
+      base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
       parts = if obj.is_a? Class
                 [base, controller_name]
@@ -238,7 +244,7 @@ module Hobo
       if s.is_a? Hobo::RawJs
         s.to_s
       else
-        "'" + s.gsub("'"){"\\'"} + "'"
+        "'" + s.to_s.gsub("'"){"\\'"} + "'"
       end
     end
      
@@ -349,7 +355,12 @@ module Hobo
         HashWithIndifferentAccess.new
       end
     end
-  
+    
+    def linkable?(obj, action, subsite=self.subsite)
+      Hobo::ModelRouter.linkable?(subsite, obj, action)
+    end
+   
+    
     # debugging support
      
     def abort_with(*args)

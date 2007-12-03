@@ -7,224 +7,193 @@ describe Template do
   
   # --- Tag Compilation Examples --- #
 
-  # --- Compilation: Calling Block Tags --- #
+  # --- Compilation: Calling Tags --- #
   
-  it "should compile block-tag calls as method calls" do
-    compile_dryml("<foo/>").should == "<%= foo() %>"
+  it "should compile tag calls as method calls" do
+    compile_dryml("<foo/>").should == "<% _output(foo({}, {})) %>"
+  end
+
+  it "should convert dashes in tag names to underscores in compiled method calls" do
+    compile_dryml("<foo-baa/>").should == "<% _output(foo_baa({}, {})) %>"
   end
 
   it "should compile attributes as keyword parameters" do
-    compile_dryml("<foo a='1' b='2'/>").should == '<%= foo({:a => "1", :b => "2"}) %>'
+    compile_dryml("<foo a='1' b='2'/>").should == '<% _output(foo({:a => "1", :b => "2"}, {})) %>'
   end
   
+  it "should convert attribute names with dashes in tag calls to symbols with underscores" do
+    compile_dryml("<foo my-attribute='1'/>").should == "<% _output(foo({:my_attribute => \"1\"}, {})) %>"
+  end
+
   it "should compile code attributes as ruby code" do 
-    compile_dryml("<foo a='&1 + 2'/>").should == '<%= foo({:a => (1 + 2)}) %>'
+    compile_dryml("<foo a='&1 + 2'/>").should == '<% _output(foo({:a => (1 + 2)}, {})) %>'
   end
   
-  it "should compile block-tag attributes with no RHS as passing `true`" do 
-    compile_dryml("<foo a/>").should == '<%= foo({:a => (true)}) %>'
+  it "should compile attributes with no RHS as passing `true`" do 
+    compile_dryml("<foo a/>").should == '<% _output(foo({:a => (true)}, {})) %>'
   end
   
-  it "should compile content of a block-tag call as a Ruby block" do 
-    compile_dryml("<foo>the body</foo>").should == "<% _output(foo() do |_foo_default_tagbody| %>the body<% end) %>"
+  it "should compile content of a tag call as the default parameter" do 
+    compile_dryml("<foo>the body</foo>").should == "<% _output(foo({}, { :default => proc { |_foo__default_content| new_context { %>the body<% } }, })) %>"
   end
   
-  it "should support <default_tagbody/> inside the content of a block-tag" do 
-    compile_dryml("<foo>!!<default_tagbody/>??</foo>").should == 
-      "<% _output(foo() do |_foo_default_tagbody| %>!!<% _foo_default_tagbody && _foo_default_tagbody.call %>??<% end) %>"
+  it "should support <param_content/> inside the content of a tag" do 
+    compile_dryml("<foo>!!<param-content/>??</foo>").should == 
+      "<% _output(foo({}, { :default => proc { |_foo__default_content| new_context { %>!!<%= _foo__default_content && _foo__default_content.call %>??<% } }, })) %>"
   end
   
-  it "should support the 'for' attribute on <default_tagbody/>" do 
-    compile_dryml("<x><y>123<default_tagbody for='x'/>456</y></x>").should == 
-      "<% _output(x() do |_x_default_tagbody| %><% _output(y() do |_y_default_tagbody| %>" +
-      "123<% _x_default_tagbody && _x_default_tagbody.call %>456" +
-      "<% end) %><% end) %>"
+  it "should support the 'for' attribute on <param-content/>" do 
+    compile_dryml("<x><y>123<param-content for='x'/>456</y></x>").should == 
+      "<% _output(x({}, { :default => proc { |_x__default_content| new_context { %><% _output(y({}, { :default => proc { |_y__default_content| new_context { %>" +
+      "123<%= _x__default_content && _x__default_content.call %>456" +
+      "<% } }, })) %><% } }, })) %>"
   end
   
-  it "should allow :foo as a shorthand for field='foo' on block tags" do 
-    compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
+  it "should allow :foo as a shorthand for field='foo' on tags" do 
+    compile_dryml("<foo:name/>").should == '<% _output(foo({:field => "name"}, {})) %>'
   end
   
-  it "should allow :title as a shorthand for field='title' on block tags (title is a static tag)" do 
-    compile_dryml("<foo:name/>").should == '<%= foo({:field => "name"}) %>'
+  it "should allow static tag names like :title as a shorthand for field='title'" do 
+    compile_dryml("<foo:name/>").should == '<% _output(foo({:field => "name"}, {})) %>'
   end
   
   it "should allow close tags to ommit the :field_name part" do 
-    compile_dryml("<foo:name></foo>").should == '<%= foo({:field => "name"}) %>'
+    compile_dryml("<foo:name></foo>").should == '<% _output(foo({:field => "name"}, {})) %>'
   end
 
-  it "should compile block-tag calls with merge_attrs" do
-    compile_dryml("<foo merge_attrs/>").should == "<%= foo(merge_attrs({},(attributes) || {})) %>"
-    compile_dryml("<foo a='1' merge_attrs/>").should == '<%= foo(merge_attrs({:a => "1"},(attributes) || {})) %>'
+  it "should compile tag calls with merge-attrs" do
+    compile_dryml("<foo merge-attrs/>").should == "<% _output(foo(merge_attrs({},(attributes) || {}), {})) %>"
+    compile_dryml("<foo a='1' merge-attrs/>").should == '<% _output(foo(merge_attrs({:a => "1"},(attributes) || {}), {})) %>'
   end
 
-  # --- Compilation: Defining Block Tags --- #
+  # --- Compilation: Defining Tags --- #
   
-  it "should compile defs with lower-case names as block tags" do 
+  it "should compile defs" do 
     compile_def("<def tag='foo'></def>").should == 
-      "<% def foo(all_attributes={}, &__block__); " +
-      "parameters = nil; " +
-      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
+      "<% def foo(all_attributes={}, all_parameters={}); " +
+      "parameters = Hobo::Dryml::TagParameters.new(all_parameters, []); " +
+      "all_parameters = Hobo::Dryml::TagParameters.new(all_parameters); " +
+      "_tag_context(all_attributes) do attributes, = _tag_locals(all_attributes, []) %>" + 
       "<% _erbout; end; end %>"
   end
   
   it "should compile attrs in defs as local variables" do 
-    compile_def("<def tag='foo' attrs='a, b'></def>").should == 
-      "<% def foo(all_attributes={}, &__block__); " +
-      "parameters = nil; " +
-      "_tag_context(all_attributes, __block__) do |tagbody| " +
-      "a, b, attributes, = _tag_locals(all_attributes, [:a, :b]) %>" + 
+    compile_def("<def tag='foo' attrs='a, my-attr'></def>").should == 
+      "<% def foo(all_attributes={}, all_parameters={}); " +
+      "parameters = Hobo::Dryml::TagParameters.new(all_parameters, []); " +
+      "all_parameters = Hobo::Dryml::TagParameters.new(all_parameters); " +
+      "_tag_context(all_attributes) do " +
+      "a, my_attr, attributes, = _tag_locals(all_attributes, [:a, :my_attr]) %>" + 
       "<% _erbout; end; end %>"
   end
-  
-  it "should allow a default tagbody to be given inside the <tagbody> tag" do 
-    compile_def("<def tag='foo'>123 <tagbody>blah</tagbody> 456</def>").should == 
-      "<% def foo(all_attributes={}, &__block__); " +
-      "parameters = nil; " +
-      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
-      "123 " +
-      "<% _output(do_tagbody(tagbody, {}, proc { %>blah<% })) %>" +
-      " 456" +
-      "<% _erbout; end; end %>"    
-  end
-  
-  # --- Compilation: Defining Templates --- #
-  
-  it "should compile defs with cap names as templates" do 
-    # Note the presence of the `parameters` param, which block-tags don't have
-    compile_def("<def tag='Foo'></def>").should == 
-      "<% def Foo(all_attributes={}, all_parameters={}, &__block__); " +
-      "parameters = all_parameters - []; " +
-      "_tag_context(all_attributes, __block__) do |tagbody| attributes, = _tag_locals(all_attributes, []) %>" + 
-      "<% _erbout; end; end %>"
-  end
-  
-  it "should dissallow `param` outside of template definitions" do 
+    
+  it "should dissallow `param` outside of tag definitions" do 
     proc { compile_dryml("<foo param/>") }.should raise_error(DrymlException)
   end
   
-  it "should compile param tag-calls as calls to `call_block_tag_parameter`" do 
-    compile_in_template("<foo param a='1'/>").should == '<%= call_block_tag_parameter(:foo, {:a => "1"}, all_parameters[:foo]) %>'
+  it "should compile param-tag calls as calls to `call_tag_parameter`" do 
+    compile_in_template("<foo param a='1'/>").should == '<% _output(call_tag_parameter(:foo, {:a => "1"}, {}, all_parameters, :foo)) %>'
   end
   
   it "should compile with support for named params" do 
-    compile_in_template("<foo param='zap'/>").should == "<%= call_block_tag_parameter(:foo, {}, all_parameters[:zap]) %>"
+    compile_in_template("<foo param='zap'/>").should == "<% _output(call_tag_parameter(:foo, {}, {}, all_parameters, :zap)) %>"
   end
 
-  it "should compile a param tag-call with a body" do 
+  it "should compile a param tag-call with a body" do
     compile_in_template("<foo param>abc</foo>").should == 
-      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |_foo_default_tagbody| %>abc<% end) %>"
+      "<% _output(call_tag_parameter(:foo, {}, { :default => proc { |_foo__default_content| new_context { %>abc<% } }, }, all_parameters, :foo)) %>"
   end
   
-  it "should compile a param tag-call with a body and a call to <default_tagbody/>" do 
-    compile_in_template("<foo param>!!<default_tagbody/>!!</foo>").should == 
-      "<% _output(call_block_tag_parameter(:foo, {}, all_parameters[:foo]) do |_foo_default_tagbody| %>" +
-      "!!<% _foo_default_tagbody && _foo_default_tagbody.call %>!!<% end) %>"
+  it "should compile a param tag-call with a body and a call to <param_content/>" do 
+    compile_in_template("<foo param>!!<param-content/>!!</foo>").should == 
+      "<% _output(call_tag_parameter(:foo, {}, { :default => proc { |_foo__default_content| new_context { %>!!<%= _foo__default_content && _foo__default_content.call %>!!<% } }, }, all_parameters, :foo)) %>"
   end
 
-  it "should compile param template-calls as calls to `call_template_parameter`" do 
-    compile_in_template("<Foo param/>").should == 
-      "<% _output(call_template_parameter(:Foo, {}, {}, all_parameters[:Foo])) %>"
+  it "should compile param template-calls as calls to `call_tag_parameter`" do 
+    compile_in_template("<foo param/>").should == 
+      "<% _output(call_tag_parameter(:foo, {}, {}, all_parameters, :foo)) %>"
   end
   
-  it "should compile param template-calls with parameters as calls to `call_template_parameter`" do 
-    compile_in_template("<Foo param><a x='1'/></Foo>").should == 
-      '<% _output(call_template_parameter(:Foo, {}, {:a => proc { {:x => "1"} }, }, all_parameters[:Foo])) %>'
+  it "should compile param tag calls with parameters as calls to `call_tag_parameter`" do 
+    compile_in_template("<foo param><a: x='1'/></foo>").should == 
+      '<% _output(call_tag_parameter(:foo, {}, {:a => proc { [{:x => "1"}, {}] }, }, all_parameters, :foo)) %>'
   end
   
-  it "should compile template parameters with param" do
-    compile_in_template("<Foo><abc param/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {} }, all_parameters[:abc]), })) %>'
+  it "should compile parameters with param" do
+    compile_in_template("<foo><abc: param/></foo>").should == 
+      '<% _output(foo({}, {:abc => merge_tag_parameter(proc { [{}, {}] }, all_parameters[:abc]), })) %>'
   end
   
-  it "should compile template parameters with named params" do
-    compile_in_template("<Foo><abc param='x'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {} }, all_parameters[:x]), })) %>'
+  it "should compile tag parameters with named params" do
+    compile_in_template("<foo><abc: param='x'/></foo>").should == 
+      '<% _output(foo({}, {:abc => merge_tag_parameter(proc { [{}, {}] }, all_parameters[:x]), })) %>'
   end
   
-  it "should compile template parameters with param and attributes" do
-    compile_in_template("<Foo><abc param='x' a='b'/></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(proc { {:a => "b"} }, all_parameters[:x]), })) %>'
+  it "should compile tag parameters with param and attributes" do
+    compile_in_template("<foo><abc: param='x' a='b'/></foo>").should == 
+      '<% _output(foo({}, {:abc => merge_tag_parameter(proc { [{:a => "b"}, {}] }, all_parameters[:x]), })) %>'
   end
   
-  it "should compile template parameters with param and a tag body" do
-    compile_in_template("<Foo><abc param>ha!</abc></Foo>").should == 
-      '<% _output(Foo({}, {:abc => merge_block_tag_parameter(' +
-      'proc { {:tagbody => proc {|_abc_default_tagbody| new_context { %>ha!<% } } } }, all_parameters[:abc]), })) %>'
+  it "should compile tag parameters with param and a tag body" do
+    compile_in_template("<foo><abc: param>ha!</abc></foo>").should == 
+      '<% _output(foo({}, {:abc => merge_tag_parameter(' +
+      'proc { [{}, { :default => proc { |_abc__default_content| new_context { %>ha!<% } }, }] }, all_parameters[:abc]), })) %>'
   end
   
-  it "should compile template parameters which are template calls themselves" do 
-    compile_in_template("<Foo><Baa param x='1'/></Foo>").should == 
-      '<% _output(Foo({}, {:Baa => merge_template_parameter(proc { [{:x => "1"}, {}] }, all_parameters[:Baa]), })) %>'
+  it "should compile tag parameters with param and nested parameters" do 
+    compile_in_template("<foo><baa: param><x:>hello</x:></baa:></foo>").should == 
+      '<% _output(foo({}, {:baa => merge_tag_parameter(' +
+      'proc { [{}, {:x => proc { [{}, { :default => proc { |_x__default_content| new_context { %>hello<% } }, }] }, }] }, all_parameters[:baa]), })) %>'
   end
 
-  it "should compile template parameters which are templates themselves with their own parameters" do 
-    compile_in_template("<Foo><Baa param><x>hello</x></Baa></Foo>").should == 
-      '<% _output(Foo({}, {:Baa => merge_template_parameter(' + 
-      'proc { [{}, {:x => proc { {:tagbody => proc {|_x_default_tagbody| new_context { %>hello<% } } } }, }] }, all_parameters[:Baa]), })) %>'
-  end
-
-  # --- Compilation: Calling Templates --- # 
+  # --- Compilation: Calling tags with parameters --- # 
   
-  it "should compile template calls as method calls" do 
-    compile_dryml("<Foo/>").should == "<% _output(Foo({}, {})) %>"
+  it "should compile tag parameters as procs" do 
+    compile_dryml("<foo><x:>hello</x><y:>world</y:></foo>").should ==
+      '<% _output(foo({}, {' + 
+      ':x => proc { [{}, { :default => proc { |_x__default_content| new_context { %>hello<% } }, }] }, ' +
+      ':y => proc { [{}, { :default => proc { |_y__default_content| new_context { %>world<% } }, }] }, })) %>'
   end
   
-  it "should compile attributes on template calls as keyword parameters" do
-    compile_dryml("<Foo a='1' b='2'/>").should == '<% _output(Foo({:a => "1", :b => "2"}, {})) %>'
-  end
-  
-  it "should compile template parameters as procs" do 
-    compile_dryml("<Foo><x>hello</x><y>world</y></Foo>").should ==
-      '<% _output(Foo({}, {' + 
-      ':x => proc { {:tagbody => proc {|_x_default_tagbody| new_context { %>hello<% } } } }, ' +
-      ':y => proc { {:tagbody => proc {|_y_default_tagbody| new_context { %>world<% } } } }, })) %>'
-  end
-  
-  it "should compile template parameters with attributes" do
-    compile_dryml("<Foo><abc x='1'>hello</abc></Foo>").should ==
-      '<% _output(Foo({}, {:abc => proc { {:x => "1", :tagbody => proc {|_abc_default_tagbody| new_context { %>hello<% } } } }, })) %>'
+  it "should compile tag parameters with attributes" do
+    compile_dryml("<foo><abc: x='1'>hello</abc></foo>").should ==
+      '<% _output(foo({}, {:abc => proc { [{:x => "1"}, { :default => proc { |_abc__default_content| new_context { %>hello<% } }, }] }, })) %>'
   end
   
   it "should allow :foo as a shorthand for field='foo' on template tags" do 
-    compile_dryml("<Foo:name/>").should == '<% _output(Foo({:field => "name"}, {})) %>'
-  end
-  
-  it "should dissallow tag-bodies on template calls" do 
-    proc { compile_dryml("<Foo>this is a tag body</Foo>") }.should raise_error(DrymlException)
-  end
-  
-  it "should dissallow tag-bodies on nested template calls" do 
-    proc { compile_dryml("<Foo><Baa>this is a tag body</Baa></Foo>") }.should raise_error(DrymlException)
+    compile_dryml("<foo:name/>").should == '<% _output(foo({:field => "name"}, {})) %>'
   end
   
   it "should compile template parameters which are themselves templates" do 
-    # Template parameters which are themselves templates are procs
-    # that return a pair of hashes, the first is the attributes to the
-    # template, the second is the sub-template procs
-    compile_dryml("<Foo><Baa x='1'><a>hello</a></Baa></Foo>").should ==
-      '<% _output(Foo({}, ' +
-      '{:Baa => proc { [{:x => "1"}, {:a => proc { {:tagbody => proc {|_a_default_tagbody| new_context { %>hello<% } } } }, }] }, })) %>'
+    # Tag parameters with nested tag parameters are procs that return
+    # a pair of hashes, the first is the attributes, the second is the
+    # sub-template procs
+    compile_dryml("<foo><baa: x='1'><a:>hello</a></baa></foo>").should ==
+      '<% _output(foo({}, ' +
+      '{:baa => proc { [{:x => "1"}, {:a => proc { [{}, { :default => proc { |_a__default_content| new_context { %>hello<% } }, }] }, }] }, })) %>'
   end
 
   it "should compile 'replace' parameters" do
-    compile_dryml("<Page><head replace>abc</head></Page>").should == 
-      '<% _output(Page({}, {:head => proc {|_head__default| new_context { %>abc<% } }, })) %>'
+    # A replace parameter is detected at runtime by the arity of the
+    # block == 1 (for a normal parameter it would be 0). See
+    # TemplateEnvironment#call_tag_parameter
+    compile_dryml("<page><head: replace>abc</head></page>").should == 
+      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc<% } }, })) %>'
   end
     
   it "should compile 'replace' parameters with a default parameter call" do
-    compile_dryml("<Page><head replace>abc <head restore>blah</head></head></Page>").should == 
+    compile_dryml("<page><head: replace>abc <head restore>blah</head></head></page>").should == 
       
-      '<% _output(Page({}, {:head => proc {|_head__default| new_context { %>abc ' +
-      '<% _output(_head__default.call_with_block({}) do |_head_default_tagbody| %>blah<% end) %>' +
+      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc ' +
+      '<% _output(_head_restore.call({}, { :default => proc { |_head__default_content| new_context { %>blah<% } }, })) %>' +
       '<% } }, })) %>'
   end
   
-  it "should compile 'replace' template parameters with a default parameter call" do
-    compile_dryml("<Page><Head replace>abc <Head restore/></Head></Page>").should == 
+  it "should compile 'replace' tag parameters with a default parameter call" do
+    compile_dryml("<page><head: replace>abc <head restore/></head></page>").should == 
       
-      '<% _output(Page({}, {:Head => proc {|_Head__default| new_context { %>abc ' +
-      '<% _output(_Head__default.call({}, {})) %>' +
+      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc ' +
+      '<% _output(_head_restore.call({}, {})) %>' +
       '<% } }, })) %>'
   end
   
@@ -246,209 +215,218 @@ describe Template do
   end
   
   it "should support attribute merging on static tags" do 
-    eval_dryml(%(<p class="big" id="x" merge_attrs="&{:class => 'small', :id => 'y', :a => 'b'}"/>)).
+    eval_dryml(%(<p class="big" id="x" merge-attrs="&{:class => 'small', :id => 'y', :a => 'b'}"/>)).
       should be_dom_equal_to('<p class="big small" id="y" a="b"/>')
   end
   
   it "should support attribute merging of all extra attributes on static tags" do 
-    eval_dryml(%(<def tag="x"><p class="big" id="x" merge_attrs/></def>
+    eval_dryml(%(<def tag="x"><p class="big" id="x" merge-attrs/></def>
                  <x class='small' id='y' a='b'/>)).
       should be_dom_equal_to('<p class="big small" id="y" a="b"/>')
   end
   
   
-  # --- Block Tags --- #
+  # --- Tags without named parameters --- #
   
   
   def eval_with_defs(dryml)
     eval_dryml(<<-END + dryml).strip
+      <def tag="do"><%= parameters.default %></def>
+
       <def tag="t">plain tag</def>
 
-      <def tag="t_attr" attrs="x">it is <%= x %></def>
+      <def tag="t-attr" attrs="my-attr">it is <%= my_attr %></def>
 
-      <def tag="t_body">( <tagbody>hmm</tagbody> )</def>
+      <def tag="t-body">( <do param="default">hmm</do> )</def>
 
-      <def tag="merge_attrs_example"><p merge_attrs>hi</p></def>
+      <def tag="merge-attrs-example"><p merge-attrs>hi</p></def>
     END
   end
 
-  it "should call block tags" do 
+  it "should call tags" do 
     eval_with_defs("<t/>").should == "plain tag"
   end
     
 
-  it "should call block tags passing attributes" do
-    eval_with_defs("<t_attr x='10'/>").should == "it is 10"
+  it "should call tags passing attributes" do
+    eval_with_defs("<t-attr my-attr='10'/>").should == "it is 10"
   end
   
-  it "should call block tags with a body" do
-    eval_with_defs("<t_body>foo</t_body>").should == "( foo )"
+  it "should call tags with content (default parameter)" do
+    eval_with_defs("<t-body>foo</t-body>").should == "( foo )"
   end
   
-  it "should allow tagbody to have a default" do
-    eval_with_defs("<t_body/>").should == "( hmm )"
+  it "should allow parameters to have a default" do
+    eval_with_defs("<t-body/>").should == "( hmm )"
   end
   
-  it "should provide access to the default tagbody when overriding the body" do
-    eval_with_defs("<t_body>[<default_tagbody/>]</t_body>").should == "( [hmm] )"
+  it "should provide access to the default parameter content" do
+    eval_with_defs("<t-body>[<param-content/>]</t-body>").should == "( [hmm] )"
   end
   
-  it "should support merge_attrs on static tags" do 
-    eval_with_defs('<merge_attrs_example class="x"/>').should == '<p class="x">hi</p>'
+  it "should support merge-attrs on static tags" do 
+    eval_with_defs('<merge-attrs-example class="x"/>').should == '<p class="x">hi</p>'
   end
   
-  it "should make the declared attributes available via the 'attrs_for' method" do 
-    eval_with_defs('<%= attrs_for(:t_attr).inspect %>').should == '[:x]'
+  it "should make the declared attributes available via the 'attrs-for' method" do 
+    eval_with_defs('<%= attrs_for(:t_attr).inspect %>').should == '[:my_attr]'
+  end
+  
+  it "should allow undeclared attributes to be extracted from 'attributes'" do
+    eval_dryml("<def tag='t'><%= attributes[:my_attribute] %></def><t my-attribute='123'/>").should == "123"
   end
   
   
   
-  # --- Template Tags --- #
+  # --- Parameters --- #
   
   def eval_with_templates(dryml)
     eval_dryml(<<-END + dryml).strip
-      <def tag="defined" attrs="a, b">a is <%= a %>, b is <%= b %>, body is <tagbody/></def>
+      <def tag="do"><%= parameters.default %></def>
 
-      <def tag="T">plain template</def>
+      <def tag="defined" attrs="a, b">a is <%= a %>, b is <%= b %>, body is <do param="default"/></def>
 
-      <def tag="StaticMerge"><p>a <b name="big" param>bold</b> word</p></def>
+      <def tag="t">plain template</def>
 
-      <def tag="EmptyStaticMerge"><img name="big" src="..." param/></def>
+      <def tag="static-merge"><p>a <b name="big" param>bold</b> word</p></def>
 
-      <def tag="DefTagMerge">foo <defined param b="3">baa</defined>!</def>
+      <def tag="empty-static-merge"><img name="big" src="..." param/></def>
 
-      <def tag="NestedStaticMerge">merge StaticMerge: <StaticMerge param/></def>
+      <def tag="def-tag-merge">foo <defined param b="3">baa</defined>!</def>
 
-      <def tag="ParameterMerge">parameter merge: <StaticMerge><b param/></StaticMerge></def>
+      <def tag="nested-static-merge">merge StaticMerge: <static-merge param/></def>
+
+      <def tag="parameter-merge">parameter merge: <static-merge><b: param/></static-merge></def>
     END
   end
 
-  it "should call template tags" do
-    eval_with_templates("<T/>").should == "plain template"
-  end
-  
   it "should add attributes to static tags when merging" do 
-    eval_with_templates("<StaticMerge><b onclick='alert()'/></StaticMerge>").should == 
+    eval_with_templates("<static-merge><b: onclick='alert()'/></static-merge>").should == 
       '<p>a <b name="big" onclick="alert()">bold</b> word</p>'    
   end
   
   it "should override attributes on static tags when merging" do 
-    eval_with_templates("<StaticMerge><b name='small'/></StaticMerge>").should == 
+    eval_with_templates("<static-merge><b: name='small'/></static-merge>").should == 
       '<p>a <b name="small">bold</b> word</p>'
   end
   
   it "should replace tag bodies on static tags when merging" do
-    eval_with_templates('<StaticMerge><b>BOLD</b></StaticMerge>').should == 
+    eval_with_templates('<static-merge><b:>BOLD</b></static-merge>').should == 
       '<p>a <b name="big">BOLD</b> word</p>'
   end
   
   it "should add attributes to defined tags when merging" do 
-    eval_with_templates('<DefTagMerge><defined a="2"/></DefTagMerge>').should ==
+    eval_with_templates('<def-tag-merge><defined: a="2"/></def-tag-merge>').should ==
       'foo a is 2, b is 3, body is baa!'
   end
   
   it "should override attributes on defined tags when merging" do 
-    eval_with_templates('<DefTagMerge><defined b="2"/></DefTagMerge>').should ==
+    eval_with_templates('<def-tag-merge><defined: b="2"/></def-tag-merge>').should ==
       'foo a is , b is 2, body is baa!'
   end
   
   it "should replace tag bodies on defined tags when merging" do 
-    eval_with_templates('<DefTagMerge><defined>zip</defined></DefTagMerge>').should ==
+    eval_with_templates('<def-tag-merge><defined:>zip</defined></def-tag-merge>').should ==
       'foo a is , b is 3, body is zip!'
   end
   
   it "should leave non-merged tags unchanged" do
-    eval_with_templates('<StaticMerge></StaticMerge>').should ==
+    eval_with_templates('<static-merge></static-merge>').should ==
       '<p>a <b name="big">bold</b> word</p>'
   end
   
   it "should merge into static tags with no body" do
-    eval_with_templates("<EmptyStaticMerge><img name='small'/></EmptyStaticMerge>").should == 
+    eval_with_templates("<empty-static-merge><img: name='small'/></empty-static-merge>").should == 
       '<img name="small" src="..." />'
   end
     
   it "should merge template parameters into nested templates" do 
-    eval_with_templates('<NestedStaticMerge><StaticMerge><b name="small"/></StaticMerge></NestedStaticMerge>').should ==
+    eval_with_templates('<nested-static-merge><static-merge:><b: name="small"/></static-merge></nested-static-merge>').should ==
       'merge StaticMerge: <p>a <b name="small">bold</b> word</p>'
   end
   
   it "should merge the body of template parameters into nested templates" do 
-    eval_with_templates('<NestedStaticMerge><StaticMerge><b>BOLD</b></StaticMerge></NestedStaticMerge>').should ==
+    eval_with_templates('<nested-static-merge><static-merge:><b:>BOLD</b></static-merge></nested-static-merge>').should ==
       'merge StaticMerge: <p>a <b name="big">BOLD</b> word</p>'
   end
   
   it "should allow param names to be defined dynamically" do 
-    eval_dryml('<def tag="T"><p param="& :a.to_s + :b.to_s"/></def>' +
-               '<T><ab x="1"/></T>').should == '<p x="1" />'
+    eval_dryml('<def tag="t"><p param="& :a.to_s + :b.to_s"/></def>' +
+               '<t><ab: x="1"/></t>').should == '<p x="1" />'
   end
   
   it "should allow params to be defined on other params" do 
-    eval_with_templates('<ParameterMerge><b name="small">foo</b></ParameterMerge>').should == 
+    eval_with_templates('<parameter-merge><b: name="small">foo</b></parameter-merge>').should == 
       'parameter merge: <p>a <b name="small">foo</b> word</p>'
-    
   end
   
   it "should allow parameter bodies to be restored with static tag params" do 
-    eval_with_templates("<StaticMerge><b>very <default_tagbody/></b></StaticMerge>").should ==
+    eval_with_templates("<static-merge><b:>very <param-content/></b></static-merge>").should ==
       '<p>a <b name="big">very bold</b> word</p>'
   end
 
   it "should allow parameter bodies to be restored with defined tag params" do 
-    eval_with_templates("<DefTagMerge><defined>hum<default_tagbody/></defined></DefTagMerge>").should ==
+    eval_with_templates("<def-tag-merge><defined:>hum<param-content/></defined></def-tag-merge>").should ==
       'foo a is , b is 3, body is humbaa!'
   end
 
-  it "should insert the correct default_tagbody in nested merged template parameters" do 
-    eval_dryml("<def tag='T1'><p param>t1 default</p></def>" +
-               "<def tag='T2'><T1 merge><p param><default_tagbody/> - t2 default</p></T1></def>" +
-               "<T2><p><default_tagbody/></p></T2>").should == "<p>t1 default - t2 default</p>"
+  it "should insert the correct param-content in nested merged template parameters" do 
+    eval_dryml("<def tag='t1'><p param>t1 default</p></def>" +
+               "<def tag='t2'><t1 merge><p: param><param-content/> - t2 default</p></t1></def>" +
+               "<t2><p:><param-content/>!</p></t2>").should == "<p>t1 default - t2 default!</p>"
   end
   
   it "should accumulate attributes through nested merged template parameters" do 
-    eval_dryml("<def tag='T1'><p class='c1' c='c' param/></def>" +
-               "<def tag='T2'><T1 merge/></def>" +
-               "<def tag='T3'><T2 merge><p class='c2' b='b' param/></T2></def>" +
-               "<T3><p class='call' a='a'/></T3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'/>")
+    eval_dryml("<def tag='t1'><p: class='c1' c='c' param/></def>" +
+               "<def tag='t2'><t1: merge/></def>" +
+               "<def tag='t3'><t2: merge><p: class='c2' b='b' param/></t2></def>" +
+               "<t3><p: class='call' a='a'/></t3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'/>")
   end
 
-  # --- Replacing Template Parameters --- #
+  # --- Replacing Parameters --- #
   
   it "should allow template parameters to be replaced" do 
-    eval_with_templates('<StaticMerge><b replace>short</b></StaticMerge>').should ==
+    eval_with_templates('<static-merge><b: replace>short</b></static-merge>').should ==
       '<p>a short word</p>'
   end
   
   it "should allow template parameters to be replaced and then re-instated" do 
-    eval_with_templates('<StaticMerge><b replace>short <b restore/></b></StaticMerge>').should ==
-      '<p>a short <b name="big">bold</b> word</p>'
+    eval_with_templates('<nested-static-merge><static-merge: replace>Come back: <static-merge restore/></static-merge></nested-static-merge>').should ==
+      'merge StaticMerge: Come back: <p>a <b name="big">bold</b> word</p>'
   end
 
   it "should allow template parameters to be replaced and then re-instated with different attributes" do 
-    eval_with_templates('<StaticMerge><b replace>short <b restore name="small"/></b></StaticMerge>').should ==
+    eval_with_templates('<static-merge><b: replace>short <b restore name="small"/></b></static-merge>').should ==
       '<p>a short <b name="small">bold</b> word</p>'
   end
 
-  it "should allow template parameters to be replaced and then re-instated with a different tagbody" do 
-    eval_with_templates('<StaticMerge><b replace>short <b restore>big</b></b></StaticMerge>').should ==
+  it "should allow template parameters to be replaced and then re-instated with different content" do 
+    eval_with_templates('<static-merge><b: replace>short <b restore>big</b></b></static-merge>').should ==
       '<p>a short <b name="big">big</b> word</p>'
   end
   
-
+  it "should allow restored parameters to themselves be parameters" do
+    eval_with_templates('<def tag="restore-param"><static-merge><b: replace>short <b restore param>big</b></b></static-merge></def>' +
+                        '<restore-param><b:>very big</b:></restore-param>').
+      should == '<p>a short <b name="big">very big</b> word</p>'
+    
+  end
+  
   # --- Merge Params --- #
   
   
   it "should support merge_param on template calls" do
-    tags = %(<def tag="Page"><h1 param='title'/><div param='footer'/></def>
-             <def tag="MyPage"><Page merge_params><footer>the footer</footer></Page></def>)
+    tags = %(<def tag="page"><h1 param='title'/><div param='footer'/></def>
+             <def tag="my-page"><page merge-params><footer:>the footer</footer></page></def>)
 
-    eval_dryml(tags + "<MyPage><title>Hi!</title></MyPage>").should == '<h1>Hi!</h1><div>the footer</div>'
+    eval_dryml(tags + "<my-page><title:>Hi!</title></my-page>").should == '<h1>Hi!</h1><div>the footer</div>'
   end
   
   
   # --- Polymorphic Tags --- #
   
   it "should allow tags to be selected based on types" do
-    tags = %(<def tag="do"><tagbody/></def>
+    tags = %(<def tag="do"><%= parameters.default %></def>
              <def tag="t" for="String">A string</def>
              <def tag="t" for="TrueClass">A boolean</def>)
 
@@ -493,9 +471,9 @@ describe Template do
   end
   
   it "should allow the context to be changed inside template parameters" do 
-    tags = %(<def tag="do"><tagbody/></def>
-             <def tag="Template"><do:name><p param/></do></def>)
-    context_eval(a_user, tags + '<Template><p><%= this %></p></Template>').should == '<p>Tom</p>'
+    tags = %(<def tag="do"><%= parameters.default %></def>
+             <def tag="template"><do:name><p param/></do></def>)
+    context_eval(a_user, tags + '<template><p:><%= this %></p:></template>').should == '<p>Tom</p>'
   end
 
   
@@ -524,12 +502,11 @@ describe Template do
   
   it "should support scoped variables" do 
     tags =
-      "<def tag='t1'><set_scoped x='ping'><tagbody/></set_scoped></def>" + 
-      "<def tag='t2'><set_scoped x='pong'><tagbody/></set_scoped></def>"
-    eval_dryml(tags + "<t1><%= scope.x %></t1>").should == 'ping'
-    eval_dryml(tags + "<t1><t2><%= scope.x %></t2> <%= scope.x %></t1>").should == 'pong ping'
+      "<def tag='t1'><set-scoped my-var='ping'><%= parameters.default %></set-scoped></def>" + 
+      "<def tag='t2'><set-scoped my-var='pong'><%= parameters.default %></set-scoped></def>"
+    eval_dryml(tags + "<t1><%= scope.my_var %></t1>").should == 'ping'
+    eval_dryml(tags + "<t1><t2><%= scope.my_var %></t2> <%= scope.my_var %></t1>").should == 'pong ping'
   end
-  
   
   # --- Taglibs --- #
   
@@ -562,12 +539,21 @@ describe Template do
       '<img src="1" /><img src="2" /><img src="3" />'
   end
   
-  it "should alow templates to be repeated with the 'repeat' attribute" do 
-    eval_dryml('<def tag="T"><%= this %></def><T repeat="&[1,2,3]"/>').should == '123'
+  it "should alow defined tags to be repeated with the 'repeat' attribute" do 
+    eval_dryml('<def tag="t"><%= this %></def><t repeat="&[1,2,3]"/>').should == '123'
   end
 
   it "should allow <else> to be used with the if attribute" do
     eval_dryml("<p if='&false'/><%= Hobo::Dryml.last_if %>").should == "false"
+  end
+  
+  
+  # --- Testing for parameters --- #
+  
+  it "should be possible to test for the presence of a parameter with parameters.foo?" do 
+    tag = "<def tag='t'><%= parameters.foo? ? 'y' : 'n' %></def>"
+    eval_dryml(tag + "<t/>").should == "n"
+    eval_dryml(tag + "<t><foo:/></t>").should == "y"
   end
 
   

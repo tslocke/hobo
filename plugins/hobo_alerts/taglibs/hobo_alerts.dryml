@@ -1,12 +1,12 @@
-<def tag="Alert">
-  <div class="alert #{this.subject._?.class.name.underscore} #{this.name.underscore}" hobo_model_id="#{dom_id}" merge_attrs>
-    <delete_button confirm="&false" param/>
-    <call_tag:subject tag="#{this.name}_alert" param="message"/>
+<def tag="alert">
+  <div class="alert #{this.subject._?.class.name.underscore} #{this.name.underscore}" hobo-model-id="#{dom_id}" merge-attrs>
+    <delete-button confirm="&false" param subsite=""/>
+    <call-tag:subject tag="#{this.name}_alert" param="message"/>
   </div>
 </def>
 
-<def tag="Alerts">
+<def tag="alerts">
   <div class="#{this.member_class.name.underscore.pluralize}" if="any?">
-    <Alert repeat merge/>
+    <alert repeat merge/>
   </div>
 </def>

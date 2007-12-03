@@ -70,7 +70,7 @@ var RatingInput = Behavior.create(Object.extend(Hobo.RatingsBase, {
 }))
 
 Event.addBehavior({
-    'div.hobo_rating.editor' : RatingEditor(),
-    'div.hobo_rating.input'  : RatingInput()
+    'div.hobo-rating.editor' : RatingEditor(),
+    'div.hobo-rating.input'  : RatingInput()
 });
 

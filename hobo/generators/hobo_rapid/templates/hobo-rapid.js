@@ -24,19 +24,19 @@ var Hobo = {
 
     updatesForElement: function(el) {
         el = $(el)
-        var updates = el.getAttribute("hobo_update")
+        var updates = el.getAttribute("hobo-update")
         return updates ? updates.split(/\s*,\s*/) : []
     },
 
     ajaxSetFieldForElement: function(el, val, options) {
         var updates = Hobo.updatesForElement(el)
         var params = Hobo.fieldSetParam(el, val)
-        var p = el.getAttribute("hobo_ajax_params")
+        var p = el.getAttribute("hobo-ajax-params")
         if (p) params = params + "&" + p
 
         var opts = Object.merge(options || {}, { params: params})
         Hobo.ajaxRequest(Hobo.putUrl(el),
-                         el.getAttribute("hobo_ajax_message") || "Changing...",
+                         el.getAttribute("hobo-ajax-message") || "Changing...",
                          updates,
                          opts)
     },
@@ -48,11 +48,11 @@ var Hobo = {
             updates.each(function(id_or_el) {
                 var el = $(id_or_el)
                 if (el) { // ignore update of parts that do not exist
-                    var dom_id
-                    dom_id = el.id
-                    if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
-                    params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[dom_id]))
-                    params.push("render["+i+"][id]=" + dom_id)
+                    var partDomId
+                    partDomId = el.id
+                    if (!hoboParts[partDomId]) { throw "Update of dom-id that is not a part: " + partDomId }
+                    params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[partDomId]))
+                    params.push("render["+i+"][id]=" + partDomId)
                     i += 1
                 }
             })
@@ -86,6 +86,10 @@ var Hobo = {
             var url = form.action
         }
         var params = []
+
+        if (typeof(formAuthToken) != "undefined") {
+            params.push(formAuthToken.name + "=" + formAuthToken.value)
+        }
         
         updateParams = Hobo.ajaxUpdateParams(updates, options.resultUpdate)
         if (updateParams != "") { params.push(updateParams) }
@@ -155,16 +159,16 @@ var Hobo = {
         var oldValue = Hobo.ipeOldValues[el.id]
         delete Hobo.ipeOldValues[el.id]
 
-        var blank = el.getAttribute("hobo_blank_message")
+        var blank = el.getAttribute("hobo-blank-message")
         if (blank && newValue.strip().length == 0) {
             el.update(blank)
         } else {
             el.update(newValue)
         }
 
-        var modelId = el.getAttribute('hobo_model_id')
+        var modelId = el.getAttribute('hobo-model-id')
         if (oldValue) {
-            $$("*[hobo_model_id=" + modelId + "]").each(function(e) {
+            $$("*[hobo-model-id=" + modelId + "]").each(function(e) {
                 if (e != el && e.innerHTML == oldValue) e.update(newValue)
             })
         }
@@ -182,28 +186,29 @@ var Hobo = {
         opts = {okButton: false,
                 cancelLink: false,
                 submitOnBlur: true,
-                callback: function(form, val) {
-                    old = val
-                    return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
-                },
-                onFailure: function(resp) { alert(resp.responseText); el.innerHTML = old },
                 evalScripts: true,
                 htmlResponse: false,
                 ajaxOptions: { method: "put" },
                 onEnterHover: null,
-                onLeaveHover: null
+                onLeaveHover: null,
+                callback: function(form, val) {
+                    old = val
+                    return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
+                },
+                onFailure: function(resp) { 
+                    alert(resp.responseText); el.innerHTML = old
+                },
+                onEnterEditMode: function() {
+                    var blank_message = el.getAttribute("hobo-blank-message")
+                    if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
+                        el.innerHTML = "" 
+                    } else {
+                        Hobo.ipeOldValues[el.id] = el.innerHTML
+                    }
+                }
                }
         Object.extend(opts, options)
-        var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
-        ipe.onEnterEditMode = function() {
-            var blank_message = el.getAttribute("hobo_blank_message")
-            if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
-                el.innerHTML = "" 
-            } else {
-                Hobo.ipeOldValues[el.id] = el.innerHTML
-            }
-        }
-        return ipe
+        return new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
     },
 
     applyEvents: function(root) {
@@ -212,21 +217,21 @@ var Hobo = {
             return new Selector(p).findElements(root)
         }
 
-        select(".in_place_textfield_bhv").each(function (el) {
+        select(".in-place-textfield-bhv").each(function (el) {
             ipe = Hobo._makeInPlaceEditor(el)
             ipe.getText = function() {
                 return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
             }
         })
 
-        select(".in_place_textarea_bhv").each(function (el) {
+        select(".in-place-textarea-bhv").each(function (el) {
             ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
             ipe.getText = function() {
                 return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
             }
         })
 
-        select(".in_place_html_textarea_bhv").each(function (el) {
+        select(".in-place-html-textarea-bhv").each(function (el) {
             var options = {rows: 2, handleLineBreaks: false}
             if (typeof(tinyMCE) != "undefined") options["submitOnBlur"] = false
             var ipe = Hobo._makeInPlaceEditor(el, options) 
@@ -250,22 +255,22 @@ var Hobo = {
             }
         })
 
-        select("select.number_editor_bhv").each(function(el) {
+        select("select.number-editor-bhv").each(function(el) {
             el.onchange = function() {
                 Hobo.ajaxSetFieldForElement(el, el.value)
             }
         })
                                                 
-        select(".autocomplete_bhv").each(function (el) {
+        select(".autocomplete-bhv").each(function (el) {
             options = {paramName: "query", minChars: 3, method: 'get' }
             if (el.hasClassName("autosubmit")) {
                 options.afterUpdateElement = function(el, item) { el.form.onsubmit(); }
             }
-            new Ajax.Autocompleter(el, el.id + "_completions", el.getAttribute("autocomplete_url"),
+            new Ajax.Autocompleter(el, el.id + "-completions", el.getAttribute("autocomplete-url"),
                                    options);
         });
 
-        select(".search_bhv").each(function(el) {
+        select(".search-bhv").each(function(el) {
             new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
         });
     },
@@ -273,10 +278,10 @@ var Hobo = {
 
     doSearch: function(el) {
         el = $(el)
-        var spinner = $(el.getAttribute("search_spinner") || "search_spinner")
-        var search_results = $(el.getAttribute("search_results") || "search_results")
-        var search_results_panel = $(el.getAttribute("search_results_panel") || "search_results_panel")
-        var url = el.getAttribute("search_url") || (urlBase + "/search")
+        var spinner = $(el.getAttribute("search-spinner") || "search-spinner")
+        var search_results = $(el.getAttribute("search-results") || "search-results")
+        var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results-panel")
+        var url = el.getAttribute("search-url") || (urlBase + "/search")
 
         el.focus();
         var value = $F(el)
@@ -311,7 +316,11 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
+        res = spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
+        if (typeof(formAuthToken) != "undefined") {
+            res = res + "&" + formAuthToken.name + "=" + formAuthToken.value
+        }
+        return res
     },
 
     fadeObjectElement: function(el) {
@@ -343,7 +352,7 @@ var Hobo = {
 
 
     parseFieldId: function(el) {
-        id = el.getAttribute("hobo_model_id")
+        id = el.getAttribute("hobo-model-id")
         if (!id) return
         m = id.match(/^([a-z_]+)_([0-9]+)_([a-z_]+)$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
@@ -360,7 +369,7 @@ var Hobo = {
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
-            id = el.getAttribute("hobo_model_id");
+            id = el.getAttribute("hobo-model-id");
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
             el = el.parentNode;
@@ -370,13 +379,13 @@ var Hobo = {
 
 
     showSpinner: function(message) {
-        if(t = $('ajax_progress_text')) Element.update(t, message);
-        if(e = $('ajax_progress')) e.style.display = "block";
+        if(t = $('ajax-progress-text')) Element.update(t, message);
+        if(e = $('ajax-progress')) e.style.display = "block";
     },
 
 
     hideSpinner: function() {
-        if(e = $('ajax_progress')) e.style.display = "none";
+        if(e = $('ajax-progress')) e.style.display = "none";
     },
 
 
@@ -426,11 +435,21 @@ Element.findContaining = function(el, tag) {
     return null;
 }
 
+// Add an afterEnterEditMode hook to in-place-editor
 origEnterEditMode = Ajax.InPlaceEditor.prototype.enterEditMode
 Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
     if (this.afterEnterEditMode) this.afterEnterEditMode()
     return false
+}
+
+// Fix Safari in-place-editor bug
+Ajax.InPlaceEditor.prototype.removeForm = function() {
+    if (!this._form) return;
+    
+    if (this._form.parentNode) { try { Element.remove(this._form); } catch (e) {}}    
+    this._form = null;
+    this._controls = { };
 }
 
 // Silence errors from IE :-(
@@ -460,7 +479,7 @@ HasManyThroughInput = Behavior.create({
         var select = this.element.down('select')
         var selected = select.options[select.selectedIndex]
         if (selected.style.display != "none" & selected.value != "") {
-            var newItem = strToDom(this.element.down('.item_proto').innerHTML)
+            var newItem = strToDom(this.element.down('.item-proto').innerHTML)
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             newItem.down('input[type=hidden]').value = selected.innerHTML
@@ -472,7 +491,7 @@ HasManyThroughInput = Behavior.create({
     onclick : function(e) {
         var el = Event.element(e);
         Event.stop(e);
-        if (el.match(".remove_item")) { this.removeOne(el.parentNode) }
+        if (el.match(".remove-item")) { this.removeOne(el.parentNode) }
     },
 
     removeOne : function(el) {
@@ -487,5 +506,5 @@ HasManyThroughInput = Behavior.create({
 })
 
 Event.addBehavior({
-    'div.has_many_through.input' : HasManyThroughInput()
+    'div.has-many-through.input' : HasManyThroughInput()
 });

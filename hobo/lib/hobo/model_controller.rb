@@ -112,7 +112,7 @@ module Hobo
         options = options.reverse_merge(:limit => 15)
         options[:data_filters_block] = b
         @completers ||= HashWithIndifferentAccess.new
-        @completers[attr.to_sym] = opts
+        @completers[attr.to_sym] = options
       end
 
 
@@ -130,12 +130,16 @@ module Hobo
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
           @this = find_instance(opts) unless opts[:no_find]
-          permission_denied unless Hobo.can_call?(current_user, @this, method)
-          if got_block
+          set_status(Hobo.can_call?(current_user, @this, method) ? :valid : :not_allowed)
+          # TODO - block should get to handle permission denied?
+          if not_allowed?
+            permission_denied
+          elsif got_block
             instance_eval(&block)
           else
             @this.send(method)
           end
+          
           hobo_ajax_response unless performed?
         end
       end
@@ -209,7 +213,7 @@ module Hobo
         else
           # Black list
           except = Array(@auto_actions[:except])
-          name.not_in?(except) || (collection_action && :collections.not_in?(except))
+          return !(name.in?(except) || (collection_action && :collections.in?(except)))
         end
       end
 
@@ -507,7 +511,7 @@ module Hobo
       @this.send(:clear_association_cache)
       
       changes = params[model.name.underscore]
-      @this.attributes = changes
+      @this.attributes = changes 
       save_and_set_status!(@this, original)
 
       # Ensure current_user isn't out of date
@@ -523,7 +527,7 @@ module Hobo
               redirect_to(params[:after_submit] || object_url(@this))
             end
             wants.js do
-              if changes.size == 1
+              if changes.size == 1 && params[:render]
                 # Decreasingly hacky support for the scriptaculous in-place-editor
                 new_val = Hobo::Dryml.render_tag(@template, "view",
                                                  :with => @this, :field => changes.keys.first,
@@ -648,7 +652,7 @@ module Hobo
     def permission_denied(options={})
       if respond_to? :permission_denied_response
         permission_denied_response
-      elsif render_tag("PermissionDeniedPage", { :with => @this }, :status => 403)
+      elsif render_tag("permission-denied-page", { :with => @this }, :status => 403)
         # cool
       else
         message = options[:message] || "Permission Denied"
@@ -660,7 +664,7 @@ module Hobo
     def not_found
       if respond_to? :not_found_response
         not_found_response
-      elsif render_tag("NotFoundPage", { :with => @this }, :status => 404)
+      elsif render_tag("not-found-page", { :with => @this }, :status => 404)
         # cool
       else
         render(:text => "The page you requested cannot be found.", :status => 404)
@@ -680,7 +684,7 @@ module Hobo
           true
         else
           # This returns false if no such tag exists
-          render_tag("#{page_kind.to_s.camelize}Page", :with => @this)
+          render_tag("#{page_kind.to_s.dasherize}-page", :with => @this)
         end
       rescue ActionView::TemplateError => wrapper
         e = wrapper.original_exception if wrapper.respond_to? :original_exception

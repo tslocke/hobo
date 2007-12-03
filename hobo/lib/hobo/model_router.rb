@@ -2,9 +2,19 @@ module Hobo
   
   class ModelRouter
     
+    @linkable = Hash.new {|h, k| h[k] = Hash.new {|h, k| h[k] = {} } }
+    
     APP_ROOT = "#{RAILS_ROOT}/app"
     
     class << self
+      
+      def linkable(subsite, klass, action)
+        @linkable[subsite][klass.name][action] = true
+      end
+      
+      def linkable?(subsite, klass, action)
+        @linkable[subsite][klass.name][action]
+      end
       
       def add_routes(map)
         begin 
@@ -17,6 +27,7 @@ module Hobo
         require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
         require "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
         
+        # Add non-subsite routes
         add_routes_for(map, nil)
 
         # Any directory inside app/controllers defines a subsite
@@ -88,15 +99,16 @@ module Hobo
     def resource_routes
       # We re-implement resource routing - routes are not created for
       # actions that the controller does not provide
-      named_route(plural,                plural,               :action => "index",   :conditions => { :method => :get })
+      linkable_route(plural, plural, :index, :conditions => { :method => :get })
                                                                                                                           
-      named_route("new_#{singular}",     "#{plural}/new",      :action => "new",     :conditions => { :method => :get })  
-      named_route("edit_#{singular}",    "#{plural}/:id/edit", :action => "edit",    :conditions => { :method => :get })  
-      named_route(singular,              "#{plural}/:id",      :action => "show",    :conditions => { :method => :get })  
+      linkable_route("new_#{singular}",  "#{plural}/new",      :new,  :conditions => { :method => :get })  
+      linkable_route("edit_#{singular}", "#{plural}/:id/edit", :edit, :conditions => { :method => :get })  
+      
+      linkable_route(singular, "#{plural}/:id", :show, :conditions => { :method => :get })
                                                                                                                           
-      named_route("create_#{singular}",  plural,               :action => "create",  :conditions => { :method => :post })
-      named_route("update_#{singular}",  "#{plural}/:id",      :action => "update",  :conditions => { :method => :put }) 
-      named_route("destroy_#{singular}", "#{plural}/:id",      :action => "destroy", :conditions => { :method => :delete })
+      linkable_route("create_#{singular}",  plural,          :create,  :conditions => { :method => :post })
+      linkable_route("update_#{singular}",  "#{plural}/:id", :update,  :conditions => { :method => :put }) 
+      linkable_route("destroy_#{singular}", "#{plural}/:id", :destroy, :conditions => { :method => :delete })
     end
     
     
@@ -156,7 +168,15 @@ module Hobo
         map.named_route(name, route, options)
         format_route = options.delete(:format) != false
         map.named_route("formatted_#{name}", "#{route}.:format", options) if format_route
+        true
+      else
+        false
       end
+    end
+    
+    
+    def linkable_route(name, route, action, options)
+      named_route(name, route, options.merge(:action => action.to_s)) and self.class.linkable(subsite, model, action)
     end
     
    

@@ -17,13 +17,18 @@ module Hobo
       Hobo.register_model(base)
       base.extend(ClassMethods)
       base.class_eval do
-        @field_specs  = HashWithIndifferentAccess.new
-        set_field_type({})
         alias_method_chain :attributes=, :hobo_type_conversion
       end
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
+        alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
+        def inherited(klass)
+          fields do
+            Hobo.register_model(klass)
+            field(klass.inheritance_column, :string)
+          end
+        end
       end
     end
 
@@ -70,9 +75,17 @@ module Hobo
         end
         res
       end
-      
-      
-      attr_reader :field_specs
+
+
+      def acts_as_list_with_fields(options = {})
+        fields { |f| f.send(options._?[:column] || "position", :integer) }
+        acts_as_list_without_fields(options)
+      end
+
+
+      def field_specs
+        @field_specs ||= HashWithIndifferentAccess.new
+      end
       public :field_specs
       
       def set_field_type(types)
@@ -108,7 +121,7 @@ module Hobo
       end
 
       def never_show?(field)
-        @hobo_never_show && field.to_sym.in?(@hobo_never_show)
+        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
       public :never_show?
 
@@ -157,7 +170,7 @@ module Hobo
         end
 
         class_eval %{
-          def self.find_by_id_name(id_name, options)
+          def self.find_by_id_name(id_name, options={})
             #{finder}
           end
         }
@@ -381,9 +394,11 @@ module Hobo
                        end
           
           if find_scope
+            scope_name = "@#{name.to_s.gsub('?','')}_scope"
+
             # Calling instance_variable_get directly causes self to
             # get loaded, hence this trick
-            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call("@#{name}_scope")
+            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call(scope_name)
             
             unless assoc
               options = proxy_reflection.options
@@ -418,7 +433,7 @@ module Hobo
                       end.new(self.proxy_owner, r)
 
               # Calling directly causes self to get loaded
-              Kernel.instance_method(:instance_variable_set).bind(self).call("@#{name}_scope", assoc)
+              Kernel.instance_method(:instance_variable_set).bind(self).call(scope_name, assoc)
             end
             assoc
           else
@@ -442,9 +457,9 @@ module Hobo
     end
     
     
-    def attributes_with_hobo_type_conversion=(attributes)
+    def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
-      self.attributes_without_hobo_type_conversion = converted
+      send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
       
 
@@ -529,12 +544,16 @@ module Hobo
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
+        else
+          value
         end
       elsif field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String
           parse_datetime(value)
+        else
+          value
         end
       elsif field_type <= TrueClass
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true

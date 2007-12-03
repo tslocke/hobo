@@ -8,107 +8,124 @@
 <include src="rapid_navigation"/>
 <include src="rapid_plus"/>
 
-<def tag="FieldList" attrs="tag">
+<def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "editor" %>
-  <field_list merge_attrs="&attributes - attrs_for(:with_fields)">
-    <with_fields merge_attrs="&attributes & attrs_for(:with_fields)">
-      <field_list_item>
-        <item_label param="#{this_field.to_s.sub('?', '')}_label">
+  <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
+    <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
+      <labelled-item>
+        <item-label param="#{this_field.to_s.sub('?', '')}-label">
           <do param="label"><%= this_field.to_s.titleize %></do>
-        </item_label>
-        <item_value param="#{this_field.to_s.sub('?', '')}_view">
-          <do param="view"><call_tag tag="&tag" param="#{this_field.to_s.sub('?', '')}_tag"/></do>
-        </item_value>
-      </field_list_item>
-    </with_fields>
-  </field_list>
+        </item-label>
+        <item-value param="#{this_field.to_s.sub('?', '')}-view">
+          <do param="view"><call-tag tag="&tag" param="#{this_field.to_s.sub('?', '')}-tag"/></do>
+        </item-value>
+      </labelled-item>
+    </with-fields>
+  </labelled-item-list>
 </def>
 
 
-<def tag="item"><% scope.items << tagbody.call %></def>
+<def tag="item"><% scope.items << parameters.default %></def>
 
-<def tag="nil_view"><%= scope.nil_view || "(Not Available)" %></def>
+<def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
-<def tag="UL">
-  <ul merge_attrs unless="&this.empty?">
-    <repeat>
-      <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore}"
-          merge_attrs="&{:hobo_model_id => dom_id(this)} if this.respond_to?(:typed_id)">
-        <tagbody><a/></tagbody>
-      </li>
-    </repeat>
-  </ul>
-</def>
-
-
-<def tag="Table" attrs="fields, field_tag, empty">
-  <% field_tag ||= "view" %>
-  <table merge_attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty? && !empty">
-    <thead if="&all_parameters[:thead] || fields" param>
-      <tr param="field_heading_row">
-        <with_field_names merge_attrs="&all_attributes & attrs_for(:with_fields)">
-          <th param="#{scope.field_name}_heading"><%= scope.field_name.titleize %></th>
-        </with_field_names>
-        <th if="&all_parameters[:controls]" class="controls"/>
-      </tr>
-    </thead>
-    <tbody>
+<def tag="ul">
+  <% if all_parameters.li? # don't use dryml if, because it will mess up <ul/><else> %>
+    <unless test="&this.empty?">
+      <% element "ul", attributes do %>
       <repeat>
-        <tr param if="&can_view?"
-            class="#{scope.even_odd} #{this_type.name.underscore}"
-            hobo_model_id="#{dom_id(this)}">
-          <if test="&fields">
-            <with_fields merge_attrs="&all_attributes & attrs_for(:with_fields)">
-              <td param="#{this_field.to_s.sub('?', '').gsub('.', '_')}_view"><call_tag tag="&field_tag"/></td>
-            </with_fields>
-            <td class="controls" param="controls" if="&all_parameters[:controls]">
-              <a param="edit_link">Edit</a>
-              <delete_button param/>
-            </td>
-          </if>
+        <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize}"
+            merge-attrs="&{'hobo-model-id' => dom_id(this)} if this.respond_to?(:typed_id)">
+          <do param="default"><a/></do>
+        </li>
+      </repeat>
+      <% end %>
+    </unless>
+  <% else %>
+    <%= element("ul", attributes, all_parameters.default) %>
+  <% end %>      
+</def>
+
+
+<def tag="table" attrs="fields, field-tag, empty">
+  <if test="&!(fields || all_parameters.tr?)">
+    <%= element("table", attributes, all_parameters.default) %>
+  </if>
+  <else>
+    <% field_tag ||= "view" %>
+    <unless test="&this.empty? && !empty">
+      <% element "table", attributes - attrs_for(:with_fields) do %>
+      <thead if="&all_parameters[:thead] || fields" param>
+        <tr param="field-heading-row">
+          <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
+            <th param="#{scope.field_name}-heading"><%= scope.field_name.titleize %></th>
+          </with-field-names>
+          <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
-      </repeat>      
-    </tbody>
-    <tfoot if="&all_parameters[:tfoot]" param/>
-  </table>
+      </thead>
+      <tbody>
+        <repeat>
+          <tr param if="&can_view?"
+              class="#{scope.even_odd} #{this_type.name.underscore}"
+              hobo-model-id="#{dom_id(this)}">
+            <if test="&fields">
+              <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
+                <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+              </with-fields>
+              <td class="controls" param="controls" if="&all_parameters[:controls]">
+                <a param="edit-link">Edit</a>
+                <delete-button param/>
+              </td>
+            </if>
+          </tr>
+        </repeat>      
+      </tbody>
+      <tfoot if="&all_parameters[:tfoot]" param/>
+      <% end %>
+    </unless>
+  </else>
 </def>
 
 
 <def tag="image" attrs="src">
-  <img src="#{base_url}/images/#{src}" merge_attrs/>
+  <img src="#{base_url}/images/#{src}" merge-attrs/>
 </def>
 
 
 <def tag="spinner">
-  <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge_attrs/>
+  <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
 </def>
 
 
-<def tag="theme_image" attrs="src">
-  <img src="#{theme_asset('images/' + src)}" merge_attrs/>
+<def tag="theme-image" attrs="src">
+  <img src="#{theme_asset('images/' + src)}" merge-attrs/>
 </def>
 
 
 <def tag="card">
   <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card" unless="&poly"><type_name/>: <a/></div>
+  <div class="card" unless="&poly"><type-name/>: <a/></div>
 </def>
   
 
-<def tag="hobo_rapid_javascripts" attrs="tiny_mce"><%=
-    res = '<script type="text/javascript">var hoboParts = {};'
-    unless Hobo.all_models.empty?
-      # Tell JS code how to pluralize names, unless they follow the simple rule
-      names = Hobo.all_models.map do |m|
-        "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
-      end.compact
-      res += "var pluralisations = {#{names * ', '}}; "
-    end
-    base = [base_url, subsite].compact.join("/")
-    res += "urlBase = '#{base}'; hoboPagePath = '#{view_name}'</script>"
-    
-    if tiny_mce
-      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
+<def tag="hobo-rapid-javascripts" attrs="tiny-mce"><%=
+   res = '<script type="text/javascript">var hoboParts = {};'
+   unless Hobo.all_models.empty?
+     # Tell JS code how to pluralize names, unless they follow the simple rule
+     names = Hobo.all_models.map do |m|
+                                "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+                              end.compact
+     res << "var pluralisations = {#{names * ', '}}; "
+   end
+   base = [base_url, subsite].compact.join("/")
+   res << "urlBase = '#{base}'; hoboPagePath = '#{view_name}'"
+   if request_forgery_protection_token
+     res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
+   end
+   res << "</script>"
+   
+   if tiny_mce
+     res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
                <script type="text/javascript">
                  tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
                        plugins: 'save',
@@ -119,8 +136,8 @@
                        theme_advanced_buttons3 : ""
                  });
                </script>}
-    end
-    res
+   end
+   res
 %></def>
 
 
@@ -145,7 +162,7 @@
   end
 %></def>
 
-<def tag="type_name" attrs="type, plural, lowercase"><%=
+<def tag="type-name" attrs="type, plural, lowercase"><%=
   type ||= if this.is_a?(Class)
              this
            elsif this.respond_to? :proxy_reflection
@@ -160,15 +177,15 @@
 %></def>
 
 
-<def tag="a" attrs="action, to, params, query_params, href, format, subsite"><%=
-  content = tagbody.call if tagbody
+<def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
+  content = parameters.default
    
   params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
   
   if href || attributes[:name]
     # Regular link
     href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if params
-    content_tag(:a, content, attributes.update(:href => href))
+    element(:a, attributes.update(:href => href), content)
   else
     target = to || this
   
@@ -188,9 +205,9 @@
                          end
 
         href = object_url(target, "new", params._?.merge(:subsite => subsite))
-        add_classes!(attributes, "new_#{new_class_name.underscore}_link")
+        add_classes!(attributes, "new-#{new_class_name.underscore}-link")
         content = "New #{new_class_name.titleize}" if content.blank?
-        content_tag(:a, content, attributes.update(:href => href))
+        element(:a, attributes.update(:href => href), content)
       else
         Hobo::Dryml.last_if = false
         ""
@@ -203,20 +220,29 @@
         target = target.member_class
       end
       
-      href = object_url(target, action, params._?.merge(:subsite => subsite))
-      add_classes!(attributes, "#{target.class.name.underscore}_link")
-      
-      href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
-      
-      # Set default link text if none given
       content = name if content.blank?
-      content_tag(:a, content, attributes.update(:href => href))
+      
+      # Do we want automatic disabling of links to thinks that are not
+      # linkable?
+      only_if_linkable = format.blank?
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => only_if_linkable))
+      if href.nil?
+        # This target is registered with ModelRouter as not linkable
+        content
+      else
+        add_classes!(attributes, "#{target.class.name.underscore}-link")
+      
+        href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
+      
+        # Set default link text if none given
+        element(:a, attributes.update(:href => href), content)
+      end
     end
   end
 %></def>
 
         
-<def tag="view" attrs="inline, block, if_blank, no_wrapper, truncate"><%=
+<def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
@@ -230,7 +256,7 @@
           end
         else
           attrs = add_classes(attributes, "view", type_id, type_and_field)
-          attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
+          attrs['hobo-model-id'] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
          
           view_tag = find_polymorphic_tag("view")
           
@@ -256,7 +282,7 @@
                         else
                           :span
                         end
-              content_tag(wrapper, the_view, attrs - view_attrs)
+              element(wrapper, attrs - view_attrs, the_view)
             end
           end
         end
@@ -265,13 +291,13 @@
 %></def>
 
     
-<def tag="belongs_to_view"><a/></def>
+<def tag="belongs-to-view"><a/></def>
 
-<def tag="has_many_view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
+<def tag="has-many-view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
 
-<def tag="view" for="Date" attrs="format"><%= format ? this.strftime(format) : this.to_s(:long) %></def>
+<def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
-<def tag="view" for="Time" attrs="format"><%= format ? this.strftime(format) : this.to_s(:long) %></def>
+<def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
@@ -289,8 +315,7 @@
 
 <def tag="view" for="TrueClass"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="count" attrs="label, prefix, unless_none, if_any"><%=
-  if_any = unless_none if if_any.nil?
+<def tag="count" attrs="label, prefix, if-any"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
   if this.is_a?(Class) and this < ActiveRecord::Base
@@ -307,8 +332,8 @@
         end
   end
    
-  Hobo::Dryml.last_if = c > 0 if unless_none
-  if unless_none && c == 0
+  Hobo::Dryml.last_if = c > 0 if if_any
+  if if_any && c == 0
     ""
   else
     main = label.blank? ? c : pluralize(c, label)
@@ -323,8 +348,9 @@
 %></def>
 
 
-<def tag="theme_stylesheet">
-  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/application.css"
+<def tag="theme-stylesheet" attrs="name">
+  <% name ||= 'application' -%>
+  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/<%= name %>.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 
@@ -335,25 +361,25 @@
 <!-- The Tags defined below here are a bit rough and will be improved
 in the future - use at your own risk. -->
 
-<def tag="has_many_table" attrs="part_id, delete_buttons, headings, id">
-  <table_for headings="&headings" merge_attrs="&true">
+<def tag="has-many-table" attrs="part-id, delete-buttons, headings, id">
+  <table-for headings="&headings" merge-attrs="&true">
 
-    <tagbody/>
+    <do param="default"/>
 
     <if test="&delete_buttons != false and can_delete?(this)">
-      <td><DeleteButton/></td>
+      <td><delete-button/></td>
     </if>
-  </table_for>
+  </table-for>
   <else>
     <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
   </else>
   <div>
-    <CreateButton update="&id || part_id"/>
+    <create-button update="&id || part_id"/>
   </div>
 </def>
 
 
-<def tag="add_by_name" attrs="action_name, add_text, update, part_id">
+<def tag="add-by-name" attrs="action-name, add-text, update, part-id">
   <% add_to = this
      refl = this_type
      joins = this_parent.send(refl.through_reflection.name)
@@ -363,13 +389,13 @@ in the future - use at your own risk. -->
                   "enter its name"
      source = refl.source_reflection.name
   %>
-  <tagbody with="&joins"/>
+  <do param="default" with="&joins"/>
   <with with="&joins.new_without_appending">
     <if test="can_create?">
-       <form update="&[update, part_id]" message="&action_name" hidden_fields="*">
+       <form update="&[update, part_id]" message="&action_name" hidden-fields="*">
          <p>
            <%= add_text %>:
-           <belongs_to_autocompleting_field field="&source" where_not_in="&dom_id(add_to)" class="autosubmit"/>
+           <belongs-to-autocompleting-field field="&source" where-not-in="&dom_id(add_to)" class="autosubmit"/>
          </p>
        </form>
     </if>
@@ -379,11 +405,22 @@ in the future - use at your own risk. -->
 
 <def tag="you" attrs="have, are">
   <if test="&this == current_user">you <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
+  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
 </def>
 
 
 <def tag="You" attrs="have, are">
   <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><tagbody><name/> <%= if have then 'has' elsif are then 'is' end %></tagbody></else>
+  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
+</def>
+
+<def tag="your">
+  <if test="&this == current_user">your</if>
+  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+</def>
+
+
+<def tag="Your">
+  <if test="&this == current_user">Your</if>
+  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>

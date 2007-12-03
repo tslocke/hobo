@@ -1,53 +1,55 @@
-<def tag="field_list"><table class="field_list" merge_attrs><tagbody/></table></def>
+<def tag="labelled-item-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
 
-<def tag="field_list_item"><tr merge_attrs><tagbody/></tr></def>
+<def tag="labelled-item"><tr merge-attrs><do param="default"/></tr></def>
 
-<def tag="item_label"><th merge_attrs><tagbody/></th></def>
+<def tag="item-label"><th merge-attrs><do param="default"/></th></def>
 
-<def tag="item_value"><td merge_attrs><tagbody/></td></def>
+<def tag="item-value"><td merge-attrs><do param="default"/></td></def>
 
 
 <def tag="heading">
-  <%= content_tag "h#{scope.heading_level || '1'}", tagbody.call, attributes %>
+   <%= element("h#{scope.heading_level || '1'}", attributes, parameters.default) %>
 </def>
 
-<def tag="sub_heading">
-  <%= content_tag "h#{scope.heading_level.to_i + 1|| '2'}", tagbody.call, attributes.merge(:class => "subheading") %>
-</def>
+<def tag="sub-heading"><%= 
+  element("h#{scope.heading_level ? scope.heading_level.to_i + 1 : '2'}",
+          attributes.merge(:class => "subheading"),
+          parameters.default)
+%></def>
 
 <def tag="nav">
-  <div class="nav" merge_attrs><tagbody/></div>
+  <div class="nav" merge-attrs><do param="default"/></div>
 </def>  
 
 <!-- section represents a generic document or application section. -->
 <def tag="section" attrs="empty">
-  <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="section" merge_attrs if="&!body.blank? || empty"><%= body %></div>
+  <set body="&parameters.default"/>
+  <div class="section" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
 <def tag="aside" attrs="empty">
-  <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="aside" merge_attrs if="&!body.blank? || empty"><%= body %></div>
+  <set body="&parameters.default"/>
+  <div class="aside" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
 <def tag="header" attrs="empty">
-  <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="header" merge_attrs if="&!body.blank? || empty"><%= body %></div>
+  <set body="&parameters.default"/>
+  <div class="header" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
 <def tag="footer" attrs="empty">
-  <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="footer" merge_attrs if="&!body.blank? || empty"><%= body %></div>
+  <set body="&parameters.default"/>
+  <div class="footer" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
 <!-- article represents an independent piece of content of a --> 
 <!-- document, such as a blog entry or newspaper article.    -->
 <def tag="article" attrs="empty">
-  <set body="&tagbody ? tagbody.call : ''"/>
-  <div class="article" merge_attrs if="&!body.blank? || empty"><%= body %></div>
+  <set body="&parameters.default"/>
+  <div class="article" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
 <!-- temporary tag -->
 <def tag="panel">
-  <div class="panel" merge_attrs><tagbody/></div>
+  <div class="panel" merge-attrs><do param="default"/></div>
 </def>

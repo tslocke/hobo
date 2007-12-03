@@ -1,4 +1,4 @@
-<def tag="with_fields" attrs="fields, skip, skip_associations, include_timestamps"><%
+<def tag="with-fields" attrs="fields, skip, skip-associations, include-timestamps, force-all"><%
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
                   columns = klass.content_columns.every(:name)
@@ -18,11 +18,11 @@
                   comma_split(fields)
                 end
   field_names -= comma_split(skip) if skip
-  field_names = field_names.select {|f| can_view?(this, f)}
-  field_names.each do |field| %><with field="&field"><tagbody/></with><% end
+  field_names = field_names.select {|f| can_view?(this, f)} unless force_all
+  field_names.each do |field| %><with field="&field"><do param="default"/></with><% end
 %></def>
 
-<def tag="with_field_names" attrs="fields, skip, skip_associations, include_timestamps"><%=
+<def tag="with-field-names" attrs="fields, skip, skip-associations, include-timestamps"><%=
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.proxy_reflectin.class
                   columns = klass.content_columns.every(:name)
@@ -46,7 +46,7 @@
     field_names.map do |n|
       scope.field_name = n.to_s.gsub("." , "_")
       scope.field_path = n
-      tagbody.call
+      parameters.default
     end
   end
 %>

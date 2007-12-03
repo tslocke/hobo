@@ -1,19 +1,19 @@
-<Page title="Search">
-  <body onload="Hobo.applyEvents(); Hobo.doSearch('search_field')"/>
+<page title="Search">
+  <body: onload="Hobo.applyEvents(); Hobo.doSearch('search-field')"/>
 
-  <content_body>
+  <content-body:>
     <panel class="red" style="margin-top: 40px">
       <h2>Search</h2>
-      <div class='search' style='margin:10px'>
-        <input type='text' id="search_field" class="search_bhv" style="width: 90%"/>
+      <div class="search">
+        <input type="text" id="search-field" class="search-bhv" style="width: 90%"/>
         <spinner id="search_spinner"/>
       </div>
     </panel>
 
-    <panel class="hidden" id="search_results_panel">
+    <panel class="hidden" id="search-results-panel">
       <h2>Results</h2>
-      <section id="search_results">&nbsp;</section>
+      <section id="search-results">&nbsp;</section>
     </panel>
-  </content_body>
+  </content-body>
 
-</Page>
+</page>

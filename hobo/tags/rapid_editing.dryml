@@ -16,12 +16,12 @@
 %></def>
 
 
-<def tag="has_many_editor">
+<def tag="has-many-editor">
   <% #TODO: Implement %>
-  <a merge_attrs/>
+  <a merge-attrs/>
 </def>
   
-<def tag="belongs_to_editor"><%= belongs_to_menu_editor(attributes) %></def>
+<def tag="belongs-to-editor"><%= belongs_to_menu_editor(attributes) %></def>
 
 <def tag="editor" for="string"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
@@ -39,12 +39,16 @@
 
 <def tag="editor" for="password"><% raise HoboError, "passwords cannot be edited in place" %></def>
 
-<def tag="editor" for="boolean"><boolean_checkbox_editor merge_attrs/></def>
+<def tag="editor" for="boolean"><boolean-checkbox-editor merge-attrs/></def>
 
 <def tag="editor" for="big_integer"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
+<def tag="editor" for="Hobo::EnumString">
+ <string-select-editor values="&this_type.values"/>
+</def>
 
-<def tag="autocompleter" attrs="completer_model, completer_attr, id, filter, name, value">
+
+<def tag="autocompleter" attrs="completer-model, completer-attr, id, filter, name, value">
   <% refl = this_type
      if refl.respond_to?(:macro) && refl.macro == :belongs_to
        completer_model ||= refl.klass
@@ -56,17 +60,17 @@
      url = object_url(completer_model, "completions",
                       { :for => completer_attr }.update(attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}))
   %>
-  <input type="text" name="#{name}" id="#{id}" class="autocomplete_bhv"
-         autocomplete_url="#{url}" value="#{value}"
-         merge_attrs/>
-  <div id="<%= id %>_completions" class="completions_popup" style="display:none"></div>
+  <input type="text" name="#{name}" id="#{id}" class="autocomplete-bhv"
+         autocomplete-url="#{url}" value="#{value}"
+         merge-attrs/>
+  <div id="<%= id %>-completions" class="completions-popup" style="display:none"></div>
 </def>
 
 
-<def tag="belongs_to_menu_editor"><%
+<def tag="belongs-to-menu-editor"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   link_id = "#{this_field_dom_id}_editor" %>
-  <span id="#{link_id}" part="rapid_belongs_to_edit">
+  <span id="#{link_id}" part="rapid-belongs-to-edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
@@ -86,8 +90,8 @@
 </def>
 
 
-<def tag="belongs_to_autocompleting_editor" attrs="update">
-  <if_can_edit><%
+<def tag="belongs-to-autocompleting-editor" attrs="update">
+  <if-can-edit><%
   return object_link unless can_edit?
 
   id ||= this_field_dom_id + "_completer"
@@ -105,18 +109,18 @@
                    attributes.select_hash {|k,v| k.to_s.starts_with? "where_"})
   %>
     <form onsubmit="#{f}; $('#{id}').blur(); return false">
-      <input type="text" class="autocomplete_bhv autosubmit" id="#{id}" autocomplete_url="#{url}"
-             value="#{this && this.id_name}" merge_attrs />
-      <div id="#{id}_completions" class="completions_popup" style="display:none"></div>
+      <input type="text" class="autocomplete-bhv autosubmit" id="#{id}" autocomplete-url="#{url}"
+             value="#{this && this.id_name}" merge-attrs />
+      <div id="#{id}-completions" class="completions-popup" style="display:none"></div>
     </form>
-  </if_can_edit>
+  </if-can-edit>
   <else>
-    <object_link/>
+    <object-link/>
   </else>
 </def>
 
 
-<def tag="string_select_editor" attrs="update, values"><%
+<def tag="string-select-editor" attrs="update, values"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
 
   values = comma_split(values)
@@ -128,13 +132,13 @@
                     } })
   html_attributes = add_classes(attributes, editor_class)
 %>
-  <select onchange="#{f}" merge_attrs="&html_attributes">
+  <select onchange="#{f}" merge-attrs="&html_attributes">
     <%= options_for_select(values, this) %>
   </select>  
 </def>
 
 
-<def tag="boolean_checkbox_editor" attrs="update"><%
+<def tag="boolean-checkbox-editor" attrs="update"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   f = ajax_updater(object_url(this_parent),
                    "Change #{this_field.to_s.titleize}", update,
@@ -145,11 +149,11 @@
   attributes = add_classes(attributes, editor_class)
 %>
   <input type="checkbox" value="1" onclick="#{f}"
-         merge_attrs="& this ? attributes.merge(:checked => 'checked') : attributes" />
+         merge-attrs="& this ? attributes.merge(:checked => 'checked') : attributes" />
 </def>
 
 
-<def tag="sti_type_editor" attrs="update">
+<def tag="sti-type-editor" attrs="update">
   <% base_class = this.class
      base_class = base_class.superclass while base_class.superclass != ActiveRecord::Base
    f = ajax_updater("#{base_url}/#{controller_for base_class}/#{this.id}",
@@ -161,27 +165,23 @@
   %>
 
   <select onchange="#{f}">
-    <if test="&tagbody">
-      <tagbody/>
-    </if>
-    <else>
-      <%= options_for_select(base_class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
-    </else>
+    <%= parameters.default || options_for_select(base_class.send(:subclasses).map{|x| [x.name.titleize, x.name]},
+                                                 this.class.name) %>
   </select>
 </def>
 
       
-<def tag="integer_select_editor" attrs="min, max, update, nil_option, message">
- <select class="number_editor_bhv" hobo_update="#{update}"
-          hobo_model_id="#{this_field_dom_id}"
-          merge_attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
+<def tag="integer-select-editor" attrs="min, max, update, nil-option, message">
+ <select class="number-editor-bhv" hobo-update="#{update}"
+          hobo-model-id="#{this_field_dom_id}"
+          merge-attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
    <if test="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
  </select>
 </def>
 
 
-<def tag="has_many_checkbox_editor" attrs="model, update, message"><%=
+<def tag="has-many-checkbox-editor" attrs="model, update, message"><%=
   raise HoboError.new("no update specified") unless update
 
   fields = attributes.delete_if{|k,v|!k.ends_with? "_id"}
@@ -208,15 +208,15 @@
       checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), message, update, {:method => 'delete'})                          
     end
   end
-  tag :input, add_classes(attributes.merge(checkbox_attrs),
-                          "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox") if permission
+  element(:input, add_classes(attributes.merge(checkbox_attrs),
+                              "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox")) if permission
 %></def>
 
-<def tag="HasManyCheckboxEditors">
-  <Table>
-    <tr>
-      <td><has_many_checkbox_editor param="editor" merge_attrs/></td>
+<def tag="has-many-checkbox-editors">
+  <table>
+    <tr:>
+      <td><has-many-checkbox-editor param="editor" merge-attrs/></td>
       <td><name param/></td>
     </tr>
-  </Table>
+  </table>
 </def>
