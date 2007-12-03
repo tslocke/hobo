@@ -19,7 +19,7 @@
     if even_odd
       map_this do
         klass = [attributes[:class], cycle("even", "odd")].compact.join(' ')
-        content_tag(even_odd, parameters.default, attributes.merge(:class => klass, :hobo_model_id => dom_id(this)))
+        element(even_odd, attributes.merge(:class => klass, "hobo-model-id" => dom_id(this)), parameters.default)
       end.join(join)
     else
       scope.new_scope do
@@ -37,8 +37,8 @@
 %></def>
 
 
-<def tag="do"><%= all_parameters[:default].call("") %></def>
-<def tag="with"><%= all_parameters[:default].call("") %></def>
+<def tag="do"><%= parameters.default %></def>
+<def tag="with"><%= parameters.default %></def>
 
 
 <def tag="if" attrs="test"><%= 

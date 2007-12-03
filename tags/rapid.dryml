@@ -10,67 +10,80 @@
 
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "editor" %>
-  <field-list merge-attrs="&attributes - attrs_for(:with_fields)">
+  <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
-      <field-list-item>
+      <labelled-item>
         <item-label param="#{this_field.to_s.sub('?', '')}-label">
           <do param="label"><%= this_field.to_s.titleize %></do>
         </item-label>
         <item-value param="#{this_field.to_s.sub('?', '')}-view">
           <do param="view"><call-tag tag="&tag" param="#{this_field.to_s.sub('?', '')}-tag"/></do>
         </item-value>
-      </field-list-item>
+      </labelled-item>
     </with-fields>
-  </field-list>
+  </labelled-item-list>
 </def>
 
 
-<def tag="item"><% scope.items << tagbody.call %></def>
+<def tag="item"><% scope.items << parameters.default %></def>
 
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
 <def tag="ul">
-  <ul merge-attrs unless="&this.empty?">
-    <repeat>
-      <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore}"
-          merge-attrs="&{:hobo_model_id => dom_id(this)} if this.respond_to?(:typed_id)">
-        <do param="default"><a/></do>
-      </li>
-    </repeat>
-  </ul>
+  <% if all_parameters.li? # don't use dryml if, because it will mess up <ul/><else> %>
+    <unless test="&this.empty?">
+      <% element "ul", attributes do %>
+      <repeat>
+        <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize}"
+            merge-attrs="&{'hobo-model-id' => dom_id(this)} if this.respond_to?(:typed_id)">
+          <do param="default"><a/></do>
+        </li>
+      </repeat>
+      <% end %>
+    </unless>
+  <% else %>
+    <%= element("ul", attributes, all_parameters.default) %>
+  <% end %>      
 </def>
 
 
 <def tag="table" attrs="fields, field-tag, empty">
-  <% field_tag ||= "view" %>
-  <table merge-attrs="&attributes - attrs_for(:with_fields)" unless="&this.empty? && !empty">
-    <thead if="&all_parameters[:thead] || fields" param>
-      <tr param="field-heading-row">
-        <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-          <th param="#{scope.field_name}-heading"><%= scope.field_name.titleize %></th>
-        </with-field-names>
-        <th if="&all_parameters[:controls]" class="controls"/>
-      </tr>
-    </thead>
-    <tbody>
-      <repeat>
-        <tr param if="&can_view?"
-            class="#{scope.even_odd} #{this_type.name.underscore}"
-            hobo-model-id="#{dom_id(this)}">
-          <if test="&fields">
-            <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
-              <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
-            </with-fields>
-            <td class="controls" param="controls" if="&all_parameters[:controls]">
-              <a param="edit-link">Edit</a>
-              <delete-button param/>
-            </td>
-          </if>
+  <if test="&!(fields || all_parameters.tr?)">
+    <%= element("table", attributes, all_parameters.default) %>
+  </if>
+  <else>
+    <% field_tag ||= "view" %>
+    <unless test="&this.empty? && !empty">
+      <% element "table", attributes - attrs_for(:with_fields) do %>
+      <thead if="&all_parameters[:thead] || fields" param>
+        <tr param="field-heading-row">
+          <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
+            <th param="#{scope.field_name}-heading"><%= scope.field_name.titleize %></th>
+          </with-field-names>
+          <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
-      </repeat>      
-    </tbody>
-    <tfoot if="&all_parameters[:tfoot]" param/>
-  </table>
+      </thead>
+      <tbody>
+        <repeat>
+          <tr param if="&can_view?"
+              class="#{scope.even_odd} #{this_type.name.underscore}"
+              hobo-model-id="#{dom_id(this)}">
+            <if test="&fields">
+              <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
+                <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+              </with-fields>
+              <td class="controls" param="controls" if="&all_parameters[:controls]">
+                <a param="edit-link">Edit</a>
+                <delete-button param/>
+              </td>
+            </if>
+          </tr>
+        </repeat>      
+      </tbody>
+      <tfoot if="&all_parameters[:tfoot]" param/>
+      <% end %>
+    </unless>
+  </else>
 </def>
 
 
@@ -96,19 +109,23 @@
   
 
 <def tag="hobo-rapid-javascripts" attrs="tiny-mce"><%=
-    res = '<script type="text/javascript">var hoboParts = {};'
-    unless Hobo.all_models.empty?
-      # Tell JS code how to pluralize names, unless they follow the simple rule
-      names = Hobo.all_models.map do |m|
-        "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
-      end.compact
-      res += "var pluralisations = {#{names * ', '}}; "
-    end
-    base = [base_url, subsite].compact.join("/")
-    res += "urlBase = '#{base}'; hoboPagePath = '#{view_name}'</script>"
-    
-    if tiny_mce
-      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
+   res = '<script type="text/javascript">var hoboParts = {};'
+   unless Hobo.all_models.empty?
+     # Tell JS code how to pluralize names, unless they follow the simple rule
+     names = Hobo.all_models.map do |m|
+                                "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+                              end.compact
+     res << "var pluralisations = {#{names * ', '}}; "
+   end
+   base = [base_url, subsite].compact.join("/")
+   res << "urlBase = '#{base}'; hoboPagePath = '#{view_name}'"
+   if request_forgery_protection_token
+     res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
+   end
+   res << "</script>"
+   
+   if tiny_mce
+     res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
                <script type="text/javascript">
                  tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
                        plugins: 'save',
@@ -119,8 +136,8 @@
                        theme_advanced_buttons3 : ""
                  });
                </script>}
-    end
-    res
+   end
+   res
 %></def>
 
 
@@ -161,14 +178,14 @@
 
 
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
-  content = tagbody.call if tagbody
+  content = parameters.default
    
   params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
   
   if href || attributes[:name]
     # Regular link
     href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if params
-    content_tag(:a, content, attributes.update(:href => href))
+    element(:a, attributes.update(:href => href), content)
   else
     target = to || this
   
@@ -190,7 +207,7 @@
         href = object_url(target, "new", params._?.merge(:subsite => subsite))
         add_classes!(attributes, "new-#{new_class_name.underscore}-link")
         content = "New #{new_class_name.titleize}" if content.blank?
-        content_tag(:a, content, attributes.update(:href => href))
+        element(:a, attributes.update(:href => href), content)
       else
         Hobo::Dryml.last_if = false
         ""
@@ -204,9 +221,13 @@
       end
       
       content = name if content.blank?
-      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => true))
+      
+      # Do we want automatic disabling of links to thinks that are not
+      # linkable?
+      only_if_linkable = format.blank?
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => only_if_linkable))
       if href.nil?
-        # This object is registered with ModelRouter as not linkable
+        # This target is registered with ModelRouter as not linkable
         content
       else
         add_classes!(attributes, "#{target.class.name.underscore}-link")
@@ -214,7 +235,7 @@
         href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
       
         # Set default link text if none given
-        content_tag(:a, content, attributes.update(:href => href))
+        element(:a, attributes.update(:href => href), content)
       end
     end
   end
@@ -235,7 +256,7 @@
           end
         else
           attrs = add_classes(attributes, "view", type_id, type_and_field)
-          attrs[:hobo_model_id] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
+          attrs['hobo-model-id'] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
          
           view_tag = find_polymorphic_tag("view")
           
@@ -261,7 +282,7 @@
                         else
                           :span
                         end
-              content_tag(wrapper, the_view, attrs - view_attrs)
+              element(wrapper, attrs - view_attrs, the_view)
             end
           end
         end

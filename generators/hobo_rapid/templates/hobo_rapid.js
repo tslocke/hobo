@@ -48,11 +48,11 @@ var Hobo = {
             updates.each(function(id_or_el) {
                 var el = $(id_or_el)
                 if (el) { // ignore update of parts that do not exist
-                    var dom_id
-                    dom_id = el.id
-                    if (!hoboParts[dom_id]) { throw "Update of dom-id that is not a part: " + dom_id }
-                    params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[dom_id]))
-                    params.push("render["+i+"][id]=" + dom_id)
+                    var partDomId
+                    partDomId = el.id
+                    if (!hoboParts[partDomId]) { throw "Update of dom-id that is not a part: " + partDomId }
+                    params.push("render["+i+"][part_context]=" + encodeURIComponent(hoboParts[partDomId]))
+                    params.push("render["+i+"][id]=" + partDomId)
                     i += 1
                 }
             })
@@ -191,7 +191,15 @@ var Hobo = {
                 htmlResponse: false,
                 ajaxOptions: { method: "put" },
                 onEnterHover: null,
-                onLeaveHover: null
+                onLeaveHover: null,
+                onFormCustomization: function(ipe, form) {
+                    if (typeof(formAuthToken) != "undefined") {
+                        var hidden = $input({ type: 'hidden',
+                                              name: formAuthToken.name,
+                                              value: formAuthToken.value })
+                        form.appendChild(hidden)
+                    }
+                }
                }
         Object.extend(opts, options)
         var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
@@ -261,7 +269,7 @@ var Hobo = {
             if (el.hasClassName("autosubmit")) {
                 options.afterUpdateElement = function(el, item) { el.form.onsubmit(); }
             }
-            new Ajax.Autocompleter(el, el.id + "_completions", el.getAttribute("autocomplete-url"),
+            new Ajax.Autocompleter(el, el.id + "-completions", el.getAttribute("autocomplete-url"),
                                    options);
         });
 
@@ -275,7 +283,7 @@ var Hobo = {
         el = $(el)
         var spinner = $(el.getAttribute("search-spinner") || "search-spinner")
         var search_results = $(el.getAttribute("search-results") || "search-results")
-        var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results_panel")
+        var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results-panel")
         var url = el.getAttribute("search-url") || (urlBase + "/search")
 
         el.focus();
@@ -431,6 +439,16 @@ Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
     if (this.afterEnterEditMode) this.afterEnterEditMode()
     return false
+}
+
+// Fix Safari in-place-editor bug
+Ajax.InPlaceEditor.prototype.removeForm = function() {
+    if(this.form) {
+        if (this.form.parentNode) {
+            try { Element.remove(this.form); } catch (e) {}
+        }
+        this.form = null;
+    }
 }
 
 // Silence errors from IE :-(

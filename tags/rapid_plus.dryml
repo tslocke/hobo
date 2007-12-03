@@ -1,6 +1,6 @@
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
-  <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:Table)">
+  <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
         <form param="search-form" method="get" action="">
@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <table merge-attrs="&attributes & (attrs_for(:Table) + attrs_for(:with_fields))" merge-params>
+    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" merge-params>
       <field-heading-row:>
         <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path

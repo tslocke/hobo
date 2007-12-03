@@ -46,7 +46,7 @@
     field_names.map do |n|
       scope.field_name = n.to_s.gsub("." , "_")
       scope.field_path = n
-      tagbody.call
+      parameters.default
     end
   end
 %>

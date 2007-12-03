@@ -43,6 +43,10 @@
 
 <def tag="editor" for="big_integer"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
+<def tag="editor" for="Hobo::EnumString">
+ <string-select-editor values="&this_type.values"/>
+</def>
+
 
 <def tag="autocompleter" attrs="completer-model, completer-attr, id, filter, name, value">
   <% refl = this_type
@@ -66,7 +70,7 @@
 <def tag="belongs-to-menu-editor"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   link_id = "#{this_field_dom_id}_editor" %>
-  <span id="#{link-id}" part="rapid-belongs-to-edit">
+  <span id="#{link_id}" part="rapid-belongs-to-edit">
     <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
@@ -204,8 +208,8 @@
       checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), message, update, {:method => 'delete'})                          
     end
   end
-  tag :input, add_classes(attributes.merge(checkbox_attrs),
-                          "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox") if permission
+  element(:input, add_classes(attributes.merge(checkbox_attrs),
+                              "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox")) if permission
 %></def>
 
 <def tag="has-many-checkbox-editors">

@@ -1,26 +1,26 @@
-<Page title="<%= app_name %>">
+<page title="<%= app_name %>">
 
-  <content_header>
-    <h1 class="front_page_title"><%= app_name %></h1>
+  <content-header:>
+    <h1 class="front-page-title"><%= app_name %></h1>
     <panel>
-      <div style="margin-left: 40px; ">
+      <div>
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
         <ul>
           <li>To customise this page: edit app/views/<%= file_name %>/index.dryml </li>
         </ul>
       </div>
     </panel>
-  </content_header>
+  </content-header>
 
 
-  <content_body>
+  <content-body:>
     <repeat with="&Hobo.models">
       <panel>
         <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
         <section>
           <if test="&this.count == 0">
             <p>There are no <%%= this.name.titleize.pluralize %></p>
-            <if test="&can_create?(this)">
+            <if test="&can_create?">
               <p>Create a <a to="&this" action="new"/>.</p>
             </if>
           </if>
@@ -33,6 +33,6 @@
         </section>
       </panel>
     </repeat>
-  </content_body>
+  </content-body>
   
-</Page>
+</page>

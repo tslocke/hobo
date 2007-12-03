@@ -270,7 +270,7 @@ module Hobo::Dryml
       attributes.delete(:with)
       attributes.delete(:field)
       
-      # positional arguments never appear in the attributes hash
+      # declared attributes don't appear in the attributes hash
       stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
       locals.each {|a| stripped_attributes.delete(a.to_sym) }
       
@@ -288,11 +288,7 @@ module Hobo::Dryml
                else
                  nil
                end
-        if body.blank?
-          tag(the_tag, attributes)
-        else
-          content_tag(the_tag, body, attributes)
-        end
+        element(the_tag, attributes, body)
       else
         d = if overriding_content_proc
               proc { |default| overriding_content_proc.call(proc { default_content._?.call(default) }) }
@@ -351,11 +347,7 @@ module Hobo::Dryml
                else
                  nil
                end
-        if body.blank?
-          tag(the_tag, attributes)
-        else
-          content_tag(the_tag, body, attributes)
-        end
+        element(the_tag, attributes, body)
       else
         d = if overriding_default_content
               proc { |default| overriding_default_content.call(proc { default_content._?.call(default) }) }
@@ -430,14 +422,55 @@ module Hobo::Dryml
     
     
     def render_tag(tag_name, attributes)
-      if respond_to?(tag_name)
-        (send(tag_name, attributes) + part_contexts_storage_tag).strip
+      method_name = tag_name.gsub('-', '_')
+      if respond_to?(method_name)
+        (send(method_name, attributes) + part_contexts_storage_tag).strip
       else
         false
       end
     end
     
     
+    def element(name, attributes, content=nil, escape = true, &block)
+      unless attributes.blank?
+        attrs = []
+        if escape
+          attributes.each do |key, value|
+            next unless value
+            key = key.to_s.gsub("_", "-") 
+            
+            value = if ActionView::Helpers::TagHelper::BOOLEAN_ATTRIBUTES.include?(key)
+                      key
+                    else
+                      # escape once
+                      value.to_s.gsub(/[\"><]|&(?!([a-zA-Z]+|(#\d+));)/) { |special| ERB::Util::HTML_ESCAPE[special] }
+                    end
+            attrs << %(#{key}="#{value}")
+          end
+          
+        else
+          attrs = options.map do |key, value|
+            key = key.to_s.gsub("_", "-")
+            %(#{key}="#{value}")
+          end
+        end
+        attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
+      end
+      
+      content = new_context(&block) if block_given?
+      res = if content
+              "<#{name}#{attr_string}>#{content}</#{name}>"
+            else
+              "<#{name}#{attr_string} />"
+            end
+      if block && eval("defined? _erbout", block.binding) # in erb context
+        _output(res)
+      else
+        res
+      end
+    end
+
+  
     def session
       @view ? @view.session : {}
     end
@@ -451,8 +484,6 @@ module Hobo::Dryml
       end
     end
     
-
   end
-  
 
 end
