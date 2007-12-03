@@ -86,6 +86,10 @@ var Hobo = {
             var url = form.action
         }
         var params = []
+
+        if (typeof(formAuthToken) != "undefined") {
+            params.push(formAuthToken.name + "=" + formAuthToken.value)
+        }
         
         updateParams = Hobo.ajaxUpdateParams(updates, options.resultUpdate)
         if (updateParams != "") { params.push(updateParams) }
@@ -182,36 +186,29 @@ var Hobo = {
         opts = {okButton: false,
                 cancelLink: false,
                 submitOnBlur: true,
-                callback: function(form, val) {
-                    old = val
-                    return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
-                },
-                onFailure: function(resp) { alert(resp.responseText); el.innerHTML = old },
                 evalScripts: true,
                 htmlResponse: false,
                 ajaxOptions: { method: "put" },
                 onEnterHover: null,
                 onLeaveHover: null,
-                onFormCustomization: function(ipe, form) {
-                    if (typeof(formAuthToken) != "undefined") {
-                        var hidden = $input({ type: 'hidden',
-                                              name: formAuthToken.name,
-                                              value: formAuthToken.value })
-                        form.appendChild(hidden)
+                callback: function(form, val) {
+                    old = val
+                    return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
+                },
+                onFailure: function(resp) { 
+                    alert(resp.responseText); el.innerHTML = old
+                },
+                onEnterEditMode: function() {
+                    var blank_message = el.getAttribute("hobo-blank-message")
+                    if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
+                        el.innerHTML = "" 
+                    } else {
+                        Hobo.ipeOldValues[el.id] = el.innerHTML
                     }
                 }
                }
         Object.extend(opts, options)
-        var ipe = new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
-        ipe.onEnterEditMode = function() {
-            var blank_message = el.getAttribute("hobo-blank-message")
-            if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
-                el.innerHTML = "" 
-            } else {
-                Hobo.ipeOldValues[el.id] = el.innerHTML
-            }
-        }
-        return ipe
+        return new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
     },
 
     applyEvents: function(root) {
@@ -319,7 +316,11 @@ var Hobo = {
         
     fieldSetParam: function(el, val) {
         spec = Hobo.parseFieldId(el)
-        return spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
+        res = spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
+        if (typeof(formAuthToken) != "undefined") {
+            res = res + "&" + formAuthToken.name + "=" + formAuthToken.value
+        }
+        return res
     },
 
     fadeObjectElement: function(el) {
@@ -434,6 +435,7 @@ Element.findContaining = function(el, tag) {
     return null;
 }
 
+// Add an afterEnterEditMode hook to in-place-editor
 origEnterEditMode = Ajax.InPlaceEditor.prototype.enterEditMode
 Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
     origEnterEditMode.bind(this)(evt)
@@ -443,12 +445,11 @@ Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
 
 // Fix Safari in-place-editor bug
 Ajax.InPlaceEditor.prototype.removeForm = function() {
-    if(this.form) {
-        if (this.form.parentNode) {
-            try { Element.remove(this.form); } catch (e) {}
-        }
-        this.form = null;
-    }
+    if (!this._form) return;
+    
+    if (this._form.parentNode) { try { Element.remove(this._form); } catch (e) {}}    
+    this._form = null;
+    this._controls = { };
 }
 
 // Silence errors from IE :-(
