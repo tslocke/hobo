@@ -1,4 +1,3 @@
-require 'ruby-debug'
 require 'fileutils'
 
 def restore_erb_scriptlets(scriptlets, src)
