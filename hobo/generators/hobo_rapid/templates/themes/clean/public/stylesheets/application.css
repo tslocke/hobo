@@ -9,37 +9,62 @@ h1 {line-height: 54px;}
 h2 {line-height: 42px;}
 h3 {line-height: 27px;}
 
+li {margin-left: 20px;}
+
 a {
 	text-decoration: none; color: black;
 	border-bottom: 1px dotted #aaa;
 }
 a:hover {border-bottom: 1px dotted #222;}
 
-.content_header, .content_body {margin: 30px;}
+
+input.text, input.string, input.email_address, input.password, textarea {
+	border: 2px solid #444; padding: 1px;
+}
+
+input.file_upload {
+	/*background: #070707;*/ border: 1px dotted #666;
+}
+
+.button {
+	padding: 4px 8px;
+	color: white; background: black; border: 1px solid #666;
+	font: 12px "Lucida Grande", Arial, sans-serif;
+}
+.button:hover {cursor: pointer;}
+
+.field-list th {font-weight: bold;}
+.field-list th, .field-list td {padding: 3px 10px;}
+
+.content-header, .content-body {margin: 30px;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
 /***********/
 
-.page_header .nav {color: white; padding-bottom: 8px; background: black; overflow: hidden; height: 100%;}
-.page_header .nav li {float: left; padding-right: 20px;}
-.page_header .nav a {border-bottom: 1px solid black; color: white;}
-.page_header .nav a:hover {border-bottom: 1px dotted #ddd;}
-.main_nav {float: right;}
-.main_nav li {line-height: 36px;}
-.main_nav a {
+.page-header .nav {color: white; padding-bottom: 8px; background: black; overflow: hidden; height: 100%;}
+.page-header .nav li {float: left; padding-right: 20px; list-style: none;}
+.page-header .nav a {border-bottom: 1px solid black; color: white;}
+.page-header .nav a:hover {border-bottom: 1px dotted #ddd;}
+.main-nav {float: right;}
+.main-nav li {line-height: 36px;}
+.main-nav a {
 	font: bold 16px "Myriad Pro", Arial, sans-serif;
 }
-.account_nav {
+.account-nav {
 	clear: both; float: right;
 	font: normal 12px "Myriad Pro", Arial, sans-serif;
 }
-.account_nav a {font-weight: bold;}
+.account-nav a {font-weight: bold;}
 
-/***********/
 
-.intro {
+/*******************************************************/
+/* these styles are for the generated front index page */
+/* you can delete them if you over-ride it             */
+
+.front-page .welcome-message {
 	background: #eee; color: #222; padding: 10px 20px;
 }
-.intro h2 {
+.front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
 }
+.front-page .content-body li {list-style: none; margin-left: 0;}

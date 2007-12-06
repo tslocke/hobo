@@ -58,7 +58,7 @@
 <def tag="default-layout" alias-of="simple-layout"/>
 
 
-<def tag="page" attrs="layout"><% name ||= "default" %><call-tag tag="#{layout}-layout" merge/></def>
+<def tag="page" attrs="layout"><% layout ||= "default" %><call-tag tag="#{layout}-layout" merge/></def>
 
 
 <def tag="index-page" attrs="layout">
@@ -212,16 +212,16 @@
     </content-header>
 
     <content-body: param>
-      <form action="&request.request_uri" param>
+      <form action="&request.request_uri" class="login" param>
         <labelled-item-list>
           <labelled-item>
             <item-label param="login-label"><%= model.login_attr.to_s.titleize %></item-label>
-            <item-value><input type="text" name="login" id="login" param="login-input" /></item-value>
+            <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
           </labelled-item>
 
           <labelled-item>
             <item-label param="password-label">Password</item-label>
-            <item-value><input type="password" name="password" id="password" param="password-input"/></item-value>
+            <item-value><input type="password" name="password" id="password" class="string" param="password-input"/></item-value>
           </labelled-item>
 
           <labelled-item if="&remember_me">

@@ -1,38 +1,34 @@
-<page title="<%= app_name %>">
+<page title="#{app_name}">
+
+  <body: class="front-page"/>
 
   <content-header:>
     <h1 class="front-page-title"><app-name/></h1>
-    <panel>
-      <div>
-        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
-        <ul>
-          <li>To customise this page: edit app/views/<%= file_name %>/index.dryml</li>
-        </ul>
-      </div>
-    </panel>
+    <section class="welcome-message">
+      <h3>Congratulations! Your Hobo Rails App is up and running</h3>
+      <ul>
+        <li>To customise this page: edit app/views/<%= file_name %>/index.dryml</li>
+      </ul>
+    </section>
   </content-header>
 
 
   <content-body:>
-    <repeat with="&Hobo.models">
-      <panel>
+    <ul with="&Hobo.models">
+      <li:>
         <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
         <section>
-          <if test="&this.count == 0">
-            <p>There are no <%%= this.name.titleize.pluralize %></p>
-            <if test="&can_create?">
-              <p>Create a <a to="&this" action="new"/>.</p>
-            </if>
-          </if>
+          <p if="blank?">There are no <%%= this.name.titleize.pluralize %></p>
           <else>
             <repeat with="&this.find(:all, :limit => 3)">
               <card if="&can_view?"/>
             </repeat>
             <p><a>More</a> (<count/>)</p>
           </else>
+          <p if="&can_create?">Create a <a to="&this" action="new"/>.</p>
         </section>
-      </panel>
-    </repeat>
+      </li:>
+    </ul>  
   </content-body>
   
 </page>

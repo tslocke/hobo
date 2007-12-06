@@ -356,8 +356,9 @@ module Hobo
       end
     end
     
-    def linkable?(obj, action, subsite=self.subsite)
-      Hobo::ModelRouter.linkable?(subsite, obj, action)
+    def linkable?(obj, action=nil, subsite=self.subsite)
+      action ||= obj.is_a?(Class) ? :index : :show
+      Hobo::ModelRouter.linkable?(subsite, obj, action.to_sym)
     end
    
     

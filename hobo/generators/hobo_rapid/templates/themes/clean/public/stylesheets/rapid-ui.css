@@ -1,62 +1,31 @@
 .flash {
 	background: #92ab6e;
-	padding: 10px;
-	margin-top: 5px;
-	border-top: 2px solid #829862;
-	border-bottom: 2px solid #829862;
-}
-
-input.text, input.string, input.email_address, input.password, textarea {
-	border: 2px solid #444; padding: 1px;
-}
-input.file_upload {
-	background: #070707; border: 1px dotted #666;
+	padding: 10px; margin-top: 5px;
+	border: 2px solid #829862;
+	border-width: 2px 0;
 	color: white;
 }
 
-.button {
-	padding: 4px 8px;
-	color: white; /* background: #292929; border: 2px solid #444;*/ background: black; border: 1px solid #666;
-	font: 12px "Lucida Grande", Arial, sans-serif;
-}
-.button:hover {cursor: pointer;}
-/*.delete_button {
-  border: none; background: url(../images/small_close.png) center bottom no-repeat;
-  width: 14px; height: 15px;
-  margin: 0; padding: 0; margin-left: 5px;
-  overflow: hidden; text-indent: -300px;
-}*/
-
-.in_place_textfield_bhv, .in_place_textarea_bhv, .in_place_html_textarea_bhv {
-/*	background: #070707; border: 1px dotted #666;*/
-	padding: 0 3px;
+.in-place-textfield-bhv, .in-place-textarea-bhv, .in-place-html-textarea-bhv {
+	border: 1px dotted #666;
+	padding: 0 3px; padding-right: 20px;
 	background-image: url(../images/pencil.png);
 	background-position: top right;
 	background-repeat: no-repeat;
 }
-.in_place_textfield_bhv {
-	padding-right: 20px;
-}
 
 .inplaceeditor-form input, .inplaceeditor-form textarea, 
-table.new_record textarea, table.new_record input {
-	background: #070707; border: 1px dotted #666;
-	padding: 3px;	color: white; width: 100%;
+table.new-record textarea, table.new-record input {
+	border: 1px dotted #666;
+	padding: 3px;	width: 100%;
 }
 .inplaceeditor-form, .inplaceeditor-form input {
 	display: inline;	
 }
 
-.login-table, .login-table td {border: none;}
-.login_table td.field_label { vertical-align: middle; }
-.login-table tr td {
-	padding-bottom: 15px;
-	padding-right: 10px;
-}
-#login-form {
-	padding-top: 20px;
-}
-#login-form .submit_button {margin-left: 68px;}
+form.login .field-list {margin-bottom: 10px;}
+form.login .field-list th {width: 68px;}
+form.login .submit-button {margin-left: 100px;}
 
 /**** Admin ****/
 
@@ -76,7 +45,7 @@ table.new_record textarea, table.new_record input {
 }
 
 /* rails error message */
-.error_messages {
+.error-messages {
 	font-family: "Lucida Grande", arial, sans-serif;
 	background: #9d0018;
 	border: 1px solid #7a0013;
@@ -84,13 +53,13 @@ table.new_record textarea, table.new_record input {
 	color: white;
 	margin-bottom: 20px;
 }
-.error_messages h2 {
+.error-messages h2 {
 	text-transform: none;
 	letter-spacing: normal;
 	color: white;
 	margin-bottom: 10px;
 }
-.error_messages li {
+.error-messages li {
 	margin-left: 20px;
 }
 
@@ -98,7 +67,7 @@ table.new_record textarea, table.new_record input {
 
 /**** Default styling for Rapid ****/
 
-#ajax_progress {
+#ajax-progress {
     color: grey;
     float: right;
     margin: 20px;
@@ -109,14 +78,14 @@ table.new_record textarea, table.new_record input {
 	z-index: 10;
 }
 
-#ajax_progress div {
+#ajax-progress div {
     border: 1px dashed grey;
     margin: 10px;
     padding: 3px;
 /*    padding-top: -15px;*/
 }
 
-#ajax_progress img {
+#ajax-progress img {
     padding-left: 6px;
     vertical-align: middle;
 }
@@ -124,7 +93,7 @@ table.new_record textarea, table.new_record input {
 
 /* Scriptaculous Autocompleter ---*/
 
-div.completions_popup {
+div.completions-popup {
     position:absolute;
     width:250px;
     background-color:white;
@@ -132,13 +101,13 @@ div.completions_popup {
     margin:0px;
     padding:0px;
 }
-div.completions_popup ul {
+div.completions-popup ul {
     list-style-type:none;
     margin:0px;
     padding:0px;
 }
-div.completions_popup ul li.selected { background-color: #ffb;}
-div.completions_popup ul li {
+div.completions-popup ul li.selected { background-color: #ffb;}
+div.completions-popup ul li {
     list-style-type:none;
     display:block;
     margin:0;
@@ -147,21 +116,17 @@ div.completions_popup ul li {
 }
 
 
-.field_list   { width:95%; }
-.field_list td { padding: 5px; vertical-align: middle; }
-.field_list td.field_label {
+.field-list   { width:95%; }
+.field-list td { padding: 5px; vertical-align: middle; width: 75%; }
+.field-list td.field-label {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
-/*.field_list input[type=text] { width: 100%; }*/
-/*.field_list input, .field_list textarea { margin: -2px 0 0 0; }*/
-.field_list textarea { width: 100%; margin: 0; }
-/*table.login-table input {font-size: 16px; color: black;}*/
+.field-list textarea, .field-list input { width: 100%; margin: 0; }
 
 /*input[type=text].wide { width: 100%; }*/
-textarea { height: 200px; }
+textarea { height: 170px; }
 textarea.wide { width: 100%; }
 textarea.tall { height: 350px; }
 
-.field_list input.percentage {width: 25px; display: inline; margin-right: 5px; padding: 1px 3px;}
-
+.field-list input.percentage {width: 25px; display: inline; margin-right: 5px; padding: 1px 3px;}
