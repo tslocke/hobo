@@ -1,0 +1,23 @@
+<include src="hobo_blog"/>
+
+<def tag="IndexPage" extend_with="hobo_blog">
+  <IndexPageWithoutHoboBlog title="#{@model.name.titleize.pluralize}">
+    <content_header>
+      <heading param><type_name with="&@model" plural/></heading>
+      <a to="&@model" action="new" param="new_link">Create New <type_name with="&@model"/></a>
+    </content_header>
+    <content_body>
+      <BlogPostsList merge/>
+    </content_body>
+    <new_link replace/>
+  </IndexPageWithoutHoboBlog>
+</def>
+
+
+<def tag="ShowPage">
+  <ShowPage title="#{this.title}">
+    <main>
+      <BlogPostShow/>
+    </main>
+  </ShowPage>
+</def>

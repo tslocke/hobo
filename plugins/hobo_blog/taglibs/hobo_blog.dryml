@@ -1,0 +1,119 @@
+<def tag="BlogPostSummary">
+  <article class="blog-post-summary">
+    <delete_button label="Delete #{@model.name.underscore.gsub('_', ' ').titleize}"/>
+    <heading param="title"><a><view:title/></a></heading>
+    <if test="&this.class.has_feature(:comments)">
+      <p class="date-comment-summary">
+        <span class="created_at"><view:created_at/></span>
+        <count:comments if_any/>
+        <else><span param="no_comments">No comments</span></else>
+      </p>
+    </if>
+    <div param="body" class="body"><view:body truncate="350"/></div>
+    <div param="continue"><a>Continue Reading >></a></div>
+  </article>
+</def>
+
+
+<def tag="BlogPostShow">
+  <article class="blog-post">
+    <heading param="title"><a><editor:title/></a></heading>
+    <div class="created_at" param="created_at"><view:created_at/></div>
+    <div class="body" param="body"><editor:body/></div>
+    <if test="&this.class.has_feature(:comments)">
+      <div>
+        <a name="comments"></a>
+        <% count = 1 %>
+        <repeat:comments>
+          <div class="comment">
+            <div class="comment-header">
+              <delete_button label="Remove Comment" in_place="&false"/>
+              <div class="comment-count"><%= count %></div>
+              <div class="comment-author">Written By <view:author/></div>
+              <div class="comment-datetime">Posted on: <view:created_at/></div>
+            </div>
+            <div class="comment-body"><view:body/></div>
+          </div>
+          <% count = count + 1 %>
+        </repeat>
+        <a name="bottom"></a>
+        <NewCommentForm/>
+      </div>
+    </if>
+  </article>
+</def>
+
+
+<def tag="BlogPostsList">
+  <UL class="blog-posts">
+    <li><BlogPostSummary/></li>
+  </UL>
+  <else>
+    <p>There are no <%= @model.name.pluralize.underscore.gsub('_', ' ') %> to display.</p>
+  </else>
+</def>
+
+<def tag="has_many_checkbox_editor" attrs="model, update, message"><%=
+  raise HoboError.new("no update specified") unless update
+
+  fields = attributes.delete_if{|k,v|!k.ends_with? "_id"}
+  conditions = fields.map{|k,v|"#{k}=#{v}"}.join " AND "
+
+  klass = model.is_a?(String) ? model.constantize : model
+  obj = klass.find(:first, :conditions => conditions)
+
+  checkbox_attrs = {:type =>'checkbox'}
+  
+  if obj == nil
+    new = klass.new(fields)
+    permission = if can_create?(new)
+      message ||= "Setting #{new.class.name.titleize}"
+      class_name = new.class.name.underscore
+      checkbox_attrs[:onclick] = ajax_updater(object_url(new.class), message, update,
+                          ({:params => { class_name => fields }} unless fields.empty?))
+    end
+  else
+    permission = if can_delete?(obj)
+      checkbox_attrs[:checked] = 'checked'
+      message ||= "Unsetting #{obj.class.name.titleize}"
+      class_name = obj.class.name.underscore
+      checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), message, update, {:method => 'delete'})                          
+    end
+  end
+  tag :input, add_classes(attributes.merge(checkbox_attrs),
+                          "checkbox_input has_many_checkbox has_many_#{class_name}_checkbox") if permission
+%></def>
+
+<def tag="HasManyCheckboxEditors">
+  <Table>
+    <tr>
+      <td><has_many_checkbox_editor param="editor" merge_attrs/></td>
+      <td><name param/></td>
+    </tr>
+  </Table>
+</def>
+  
+<def tag="select_blog_post_categories">
+  <div class="select_blog_post_categories">
+    <h2>Select Categories For This Article</h2>
+    <form update="categories" with="&Category.new" reset_form>
+      <input:name/>
+      <submit label="Add"/>
+    </form>
+    <set article_id="&this.id.to_s"/>
+    <div part="categories" part_locals="article_id">
+      <HasManyCheckboxEditors with="&Category.all">
+        <editor model="Categorisation" article_id="&article_id" category_id="&this.id" update="categories"/>
+      </HasManyCheckboxEditors>
+    </div>
+  </div>
+</def>
+
+<def tag="list_blog_post_categories" attrs="title">
+  <div class="blog_post_categories_list">
+  <h2><%= title || "Categories" %></h2>
+  <UL>
+    <li><a/></li>
+  </UL>
+  </div>
+</def>

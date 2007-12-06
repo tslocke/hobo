@@ -1,0 +1,30 @@
+<def tag="show_image">
+  <a><img src="#{this.public_filename()}" alt="#{this.label}"/></a>
+</def>
+
+<def tag="show_thumbnail">
+  <a><img src="#{this.public_filename(:thumb)}" alt="#{this.label}"/></a>
+</def>
+
+<def tag="upload_new_image">
+  <%= error_messages_for this.sym[:content_image] %>
+  <form with="&this.new" enctype="multipart/form-data">
+    <p>Upload an image (<abbr>JPG</abbr>, <abbr>PNG</abbr> and <abbr>GIF</abbr> formats accepted)</p>
+    <label for="#{param_name_for this, :uploaded_data}">Choose File</label>
+    <input type="file" name="#{param_name_for this, :uploaded_data}" class="file_upload" />
+    <submit label="Upload"/>
+  </form>
+</def>
+
+<def tag="select_image_dialog">
+  <div id="select_image_dialog" class="dialog" style="display: none;">
+    <UL with="&this.fullsize_images" class="image-list">
+      <li>
+        <a href="#" onclick="select_image_callback(#{this.id}, '#{this.public_filename}', '#{this.label}'); return false;">
+          <img src="#{this.public_filename(:thumb)}" alt="#{this.label}"/>
+          <span class="file-name"><view:filename/></span>
+        </a>
+      </li>
+    </UL>
+  </div>
+</def>
