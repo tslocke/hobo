@@ -1,12 +1,12 @@
 <page title="<%= app_name %>">
 
   <content-header:>
-    <h1 class="front-page-title"><%= app_name %></h1>
+    <h1 class="front-page-title"><app-name/></h1>
     <panel>
       <div>
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
         <ul>
-          <li>To customise this page: edit app/views/<%= file_name %>/index.dryml </li>
+          <li>To customise this page: edit app/views/<%= file_name %>/index.dryml</li>
         </ul>
       </div>
     </panel>

@@ -519,7 +519,7 @@ module Hobo
       elsif respond_to? :name
         name
       else
-        "#{self.class.name.humanize} #{id}"
+        "#{self.class.name.titleize} #{id}"
       end
     end
     

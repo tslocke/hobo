@@ -1,36 +1,28 @@
 <def tag="base-page" attrs="title, doctype">
-  <% title ||= request.request_uri %>
+  <% title ||= default_page_title %>
   <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
       <title param><%= title %></title>
       <do param="stylesheets">
         <stylesheet name="reset"/>
+        <stylesheet name="hobo-rapid"/>
         <stylesheet name="application"/>
       </do>
+
       <do param="scripts">
-        <javascript name="prototype,effects,dragdrop,controls,application"/>
+        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <hobo-rapid-javascripts param/>
       </do>
     </head>
-    <body onload="Hobo.applyEvents();" param>
-    </body>
-  </html>
+
+    <body onload="Hobo.applyEvents();" param/>
+</html>
 </def>
 
 
-<def tag="page">
+<def tag="simple-layout">
   <base-page merge>
-    <stylesheets: param>
-      <stylesheet name="reset"/>
-      <stylesheet name="hobo-rapid"/>
-      <stylesheet name="application"/>
-    </stylesheets>
-
-    <scripts: param>
-      <javascript name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
-      <hobo-rapid-javascripts param/>
-    </scripts>
-
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
@@ -46,34 +38,32 @@
         <footer class="content-footer" param="content-footer"/>
       </section>
       <footer class="page-footer" param/>
-    </body>
+    </body:>
   </base-page>
 </def>
 
-<def tag="page-without-aside" alias-of="page"/>
-<def tag="page-with-aside">
-  <page-without-aside merge>
-    <content:>
+
+<def tag="aside-layout">
+  <simple-layout merge>
+    <content: param>
       <section class="main-content" param="main-content">
-        <default-tagbody for="content"/>
+        <param-content for="content"/>
       </section>
       <aside class="aside-content" param/>
-    </content>
-  </page-without-aside>
+    </content:>
+  </simple-layout>
 </def>
       
 
-<def tag="page-for-index"><page merge/></def>
-<def tag="page-for-new"><page merge/></def>
-<def tag="page-for-show"><page merge/></def>
-<def tag="page-for-edit"><page merge/></def>
-<def tag="page-for-new-in-collection"><page merge/></def>
-<def tag="page-for-show-collection"><page merge/></def>
+<def tag="default-layout" alias-of="simple-layout"/>
 
 
-<def tag="index-page">
+<def tag="page" attrs="layout"><% name ||= "default" %><call-tag tag="#{layout}-layout" merge/></def>
+
+
+<def tag="index-page" attrs="layout">
   <% model_name = @model.name.titleize %>
-  <page-for-index title="All #{model_name.pluralize}" merge>
+  <page layout="&layout" title="All #{model_name.pluralize}" merge>
     <body: class="index-page #{@model.name.underscore.pluralize}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
@@ -93,12 +83,12 @@
     <content-footer: param>
       <a to="&@model" action="new" param="new-link"/>
     </content-footer>
-  </page-for-index>
+  </page>
 </def>
 
 
-<def tag="new-page">
-  <page-for-new title="New #{type_name}" merge>
+<def tag="new-page" attrs="layout">
+  <page layout="&layout" title="New #{type_name}" merge>
     <body: class="new-page #{type_name.underscore}" param/>
     <content-header: param>
       <heading param>New <type-name title/></heading>
@@ -112,16 +102,16 @@
         <submit label="Create" param/>
       </form>
     </content-body>
-  </page-for-new>
+  </page>
 </def>
 
 
-<def tag="show-page">
+<def tag="show-page" attrs="layout">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
   %>
-  <page-for-show merge title="#{name :no_wrapper => true}">
+  <page layout="&layout" merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
       <heading param><type-name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
@@ -137,12 +127,12 @@
         </ul>
       </nav>
     </content-body>
-  </page-for-show>
+  </page>
 </def>
 
 
-<def tag="edit-page">
-  <page-for-edit merge>    
+<def tag="edit-page" attrs="layout">
+  <page layout="&layout" merge>    
     <body: class="edit-page #{this.class.name.underscore}" param/>
     <content-header: param>
       <heading><type-name/><if test="&this.respond_to? :name">: <name/></if></heading>
@@ -157,12 +147,12 @@
       </form>
           
     </content-body>
-  </page-for-edit>
+  </page>
 </def>
 
 
-<def tag="new-in-collection-page">
-  <page-for-new-in-collection title="New #{type_name}" merge>
+<def tag="new-in-collection-page" attrs="layout">
+  <page layout="&layout" title="New #{type_name}" merge>
     <body: class="new-in-collection-page #{type_name(:with => @owner)} #{type_name}" param/>
     <content-header: param>
       <heading param>New <type-name/></heading>
@@ -177,13 +167,13 @@
         <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
       </form>
     </content-body>
-  </page-for-new-in-collection>
+  </page>
 </def>
 
 
-<def tag="show-collection-page">
-  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
-  <page-for-show-collection title="&title" merge>
+<def tag="show-collection-page" attrs="layout">
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)} - #{app_name}" %>
+  <page layout="&layout" title="&title" merge>
     <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
           param/>
     <content-header: param>
@@ -209,12 +199,12 @@
         <a to="&@association" action="new"/>
       </nav>
     </content-body>
-  </page-for-show-collection>
+  </page>
 </def>
 
 
-<def tag="login-page" attrs="remember-me">
-  <page title="Log In" merge>
+<def tag="login-page" attrs="remember-me, layout">
+  <page layout="&layout" title="Log in to #{app_name}" merge>
     <body: class="login-page" param/>
     <nav: replace/>
     <content-header: param>
@@ -246,8 +236,8 @@
 </def>
 
 
-<def tag="signup-page">
-  <page title="Sign Up" merge>
+<def tag="signup-page" attrs="layout">
+  <page layout="&layout" title="Sign up to #{app_name}" merge>
     <body: class="signup-page" param/>
     <nav: replace/>
     <content-header: param>
@@ -336,4 +326,8 @@
   </div>
 </def>
 
+
+<def tag="app-name"><%= @hobo_app_name ||= File.basename(Dir.chdir(RAILS_ROOT) { Dir.getwd }).strip.titleize %></def>
+
+<def tag="default-page-title"><%= t = this.to_s; ; "#{t.blank? ? '' : t + ' - '}#{app_name}" %></def>
 
