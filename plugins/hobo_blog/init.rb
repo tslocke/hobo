@@ -75,7 +75,7 @@ module ::Hobo::Plugins
 
     def posts_controller
       resource_controller :PostsController do
-        include_taglib "posts_controller", :from_plugin => "hobo_blog"
+        include_taglib "post_pages", :from_plugin => "hobo_blog"
         if has_feature(:comments)
           include_taglib "hobo_comments", :from_plugin => "hobo_comments"
         end

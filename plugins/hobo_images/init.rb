@@ -53,7 +53,7 @@ module ::Hobo::Plugins
 
     def images_controller
       resource_controller :ImagesController do
-        include_taglib "images_controller", :from_plugin => "hobo_images"
+        include_taglib "image_pages", :from_plugin => "hobo_images"
         
         def update
           hobo_update do
