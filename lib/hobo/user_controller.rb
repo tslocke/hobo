@@ -49,9 +49,9 @@ module Hobo
             redirect_back_or_default(options[:redirect_to] || home_page) unless performed?
           end
         end
-      else
-        hobo_render unless performed?
       end
+      
+      hobo_render unless performed?
     end
 
     
