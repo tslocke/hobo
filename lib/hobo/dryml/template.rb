@@ -431,6 +431,8 @@ module Hobo::Dryml
                  "#{param_restore_local_name(name)}.call(#{attributes}, #{parameters})"
                elsif (call_type = polymorphic_call_type(el))
                  "send(find_polymorphic_tag(:#{name.underscore}, #{call_type}), #{attributes}, #{parameters})"
+               elsif attributes == "{}" && parameters == "{}"
+                 "#{name.underscore}.to_s"
                else
                  "#{name.underscore}(#{attributes}, #{parameters})"
                end

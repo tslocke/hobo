@@ -1,6 +1,6 @@
 .flash {
 	background: #92ab6e;
-	padding: 10px; margin-top: 5px;
+	padding: 10px 30px; margin-top: 5px;
 	border: 2px solid #829862;
 	border-width: 2px 0;
 	color: white;
@@ -23,9 +23,16 @@ table.new-record textarea, table.new-record input {
 	display: inline;	
 }
 
+.login-page .content-header {padding-top: 20px;}
+form.login .field-list {width: 300px;}
 form.login .field-list {margin-bottom: 10px;}
 form.login .field-list th {width: 68px;}
-form.login .submit-button {margin-left: 100px;}
+form.login .submit-button {margin-left: 83px;}
+
+.edit-page .content-header {overflow: hidden; height: 100%;}
+.edit-page .content-header h1 {float: left;}
+.edit-page .content-header .delete-button {float: right;}
+form .actions {margin: 30px 0;width: 100%; text-align: center;}
 
 /**** Admin ****/
 
@@ -116,8 +123,12 @@ div.completions-popup ul li {
 }
 
 
-.field-list   { width:95%; }
-.field-list td { padding: 5px; vertical-align: middle; width: 75%; }
+.field-list   {width:100%;}
+.field-list td {vertical-align: middle; width: 75%;}
+.field-list th {font-weight: bold;}
+.field-list th, .field-list td {padding: 5px 0;}
+.field-list th {padding-right: 10px;}
+
 .field-list td.field-label {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
