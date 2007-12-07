@@ -99,7 +99,9 @@
 
       <form param>
         <field-list skip-associations="has_many" param/>
-        <submit label="Create" param/>
+        <div class="actions" param="actions">
+          <submit label="Create #{type_name}" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
       </form>
     </content-body>
   </page>
@@ -115,7 +117,7 @@
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
       <heading param><type-name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
-      <delete-button in-place="&false" param/>
+      <a action="edit">Edit <type-name/></a>
     </content-header>
     
     <content-body: param>
@@ -136,14 +138,16 @@
     <body: class="edit-page #{this.class.name.underscore}" param/>
     <content-header: param>
       <heading><type-name/><if test="&this.respond_to? :name">: <name/></if></heading>
-      <delete-button in-place="&false" param/>
+      <delete-button in-place="&false" label="Remove This #{this.class.name}" param/>
     </content-header>
 
     <content-body: param>
       <error-messages param/>
       <form param>
         <field-list skip-associations="has_many" param/>
-        <submit label="Save"/>
+        <div class="actions" param="actions">
+          <submit label="Save Changes" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
       </form>
           
     </content-body>
@@ -152,10 +156,11 @@
 
 
 <def tag="new-in-collection-page" attrs="layout">
+  <set association-name="&@association.proxy_reflection.name.to_s.singularize.titleize"/>
   <page layout="&layout" title="New #{type_name}" merge>
     <body: class="new-in-collection-page #{type_name(:with => @owner)} #{type_name}" param/>
     <content-header: param>
-      <heading param>New <type-name/></heading>
+      <heading param>New <association-name/></heading>
       <sub-heading param>For: <a with="&@owner" /></sub-heading>
     </content-header>
 
@@ -163,8 +168,10 @@
       <error-messages/>
 
       <form param>
-        <field-list skip-associations="has_many" param/>
-        <submit label='Add to #{name(:with => @owner, :no_wrapper => true)}' param/>
+        <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}" skip-associations="has_many" param/>
+        <div class="actions" param="actions">
+          <submit label='Create #{association_name}' param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
+        </div>
       </form>
     </content-body>
   </page>

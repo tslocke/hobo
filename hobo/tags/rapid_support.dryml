@@ -6,12 +6,12 @@
                     include_timestamps
 
                   if skip_associations == "has_many"
-                    assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.every(:name)
+                    assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
                     columns + assocs
                   elsif skip_associations
                     columns
                   else
-                    assocs = klass.reflections.values.every(:name)
+                    assocs = klass.reflections.values.map &its.name.to_s
                     columns + assocs
                   end
                 else
@@ -29,12 +29,12 @@
                   columns -= %w{created_at updated_at created_on updated_on} unless include_timestamps
 
                   if skip_associations == "has_many"
-                    assocs = this.reflections.values.reject {|r| r.macro == :has_many }.every(:name)
+                    assocs = this.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
                     columns + assocs
                   elsif skip_associations
                     columns
                   else
-                    assocs = klass.reflections.values.every(:name)
+                    assocs = klass.reflections.values.map &its.name.to_s
                     columns + assocs
                   end
                 else

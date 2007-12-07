@@ -1,13 +1,16 @@
 html {background: #666;}
 body {
-	width: 600px; margin: 0 auto; background: white;
+	width: 800px; margin: 0 auto; background: white;
 	font: 14px "Lucida Grande", Arial, sans-serif;
 	line-height: 21px; padding-bottom: 10px; margin-bottom: 20px;
 }
 h1, h2, h3 {font-family: "Rockwell", "Trebuchet MS", "Arial", sans-serif;}
-h1 {line-height: 54px;}
-h2 {line-height: 42px;}
-h3 {line-height: 27px;}
+h1 {font-size: 36px; line-height: 36px; margin: 20px 0 10px;}
+h2 {font-size: 28px; line-height: 28px; margin: 15px 0 10px;}
+h3 {font-size: 18px; line-height: 18px; margin: 10px 0 5px;}
+h4 {font-size: 14px; line-height: 14px; margin: 10px 0 5px;}
+h5 {font-size: 12px; line-height: 12px; margin: 10px 0 5px;}
+h6 {font-size: 10px; line-height: 10px; margin: 10px 0 5px;}
 
 li {margin-left: 20px;}
 
@@ -23,7 +26,7 @@ input.text, input.string, input.email_address, input.password, textarea {
 }
 
 input.file_upload {
-	/*background: #070707;*/ border: 1px dotted #666;
+	border: 1px dotted #666;
 }
 
 .button {
@@ -32,9 +35,6 @@ input.file_upload {
 	font: 12px "Lucida Grande", Arial, sans-serif;
 }
 .button:hover {cursor: pointer;}
-
-.field-list th {font-weight: bold;}
-.field-list th, .field-list td {padding: 3px 10px;}
 
 .content-header, .content-body {margin: 30px;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
@@ -62,7 +62,7 @@ input.file_upload {
 /* you can delete them if you over-ride it             */
 
 .front-page .welcome-message {
-	background: #eee; color: #222; padding: 10px 20px;
+	background: #eee; color: #222; padding: 10px 20px 20px;
 }
 .front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
