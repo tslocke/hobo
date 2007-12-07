@@ -12,13 +12,12 @@
     </section>
   </content-header>
 
-
   <content-body:>
-    <ul with="&Hobo.models">
+    <ul with="&Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}">
       <li:>
-        <header><h2><%%= this.name.titlecase.pluralize %></h2></header>
+        <header><h2><a/></h2></header>
         <section>
-          <p if="blank?">There are no <%%= this.name.titleize.pluralize %></p>
+          <p if="&this.count == 0">There are no <type-name plural/></p>
           <else>
             <repeat with="&this.find(:all, :limit => 3)">
               <card if="&can_view?"/>
