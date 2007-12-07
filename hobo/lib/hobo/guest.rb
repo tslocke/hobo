@@ -15,6 +15,10 @@ module Hobo
     def super_user?
       false
     end
+    
+    def administrator?
+      false
+    end
 
   end
 
