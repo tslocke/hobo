@@ -76,7 +76,7 @@ module ::Hobo
     
     def create_controllers
       self.class.controllers.each do |model_name, block|
-        klass = make_class("#{new_name_for(model_name)}Controller", ApplicationController, &block)
+        klass = make_class("#{new_name_for(model_name).to_s.pluralize}Controller", ApplicationController, &block)
         klass.class_eval { hobo_model_controller }
         klass.class_eval(&block)
       end

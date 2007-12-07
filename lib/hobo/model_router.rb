@@ -26,7 +26,7 @@ module Hobo
 
         require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
         require "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
-        
+
         # Add non-subsite routes
         add_routes_for(map, nil)
 
