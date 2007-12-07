@@ -50,7 +50,7 @@ module Hobo
           end
         end
       end
-      
+
       hobo_render unless performed?
     end
 

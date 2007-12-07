@@ -12,7 +12,7 @@
   <% tag ||= scope.in_form ? "input" : "editor" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
-      <labelled-item>
+      <labelled-item unless="&tag == 'input' && !can_edit?">
         <item-label param="#{this_field.to_s.sub('?', '')}-label">
           <do param="label"><%= this_field.to_s.titleize %></do>
         </item-label>

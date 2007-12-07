@@ -13,10 +13,16 @@ class <%= class_name %> < ActiveRecord::Base
 
   # --- Hobo Permissions --- #
 
-  def super_user?
-    # Return true to make this user exempt from permission restrictions
-    # e.g.
-    # login == 'admin'
+  # It is possible to override the permission system entirely by
+  # returning true from super_user?
+  # def super_user?; true; end
+
+
+  # This method has no special meaning to the permission system. It is
+  # used by some standard Hobo plugins such as hobo_blog. Redefine to
+  # taste.
+  def administrator?
+    login == "admin"
   end
 
   def creatable_by?(creator)
