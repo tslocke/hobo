@@ -36,25 +36,36 @@ input.file_upload {
 }
 .button:hover {cursor: pointer;}
 
-.content-header, .content-body {margin: 30px;}
+.content-header, .content-body, .content-footer {margin: 30px; padding: 0 30px;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
 /***********/
 
-.page-header .nav {color: white; padding-bottom: 8px; background: black; overflow: hidden; height: 100%;}
-.page-header .nav li {float: left; padding-right: 20px; list-style: none;}
-.page-header .nav a {border-bottom: 1px solid black; color: white;}
-.page-header .nav a:hover {border-bottom: 1px dotted #ddd;}
-.main-nav {float: right;}
-.main-nav li {line-height: 36px;}
+.page-header {color: white; background: black; padding: 20px 0 0; position: relative;}
+.page-header h1 {margin: 0; padding: 0 40px 30px; font-size: 48px; letter-spacing: -4.0pt;}
+.page-header .nav {padding-left: 30px; overflow: hidden; height: 100%;}
+.page-header .nav li {float: left; list-style: none; margin-left: 0;}
+.page-header a {color: white; border: none;}
+ul.main-nav {float: left; margin: 0;}
+.main-nav li {background: black; margin-right: 10px;}
 .main-nav a {
-	font: bold 16px "Myriad Pro", Arial, sans-serif;
+	display: block; padding: 8px 15px; border: none;
+	font: bold 16px "Myriad Pro", Arial, sans-serif; background: #222;
 }
+.main-nav a:hover {background: #222; border-bottom: none;}
 .account-nav {
-	clear: both; float: right;
+/*	clear: both; float: right;*/
+	position: absolute; top: 10px; right: 20px;
 	font: normal 12px "Myriad Pro", Arial, sans-serif;
 }
-.account-nav a {font-weight: bold;}
+.account-nav li {padding-right: 20px;}
+.account-nav a {border-bottom: 1px solid black; font-weight: bold;}
+.account-nav a:hover {border-bottom: 1px dotted #ddd;}
+
+
+.edit-page .delete-button {margin-top: 25px;}
+
+.login-page {width: 50%;}
 
 
 /*******************************************************/

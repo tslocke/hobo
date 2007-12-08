@@ -23,7 +23,9 @@ table.new-record textarea, table.new-record input {
 	display: inline;	
 }
 
-.login-page .content-header {padding-top: 20px;}
+body.login-page {margin-top: 100px;}
+.login-page .content-header {padding-top: 10px;}
+
 form.login .field-list {width: 300px;}
 form.login .field-list {margin-bottom: 10px;}
 form.login .field-list th {width: 68px;}

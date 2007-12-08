@@ -26,9 +26,10 @@
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
+        <h1><a href="/#{base_url}"><app-name/></a></h1>
         <nav param>
-          <magic-nav class="main-nav" param="main-nav"/>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
+          <magic-nav class="main-nav" param="main-nav"/>
         </nav>
       </header>
       <section class="page-content" param="content">
@@ -137,7 +138,8 @@
   <page layout="&layout" merge>    
     <body: class="edit-page #{this.class.name.underscore}" param/>
     <content-header: param>
-      <heading><type-name/><if test="&this.respond_to? :name">: <name/></if></heading>
+      <div class="note">Editing:</div>
+      <heading><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
       <delete-button in-place="&false" label="Remove This #{this.class.name}" param/>
     </content-header>
 
