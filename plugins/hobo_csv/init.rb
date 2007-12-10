@@ -35,4 +35,4 @@ module HoboCsv
   
 end
 
-Hobo::ModelController.send(:include, HoboCsv)
+::Hobo::ModelController.send(:include, HoboCsv)
