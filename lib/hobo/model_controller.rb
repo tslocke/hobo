@@ -510,14 +510,14 @@ module Hobo
       @this.send(:clear_aggregation_cache)
       @this.send(:clear_association_cache)
       
-      changes = params[model.name.underscore]
+      changes = params[@this.class.name.underscore]
       @this.attributes = changes 
       save_and_set_status!(@this, original)
 
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if !request.xhr? && valid?
+      flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
       
       set_named_this!
       response_block(&b) or 
