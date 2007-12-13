@@ -22,9 +22,9 @@ module Hobo
     
     def hobo_login(options={})
       options = LazyHash.new(options)
+      login_attr = model.login_attr.to_s.titleize.downcase
       options.reverse_merge!(:success_notice => "You have logged in.",
-                             :failure_notice => "You did not provide a valid #{model.login_attr.to_s.titleize.downcase} and password.",
-                             :disabled_notice => "You account is not currently available.")
+                             :failure_notice => "You did not provide a valid #{login_attr} and password.")
       
       if request.post?
         user = model.authenticate(params[:login], params[:password])
@@ -39,7 +39,7 @@ module Hobo
           if block_given? && !yield
             # block returned false - cancel this login
             self.current_user = old_user
-            flash[:notice] ||= options[:disabled_notice]
+            hobo_render(:account_disabled_page)
           else
             if params[:remember_me] == "1"
               current_user.remember_me

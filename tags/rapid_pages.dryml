@@ -26,7 +26,7 @@
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
-        <h1><a href="/#{base_url}"><app-name/></a></h1>
+        <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
           <magic-nav class="main-nav" param="main-nav"/>
@@ -45,6 +45,8 @@
 
 
 <def tag="aside-layout">
+  <body: class="aside-layout"/>
+
   <simple-layout merge>
     <content: param>
       <section class="main-content" param="main-content">
@@ -65,7 +67,7 @@
 <def tag="index-page" attrs="layout">
   <% model_name = @model.name.titleize %>
   <page layout="&layout" title="All #{model_name.pluralize}" merge>
-    <body: class="index-page #{@model.name.underscore.pluralize}" param/>
+    <body: class="index-page #{@model.name.underscore}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
       <p class="note" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
@@ -122,7 +124,7 @@
     </content-header>
     
     <content-body: param>
-      <field-list skip="name" tag="editor" param/>
+      <field-list skip="name" param/>
 
       <nav param="new-links">
         <ul with="&has_many_assocs">
@@ -170,7 +172,8 @@
       <error-messages/>
 
       <form param>
-        <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}" skip-associations="has_many" param/>
+        <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}"
+                    skip-associations="has_many" param/>
         <div class="actions" param="actions">
           <submit label='Create #{association_name}' param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
         </div>
@@ -212,10 +215,36 @@
 </def>
 
 
+<def tag="signup-page" attrs="layout">
+  <page layout="&layout" title="Sign up to #{app_name}" merge>
+    <body: class="signup-page" param/>
+    <nav: replace/>
+    <content-header: param>
+      <heading param>Sign Up</heading>
+    </content-header>
+    
+    <content-body: param>
+      <error-messages/>
+      <form action="&request.request_uri" param>
+        <field-list fields="login, password, password_confirmation" param>
+          <password-confirmation-label:>Confirm Password</password-confirmation-label>
+        </field-list>
+
+        <submit label='Sign Up'/>
+      </form>
+    </content-body>
+
+  </page>
+</def>
+
+
 <def tag="login-page" attrs="remember-me, layout">
   <page layout="&layout" title="Log in to #{app_name}" merge>
+   
     <body: class="login-page" param/>
+ 
     <nav: replace/>
+    
     <content-header: param>
       <heading param>Log In</heading>
     </content-header>
@@ -245,27 +274,21 @@
 </def>
 
 
-<def tag="signup-page" attrs="layout">
-  <page layout="&layout" title="Sign up to #{app_name}" merge>
-    <body: class="signup-page" param/>
-    <nav: replace/>
-    <content-header: param>
-      <heading param>Sign Up</heading>
-    </content-header>
-    
+<def tag="account-disabled-page" attrs="layout">
+
+  <page layout="&layout" title="#{app_name} - account not available" merge>
+       
+    <body: class="account-disabled-page" param/>
+
+    <content-header: param><heading param>Account is not availble</heading></content>
+
     <content-body: param>
-      <error-messages/>
-      <form action="&request.request_uri" param>
-        <field-list fields="login, password, password_confirmation" param>
-          <password-confirmation-label:>Confirm Password</password-confirmation-label>
-        </field-list>
-
-        <submit label='Sign Up'/>
-      </form>
+      <p>Your account is not available at this time.</p>
     </content-body>
-
   </page>
+
 </def>
+ 
 
 
 <def tag="permission-denied-page">

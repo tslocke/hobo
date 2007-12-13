@@ -138,11 +138,13 @@
 </def>
 
 
-<def tag="boolean-checkbox-editor" attrs="update"><%
+<def tag="boolean-checkbox-editor" attrs="update, message"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   f = ajax_updater(object_url(this_parent),
-                   "Change #{this_field.to_s.titleize}", update,
+                   message || "Change #{this_field.to_s.titleize}",
+                   update,
                    :method => "put",
+                   :spinner_next_to => Hobo.raw_js("this"),
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
                     } })

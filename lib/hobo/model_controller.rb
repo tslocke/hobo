@@ -4,18 +4,10 @@ module Hobo
 
     include Hobo::Controller
 
-    class PermissionDeniedError < RuntimeError; end
-    class UserPermissionError < StandardError
-      attr :models
-      def initialize(models)
-        @models = models || []
-      end
-    end
-    
     VIEWLIB_DIR = "taglibs"
     
     PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
-
+    
     class << self
 
       def included(base)
@@ -23,37 +15,13 @@ module Hobo
           @auto_actions ||= {}
           
           extend ClassMethods
-          helper_method :find_partial, :model, :current_user
+          
+          helper_method :model, :current_user
           before_filter :set_no_cache_headers
         end
+        base.template_path_cache = {}        
 
         Hobo::Controller.included_in_class(base)
-      end
-
-      def find_partial(klass, as)
-        find_model_template(klass, as, :is_parital => true)
-      end
-
-
-      def template_path(dir, name, is_partial)
-        fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
-        if File.exists?(full_dir) && Dir.entries(full_dir).grep(fileRx).any?
-          return "#{dir}/#{name}"
-        end
-      end
-
-
-      def find_model_template(klass, name, options={})
-        while klass and klass != ActiveRecord::Base
-          dir = klass.name.underscore.pluralize
-          dir = File.join(options[:subsite], dir) if options[:subsite]
-          path = template_path(dir, name, options[:is_partial])
-          return path if path
-
-          klass = klass.superclass
-        end
-        nil
       end
       
     end
@@ -61,6 +29,8 @@ module Hobo
     module ClassMethods
 
       attr_writer :model
+      
+      attr_accessor :template_path_cache
       
       def add_collection_actions(name)
         defined_methods = instance_methods
@@ -671,32 +641,42 @@ module Hobo
       end
     end
     
+    
+    def hobo_template_exists?(dir, name)
+      self.class.template_path_cache.fetch([dir, name], 
+                                           begin
+                                             full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+                                             !Dir["#{full_dir}/#{name}.*"].empty?
+                                           end)
+    end
+        
 
+    def find_model_template(klass, name)
+      while klass and klass != ActiveRecord::Base
+        dir = klass.name.underscore.pluralize
+        dir = File.join(subsite, dir) if subsite
+        if hobo_template_exists?(dir, name)
+          return "#{dir}/#{name}"
+        end
+        klass = klass.superclass
+      end
+      nil
+    end
+
+    
     def hobo_render(page_kind = nil, page_model=nil)
       page_kind ||= params[:action].to_sym
       page_model ||= model
-      
-      template = ModelController.find_model_template(page_model, page_kind, :subsite => subsite)
 
-      begin
-        if template
-          render :template => template
-          true
-        else
-          # This returns false if no such tag exists
-          render_tag("#{page_kind.to_s.dasherize}-page", :with => @this)
-        end
-      rescue ActionView::TemplateError => wrapper
-        e = wrapper.original_exception if wrapper.respond_to? :original_exception
-        if e.is_a? Hobo::ModelController::UserPermissionError
-          if current_user.guest?
-            redirect_to login_url(e.models.first || UserController.user_models.first)
-          else
-            permission_denied(:message => e.message)
-          end
-        else
-          raise
-        end
+      if hobo_template_exists?(controller_path, page_kind)
+        render :action => page_kind
+        true
+      elsif (template = find_model_template(page_model, page_kind))
+        render :template => template
+        true
+      else
+        # This returns false if no such tag exists
+        render_tag("#{page_kind.to_s.dasherize}-page", :with => @this)
       end
     end
 

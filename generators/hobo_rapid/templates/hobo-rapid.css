@@ -8,11 +8,10 @@
     background: white;
     font-family: Tahoma "sans serif";
     display: none;
-	z-index: 10;
+    z-index: 10;
 }
 
 #ajax_progress div {
-    border: 1px dashed grey;
     margin: 10px;
     padding: 3px;
 /*    padding-top: -15px;*/
