@@ -1,6 +1,6 @@
 module ::Hobo::Plugins
 
-  class HoboGlobals < HoboPlugin
+  class HoboGlobals
     
     def initialize(options={}, &b)
       options = options.reverse_merge(:model => "Globals", :table_name => "globals")
