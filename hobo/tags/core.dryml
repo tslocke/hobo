@@ -9,9 +9,10 @@
 </def>
 
     
-<def tag="partial" attrs="as">
-   <%= render(:partial => find_partial(this, as), :locals => { :this => this }) %>
-</def>
+<def tag="partial" attrs="name, locals"><%= 
+   locals ||= {}
+   render(:partial => name, :locals => locals.merge(:this => this))
+%></def>
 
 
 <def tag="repeat" attrs="even-odd, join"><%= 

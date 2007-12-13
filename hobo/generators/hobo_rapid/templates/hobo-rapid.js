@@ -16,6 +16,7 @@ var Hobo = {
     searchRequest: null,
     uidCounter: 0,
     ipeOldValues: {},
+    spinnerMinTime: 1000, // milliseconds 
 
     uid: function() {
         Hobo.uidCounter += 1
@@ -103,7 +104,7 @@ var Hobo = {
             params.push(Form.serialize(form))
         }
 
-        Hobo.showSpinner(message)
+        Hobo.showSpinner(message, options.spinnerNextTo)
         var complete = function() {
             if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
@@ -378,14 +379,30 @@ var Hobo = {
     },
 
 
-    showSpinner: function(message) {
+    showSpinner: function(message, nextTo) {
+        clearTimeout(Hobo.spinnerTimer)
+        Hobo.spinnerHideAt = new Date().getTime() + Hobo.spinnerMinTime;
         if(t = $('ajax-progress-text')) Element.update(t, message);
-        if(e = $('ajax-progress')) e.style.display = "block";
+        if(e = $('ajax-progress')) {
+            if (nextTo) {
+                var pos = nextTo.cumulativeOffset()
+                e.style.top = pos.top + "px"
+                e.style.left = (pos.left + nextTo.offsetWidth) + "px"
+            }
+            e.style.display = "block";
+        }
     },
 
 
     hideSpinner: function() {
-        if(e = $('ajax-progress')) e.style.display = "none";
+        if (e = $('ajax-progress')) {
+            var remainingTime = Hobo.spinnerHideAt - new Date().getTime()
+            if (remainingTime <= 0) {
+                e.visualEffect('Fade')
+            } else {
+                Hobo.spinnerTimer = setTimeout(function () { e.visualEffect('Fade') }, remainingTime)
+            }
+        }
     },
 
 

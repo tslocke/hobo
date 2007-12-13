@@ -41,6 +41,8 @@ module Hobo::Dryml
       @last_element = nil
     end
 
+    attr_accessor :plugin_renames
+    
     attr_reader :tags, :template_path
     
     def compile(local_names=[], auto_taglibs=[])
@@ -247,9 +249,12 @@ module Hobo::Dryml
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       if (for_type = el.attributes['for'])
-        type_name = if for_type =~ /^[a-z]/
+        type_name = case for_type
+                    when /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
                       Hobo.field_types[for_type].name
+                    when /^_.*_$/
+                      plugin_magic_option(for_type)
                     else
                       for_type
                     end.underscore.gsub('/', '__')
@@ -768,6 +773,13 @@ module Hobo::Dryml
       @gensym_counter ||= 0
       @gensym_counter += 1
       "#{name}_#{@gensym_counter}"
+    end
+    
+    def plugin_magic_option(name)
+      name = name[1..-2]
+      # The only plugin options supported at the moment are class renames
+      name = plugin_renames[name] while plugin_renames.has_key?(name)
+      name
     end
 
   end

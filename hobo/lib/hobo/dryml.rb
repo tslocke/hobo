@@ -61,10 +61,11 @@ module Hobo
         page ||= view.instance_variable_get('@hobo_template_path')
 
         prepare_view!(view)
-        included_taglibs = ([subsite_taglib(page)] + controller_taglibs(page)).compact
+        included_taglibs = ([subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
 
         if page.ends_with?(EMPTY_PAGE)
-          controller_class = controller_class_for(page)
+          # DELETE ME: controller_class = controller_class_for(page)
+          controller_class = view.controller.class
           @tag_page_renderer_classes[controller_class.name] ||= 
             make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
           @tag_page_renderer_classes[controller_class.name].new(page, view)
@@ -87,14 +88,14 @@ module Hobo
       end
       
       
+      # TODO: Delete this - not needed (use view.controller.class)
       def controller_class_for(page)
         controller, view = Controller.controller_and_view_for(page)
         "#{controller.camelize}Controller".constantize
       end
       
       
-      def controller_taglibs(page)
-        controller_class = controller_class_for(page)
+      def controller_taglibs(controller_class)
         (controller_class.respond_to?(:included_taglibs) && controller_class.included_taglibs) || []
       end
       
