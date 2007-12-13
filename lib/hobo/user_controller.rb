@@ -39,7 +39,7 @@ module Hobo
           if block_given? && !yield
             # block returned false - cancel this login
             self.current_user = old_user
-            hobo_render(:account_disabled_page)
+            hobo_render(:account_disabled)
           else
             if params[:remember_me] == "1"
               current_user.remember_me

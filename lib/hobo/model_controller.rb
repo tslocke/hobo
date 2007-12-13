@@ -643,6 +643,7 @@ module Hobo
     
     
     def hobo_template_exists?(dir, name)
+      self.class.template_path_cache.clear if RAILS_ENV == "development"
       self.class.template_path_cache.fetch([dir, name], 
                                            begin
                                              full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
