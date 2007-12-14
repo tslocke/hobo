@@ -175,7 +175,7 @@
         <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}"
                     skip-associations="has_many" param/>
         <div class="actions" param="actions">
-          <submit label='Create #{association_name}' param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
+          <submit label="Create #{association_name}" param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
         </div>
       </form>
     </content-body>
