@@ -20,19 +20,18 @@ module HoboCsv
       headers["Content-Disposition"] = "attachment; filename=\"#{filename}\"" 
     end
 
-    response_proc = prod do |response, output|
+    response_proc = proc do |response, output|
       CSV::Writer.generate(output, ',') do |csv|
         if block_given?
           yield(csv)
         else
           fields = args.blank? ? @member_class.content_columns.every(:name) : args
-          
           # Generate and write out titles
           titles = fields.map do |field|
-            if field.is_a?(Hash)
-              field.map { |k, v| "#{k.to_s.titleize} #{v.to_s.titleize}" }
+            if field.is_a?(String)
+              field.split('.').map(&its.titleize).join(' ')
             else
-              name.to_s.titleize
+              field.to_s.titleize
             end
           end.flatten
           csv << titles
@@ -40,8 +39,8 @@ module HoboCsv
           @this.each do |record|
             # Generate and write out one row
             values = fields.map do |field| 
-              if field.is_a?(Hash)
-                field.map { |k, v| record.send(k).send(v) }
+              if field.is_a?(String)
+                field.split('.').inject(record) {|r,f|r.send(f)}
               else
                 record.send(field)
               end
