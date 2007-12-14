@@ -32,12 +32,9 @@ module Hobo
       attr_reader :included_taglibs
 
       def include_taglib(src, options={})
-        @included_taglibs << if options[:from_plugin]
-                               'plugins/' + options[:from_plugin] + '/taglibs/' + src
-                             else
-                               src.to_s
-                             end
+        @included_taglibs << options.merge(:src => src)
       end
+      
     end
 
     

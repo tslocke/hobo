@@ -64,7 +64,7 @@ module Hobo::Dryml
 
     def build(local_names, auto_taglibs)
 
-      auto_taglibs.each{|t| import_taglib(t)}
+      auto_taglibs.each { |t| import_taglib(t) }
     
       @build_instructions.each do |instruction|
         name = instruction[:name]
@@ -82,7 +82,7 @@ module Hobo::Dryml
           @environment.class_eval(method_src, template_path, instruction[:line_num])
           
         when :include
-          import_taglib(name, instruction[:as])
+          import_taglib(name, :as => instruction[:as])
           
         when :module
           import_module(name.constantize, instruction[:as])
@@ -102,31 +102,18 @@ module Hobo::Dryml
     end
     
 
-    def expand_template_path(path)
-      base = if path.starts_with? "plugins"
-               "vendor/" + path
-             elsif path.include?("/")
-               "app/views/#{path}"
-             else
-               template_dir = File.dirname(template_path)
-               "#{template_dir}/#{path}"
-             end
-       base + ".dryml"
-    end
-
-
-    def import_taglib(src_path, as=nil)
-      path = expand_template_path(src_path)
-      unless template_path == path
-        taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
-        taglib.import_into(@environment, as)
+    def import_taglib(options)
+      if options[:module]
+        raise NotImplementedError if options[:as]
+        @environment.send(:include, options[:module].constantize)
+      else
+        taglib = Taglib.get(options.merge(:template_path => template_path))
+        taglib.import_into(@environment, options[:as])
       end
     end
 
 
     def import_module(mod, as=nil)
-      raise NotImplementedError if as
-      @environment.send(:include, mod)
     end
   
 

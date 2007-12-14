@@ -6,16 +6,16 @@ module Hobo::Dryml
 
     class << self
 
-      def get(path)
+      def get(options)
         raise DrymlException, "No such taglib: #{path}" unless File.exists?(path)
-        file = File.new(path)
+        file = taglib_file(options)
 
-        taglib = @cache[file.path]
+        taglib = @cache[options]
         if taglib
           taglib.reload
         else
-          taglib = Taglib.new(file)
-          @cache[file.path] = taglib
+          taglib = Taglib.new(file, renames)
+          @cache[options] = taglib
         end
         taglib
       end
@@ -23,11 +23,33 @@ module Hobo::Dryml
       def clear_cache
         @cache = {}
       end
+      
+      private
+      
+      def taglib_file(options)
+        if (plugin = options[:bundle])
+          base = "vendor/plugins/#{plugin}/taglibs"
+        elsif (bundle = options[:bundle])
+          
+        else
+      elsif path.include?("/")
+               "app/views/#{path}"
+             else
+               template_dir = File.dirname(template_path)
+               "#{template_dir}/#{path}"
+             end
+       base + ".dryml"
+      RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path), options[:renames]
+
+        
+        File.new(path)
+      end
 
     end
 
-    def initialize(file)
+    def initialize(file, renames)
       @file = file
+      @renames = renames
       load
     end
 
@@ -62,7 +84,7 @@ module Hobo::Dryml
         
       end
       @file.rewind
-      template = Template.new(@file.read, @module, @file.path)
+      template = Template.new(@file.read, @module, @file.path, @renamess)
       template.compile([], [])
       @last_load_time = @file.mtime
     end

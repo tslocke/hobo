@@ -28,12 +28,11 @@ module Hobo::Dryml
       end
     end
 
-    def initialize(src, environment, template_path)
+    def initialize(src, environment, template_path, renames)
       @src = src
-
       @environment = environment # a class or a module
-
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
+      @class_renames = renames
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(@template_path)
       @builder.set_environment(environment)
@@ -41,9 +40,7 @@ module Hobo::Dryml
       @last_element = nil
     end
 
-    attr_accessor :plugin_renames
-    
-    attr_reader :tags, :template_path
+    attr_reader :tags, :template_path, :class_renames
     
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
@@ -146,7 +143,8 @@ module Hobo::Dryml
 
       when "include"
         include_element(el)
-        # return nothing - the include has no presence in the erb source
+        # return just the newlines to keep line-number matching - the
+        # include has no presence in the erb source
         tag_newlines(el)
         
       when "set-theme"
@@ -181,15 +179,10 @@ module Hobo::Dryml
     def include_element(el)
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
-      if el.attributes["src"]
-        @builder.add_build_instruction(:include, 
-                                       :name => el.attributes["src"], 
-                                       :as => el.attributes["as"])
-      elsif el.attributes["module"]
-        @builder.add_build_instruction(:module, 
-                                       :name => el.attributes["module"], 
-                                       :as => el.attributes["as"])
-      end
+      @builder.add_build_instruction(:include, 
+                                     :src    => el.attributes["src"], 
+                                     :module => el.attributes["module"],
+                                     :as     => el.attributes["as"])
     end
     
 
@@ -254,7 +247,7 @@ module Hobo::Dryml
                       # It's a symbolic type name - look up the Ruby type name
                       Hobo.field_types[for_type].name
                     when /^_.*_$/
-                      plugin_magic_option(for_type)
+                      rename_class(for_type)
                     else
                       for_type
                     end.underscore.gsub('/', '__')
@@ -775,10 +768,9 @@ module Hobo::Dryml
       "#{name}_#{@gensym_counter}"
     end
     
-    def plugin_magic_option(name)
+    def rename_class(name)
       name = name[1..-2]
-      # The only plugin options supported at the moment are class renames
-      name = plugin_renames[name] while plugin_renames.has_key?(name)
+      name = class_renames[name] while class_renames.has_key?(name)
       name
     end
 

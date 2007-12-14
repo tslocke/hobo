@@ -2,13 +2,13 @@ require 'extensions'
 
 module ::Hobo
   
-  class Plugin
+  class Bundle
     
-    @plugins = HashWithIndifferentAccess.new
+    @bundles = HashWithIndifferentAccess.new
     
     class << self
       
-      attr_accessor :plugins
+      attr_accessor :bundles
       
       def inherited(base)
         filename = caller[0].match(/^(.*):\d+:/)[1]
@@ -26,12 +26,12 @@ module ::Hobo
       end
       
       
-      def plugin_model(name, &block)
+      def bundle_model(name, &block)
         models << [name, block]
       end
 
       
-      def plugin_model_controller(model_name, &block)
+      def bundle_model_controller(model_name, &block)
         controllers << [model_name, block]
       end
       
@@ -50,13 +50,7 @@ module ::Hobo
       options = args.extract_options!
       
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
-      Plugin.plugins[name] = self
-      
-      if options.has_key?(:if)
-        if_options = options.delete(:if)
-        return unless if_options
-        options = options.merge(if_options) if if_options.is_a?(Hash)
-      end
+      Bundle.bundles[name] = self
       
       @renames, @options = separate_renames(options)
 
@@ -69,7 +63,7 @@ module ::Hobo
     attr_accessor :renames, :options, :name
     
     def init
-      # optionally overridden by the plugin
+      # optionally overridden by the bundle subclass
     end
     
     def create_models
@@ -83,7 +77,7 @@ module ::Hobo
     
     
     def create_controllers
-      plugin = self
+      bundle = self
       self.class.controllers.each do |model_name, block|
         klass = make_class("#{new_name_for(model_name).to_s.pluralize}Controller", ApplicationController) do 
           hobo_model_controller
@@ -94,21 +88,21 @@ module ::Hobo
     
     
     def make_class(name, base_class, &b)
-      plugin = self
+      bundle = self
       klass = Class.new(base_class) do
         # Nasty hack because blocks can't take blocks
         # Roll on Ruby 1.9
-        def self.plugin_feature(name, &block)
-          _plugin_feature(name, block)
+        def self.feature(name, &block)
+          _feature(name, block)
         end
       end
       
-      klass.meta_def(:plugin) do 
-        plugin
+      klass.meta_def(:bundle) do 
+        bundle
       end
       
-      klass.meta_def(:_plugin_feature) do |feature, block|
-        has_feature = plugin.option(feature)
+      klass.meta_def(:_bundle_feature) do |feature, block|
+        has_feature = bundle.option(feature)
         if has_feature
           define_method("features_#{feature}?") { true }
           meta_def("features_#{feature}?") { true }
@@ -122,7 +116,7 @@ module ::Hobo
       
       klass.meta_def :method_missing do |name, *args|
         if name.to_s =~ /^_.*_$/
-          plugin.magic_option(name)
+          bundle.magic_option(name)
         else
           super
         end
@@ -161,18 +155,42 @@ module ::Hobo
     # Returns the option value or renamed class name from a 'magic'
     # name like _foo_ or _MyFoo_
     def magic_option(name)
-      option_name = name.to_s[1..-2].to_sym
-      if option_name =~ /^[A-Z]/
-        new_name_for(option_name)
-      else
-        option(option_name)
+      option_name = name.to_s[1..-2]
+      case option_name
+        when "bundle";   self.name
+        when /^[A-Z]/; new_name_for(option_name.to_syn)
+        else           option(option_name.to_sym)
       end
     end
+    
     
     def option(name)
       options[name] || defaults[name]
     end
     
+    
+    def optional_bundle(*args)
+      local_options = args.extract_options!
+      klass, option_name = args
+      option_name ||= klass.name.underscore.to_sym
+      _include_bundle(klass, option_name, local_options) if self.options[option_name]
+    end
+    
+    
+    def include_bundle(*args)
+      local_options = args.extract_options!
+      klass, option_name = args
+      option_name ||= klass.name.underscore.to_sym
+      _include_bundle(klass, option_name, local_options)
+    end
+    
+    def _include_bundle(klass, option_name, local_options)
+      external_options = self.options[option_name]
+      name = "#{self.name}_#{option_name}"
+      klass.new(name, (external_options || {}).merge(local_options))
+      self.options["#{option_name}_bundle"] = name
+    end
+
   end
   
 end
