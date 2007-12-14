@@ -1,4 +1,4 @@
-plugin_model :Globals do 
+bundle_model :Globals do 
   
   set_table_name _table_name_
 

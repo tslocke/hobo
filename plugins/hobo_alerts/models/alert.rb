@@ -1,4 +1,4 @@
-plugin_model :Alert do 
+bundle_model :Alert do 
   
   fields do
     name :string
