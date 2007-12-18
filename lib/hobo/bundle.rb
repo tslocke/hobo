@@ -8,11 +8,12 @@ module ::Hobo
     
     class << self
       
-      attr_accessor :bundles
+      attr_accessor :bundles, :plugin
       
       def inherited(base)
-        filename = caller[0].match(/^(.*):\d+:/)[1]
-        dirname = filename.gsub(/\/init.rb$/, "")
+        filename = caller[0].match(/^(.*):\d+/)[1]
+        dirname = filename.match(%r(^.*/plugins/[^/]+))[0]
+        base.plugin = File.basename(dirname)
         
         base.meta_eval do 
           attr_accessor :models, :controllers
@@ -47,12 +48,15 @@ module ::Hobo
     end
     
     def initialize(*args)
-      options = args.extract_options!
+      options = args.extract_options!.with_indifferent_access
       
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
       Bundle.bundles[name] = self
       
       @renames, @options = separate_renames(options)
+      @defaults = defaults.with_indifferent_access
+      
+      includes
 
       create_models
       create_controllers
@@ -62,9 +66,16 @@ module ::Hobo
     
     attr_accessor :renames, :options, :name
     
-    def init
-      # optionally overridden by the bundle subclass
+    # optionally overridden by the bundle subclass
+    def includes; end
+    def init;     end
+    def defaults; {}; end
+
+    
+    def plugin
+      self.class.plugin
     end
+    
     
     def create_models
       self.class.models.each do |name, block|
@@ -101,7 +112,7 @@ module ::Hobo
         bundle
       end
       
-      klass.meta_def(:_bundle_feature) do |feature, block|
+      klass.meta_def(:_feature) do |feature, block|
         has_feature = bundle.option(feature)
         if has_feature
           define_method("features_#{feature}?") { true }
@@ -134,7 +145,17 @@ module ::Hobo
     
     
     def separate_renames(options)
-      options.partition_hash { |k, v| k.to_s =~ /[A-Z]/ }
+      simple_options, renames = HashWithIndifferentAccess.new, HashWithIndifferentAccess.new
+      options.each do |k, v| 
+        if k.to_s =~ /^[A-Z]/
+          renames[k] = v.to_s
+          renames[k.to_s.underscore] = v.to_s.underscore.to_sym
+          renames[k.to_s.underscore.pluralize] = v.to_s.underscore.pluralize.to_sym
+        else
+          simple_options[k] = v
+        end
+      end
+      [renames, simple_options]
     end
     
     
@@ -156,23 +177,30 @@ module ::Hobo
     # name like _foo_ or _MyFoo_
     def magic_option(name)
       option_name = name.to_s[1..-2]
-      case option_name
-        when "bundle";   self.name
-        when /^[A-Z]/; new_name_for(option_name.to_syn)
-        else           option(option_name.to_sym)
-      end
+      if option_name == "bundle"
+        self.name
+      elsif has_option?(option_name)
+        option(option_name)
+      else
+        new_name_for(option_name)
+      end 
+    end
+    
+    
+    def has_option?(name)
+      options.has_key?(name) || @defaults.has_key?(name)
     end
     
     
     def option(name)
-      options[name] || defaults[name]
+      options[name] || @defaults[name]
     end
     
     
     def optional_bundle(*args)
       local_options = args.extract_options!
       klass, option_name = args
-      option_name ||= klass.name.underscore.to_sym
+      option_name ||= klass.name.underscore
       _include_bundle(klass, option_name, local_options) if self.options[option_name]
     end
     
@@ -180,14 +208,16 @@ module ::Hobo
     def include_bundle(*args)
       local_options = args.extract_options!
       klass, option_name = args
-      option_name ||= klass.name.underscore.to_sym
+      option_name ||= klass.name.underscore
       _include_bundle(klass, option_name, local_options)
     end
     
+    
     def _include_bundle(klass, option_name, local_options)
       external_options = self.options[option_name]
+      external_options = {} if external_options.nil? || external_options == true
       name = "#{self.name}_#{option_name}"
-      klass.new(name, (external_options || {}).merge(local_options))
+      klass.new(name, external_options.merge(local_options))
       self.options["#{option_name}_bundle"] = name
     end
 

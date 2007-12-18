@@ -82,7 +82,7 @@ module Hobo::Dryml
           @environment.class_eval(method_src, template_path, instruction[:line_num])
           
         when :include
-          import_taglib(name, :as => instruction[:as])
+          import_taglib(instruction)
           
         when :module
           import_module(name.constantize, instruction[:as])
@@ -104,23 +104,25 @@ module Hobo::Dryml
 
     def import_taglib(options)
       if options[:module]
-        raise NotImplementedError if options[:as]
-        @environment.send(:include, options[:module].constantize)
+        import_module(options[:module].constantize, options[:as])
       else
-        taglib = Taglib.get(options.merge(:template_path => template_path))
+        template_dir = File.dirname(template_path)
+        taglib = Taglib.get(options.merge(:template_dir => template_dir))
         taglib.import_into(@environment, options[:as])
       end
     end
 
 
     def import_module(mod, as=nil)
+      raise NotImplementedError if as
+      @environment.send(:include, mod)
     end
   
 
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
-        import_taglib("taglibs/themes/#{name}/application")
+        import_taglib(:src => "taglibs/themes/#{name}/application")
       end
     end
   end

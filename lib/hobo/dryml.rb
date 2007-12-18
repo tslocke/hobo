@@ -24,8 +24,8 @@ module Hobo
 
     EMPTY_PAGE = "[tag-page]"
 
-    APPLICATION_TAGLIB = "taglibs/application"
-    CORE_TAGLIB = "plugins/hobo/tags/core"
+    APPLICATION_TAGLIB = { :src => "taglibs/application" }
+    CORE_TAGLIB        = { :src => "core", :plugin => "hobo" }
     
     DEFAULT_IMPORTS = [Hobo::HoboHelper, ApplicationHelper]
 
@@ -104,7 +104,7 @@ module Hobo
         parts = page.split("/")
         if parts.length == 3
           subsite = parts.first
-          "taglibs/#{subsite}" if File.exists?("#{RAILS_ROOT}/app/views/taglibs/#{subsite}.dryml")
+          { :src => "taglibs/#{subsite}" } if File.exists?("#{RAILS_ROOT}/app/views/taglibs/#{subsite}.dryml")
         end
       end
 
