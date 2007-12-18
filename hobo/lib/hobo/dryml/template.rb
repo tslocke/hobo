@@ -28,7 +28,7 @@ module Hobo::Dryml
       end
     end
 
-    def initialize(src, environment, template_path, renames)
+    def initialize(src, environment, template_path, renames={})
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
@@ -179,10 +179,11 @@ module Hobo::Dryml
     def include_element(el)
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
-      @builder.add_build_instruction(:include, 
-                                     :src    => el.attributes["src"], 
-                                     :module => el.attributes["module"],
-                                     :as     => el.attributes["as"])
+      options = {}
+      %w(src module plugin bundle as).each do |attr|
+        options[attr.to_sym] = el.attributes[attr] if el.attributes[attr]
+      end
+      @builder.add_build_instruction(:include, options)
     end
     
 

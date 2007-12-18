@@ -7,7 +7,7 @@ bundle_model :Comment do
     f.timestamps
   end
 
-  belongs_to :target, :class_name => _CommentTarget_
+  belongs_to _comment_target_
   
   feature :author_model do
     belongs_to :author, :class_name => _author_model_ 

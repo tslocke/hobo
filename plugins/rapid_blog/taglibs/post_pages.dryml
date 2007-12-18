@@ -14,8 +14,8 @@
 </def>
 
 
-<def tag="show-page">
-  <show-page title="#{this.title}">
+<def tag="show-page" extend-with="rapid-blog">
+  <show-page-without-rapid-blog>
     <main:>
       <blog-post-show/>
     </main>

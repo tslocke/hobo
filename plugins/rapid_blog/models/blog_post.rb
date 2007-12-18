@@ -13,8 +13,8 @@ bundle_model :BlogPost do
   end
   
   feature :categories do 
-    has_many :categorisations, :class_name => _BlogPostCategorisations_
-    has_many :categories, :through => :categorisations, :class_name => _BlogPostCategory_
+    has_many :categorisations, :class_name => _BlogPostCategorisation_
+    has_many :categories, :through => :categorisations, :class_name => _BlogPostCategory_, :source => :blog_post_category
   end
   
   def_scope :recent do |limit|

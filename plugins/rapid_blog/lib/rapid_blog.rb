@@ -1,6 +1,6 @@
 class RapidBlog < Hobo::Bundle
   
-  def init
+  def includes
     optional_bundle(RapidComments, :comments,
                     :CommentTarget => :BlogPost,
                     :Comment       => :BlogPostComment)
@@ -9,7 +9,9 @@ class RapidBlog < Hobo::Bundle
                     :Tag       => :BlogPostCategory,
                     :TagTarget => :BlogPost,
                     :Tagging   => :BlogPostCategorisation)
-    
+  end
+  
+  def init
     customize :BlogPostCommentsController do
       def create
         hobo_create do
