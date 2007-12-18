@@ -2,7 +2,7 @@
   <article class="blog-post-summary">
     <delete-button label="Delete #{@model.name.titleize}"/>
     <heading param="title"><a><view:title/></a></heading>
-    <do if="has_comments?">
+    <do if="features_comments?">
       <p class="date-comment-summary">
         <span class="created-at"><view:created_at/></span>
         <count:comments if-any/>
@@ -20,7 +20,7 @@
     <heading param="title"><a><editor:title/></a></heading>
     <div class="created-at" param="created-at"><view:created_at/></div>
     <div class="body" param="body"><editor:body/></div>
-    <if test="&this.class.has_feature(:comments)">
+    <do if="features_comments?">
       <div>
         <a name="comments"></a>
         <set count="&1"/>
@@ -39,7 +39,7 @@
         <a name="bottom"></a>
         <new-comment-form/>
       </div>
-    </if>
+    </do>
   </article>
 </def>
 

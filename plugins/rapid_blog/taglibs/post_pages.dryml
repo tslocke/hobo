@@ -15,9 +15,12 @@
 
 
 <def tag="show-page" extend-with="rapid-blog">
-  <show-page-without-rapid-blog>
-    <main:>
+  <show-page-without-rapid-blog layout="aside">
+    <main-content:>
       <blog-post-show/>
-    </main>
+    </main-content>
+    <aside:>
+      <list-blog-post-categories:categories/>
+    </aside:>
   </show-page>
 </def>
