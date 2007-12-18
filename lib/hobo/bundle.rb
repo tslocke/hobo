@@ -119,8 +119,8 @@ module ::Hobo
           meta_def("features_#{feature}?") { true }
           block.call if block
         else
-          define_method("has_#{feature}?") { false }
-          meta_def("has_#{feature}?") { false }
+          define_method("features_#{feature}?") { false }
+          meta_def("features_#{feature}?") { false }
         end      
       end
       silence_warnings { Object.const_set(name, klass) }
