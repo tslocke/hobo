@@ -48,13 +48,13 @@ module ::Hobo
     end
     
     def initialize(*args)
-      options = args.extract_options!.with_indifferent_access
+      options = defaults.with_indifferent_access
+      options.update(args.extract_options!)
       
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
       Bundle.bundles[name] = self
       
       @renames, @options = separate_renames(options)
-      @defaults = defaults.with_indifferent_access
       
       includes
 
@@ -179,21 +179,11 @@ module ::Hobo
       option_name = name.to_s[1..-2]
       if option_name == "bundle"
         self.name
-      elsif has_option?(option_name)
-        option(option_name)
+      elsif options.has_key?(name)
+        options[option_name]
       else
         new_name_for(option_name)
       end 
-    end
-    
-    
-    def has_option?(name)
-      options.has_key?(name) || @defaults.has_key?(name)
-    end
-    
-    
-    def option(name)
-      options[name] || @defaults[name]
     end
     
     

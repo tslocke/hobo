@@ -3,11 +3,9 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_user_model
 
   fields do
-    username :string
+    username :string, :login => true
     timestamps
   end
-
-  set_login_attr :username
   
   alias_attribute :to_s, :username
 
