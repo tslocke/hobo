@@ -7,10 +7,10 @@ bundle_model :Comment do
     f.timestamps
   end
 
-  belongs_to _comment_target_
+  belongs_to _comment_target_, :primary => true
   
   feature :author_model do
-    belongs_to :author, :class_name => _author_model_ 
+    belongs_to :author, :class_name => _author_model_, :creator => true
   end
   
   def creatable_by?(user);       true; end

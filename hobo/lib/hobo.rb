@@ -208,54 +208,66 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      setter = "#{field.to_s.sub /\?$/, ''}=" 
-      return false unless can_view?(person, object, field) and object.respond_to?(setter)
+      # Can't view implies can't edit
+      return false if !can_view?(person, object, field)
       
-      refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
-      
-      # has_one and polymorphic associations are not editable (for now)
-      return false if refl and (refl.options[:polymorphic] or refl.macro == :has_one)
-      
-      if object.has_hobo_method?(:editable_by?)
-        check_permission(:edit, person, object, field.to_sym)
-      elsif object.has_hobo_method?("#{field}_editable_by?")
-        object.send("#{field}_editable_by?", person)
-      else
-        # Fake an edit test by setting the field in question to
-        # Hobo::Undefined and then testing for update permission
-        
-        # This technique is not suitable for has_many associations
-        return false if refl._?.macro == :has_many
-        
-        current = object.send(field)
-        new = object.duplicate
-
-        begin
-          # Setting the undefined value can sometimes result in an
-          # UndefinedAccessError. In that case we have no choice but
-          # return false.
-          new.send(setter, if current == true
-                             false
-                           elsif current == false
-                             true
-                           elsif refl and refl.macro == :belongs_to
-                             Hobo::Undefined.new(refl.klass)
-                           else
-                             Hobo::Undefined.new
-                           end)
-        rescue Hobo::UndefinedAccessError
-          raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " + 
-                            "define editable_by?(user, field)")
+      if field.nil?
+        if respond_to?(:editable_by?)
+          object.editable_by?(person) 
+        else
+          object.updatable_by?(person, nil)
         end
         
-        begin
-          if object.new_record?
-            check_permission(:create, person, new)
-          else
-            check_permission(:update, person, object, new)
+      else
+        setter = "#{field.to_s.sub /\?$/, ''}=" 
+        return false if !object.respond_to?(setter)
+        
+        refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
+        
+        # has_one and polymorphic associations are not editable (for now)
+        return false if refl and (refl.options[:polymorphic] or refl.macro == :has_one)
+        
+        if object.has_hobo_method?("#{field}_editable_by?")
+          object.send("#{field}_editable_by?", person)
+        elsif object.has_hobo_method?(:editable_by?)
+          check_permission(:edit, person, object)
+        else
+          # Fake an edit test by setting the field in question to
+          # Hobo::Undefined and then testing for update permission
+          
+          # This technique is not suitable for has_many associations
+          return false if refl._?.macro == :has_many
+          
+          current = object.send(field)
+          new = object.duplicate
+
+          begin
+            # Setting the undefined value can sometimes result in an
+            # UndefinedAccessError. In that case we have no choice but
+            # return false.
+            new.send(setter, if current == true
+                               false
+                             elsif current == false
+                               true
+                             elsif refl and refl.macro == :belongs_to
+                               Hobo::Undefined.new(refl.klass)
+                             else
+                               Hobo::Undefined.new
+                             end)
+          rescue Hobo::UndefinedAccessError
+            raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " + 
+                              "define editable_by?(user, field)")
           end
-        rescue Hobo::UndefinedAccessError
-          false
+          
+          begin
+            if object.new_record?
+              check_permission(:create, person, new)
+            else
+              check_permission(:update, person, object, new)
+            end
+          rescue Hobo::UndefinedAccessError
+            false
+          end
         end
       end
     end

@@ -9,7 +9,7 @@
 <include src="rapid_plus"/>
 
 <def tag="field-list" attrs="tag">
-  <% tag ||= scope.in_form ? "input" : "editor" %>
+  <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
       <labelled-item unless="&tag == 'input' && !can_edit?">
@@ -104,7 +104,18 @@
 
 <def tag="card">
   <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card" unless="&poly"><type-name/>: <a/></div>
+  <div class="card" unless="&poly">
+    <a/>
+    <div class="creation-details">
+      <if test="&this.class.creator_association">
+        Created by <view with="&this.send(this.class.creator_association)"/> 
+        <do if="&this.respond_to?(:created_at)">on <view:created_at /></do>
+      </if>
+      <else if="&this.respond_to?(:created_at)">
+        Created <view:created_at/>
+      </else>
+    </div>
+  </div>
 </def>
   
 

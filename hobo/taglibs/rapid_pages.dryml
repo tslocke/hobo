@@ -119,12 +119,32 @@
   <page layout="&layout" merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
-      <heading param><type-name/><if test="&this.respond_to? :name">: <editor:name/></if></heading>
-      <a action="edit">Edit <type-name/></a>
+      <heading param><%= this %></heading>
+
+      <if test="&this.class.creator_association">
+        Created by <view with="&this.send(this.class.creator_association)"/> 
+        <do if="&this.respond_to?(:created_at)">on <view:created_at /></do>
+      </if>
+      <else if="&this.respond_to?(:created_at)">
+        Created <view:created_at/>
+      </else>
+
+      <a action="edit" if="&can_edit?(this, nil)">Edit <type-name/></a>
+      <% this.class.primary_collections.each do |c| %>
+        <count with="&this.send(c)"/>
+      <% end %>
     </content-header>
     
     <content-body: param>
-      <field-list skip="name" param/>
+      <view with="&this.send(this.class.primary_content_attribute)" if="&this.class.primary_content_attribute"/>
+
+      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute].compact" skip-associations="has_many" param/>
+
+      <% this.class.primary_collections.each do |c| %>
+        <ul with="&this.send(c)">
+          <li:><card/></li:>
+        </ul>
+      <% end %>
 
       <nav param="new-links">
         <ul with="&has_many_assocs">
