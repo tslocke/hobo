@@ -113,7 +113,7 @@ module ::Hobo
       end
       
       klass.meta_def(:_feature) do |feature, block|
-        has_feature = bundle.option[feature]
+        has_feature = bundle.options[feature]
         if has_feature
           define_method("features_#{feature}?") { true }
           meta_def("features_#{feature}?") { true }
