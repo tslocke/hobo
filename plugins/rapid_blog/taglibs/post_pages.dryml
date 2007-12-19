@@ -1,4 +1,4 @@
-<include src="hobo_blog"/>
+<include src="rapid_blog"/>
 
 <def tag="index-page" extend-with="hobo-blog">
   <index-page-without-hobo-blog title="#{@model.name.titleize.pluralize}">
