@@ -179,7 +179,7 @@ module ::Hobo
       option_name = name.to_s[1..-2]
       if option_name == "bundle"
         self.name
-      elsif options.has_key?(name)
+      elsif options.has_key?(option_name)
         options[option_name]
       else
         new_name_for(option_name)
