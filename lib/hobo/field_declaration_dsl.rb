@@ -19,6 +19,8 @@ module Hobo
       
       @model.name_attribute = name.to_sym            if options.delete(:name)
       @model.primary_content_attribute = name.to_sym if options.delete(:description)
+
+      @model.send(:login_attribute=, name.to_sym, options.delete(:validate)) if @model < User && options.delete(:login)
       
       @model.send(:set_field_type, name => type) unless
         type.in?(@model.connection.native_database_types.keys - [:text])
