@@ -189,25 +189,25 @@ module ::Hobo
     
     def optional_bundle(*args)
       local_options = args.extract_options!
-      klass, option_name = args
-      option_name ||= klass.name.underscore
-      _include_bundle(klass, option_name, local_options) if self.options[option_name]
+      class_name, option_name = args
+      option_name ||= class_name.to_s.underscore
+      _include_bundle(class_name, option_name, local_options) if self.options[option_name]
     end
     
     
     def include_bundle(*args)
       local_options = args.extract_options!
-      klass, option_name = args
-      option_name ||= klass.name.underscore
-      _include_bundle(klass, option_name, local_options)
+      class_name, option_name = args
+      option_name ||= class_name.to_s.underscore
+      _include_bundle(class_name, option_name, local_options)
     end
     
     
-    def _include_bundle(klass, option_name, local_options)
+    def _include_bundle(class_name, option_name, local_options)
       external_options = self.options[option_name]
       external_options = {} if external_options.nil? || external_options == true
       name = "#{self.name}_#{option_name}"
-      klass.new(name, external_options.merge(local_options))
+      class_name.to_s.constantize.new(name, external_options.merge(local_options))
       self.options["#{option_name}_bundle"] = name
     end
 
