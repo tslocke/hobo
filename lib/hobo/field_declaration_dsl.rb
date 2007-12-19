@@ -16,6 +16,10 @@ module Hobo
     def field(name, *args)
       type = args.shift
       options = args.extract_options!
+      
+      @model.name_attribute = name.to_sym            if options.delete(:name)
+      @model.primary_content_attribute = name.to_sym if options.delete(:description)
+      
       @model.send(:set_field_type, name => type) unless
         type.in?(@model.connection.native_database_types.keys - [:text])
       @model.field_specs[name] = FieldSpec.new(@model, name, type, options)

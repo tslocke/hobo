@@ -2,6 +2,9 @@ module Hobo
 
   module Model
     
+    NAME_FIELD_GUESS      = [:name, :title]
+    PRIMARY_CONTENT_GUESS = [:description, :body, :content, :profile]
+    
     PLAIN_TYPES = { :boolean       => TrueClass,
                     :date          => Date,
                     :datetime      => Time,
@@ -22,6 +25,7 @@ module Hobo
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
+        alias_method_chain :belongs_to, :hobo_metadata
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
         def inherited(klass)
           fields do
@@ -36,6 +40,32 @@ module Hobo
       
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
+      
+      attr_accessor :creator_association, :primary_association
+      attr_writer :name_attribute, :primary_content_attribute
+      
+      def name_attribute
+        @name_attribute ||= begin
+                              cols = columns.every :name
+                              NAME_FIELD_GUESS.detect {|f| f.to_s.in? columns.every(:name) }
+                            end
+      end
+      
+
+      def primary_content_attribute
+        @description_attribute ||= begin
+                                     cols = columns.every :name
+                                     PRIMARY_CONTENT_GUESS.detect {|f| f.to_s.in? columns.every(:name) }
+                                   end
+      end
+      
+      def primary_collections
+        reflections.values.select do |refl| 
+          refl.macro == :has_many &&
+            refl.klass.primary_association && 
+            refl.klass.primary_association == reverse_reflection(refl.name)._?.name
+        end.every(:name)
+      end
       
       private
       
@@ -74,6 +104,14 @@ module Hobo
           field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
         end
         res
+      end
+      
+      
+      def belongs_to_with_hobo_metadata(name, *args, &block)
+        options = args.extract_options!
+        self.creator_association = name.to_sym if options.delete(:creator)
+        self.primary_association = name.to_sym if options.delete(:primary)
+        belongs_to_without_hobo_metadata(name, *args + [options], &block)
       end
 
 
@@ -124,12 +162,6 @@ module Hobo
         (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
       public :never_show?
-
-      def set_creator_attr(attr)
-        @creator_attr = attr.to_sym
-      end 
-      attr_reader :creator_attr
-      public :creator_attr
 
       def set_search_columns(*columns)
         class_eval %{
@@ -281,7 +313,7 @@ module Hobo
       end
 
       def creator_type
-        reflections[@creator_attr]._?.klass
+        reflections[@creator_association]._?.klass
       end
 
       def search_columns
@@ -300,9 +332,9 @@ module Hobo
                           :has_many
                         end
         refl.klass.reflections.values.find do |r|
-          r.macro == reverse_macro and
-            r.klass == self and 
-            !r.options[:conditions] and
+          r.macro == reverse_macro &&
+            r.klass == self &&
+            !r.options[:conditions] &&
             r.primary_key_name == refl.primary_key_name
         end
       end
@@ -465,7 +497,7 @@ module Hobo
 
     
     def set_creator(user)
-      self.send("#{self.class.creator_attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
+      self.send("#{self.class.creator_association}=", user) if (t = self.class.creator_type) && user.is_a?(t)
     end
 
 
