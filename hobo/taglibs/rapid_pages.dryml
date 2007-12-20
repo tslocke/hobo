@@ -82,7 +82,15 @@
     </content-body>
     
     <content-footer: param>
-      <a to="&@model" action="new" param="new-link"/>
+      <a to="&@model" action="new" param="new-link" if="&linkable?(@model, :new)"/>
+      <else>
+        <do with="&new_for_current_user @model">
+          <section class="create-new" if="&can_create?">
+            <h2>New <type-name/></h2>
+            <form><field-list/><submit label="Create #{type_name}"/></form>
+          </section>
+        </do>
+      </else>
     </content-footer>
   </page>
 </def>
@@ -113,13 +121,13 @@
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
-     show_all_cards = this.class.dependent_collections if this.class.dependent_collections.length == 1 
+     show_all_cards = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
   %>
   <page layout="&layout" merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
-      <div class="container" if="&this.class.dependent_on">
-        <a field="&this.class.dependent_on.first"/>
+      <div class="container" if="dependent_on">
+        <a with="&this.dependent_on.first"/>
       </div>
 
       <heading param><%= this %></heading>
@@ -137,16 +145,29 @@
                   skip-associations="has_many" param/>
 
       <if test="&show_all_cards">
-        <ul field="&show_all_cards">
-          <li:><card/></li:>
-        </ul>
+        <section class="dependent-collection" field="&show_all_cards">
+          <h2><%= show_all_cards.to_s.titleize %></h2>
+          <ul><li:><card/></li:></ul>
+        
+          <do with="&new_for_current_user">
+            <section class="create-new" if="&!linkable?(:new) && can_create?">
+              <h2>New <type-name/></h2>
+              <form>
+                <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
+                            skip-associations="has_many" param/>
+                <submit label="Create #{type_name}"/>
+              </form>
+            </section>
+          </do>
+        </section>
       </if>
 
       <nav class="new-links" param="new-links">
         <ul with="&has_many_assocs">
-          <li: replace><li if="&can_create?"><a action="new"/></li></li>
+          <li: replace><li if="&can_create? && linkable?(:new)"><a action="new"/></li></li>
         </ul>
       </nav>
+
     </content-body>
   </page>
 </def>
