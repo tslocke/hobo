@@ -493,6 +493,11 @@ module Hobo
     end
     
     
+    def dependent_on
+      self.class.dependent_on.map { |assoc| send(assoc) }
+    end
+    
+    
     def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)

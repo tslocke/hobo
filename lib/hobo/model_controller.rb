@@ -370,6 +370,24 @@ module Hobo
     end
     
     
+    def destination_after_create(record)
+      # The after_submit post parameter takes priority
+      params[:after_submit] || 
+        
+        # Then try the records show page
+        object_url(@this,       :if_available => true) || 
+        
+        # Then the show page of the 'owning' object if there is one
+        (@this.dependent_on.first && object_url(@this.dependent_on.first, :if_available => true)) ||
+        
+        # Last try - the index page for this model
+        object_url(@this.class, :if_available => true) ||
+        
+        # Give up
+        home_page
+    end
+    
+    
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
@@ -448,7 +466,7 @@ module Hobo
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
+            wants.html { redirect_to(destination_after_create(@this)) }
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         elsif invalid?
