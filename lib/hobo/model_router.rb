@@ -1,12 +1,23 @@
+class ActionController::Routing::RouteSet
+  # Monkey patch this method so routes are reloaded on *every*
+  # request. Without this Rails checks the mtime of config/routes.rb
+  # which doesn't take into account Hobo's auto routing
+  def reload
+    load!
+  end
+end
+
 module Hobo
   
   class ModelRouter
     
-    @linkable = Hash.new {|h, k| h[k] = Hash.new {|h, k| h[k] = {} } }
-    
     APP_ROOT = "#{RAILS_ROOT}/app"
     
     class << self
+      
+      def reset_linkables
+        @linkable = Hash.new {|h, k| h[k] = Hash.new {|h, k| h[k] = {} } }
+      end
       
       def linkable(subsite, klass, action)
         @linkable[subsite][klass.name][action] = true
@@ -17,6 +28,7 @@ module Hobo
       end
       
       def add_routes(map)
+        reset_linkables
         begin 
           ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
         rescue
@@ -25,7 +37,7 @@ module Hobo
         end
 
         require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
-        require "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
+        load "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
 
         # Add non-subsite routes
         add_routes_for(map, nil)
