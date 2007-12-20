@@ -76,9 +76,7 @@
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
       
-      <table param>
-        <tr:><td><a/></td><td><delete-button update="item-count"/></td></tr>
-      </table>
+      <card repeat/>
       
       <nav param="bottom-pagination-nav"><page-nav/></nav>
     </content-body>
@@ -115,40 +113,38 @@
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
+     show_all_cards = this.class.dependent_collections if this.class.dependent_collections.length == 1 
   %>
   <page layout="&layout" merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
+      <div class="container" if="&this.class.dependent_on">
+        <a field="&this.class.dependent_on.first"/>
+      </div>
+
       <heading param><%= this %></heading>
 
-      <if test="&this.class.creator_association">
-        Created by <view with="&this.send(this.class.creator_association)"/> 
-        <do if="&this.respond_to?(:created_at)">on <view:created_at /></do>
-      </if>
-      <else if="&this.respond_to?(:created_at)">
-        Created <view:created_at/>
-      </else>
+      <creation-details/>
 
-      <a action="edit" if="&can_edit?(this, nil)">Edit <type-name/></a>
-      <% this.class.primary_collections.each do |c| %>
-        <count with="&this.send(c)"/>
-      <% end %>
+      <a action="edit" if="&can_edit?(this, nil)" class="edit">Edit <type-name/></a>
+      <count field="&show_all_cards" if="&show_all_cards"/>
     </content-header>
     
     <content-body: param>
-      <view with="&this.send(this.class.primary_content_attribute)" if="&this.class.primary_content_attribute"/>
+      <view field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
 
-      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute].compact" skip-associations="has_many" param/>
+      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_association, this.class.dependent_on.first].compact "
+                  skip-associations="has_many" param/>
 
-      <% this.class.primary_collections.each do |c| %>
-        <ul with="&this.send(c)">
+      <if test="&show_all_cards">
+        <ul field="&show_all_cards">
           <li:><card/></li:>
         </ul>
-      <% end %>
+      </if>
 
-      <nav param="new-links">
+      <nav class="new-links" param="new-links">
         <ul with="&has_many_assocs">
-          <li:><a action="new"/></li>
+          <li: replace><li if="&can_create?"><a action="new"/></li></li>
         </ul>
       </nav>
     </content-body>

@@ -3,12 +3,10 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_user_model
 
   fields do
-    username :string, :login => true
+    username :string, :login => true, :name => true
     timestamps
   end
   
-  alias_attribute :to_s, :username
-
   # --- Hobo Permissions --- #
 
   # It is possible to override the permission system entirely by
