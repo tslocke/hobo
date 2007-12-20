@@ -195,7 +195,11 @@ module Hobo
      
     def can_edit?(*args)
       if args.empty?
-        this_parent && this_field && can_edit?(this_parent, this_field)
+        if this_parent && this_field
+          can_edit?(this_parent, this_field)
+        else
+          can_edit?(this, nil)
+        end
       else
         object, field = args.length == 2 ? args : [this, args.first]
         

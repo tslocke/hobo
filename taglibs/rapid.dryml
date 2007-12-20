@@ -106,15 +106,7 @@
   <%= poly = call_polymorphic_tag('card', attributes) %>
   <div class="card" unless="&poly">
     <a/>
-    <div class="creation-details">
-      <if test="&this.class.creator_association">
-        Created by <view with="&this.send(this.class.creator_association)"/> 
-        <do if="&this.respond_to?(:created_at)">on <view:created_at /></do>
-      </if>
-      <else if="&this.respond_to?(:created_at)">
-        Created <view:created_at/>
-      </else>
-    </div>
+    <creation-details/>
   </div>
 </def>
   
@@ -434,4 +426,12 @@ in the future - use at your own risk. -->
 <def tag="Your">
   <if test="&this == current_user">Your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+</def>
+
+
+<def tag="creation-details">
+  <div class="creation-details">
+    <view with="&this.send(this.class.creator_association)" if="&this.class.creator_association" />
+    <view:created_at if="&this.respond_to?(:created_at)"/>
+  </div>
 </def>

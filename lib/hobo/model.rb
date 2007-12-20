@@ -41,7 +41,7 @@ module Hobo
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
       
-      attr_accessor :creator_association, :primary_association
+      attr_accessor :creator_association
       attr_writer :name_attribute, :primary_content_attribute
       
       def name_attribute
@@ -59,11 +59,16 @@ module Hobo
                                    end
       end
       
-      def primary_collections
+      def dependent_collections
         reflections.values.select do |refl| 
-          refl.macro == :has_many &&
-            refl.klass.primary_association && 
-            refl.klass.primary_association == reverse_reflection(refl.name)._?.name
+          refl.macro == :has_many && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
+        end.every(:name)
+      end
+      
+      
+      def dependent_on
+        reflections.values.select do |refl| 
+          refl.macro == :belongs_to && refl.options[:dependent]
         end.every(:name)
       end
       
@@ -110,7 +115,6 @@ module Hobo
       def belongs_to_with_hobo_metadata(name, *args, &block)
         options = args.extract_options!
         self.creator_association = name.to_sym if options.delete(:creator)
-        self.primary_association = name.to_sym if options.delete(:primary)
         belongs_to_without_hobo_metadata(name, *args + [options], &block)
       end
 
@@ -519,11 +523,15 @@ module Hobo
 
 
     def same_fields?(other, *fields)
+      return true if other.nil?
+      
       fields = fields.flatten
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
     def only_changed_fields?(other, *changed_fields)
+      return true if other.nil?
+      
       changed_fields = changed_fields.flatten.every(:to_s)
       all_cols = self.class.columns.every(:name) - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
@@ -546,10 +554,8 @@ module Hobo
     end
     
     def to_s
-      if respond_to? :title
-        title
-      elsif respond_to? :name
-        name
+      if self.class.name_attribute
+        send self.class.name_attribute
       else
         "#{self.class.name.titleize} #{id}"
       end
