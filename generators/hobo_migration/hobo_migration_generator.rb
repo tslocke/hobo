@@ -78,7 +78,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
     
-    action = input("What now: [g]enerate migrations, generate and [m]igrate now or [c]ancel?", %w(g m c))
+    action = input("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", %w(g m c))
 
     if action == 'c'
       # record nothing to keep the generator happy
