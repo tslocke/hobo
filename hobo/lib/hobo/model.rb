@@ -61,14 +61,14 @@ module Hobo
       
       def dependent_collections
         reflections.values.select do |refl| 
-          refl.macro == :has_many && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
+          refl.macro == :has_many && refl.options[:dependent]
         end.every(:name)
       end
       
       
       def dependent_on
         reflections.values.select do |refl| 
-          refl.macro == :belongs_to && refl.options[:dependent]
+          refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
         end.every(:name)
       end
       
