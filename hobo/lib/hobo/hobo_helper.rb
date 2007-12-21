@@ -363,7 +363,7 @@ module Hobo
     
     def linkable?(*args)
       options = args.extract_options!
-      target = args.first.is_a?(Symbol) ? this : args.shift
+      target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
       action = args.first
 
       if target.is_a?(Class)

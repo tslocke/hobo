@@ -104,8 +104,11 @@
 
 <def tag="card">
   <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card" unless="&poly">
-    <a/>
+  <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
+    <a if="&linkable?"/>
+    <else>
+      <primary-content/>
+    </else>
     <creation-details/>
   </div>
 </def>
@@ -165,7 +168,7 @@
   end
 %></def>
 
-<def tag="type-name" attrs="type, plural, lowercase"><%=
+<def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
   type ||= if this.is_a?(Class)
              this
            elsif this.respond_to? :proxy_reflection
@@ -173,7 +176,7 @@
            else
              this.class
            end
-  name = type.name.titleize
+  name = dasherize ? type.name.underscore.dasherize : type.name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
   name
@@ -294,7 +297,7 @@
 %></def>
 
     
-<def tag="belongs-to-view"><a/></def>
+<def tag="belongs-to-view"><a merge-attrs/></def>
 
 <def tag="has-many-view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
 
@@ -430,8 +433,12 @@ in the future - use at your own risk. -->
 
 
 <def tag="creation-details">
-  <div class="creation-details">
-    <view with="&this.send(this.class.creator_association)" if="&this.class.creator_association" />
-    <view:created_at if="&this.respond_to?(:created_at)"/>
-  </div>
+  <span class="creation-details">
+    <view with="&this.send(this.class.creator_association)" class="creator" if="&this.class.creator_association" />
+    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
+  </span>
+</def>
+
+<def tag="primary-content">
+  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
 </def>
