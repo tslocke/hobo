@@ -1,4 +1,4 @@
-<page title="#{app_name}">
+<page>
 
   <body: class="front-page"/>
 
