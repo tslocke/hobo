@@ -419,9 +419,9 @@ module Hobo::Dryml
                            # holding a proc
                            param_restore_local_name(name)
                          elsif (call_type = polymorphic_call_type(el))
-                           "find_polymorphic_tag(:#{name.underscore}, #{call_type})"
+                           "find_polymorphic_tag(:#{ruby_name name}, #{call_type})"
                          else
-                           ":#{name.underscore}"
+                           ":#{ruby_name name}"
                          end
                "call_tag_parameter(#{to_call}, #{args})"
              else
@@ -429,11 +429,11 @@ module Hobo::Dryml
                  # The tag is a proc available in a local variable
                  "#{param_restore_local_name(name)}.call(#{attributes}, #{parameters})"
                elsif (call_type = polymorphic_call_type(el))
-                 "send(find_polymorphic_tag(:#{name.underscore}, #{call_type}), #{attributes}, #{parameters})"
+                 "send(find_polymorphic_tag(:#{ruby_name name}, #{call_type}), #{attributes}, #{parameters})"
                elsif attributes == "{}" && parameters == "{}"
-                 "#{name.underscore}.to_s"
+                 "#{ruby_name name}.to_s"
                else
-                 "#{name.underscore}(#{attributes}, #{parameters})"
+                 "#{ruby_name name}(#{attributes}, #{parameters})"
                end
              end
 
@@ -525,7 +525,7 @@ module Hobo::Dryml
     
     
     def param_restore_local_name(name)
-      "_#{name.underscore}_restore"
+      "_#{ruby_name name}_restore"
     end
     
     
@@ -550,7 +550,7 @@ module Hobo::Dryml
     
     
     def param_content_local_name(name)
-      "_#{name.underscore}__default_content"
+      "_#{ruby_name name}__default_content"
     end
     
         
