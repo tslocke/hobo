@@ -381,6 +381,14 @@ module Hobo
     end
    
     
+    # Convenience helper for the default app
+    
+    def front_models
+      Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}
+    end
+    
+    
+    
     # debugging support
      
     def abort_with(*args)

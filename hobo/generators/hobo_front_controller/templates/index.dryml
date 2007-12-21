@@ -13,18 +13,16 @@
   </content-header>
 
   <content-body:>
-    <ul with="&Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}">
+    <ul with="&front_models">
       <li:>
         <header><h2><a/></h2></header>
         <section>
           <p if="&this.count == 0">There are no <type-name plural/></p>
           <else>
-            <repeat with="&this.find(:all, :limit => 3)">
-              <card if="&can_view?"/>
-            </repeat>
+            <card repeat="&select_viewable(this.recent.all)"/>
             <p><a>More</a> (<count/>)</p>
           </else>
-          <p if="&can_create?">Create a <a to="&this" action="new"/>.</p>
+          <p if="&can_create? && linkable?(:new)">Create a <a to="&this" action="new"/>.</p>
         </section>
       </li:>
     </ul>  
