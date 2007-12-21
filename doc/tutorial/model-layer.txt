@@ -337,11 +337,22 @@ Aside: Does this feel too magical? Do we really want the automatic pages to be s
 
 In our app, there's really only one such relationship: adverts exist "inside" categories. We can declare this in the `Category` model by modifying the `has_many :adverts` declaration as follows:
 
+File: app/models/category.rb
+
     has_many :adverts, :dependent => :destroy
     
 That's it. You should see a couple of changes in the UI:
 
  * The show page for individual categories will now contain summary "cards" for each advert.
  * Each advert will provide a link back to its category, just above the title of the advert
+ 
+It also makes sense that when a user is deleted from this app, their adverts should be removed too. Let's declare that rule in the user model:
+
+File: app/models/user.rb
+
+    has_many :adverts, :dependent => :destroy
+    
+If you click on one of the user links in the app, you should now see that all of a user's adverts are listed. Remember it's very easy to change this if the assumptions built in to the automatic pages don't work for your application -- these are just useful defaults.
+
 
 We're now going to move on and look at customising the controllers. These automatic pages have some more smarts that respond to controller-level configuration, so we'll be able to improve the UI still more with just a few declarative changes.
