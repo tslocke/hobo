@@ -27,6 +27,14 @@
       <ajax-progress/>
       <header class="page-header" param>
         <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
+        <div class="search">
+          <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
+          <spinner id="search-spinner"/>
+        </div>
+        <section class="hidden" id="search-results-panel">
+          <h2>Search Results</h2>
+          <section id="search-results">&nbsp;</section>
+        </section>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
           <magic-nav class="main-nav" param="main-nav"/>
@@ -156,7 +164,7 @@
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
               <h2>New <%= show_all_cards.to_s.singularize.titleize %></h2>
-              <form update="dependent-collection" reset-form>
+              <form update="dependent-collection" message="Adding #{show_all_cards.to_s.singularize.titleize}..." reset-form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
                             skip-associations="has_many" param/>
                 <submit label="Create #{show_all_cards.to_s.singularize.titleize}"/>
