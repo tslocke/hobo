@@ -21,6 +21,7 @@ module Hobo
       base.extend(ClassMethods)
       base.class_eval do
         alias_method_chain :attributes=, :hobo_type_conversion
+        default_scopes
       end
       class << base
         alias_method_chain :has_many, :defined_scopes
@@ -43,6 +44,13 @@ module Hobo
       
       attr_accessor :creator_association
       attr_writer :name_attribute, :primary_content_attribute
+      
+      def default_scopes
+        def_scope :recent do |*args|
+          count = args.first || 3
+          { :limit => count, :order => "#{table_name}.created_at DESC" }
+        end
+      end
       
       def name_attribute
         @name_attribute ||= begin
