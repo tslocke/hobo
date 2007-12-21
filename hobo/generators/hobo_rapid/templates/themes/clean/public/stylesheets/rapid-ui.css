@@ -1,8 +1,8 @@
 .flash {
 	background: #92ab6e;
 	padding: 10px 30px; margin-top: 5px;
-	border: 2px solid #829862;
-	border-width: 2px 0;
+	border: 1px solid #829862;
+/*	border-width: 2px 0;*/
 	color: white;
 }
 
@@ -135,7 +135,7 @@ div.completions-popup ul li {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
-.field-list textarea, .field-list input { width: 100%; margin: 0; }
+.field-list textarea, .field-list input.string { width: 100%; margin: 0; }
 
 /*input[type=text].wide { width: 100%; }*/
 textarea { height: 170px; }
