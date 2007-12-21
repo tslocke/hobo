@@ -1,3 +1,5 @@
+.hidden {display: none;}
+
 .flash {
 	background: #92ab6e;
 	padding: 10px 30px; margin-top: 5px;
@@ -74,8 +76,13 @@ form .actions {margin: 30px 0;width: 100%; text-align: center;}
 
 /********* everything below here came from hobo_rapid.css, needs looking at ********/
 
-/**** Default styling for Rapid ****/
+/**** Default styling for Rapid ***/
 
+#ajax-progress {
+	float: right; margin: 20px;
+	position: fixed; display: none; z-index: 10;
+}
+/*
 #ajax-progress {
     color: grey;
     float: right;
@@ -91,14 +98,14 @@ form .actions {margin: 30px 0;width: 100%; text-align: center;}
     border: 1px dashed grey;
     margin: 10px;
     padding: 3px;
-/*    padding-top: -15px;*/
+    padding-top: -15px;
 }
 
 #ajax-progress img {
     padding-left: 6px;
     vertical-align: middle;
 }
-
+*/
 
 /* Scriptaculous Autocompleter ---*/
 
