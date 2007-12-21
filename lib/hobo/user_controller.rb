@@ -79,7 +79,7 @@ module Hobo
 
     
     def hobo_logout(options={})
-      options = options.reverse_merge(:notice => "You have been logged out.",
+      options = options.reverse_merge(:notice => "You have logged out.",
                                       :redirect_to => base_url)
         
       current_user.forget_me if logged_in?
