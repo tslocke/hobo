@@ -1,8 +1,8 @@
 html {background: #666;}
 body {
-	width: 800px; margin: 0 auto; background: white;
-	font: 14px "Lucida Grande", Arial, sans-serif;
-	line-height: 21px; padding-bottom: 10px; margin-bottom: 20px;
+	width: 800px; margin: 0 auto; background: white; color: #222;
+	font: 13px "Lucida Grande", Arial, sans-serif;
+	line-height: 18px; padding-bottom: 10px; margin-bottom: 20px;
 }
 h1, h2, h3 {font-family: "Rockwell", "Trebuchet MS", "Arial", sans-serif;}
 h1 {font-size: 36px; line-height: 36px; margin: 20px 0 10px;}
@@ -19,11 +19,11 @@ a {
 	border-bottom: 1px dotted #aaa;
 }
 a:hover {border-bottom: 1px dotted #222;}
+h1 a, h2 a, h3 a {border: none;}
 
-
-input.text, input.string, input.email_address, input.password, textarea {
+/*input.text, input.string, input.email_address, input.password, textarea {
 	border: 2px solid #444; padding: 1px;
-}
+}*/
 
 input.file_upload {
 	border: 1px dotted #666;
@@ -36,7 +36,8 @@ input.file_upload {
 }
 .button:hover {cursor: pointer;}
 
-.content-header, .content-body, .content-footer {margin: 30px; padding: 0 30px;}
+.content-header, .content-body, .content-footer {margin: 20px 60px; padding: 0;}
+.flash {margin-left: 60px; margin-right: 60px;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
 /***********/
@@ -46,13 +47,15 @@ input.file_upload {
 .page-header .nav {padding-left: 30px; overflow: hidden; height: 100%;}
 .page-header .nav li {float: left; list-style: none; margin-left: 0;}
 .page-header a {color: white; border: none;}
+.page-content {padding-top: 10px;}
 ul.main-nav {float: left; margin: 0;}
 .main-nav li {background: black; margin-right: 10px;}
 .main-nav a {
+	background: #222;
 	display: block; padding: 8px 15px; border: none;
-	font: bold 16px "Myriad Pro", Arial, sans-serif; background: #222;
+	font: bold 16px "Myriad Pro", Arial, sans-serif; text-shadow: black 2px 2px 2px;
 }
-.main-nav a:hover {background: #222; border-bottom: none;}
+.main-nav a:hover {background: #444; border-bottom: none;}
 .account-nav {
 /*	clear: both; float: right;*/
 	position: absolute; top: 10px; right: 20px;
@@ -67,13 +70,36 @@ ul.main-nav {float: left; margin: 0;}
 
 .login-page {width: 50%;}
 
+.show-page .content-header {position: relative;}
+.show-page .content-header h1 {margin-bottom: 0;}
+.show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
+
+.show-page .create-new form .submit-button {margin: 20px 170px;}
+
+.card {
+	background: #f5f5f5;
+	border: 1px solid #e8e8e8;
+	padding:10px 20px;
+	margin-bottom: 5px;
+}
+.card .creation-details {
+	font-size: 11px; color: #333;
+}
+.card .datetime {color: #666;}
+
+.new-links {margin-top: 20px;}
+.new-links ul li {list-style: none; margin-left: 0;}
+
+.dependent-collection ul li {
+	list-style: none; margin-left: 0;
+}
 
 /*******************************************************/
 /* these styles are for the generated front index page */
 /* you can delete them if you over-ride it             */
 
 .front-page .welcome-message {
-	background: #eee; color: #222; padding: 10px 20px 20px;
+	background: #eee; color: #222; border: 1px solid #e8e8e8; padding: 10px 20px 20px;
 }
 .front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
