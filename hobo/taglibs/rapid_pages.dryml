@@ -134,22 +134,20 @@
   <page layout="&layout" merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
-      <div class="container" if="dependent_on">
-        <a with="&this.dependent_on.first"/>
-      </div>
+      <if with="&this.dependent_on.reject{|x| x.is_a?(Hobo::User)}.first">
+        <div class="container"><a/></div>
+      </if>
 
       <heading param><%= this %></heading>
-
       <creation-details/>
-      <a class="dependent-collection-count" href="##{show_all_cards.to_s.underscore}"><count field="&show_all_cards" if="&show_all_cards"/></a>
-      
-      <a action="edit" if="&can_edit?(this, nil)" class="edit">Edit <type-name/></a>
+      <a class="dependent-collection-count" href="##{show_all_cards.to_s.underscore}" if="&show_all_cards"><count-dependents/></a>
+      <a action="edit" if="&can_edit?" class="edit">Edit <type-name/></a>
     </content-header>
     
     <content-body: param>
       <primary-content param/>
 
-      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_association, this.class.dependent_on.first].compact "
+      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_attribute, this.class.dependent_on.first].compact "
                   skip-associations="has_many" param/>
 
       <if test="&show_all_cards">
@@ -163,7 +161,7 @@
         
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
-              <h2>New <%= show_all_cards.to_s.singularize.titleize %></h2>
+              <h2>Add <a-or-an word="&show_all_cards.to_s.singularize.titleize"/></h2>
               <form update="dependent-collection" message="Adding #{show_all_cards.to_s.singularize.titleize}..." reset-form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
                             skip-associations="has_many" param/>
