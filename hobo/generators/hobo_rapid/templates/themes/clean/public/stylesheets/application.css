@@ -116,9 +116,13 @@ ul.main-nav {float: left; margin: 0 10px;}
 
 .page-content {padding-top: 10px;}
 
-.edit-page .delete-button {margin-top: 25px;}
+.login-page, .signup-page {width: 50%; margin-top: 40px;}
+.login-page .field-list, .signup-page .field-list {width: 300px;}
+.login-page .field-list td, .signup-page .field-list td {width: auto;}
+.login-page .field-list th, .signup-page .field-list th {width: 120px;}
+.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}
 
-.login-page {width: 50%;}
+.edit-page .delete-button {margin-top: 25px;}
 
 .show-page .content-header {position: relative; border-bottom: 1px dotted #ddd;}
 .show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 4px; margin-right: 70px;}
@@ -131,7 +135,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 	padding: 0 30px;
 	border-top: 1px dotted #ddd; margin-top: 20px; background: #f5f5f5;
 }
-.show-page .create-new form .submit-button {margin: 20px 170px;}
+.show-page .create-new form .submit-button {margin: 20px 155px;}
 
 .card {
 	background: #f5f5f5;

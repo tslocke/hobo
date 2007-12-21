@@ -25,14 +25,6 @@ table.new-record textarea, table.new-record input {
 	display: inline;	
 }
 
-body.login-page {margin-top: 100px;}
-.login-page .content-header {padding-top: 10px;}
-
-form.login .field-list {width: 300px;}
-form.login .field-list {margin-bottom: 10px;}
-form.login .field-list th {width: 68px;}
-form.login .submit-button {margin-left: 83px;}
-
 .edit-page .content-header {overflow: hidden; height: 100%;}
 .edit-page .content-header h1 {float: left;}
 .edit-page .content-header .delete-button {float: right;}
@@ -142,7 +134,7 @@ div.completions-popup ul li {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
-.field-list textarea, .field-list input.string { width: 100%; margin: 0; }
+.field-list textarea, .field-list input.string, .field-list input.password { width: 100%; margin: 0; }
 
 /*input[type=text].wide { width: 100%; }*/
 textarea { height: 170px; }
