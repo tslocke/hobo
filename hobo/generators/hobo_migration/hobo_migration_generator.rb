@@ -34,7 +34,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
 
     to_create = model_table_names - db_tables
     to_drop = db_tables - model_table_names - ['schema_info']
-    to_change = db_tables & model_table_names
+    to_change = model_table_names
     
     to_rename = rename_or_drop!(to_create, to_drop, "table")
     
@@ -62,13 +62,13 @@ class HoboMigrationGenerator < Rails::Generator::Base
     changes = []
     undo_changes = []
     to_change.each do |t|
-      change, undo = change_table(models_by_table_name[t])
+      change, undo = change_table(models_by_table_name[t], to_rename.index(t))
       changes << change
       undo_changes << undo
     end
     
     up = [renames, drops, creates, changes].flatten.select{|s|!s.blank?} * "\n\n"
-    down = [undo_renames, undo_drops, undo_creates, undo_changes].flatten.select{|s|!s.blank?} * "\n\n"
+    down = [undo_changes, undo_renames, undo_drops, undo_creates].flatten.select{|s|!s.blank?} * "\n\n"
 
     if up.blank?
       puts "Database and models match -- nothing to change"
@@ -147,40 +147,42 @@ class HoboMigrationGenerator < Rails::Generator::Base
     "  t.%-*s %s" % [field_name_width, field_spec.sql_type, args.join(', ')]
   end
   
-  def change_table(model)
-    table_name = model.table_name
-    db_columns = model.connection.columns(model.table_name).index_by{|c|c.name} - [model.primary_key]
+  def change_table(model, current_table_name=nil)
+    new_table_name = model.table_name
+    current_table_name ||= new_table_name
+    
+    db_columns = model.connection.columns(current_table_name).index_by{|c|c.name} - [model.primary_key]
     model_column_names = model.field_specs.keys.every(:to_s)
     db_column_names = db_columns.keys.every(:to_s)
     
     to_add = model_column_names - db_column_names
     to_remove = db_column_names - model_column_names - [model.primary_key.to_sym]
 
-    to_rename = rename_or_drop!(to_add, to_remove, "column", "#{table_name}.")
+    to_rename = rename_or_drop!(to_add, to_remove, "column", "#{new_table_name}.")
 
     db_column_names -= to_rename.keys
     db_column_names |= to_rename.values
     to_change = db_column_names & model_column_names
     
     renames = to_rename.map do |old_name, new_name|
-      "rename_column :#{table_name}, :#{old_name}, :#{new_name}"
+      "rename_column :#{new_table_name}, :#{old_name}, :#{new_name}"
     end
     undo_renames = to_rename.map do |old_name, new_name|
-      "rename_column :#{table_name}, :#{new_name}, :#{old_name}"
+      "rename_column :#{new_table_name}, :#{new_name}, :#{old_name}"
     end
     
     to_add = to_add.sort_by{|c| model.field_specs[c].position }
     adds = to_add.map do |c|
       spec = model.field_specs[c]
       args = [":#{spec.sql_type}"] + format_options(spec.options, spec.sql_type)
-      "add_column :#{table_name}, :#{c}, #{args * ', '}"
+      "add_column :#{new_table_name}, :#{c}, #{args * ', '}"
     end
     undo_adds = to_add.map do |c|
-      "remove_column :#{table_name}, :#{c}"
+      "remove_column :#{new_table_name}, :#{c}"
     end
     
     removes = to_remove.map do |c|
-      "remove_column :#{table_name}, :#{c}"
+      "remove_column :#{new_table_name}, :#{c}"
     end
     undo_removes = to_remove.map do |c|
       revert_column(table_name, c)
