@@ -106,10 +106,11 @@
   <%= poly = call_polymorphic_tag('card', attributes) %>
   <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
     <a if="&linkable?"/>
-    <else>
-      <primary-content/>
-    </else>
+    <div class="content" param="content">
+      <primary-content if="&!linkable?"/>
+     </div>
     <creation-details/>
+    <span class="dependents"><count-dependents /></span>
   </div>
 </def>
   
@@ -434,7 +435,7 @@ in the future - use at your own risk. -->
 
 <def tag="creation-details">
   <span class="creation-details">
-    <view with="&this.send(this.class.creator_association)" class="creator" if="&this.class.creator_association" />
+    <view with="&this.send(this.class.creator_attribute)" class="creator" if="&this.class.creator_attribute" />
     <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
   </span>
 </def>
@@ -442,3 +443,18 @@ in the future - use at your own risk. -->
 <def tag="primary-content">
   <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
 </def>
+
+<def tag="count-dependents">
+  <% assoc = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 %>
+  <count field="&assoc" if="&assoc"/>
+</def>
+
+
+<def tag="a-or-an" attrs="word, upper"><%=
+  word =~ /^[aeiouh]/ ? "an" : "a"
+%></def>
+
+
+<def tag="A-or-An" attrs="word, upper"><%=
+  word =~ /^[aeiouh]/ ? "An" : "A"
+%></def>
