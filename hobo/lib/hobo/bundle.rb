@@ -139,7 +139,13 @@ module ::Hobo
     
     
     def new_name_for(name)
-      name = renames[name] while renames.has_key?(name)
+      while renames.has_key?(name)
+        name = renames[name] 
+        name2 = name.to_s.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
+        
+        # Make sure symbols stay symbols
+        name = name.is_a?(Symbol) ? name2.to_sym : name2
+      end
       name
     end
     
@@ -207,7 +213,7 @@ module ::Hobo
       external_options = self.options[option_name]
       external_options = {} if external_options.nil? || external_options == true
       name = "#{self.name}_#{option_name}"
-      class_name.to_s.constantize.new(name, external_options.merge(local_options))
+      class_name.to_s.constantize.new(name, external_options.merge(local_options).merge(renames))
       self.options["#{option_name}_bundle"] = name
     end
 
