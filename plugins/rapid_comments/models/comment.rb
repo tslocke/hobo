@@ -1,7 +1,7 @@
 bundle_model :Comment do
   
   fields do |f|
-    f.author  :string unless _author_model_
+    f.author  :string, :creator => true unless _author_model_
     f.body    _format_
     f.website :string if _website_
     f.timestamps
