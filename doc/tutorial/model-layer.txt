@@ -1,0 +1,347 @@
+# The model layer
+
+## Create the models
+
+The POD demo has a simple data-model. Let's start with a look at three models and the relationships between them. There are many users, (Hobo has already created the user model for us), a user has many adverts, and conversely each advert belongs to a user. There are also categories, such as Computers, Musical Instruments, etc. Each advert belongs in one category, and conversely, each category contains many adverts.
+
+In Rails terms, we would write:
+
+    class User < ActiveRecord::Base
+      has_many :adverts
+    end
+
+    class Advert < ActiveRecord::Base
+      belongs_to :user
+      belongs_to :category
+    end
+
+    class Category < ActiveRecord::Base
+      has_many :adverts
+    end
+
+The models need some data in them. Users won't need any extra fields beyond what hobo gives us automatically, but adverts will need a title and a body, and categories will need a name. With Hobo we declare the fields inside the models. We would code this as follows (don't do anything yet -- this is just to give you an overview of the data-model):
+
+    class Advert < ActiveRecord::Base
+      fields do
+        title :string
+        body  :text
+      end
+      belongs_to :user
+      belongs_to :category
+    end
+
+    class Category < ActiveRecord::Base
+      fields do
+        name :string
+      end
+      has_many :adverts
+    end
+    
+OK let's go ahead and create these models. As mentioned, `User` is already done. Let's generate `Advert` and `Category`
+
+(Tip: keep the development server running in its terminal, and open up a new terminal in which to run these commands. That way you can just refresh the browser when you want to see the changes to the web-app)
+
+    ruby script/generate hobo_model advert
+    ruby script/generate hobo_model category
+
+We need to edit the files that have been created in `app/models`. Let's start with `advert.rb`. Open it up in your editor, it should look like:
+
+    class Advert < ActiveRecord::Base
+
+      hobo_model
+
+      fields do
+        timestamps
+      end
+
+
+      # --- Hobo Permissions --- #
+      # Ignore everything below here for now
+    end
+    
+There are a few differences from the skeleton file we described above. Firstly, there are four stub methods for Hobo's permission system -- we'll ignore those for now. There's the `hobo_model` declaration, which all Hobo-enhanced models need, and there's the word `timestamps` in the `fields` block. `timestamps` tells Hobo to add the standard `created_at` and `updated_at` fields to this model (Active Record will maintain these fields automatically).
+
+We need to add the two associations:
+
+    belongs_to :user
+    belongs_to :category
+
+And the two fields:
+    
+    fields do
+      title :string
+      body  :text
+      timestamps
+    end
+    
+The file should end up looking like this:
+    
+    class Advert < ActiveRecord::Base
+
+      hobo_model
+
+      fields do
+        title :string
+        body  :text
+        timestamps
+      end
+
+      belongs_to :user
+      belongs_to :category
+
+      # --- Hobo Permissions --- #
+      # Don't change anything below here yet
+    end
+    
+
+Similarly, edit the `app/models/category.rb` to look like this:
+
+    class Category < ActiveRecord::Base
+
+      hobo_model
+
+      fields do
+        name :string
+        timestamps
+      end
+
+      has_many :adverts
+
+
+      # --- Hobo Permissions --- #
+      # Don't change anything below here yet
+    end
+    
+Finally, we need to add just one thing to `app/models/user.rb` -- the `has_many :adverts` declaration. The file should end up looking like this:
+
+    class User < ActiveRecord::Base
+
+      hobo_user_model
+
+      fields do
+        username :string, :login => true, :name => true
+        timestamps
+      end
+
+      has_many :adverts
+
+      # --- Hobo Permissions --- #
+      # Don't change anything below here yet
+    end
+    
+With those changes in place, we're ready to create the database tables:
+
+    ruby script/generate hobo_migration
+    
+That should output:
+
+    ---------- Up Migration ----------
+    create_table :adverts do |t|
+      t.string   :title
+      t.text     :body
+      t.datetime :created_at
+      t.datetime :updated_at
+      t.integer  :user_id
+      t.integer  :category_id
+    end
+
+    create_table :categories do |t|
+      t.string   :name
+      t.datetime :created_at
+      t.datetime :updated_at
+    end
+    ----------------------------------
+
+    ---------- Down Migration --------
+    drop_table :adverts
+    drop_table :categories
+    ----------------------------------
+    What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?
+    
+Notice how the generator knows to create the two foreign keys on the adverts table according to Active Record conventions. Respond with `m` and give something like "add adverts and categories" as the migration name.
+
+That's the basics of the model layer in place. You won't see any changes in the app yet though, because...
+
+
+## Create the controllers
+
+...there are no controllers for are new models. We'll look at controllers in a bit more detail in the next chapter. For now we just need some controllers in place so we can play with the app. We can generate them like this:
+
+    ruby script/generate hobo_model_controller advert
+    ruby script/generate hobo_model_controller category
+    
+Note that you provide the *singular* model name to the generator.
+
+Refresh the browser and you should see:
+
+<img src="front-with-models.png">
+
+You can also browse to "Adverts" and "Categories" pages.
+
+In order to populate the application with some data, we need to take a look at permissions.
+
+
+## Adding permissions
+
+At the moment you are only allowed to view adverts and categories, not create or edit them.
+
+First off, we'll create an administrator and give them permission to create and edit categories.
+
+The user model defines a method `administrator?`. By default this simply returns true for a user with the name 'admin'. That's good enough for our needs. If you haven't created a user called "admin" yet, do that now. Just log out (if you're logged in) and sign up as "admin".
+
+The permissions for categories are currently defined like this:
+
+File: app/models/category.rb
+
+    # --- Hobo Permissions --- #
+
+    def creatable_by?(user)
+      false
+    end
+
+    def updatable_by?(user, new)
+      false
+    end
+
+    def deletable_by?(user)
+      false
+    end
+
+    def viewable_by?(user, field)
+      true
+    end
+    
+This means, no one is allowed to create, change or delete categories, but anyone can view them. We want to allow the administrator to make any changes, so we'll edit the file like this:
+
+File: app/models/category.rb
+
+    # --- Hobo Permissions --- #
+
+    def creatable_by?(user)
+      user.administrator?
+    end
+
+    def updatable_by?(user, new)
+      user.administrator?
+    end
+
+    def deletable_by?(user)
+      user.administrator?
+    end
+
+    def viewable_by?(user, field)
+      true
+    end
+
+What's happening here? Whenever Hobo needs to know if a user is allowed to make a change, it calls one of these methods, passing the currently logged in user. If the method returns true, the operation is allowed, otherwise it is not. By returning `user.administrator?`, we're effectively saying that the administrator can perform this operation, but no-one else can.
+
+Once you've made those changes, make sure you're logged in as `admin`, then refresh the home-page of the app. The categories section should now have a link to create a new category:
+
+<img src="new-category-link.png">
+
+Follow that link and you'll see Hobo has automatically created a form for the category:
+
+<img src="new-category-form.png">
+
+You can now create a category. By default Hobo takes you to the 'show' page for the new category. You can use the navigation bar to get back to the "Categories" index page to create more categories.
+
+You should see that you are now able to rename, and delete categories as well.
+
+If you log out, you will see that you can only perform these actions as administrator.
+
+Let's add some permissions to the advert model
+
+File: app/models/advert.rb
+
+    # --- Hobo Permissions --- #
+
+    def creatable_by?(user)
+      !user.guest?
+    end
+
+    def updatable_by?(user, new)
+      !user.guest?
+    end
+
+    def deletable_by?(user)
+      !user.guest?
+    end
+
+    def viewable_by?(user, field)
+      true
+    end
+
+What we're saying here is that anyone who is logged in is allowed to create, change and delete any advert. That's far too permissive but it's a start. Try logging in as someone other than admin and creating some adverts.
+
+You probably noticed that you can set the user who owns the advert to anyone. That's not what we want. The current user should be automatically assigned as the owner of the advert, and no one (except maybe admin) should be able to change that later.
+
+All of this is easily handled by Hobo's permission system. First of all we need to tell Hobo that the `user` association on an advert, is what Hobo calls the 'creator association'. This means that Hobo will automatically set the user to be the currently logged in user when the advert is created. We just need to change the `belongs_to :user` declaration on the advert to:
+
+File: app/models/advert.rb
+
+    belongs_to :user, :creator => true
+    
+Next we need to alter the permissions so that the user is not allowed to manually set the user. This requires a bit more understanding of the permission system. We'll take the create and update stages in turn.
+
+The method `creatable_by?` is called when Hobo needs to know if the current user is allowed to create a particular record. Hobo instantiates the object, in our case the new advert, but does not save it in the database. The fields are then set to the proposed values, and the `creatable_by?` method is called. So, inside `creatable_by?`, `self` is in the proposed state. Hobo is effectively asking the object to test itself: "are you in a legal state for this user to create you?".
+
+Remember the `user` association has been automatically set, so the test can be written like this:
+
+File: app/models/advert.rb
+
+    def creatable_by?(user)
+      self.user == user
+    end
+    
+To paraphrase, we're stating that the currently logged in user (the `user` parameter) can create this advert, as long as they are the same user as specified in the `self.user` association. In other words, you can only create your own adverts. We could go further and write:
+
+    def creatable_by?(user)
+      self.user == user || user.administrator?
+    end
+    
+Which would exempt the administrator from this restriction, allowing them to create adverts that belong to any user.
+
+Make the change to `creatable_by?` and refresh the browser. You should see that the new advert form no longer contains the user selector. Hobo has discovered that you do not have permission to change that association, and has removed it.
+
+If you create an advert and then navigate to its edit page, you'll see that the same restriction is not in place -- it is possible to change the advert's user. This is because create permission and update permission are defined separately. We need to modify `updatable_by?`.
+
+`updatable_by?` works slightly differently to the other permission methods. When an update to a record is attempted (e.g. by a form submission), Hobo retrieves the record from the database, and creates a *duplicate* of it. The changes are made to the duplicate. The `updatable_by?` method is then called on the original *unchanged* record, passing the changed record as the `new` parameter. So when we implement:
+
+    def updatable_by?(user, new)
+    
+On our advert model, we know that `self` is the advert as it now exists in the database, `user` is the user attempting to make the change, and `new` is the proposed new state of the advert. This gives us all the information we need to propose pretty much any security restriction.
+
+There are two restrictions we need in this case: a user should only be able to modify their own adverts, and the `user` association itself should never be changed. Hobo provides a convenience method `same_fields?` for asserting that a field (or several fields) has not changed its value. The definition we want is:
+
+    def updatable_by?(user, new)
+      user == self.user && same_fields?(new, :user)
+    end
+    
+Or, if we want to allow administrators to do whatever they like:
+
+    def updatable_by?(user, new)
+      (user == self.user && same_fields?(new, :user)) || user.administrator?
+    end
+    
+If you make this change, you should see two changes in the UI: the edit-advert form in the app no longer contains a user selector, and there is no edit link at all for adverts belonging to other users.
+
+The app is looking pretty good now, despite the fact we haven't done any work at all in the view layer. We're not quite ready to move on yet though -- Hobo's automatic views have one or two more tricks up their sleeve.
+
+## Model hierarchy
+
+Most domain models have some kind of innate hierarchy. Forums have topics, blog posts have comments, categories have adverts. There may be more than one level, e.g. forum topics each have their own collection of replies. If Hobo sees such a hierarchy in your models, the automatic interface will take it into account and you'll have an even better UI.
+
+How does Hobo detect these relationships? They all have one thing in common - life-cycle dependencies. If you delete a blog-post, you're going to want the comments to be deleted too. If you delete a forum topic, you'll want all the replies deleted. In Active Record we declare these dependencies on our `has_many` relationships with `:dependent => :destroy` or `:dependent => :delete_all`. Hobo's automatic pages spot these declarations and adapt accordingly.
+
+Aside: Does this feel too magical? Do we really want the automatic pages to be so clever? What if built in assumptions don't work in a particular situation? All this is really just about extending an already familiar concept - convention over configuration, a.k.a. sensible defaults. The interface you get out of the box is just a starting point. You can easily throw away some or all of the defaults, on a page by page basis or even site-wide. Hobo's goal is to get as close as possible to a good UI out of the box. Your job is then to take it the rest of the way and get the hand crafted UI your app needs. If you only have to change one or two things -- fantastic! If you end up changing everything, that's fine too.
+
+In our app, there's really only one such relationship: adverts exist "inside" categories. We can declare this in the `Category` model by modifying the `has_many :adverts` declaration as follows:
+
+    has_many :adverts, :dependent => :destroy
+    
+That's it. You should see a couple of changes in the UI:
+
+ * The show page for individual categories will now contain summary "cards" for each advert.
+ * Each advert will provide a link back to its category, just above the title of the advert
+
+We're now going to move on and look at customising the controllers. These automatic pages have some more smarts that respond to controller-level configuration, so we'll be able to improve the UI still more with just a few declarative changes.
