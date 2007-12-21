@@ -111,7 +111,8 @@ module Hobo
 
     def find_by_search(query)
       sql = Hobo.models.map do |model|
-        if model.superclass == ActiveRecord::Base # filter out STI subclasses
+        if model.superclass == ActiveRecord::Base && # filter out STI subclasses
+            ModelRouter.linkable?(nil, model, :show) # filter out non-linkables
           cols = model.search_columns
           if cols.blank?
             nil
