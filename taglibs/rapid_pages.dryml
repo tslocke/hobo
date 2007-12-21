@@ -133,13 +133,13 @@
       <heading param><%= this %></heading>
 
       <creation-details/>
-
-      <a action="edit" if="&can_edit?(this, nil)" class="edit">Edit <type-name/></a>
       <count field="&show_all_cards" if="&show_all_cards"/>
+      
+      <a action="edit" if="&can_edit?(this, nil)" class="edit">Edit <type-name/></a>
     </content-header>
     
     <content-body: param>
-      <view field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
+      <primary-content param/>
 
       <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_association, this.class.dependent_on.first].compact "
                   skip-associations="has_many" param/>
@@ -151,11 +151,11 @@
         
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
-              <h2>New <type-name/></h2>
+              <h2>New <%= show_all_cards.to_s.singularize.titleize %></h2>
               <form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
                             skip-associations="has_many" param/>
-                <submit label="Create #{type_name}"/>
+                <submit label="Create #{show_all_cards.to_s.singularize.titleize}"/>
               </form>
             </section>
           </do>
