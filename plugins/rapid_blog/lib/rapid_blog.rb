@@ -3,12 +3,12 @@ class RapidBlog < Hobo::Bundle
   def includes
     optional_bundle(:RapidComments, :comments,
                     :CommentTarget => :BlogPost,
-                    :Comment       => :BlogPostComment)
+                    :Comment       => :_BlogPost_Comment)
 
     optional_bundle(:RapidTagging, :categories, 
-                    :Tag       => :BlogPostCategory,
                     :TagTarget => :BlogPost,
-                    :Tagging   => :BlogPostCategorisation)
+                    :Tag       => :_BlogPost_Category,
+                    :Tagging   => :_BlogPost_Categorisation)
   end
   
   def defaults
