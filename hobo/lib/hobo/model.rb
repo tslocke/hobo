@@ -2,8 +2,9 @@ module Hobo
 
   module Model
     
-    NAME_FIELD_GUESS      = [:name, :title]
-    PRIMARY_CONTENT_GUESS = [:description, :body, :content, :profile]
+    NAME_FIELD_GUESS      = %w(name title)
+    PRIMARY_CONTENT_GUESS = %w(description body content profile)
+    SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
     
     PLAIN_TYPES = { :boolean       => TrueClass,
                     :date          => Date,
@@ -42,7 +43,7 @@ module Hobo
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
       
-      attr_accessor :creator_association
+      attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
       
       def default_scopes
@@ -55,7 +56,7 @@ module Hobo
       def name_attribute
         @name_attribute ||= begin
                               cols = columns.every :name
-                              NAME_FIELD_GUESS.detect {|f| f.to_s.in? columns.every(:name) }
+                              NAME_FIELD_GUESS.detect {|f| f.in? columns.every(:name) }
                             end
       end
       
@@ -63,7 +64,7 @@ module Hobo
       def primary_content_attribute
         @description_attribute ||= begin
                                      cols = columns.every :name
-                                     PRIMARY_CONTENT_GUESS.detect {|f| f.to_s.in? columns.every(:name) }
+                                     PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
                                    end
       end
       
@@ -122,7 +123,7 @@ module Hobo
       
       def belongs_to_with_hobo_metadata(name, *args, &block)
         options = args.extract_options!
-        self.creator_association = name.to_sym if options.delete(:creator)
+        self.creator_attribute = name.to_sym if options.delete(:creator)
         belongs_to_without_hobo_metadata(name, *args + [options], &block)
       end
 
@@ -325,12 +326,12 @@ module Hobo
       end
 
       def creator_type
-        reflections[@creator_association]._?.klass
+        reflections[creator_attribute]._?.klass
       end
 
       def search_columns
         cols = columns.every(:name)
-        %w{name title body content}.select{|c| c.in?(cols) }
+        SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
       end
       
       # This should really be a method on AssociationReflection
@@ -514,7 +515,17 @@ module Hobo
 
     
     def set_creator(user)
-      self.send("#{self.class.creator_association}=", user) if (t = self.class.creator_type) && user.is_a?(t)
+      attr = self.class.creator_attribute
+      return unless attr
+      
+      # Is creator a string field or an association?
+      if self.class.reflections[attr]
+        # It's an association
+        self.send("#{attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
+      else
+        # Assume it's a string field -- set it to the name of the current user
+        self.send("#{attr}=", user.to_s) unless user.guest?
+      end
     end
 
 
