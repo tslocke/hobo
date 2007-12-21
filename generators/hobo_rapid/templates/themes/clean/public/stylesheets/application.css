@@ -27,7 +27,7 @@ h1 a, h2 a, h3 a {background: none; border: none;}
 /*input.text, input.string, input.email_address, input.password, textarea {
 	border: 2px solid #444; padding: 1px;
 }*/
-input.text, input.string, input.email_address, input.password, textarea {
+input.text, input.string, input.email_address, input.password, input.search, textarea {
 	font-size:1.1em;
 	line-height:1.3em;
 	border-top:1px solid #7c7c7c;
@@ -55,18 +55,52 @@ input.file_upload {
 .button:active {border-top:1px solid #8c8c8c; border-bottom:1px solid #ddd;}
 .actions {font-size: 11px;}
 
+
+#ajax-progress {
+	background: black url(../images/spinner.gif) no-repeat 10px 8px;
+	border: 1px solid #444;
+	padding: 8px 20px 8px 40px;
+	color: #cfc; font-weight: bold; font-size: 13px; text-shadow: black 2px 2px 2px;
+}
+#search-results-panel {
+	position: absolute; top: 35px; right: 25px; width: 350px; height: 500px; overflow: auto; z-index: 50;
+	padding: 0 20px 20px; background: #f2f2f2; border: 1px solid #ddd; color: black;
+}
+#search-results-panel .card.linkable a {
+/*	background: #333; border-color: #444;*/ color: black;
+}
+
 .content-header, .content-body, .content-footer {margin: 10px 60px; padding: 0 0 10px;}
-.flash {margin-left: 60px; margin-right: 60px;}
+.flash {margin-left: 60px; margin-right: 60px; text-shadow: #728852 2px 2px 0;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
 /***********/
 
 .page-header {color: white; background: black; padding: 20px 0 0; position: relative;}
-.page-header h1 {margin: 0; padding: 0 40px 30px; font-size: 48px; letter-spacing: -4.0pt;}
-.page-header .nav {padding-left: 30px; overflow: hidden; height: 100%;}
+.page-header h1 {margin: 0; padding: 0 40px 30px; font-family: "Trebuchet MS", Tahoma, Arial, sans-serif; font-size: 48px; letter-spacing: -2.5pt;}
+.page-header .nav {margin: 0 30px; overflow: hidden; height: 100%;}
 .page-header .nav li {float: left; list-style: none; margin-left: 0;}
 .page-header a {color: white; border: none; background: none;}
-.page-content {padding-top: 10px;}
+
+.page-header div.search {
+	position: absolute; top: 0; right: 25px; padding: 6px 30px 8px 15px; 
+	background: #181818; border: 1px solid #222; border-width: 0 1px 1px;
+}
+.page-header div.search label {
+	padding-right: 10px; 
+	text-transform: uppercase; font: bold 9px Arial, sans-serif; letter-spacing: 1.0pt;
+}
+.page-header div.search input {
+	font-size: 10px;
+}
+#search-spinner {position: absolute; top: 6px; right: 7px;}
+
+.account-nav {
+	position: absolute; top: 38px; right: 40px;
+/*	font: normal 12px Arial, sans-serif;*/
+	font-size: 11px;
+}
+
 ul.main-nav {float: left; margin: 0 10px;}
 .main-nav li {background: black; margin-right: 10px;}
 .main-nav a {
@@ -75,25 +109,22 @@ ul.main-nav {float: left; margin: 0 10px;}
 	font: bold 16px "Myriad Pro", Arial, sans-serif; text-shadow: black 2px 2px 2px;
 }
 .main-nav a:hover {background: #444; border: 1px solid #555; border-width: 1px 1px 0;}
-.account-nav {
-/*	clear: both; float: right;*/
-	position: absolute; top: 15px; right: 20px;
-	font: normal 12px "Myriad Pro", Arial, sans-serif;
-}
-.account-nav li {padding-right: 20px;}
+.account-nav li {padding-left: 20px;}
 .account-nav a {border-bottom: 1px solid black; font-weight: bold;}
 .account-nav a:hover {border-bottom: 1px dotted #ddd;}
 
+
+.page-content {padding-top: 10px;}
 
 .edit-page .delete-button {margin-top: 25px;}
 
 .login-page {width: 50%;}
 
 .show-page .content-header {position: relative; border-bottom: 1px dotted #ddd;}
-.show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 0; margin-right: 70px;}
+.show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 4px; margin-right: 70px;}
 .show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
 
-.new-in-collection-page .content-header h2 {margin-top: 5px; font: bold 16px "Lucida Grande", Arial, sans-serif;}
+.new-in-collection-page .content-header h2 {margin-top: 6px; font: bold 16px "Lucida Grande", Arial, sans-serif;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
 
 .show-page .create-new {
