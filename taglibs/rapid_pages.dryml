@@ -20,21 +20,13 @@
 </html>
 </def>
 
-
 <def tag="simple-layout">
   <base-page merge>
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
         <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
-        <div class="search">
-          <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
-          <spinner id="search-spinner"/>
-        </div>
-        <section class="hidden" id="search-results-panel">
-          <h2>Search Results</h2>
-          <section id="search-results">&nbsp;</section>
-        </section>
+        <live-search param/>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
           <magic-nav class="main-nav" param="main-nav"/>
@@ -53,9 +45,8 @@
 
 
 <def tag="aside-layout">
-  <body: class="aside-layout"/>
-
   <simple-layout merge>
+  <body: class="aside-layout" param/>
     <content: param>
       <section class="main-content" param="main-content">
         <param-content for="content"/>
@@ -125,7 +116,7 @@
 </def>
 
 
-<def tag="show-page" attrs="layout">
+<def tag="show-page" attrs="layout" debug-source>
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
@@ -161,7 +152,7 @@
         
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
-              <h2>Add <a-or-an word="&show_all_cards.to_s.singularize.titleize"/></h2>
+              <h2>Add <A-or-An word="&show_all_cards.to_s.singularize.titleize"/></h2>
               <form update="dependent-collection" message="Adding #{show_all_cards.to_s.singularize.titleize}..." reset-form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
                             skip-associations="has_many" param/>
@@ -264,7 +255,10 @@
 <def tag="signup-page" attrs="layout">
   <page layout="&layout" title="Sign up to #{app_name}" merge>
     <body: class="signup-page" param/>
+
+    <live-search: replace/>
     <nav: replace/>
+    
     <content-header: param>
       <heading param>Sign Up</heading>
     </content-header>
@@ -289,6 +283,7 @@
    
     <body: class="login-page" param/>
  
+    <live-search: replace/>
     <nav: replace/>
     
     <content-header: param>

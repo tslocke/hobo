@@ -444,17 +444,28 @@ in the future - use at your own risk. -->
   <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
 </def>
 
+<def tag="live-search">
+  <div class="search">
+    <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
+    <spinner id="search-spinner"/>
+  </div>
+  <section class="hidden" id="search-results-panel">
+    <h2>Search Results</h2>
+    <section id="search-results">&nbsp;</section>
+  </section>
+</def>
+
 <def tag="count-dependents">
   <% assoc = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 %>
   <count field="&assoc" if="&assoc"/>
 </def>
 
 
-<def tag="a-or-an" attrs="word, upper"><%=
-  word =~ /^[aeiouh]/ ? "an" : "a"
+<def tag="a-or-an" attrs="word"><%=
+  (word =~ /^[aeiouh]/ ? "an " : "a ") + word
 %></def>
 
 
-<def tag="A-or-An" attrs="word, upper"><%=
-  word =~ /^[aeiouh]/ ? "An" : "A"
+<def tag="A-or-An" attrs="word"><%=
+  (word =~ /^[aeiouh]/ ? "An " : "A ") + word
 %></def>
