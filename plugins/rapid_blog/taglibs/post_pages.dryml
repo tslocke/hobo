@@ -1,20 +1,23 @@
 <include src="rapid_blog"/>
 
-<def tag="index-page" extend-with="hobo-blog">
-  <index-page-without-hobo-blog title="#{@model.name.titleize.pluralize}">
-    <content-header:>
-      <heading param><type-name with="&@model" plural/></heading>
-      <a to="&@model" action="new" param="new-link">Create New <type-name with="&@model"/></a>
-    </content-header>
-    <content-body:>
-      <blog-posts-list merge/>
-    </content-body>
-    <new-link: replace/>
-  </index-page-without-hobo-blog>
+<def tag="page" extend-with="rapid-blog">
+  <page-without-rapid-blog merge>
+    <stylesheets: param>
+      <param-content/>
+      <stylesheet name="rapid-blog"/>
+    </stylesheets>
+  </page-without-rapid-blog>
 </def>
 
+<def tag="index-page" extend-with="rapid-blog">
+  <index-page-without-rapid-blog merge>
+    <content-body:>
+      <blog-posts-list-by-month with="&@posts_by_month" param />
+    </content-body>
+  </index-page-without-rapid-blog>
+</def>
 
-<def tag="show-page" extend-with="rapid-blog">
+<def tag="show-pagem" extend-withm="rapid-blog">
   <show-page-without-rapid-blog layout="aside">
     <main-content:>
       <blog-post-show/>

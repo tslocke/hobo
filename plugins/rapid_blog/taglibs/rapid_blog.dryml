@@ -44,13 +44,14 @@
 </def>
 
 
-<def tag="blog-posts-list">
-  <ul class="blog-posts">
-    <li:><blog-post-summary/></li>
-  </ul>
-  <else>
-    <p>There are no <%= @model.name.pluralize.underscore.gsub('_', ' ') %> to display.</p>
-  </else>
+<def tag="blog-posts-list-by-month">
+  <% this.each do |month, posts| -%>
+    <h2><view with="&month" format="%B %Y"/></h2>
+    <ul with="&posts"><li:><a/></li></ul>
+  <% end -%>
+  <if test="&this.empty?">
+    <p>There are no posts to display</p>
+  </if>
 </def>
 
 <def tag="has-many-checkbox-editor" attrs="model, update, message"><%=
