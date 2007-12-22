@@ -3,7 +3,7 @@
   <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
-      <title param><%= title %></title>
+      <title param><%= title.gsub(/<.*?>/, '') %></title>
       <do param="stylesheets">
         <stylesheet name="reset"/>
         <stylesheet name="hobo-rapid"/>
@@ -162,6 +162,17 @@
           </do>
         </section>
       </if>
+      <else>
+        <section class="preview-collections">
+          <with-fields associations="has_many">
+            <section class="#{this_field.dasherize}">
+              <h2>Recent <this-field.titleize/></h2>
+              <card repeat="&this.recent.all"/>
+              <a class="more">More... (<count/>)</a>
+            </section>
+          </with-fields>
+        </section>
+      </else>
 
       <nav class="new-links" param="new-links">
         <ul with="&has_many_assocs">
@@ -221,7 +232,7 @@
 
 
 <def tag="show-collection-page" attrs="layout">
-  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)} - #{app_name}" %>
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
   <page layout="&layout" title="&title" merge>
     <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
           param/>
@@ -234,13 +245,7 @@
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
 
-      <table param="Table">
-        <tr:>
-          <if test="&can_view?">
-            <td><a/></td><td><delete-button/></td>
-          </if>
-        </tr>
-      </table>
+      <card repeat/>
       
       <nav param="bottom-pagination-nav"><page-nav param/></nav>
       
