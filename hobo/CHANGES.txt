@@ -1,3 +1,61 @@
+=== Release 0.7.1 ===
+
+Hobo 0.7 is tested against Rails 2.0.1
+
+Adding docs to the repo in /doc, including the beginings of a Hobo
+tutorial
+
+Front controller generator -- improvements to index page (app home
+page)
+
+Migration generator -- fix for situations where a table is being
+renamed and modified in the same migration.
+
+
+DRYML
+
+  Changes to <include> for plugins:
+
+    <include src="plugin/foo/taglibs/baa"/>
+    becomes
+    <include src="baa" plugin="foo"/>
+
+
+Hobo Rapid
+
+  CSS -- small tweaks
+
+  JavaScript -- Ajax spinner now appears for a minimum time, and has a
+  fade effect.
+
+  Clean theme -- many improvements
+
+
+Hobo user controller generator -- no index page for users by default.
+
+
+Hobo models
+
+  New style for declarting extra metadata on fields /
+  associations. Now part of the field / assoication declaration
+  instead of requiring an additional declaration:
+
+    set_creator_attr :foo
+      is now:
+      belongs_to :foo, :creator => true
+
+    set_login_attr :username
+      is now:
+      username :string, :creator => true
+      (within the "fields do" block)
+
+    Plus two new ones for fields: :name => true and :description => true.
+
+
+
+
+
+
 === Release 0.7 ===
 
 Hobo 0.7 is tested against Rails 1.99.1 (aka Rais 2.0 RC2)
