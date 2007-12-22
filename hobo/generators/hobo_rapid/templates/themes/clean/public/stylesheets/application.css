@@ -84,7 +84,7 @@ input.file_upload {
 
 .page-header div.search {
 	position: absolute; top: 0; right: 25px; padding: 6px 30px 8px 15px; 
-	background: #181818; border: 1px solid #222; border-width: 0 1px 1px;
+	background: #282828; border: 1px solid #313131; border-width: 0 1px 1px;
 }
 .page-header div.search label {
 	padding-right: 10px; 
