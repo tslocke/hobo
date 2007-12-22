@@ -116,7 +116,7 @@
 </def>
 
 
-<def tag="show-page" attrs="layout" debug-source>
+<def tag="show-page" attrs="layout">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
