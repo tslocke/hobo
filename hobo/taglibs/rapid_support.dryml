@@ -1,5 +1,8 @@
-<def tag="with-fields" attrs="fields, skip, skip-associations, include-timestamps, force-all"><%
-  field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
+<def tag="with-fields" attrs="fields, associations, skip, skip-associations, include-timestamps, force-all"><%
+  field_names = if associations == "has_many"
+                  this.class.reflections.values.select { |refl| refl.macro == :has_many }.map { |refl| refl.name.to_s }
+                                                                                                                
+                elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
                   columns = klass.content_columns.every(:name)
                   columns -= %w{created_at updated_at created_on updated_on} unless
