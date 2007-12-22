@@ -103,15 +103,17 @@
 
 
 <def tag="card">
-  <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
-    <a if="&linkable?"/>
-    <div class="content" param="content">
-      <primary-content if="&!linkable?"/>
-     </div>
-    <creation-details/>
-    <span class="dependents"><count-dependents /></span>
-  </div>
+  <if test="&can_view?">
+    <%= poly = call_polymorphic_tag('card', attributes) %>
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
+      <a if="&linkable?"/>
+      <div class="content" param="content">
+        <primary-content if="&!linkable?"/>
+      </div>
+      <creation-details/>
+      <span class="dependents"><count-dependents /></span>
+    </div>
+  </if>
 </def>
   
 
