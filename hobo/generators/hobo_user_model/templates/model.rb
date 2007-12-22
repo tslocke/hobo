@@ -4,8 +4,11 @@ class <%= class_name %> < ActiveRecord::Base
 
   fields do
     username :string, :login => true, :name => true
+    administrator :boolean
     timestamps
   end
+
+  set_admin_on_first_user
   
   # --- Hobo Permissions --- #
 
@@ -13,24 +16,16 @@ class <%= class_name %> < ActiveRecord::Base
   # returning true from super_user?
   # def super_user?; true; end
 
-
-  # This method has no special meaning to the permission system. It is
-  # used by some standard Hobo plugins such as hobo_blog. Redefine to
-  # taste.
-  def administrator?
-    login == "admin"
-  end
-
   def creatable_by?(creator)
     true
   end
 
   def updatable_by?(updater, new)
-    false
+    upadter.administrator?
   end
 
   def deletable_by?(deleter)
-    false
+    deleter.administrator?
   end
 
   def viewable_by?(viewer, field)
