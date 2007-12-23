@@ -197,7 +197,17 @@ Rapid tag library
 
   Fix: incorrect use of <ul> in <error-messages>
 
+  <magic-nav> -- removed serach item, extended to maximum of 6 models
 
+  Many, many improvements to the default pages
+
+  <with-fields associations="has_many"> iterates of all has_many
+  relationships
+
+Removed require of ruby-debug from fixdryml.task
+
+New plugins featuring bundles: rapid_blog, rapid_comments,
+rapid_images and rapid_tagging. All are work-in-progress.
 
 
 === Release 0.7 ===
