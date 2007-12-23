@@ -168,6 +168,8 @@ Site search -- don't search for records that are not linkable
 
 Hobo Rapid
 
+  Clean theme is now the default theme
+
   CSS -- small tweaks
 
   JavaScript -- Ajax spinner now appears for a minimum time, and has a
