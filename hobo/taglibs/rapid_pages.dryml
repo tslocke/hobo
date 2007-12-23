@@ -1,0 +1,411 @@
+<def tag="base-page" attrs="title, doctype">
+  <% title ||= default_page_title %>
+  <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
+  <html>
+    <head param>
+      <title param><%= title.gsub(/<.*?>/, '') %></title>
+      <do param="stylesheets">
+        <stylesheet name="reset"/>
+        <stylesheet name="hobo-rapid"/>
+        <stylesheet name="application"/>
+      </do>
+
+      <do param="scripts">
+        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <hobo-rapid-javascripts param/>
+      </do>
+    </head>
+
+    <body onload="Hobo.applyEvents();" param/>
+</html>
+</def>
+
+<def tag="simple-layout">
+  <base-page merge>
+    <body: param>
+      <ajax-progress/>
+      <header class="page-header" param>
+        <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
+        <live-search param/>
+        <nav param>
+          <account-nav if="&Hobo::UserController.user_models.first" param/>
+          <magic-nav class="main-nav" param="main-nav"/>
+        </nav>
+      </header>
+      <section class="page-content" param="content">
+        <header class="content-header" param="content-header"/>
+        <flash-message param/>
+        <section class="content-body" param="content-body"/>
+        <footer class="content-footer" param="content-footer"/>
+      </section>
+      <footer class="page-footer" param/>
+    </body:>
+  </base-page>
+</def>
+
+
+<def tag="aside-layout">
+  <simple-layout merge>
+  <body: class="aside-layout" param/>
+    <content: param>
+      <section class="main-content" param="main-content">
+        <param-content for="content"/>
+      </section>
+      <aside class="aside-content" param/>
+    </content:>
+  </simple-layout>
+</def>
+      
+
+<def tag="default-layout" alias-of="simple-layout"/>
+
+
+<def tag="page" attrs="layout"><% layout ||= "default" %><call-tag tag="#{layout}-layout" merge/></def>
+
+
+<def tag="index-page" attrs="layout">
+  <% model_name = @model.name.titleize %>
+  <page layout="&layout" title="All #{model_name.pluralize}" merge>
+    <body: class="index-page #{@model.name.underscore}" param/>
+    <content-header: param>
+      <heading param><%= model_name.pluralize %></heading>
+      <p class="note" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
+    </content-header>
+
+    <content-body: param>
+      <nav param="top-pagination-nav"><page-nav/></nav>
+      
+      <card repeat/>
+      
+      <nav param="bottom-pagination-nav"><page-nav/></nav>
+    </content-body>
+    
+    <content-footer: param>
+      <a to="&@model" action="new" param="new-link" if="&linkable?(@model, :new)"/>
+      <else>
+        <do with="&new_for_current_user @model">
+          <section class="create-new" if="&can_create?">
+            <h2>New <type-name/></h2>
+            <form><field-list/><submit label="Create #{type_name}"/></form>
+          </section>
+        </do>
+      </else>
+    </content-footer>
+  </page>
+</def>
+
+
+<def tag="new-page" attrs="layout">
+  <page layout="&layout" title="New #{type_name}" merge>
+    <body: class="new-page #{type_name.underscore}" param/>
+    <content-header: param>
+      <heading param>New <type-name title/></heading>
+    </content-header>
+
+    <content-body: param>
+      <error-messages param/>
+
+      <form param>
+        <field-list skip-associations="has_many" param/>
+        <div class="actions" param="actions">
+          <submit label="Create #{type_name}" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
+      </form>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="show-page" attrs="layout">
+  <% has_many_assocs = this.class.reflections.values.map do |refl|
+       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
+     end.compact
+     show_all_cards = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
+  %>
+  <page layout="&layout" merge title="#{name :no_wrapper => true}">
+    <body: class="show-page #{type_name.underscore}" param/>
+    <content-header: param>
+      <if with="&this.dependent_on.reject{|x| x.is_a?(Hobo::User)}.first">
+        <div class="container"><a/></div>
+      </if>
+
+      <heading param><%= this %></heading>
+      <creation-details/>
+      <a class="dependent-collection-count" href="##{show_all_cards.to_s.underscore}" if="&show_all_cards"><count-dependents/></a>
+      <a action="edit" if="&can_edit?" class="edit">Edit <type-name/></a>
+    </content-header>
+    
+    <content-body: param>
+      <primary-content param/>
+
+      <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_attribute, this.class.dependent_on.first].compact "
+                  skip-associations="has_many" param/>
+
+      <if test="&show_all_cards">
+        <section class="dependent-collection" field="&show_all_cards">
+          <a name="#{show_all_cards.to_s.underscore}"/>
+          <h2><%= show_all_cards.to_s.titleize %></h2>
+          <do part="dependent-collection" part-locals="show_all_cards">
+            <ul><li:><card/></li:></ul>
+            <else>No <%= show_all_cards.to_s %> have been added yet.</else>
+          </do>
+        
+          <do with="&new_for_current_user">
+            <section class="create-new" if="&!linkable?(:new) && can_create?">
+              <h2>Add <A-or-An word="&show_all_cards.to_s.singularize.titleize"/></h2>
+              <form update="dependent-collection" message="Adding #{show_all_cards.to_s.singularize.titleize}..." reset-form>
+                <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
+                            skip-associations="has_many" param/>
+                <submit label="Create #{show_all_cards.to_s.singularize.titleize}"/>
+              </form>
+            </section>
+          </do>
+        </section>
+      </if>
+      <else>
+        <section class="preview-collections">
+          <with-fields associations="has_many">
+            <section class="#{this_field.dasherize}">
+              <h2>Recent <this-field.titleize/></h2>
+              <card repeat="&this.recent.all"/>
+              <a class="more">More... (<count/>)</a>
+            </section>
+          </with-fields>
+        </section>
+      </else>
+
+      <nav class="new-links" param="new-links">
+        <ul with="&has_many_assocs">
+          <li: replace><li if="&can_create? && linkable?(:new)"><a action="new"/></li></li>
+        </ul>
+      </nav>
+
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="edit-page" attrs="layout">
+  <page layout="&layout" merge>    
+    <body: class="edit-page #{this.class.name.underscore}" param/>
+    <content-header: param>
+      <heading><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
+      <delete-button in-place="&false" label="Remove This #{this.class.name}" param/>
+    </content-header>
+
+    <content-body: param>
+      <error-messages param/>
+      <form param>
+        <field-list skip-associations="has_many" param/>
+        <div class="actions" param="actions">
+          <submit label="Save Changes" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
+      </form>
+          
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="new-in-collection-page" attrs="layout">
+  <set association-name="&@association.proxy_reflection.name.to_s.singularize.titleize"/>
+  <page layout="&layout" title="New #{type_name}" merge>
+    <body: class="new-in-collection-page #{type_name(:with => @owner)} #{type_name}" param/>
+    <content-header: param>
+      <heading param>New <association-name/></heading>
+      <sub-heading param>For: <a with="&@owner" /></sub-heading>
+    </content-header>
+
+    <content-body: param>
+      <error-messages/>
+
+      <form param>
+        <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}"
+                    skip-associations="has_many" param/>
+        <div class="actions" param="actions">
+          <submit label="Create #{association_name}" param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
+        </div>
+      </form>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="show-collection-page" attrs="layout">
+  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
+  <page layout="&layout" title="&title" merge>
+    <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
+          param/>
+    <content-header: param>
+      <nav>Back to <a with="&@owner"/></nav>
+      <heading><%= title %></heading>
+      <sub-heading><count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/></sub-heading>
+    </content-header>
+
+    <content-body: param>
+      <nav param="top-pagination-nav"><page-nav/></nav>
+
+      <card repeat/>
+      
+      <nav param="bottom-pagination-nav"><page-nav param/></nav>
+      
+      <nav if="&Hobo.simple_has_many_association?(@association)" param="new-link">
+        <a to="&@association" action="new"/>
+      </nav>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="signup-page" attrs="layout">
+  <page layout="&layout" title="Sign up to #{app_name}" merge>
+    <body: class="signup-page" param/>
+
+    <live-search: replace/>
+    <nav: replace/>
+    
+    <content-header: param>
+      <heading param>Sign Up</heading>
+    </content-header>
+    
+    <content-body: param>
+      <error-messages/>
+      <form action="&request.request_uri" param>
+        <field-list fields="login, password, password_confirmation" param>
+          <password-confirmation-label:>Confirm Password</password-confirmation-label>
+        </field-list>
+
+        <submit label='Sign Up'/>
+      </form>
+    </content-body>
+
+  </page>
+</def>
+
+
+<def tag="login-page" attrs="remember-me, layout">
+  <page layout="&layout" title="Log in to #{app_name}" merge>
+   
+    <body: class="login-page" param/>
+ 
+    <live-search: replace/>
+    <nav: replace/>
+    
+    <content-header: param>
+      <heading param>Log In</heading>
+    </content-header>
+
+    <content-body: param>
+      <form action="&request.request_uri" class="login" param>
+        <labelled-item-list>
+          <labelled-item>
+            <item-label param="login-label"><%= model.login_attr.to_s.titleize %></item-label>
+            <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
+          </labelled-item>
+
+          <labelled-item>
+            <item-label param="password-label">Password</item-label>
+            <item-value><input type="password" name="password" id="password" class="string" param="password-input"/></item-value>
+          </labelled-item>
+
+          <labelled-item if="&remember_me">
+            <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
+            <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
+          </labelled-item>
+        </labelled-item-list>
+        <submit label='Log in' param/>
+      </form>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="account-disabled-page" attrs="layout">
+
+  <page layout="&layout" title="#{app_name} - account not available" merge>
+       
+    <body: class="account-disabled-page" param/>
+
+    <content-header: param><heading param>Account is not availble</heading></content>
+
+    <content-body: param>
+      <p>Your account is not available at this time.</p>
+    </content-body>
+  </page>
+
+</def>
+ 
+
+
+<def tag="permission-denied-page">
+  <page merge>
+    <content-header: param>
+      <heading param>That operation is not allowed</heading>
+    </content-header>
+  </page>
+</def>
+
+<def tag="not-found-page">
+  <page merge>
+    <content-header: param>
+      <heading param>The page you were looking for could not be found</heading>
+    </content-header>
+  </page>
+</def>
+
+<def tag="doctype" attrs="version"><%=
+  case version.upcase
+    when "HTML 4.01 STRICT"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ' + 
+        '"http://www.w3.org/TR/html4/strict.dtd">'
+    when "HTML 4.01 TRANSITIONAL"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/html4/loose.dtd">'
+    when "XHTML 1.0 STRICT"
+      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    when "XHTML 1.0 TRANSITIONAL"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    when "XHTML 1.1"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" ' + 
+        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+  end
+%></def>
+
+<def tag="stylesheet" attrs="name, media">
+  <repeat with="&comma_split(name)">
+    <link href="#{base_url}/stylesheets/#{this}.css" media="#{ media || 'all' }"
+          rel="stylesheet" type="text/css" />
+  </repeat>
+</def>
+
+<def tag="javascript" attrs="name">
+  <if test="&name.is_a?(Symbol)">
+    <%= javascript_include_tag name %>
+  </if>
+  <else>
+    <repeat with="&comma_split(name)">
+      <%= javascript_include_tag this %>
+    </repeat>
+  </else>
+</def>
+
+<def tag="flash-message" attrs="type">
+  <% type = type ? type.to_sym : :notice %>
+  <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
+</def>
+
+<def tag="ajax-progress">
+  <div id="ajax-progress">
+    <div>
+      <span id="ajax-progress-text"></span>
+    </div>
+  </div>
+</def>
+
+
+<def tag="app-name"><%= @hobo_app_name ||= File.basename(Dir.chdir(RAILS_ROOT) { Dir.getwd }).strip.titleize %></def>
+
+<def tag="default-page-title"><%= t = this.to_s; ; "#{t.blank? ? '' : t + ' - '}#{app_name}" %></def>
+

@@ -54,8 +54,8 @@ module Hobo
       # TODO - what if you want if_available as a query param?
       if_available = params.delete(:if_available)
       return nil if if_available && 
-        ((action.nil? && obj.respond_to?(:typed_id) && !linkable?(obj.class, :show, subsite)) ||
-         (action.nil? && obj.is_a?(Class) &&           !linkable?(obj, :index, subsite)))
+        ((action.nil? && obj.respond_to?(:typed_id) && !linkable?(obj.class, :show,  :subsite => subsite)) ||
+         (action.nil? && obj.is_a?(Class) &&           !linkable?(obj,       :index, :subsite => subsite)))
       
       base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
       
@@ -195,7 +195,11 @@ module Hobo
      
     def can_edit?(*args)
       if args.empty?
-        this_parent && this_field && can_edit?(this_parent, this_field)
+        if this_parent && this_field
+          can_edit?(this_parent, this_field)
+        else
+          can_edit?(this, nil)
+        end
       else
         object, field = args.length == 2 ? args : [this, args.first]
         
@@ -300,10 +304,11 @@ module Hobo
     end
      
      
-    def create_model(model)
-      n = model.new
-      n.set_creator(current_user)
-      n
+    def new_for_current_user(model_or_assoc=nil)
+      model_or_assoc ||= this
+      record = model_or_assoc.new
+      record.set_creator(current_user)
+      record
     end
     
     
@@ -356,10 +361,33 @@ module Hobo
       end
     end
     
-    def linkable?(obj, action, subsite=self.subsite)
-      Hobo::ModelRouter.linkable?(subsite, obj, action)
+    def linkable?(*args)
+      options = args.extract_options!
+      target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
+      action = args.first
+
+      if target.is_a?(Class)
+        klass = target
+        action ||= :index
+      elsif target.respond_to?(:member_class)
+        klass = target.member_class
+        action ||= :show
+      else
+        klass = target.class
+        action ||= :show
+      end      
+      
+      Hobo::ModelRouter.linkable?(subsite, klass, action.to_sym)
     end
    
+    
+    # Convenience helper for the default app
+    
+    def front_models
+      Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}
+    end
+    
+    
     
     # debugging support
      

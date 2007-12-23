@@ -1,0 +1,29 @@
+<include src="rapid_blog"/>
+
+<def tag="page" extend-with="rapid-blog">
+  <page-without-rapid-blog merge>
+    <stylesheets: param>
+      <param-content/>
+      <stylesheet name="rapid-blog"/>
+    </stylesheets>
+  </page-without-rapid-blog>
+</def>
+
+<def tag="index-page" extend-with="rapid-blog">
+  <index-page-without-rapid-blog merge>
+    <content-body:>
+      <blog-posts-list-by-month with="&@posts_by_month" param />
+    </content-body>
+  </index-page-without-rapid-blog>
+</def>
+
+<def tag="show-pagem" extend-withm="rapid-blog">
+  <show-page-without-rapid-blog layout="aside">
+    <main-content:>
+      <blog-post-show/>
+    </main-content>
+    <aside:>
+      <list-blog-post-categories:categories/>
+    </aside:>
+  </show-page>
+</def>

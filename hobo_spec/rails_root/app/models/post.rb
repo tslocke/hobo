@@ -8,8 +8,7 @@ class Post < ActiveRecord::Base
     timestamps
   end
   
-  belongs_to :user
-  set_creator_attr :user
+  belongs_to :user, :creator => true
   
   has_many :comments
   has_many :categorisations

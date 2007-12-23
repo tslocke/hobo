@@ -1,0 +1,6 @@
+Ideas for the tutorial:
+
+  The controllers chapter should show how to paginate the adverts on a user or category page:
+  
+  show_action :show, :page_size => 10
+  (not implemented yet in 0.7.1)

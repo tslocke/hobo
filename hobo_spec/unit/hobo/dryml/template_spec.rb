@@ -10,11 +10,11 @@ describe Template do
   # --- Compilation: Calling Tags --- #
   
   it "should compile tag calls as method calls" do
-    compile_dryml("<foo/>").should == "<% _output(foo({}, {})) %>"
+    compile_dryml("<foo/>").should == "<% _output(foo.to_s) %>"
   end
 
   it "should convert dashes in tag names to underscores in compiled method calls" do
-    compile_dryml("<foo-baa/>").should == "<% _output(foo_baa({}, {})) %>"
+    compile_dryml("<foo-baa/>").should == "<% _output(foo_baa.to_s) %>"
   end
 
   it "should compile attributes as keyword parameters" do

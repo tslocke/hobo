@@ -92,7 +92,6 @@
 <def tag="magic-nav">
   <navigation merge-attrs>
     <nav-item href="#{base_url}/">Home</nav-item>
-    <nav-item repeat="&Hobo.models.select{|m| [0..2]}"><name/></nav-item>
-    <nav-item href="&search_url" if="&defined_route? :search">Search</nav-item>
+    <nav-item repeat="&front_models[0..5]"><name/></nav-item>
   </navigation>
 </def>

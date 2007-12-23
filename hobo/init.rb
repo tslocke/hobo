@@ -17,8 +17,6 @@ require 'hobo/dryml/taglib'
 require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
-require 'hobo/plugins'
-
 require 'extensions/test_case' if RAILS_ENV == "test"
 
 # Rich data types

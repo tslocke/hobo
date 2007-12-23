@@ -1,3 +1,215 @@
+=== Release 0.7.1 ===
+
+Hobo 0.7 is tested against Rails 2.0.1
+
+Adding docs to the repo in /doc, including the beginings of a Hobo
+tutorial
+
+Front controller generator -- improvements to index page (app home
+page)
+
+Migration generator -- fix for situations where a table is being
+renamed and modified in the same migration.
+
+Hobo user controller generator -- no index page for users by default.
+
+
+Hobo models
+
+  New style for declarting extra metadata on fields /
+  associations. Now part of the field / assoication declaration
+  instead of requiring an additional declaration:
+
+    set_creator_attr :foo
+      is now:
+      belongs_to :foo, :creator => true
+
+      Note that :creator => true can now be set on either a belongs_to
+      or a string field. In the latter case the string is set to the
+      login name of the current user.
+
+    set_login_attr :username
+      is now:
+      username :string, :login => true
+      (within the "fields do" block)
+
+      Can also write
+      username :string, :login => true, :validate => false 
+      to disable the automatic login validations (see hobo/lib/hobo/user.rb)
+
+    Plus two new ones for fields: :name => true and :description => true.
+
+    All hobo models have a "recent" scope by default.
+
+    Added reflection helpers to find which collections are dependent.
+
+    The permission system can now be used to check for edit permission
+    on the object (rather than individual field) level. If the model
+    defined #can_edit?, that will be used, otherwise #can_update? is
+    called with a nil 'new object'.
+
+    #same_fields? and #only_changed_fields? now return true without
+    testing anything if the record passed is nil. This is more
+    compatible with the new ability to test for general edit
+    permission on an object.
+
+    #to_s now uses the declated name field (:name => true) if there is
+    one
+
+
+
+
+Hobo user model
+
+  New class-level declaration set_admin_on_forst_user. Does what it
+  says on the tin. Only use it if your user model defines a boolean
+  field 'administrator'
+
+
+Active Record extensions -- removed dubious #include? optimisation
+from has_many associations.
+
+
+New plugin feature -- Bundles
+
+  Bundles are Hobo's equivalent to "appable plugins" or "engines". A
+  plugin provides a bundle, and the app *instantiates* the bundle,
+  possibly more than once in file app/assemble.rb. This is the wrong
+  place to start documenting them but there are some examples in
+  /plugins
+
+
+Hobo controllers
+
+  Options given to the include_plugin declaration have changed. They
+  are now exactly the same as the attributes taken by DRYML's
+  <include>
+
+
+Hobo model controllers
+
+  Removed cruft left over from view-layer permissions experiment.
+
+  Simplified template lookup mechanism and removed inheritence aware
+  search for partials.
+
+  Added a cache for file-system tests to locate the correct
+  template. This avoids the need to stat files in production mode.
+
+  Better smarts for where to redirect to after a model is created.
+
+  Better support for model controllers that handle more than one
+  model. (this is a bit of a strange thing to do but a need for it
+  cropped up in an app than has a single place for users of different
+  types to log in)
+
+
+Hobo user controller
+
+  "Account not available" is now a separate page
+  (<account-disabled-page>) instead of just a flash message.
+
+  Fixed occasional missing template bug 
+
+
+
+DRYML
+
+  DRYML now supports bundle class renaming when defining polymorphic
+  tags
+
+  Changes to <include> for plugins:
+
+    <include src="plugin/foo/taglibs/baa"/>
+    becomes
+    <include src="baa" plugin="foo"/>
+
+    You can also say <include src="foo" bundle="abc"/> which includes a
+    taglib from the bundle's plugin, as well as handling class renames
+    for polymorphic definitions.
+
+  Fix to allow calling tags with upper-case letters in their names.
+
+
+DRYML core tags
+
+  <call-tag> now dasherises the tag name passed
+
+  <partial> is now just a trivial wrapper around render :partial
+
+
+
+
+Hobo helpers
+
+  can_edit? can now be given nil as the field parameter to test for
+  general ability to edit this record (e.g. to decide wether to render
+  an "Edit" link). Also, parameters now default to #this and nil.
+
+  Renamed create_model to new_for_current_user. Pass a class or
+  association, defaults to #this.
+
+  New helper #font_models. Returns a list of models that are
+  candidates to appear on the default front page and main nav. 
+
+  Changes to linkable? Subsite is now a named option (:subsite =>
+  "admin"), the target of the links defaults to #this and the action
+  defaults to :index for model targets and :show for records.
+
+
+Hobo routing
+
+  Now automatically updates routes without restarting the server in
+  dev mode (yay!)
+
+  
+Site search -- don't search for records that are not linkable
+
+
+Hobo Rapid
+
+  CSS -- small tweaks
+
+  JavaScript -- Ajax spinner now appears for a minimum time, and has a
+  fade effect.
+
+  Clean theme -- many improvements
+
+  Added an ajax option -- :spinner_next_to. Pass the dom id of a node
+  and the spinner will appear near that node.
+
+
+Rapid tag library
+
+  <field-list> now defaults to <view> not <edit> as the tag for the
+  fields. Also, if the tag is <input>, non-editable fields are skipped
+  (used keep them in but to drop back to views).
+
+  <card> displays nothing if the object is not viewable. Default card
+  has various improvements.
+
+  New attribute <type-name dasherize/>
+
+  Fix: merge-attrs was missing on the belongs_to view
+
+  <boolean-checkbox-editor> now supports a custom ajax message and
+  configures the ajax spinner to appear near the checkbox.
+
+  Fix: incorrect use of <ul> in <error-messages>
+
+  <magic-nav> -- removed serach item, extended to maximum of 6 models
+
+  Many, many improvements to the default pages
+
+  <with-fields associations="has_many"> iterates of all has_many
+  relationships
+
+Removed require of ruby-debug from fixdryml.task
+
+New plugins featuring bundles: rapid_blog, rapid_comments,
+rapid_images and rapid_tagging. All are work-in-progress.
+
+
 === Release 0.7 ===
 
 Hobo 0.7 is tested against Rails 1.99.1 (aka Rais 2.0 RC2)
@@ -40,13 +252,13 @@ DRYML
   A rake task hobo:fixdryml has been added which does a pretty good
   job of converting Hobo 0.6 DRYML source-code to the new style. It
   will change every file in app/views/**/*.dryml, and keeps a backup
-  copy of app/views in app_views_before_fixdryml. If you pass it CSS=y
+  copy of app/views in app_views_before_fixdryml. If you pass it CLASS=y
   and ID=y it will 'dasherize' css classes and IDs too, which is the
-  new Hobo concention. You can also pass DIR=... if you want to point
+  new Hobo convention. You can also pass DIR=... if you want to point
   it somewhere other than app/views. It won't fix anything in erb
   scriptlets, e.g. use of the tagbody local variable. Expect to do
   some manual fixes after running the task (good job you've got that
-  thourough test suite eh?)
+  thorough test suite eh?)
 
   The add_classes helper now automatically dasherizes all class names.
 
@@ -57,13 +269,13 @@ DRYML
 Migration generator
 
   Better support for STI. It no longer wants to generate tables for
-  the subclasses. Stil needed: a way of integrating fields declared in
+  the subclasses. Still needed: a way of integrating fields declared in
   the subclasses -- they are currently ignored by the generator.
 
 
 Hobo Rapid
 
-  In place editiing (and Ajax in general) will now provide the form
+  In place editing (and Ajax in general) will now provide the form
   authentication token (CSRF protection) if available. No need to
   disable protect_from_forgery any more.
 
@@ -141,7 +353,7 @@ User model
   Newly generated user models (hobo_user_model generator) now give
   create permission to all by default (to enable signup).
 
-  logins_count renamed to login_count (Hobo manages this feild for you
+  logins_count renamed to login_count (Hobo manages this field for you
   if it exists).
 
 
@@ -149,23 +361,6 @@ Core extensions
 
   Module#alias_tag_chain, which never should have been there is
   gone. (It's not needed now that camel-case tags have gone).
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 === Release 0.6.4 ===

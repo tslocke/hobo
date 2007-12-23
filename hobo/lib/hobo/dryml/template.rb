@@ -28,12 +28,11 @@ module Hobo::Dryml
       end
     end
 
-    def initialize(src, environment, template_path)
+    def initialize(src, environment, template_path, renames={})
       @src = src
-
       @environment = environment # a class or a module
-
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
+      @class_renames = renames
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(@template_path)
       @builder.set_environment(environment)
@@ -41,7 +40,7 @@ module Hobo::Dryml
       @last_element = nil
     end
 
-    attr_reader :tags, :template_path
+    attr_reader :tags, :template_path, :class_renames
     
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
@@ -144,7 +143,8 @@ module Hobo::Dryml
 
       when "include"
         include_element(el)
-        # return nothing - the include has no presence in the erb source
+        # return just the newlines to keep line-number matching - the
+        # include has no presence in the erb source
         tag_newlines(el)
         
       when "set-theme"
@@ -179,15 +179,11 @@ module Hobo::Dryml
     def include_element(el)
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
-      if el.attributes["src"]
-        @builder.add_build_instruction(:include, 
-                                       :name => el.attributes["src"], 
-                                       :as => el.attributes["as"])
-      elsif el.attributes["module"]
-        @builder.add_build_instruction(:module, 
-                                       :name => el.attributes["module"], 
-                                       :as => el.attributes["as"])
+      options = {}
+      %w(src module plugin bundle as).each do |attr|
+        options[attr.to_sym] = el.attributes[attr] if el.attributes[attr]
       end
+      @builder.add_build_instruction(:include, options)
     end
     
 
@@ -247,9 +243,12 @@ module Hobo::Dryml
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       if (for_type = el.attributes['for'])
-        type_name = if for_type =~ /^[a-z]/
+        type_name = case for_type
+                    when /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
                       Hobo.field_types[for_type].name
+                    when /^_.*_$/
+                      rename_class(for_type)
                     else
                       for_type
                     end.underscore.gsub('/', '__')
@@ -420,9 +419,9 @@ module Hobo::Dryml
                            # holding a proc
                            param_restore_local_name(name)
                          elsif (call_type = polymorphic_call_type(el))
-                           "find_polymorphic_tag(:#{name.underscore}, #{call_type})"
+                           "find_polymorphic_tag(:#{ruby_name name}, #{call_type})"
                          else
-                           ":#{name.underscore}"
+                           ":#{ruby_name name}"
                          end
                "call_tag_parameter(#{to_call}, #{args})"
              else
@@ -430,9 +429,11 @@ module Hobo::Dryml
                  # The tag is a proc available in a local variable
                  "#{param_restore_local_name(name)}.call(#{attributes}, #{parameters})"
                elsif (call_type = polymorphic_call_type(el))
-                 "send(find_polymorphic_tag(:#{name.underscore}, #{call_type}), #{attributes}, #{parameters})"
+                 "send(find_polymorphic_tag(:#{ruby_name name}, #{call_type}), #{attributes}, #{parameters})"
+               elsif attributes == "{}" && parameters == "{}"
+                 "#{ruby_name name}.to_s"
                else
-                 "#{name.underscore}(#{attributes}, #{parameters})"
+                 "#{ruby_name name}(#{attributes}, #{parameters})"
                end
              end
 
@@ -524,7 +525,7 @@ module Hobo::Dryml
     
     
     def param_restore_local_name(name)
-      "_#{name.underscore}_restore"
+      "_#{ruby_name name}_restore"
     end
     
     
@@ -549,7 +550,7 @@ module Hobo::Dryml
     
     
     def param_content_local_name(name)
-      "_#{name.underscore}__default_content"
+      "_#{ruby_name name}__default_content"
     end
     
         
@@ -766,6 +767,12 @@ module Hobo::Dryml
       @gensym_counter ||= 0
       @gensym_counter += 1
       "#{name}_#{@gensym_counter}"
+    end
+    
+    def rename_class(name)
+      name = name[1..-2]
+      name = class_renames[name] while class_renames.has_key?(name)
+      name
     end
 
   end

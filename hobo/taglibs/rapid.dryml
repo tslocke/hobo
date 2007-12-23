@@ -9,10 +9,10 @@
 <include src="rapid_plus"/>
 
 <def tag="field-list" attrs="tag">
-  <% tag ||= scope.in_form ? "input" : "editor" %>
+  <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
-      <labelled-item>
+      <labelled-item unless="&tag == 'input' && !can_edit?">
         <item-label param="#{this_field.to_s.sub('?', '')}-label">
           <do param="label"><%= this_field.to_s.titleize %></do>
         </item-label>
@@ -103,8 +103,17 @@
 
 
 <def tag="card">
-  <%= poly = call_polymorphic_tag('card', attributes) %>
-  <div class="card" unless="&poly"><type-name/>: <a/></div>
+  <if test="&can_view?">
+    <%= poly = call_polymorphic_tag('card', attributes) %>
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
+      <a if="&linkable?"/>
+      <div class="content" param="content">
+        <primary-content if="&!linkable?"/>
+      </div>
+      <creation-details/>
+      <span class="dependents"><count-dependents /></span>
+    </div>
+  </if>
 </def>
   
 
@@ -162,7 +171,7 @@
   end
 %></def>
 
-<def tag="type-name" attrs="type, plural, lowercase"><%=
+<def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
   type ||= if this.is_a?(Class)
              this
            elsif this.respond_to? :proxy_reflection
@@ -170,7 +179,7 @@
            else
              this.class
            end
-  name = type.name.titleize
+  name = dasherize ? type.name.underscore.dasherize : type.name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
   name
@@ -291,7 +300,7 @@
 %></def>
 
     
-<def tag="belongs-to-view"><a/></def>
+<def tag="belongs-to-view"><a merge-attrs/></def>
 
 <def tag="has-many-view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
 
@@ -424,3 +433,41 @@ in the future - use at your own risk. -->
   <if test="&this == current_user">Your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
+
+
+<def tag="creation-details">
+  <span class="creation-details">
+    <view with="&this.send(this.class.creator_attribute)" class="creator" if="&this.class.creator_attribute" />
+    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
+  </span>
+</def>
+
+<def tag="primary-content">
+  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
+</def>
+
+<def tag="live-search">
+  <div class="search">
+    <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
+    <spinner id="search-spinner"/>
+  </div>
+  <section class="hidden" id="search-results-panel">
+    <h2>Search Results</h2>
+    <section id="search-results">&nbsp;</section>
+  </section>
+</def>
+
+<def tag="count-dependents">
+  <% assoc = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 %>
+  <count field="&assoc" if="&assoc"/>
+</def>
+
+
+<def tag="a-or-an" attrs="word"><%=
+  (word =~ /^[aeiouh]/ ? "an " : "a ") + word
+%></def>
+
+
+<def tag="A-or-An" attrs="word"><%=
+  (word =~ /^[aeiouh]/ ? "An " : "A ") + word
+%></def>

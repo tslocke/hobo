@@ -157,9 +157,6 @@
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
-
-
-
 <def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
   <% labels ||= {} %>
   <% titleize = true if titleize.nil? %>
@@ -313,7 +310,7 @@
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">In order to proceed please correct the following:</h2>
     <ul:errors.full_messages param>
-      <li param><%= this %></li>
+      <li: param><%= this %></li:>
     </ul>
   </section>
 </def>

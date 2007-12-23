@@ -2,6 +2,10 @@ module Hobo
 
   module Model
     
+    NAME_FIELD_GUESS      = %w(name title)
+    PRIMARY_CONTENT_GUESS = %w(description body content profile)
+    SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
+    
     PLAIN_TYPES = { :boolean       => TrueClass,
                     :date          => Date,
                     :datetime      => Time,
@@ -18,10 +22,12 @@ module Hobo
       base.extend(ClassMethods)
       base.class_eval do
         alias_method_chain :attributes=, :hobo_type_conversion
+        default_scopes
       end
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
+        alias_method_chain :belongs_to, :hobo_metadata
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
         def inherited(klass)
           fields do
@@ -36,6 +42,44 @@ module Hobo
       
       # include methods also shared by CompositeModel
       include ModelSupport::ClassMethods
+      
+      attr_accessor :creator_attribute
+      attr_writer :name_attribute, :primary_content_attribute
+      
+      def default_scopes
+        def_scope :recent do |*args|
+          count = args.first || 3
+          { :limit => count, :order => "#{table_name}.created_at DESC" }
+        end
+      end
+      
+      def name_attribute
+        @name_attribute ||= begin
+                              cols = columns.every :name
+                              NAME_FIELD_GUESS.detect {|f| f.in? columns.every(:name) }
+                            end
+      end
+      
+
+      def primary_content_attribute
+        @description_attribute ||= begin
+                                     cols = columns.every :name
+                                     PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
+                                   end
+      end
+      
+      def dependent_collections
+        reflections.values.select do |refl| 
+          refl.macro == :has_many && refl.options[:dependent]
+        end.every(:name)
+      end
+      
+      
+      def dependent_on
+        reflections.values.select do |refl| 
+          refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
+        end.every(:name)
+      end
       
       private
       
@@ -74,6 +118,13 @@ module Hobo
           field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
         end
         res
+      end
+      
+      
+      def belongs_to_with_hobo_metadata(name, *args, &block)
+        options = args.extract_options!
+        self.creator_attribute = name.to_sym if options.delete(:creator)
+        belongs_to_without_hobo_metadata(name, *args + [options], &block)
       end
 
 
@@ -124,12 +175,6 @@ module Hobo
         (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
       public :never_show?
-
-      def set_creator_attr(attr)
-        @creator_attr = attr.to_sym
-      end 
-      attr_reader :creator_attr
-      public :creator_attr
 
       def set_search_columns(*columns)
         class_eval %{
@@ -281,12 +326,12 @@ module Hobo
       end
 
       def creator_type
-        reflections[@creator_attr]._?.klass
+        reflections[creator_attribute]._?.klass
       end
 
       def search_columns
         cols = columns.every(:name)
-        %w{name title body content}.select{|c| c.in?(cols) }
+        SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
       end
       
       # This should really be a method on AssociationReflection
@@ -300,9 +345,9 @@ module Hobo
                           :has_many
                         end
         refl.klass.reflections.values.find do |r|
-          r.macro == reverse_macro and
-            r.klass == self and 
-            !r.options[:conditions] and
+          r.macro == reverse_macro &&
+            r.klass == self &&
+            !r.options[:conditions] &&
             r.primary_key_name == refl.primary_key_name
         end
       end
@@ -457,6 +502,11 @@ module Hobo
     end
     
     
+    def dependent_on
+      self.class.dependent_on.map { |assoc| send(assoc) }
+    end
+    
+    
     def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
@@ -465,7 +515,17 @@ module Hobo
 
     
     def set_creator(user)
-      self.send("#{self.class.creator_attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
+      attr = self.class.creator_attribute
+      return unless attr
+      
+      # Is creator a string field or an association?
+      if self.class.reflections[attr]
+        # It's an association
+        self.send("#{attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
+      else
+        # Assume it's a string field -- set it to the name of the current user
+        self.send("#{attr}=", user.to_s) unless user.guest?
+      end
     end
 
 
@@ -487,11 +547,15 @@ module Hobo
 
 
     def same_fields?(other, *fields)
+      return true if other.nil?
+      
       fields = fields.flatten
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
     def only_changed_fields?(other, *changed_fields)
+      return true if other.nil?
+      
       changed_fields = changed_fields.flatten.every(:to_s)
       all_cols = self.class.columns.every(:name) - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
@@ -514,12 +578,10 @@ module Hobo
     end
     
     def to_s
-      if respond_to? :title
-        title
-      elsif respond_to? :name
-        name
+      if self.class.name_attribute
+        send self.class.name_attribute
       else
-        "#{self.class.name.humanize} #{id}"
+        "#{self.class.name.titleize} #{id}"
       end
     end
     

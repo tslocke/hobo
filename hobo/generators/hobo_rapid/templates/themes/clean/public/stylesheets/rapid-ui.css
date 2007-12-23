@@ -1,0 +1,144 @@
+.hidden {display: none;}
+
+.flash {
+	background: #92ab6e;
+	padding: 10px 30px; margin-top: 5px;
+	border: 1px solid #829862;
+/*	border-width: 2px 0;*/
+	color: white;
+}
+
+.in-place-textfield-bhv, .in-place-textarea-bhv, .in-place-html-textarea-bhv {
+	border: 1px dotted #666;
+	padding: 0 3px; padding-right: 20px;
+	background-image: url(../images/pencil.png);
+	background-position: top right;
+	background-repeat: no-repeat;
+}
+
+.inplaceeditor-form input, .inplaceeditor-form textarea, 
+table.new-record textarea, table.new-record input {
+	border: 1px dotted #666;
+	padding: 3px;	width: 100%;
+}
+.inplaceeditor-form, .inplaceeditor-form input {
+	display: inline;	
+}
+
+.edit-page .content-header {overflow: hidden; height: 100%;}
+.edit-page .content-header h1 {float: left;}
+.edit-page .content-header .delete-button {float: right;}
+form .actions {margin: 30px 0;width: 100%; text-align: center;}
+
+/**** Admin ****/
+
+.admin-banner {
+	background: #9d0018; border-top: 2px solid #7a0013;	border-bottom: 2px solid #7a0013;
+	padding: 2px 0;
+	margin: 10px 0;
+}
+.admin-banner p, .admin-banner span {
+	font: 12px "Lucida Grande", Arial, sans-serif;
+}
+.admin-banner p, .admin-banner div {margin-bottom: 0;}
+.admin-banner a {color: white; text-decoration: none; padding: 1px 5px; font-weight: bold;}
+.admin-banner a:hover {color: #9d0018; background: white;}
+.admin-banner .logged-in {
+	float: right;
+}
+
+/* rails error message */
+.error-messages {
+	font-family: "Lucida Grande", arial, sans-serif;
+	background: #9d0018;
+	border: 1px solid #7a0013;
+	padding: 15px 30px;
+	color: white;
+	margin-bottom: 20px;
+}
+.error-messages h2 {
+	text-transform: none;
+	letter-spacing: normal;
+	color: white;
+	margin-bottom: 10px;
+}
+.error-messages li {
+	margin-left: 20px;
+}
+
+/********* everything below here came from hobo_rapid.css, needs looking at ********/
+
+/**** Default styling for Rapid ***/
+
+#ajax-progress {
+	float: right; margin: 20px;
+	position: fixed; display: none; z-index: 10;
+}
+/*
+#ajax-progress {
+    color: grey;
+    float: right;
+    margin: 20px;
+    position: fixed;
+    background: white;
+    font-family: Tahoma "sans serif";
+    display: none;
+	z-index: 10;
+}
+
+#ajax-progress div {
+    border: 1px dashed grey;
+    margin: 10px;
+    padding: 3px;
+    padding-top: -15px;
+}
+
+#ajax-progress img {
+    padding-left: 6px;
+    vertical-align: middle;
+}
+*/
+
+/* Scriptaculous Autocompleter ---*/
+
+div.completions-popup {
+    position:absolute;
+    width:250px;
+    background-color:white;
+    border:1px solid #888;
+    margin:0px;
+    padding:0px;
+}
+div.completions-popup ul {
+    list-style-type:none;
+    margin:0px;
+    padding:0px;
+}
+div.completions-popup ul li.selected { background-color: #ffb;}
+div.completions-popup ul li {
+    list-style-type:none;
+    display:block;
+    margin:0;
+    padding:2px;
+    cursor:pointer;
+}
+
+
+.field-list   {width:100%;}
+.field-list td {vertical-align: middle; width: 75%;}
+.field-list th {font-weight: bold;}
+.field-list th, .field-list td {padding: 5px 0;}
+.field-list th {padding-right: 10px;}
+
+.field-list td.field-label {
+    text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
+    padding-top: 10px; padding-bottom: 10px;
+}
+.field-list textarea, .field-list input.string, .field-list input.password { width: 100%; margin: 0; }
+
+/*input[type=text].wide { width: 100%; }*/
+textarea { height: 170px; }
+textarea.wide { width: 100%; }
+textarea.tall { height: 350px; }
+
+.field-list input.percentage {width: 25px; display: inline; margin-right: 5px; padding: 1px 3px;}

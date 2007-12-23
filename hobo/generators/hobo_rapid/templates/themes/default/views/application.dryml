@@ -1,4 +1,4 @@
-<include src="plugins/hobo/tags/rapid"/>
+<include src="rapid" plugin="hobo"/>
 
 <def tag="page" extend-with="theme">
   <page-without-theme merge>

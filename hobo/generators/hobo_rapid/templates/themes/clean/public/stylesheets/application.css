@@ -1,45 +1,173 @@
 html {background: #666;}
 body {
-	width: 600px; margin: 0 auto; background: white;
-	font: 14px "Lucida Grande", Arial, sans-serif;
-	line-height: 21px; padding-bottom: 10px; margin-bottom: 20px;
+	width: 800px; margin: 0 auto; background: white; color: #222;
+	font: 12px "Lucida Grande", Arial, sans-serif;
+	line-height: 18px; padding-bottom: 10px; margin-bottom: 20px;
 }
 h1, h2, h3 {font-family: "Rockwell", "Trebuchet MS", "Arial", sans-serif;}
-h1 {line-height: 54px;}
-h2 {line-height: 42px;}
-h3 {line-height: 27px;}
+h1 {font-size: 32px; line-height: 32px; margin: 20px 0 10px;}
+h2 {font-size: 24px; line-height: 24px; margin: 15px 0 10px;}
+h3 {font-size: 18px; line-height: 18px; margin: 10px 0 5px;}
+h4 {font-size: 14px; line-height: 14px; margin: 10px 0 5px;}
+h5 {font-size: 12px; line-height: 12px; margin: 10px 0 5px;}
+h6 {font-size: 10px; line-height: 10px; margin: 10px 0 5px;}
+
+li {margin-left: 20px;}
 
 a {
-	text-decoration: none; color: black;
-	border-bottom: 1px dotted #aaa;
+	text-decoration: none; color: #222;
+	border-bottom: 1px dotted #ccc;
+	background: #f8f8f8;
 }
-a:hover {border-bottom: 1px dotted #222;}
+a:hover {
+	border-bottom: 1px dotted #aaa; background: #f0f0f0; color: black;
+}
+h1 a, h2 a, h3 a {background: none; border: none;}
 
-.content_header, .content_body {margin: 30px;}
+/*input.text, input.string, input.email_address, input.password, textarea {
+	border: 2px solid #444; padding: 1px;
+}*/
+input.text, input.string, input.email_address, input.password, input.search, textarea {
+	font-size:1.1em;
+	line-height:1.3em;
+	border-top:1px solid #7c7c7c;
+	border-left:1px solid #c3c3c3;
+	border-right:1px solid #c3c3c3;
+	border-bottom:1px solid #ddd;
+	background: #fff url(../images/fieldbg.gif) repeat-x top;
+}
+
+input.file_upload {
+	border: 1px dotted #666;
+}
+
+.button {
+	padding: 6px 10px;
+/*	color: white; background: black; border: 1px solid #666;*/
+	font: bold 11px "Lucida Grande", Arial, sans-serif;
+	border-top:1px solid #ddd;
+	border-left:1px solid #c3c3c3;
+	border-right:1px solid #c3c3c3;
+	border-bottom:1px solid #8c8c8c;
+	background: #eee; 
+}
+.button:hover {cursor: pointer;}
+.button:active {border-top:1px solid #8c8c8c; border-bottom:1px solid #ddd;}
+.actions {font-size: 11px;}
+
+
+#ajax-progress {
+	background: black url(../images/spinner.gif) no-repeat 10px 8px;
+	border: 1px solid #444;
+	padding: 8px 20px 8px 40px;
+	color: #cfc; font-weight: bold; font-size: 13px; text-shadow: black 2px 2px 2px;
+}
+#search-results-panel {
+	position: absolute; top: 35px; right: 25px; width: 350px; height: 500px; overflow: auto; z-index: 50;
+	padding: 0 20px 20px; background: #f2f2f2; border: 1px solid #ddd; color: black;
+}
+#search-results-panel .card.linkable a {
+/*	background: #333; border-color: #444;*/ color: black;
+}
+
+.content-header, .content-body, .content-footer {margin: 10px 60px; padding: 0 0 10px;}
+.flash {margin-left: 60px; margin-right: 60px; text-shadow: #728852 2px 2px 0;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
 /***********/
 
-.page_header .nav {color: white; padding-bottom: 8px; background: black; overflow: hidden; height: 100%;}
-.page_header .nav li {float: left; padding-right: 20px;}
-.page_header .nav a {border-bottom: 1px solid black; color: white;}
-.page_header .nav a:hover {border-bottom: 1px dotted #ddd;}
-.main_nav {float: right;}
-.main_nav li {line-height: 36px;}
-.main_nav a {
-	font: bold 16px "Myriad Pro", Arial, sans-serif;
-}
-.account_nav {
-	clear: both; float: right;
-	font: normal 12px "Myriad Pro", Arial, sans-serif;
-}
-.account_nav a {font-weight: bold;}
+.page-header {color: white; background: black; padding: 20px 0 0; position: relative;}
+.page-header h1 {margin: 0; padding: 0 40px 30px; font-family: "Trebuchet MS", Tahoma, Arial, sans-serif; font-size: 48px; letter-spacing: -2.5pt;}
+.page-header .nav {margin: 0 30px; overflow: hidden; height: 100%;}
+.page-header .nav li {float: left; list-style: none; margin-left: 0;}
+.page-header a {color: white; border: none; background: none;}
 
-/***********/
-
-.intro {
-	background: #eee; color: #222; padding: 10px 20px;
+.page-header div.search {
+	position: absolute; top: 0; right: 25px; padding: 6px 30px 8px 15px; 
+	background: #282828; border: 1px solid #313131; border-width: 0 1px 1px;
 }
-.intro h2 {
+.page-header div.search label {
+	padding-right: 10px; 
+	text-transform: uppercase; font: bold 9px Arial, sans-serif; letter-spacing: 1.0pt;
+}
+.page-header div.search input {
+	font-size: 10px;
+}
+#search-spinner {position: absolute; top: 6px; right: 7px;}
+
+.account-nav {
+	position: absolute; top: 38px; right: 40px;
+/*	font: normal 12px Arial, sans-serif;*/
+	font-size: 11px;
+}
+
+ul.main-nav {float: left; margin: 0 10px;}
+.main-nav li {background: black; margin-right: 10px;}
+.main-nav a {
+	background: #282828;
+	display: block; padding: 7px 15px; border: 1px solid #313131; border-width: 1px 1px 0;
+	font: bold 16px "Myriad Pro", Arial, sans-serif; text-shadow: black 2px 2px 2px;
+}
+.main-nav a:hover {background: #444; border: 1px solid #555; border-width: 1px 1px 0;}
+.account-nav li {padding-left: 20px;}
+.account-nav a {border-bottom: 1px solid black; font-weight: bold;}
+.account-nav a:hover {border-bottom: 1px dotted #ddd;}
+
+
+.page-content {padding-top: 10px;}
+
+.login-page, .signup-page {width: 50%; margin-top: 40px;}
+.login-page .field-list, .signup-page .field-list {width: 300px;}
+.login-page .field-list td, .signup-page .field-list td {width: auto;}
+.login-page .field-list th, .signup-page .field-list th {width: 120px;}
+.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}
+
+.edit-page .delete-button {margin-top: 25px;}
+
+.show-page .content-header {position: relative; border-bottom: 1px dotted #ddd;}
+.show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 4px; margin-right: 70px;}
+.show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
+
+.new-in-collection-page .content-header h2 {margin-top: 6px; font: bold 16px "Lucida Grande", Arial, sans-serif;}
+.new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
+
+.show-page .create-new {
+	padding: 0 30px;
+	border-top: 1px dotted #ddd; margin-top: 20px; background: #f5f5f5;
+}
+.show-page .create-new form .submit-button {margin: 20px 155px;}
+
+.card {
+	background: #f5f5f5;
+	border: 1px solid #e8e8e8;
+	padding:10px 20px;
+	margin-bottom: 5px;
+}
+.card .creation-details {
+	font-size: 11px; color: #333; display: block;
+}
+.card .datetime {color: #666;}
+
+.card.content {
+	font-size: 11px;
+	border: none; background: none; padding: 0; margin: 10px 0;
+}
+
+.new-links {margin-top: 20px;}
+.new-links ul li {list-style: none; margin-left: 0;}
+
+.dependent-collection ul li {
+	list-style: none; margin-left: 0;
+}
+
+/*******************************************************/
+/* these styles are for the generated front index page */
+/* you can delete them if you over-ride it             */
+
+.front-page .welcome-message {
+	background: #eee; color: #222; border: 1px solid #e8e8e8; padding: 10px 20px 20px;
+}
+.front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
 }
+.front-page .content-body li {list-style: none; margin-left: 0;}

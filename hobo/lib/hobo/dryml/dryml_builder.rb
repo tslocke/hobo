@@ -64,7 +64,7 @@ module Hobo::Dryml
 
     def build(local_names, auto_taglibs)
 
-      auto_taglibs.each{|t| import_taglib(t)}
+      auto_taglibs.each { |t| import_taglib(t) }
     
       @build_instructions.each do |instruction|
         name = instruction[:name]
@@ -82,7 +82,7 @@ module Hobo::Dryml
           @environment.class_eval(method_src, template_path, instruction[:line_num])
           
         when :include
-          import_taglib(name, instruction[:as])
+          import_taglib(instruction)
           
         when :module
           import_module(name.constantize, instruction[:as])
@@ -102,24 +102,13 @@ module Hobo::Dryml
     end
     
 
-    def expand_template_path(path)
-      base = if path.starts_with? "plugins"
-               "vendor/" + path
-             elsif path.include?("/")
-               "app/views/#{path}"
-             else
-               template_dir = File.dirname(template_path)
-               "#{template_dir}/#{path}"
-             end
-       base + ".dryml"
-    end
-
-
-    def import_taglib(src_path, as=nil)
-      path = expand_template_path(src_path)
-      unless template_path == path
-        taglib = Taglib.get(RAILS_ROOT + (path.starts_with?("/") ? path : "/" + path))
-        taglib.import_into(@environment, as)
+    def import_taglib(options)
+      if options[:module]
+        import_module(options[:module].constantize, options[:as])
+      else
+        template_dir = File.dirname(template_path)
+        taglib = Taglib.get(options.merge(:template_dir => template_dir))
+        taglib.import_into(@environment, options[:as])
       end
     end
 
@@ -133,7 +122,7 @@ module Hobo::Dryml
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
-        import_taglib("taglibs/themes/#{name}/application")
+        import_taglib(:src => "taglibs/themes/#{name}/application")
       end
     end
   end

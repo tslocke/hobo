@@ -3,32 +3,29 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_user_model
 
   fields do
-    username :string
+    username :string, :login => true, :name => true
+    administrator :boolean
     timestamps
   end
 
-  set_login_attr :username
+  set_admin_on_first_user
   
-  alias_attribute :to_s, :username
-
   # --- Hobo Permissions --- #
 
-  def super_user?
-    # Return true to make this user exempt from permission restrictions
-    # e.g.
-    # login == 'admin'
-  end
+  # It is possible to override the permission system entirely by
+  # returning true from super_user?
+  # def super_user?; true; end
 
   def creatable_by?(creator)
     true
   end
 
   def updatable_by?(updater, new)
-    false
+    updater.administrator?
   end
 
   def deletable_by?(deleter)
-    false
+    deleter.administrator?
   end
 
   def viewable_by?(viewer, field)

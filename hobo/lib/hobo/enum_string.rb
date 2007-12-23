@@ -31,7 +31,7 @@ module Hobo
       end
       
       def inspect
-        "#<EnumString #{(values || []) * ' '}>"
+        name.blank? ? "#<EnumString #{(values || []) * ' '}>" : name
       end
       alias_method :to_s, :inspect
       

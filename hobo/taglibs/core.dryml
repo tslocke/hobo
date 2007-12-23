@@ -1,5 +1,5 @@
 <def tag="call-tag" attrs="tag">
-  <%= send(tag, attributes, parameters) %>
+  <%= send(tag.gsub('-', '_'), attributes, parameters) %>
 </def>
 
 
@@ -9,9 +9,10 @@
 </def>
 
     
-<def tag="partial" attrs="as">
-   <%= render(:partial => find_partial(this, as), :locals => { :this => this }) %>
-</def>
+<def tag="partial" attrs="name, locals"><%= 
+   locals ||= {}
+   render(:partial => name, :locals => locals.merge(:this => this))
+%></def>
 
 
 <def tag="repeat" attrs="even-odd, join"><%= 

@@ -41,7 +41,7 @@ module Hobo
       end
     end
 
-    # Additional classmethods for AuthenticatedUser
+    # Additional classmethods for authentication
     module ClassMethods
       
       # Validation of the plaintext password
@@ -49,22 +49,20 @@ module Hobo
         validates_length_of :password, :within => 4..40, :if => :password_required?
       end
       
-      def set_login_attr(attr)
+      def login_attribute=(attr, validate=true)
         @login_attr = attr = attr.to_sym
         unless attr == :login
           alias_attribute(:login, attr)
           set_field_type :login => field_type(attr)
         end
         
-        if block_given?
-          yield
-        else 
+        if validate
           validates_presence_of   attr
           validates_length_of     attr, :within => 3..100
           validates_uniqueness_of attr, :case_sensitive => false
         end
       end
-      def login_attr; @login_attr; end
+      attr_reader :login_attr
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
@@ -85,6 +83,11 @@ module Hobo
       # Encrypts some data with the salt.
       def encrypt(password, salt)
         Digest::SHA1.hexdigest("--#{salt}--#{password}--")
+      end
+      
+      
+      def set_admin_on_first_user
+        before_create { |user| user.administrator = true if count == 0 }
       end
 
     end
@@ -121,7 +124,7 @@ module Hobo
     def guest?
       false
     end
-
+    
     protected
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password

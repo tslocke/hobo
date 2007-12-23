@@ -4,18 +4,10 @@ module Hobo
 
     include Hobo::Controller
 
-    class PermissionDeniedError < RuntimeError; end
-    class UserPermissionError < StandardError
-      attr :models
-      def initialize(models)
-        @models = models || []
-      end
-    end
-    
     VIEWLIB_DIR = "taglibs"
     
     PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
-
+    
     class << self
 
       def included(base)
@@ -23,37 +15,13 @@ module Hobo
           @auto_actions ||= {}
           
           extend ClassMethods
-          helper_method :find_partial, :model, :current_user
+          
+          helper_method :model, :current_user
           before_filter :set_no_cache_headers
         end
+        base.template_path_cache = {}        
 
         Hobo::Controller.included_in_class(base)
-      end
-
-      def find_partial(klass, as)
-        find_model_template(klass, as, :is_parital => true)
-      end
-
-
-      def template_path(dir, name, is_partial)
-        fileRx = is_partial ? /^_#{name}\.[^.]+/ : /^#{name}\.[^.]+/
-        full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
-        if File.exists?(full_dir) && Dir.entries(full_dir).grep(fileRx).any?
-          return "#{dir}/#{name}"
-        end
-      end
-
-
-      def find_model_template(klass, name, options={})
-        while klass and klass != ActiveRecord::Base
-          dir = klass.name.underscore.pluralize
-          dir = File.join(options[:subsite], dir) if options[:subsite]
-          path = template_path(dir, name, options[:is_partial])
-          return path if path
-
-          klass = klass.superclass
-        end
-        nil
       end
       
     end
@@ -61,6 +29,8 @@ module Hobo
     module ClassMethods
 
       attr_writer :model
+      
+      attr_accessor :template_path_cache
       
       def add_collection_actions(name)
         defined_methods = instance_methods
@@ -400,6 +370,24 @@ module Hobo
     end
     
     
+    def destination_after_create(record)
+      # The after_submit post parameter takes priority
+      params[:after_submit] || 
+        
+        # Then try the records show page
+        object_url(@this,       :if_available => true) || 
+        
+        # Then the show page of the 'owning' object if there is one
+        (@this.dependent_on.first && object_url(@this.dependent_on.first, :if_available => true)) ||
+        
+        # Last try - the index page for this model
+        object_url(@this.class, :if_available => true) ||
+        
+        # Give up
+        home_page
+    end
+    
+    
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
@@ -478,7 +466,7 @@ module Hobo
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to(params[:after_submit] || object_url(@this)) }
+            wants.html { redirect_to(destination_after_create(@this)) }
             wants.js   { hobo_ajax_response || render(:text => "") }
           end
         elsif invalid?
@@ -510,14 +498,14 @@ module Hobo
       @this.send(:clear_aggregation_cache)
       @this.send(:clear_association_cache)
       
-      changes = params[model.name.underscore]
+      changes = params[@this.class.name.underscore]
       @this.attributes = changes 
       save_and_set_status!(@this, original)
 
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      flash[:notice] = "Changes to the #{model.name.titleize.downcase} were saved" if !request.xhr? && valid?
+      flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
       
       set_named_this!
       response_block(&b) or 
@@ -671,32 +659,43 @@ module Hobo
       end
     end
     
+    
+    def hobo_template_exists?(dir, name)
+      self.class.template_path_cache.clear if RAILS_ENV == "development"
+      self.class.template_path_cache.fetch([dir, name], 
+                                           begin
+                                             full_dir = "#{RAILS_ROOT}/app/views/#{dir}"
+                                             !Dir["#{full_dir}/#{name}.*"].empty?
+                                           end)
+    end
+        
 
+    def find_model_template(klass, name)
+      while klass and klass != ActiveRecord::Base
+        dir = klass.name.underscore.pluralize
+        dir = File.join(subsite, dir) if subsite
+        if hobo_template_exists?(dir, name)
+          return "#{dir}/#{name}"
+        end
+        klass = klass.superclass
+      end
+      nil
+    end
+
+    
     def hobo_render(page_kind = nil, page_model=nil)
       page_kind ||= params[:action].to_sym
       page_model ||= model
-      
-      template = ModelController.find_model_template(page_model, page_kind, :subsite => subsite)
 
-      begin
-        if template
-          render :template => template
-          true
-        else
-          # This returns false if no such tag exists
-          render_tag("#{page_kind.to_s.dasherize}-page", :with => @this)
-        end
-      rescue ActionView::TemplateError => wrapper
-        e = wrapper.original_exception if wrapper.respond_to? :original_exception
-        if e.is_a? Hobo::ModelController::UserPermissionError
-          if current_user.guest?
-            redirect_to login_url(e.models.first || UserController.user_models.first)
-          else
-            permission_denied(:message => e.message)
-          end
-        else
-          raise
-        end
+      if hobo_template_exists?(controller_path, page_kind)
+        render :action => page_kind
+        true
+      elsif (template = find_model_template(page_model, page_kind))
+        render :template => template
+        true
+      else
+        # This returns false if no such tag exists
+        render_tag("#{page_kind.to_s.dasherize}-page", :with => @this)
       end
     end
 
