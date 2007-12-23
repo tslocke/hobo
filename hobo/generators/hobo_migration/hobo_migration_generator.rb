@@ -62,9 +62,13 @@ class HoboMigrationGenerator < Rails::Generator::Base
     changes = []
     undo_changes = []
     to_change.each do |t|
-      change, undo = change_table(models_by_table_name[t], to_rename.index(t))
-      changes << change
-      undo_changes << undo
+      model = models_by_table_name[t]
+      table = to_rename.index(t) || model.table_name
+      if table.in?(db_tables)
+        change, undo = change_table(model, table)
+        changes << change
+        undo_changes << undo
+      end
     end
     
     up = [renames, drops, creates, changes].flatten.select{|s|!s.blank?} * "\n\n"
@@ -147,9 +151,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
     "  t.%-*s %s" % [field_name_width, field_spec.sql_type, args.join(', ')]
   end
   
-  def change_table(model, current_table_name=nil)
+  def change_table(model, current_table_name)
     new_table_name = model.table_name
-    current_table_name ||= new_table_name
     
     db_columns = model.connection.columns(current_table_name).index_by{|c|c.name} - [model.primary_key]
     model_column_names = model.field_specs.keys.every(:to_s)
