@@ -21,7 +21,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   def updatable_by?(updater, new)
-    upadter.administrator?
+    updater.administrator?
   end
 
   def deletable_by?(deleter)
