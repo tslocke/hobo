@@ -14,15 +14,15 @@ class HoboRapidGenerator < Hobo::Generator
       m.file "lowpro.js", "public/javascripts/lowpro.js"
       m.file "reset.css", "public/stylesheets/reset.css"
       m.file "hobo-rapid.css", "public/stylesheets/hobo-rapid.css"
-      create_all(m, "themes/default/public", "public/hobothemes/default")
-      create_all(m, "themes/default/views", "app/views/taglibs/themes/default")
+      create_all(m, "themes/clean/public", "public/hobothemes/clean")
+      create_all(m, "themes/clean/views", "app/views/taglibs/themes/clean")
     end
   end
   
   def import_tags
     path = File.join(RAILS_ROOT, "app/views/taglibs/application.dryml")
 
-    tag = "<include src=\"rapid\" plugin=\"hobo\"/>\n\n<set-theme name=\"default\"/>\n"
+    tag = "<include src=\"rapid\" plugin=\"hobo\"/>\n\n<set-theme name=\"clean\"/>\n"
       
     src = File.read(path)
     return if src.include?(tag)
