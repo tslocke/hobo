@@ -1,0 +1,31 @@
+/* forum */
+.posts {
+	border-top: 1px solid #e2e2e2;
+	width: 100%;
+	margin-bottom: 20px;
+}
+.posts th, .posts td {
+	border: 1px solid #e2e2e2; vertical-align: top;
+	border-width: 0 1px 1px 0;
+	padding: 8px 15px; padding-bottom: 20px;
+}
+.posts th {
+	background: #d8d8d8;
+}
+.posts td {
+	background: #f8f8f8;
+}
+.posts .author {
+	background: #eee; border-left: 1px solid #e2e2e2;
+}
+.posts .author {
+	width: 100px; font-weight: bold;
+}
+.posts .posted-on {
+	display: block; line-height: 16px;
+	font-style: italic; font-weight: normal; font-size: 11px;
+	padding-top: 10px;
+}
+.posts textarea {
+	width: 100%;
+}

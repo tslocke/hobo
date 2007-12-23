@@ -1,0 +1,7 @@
+<!-- Define your application-wide tags here -->
+
+<include src="rapid" plugin="hobo"/>
+
+<set-theme name="clean"/>
+
+<def tag="app-name">HoboCentral.net</def>

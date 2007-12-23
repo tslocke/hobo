@@ -1,0 +1,1 @@
+RapidBlog.new(:categories => false)

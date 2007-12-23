@@ -1,0 +1,33 @@
+<page title="#{app_name}">
+
+  <body: class="front-page"/>
+
+  <content-header:>
+    <h1 class="front-page-title">Welcome to <app-name/></h1>
+    <section class="welcome-message">
+      <h3>Congratulations! Your Hobo Rails App is up and running</h3>
+      <ul>
+        <li>To customise this page: edit app/views/front/index.dryml</li>
+      </ul>
+    </section>
+  </content-header>
+
+  <content-body:>
+    <ul with="&Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}">
+      <li:>
+        <header><h2><a/></h2></header>
+        <section>
+          <p if="&this.count == 0">There are no <type-name plural/></p>
+          <else>
+            <repeat with="&this.find(:all, :limit => 3)">
+              <card if="&can_view?"/>
+            </repeat>
+            <p><a>More</a> (<count/>)</p>
+          </else>
+          <p if="&can_create?">Create a <a to="&this" action="new"/>.</p>
+        </section>
+      </li:>
+    </ul>  
+  </content-body>
+  
+</page>

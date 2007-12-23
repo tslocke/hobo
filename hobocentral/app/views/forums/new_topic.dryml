@@ -1,0 +1,6 @@
+<new-in-collection-page>
+  <actions: replace>
+    <field-list with="&ForumPost.new" skip-associations="belongs_to"/>
+    <actions restore/>
+  </actions:>
+</new-in-collection-page>

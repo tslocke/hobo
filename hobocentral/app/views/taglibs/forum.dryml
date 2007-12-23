@@ -1,0 +1,3 @@
+<def tag="forum-post-summary">
+  <view:created_at/> <view:user.name/>
+</def>
