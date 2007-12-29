@@ -188,7 +188,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
       "remove_column :#{new_table_name}, :#{c}"
     end
     undo_removes = to_remove.map do |c|
-      revert_column(table_name, c)
+      revert_column(new_table_name, c)
     end
     
     old_names = to_rename.invert
@@ -206,9 +206,9 @@ class HoboMigrationGenerator < Rails::Generator::Base
         change_spec[:null]      = false unless spec.null
         change_spec[:default]   = spec.default
         
-        changes << "change_column :#{table_name}, :#{c}, " + 
+        changes << "change_column :#{new_table_name}, :#{c}, " + 
           ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
-        back = change_column_back(table_name, c)
+        back = change_column_back(new_table_name, c)
         undo_changes << back unless back.blank?
       else
         nil
