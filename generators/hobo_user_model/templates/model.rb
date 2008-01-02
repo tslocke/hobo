@@ -4,7 +4,7 @@ class <%= class_name %> < ActiveRecord::Base
 
   fields do
     username :string, :login => true, :name => true
-    administrator :boolean
+    administrator :boolean, :default => false
     timestamps
   end
 
