@@ -57,15 +57,12 @@
 </def>
       
 
-<def tag="default-layout" alias-of="simple-layout"/>
+<def tag="page" attrs="layout"><call-tag tag="#{layout || 'simple'}-layout" merge/></def>
 
 
-<def tag="page" attrs="layout"><% layout ||= "default" %><call-tag tag="#{layout}-layout" merge/></def>
-
-
-<def tag="index-page" attrs="layout">
+<def tag="index-page">
   <% model_name = @model.name.titleize %>
-  <page layout="&layout" title="All #{model_name.pluralize}" merge>
+  <page title="All #{model_name.pluralize}" merge>
     <body: class="index-page #{@model.name.underscore}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
@@ -95,8 +92,8 @@
 </def>
 
 
-<def tag="new-page" attrs="layout">
-  <page layout="&layout" title="New #{type_name}" merge>
+<def tag="new-page">
+  <page title="New #{type_name}" merge>
     <body: class="new-page #{type_name.underscore}" param/>
     <content-header: param>
       <heading param>New <type-name title/></heading>
@@ -116,13 +113,13 @@
 </def>
 
 
-<def tag="show-page" attrs="layout">
+<def tag="show-page">
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
      show_all_cards = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
   %>
-  <page layout="&layout" merge title="#{name :no_wrapper => true}">
+  <page merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
     <content-header: param>
       <if with="&this.dependent_on.reject{|x| x.is_a?(Hobo::User)}.first">
@@ -142,7 +139,7 @@
                   skip-associations="has_many" param/>
 
       <if test="&show_all_cards">
-        <section class="dependent-collection" field="&show_all_cards">
+        <section class="dependent-collection" id="dependent-collection" field="&show_all_cards">
           <a name="#{show_all_cards.to_s.underscore}"/>
           <h2><%= show_all_cards.to_s.titleize %></h2>
           <do part="dependent-collection" part-locals="show_all_cards">
@@ -185,8 +182,8 @@
 </def>
 
 
-<def tag="edit-page" attrs="layout">
-  <page layout="&layout" merge>    
+<def tag="edit-page">
+  <page merge>    
     <body: class="edit-page #{this.class.name.underscore}" param/>
     <content-header: param>
       <heading><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
@@ -207,9 +204,9 @@
 </def>
 
 
-<def tag="new-in-collection-page" attrs="layout">
+<def tag="new-in-collection-page">
   <set association-name="&@association.proxy_reflection.name.to_s.singularize.titleize"/>
-  <page layout="&layout" title="New #{type_name}" merge>
+  <page title="New #{type_name}" merge>
     <body: class="new-in-collection-page #{type_name(:with => @owner)} #{type_name}" param/>
     <content-header: param>
       <heading param>New <association-name/></heading>
@@ -231,9 +228,9 @@
 </def>
 
 
-<def tag="show-collection-page" attrs="layout">
+<def tag="show-collection-page">
   <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
-  <page layout="&layout" title="&title" merge>
+  <page title="&title" merge>
     <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
           param/>
     <content-header: param>
@@ -257,8 +254,8 @@
 </def>
 
 
-<def tag="signup-page" attrs="layout">
-  <page layout="&layout" title="Sign up to #{app_name}" merge>
+<def tag="signup-page">
+  <page layout="simple" title="Sign up to #{app_name}" merge>
     <body: class="signup-page" param/>
 
     <live-search: replace/>
@@ -283,8 +280,8 @@
 </def>
 
 
-<def tag="login-page" attrs="remember-me, layout">
-  <page layout="&layout" title="Log in to #{app_name}" merge>
+<def tag="login-page" attrs="remember-me">
+  <page layout="simple" title="Log in to #{app_name}" merge>
    
     <body: class="login-page" param/>
  
@@ -320,9 +317,9 @@
 </def>
 
 
-<def tag="account-disabled-page" attrs="layout">
+<def tag="account-disabled-page">
 
-  <page layout="&layout" title="#{app_name} - account not available" merge>
+  <page layout="simple" title="#{app_name} - account not available" merge>
        
     <body: class="account-disabled-page" param/>
 
