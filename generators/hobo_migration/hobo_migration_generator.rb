@@ -71,8 +71,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
       end
     end
     
-    up = [renames, drops, creates, changes].flatten.select{|s|!s.blank?} * "\n\n"
-    down = [undo_changes, undo_renames, undo_drops, undo_creates].flatten.select{|s|!s.blank?} * "\n\n"
+    up   = [renames, drops, creates, changes].flatten.reject(&:blank?) * "\n\n"
+    down = [undo_changes, undo_renames, undo_drops, undo_creates].flatten.reject(&:blank?) * "\n\n"
 
     if up.blank?
       puts "Database and models match -- nothing to change"
@@ -200,11 +200,11 @@ class HoboMigrationGenerator < Rails::Generator::Base
       spec = model.field_specs[c]
       if spec.different_to?(col)
         change_spec = {}
-        change_spec[:limit]     = spec.limit if !spec.limit.nil?
-        change_spec[:precision] = spec.precision if !spec.precision.nil?
-        change_spec[:scale]     = spec.scale if !spec.scale.nil?
-        change_spec[:null]      = false unless spec.null
-        change_spec[:default]   = spec.default
+        change_spec[:limit]     = spec.limit     unless spec.limit.nil?
+        change_spec[:precision] = spec.precision unless spec.precision.nil?
+        change_spec[:scale]     = spec.scale     unless spec.scale.nil?
+        change_spec[:null]      = false          unless spec.null
+        change_spec[:default]   = spec.default   unless spec.default.nil? && col.default.nil?
         
         changes << "change_column :#{new_table_name}, :#{c}, " + 
           ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
