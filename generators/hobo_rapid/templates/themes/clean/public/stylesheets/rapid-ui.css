@@ -125,7 +125,7 @@ div.completions-popup ul li {
 
 
 .field-list   {width:100%;}
-.field-list td {vertical-align: middle; width: 75%;}
+.field-list td {vertical-align: middle;}
 .field-list th {font-weight: bold;}
 .field-list th, .field-list td {padding: 5px 0;}
 .field-list th {padding-right: 10px;}
