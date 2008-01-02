@@ -308,7 +308,7 @@
       
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
-    <h2 param="heading">In order to proceed please correct the following:</h2>
+    <h2 param="heading">To proceed please correct the following:</h2>
     <ul:errors.full_messages param>
       <li: param><%= this %></li:>
     </ul>
