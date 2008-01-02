@@ -358,6 +358,7 @@ module Hobo
     def re_render_form(default_action)
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
+        view = default_action if view == Dryml::EMPTY_PAGE
         hobo_render(view, model_for(controller))
       else
         hobo_render(default_action)
@@ -531,7 +532,7 @@ module Hobo
           end
         elsif invalid?
           respond_to do |wants|
-          wants.html { re_render_form(:edit) }
+            wants.html { re_render_form(:edit) }
             wants.js { render(:status => 500,
                               :text => ("There was a problem with that change.\n" + 
                                         @this.errors.full_messages.join("\n"))) }
