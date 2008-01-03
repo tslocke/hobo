@@ -147,7 +147,7 @@ module Hobo::Dryml
 
     
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= this_type
+      call_type ||= (this_type.is_a?(Array) ? this_type.member_class : this_type)
       return name if call_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
       call_type = TrueClass if call_type == FalseClass
 
