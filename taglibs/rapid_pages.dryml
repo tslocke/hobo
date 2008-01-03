@@ -72,7 +72,7 @@
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
       
-      <card repeat/>
+      <do param="items"><card repeat param/></do>
       
       <nav param="bottom-pagination-nav"><page-nav/></nav>
     </content-body>
