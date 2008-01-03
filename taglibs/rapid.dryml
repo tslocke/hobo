@@ -117,6 +117,12 @@
 </def>
   
 
+<def tag="collection">
+  <%= poly = call_polymorphic_tag('collection', attributes) %>
+  <card repeat unless="&poly"/>
+</def>
+
+
 <def tag="hobo-rapid-javascripts" attrs="tiny-mce"><%=
    res = '<script type="text/javascript">var hoboParts = {};'
    unless Hobo.all_models.empty?
