@@ -119,9 +119,12 @@
 
 <def tag="collection">
   <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
-  <ul class="collection" merge-attrs>
-    <li:><card param unless="&poly"/></li:>
+  <ul class="collection" merge-attrs unless="&poly">
+    <li:><card param/></li:>
   </ul>
+  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
+    There are no <type-name plural/>
+  </p>
 </def>
 
 
