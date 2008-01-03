@@ -119,7 +119,7 @@
 
 <def tag="collection">
   <%= poly = call_polymorphic_tag('collection', attributes) %>
-  <card repeat unless="&poly"/>
+  <card repeat param unless="&poly"/>
 </def>
 
 
