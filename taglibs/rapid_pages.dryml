@@ -143,9 +143,11 @@
           <a name="#{dependent_collection.to_s.underscore}"/>
           <h2><%= dependent_collection.to_s.titleize %></h2>
 
-          <collection param part="dependent-collection" part-locals="dependent_collection">
-            <empty-message:>No <%= dependent_collection.to_s %> have been added yet.</empty-message>
-          </collection>
+          <do param="collection">
+            <collection part="dependent-collection" part-locals="dependent_collection">
+              <empty-message:>No <%= dependent_collection.to_s %> have been added yet.</empty-message>
+            </collection>
+          </do>
         
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
