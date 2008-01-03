@@ -133,13 +133,13 @@ module Hobo::Dryml
       res
     end
     
-    def call_polymorphic_tag(*args, &b)
-      attributes = extract_options_from_args!(args)
-      name, type = args
+    def call_polymorphic_tag(name, *args)
+      type = args.first.is_a?(Class) ? args.shift : nil
+      attributes, parameters = args
       
       tag = find_polymorphic_tag(name, type)
       if tag != name
-        send(tag, attributes, &b)
+        send(tag, attributes, parameters)
       else
         nil
       end
@@ -186,8 +186,7 @@ module Hobo::Dryml
               @_form_field_path]
       @_erb_output = ""
       res = yield
-      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type,
-          @_form_field_path = ctx
+      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
       res.to_s
     end
 
