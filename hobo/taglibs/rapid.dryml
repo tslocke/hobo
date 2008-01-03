@@ -104,7 +104,7 @@
 
 <def tag="card">
   <if test="&can_view?">
-    <%= poly = call_polymorphic_tag('card', attributes) %>
+    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
       <a if="&linkable?"/>
       <div class="content" param="content">
@@ -118,8 +118,10 @@
   
 
 <def tag="collection">
-  <%= poly = call_polymorphic_tag('collection', attributes) %>
-  <card repeat param unless="&poly"/>
+  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
+  <ul class="collection" merge-attrs>
+    <li:><card param unless="&poly"/></li:>
+  </ul>
 </def>
 
 
