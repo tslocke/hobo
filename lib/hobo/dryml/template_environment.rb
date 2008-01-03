@@ -139,7 +139,7 @@ module Hobo::Dryml
       
       tag = find_polymorphic_tag(name, type)
       if tag != name
-        send(tag, attributes, parameters)
+        send(tag, attributes, parameters || {})
       else
         nil
       end
