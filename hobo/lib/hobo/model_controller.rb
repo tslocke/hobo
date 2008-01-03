@@ -140,23 +140,25 @@ module Hobo
       
       
       def show_action(*names, &block)
+        options = names.extract_options!
         show_actions.concat(names)
         for name in names
           if block
             define_method(name, &block)
           else
-            define_method(name) { hobo_show }
+            define_method(name) { hobo_show options }
           end
         end
       end
       
       def index_action(*names, &block)
+        options = names.extract_options!
         index_actions.concat(names)
         for name in names
           if block
             define_method(name, &block)
           else
-            define_method(name) { hobo_index }
+            define_method(name) { hobo_index options }
           end
         end
       end
