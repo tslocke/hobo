@@ -72,7 +72,7 @@
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
       
-      <do param="items"><card repeat param/></do>
+      <collection param/>
       
       <nav param="bottom-pagination-nav"><page-nav/></nav>
     </content-body>
@@ -117,7 +117,7 @@
   <% has_many_assocs = this.class.reflections.values.map do |refl|
        this.send(refl.name) if Hobo.simple_has_many_association?(refl)
      end.compact
-     show_all_cards = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
+     dependent_collection = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
   %>
   <page merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name.underscore}" param/>
@@ -128,7 +128,7 @@
 
       <heading param><%= this %></heading>
       <creation-details/>
-      <a class="dependent-collection-count" href="##{show_all_cards.to_s.underscore}" part="dependent-collection-count"  part-locals="show_all_cards" if="&show_all_cards"><count-dependents/></a>
+      <a class="dependent-collection-count" href="##{dependent_collection.to_s.underscore}" part="dependent-collection-count" part-locals="dependent_collection" if="&dependent_collection"><count-dependents/></a>
       <a action="edit" if="&can_edit?" class="edit">Edit <type-name/></a>
     </content-header>
     
@@ -138,22 +138,22 @@
       <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_attribute, this.class.dependent_on.first].compact "
                   skip-associations="has_many" param/>
 
-      <if test="&show_all_cards">
-        <section class="dependent-collection" field="&show_all_cards">
-          <a name="#{show_all_cards.to_s.underscore}"/>
-          <h2><%= show_all_cards.to_s.titleize %></h2>
-          <do part="dependent-collection" part-locals="show_all_cards">
-            <ul><li:><card/></li:></ul>
-            <else>No <%= show_all_cards.to_s %> have been added yet.</else>
-          </do>
+      <if test="&dependent_collection">
+        <section class="dependent-collection" field="&dependent_collection">
+          <a name="#{dependent_collection.to_s.underscore}"/>
+          <h2><%= dependent_collection.to_s.titleize %></h2>
+
+          <collection param part="dependent-collection" part-locals="dependent_collection">
+            <empty-message:>No <%= dependent_collection.to_s %> have been added yet.</empty-message>
+          </collection>
         
           <do with="&new_for_current_user">
             <section class="create-new" if="&!linkable?(:new) && can_create?">
-              <h2>Add <A-or-An word="&show_all_cards.to_s.singularize.titleize"/></h2>
-              <form update="dependent-collection, dependent-collection-count" message="Adding #{show_all_cards.to_s.singularize.titleize}..." reset-form>
-                <field-list skip="#{@this.class.reverse_reflection(@this.send(show_all_cards).proxy_reflection.name).name}"
+              <h2>Add <A-or-An word="&dependent_collection.to_s.singularize.titleize"/></h2>
+              <form update="dependent-collection, dependent-collection-count" message="Adding #{dependent_collection.to_s.singularize.titleize}..." reset-form>
+                <field-list skip="#{@this.class.reverse_reflection(@this.send(dependent_collection).proxy_reflection.name).name}"
                             skip-associations="has_many" param/>
-                <submit label="Create #{show_all_cards.to_s.singularize.titleize}"/>
+                <submit label="Create #{dependent_collection.to_s.singularize.titleize}"/>
               </form>
             </section>
           </do>
@@ -164,7 +164,7 @@
           <with-fields associations="has_many">
             <section class="#{this_field.dasherize}">
               <h2>Recent <this-field.titleize/></h2>
-              <card repeat="&this.recent.all"/>
+              <collection with="&this.recent.all"/>
               <a class="more">More... (<count/>)</a>
             </section>
           </with-fields>
