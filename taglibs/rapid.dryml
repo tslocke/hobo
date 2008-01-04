@@ -475,10 +475,10 @@ in the future - use at your own risk. -->
 
 
 <def tag="a-or-an" attrs="word"><%=
-  (word =~ /^[aeiouh]/ ? "an " : "a ") + word
+  (word =~ /^[aeiouh]/i ? "an " : "a ") + word
 %></def>
 
 
 <def tag="A-or-An" attrs="word"><%=
-  (word =~ /^[aeiouh]/ ? "An " : "A ") + word
+  (word =~ /^[aeiouh]/i ? "An " : "A ") + word
 %></def>
