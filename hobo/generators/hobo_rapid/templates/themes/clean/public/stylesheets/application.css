@@ -66,11 +66,18 @@ input.file_upload {
 	color: black;
 }
 
-.content-header, .content-body, .content-footer {margin: 10px 45px; padding: 0;}
-.flash {margin-left: 40px; margin-right: 40px; text-shadow: #728852 2px 2px 0;}
+.content-header, .content-body, .content-footer {margin: 10px 45px 15px; padding: 0;}
+
+.flash {
+	margin: 20px 40px; padding: 10px 30px;
+	border-width: 2px 0;
+	color: white;
+}
+.flash.notice {background: #92ab6e; border: 1px solid #829862; text-shadow: #728852 2px 2px 0;}
+.flash.error {background: #BC1C3D; border: 1px solid #900024; text-shadow: #900024 2px 2px 0;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
 
-.content-header, .content-body {padding-bottom: 10px;}
+.content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
 
@@ -132,6 +139,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 .field-list td {width: auto;}
 
 .login-page, .signup-page {width: 50%; margin-top: 40px;}
+.login-page .content-header, .signup-page .content-header {padding-bottom: 0;}
 .login-page .field-list, .signup-page .field-list {width: 300px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 120px;}
@@ -144,7 +152,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 .show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 2px; margin-right: 70px;}
 .show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
 .content-header .creation-details, .content-header .dependent-collection-count {font-size: 11px; line-height: 11px;}
-.content-header .creator {font-weight: bold; margin-right: 5px;}
+.content-header .creator {margin-right: 5px;}
 .content-header .created-at {color: #444;}
 .content-header .dependent-collection-count {font-weight: bold; margin-left: 15px;}
 
@@ -155,14 +163,17 @@ ul.main-nav {float: left; margin: 0 10px;}
 	padding: 0 30px;
 	border-top: 1px dotted #ddd; margin-top: 20px; background: #f5f5f5;
 }
-.show-page .create-new form .submit-button {margin: 20px 125px;}
+.show-page .create-new form .submit-button {margin: 20px 130px;}
+.show-page .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
 
 /* styling of generic elements */
+.creator {font-weight: bold;}
 .card {
 	background: #f5f5f5;
 	border: 1px solid #e8e8e8;
 	padding:10px 20px;
 	margin-bottom: 5px;
+	height: 100%; overflow: hidden; clear: both;
 }
 .card a {background: #f5f5f5;}
 .card .creation-details {
@@ -172,7 +183,14 @@ ul.main-nav {float: left; margin: 0 10px;}
 
 .card.content {
 	font-size: 11px;
-	border: none; background: none; padding: 0; margin: 10px 0;
+	border: none; background: none; padding: 0; margin: 10px 0 30px;
+}
+.card.content .creation-details {
+	float: left; width: 155px; line-height: 14px;
+}
+.card.content .creation-details .created-at {display: block;}
+.card.content .content {
+	float: right; width: 420px;
 }
 ul.collection li {list-style: none; margin-left: 0;}
 
@@ -181,6 +199,10 @@ ul.collection li {list-style: none; margin-left: 0;}
 
 .dependent-collection ul li {
 	list-style: none; margin-left: 0;
+}
+.dependent-collection h2 {
+	padding: 15px 0; margin-bottom: 20px;
+	border-bottom: 1px dotted black;
 }
 
 /*******************************************************/
