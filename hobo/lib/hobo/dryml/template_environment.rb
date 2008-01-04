@@ -152,7 +152,6 @@ module Hobo::Dryml
                       when Array; this.member_class
                       else this_type
                     end
-      return name if call_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
       call_type = TrueClass if call_type == FalseClass
 
       while true
