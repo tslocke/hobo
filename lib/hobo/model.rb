@@ -354,6 +354,7 @@ module Hobo
       
       
       class ScopedProxy
+        
         def initialize(klass, scope)
           @klass = klass
           
