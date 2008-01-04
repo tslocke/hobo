@@ -166,7 +166,7 @@
           <with-fields associations="has_many">
             <section class="#{this_field.dasherize}">
               <h2>Recent <this-field.titleize/></h2>
-              <collection with="&this.recent.all"/>
+              <collection with="&this.recent"/>
               <a class="more">More... (<count/>)</a>
             </section>
           </with-fields>
@@ -274,7 +274,9 @@
           <password-confirmation-label:>Confirm Password</password-confirmation-label>
         </field-list>
 
-        <submit label='Sign Up'/>
+        <div class="actions" param="actions">
+          <submit label='Sign Up'/>
+        </div>
       </form>
     </content-body>
 
@@ -312,7 +314,10 @@
             <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
           </labelled-item>
         </labelled-item-list>
-        <submit label='Log in' param/>
+        <set user="&Hobo::UserController.user_models.first"/>
+        <div class="actions" param="actions">
+          <submit label='Log in' param/><if test="&signup_url(user)" class='nav-item'> or <a href="&signup_url(user)">Sign up</a></if>
+        </div>
       </form>
     </content-body>
   </page>
@@ -325,7 +330,7 @@
        
     <body: class="account-disabled-page" param/>
 
-    <content-header: param><heading param>Account is not availble</heading></content>
+    <content-header: param><heading param>Account is not available</heading></content>
 
     <content-body: param>
       <p>Your account is not available at this time.</p>
