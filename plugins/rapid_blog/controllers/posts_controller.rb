@@ -5,7 +5,7 @@ bundle_model_controller :BlogPost do
   include_taglib "post_pages", :bundle => _bundle_
   
   feature :comments do 
-    include_taglib "hobo_comments", :bundle => _comments_bundle_
+    include_taglib "rapid_comments", :bundle => _comments_bundle_
   end
 
 
