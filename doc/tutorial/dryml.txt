@@ -165,4 +165,4 @@ File: app/views/front/index.dryml
     
 Job done :-)
 
-[TODO: Explain how that works by breaking it down into a few steps]
+TO BE CONTINUED...

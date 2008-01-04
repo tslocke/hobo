@@ -120,10 +120,13 @@ Finally, we need to add just one thing to `app/models/user.rb` -- the `has_many 
 
       fields do
         username :string, :login => true, :name => true
+        administrator :boolean
         timestamps
       end
-
+  
       has_many :adverts
+
+      set_admin_on_first_user
 
       # --- Hobo Permissions --- #
       # Don't change anything below here yet
@@ -174,7 +177,7 @@ Note that you provide the *singular* model name to the generator.
 
 Refresh the browser and you should see:
 
-<img src="front-with-models.png">
+<img src="images/front-with-models.png">
 
 You can also browse to "Adverts" and "Categories" pages.
 
@@ -237,11 +240,11 @@ What's happening here? Whenever Hobo needs to know if a user is allowed to make 
 
 Once you've made those changes, make sure you're logged in as `admin`, then refresh the home-page of the app. The categories section should now have a link to create a new category:
 
-<img src="new-category-link.png">
+<img src="images/new-category-link.png">
 
 Follow that link and you'll see Hobo has automatically created a form for the category:
 
-<img src="new-category-form.png">
+<img src="images/new-category-form.png">
 
 You can now create a category. By default Hobo takes you to the 'show' page for the new category. You can use the navigation bar to get back to the "Categories" index page to create more categories.
 

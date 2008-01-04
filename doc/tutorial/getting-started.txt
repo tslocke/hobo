@@ -82,6 +82,7 @@ You should see:
       t.string   :remember_token
       t.datetime :remember_token_expires_at
       t.string   :username
+      t.boolean  :administrator
       t.datetime :created_at
       t.datetime :updated_at
     end
@@ -103,15 +104,13 @@ Launch Rails' built in development server with:
 
     ruby script/server
     
-And point your browser at `http://localhost:3000`. You should see
+And point your browser at `http://localhost:3000`. You should see:
 
-<img src="front-page.png">
+<img src="images/front-page.png">
 
 
 ## Sign-up and Log-in
 
 You should find that you are already able to sign up as a new user, and log in and out.
 
-We now have a basic Hobo app up and running with the default theme. Of course the app doesn't do much 
-
-
+We now have a basic Hobo app up and running with the default theme. Of course the app doesn't do much at this stage. To add functionality, the first step is to create some models.
