@@ -9,16 +9,15 @@ module Hobo
       class << self
      
         def get(options)
-          file = taglib_file(options)
-     
           taglib = @cache[options]
           if taglib
             taglib.reload
           else
+            src_file = taglib_filename(options)
             renames = (bundle = options[:bundle] and
                        Bundle.bundles[bundle]._?.renames)
      
-            taglib = Taglib.new(file, renames)
+            taglib = Taglib.new(src_file, renames)
             @cache[options] = taglib
           end
           taglib
@@ -30,7 +29,7 @@ module Hobo
         
         private
         
-        def taglib_file(options)
+        def taglib_filename(options)
           base = if (plugin = options[:plugin])
                    "vendor/plugins/#{plugin}/taglibs"
                  elsif (bundle_name = options[:bundle])
@@ -44,19 +43,19 @@ module Hobo
           
           filename = "#{RAILS_ROOT}/#{base}/#{options[:src]}.dryml"
           raise DrymlException, "No such taglib: #{options.inspect} #{filename}" unless File.exists?(filename)
-          File.new(filename)
+          filename
         end
      
       end
      
-      def initialize(file, renames)
-        @file = file
+      def initialize(src_file, renames)
+        @src_file = src_file
         @renames = renames
         load
       end
      
       def reload
-        load if @file.mtime > @last_load_time
+        load if File.mtime(@src_file) > @last_load_time
       end
      
       def load
@@ -85,10 +84,9 @@ module Hobo
           end
           
         end
-        @file.rewind
-        template = Template.new(@file.read, @module, @file.path, @renames)
+        template = Template.new(File.read(@src_file), @module, @src_file, @renames)
         template.compile([], [])
-        @last_load_time = @file.mtime
+        @last_load_time = File.mtime(@src_file)
       end
      
       def import_into(class_or_module, as)
