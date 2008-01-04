@@ -39,7 +39,7 @@ Dir.chdir(APP_NAME) do
   
   edit "app/models/user.rb" do |user|
     user.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
-  has_many :adverts
+  has_many :adverts, :dependent => :destroy
 
   # --- Hobo Permissions --- #
 
@@ -52,11 +52,11 @@ Dir.chdir(APP_NAME) do
   end
 
   def updatable_by?(user, new)
-    user == self
+    user == self || user.administrator?
   end
 
   def deletable_by?(user)
-    false
+    user.administrator?
   end
 
   def viewable_by?(user, field)
@@ -69,23 +69,21 @@ END
   
   edit "app/models/advert.rb" do |advert|
     advert.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
-  belongs_to :user
+  belongs_to :user, :creator => true
   belongs_to :category
-
-  set_creator_attr :user
 
   # --- Hobo Permissions --- #
 
   def creatable_by?(user)
-    user == self.user
+    user == self.user || user.administrator?
   end
 
   def updatable_by?(user, new)
-    user == self.user && same_fields?(new, :user)
+    user == self.user && same_fields?(new, :user) || user.administrator?
   end
 
   def deletable_by?(user)
-    user == self.user
+    user == self.user || user.administrator?
   end
 
   def viewable_by?(user, field)
@@ -98,20 +96,20 @@ END
   
   edit "app/models/category.rb" do |category|
     category.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
-  has_many :adverts
+  has_many :adverts, :dependent => :destroy
 
   # --- Hobo Permissions --- #
 
   def creatable_by?(user)
-    false
+    user.administrator?
   end
 
   def updatable_by?(user, new)
-    false
+    user.administrator?
   end
 
   def deletable_by?(user)
-    false
+    user.administrator?
   end
 
   def viewable_by?(user, field)
@@ -122,6 +120,9 @@ end
 END
   end
 
+  edit "app/controllers/categories_controller.rb" do |controller|
+    controller.sub("auto_actions :all", "auto_actions :all, :except => :new")
+  end
   sh "mysqladmin create new_hobo_app_development"
   
   gen "hobo_migration"
