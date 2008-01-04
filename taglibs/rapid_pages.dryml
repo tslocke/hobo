@@ -33,8 +33,9 @@
         </nav>
       </header>
       <section class="page-content" param="content">
-        <header class="content-header" param="content-header"/>
         <flash-message param/>
+        <flash-message type="error" param/>
+        <header class="content-header" param="content-header"/>
         <section class="content-body" param="content-body"/>
         <footer class="content-footer" param="content-footer"/>
       </section>
@@ -127,8 +128,8 @@
       </if>
 
       <heading param><%= this %></heading>
-      <creation-details/>
-      <a class="dependent-collection-count" href="##{dependent_collection.to_s.underscore}" part="dependent-collection-count" part-locals="dependent_collection" if="&dependent_collection"><count-dependents/></a>
+      <creation-details param/>
+      <do param="dependent-collection-count"><a class="dependent-collection-count" href="##{dependent_collection.to_s.underscore}" part="dependent-collection-count" part-locals="dependent_collection" if="&dependent_collection"><count-dependents/></a></do>
       <a action="edit" if="&can_edit?" class="edit">Edit <type-name/></a>
     </content-header>
     
@@ -141,7 +142,7 @@
       <if test="&dependent_collection">
         <section class="dependent-collection" field="&dependent_collection">
           <a name="#{dependent_collection.to_s.underscore}"/>
-          <h2><%= dependent_collection.to_s.titleize %></h2>
+          <h2 param="dependent-collection-title"><%= dependent_collection.to_s.titleize %></h2>
 
           <do param="collection">
             <collection part="dependent-collection" part-locals="dependent_collection">
@@ -154,7 +155,7 @@
               <h2>Add <A-or-An word="&dependent_collection.to_s.singularize.titleize"/></h2>
               <form update="dependent-collection, dependent-collection-count" message="Adding #{dependent_collection.to_s.singularize.titleize}..." reset-form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(dependent_collection).proxy_reflection.name).name}"
-                            skip-associations="has_many" param/>
+                            skip-associations="has_many" param="dependent-collection-field-list"/>
                 <submit label="Create #{dependent_collection.to_s.singularize.titleize}"/>
               </form>
             </section>
