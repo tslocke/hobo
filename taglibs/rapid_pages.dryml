@@ -20,13 +20,14 @@
 </html>
 </def>
 
+
 <def tag="simple-layout">
   <base-page merge>
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
         <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
-        <live-search param/>
+        <live-search param if="&defined_route? :search"/>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
           <magic-nav class="main-nav" param="main-nav"/>
