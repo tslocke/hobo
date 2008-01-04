@@ -1,3 +1,87 @@
+=== Release 0.7.2 ===
+
+Migration generator
+
+  Fixed "no such method table_name" bug
+
+  Fixed various problems with specific column types, in particular
+  decimal colums were problematic.
+
+
+Model and controller generators:
+
+  Brought test related files up to date with latest Rails
+
+
+Model controller
+
+  Fix: now correctly renders pages with validation errors for tag
+  pages (pages with no dryml file)
+
+  index_action and show_action can now be passed options for Hobo's
+  default actions rather than giving a block. e.g.
+
+    index_action :foo
+      hobo_index :page_size => 10
+    end
+
+    Can now be written
+
+    index_action :foo, :page_size => 10
+
+
+Hobo user model generator
+
+  Added :default => false to administrator field
+
+
+DRYML
+
+  Polymorphic tags -- looking up the polymorphic tag for an array will
+  now use the 'member_class' of the array if available.
+
+
+Rapid
+
+  New generic tag <collection>. Used to create type-specific
+  renderings of collections. E.g. you can 
+
+    <def tag="collection" for="Comment">
+
+    To customise how an array of comments are displayed. This will get
+    picked up by the default pages.
+
+
+Rapid pages
+
+  Removed <default-layout/> -- dryml has built in facilities for
+  setting and overriding defaults so this was not needed.
+
+  Login and signup pages now specify "simple" layout, so e.g. if you
+  redefine <page> to use "aside" layout, then login and signup will
+  still use the simple layout.
+
+  Various improvements to the default pages
+
+  <index-page> new params
+
+
+Plugins
+
+  Changing from hobo_* naming convention to rapid_* 
+
+
+
+Clean theme
+
+  Many small style improvements
+
+  Support for aside layout
+
+
+
+
+
 === Release 0.7.1 ===
 
 Hobo 0.7 is tested against Rails 2.0.1
