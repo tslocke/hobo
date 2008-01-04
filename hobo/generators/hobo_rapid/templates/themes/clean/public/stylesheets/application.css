@@ -135,7 +135,8 @@ ul.main-nav {float: left; margin: 0 10px;}
 .login-page .field-list, .signup-page .field-list {width: 300px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 120px;}
-.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}
+.login-page .actions, .signup-page .actions {text-align: left; margin-left: 128px; margin-top: 20px;}
+/*.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}*/
 
 .edit-page .delete-button {margin-top: 25px;}
 
