@@ -19,6 +19,8 @@ class ForumPost < ActiveRecord::Base
   # will be set up before the permission methods are called.
   belongs_to :user, :creator => true
 
+  after_create :update_topic_last_post
+
   # --- Hobo Permissions --- #
 
   # Anyone can create a post as long as they haven't tried to fake the
@@ -42,6 +44,14 @@ class ForumPost < ActiveRecord::Base
   # Everyone can view the post -- even guests.
   def viewable_by?(user, field)
     true
+  end
+
+  protected
+  
+  def update_topic_last_post
+    topic.last_post_at = Time.now
+    topic.last_post_by = self.user
+    topic.save!
   end
 
 end

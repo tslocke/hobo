@@ -5,36 +5,32 @@ class ForumTopic < ActiveRecord::Base
   hobo_model
 
   fields do
-    title      :string
-    sticky     :boolean
+    title          :string
+    sticky         :boolean, :default => false
+    body           :text
+    last_post_at   :datetime
     timestamps
   end
 
   # See app/models/forum.rb for some comments on the :dependent declaration
-  has_many   :posts, :class_name => 'ForumPost', :foreign_key => 'topic_id', :order => :created_at, :dependent => :destroy
+  has_many   :replies, :class_name => 'ForumPost', :foreign_key => 'topic_id', :order => :created_at, :dependent => :destroy
   belongs_to :forum
+
+  def_scope :recent, :order => "last_post_at DESC"
   
   # See app/models/forum_post.rb for an explanation of :creator => true
   belongs_to :user, :creator => true
 
-  # A virtual field -- this is all regular Active Record
-  attr_accessor :body
+  belongs_to :last_post_by, :class_name => 'User'
 
-  after_save :save_body
-  def save_body
-    post = posts.find(:first) || posts.new
-    
-    post.user = self.user
-    post.body = self.body
-    post.save
+  before_create :set_last_post
+
+  def has_replies?
+    @has_replies ||= (posts_count > 1)
   end
 
-  def last_post
-    posts.find(:first, :order => 'created_at DESC')
-  end
-
-  def replies
-    posts[1..-1] || []
+  def posts_count
+    @posts_count ||= (1 + replies.count)
   end
 
   # --- Hobo Permissions --- #
@@ -48,7 +44,7 @@ class ForumTopic < ActiveRecord::Base
 
   # Admins can change the sticky flag and the title. 
   def updatable_by?(user, new)
-    user.administrator? && only_changed_fields(new, :sticky, :title)
+    user.administrator? && only_changed_fields?(new, :sticky, :title)
   end
 
   # Admins can delete the topic.
@@ -59,6 +55,21 @@ class ForumTopic < ActiveRecord::Base
   # Anyone can view, even guests.
   def viewable_by?(user, field)
     true
+  end
+
+  def last_post_at_editable_by?(user)
+    false
+  end
+  
+  def last_post_by_editable_by?(user)
+    false
+  end
+
+  protected
+  
+  def set_last_post
+    self.last_post_at = Time.now
+    self.last_post_by = user
   end
 
 end

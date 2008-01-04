@@ -1,13 +1,1 @@
-<show-page>
-  <field-lista: replace>
-    <view:description/>
-    <table:topics>
-      <thead:>
-        <tr><th>Topic</th><th>Replies</th><th>Author</th><th>Last Post</th></tr>
-      </thead:>
-      <tr:>
-        <td><a/></td><td><count:replies/></td><td><view:user/></td><td><view:last_post.created_at/></td>
-      </tr:>
-    </table>
-  </field-lista:>
-</show-page>
+<show-page/>

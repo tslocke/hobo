@@ -7,6 +7,9 @@ class User < ActiveRecord::Base
     timestamps
   end
 
+  has_many :forum_posts
+  has_many :topics, :through => :forum_posts
+
   # --- Hobo Permissions --- #
 
   def administrator?

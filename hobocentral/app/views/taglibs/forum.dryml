@@ -1,3 +1,36 @@
 <def tag="forum-post-summary">
-  <view:created_at/> <view:user.name/>
+  <a><view:last_post_at/> by <name:last_post_by/></a>
+</def>
+
+<def tag="card" for="Forum">
+  <div class="card forum">
+    <div class="summary">
+      <a/>
+      <span class="count"><count:topics_count label="topic"/>, <count:posts_count label="post"/></span>
+      <view:description truncate="100"/>
+    </div>
+    <div class="latest-post">
+        Latest Post
+        <forum-post-summary:last_update/>
+    </div>
+  </div>
+</def>
+
+<def tag="collection" for="ForumTopic">
+  <table class="collection forum-topic">
+    <thead:>
+      <tr>
+        <th class="topic">Topic</th>
+        <th class="replies">Replies</th>
+        <th class="views">Views</th>
+        <th class="last-post">Last Post</th>
+      </tr>
+    </thead:>
+    <tr:>
+      <td class="topic"><a/></td>
+      <td class="replies"><view:replies.count/></td>
+      <td class="views">0</td>
+      <td class="last-post"><forum-post-summary/></td>
+    </tr:>
+  </table>
 </def>

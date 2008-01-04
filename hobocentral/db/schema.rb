@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 2) do
+ActiveRecord::Schema.define(:version => 5) do
 
   create_table "blog_post_categories", :force => true do |t|
     t.string "name"
@@ -46,11 +46,14 @@ ActiveRecord::Schema.define(:version => 2) do
 
   create_table "forum_topics", :force => true do |t|
     t.string   "title"
-    t.boolean  "sticky"
+    t.boolean  "sticky",          :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "forum_id"
     t.integer  "user_id"
+    t.text     "body"
+    t.datetime "last_post_at"
+    t.integer  "last_post_by_id"
   end
 
   create_table "forums", :force => true do |t|

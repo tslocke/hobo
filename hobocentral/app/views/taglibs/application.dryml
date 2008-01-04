@@ -5,3 +5,9 @@
 <set-theme name="clean"/>
 
 <def tag="app-name">HoboCentral.net</def>
+
+<def tag="page" extend-with="hobocentral">
+  <page-without-hobocentral layout="aside" merge>
+    <aside:>&nbsp;</aside:>
+  </page-without-hobocentral>
+</def>

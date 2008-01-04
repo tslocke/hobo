@@ -20,8 +20,19 @@ class Forum < ActiveRecord::Base
 
   # Hobo Rapid will spot the :dependent declaration here and use the
   # information to improve the default pages.
-  has_many :topics, :class_name => 'ForumTopic', :dependent => :destroy
+  has_many :topics, :class_name => 'ForumTopic', :order => 'sticky desc, last_post_at desc', :dependent => :destroy
 
+  def topics_count
+    @topics_count ||= topics.count
+  end
+
+  def posts_count
+    @posts_count ||= topics.inject(0) {|sum,topic|sum + topic.posts_count}
+  end
+
+  def last_update
+    topics.recent.find(:first)
+  end
 
   # --- Hobo Permissions --- #
   
