@@ -29,7 +29,7 @@ module Hobo
       if request.post?
         user = model.authenticate(params[:login], params[:password])
         if user.nil?
-          flash[:notice] = options[:failure_notice]
+          flash[:error] = options[:failure_notice]
         else
           old_user = current_user
           self.current_user = user
