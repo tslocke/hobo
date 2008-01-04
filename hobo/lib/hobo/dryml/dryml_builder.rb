@@ -17,7 +17,7 @@ module Hobo::Dryml
 
 
     def ready?(mtime)
-      !(@build_instructions.empty? || @last_build_time.nil? || mtime > @last_build_time)
+      !@build_instructions.empty? && @last_build_mtime && @last_build_mtime >= mtime
     end
 
 
@@ -62,7 +62,7 @@ module Hobo::Dryml
     end
 
 
-    def build(local_names, auto_taglibs)
+    def build(local_names, auto_taglibs, src_mtime)
 
       auto_taglibs.each { |t| import_taglib(t) }
     
@@ -98,7 +98,7 @@ module Hobo::Dryml
                                  "building #{template_path}")
         end
       end
-      @last_build_time = Time.now
+      @last_build_mtime = src_mtime
     end
     
 

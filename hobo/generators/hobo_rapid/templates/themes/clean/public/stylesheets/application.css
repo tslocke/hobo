@@ -1,13 +1,13 @@
 html {background: #666;}
 body {
-	width: 800px; margin: 0 auto; background: white; color: #222;
+	width: 760px; margin: 0 auto; background: white; color: #222;
 	font: 12px "Lucida Grande", Arial, sans-serif;
-	line-height: 18px; padding-bottom: 10px; margin-bottom: 20px;
+	line-height: 18px; margin-bottom: 20px;
 }
-h1, h2, h3 {font-family: "Rockwell", "Trebuchet MS", "Arial", sans-serif;}
-h1 {font-size: 32px; line-height: 32px; margin: 20px 0 10px;}
-h2 {font-size: 24px; line-height: 24px; margin: 15px 0 10px;}
-h3 {font-size: 18px; line-height: 18px; margin: 10px 0 5px;}
+h1, h2, h3 {font-family: "Lucida Grande", "Trebuchet MS", "Arial", sans-serif; font-weight: normal;}
+h1 {font-size: 22px; line-height: 22px; margin: 20px 0 10px;}
+h2 {font-size: 18px; line-height: 18px; margin: 15px 0 10px;}
+h3 {font-size: 16px; line-height: 16px; margin: 10px 0 5px;}
 h4 {font-size: 14px; line-height: 14px; margin: 10px 0 5px;}
 h5 {font-size: 12px; line-height: 12px; margin: 10px 0 5px;}
 h6 {font-size: 10px; line-height: 10px; margin: 10px 0 5px;}
@@ -17,17 +17,14 @@ li {margin-left: 20px;}
 a {
 	text-decoration: none; color: #222;
 	border-bottom: 1px dotted #ccc;
-	background: #f8f8f8;
+	background: #fafafa;
 }
 a:hover {
-	border-bottom: 1px dotted #aaa; background: #f0f0f0; color: black;
+	border-bottom: 1px dotted #aaa; background: #f2f2f2; color: black;
 }
 h1 a, h2 a, h3 a {background: none; border: none;}
 
-/*input.text, input.string, input.email_address, input.password, textarea {
-	border: 2px solid #444; padding: 1px;
-}*/
-input.text, input.string, input.email_address, input.password, input.search, textarea {
+input.text, input.string, input.email_address, input.password, input.search, input.integer, input.float, textarea {
 	font-size:1.1em;
 	line-height:1.3em;
 	border-top:1px solid #7c7c7c;
@@ -43,7 +40,6 @@ input.file_upload {
 
 .button {
 	padding: 6px 10px;
-/*	color: white; background: black; border: 1px solid #666;*/
 	font: bold 11px "Lucida Grande", Arial, sans-serif;
 	border-top:1px solid #ddd;
 	border-left:1px solid #c3c3c3;
@@ -67,24 +63,46 @@ input.file_upload {
 	padding: 0 20px 20px; background: #f2f2f2; border: 1px solid #ddd; color: black;
 }
 #search-results-panel .card.linkable a {
-/*	background: #333; border-color: #444;*/ color: black;
+	color: black;
 }
 
-.content-header, .content-body, .content-footer {margin: 10px 60px; padding: 0 0 10px;}
-.flash {margin-left: 60px; margin-right: 60px; text-shadow: #728852 2px 2px 0;}
+.content-header, .content-body, .content-footer {margin: 10px 45px 15px; padding: 0;}
+
+.flash {
+	margin: 20px 40px; padding: 10px 30px;
+	border-width: 2px 0;
+	color: white;
+}
+.flash.notice {background: #92ab6e; border: 1px solid #829862; text-shadow: #728852 2px 2px 0;}
+.flash.error {background: #BC1C3D; border: 1px solid #900024; text-shadow: #900024 2px 2px 0;}
 .article { margin: 20px 0; border-top: 1px dotted #ccc;}
+
+.content-header, .content-body {padding-bottom: 15px;}
+.content-footer {padding-bottom: 20px;}
+
+
+/* aside layout */
+body.aside-layout {width: 960px;}
+.aside-layout .page-content {overflow: hidden; height: 100%;}
+.main-content {float: left; width: 670px;}
+.aside {float: right; width: 220px; padding: 20px 30px; background: #E5E5E5;}
+.aside-content {
+	font-size: 11px; color: #444;
+}
+/* trick to produce equal height columns */
+.aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
+
 
 /***********/
 
-.page-header {color: white; background: black; padding: 20px 0 0; position: relative;}
-.page-header h1 {margin: 0; padding: 0 40px 30px; font-family: "Trebuchet MS", Tahoma, Arial, sans-serif; font-size: 48px; letter-spacing: -2.5pt;}
-.page-header .nav {margin: 0 30px; overflow: hidden; height: 100%;}
+.page-header {color: white; background: black; margin-top: 20px; padding: 20px 0 0; position: relative;}
+.page-header h1 {margin: 0; padding: 0 30px 30px; font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;}
+.page-header .nav {margin: 0 20px; overflow: hidden; height: 100%;}
 .page-header .nav li {float: left; list-style: none; margin-left: 0;}
-.page-header a {color: white; border: none; background: none;}
+.page-header a, .page-header a:hover {color: white; border: none; background: none;}
 
 .page-header div.search {
-	position: absolute; top: 0; right: 25px; padding: 6px 30px 8px 15px; 
-	background: #282828; border: 1px solid #313131; border-width: 0 1px 1px;
+	position: absolute; top: 10px; right: 5px; padding: 6px 30px 8px 15px; 
 }
 .page-header div.search label {
 	padding-right: 10px; 
@@ -96,37 +114,47 @@ input.file_upload {
 #search-spinner {position: absolute; top: 6px; right: 7px;}
 
 .account-nav {
-	position: absolute; top: 38px; right: 40px;
-/*	font: normal 12px Arial, sans-serif;*/
-	font-size: 11px;
+	position: absolute; top: -20px; right: 35px; font-size: 11px; 
 }
 
 ul.main-nav {float: left; margin: 0 10px;}
 .main-nav li {background: black; margin-right: 10px;}
 .main-nav a {
 	background: #282828;
-	display: block; padding: 7px 15px; border: 1px solid #313131; border-width: 1px 1px 0;
-	font: bold 16px "Myriad Pro", Arial, sans-serif; text-shadow: black 2px 2px 2px;
+	display: block; padding: 5px 15px 7px; border: 1px solid #313131; border-width: 1px 1px 0;
+	font: bold 13px "Lucida Grande", Arial, sans-serif; text-shadow: black 2px 2px 2px;
 }
 .main-nav a:hover {background: #444; border: 1px solid #555; border-width: 1px 1px 0;}
-.account-nav li {padding-left: 20px;}
-.account-nav a {border-bottom: 1px solid black; font-weight: bold;}
+.account-nav li {
+	padding-left: 20px; float: left; list-style: none; margin-left: 0; color: #ddd; text-shadow: #444 2px 2px 0;}
+.account-nav a {font-weight: bold;}
 .account-nav a:hover {border-bottom: 1px dotted #ddd;}
 
 
-.page-content {padding-top: 10px;}
+/* pagination nav, needs a more specific class on the wrapper */
+.content-body .nav {font-size: 11px; margin-bottom: 10px;}
+.content-body .nav a {margin-right: 5px;}
+
+.field-list th {width: 120px;}
+.field-list td {width: auto;}
 
 .login-page, .signup-page {width: 50%; margin-top: 40px;}
+.login-page .content-header, .signup-page .content-header {padding-bottom: 0;}
 .login-page .field-list, .signup-page .field-list {width: 300px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 120px;}
-.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}
+.login-page .actions, .signup-page .actions {text-align: left; margin-left: 128px; margin-top: 20px;}
+/*.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}*/
 
 .edit-page .delete-button {margin-top: 25px;}
 
-.show-page .content-header {position: relative; border-bottom: 1px dotted #ddd;}
-.show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 4px; margin-right: 70px;}
+.show-page .content-header {position: relative; border-bottom: 1px dotted black;}
+.show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 2px; margin-right: 70px;}
 .show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
+.content-header .creation-details, .content-header .dependent-collection-count {font-size: 11px; line-height: 11px;}
+.content-header .creator {margin-right: 5px;}
+.content-header .created-at {color: #444;}
+.content-header .dependent-collection-count {font-weight: bold; margin-left: 15px;}
 
 .new-in-collection-page .content-header h2 {margin-top: 6px; font: bold 16px "Lucida Grande", Arial, sans-serif;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
@@ -135,14 +163,19 @@ ul.main-nav {float: left; margin: 0 10px;}
 	padding: 0 30px;
 	border-top: 1px dotted #ddd; margin-top: 20px; background: #f5f5f5;
 }
-.show-page .create-new form .submit-button {margin: 20px 155px;}
+.show-page .create-new form .submit-button {margin: 20px 130px;}
+.show-page .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
 
+/* styling of generic elements */
+.creator {font-weight: bold;}
 .card {
 	background: #f5f5f5;
 	border: 1px solid #e8e8e8;
 	padding:10px 20px;
 	margin-bottom: 5px;
+	height: 100%; overflow: hidden; clear: both;
 }
+.card a {background: #f5f5f5;}
 .card .creation-details {
 	font-size: 11px; color: #333; display: block;
 }
@@ -150,14 +183,26 @@ ul.main-nav {float: left; margin: 0 10px;}
 
 .card.content {
 	font-size: 11px;
-	border: none; background: none; padding: 0; margin: 10px 0;
+	border: none; background: none; padding: 0; margin: 10px 0 30px;
 }
+.card.content .creation-details {
+	float: left; width: 155px; line-height: 14px;
+}
+.card.content .creation-details .created-at {display: block;}
+.card.content .content {
+	float: right; width: 420px;
+}
+ul.collection li {list-style: none; margin-left: 0;}
 
 .new-links {margin-top: 20px;}
 .new-links ul li {list-style: none; margin-left: 0;}
 
 .dependent-collection ul li {
 	list-style: none; margin-left: 0;
+}
+.dependent-collection h2 {
+	padding: 15px 0; margin-bottom: 20px;
+	border-bottom: 1px dotted black;
 }
 
 /*******************************************************/

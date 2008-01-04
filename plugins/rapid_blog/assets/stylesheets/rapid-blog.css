@@ -22,7 +22,7 @@
 .blog-post .created-at {
 	font-style: italic; padding-bottom: 10px;
 }
-.blog-post .section {padding-bottom: 10px;}
+.blog-post .content-body .section {padding-bottom: 10px;}
 
 .blog-post .comment {
 	margin: 15px 0 20px;

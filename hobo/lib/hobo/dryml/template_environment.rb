@@ -133,13 +133,13 @@ module Hobo::Dryml
       res
     end
     
-    def call_polymorphic_tag(*args, &b)
-      attributes = extract_options_from_args!(args)
-      name, type = args
+    def call_polymorphic_tag(name, *args)
+      type = args.first.is_a?(Class) ? args.shift : nil
+      attributes, parameters = args
       
       tag = find_polymorphic_tag(name, type)
       if tag != name
-        send(tag, attributes, &b)
+        send(tag, attributes, parameters || {})
       else
         nil
       end
@@ -147,8 +147,17 @@ module Hobo::Dryml
 
     
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= this_type
-      return name if call_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
+      call_type ||= case this_type
+                    when ActiveRecord::Reflection::AssociationReflection
+                      # Don't blow up with non-existent polymorphic types
+                      return name if this_type.options[:polymorphic] && !Object.const_defined?(this_type.class_name)
+                      this_type.klass
+                    when Array
+                      this.member_class
+                    else
+                      this_type
+                    end
+      
       call_type = TrueClass if call_type == FalseClass
 
       while true
@@ -186,8 +195,7 @@ module Hobo::Dryml
               @_form_field_path]
       @_erb_output = ""
       res = yield
-      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type,
-          @_form_field_path = ctx
+      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
       res.to_s
     end
 
@@ -210,13 +218,13 @@ module Hobo::Dryml
 
     def new_field_context(field_path, tag_this=nil)
       new_context do
-      path = if field_path.is_a? Array
-               field_path
-             elsif field_path.is_a? String
-               field_path.split('.')
-             else
-               [field_path]
-             end
+        path = if field_path.is_a? Array
+                 field_path
+               elsif field_path.is_a? String
+                 field_path.split('.')
+               else
+                 [field_path]
+               end
         parent, field, obj = Hobo.get_field_path(tag_this || this, path)
 
         type = if parent.class.respond_to?(:field_type) && field_type = parent.class.field_type(field)

@@ -104,7 +104,7 @@
 
 <def tag="card">
   <if test="&can_view?">
-    <%= poly = call_polymorphic_tag('card', attributes) %>
+    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
       <a if="&linkable?"/>
       <div class="content" param="content">
@@ -116,6 +116,17 @@
   </if>
 </def>
   
+
+<def tag="collection">
+  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
+  <ul class="collection" merge-attrs unless="&poly">
+    <li:><card param/></li:>
+  </ul>
+  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
+    There are no <type-name plural/>
+  </p>
+</def>
+
 
 <def tag="hobo-rapid-javascripts" attrs="tiny-mce"><%=
    res = '<script type="text/javascript">var hoboParts = {};'
@@ -464,10 +475,10 @@ in the future - use at your own risk. -->
 
 
 <def tag="a-or-an" attrs="word"><%=
-  (word =~ /^[aeiouh]/ ? "an " : "a ") + word
+  (word =~ /^[aeiouh]/i ? "an " : "a ") + word
 %></def>
 
 
 <def tag="A-or-An" attrs="word"><%=
-  (word =~ /^[aeiouh]/ ? "An " : "A ") + word
+  (word =~ /^[aeiouh]/i ? "An " : "A ") + word
 %></def>
