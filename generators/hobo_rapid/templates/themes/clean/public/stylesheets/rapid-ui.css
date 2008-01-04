@@ -1,13 +1,5 @@
 .hidden {display: none;}
 
-.flash {
-	background: #92ab6e;
-	padding: 10px 30px; margin-top: 5px;
-	border: 1px solid #829862;
-/*	border-width: 2px 0;*/
-	color: white;
-}
-
 .in-place-textfield-bhv, .in-place-textarea-bhv, .in-place-html-textarea-bhv {
 	border: 1px dotted #666;
 	padding: 0 3px; padding-right: 20px;
