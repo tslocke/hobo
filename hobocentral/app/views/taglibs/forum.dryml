@@ -27,7 +27,7 @@
       </tr>
     </thead:>
     <tr:>
-      <td class="topic"><a/></td>
+      <td class="topic"><if:sticky>Sticky: </if><a/></td>
       <td class="replies"><view:replies.count/></td>
       <td class="views">0</td>
       <td class="last-post"><forum-post-summary/></td>

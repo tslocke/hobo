@@ -1,1 +1,13 @@
-<show-page/>
+<def tag="view" for="Time"><%= this.strftime("%b %d, %Y %H:%M") %></def>
+<show-page>
+  <field-list: replace/>
+  <creation-details: replace/>
+  <dependent-collection-title: replace/>
+  <dependent-collection-count: replace/>
+  <primary-content: replace>
+    <div class="main-post">
+      <creation-details/>
+      <primary-content/>
+    </div>
+  </primary-content:>
+</show-page>

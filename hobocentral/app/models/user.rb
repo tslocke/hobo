@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :forum_posts
-  has_many :topics, :through => :forum_posts
+  has_many :topics, :through => :forum_posts, :uniq => true
 
   # --- Hobo Permissions --- #
 

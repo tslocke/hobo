@@ -1,4 +1,22 @@
-/* forum */
+.show-page.forum-topic .content-header {border: none; padding-bottom: 0;}
+.show-page.forum-topic .creation-details, .show-page.forum-topic .primary-content {font-size: 11px;}
+.show-page.forum-topic .creation-details {float: left; width: 23%;}
+.show-page.forum-topic .main-post .primary-content, .show-page.forum-topic .card.content .content {float: right; width: 70%;}
+.show-page.forum-topic .created-at {color: #666; display: block; line-height: 14px;}
+.show-page.forum-topic .main-post {overflow: hidden; height: 100%;}
+.show-page.forum-topic .primary-content {color: #444;}
+.show-page.forum-topic .creation-details, .show-page.forum-topic .card .creation-details {
+	padding: 10px; background: #f2f2f2; border-right: 1px solid #e8e8e8; padding-bottom: 2000px; margin-bottom: -1990px;
+}
+.show-page.forum-topic .creation-details a, .show-page.forum-topic .card .creation-details a {
+	background:none;
+}
+.show-page.forum-topic ul.collection .card {margin: 0;}
+.show-page.forum-topic ul.collection .card.content .content, .show-page.forum-topic .main-post .primary-content {padding: 10px 0;}
+
+li.forum-post, .main-post {border: 1px solid #e2e2e2; border-width: 1px;}
+li.forum-post, .main-post {padding: 0; margin-top: 10px;}
+
 .forum.card {
 	overflow: hidden; height: 100%;
 }
@@ -14,13 +32,9 @@
 }
 .forum.card .latest-post {font-size: 11px;}
 .forum.card .latest-post a {display: block; line-height: 14px; border: none;}
-/*
-.forum-topic.card {margin: 0; border-top: none;}
-.forum-topic.card .forum-topic-title {float: left; display: block; width: 300px;}
-.forum-topic.card .forum-topic-posts-count {float: left; display: block; width: 30px;}
-.forum-topic.card
-*/
-.collection.forum-topic {border-right: 1px solid #e2e2e2;}
+
+
+.collection.forum-topic {border-right: 1px solid #e2e2e2; margin-top: 20px;}
 .collection.forum-topic td {
 	padding: 8px 10px; border: 1px solid #e2e2e2; border-width: 0 0 1px 1px;
 }

@@ -44,7 +44,8 @@ class ForumTopic < ActiveRecord::Base
 
   # Admins can change the sticky flag and the title. 
   def updatable_by?(user, new)
-    user.administrator? && only_changed_fields?(new, :sticky, :title)
+    (user.administrator? && only_changed_fields?(new, :sticky, :title, :body)) || 
+    (user == self.user && same_fields?(new, :user, :forum, :sticky))
   end
 
   # Admins can delete the topic.
