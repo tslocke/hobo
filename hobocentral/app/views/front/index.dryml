@@ -4,12 +4,6 @@
 
   <content-header:>
     <h1 class="front-page-title">Welcome to <app-name/></h1>
-    <section class="welcome-message">
-      <h3>Congratulations! Your Hobo Rails App is up and running</h3>
-      <ul>
-        <li>To customise this page: edit app/views/front/index.dryml</li>
-      </ul>
-    </section>
   </content-header>
 
   <content-body:>
