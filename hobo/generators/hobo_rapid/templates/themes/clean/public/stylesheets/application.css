@@ -186,13 +186,13 @@ ul.main-nav {float: left; margin: 0 10px;}
 	border: none; background: none; padding: 0; margin: 10px 0 30px;
 }
 .card.content .creation-details {
-	float: left; width: 155px; line-height: 14px;
+	float: left; width: 28%; line-height: 14px;
 }
 .card.content .creation-details .created-at {display: block;}
 .card.content .content {
-	float: right; width: 420px;
+	float: right; width: 72%;
 }
-ul.collection li {list-style: none; margin-left: 0;}
+ul.collection li {list-style: none; margin-left: 0; clear: both;}
 
 .new-links {margin-top: 20px;}
 .new-links ul li {list-style: none; margin-left: 0;}
