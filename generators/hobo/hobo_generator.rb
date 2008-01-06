@@ -7,11 +7,12 @@ class HoboGenerator < Rails::Generator::Base
       route = "  Hobo.add_routes(map)\n"
 
       route_src = File.read(routes_path)
-      return if route_src.include?(route)
-
-      head = "ActionController::Routing::Routes.draw do |map|"
-      route_src.sub!(head, head + "\n\n" + route)
-      File.open(routes_path, 'w') {|f| f.write(route_src) }
+      
+      unless route_src.include?(route)
+        head = "ActionController::Routing::Routes.draw do |map|"
+        route_src.sub!(head, head + "\n\n" + route)
+        File.open(routes_path, 'w') {|f| f.write(route_src) }
+      end
     end
 
     record do |m|
