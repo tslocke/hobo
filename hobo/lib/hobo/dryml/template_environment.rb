@@ -147,12 +147,11 @@ module Hobo::Dryml
 
     
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= case this_type
-                    when ActiveRecord::Reflection::AssociationReflection
+      call_type ||= if this_type <= ActiveRecord::Reflection::AssociationReflection
                       # Don't blow up with non-existent polymorphic types
                       return name if this_type.options[:polymorphic] && !Object.const_defined?(this_type.class_name)
                       this_type.klass
-                    when Array
+                    elsif this_type <= Array
                       this.member_class
                     else
                       this_type
