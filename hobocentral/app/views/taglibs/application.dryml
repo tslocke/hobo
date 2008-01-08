@@ -9,7 +9,10 @@
 
 <def tag="page" extend-with="hobocentral">
   <page-without-hobocentral layout="aside" merge>
-    <account-nav:>hello</account-nav:>
+    <stylesheets:>
+      <param-content/>
+      <stylesheet name="rapid_forum"/>
+    </stylesheets:>
     <aside: param>
       <p>This site has been created as an open-source example of creating an app using the Hobo framework. It's at a         very early stage at the moment, and, as you have probably noticed, there's not a lot of data!</p>
 
