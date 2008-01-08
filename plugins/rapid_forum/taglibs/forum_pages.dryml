@@ -1,0 +1,5 @@
+<def tag="show-page" extend-with="forum">
+  <show-page-without-forum merge>
+    <dependent-collection-title: replace/>
+  </show-page-without-forum>
+</def>
