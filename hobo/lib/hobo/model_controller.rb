@@ -128,7 +128,7 @@ module Hobo
           def show;    hobo_show    end if include_action?(:show) 
           def new;     hobo_new     end if include_action?(:new) 
           def create;  hobo_create  end if include_action?(:create) 
-          def edit;    hobo_edit    end if include_action?(:edit) 
+          def edit;    hobo_show    end if include_action?(:edit) 
           def update;  hobo_update  end if include_action?(:update) 
           def destroy; hobo_destroy end if include_action?(:destroy) 
           
@@ -485,11 +485,6 @@ module Hobo
     end
     
 
-    def hobo_edit(*args, &b)
-      hobo_show(*args, &b)
-    end
-    
-    
     def hobo_update(*args, &b)
       options = args.extract_options!
       options = LazyHash.new(options)
