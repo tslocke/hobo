@@ -3,8 +3,8 @@
   <show-page-without-forum-topic merge>
     <field-list: replace/>
     <creation-details: replace/>
-    <dependent-collection-title: replace/>
-    <dependent-collection-count: replace/>
+    <primary-collection-title: replace/>
+    <primary-collection-count: replace/>
     <primary-content: replace>
       <div class="main-post">
         <creation-details/>

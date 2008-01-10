@@ -19,6 +19,10 @@ bundle_model :Forum do
   # information to improve the default pages.
   has_many :topics, :class_name => _ForumTopic_, :order => 'sticky desc, last_post_at desc', :dependent => :destroy
 
+  has_many :memberships, :class_name => _ForumMembership_, :dependent => :destroy
+  has_many :members, :through => :memberships, :source => :user
+  has_many :moderators, :through => :memberships, :source => :user, :conditions => "moderator = 1"
+
   def topics_count
     @topics_count ||= topics.count
   end
