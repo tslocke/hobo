@@ -53,7 +53,7 @@
       <section class="main-content" param="main-content">
         <param-content for="content"/>
       </section>
-      <aside class="aside-content" param/>
+      <aside class="aside-content" empty param/>
     </content:>
   </simple-layout>
 </def>
@@ -116,11 +116,7 @@
 
 
 <def tag="show-page">
-  <% has_many_assocs = this.class.reflections.values.map do |refl|
-       this.send(refl.name) if Hobo.simple_has_many_association?(refl)
-     end.compact
-     dependent_collection = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 
-  %>
+  <set primary-collection-name="&params[:primary_collection] || self.primary_collection_name"/>
   <page merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name :dasherize => true}" param/>
     <content-header: param>
@@ -130,8 +126,12 @@
 
       <heading param><%= this %></heading>
       <creation-details param/>
-      <do param="dependent-collection-count"><a class="dependent-collection-count" href="##{dependent_collection.to_s.underscore}" part="dependent-collection-count" part-locals="dependent_collection" if="&dependent_collection"><count-dependents/></a></do>
-      <a action="edit" if="&can_edit?" class="edit">Edit <type-name/></a>
+      
+      <do field="&primary_collection_name" if="&primary_collection_name" param="primary-collection-count">
+        <association-count class="primary-collection-count" part="primary-collection-count"/>
+      </do>
+                         
+      <a action="edit" class="edit" if="&can_edit?" param="edit-link">Edit <type-name/></a>
     </content-header>
     
     <content-body: param>
@@ -140,48 +140,38 @@
       <field-list skip="&[this.class.name_attribute, this.class.primary_content_attribute, this.class.creator_attribute, this.class.dependent_on.first].compact "
                   skip-associations="has_many" param/>
 
-      <if test="&dependent_collection">
-        <section class="dependent-collection" field="&dependent_collection">
-          <a name="#{dependent_collection.to_s.underscore}"/>
-          <h2 param="dependent-collection-title"><%= dependent_collection.to_s.titleize %></h2>
+      <section class="primary-collection" field="&primary_collection_name" if="&primary_collection_name">
+        <h2 param="primary-collection-title"><%= primary_collection_name.to_s.titleize %></h2>
 
-          <do param="collection">
-            <collection part="dependent-collection" part-locals="dependent_collection">
-              <empty-message:>No <%= dependent_collection.to_s %> have been added yet.</empty-message>
-            </collection>
-          </do>
-        
-          <do with="&new_for_current_user">
-            <section class="create-new" if="&!linkable?(:new) && can_create?">
-              <h2>Add <A-or-An word="&dependent_collection.to_s.singularize.titleize"/></h2>
-              <form update="dependent-collection, dependent-collection-count" message="Adding #{dependent_collection.to_s.singularize.titleize}..." reset-form>
-                <field-list skip="#{@this.class.reverse_reflection(@this.send(dependent_collection).proxy_reflection.name).name}"
-                            skip-associations="has_many" param="dependent-collection-field-list"/>
-                <submit label="Create #{dependent_collection.to_s.singularize.titleize}"/>
-              </form>
-            </section>
-          </do>
-        </section>
-      </if>
-      <else>
-        <section class="preview-collections">
-          <with-fields associations="has_many">
-            <section class="#{this_field.dasherize}">
-              <h2>Recent <this-field.titleize/></h2>
-              <collection with="&this.recent"/>
-              <a class="more">More... (<count/>)</a>
-            </section>
-          </with-fields>
-        </section>
-      </else>
+        <do param="primary-collection">
+          <collection part="primary-collection"/>
+        </do>
 
-      <nav class="new-links" param="new-links">
-        <ul with="&has_many_assocs">
-          <li: replace><li if="&can_create? && linkable?(:new)"><a action="new"/></li></li>
-        </ul>
-      </nav>
+        <do with="&new_for_current_user">
+          <section class="create-new" if="&!linkable?(:new) && can_create?">
+            <h2>Add <A-or-An word="&primary_collection_name.to_s.singularize.titleize"/></h2>
+            <form update="primary-collection, primary-collection-count" message="Adding #{primary_collection_name.to_s.singularize.titleize}..." reset-form>
+              <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
+                          skip-associations="has_many" param="primary-collection-field-list"/>
+              <submit label="Create #{primary_collection_name.to_s.singularize.titleize}"/>
+            </form>
+          </section>
+        </do>
+        <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
+      </section>
 
-    </content-body>
+    </content-body:>
+    <aside: param>
+      <section class="preview-collections">
+        <with-fields fields="&secondary_collection_names">
+          <section class="#{this_field.dasherize} collection">
+            <h2><this-field.titleize/></h2>
+            <collection with="&this.limit(6)"/>
+            <a class="more">More... (<count/>)</a>
+          </section>
+        </with-fields>
+      </section>
+    </aside:>
   </page>
 </def>
 
@@ -300,7 +290,7 @@
 
     <content-body: param>
       <form action="&request.request_uri" class="login" param>
-        <labelled-item-list>
+        <labelled-item-list param>
           <labelled-item>
             <item-label param="login-label"><%= model.login_attr.to_s.titleize %></item-label>
             <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>

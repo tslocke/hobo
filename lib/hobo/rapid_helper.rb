@@ -104,4 +104,28 @@ module Hobo::RapidHelper
   def editor_class
   end
 
+
+  def through_collection_names(object=this)
+    object.class.reflections.values.select do |refl| 
+      refl.macro == :has_many && refl.options[:through]
+    end.map {|x| x.options[:through]}
+  end
+
+
+  def primary_collection_name(object=this)
+    dependent_collection_names = object.class.reflections.values.select do |refl| 
+      refl.macro == :has_many && refl.options[:dependent]
+    end.every(:name)
+    
+    (dependent_collection_names - through_collection_names(object)).first
+  end
+
+
+  def secondary_collection_names(object=this)
+    secondary_collection_names = object.class.reflections.values.select do |refl| 
+      refl.macro == :has_many
+    end.every(:name)
+    
+    (secondary_collection_names - through_collection_names) - [primary_collection_name]
+  end
 end

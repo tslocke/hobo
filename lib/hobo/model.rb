@@ -51,6 +51,9 @@ module Hobo
           count = args.first || 3
           { :limit => count, :order => "#{table_name}.created_at DESC" }
         end
+        def_scope :limit do |count|
+          { :limit => count }
+        end
       end
       
       def name_attribute

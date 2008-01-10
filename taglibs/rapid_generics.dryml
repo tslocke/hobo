@@ -1,0 +1,45 @@
+<def tag="creation-details">
+  <span class="creation-details">
+    <view with="&this.send(this.class.creator_attribute)" class="creator" if="&this.class.creator_attribute" />
+    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
+  </span>
+</def>
+
+<def tag="primary-content">
+  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute" merge/>
+</def>
+
+<def tag="association-count">
+  <a class="association-count #{this_field.to_s.underscore}" href="##{this_field.to_s.underscore}" merge>
+    <count/>
+  </a>
+</def>
+
+<def tag="card">
+  <if test="&can_view?">
+    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
+      <a if="&linkable?"/>
+      <div class="content" param="content">
+        <primary-content if="&!linkable?"/>
+      </div>
+      <creation-details/>
+      <set primary-collection="&primary_collection_name"/>
+      <if test="&primary_collection">
+      <span class="dependents"><count field="&primary_collection"/></span>
+      </if>
+    </div>
+  </if>
+</def>
+
+<def tag="collection">
+  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
+  <ul class="collection" merge-attrs unless="&poly">
+    <li:><card param/></li:>
+  </ul>
+  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
+    <% label = this.respond_to?(:proxy_reflection) ? this.proxy_reflection.name.to_s : type_name(:plural => true) %>
+    There are no <%= label %>
+  </p>
+</def>
+

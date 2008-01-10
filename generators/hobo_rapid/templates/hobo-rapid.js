@@ -524,8 +524,8 @@ HasManyThroughInput = Behavior.create({
 
 Event.addBehavior({
     'div.has-many-through.input' : HasManyThroughInput(),
-		'.dependent-collection-count:click' : function(e) {
-			new Effect.ScrollTo('dependent-collection', {duration: 1.0, offset: -10, transition: Effect.Transitions.sinoidal});
+		'.association-count:click' : function(e) {
+			new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
 			Event.stop(e);
 		}
 });
