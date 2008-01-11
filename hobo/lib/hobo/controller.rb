@@ -115,7 +115,7 @@ module Hobo
       if results.empty?
         render :text => "<p>Your search returned no matches.</p>"
       else
-        render_tags(results, :card, :for_type => true)
+        render_tags(results, :search_card, :for_type => true)
       end
     end
 
