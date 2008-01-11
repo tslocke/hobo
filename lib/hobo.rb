@@ -109,10 +109,17 @@ module Hobo
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 
-    def find_by_search(query)
-      sql = Hobo.models.map do |model|
-        if model.superclass == ActiveRecord::Base && # filter out STI subclasses
-            ModelRouter.linkable?(nil, model, :show) # filter out non-linkables
+    def find_by_search(query, options={})
+      models = options.fetch(:models) do |key|
+        # By default, search all models, except...
+        Hobo.model.select do |m| 
+          model.superclass == ActiveRecord::Base && # ...filter out STI subclasses
+            ModelRouter.linkable?(nil, m, :show)    # and filter out non-linkables
+        end
+      end
+      sql = models.map do |model|
+        if 
+            ModelRouter.linkable?(nil, model, :show) 
           cols = model.search_columns
           if cols.blank?
             nil
