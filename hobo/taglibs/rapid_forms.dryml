@@ -61,7 +61,7 @@
                          :value => form_authenticity_token)
                end
 
-  page_path_hidden = hidden_field_tag("page_path", view_name) 
+  page_path_hidden = hidden_field_tag("page_path", view_name) unless method == "get"
    
   body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
    
