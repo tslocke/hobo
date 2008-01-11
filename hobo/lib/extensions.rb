@@ -230,8 +230,8 @@ class Hash
 
   def self.build(array)
     array.inject({}) do |res, x|
-      k, v = yield x
-      res[k] = v
+      pair = yield x
+      res[pair[0]] = pair[1] unless pair.nil?
       res
     end
   end
