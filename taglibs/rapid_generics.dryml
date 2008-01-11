@@ -32,13 +32,18 @@
   </if>
 </def>
 
+<def tag="search-card">
+  <%= poly = call_polymorphic_tag('search-card', attributes, parameters) %>
+  <card unless="&poly"/>
+</def>
+
 <def tag="collection">
   <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
   <ul class="collection" merge-attrs unless="&poly">
     <li:><card param/></li:>
   </ul>
   <p class="empty-collection-message" if="&this.empty?" param="empty-message">
-    <% label = this.respond_to?(:proxy_reflection) ? this.proxy_reflection.name.to_s : type_name(:plural => true) %>
+    <% label = this.respond_to?(:proxy_reflection) ? this.proxy_reflection.name.to_s : (this.respond_to?(:member_class) ? this.member_class.name : type_name(:plural => true)).pluralize.humanize.downcase.to_s %>
     There are no <%= label %>
   </p>
 </def>
