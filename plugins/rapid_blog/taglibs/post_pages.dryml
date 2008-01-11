@@ -16,14 +16,3 @@
     </content-body>
   </index-page-without-rapid-blog>
 </def>
-
-<def tag="show-pagem" extend-withm="rapid-blog">
-  <show-page-without-rapid-blog layout="aside">
-    <main-content:>
-      <blog-post-show/>
-    </main-content>
-    <aside:>
-      <list-blog-post-categories:categories/>
-    </aside:>
-  </show-page>
-</def>
