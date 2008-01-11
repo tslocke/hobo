@@ -121,9 +121,9 @@ module Hobo
       query_words = ActiveRecord::Base.connection.quote_string(query).split
                     
       Hash.build(search_targets) do |search_target|
-        conditions = search_target.search_columns.map do |col|
-          query_words.map { |word| %(#{col} like "%#{word}%") }
-        end.flatten.join(" or ")
+        conditions = query_words.map do |word| 
+          "(" + search_target.search_columns.map { |column| %(#{column} like "%#{word}%") }.join(" or ") + ")"
+        end.join(" and ")
         
         results = search_target.find(:all, :conditions => conditions)
         [search_target.name, results] unless results.empty?
