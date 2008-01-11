@@ -118,7 +118,7 @@
    if tiny_mce
      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
                <script type="text/javascript">
-                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
+                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny-mce",
                        plugins: 'save',
                        theme_advanced_buttons1 : "bold, italic, separator, " +
                                                  "bullist, outdent, indent, separator, " +
