@@ -109,43 +109,25 @@ module Hobo
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 
-    def find_by_search(query, options={})
-      models = options.fetch(:models) do |key|
-        # By default, search all models, except...
+    def find_by_search(query, search_targets)
+      search_targets ||= begin
+        # By default, search all models, but filter out...
         Hobo.model.select do |m| 
-          model.superclass == ActiveRecord::Base && # ...filter out STI subclasses
-            ModelRouter.linkable?(nil, m, :show)    # and filter out non-linkables
+          ModelRouter.linkable?(nil, m, :show) && # ...non-linkables
+            model.search_columns.any?             # and models with no search-columns
         end
-      end
-      sql = models.map do |model|
-        if 
-            ModelRouter.linkable?(nil, model, :show) 
-          cols = model.search_columns
-          if cols.blank?
-            nil
-          else
-            where = cols.map {|c| "(#{c} like ?)"}.join(' or ')
-            type = model.column_names.include?("type") ? "type" : "'#{model.name}'"
-            ActiveRecord::Base.send(:sanitize_sql,
-                                    ["select #{type} as type, id " +
-                                     "from #{model.table_name} " +
-                                     "where #{where}"] +
-                                    ["%#{query}%"] * cols.length)
-          end
-        end
-      end.compact.join(" union ")
-
-      rows = ActiveRecord::Base.connection.select_all(sql)
-      records = Hash.new {|h,k| h[k] = []}
-      for row in rows
-        records[row['type']] << row['id']
-      end
-      results = []
-      for type, ids in records
-        results.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
       end
       
-      results
+      query_words = ActiveRecord::Base.connection.quote_string(query).split
+                    
+      Hash.build(search_targets) do |search_target|
+        conditions = search_target.search_columns.map do |col|
+          query_words.map { |word| %(#{col} like "%#{word}%") }
+        end.flatten.join(" or ")
+        
+        results = search_target.find(:all, :conditions => conditions)
+        [search_target.name, results] unless results.empty?
+      end
     end
 
     def add_routes(m)
