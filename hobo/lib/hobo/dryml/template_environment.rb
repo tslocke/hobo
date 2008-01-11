@@ -134,6 +134,7 @@ module Hobo::Dryml
     end
     
     def call_polymorphic_tag(name, *args)
+      name = name.gsub('-', '_')
       type = args.first.is_a?(Class) ? args.shift : nil
       attributes, parameters = args
       
