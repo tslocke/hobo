@@ -257,12 +257,7 @@ module Hobo::Dryml
         unsafe_name += suffix
       end
       
-      # While processing this def, @def_name contains
-      # the names of all nested defs join with '_'. It's used to
-      # disambiguate local variables as a workaround for the broken
-      # scope semantics of Ruby 1.8.
-      old_def_name = @def_name
-      @def_name = @def_name ? "#{@def_name}_#{unsafe_name}" : unsafe_name
+      @def_name = unsafe_name
 
       alias_of = el.attributes['alias-of']
       extend_with = el.attributes['extend-with']
@@ -293,7 +288,7 @@ module Hobo::Dryml
               # keep line numbers matching up
               "<% #{"\n" * src.count("\n")} %>"
             end
-      @def_name = old_def_name
+      @def_name = nil
       res
     end
     
@@ -346,10 +341,19 @@ module Hobo::Dryml
 
     def part_element(el, content)
       require_attribute(el, "part", DRYML_NAME_RX)
+      
+      if contains_param?(el)
+        delegated_part_element(el, content)
+      else
+        simple_part_element(el, content)
+      end
+    end
+
+    
+    def simple_part_element(el, content)
       part_name  = el.attributes['part']
       dom_id = el.attributes['id'] || part_name
       part_name = ruby_name(part_name)
-      
       part_locals = el.attributes["part-locals"]
       
       part_src = "<% def #{part_name}_part(#{part_locals._?.gsub('@', '')}) #{tag_newlines(el)}; new_context do %>" +
@@ -360,6 +364,22 @@ module Hobo::Dryml
       newlines = "\n" * part_src.count("\n")
       args = [attribute_to_ruby(dom_id), ":#{part_name}", "nil", part_locals].compact
       "<%= call_part(#{args * ', '}) #{newlines} %>"
+    end
+    
+    
+    def delegated_part_element(el, content)
+      # TODO 
+    end
+    
+    
+    def contains_param?(el)
+      # TODO
+      false
+    end
+    
+    
+    def part_delegate_tag_name(el)
+      "#{@def_name}_#{el.attributes['part']}__part_delegate"
     end
     
     
