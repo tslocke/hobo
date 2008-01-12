@@ -94,7 +94,7 @@ module Hobo
       
       def web_method(web_name, options={}, &block)
         web_methods << web_name.to_sym
-        method = options[:method] || web_name
+        method = options.delete(:method) || web_name
         got_block = block_given?
         define_method web_name do
           # Make sure we have a copy of the options - it is being mutated somewhere
