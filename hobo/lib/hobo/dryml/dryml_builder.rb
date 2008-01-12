@@ -34,7 +34,7 @@ module Hobo::Dryml
     
     def add_part(name, src, line_num)
       raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
-      add_build_instruction(:part, :src => src, :line_num => line_num)
+      add_build_instruction(:def, :src => src, :line_num => line_num)
       @part_names << name
     end
 
@@ -72,9 +72,6 @@ module Hobo::Dryml
         when :def
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
-          
-        when :part
-          @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
           
         when :render_page
           method_src = render_page_source(erb_process(instruction[:src]), local_names)
