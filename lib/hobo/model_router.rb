@@ -3,6 +3,8 @@ class ActionController::Routing::RouteSet
   # request. Without this Rails checks the mtime of config/routes.rb
   # which doesn't take into account Hobo's auto routing
   def reload
+    # TODO: This can get slow - quicker to stat routes.rb and the
+    # controllers and only do a load if there's been a change
     load!
   end
 end
