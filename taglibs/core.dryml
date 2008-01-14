@@ -3,9 +3,9 @@
 </def>
 
 
-<def tag="wrap" attrs="tag, when">
-  <% body = parameters.default %>
-  <%= when_ ? call_tag(tag, attributes, &proc { body }) : body %>
+<def tag="wrap" attrs="tag, when, parameter">
+  <% parameter ||= :default %>
+  <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameter.default %>
 </def>
 
     
