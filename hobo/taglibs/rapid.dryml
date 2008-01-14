@@ -341,7 +341,7 @@
 
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= 'application' -%>
-  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/<%= name %>.css"
+  <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 
