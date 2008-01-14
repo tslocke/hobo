@@ -63,7 +63,7 @@
   <input type="text" name="#{name}" id="#{id}" class="autocomplete-bhv"
          autocomplete-url="#{url}" value="#{value}"
          merge-attrs/>
-  <div id="<%= id %>-completions" class="completions-popup" style="display:none"></div>
+    <div id="#{id}-completions" class="completions-popup" style="display:none"></div>
 </def>
 
 
