@@ -5,7 +5,7 @@
 <!--- General Navigation -->
   
 <def tag="navigation" attrs="current">
-  <ul merge-attrs>
+  <ul class="navigation" merge-attrs>
     <set-scoped current-navigation="&current">
       <do param="default"/>
     </set-scoped>
