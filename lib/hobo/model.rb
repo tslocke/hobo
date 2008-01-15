@@ -65,10 +65,10 @@ module Hobo
       
 
       def primary_content_attribute
-        @description_attribute ||= begin
-                                     cols = columns.every :name
-                                     PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
-                                   end
+        @primary_content_attribute ||= begin
+                                         cols = columns.every :name
+                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
+                                       end
       end
       
       def dependent_collections
@@ -119,6 +119,7 @@ module Hobo
         if refl.options[:polymorphic]
           type_col = "#{name}_type"
           field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
+          never_show(type_col)
         end
         res
       end
