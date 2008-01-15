@@ -263,6 +263,7 @@
       <error-messages/>
       <form action="&request.request_uri" param>
         <field-list fields="login, password, password_confirmation" param>
+          <login-label:><%= model.login_attribute.to_s.titleize %></login-label>
           <password-confirmation-label:>Confirm Password</password-confirmation-label>
         </field-list>
 
@@ -292,7 +293,7 @@
       <form action="&request.request_uri" class="login" param>
         <labelled-item-list param>
           <labelled-item>
-            <item-label param="login-label"><%= model.login_attr.to_s.titleize %></item-label>
+            <item-label param="login-label"><%= model.login_attribute.to_s.titleize %></item-label>
             <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
           </labelled-item>
 
