@@ -18,7 +18,7 @@ module Hobo
       options = args.extract_options!
       
       @model.name_attribute            = name.to_sym if options.delete(:name)
-      @model.primary_content_attribute = name.to_sym if options.delete(:description)
+      @model.primary_content_attribute = name.to_sym if options.delete(:primary_content)
       @model.creator_attribute         = name.to_sym if options.delete(:creator)
 
       @model.send(:login_attribute=, name.to_sym, options.delete(:validate)) if @model < User && options.delete(:login)
