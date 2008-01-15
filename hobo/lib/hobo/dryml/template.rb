@@ -257,8 +257,9 @@ module Hobo::Dryml
         unsafe_name += suffix
       end
       
-      @def_name = unsafe_name
-
+      @def_name     = unsafe_name
+      @def_line_num = element_line_num(el)
+      
       alias_of = el.attributes['alias-of']
       extend_with = el.attributes['extend-with']
 
@@ -328,8 +329,26 @@ module Hobo::Dryml
       "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
-        children_to_erb(el) +
+        wrap_tag_method_body_with_metadata(children_to_erb(el)) +
         "<% _erbout; end"
+    end
+    
+    
+    def wrap_source_with_metadata(content, *metadata)
+      if include_source_metadata
+        "<!--[DRYML:#{metadata * ':'}[-->" + content + "<!--]DRYML]-->"
+      else
+        content
+      end
+    end
+    
+    
+    def wrap_tag_method_body_with_metadata(content)
+      if @def_name.in? %w(if else do repeat with)
+        content
+      else
+        wrap_source_with_metadata(content, "tag", @def_name, @template_path, @def_line_num)
+      end
     end
     
        
@@ -538,10 +557,21 @@ module Hobo::Dryml
         "{#{param_items}}"
       end
     end
+    
+    
+    def tag_parameter_content(el, param_name=el.dryml_name)
+      content = children_to_erb(el)
+      if include_source_metadata && !el.dryml_name.in?(%w(if else do repeat with))
+        wrap_source_with_metadata(content, "param", param_name, @template_path, element_line_num(el))
+      else
+        content
+      end
+    end
 
     
     def default_param_proc(el)
-      "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{children_to_erb(el)}<% } #{tag_newlines(el)}}"
+      content = tag_parameter_content(el, 'default')
+      "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{content}<% } #{tag_newlines(el)}}"
     end
     
     
@@ -558,7 +588,7 @@ module Hobo::Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
-        "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{children_to_erb(el)}<% } #{nl}}"
+        "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{tag_parameter_content(el)}<% } #{nl}}"
       else
         attributes = el.attributes.map do 
           |name, value| ":#{ruby_name name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
@@ -597,7 +627,7 @@ module Hobo::Dryml
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
-      items << ":field => \"#{el.name}\"" if el.name != el.dryml_name
+      items << ":field => \"#{el.name}\"" if el.expanded_name =~ /:/
       
       items = items.join(", ")
       
@@ -688,7 +718,7 @@ module Hobo::Dryml
       if val.nil?
         expression
       else
-        control = if repeat && val == "&true"
+        control = if val == "&true"
                     "this"
                   elsif is_code_attribute?(val)
                     "#{val[1..-1]}"
@@ -768,7 +798,7 @@ module Hobo::Dryml
 
     def element_line_num(el)
       offset = el.source_offset
-      line_no = @xmlsrc[0..offset].count("\n") + 1
+      @xmlsrc[0..offset].count("\n") + 1
     end
 
     def tag_newlines(el)
@@ -794,6 +824,10 @@ module Hobo::Dryml
       name = name[1..-2]
       name = class_renames[name] while class_renames.has_key?(name)
       name
+    end
+    
+    def include_source_metadata
+      false
     end
 
   end
