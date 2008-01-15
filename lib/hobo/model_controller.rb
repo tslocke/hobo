@@ -8,6 +8,9 @@ module Hobo
     
     PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
     
+    READ_ONLY_ACTIONS  = [:index, :show]
+    WRITE_ONLY_ACTIONS = [:create, :update, :delete]
+    
     class << self
 
       def included(base)
@@ -36,7 +39,7 @@ module Hobo
         defined_methods = instance_methods
         
         show_collection_method = "show_#{name}".to_sym
-        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method, true)
+        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
           define_method show_collection_method do
             hobo_show_collection(name)
           end
@@ -44,7 +47,7 @@ module Hobo
           
         if Hobo.simple_has_many_association?(model.reflections[name])
           new_method = "new_#{name.to_s.singularize}"
-          if new_method.not_in?(defined_methods) && include_action?(new_method, true)
+          if new_method.not_in?(defined_methods) && include_action?(new_method)
             define_method new_method do
               hobo_new_in_collection(name)
             end
@@ -116,13 +119,31 @@ module Hobo
       
       
       def auto_actions(*args)
-        # auto_actions is either an array - the actions to provide, or a hash: { :except => [...] }
+        options = args.extract_options!
+        
         @auto_actions = case args.first
-                          when :all  then args.extract_options!
-                          when :none then []
+                          when :all        then available_auto_actions
+                          when :write_only then available_auto_write_actions + args.rest
+                          when :read_only  then available_auto_read_actions  + args.rest
                           else args
                         end
 
+        except = Array(options[:except])
+        except_actions = except.map do |arg|
+          if arg == :collections
+            available_auto_collection_actions
+          else
+            arg
+          end
+        end
+        
+        @auto_actions -= except_actions
+        
+        def_auto_actions
+      end
+      
+      
+      def def_auto_actions
         self.class_eval do
           def index;   hobo_index   end if include_action?(:index) 
           def show;    hobo_show    end if include_action?(:show) 
@@ -133,9 +154,9 @@ module Hobo
           def destroy; hobo_destroy end if include_action?(:destroy) 
           
           def completions; hobo_completions end if include_action?(:completions)
-          
-          collections.each { |c| add_collection_actions(c.to_sym) } 
         end
+
+        collections.each { |c| add_collection_actions(c.to_sym) } 
       end
       
       
@@ -176,17 +197,30 @@ module Hobo
           model.find(id, options)
         end
       end
-            
-      def include_action?(name, collection_action=false)
-        name = name.to_sym
-        if @auto_actions.is_a?(Array)
-          # White list
-          name.in?(@auto_actions) || (collection_action && :collections.in?(@auto_actions))
-        else
-          # Black list
-          except = Array(@auto_actions[:except])
-          return !(name.in?(except) || (collection_action && :collections.in?(except)))
-        end
+
+      
+      def include_action?(name)
+        name.to_sym.in?(@auto_actions)
+      end
+      
+      
+      def available_auto_actions
+        READ_ONLY_ACTIONS + WRITE_ONLY_ACTIONS + available_auto_collection_actions
+      end
+      
+      
+      def available_auto_read_actions
+        READ_ONLY_ACTIONS + collections
+      end
+      
+      
+      def available_auto_write_actions
+        WRITE_ONLY_ACTIONS
+      end
+      
+      
+      def available_auto_collection_actions
+        collections + collections.map {|c| "new_#{c.to_s.singularize}".to_sym}
       end
 
     end
