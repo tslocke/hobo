@@ -1,0 +1,12 @@
+<def tag="recommendations">
+  <section>
+    <h3>Recommendations</h3>
+    <collection part="recommendations"/>
+
+    <h4>Recommend this <type-name:proxy_owner/></h4>
+    <form with="&new_for_current_user" update="recommendations">
+      <field-list/>
+      <submit label="Recommend"/>
+    </form>
+  </section>
+</def>
