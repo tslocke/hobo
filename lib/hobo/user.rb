@@ -50,7 +50,7 @@ module Hobo
       end
       
       def login_attribute=(attr, validate=true)
-        @login_attr = attr = attr.to_sym
+        @login_attribute = attr = attr.to_sym
         unless attr == :login
           alias_attribute(:login, attr)
           set_field_type :login => field_type(attr)
@@ -62,11 +62,11 @@ module Hobo
           validates_uniqueness_of attr, :case_sensitive => false
         end
       end
-      attr_reader :login_attr
+      attr_reader :login_attribute
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
-        u = find(:first, :conditions => ["#{@login_attr} = ?", login]) # need to get the salt
+        u = find(:first, :conditions => ["#{@login_attribute} = ?", login]) # need to get the salt
         
         if u && u.authenticated?(password)
           if u.respond_to?(:last_login_at) || u.respond_to?(:login_count)
