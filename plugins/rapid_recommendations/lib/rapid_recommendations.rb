@@ -1,7 +1,7 @@
 class RapidRecommendations < Hobo::Bundle
     
   def defaults
-    { :polymorphic_user => false, :polymorphic_subject => false, :RecommendationUser => :User }
+    { :polymorphic_author => false, :polymorphic_target => false, :comment_format => :text, :Author => :User }
   end
     
 end

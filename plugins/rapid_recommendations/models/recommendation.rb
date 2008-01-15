@@ -5,8 +5,8 @@ bundle_model :Recommendation do
     timestamps
   end
 
-  belongs_to :author, (_polymorphic_user_    ? { :polymorphic => true } : { :class_name => _Author_ }), :creator => true
-  belongs_to :target, (_polymorphic_subject_ ? { :polymorphic => true } : { :class_name => _Target_ })
+  belongs_to :author, (_polymorphic_author_ ? { :polymorphic => true } : { :class_name => _Author_ }), :creator => true
+  belongs_to :target, (_polymorphic_target_ ? { :polymorphic => true } : { :class_name => _Target_ })
   
   def creatable_by?(user);         user == self.user; end
   def updatable_by?(user, new);    user == self.user; end
