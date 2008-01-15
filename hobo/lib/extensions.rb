@@ -223,6 +223,10 @@ module Enumerable
     end
     res
   end
+  
+  def rest
+    self[1..-1]
+  end
 
 end
 
