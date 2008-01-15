@@ -267,7 +267,8 @@ module Hobo::Dryml
       
       
       @builder.add_build_instruction(:alias_method,
-                                     :new => ruby_name(name).to_sym, :old => ruby_name(alias_of).to_sym) if alias_of
+                                     :new => ruby_name(name).to_sym, 
+                                     :old => ruby_name(Hobo::Dryml.unreserve(alias_of)).to_sym) if alias_of
       
       res = if alias_of
               "<% #{tag_newlines(el)} %>"
