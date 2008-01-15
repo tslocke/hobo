@@ -39,7 +39,7 @@
 
 
 <def tag="do"><%= parameters.default %></def>
-<def tag="with"><%= parameters.default %></def>
+<def tag="with" alias-of="do"/>
 
 
 <def tag="if" attrs="test"><%= 
