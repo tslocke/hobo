@@ -27,51 +27,58 @@
 
   new_record = this.respond_to?(:new_record?) && this.new_record?
    
-  method = if method.nil?
-             (action || web_method || new_record) ? "post" : "put"
-           else
-             method.downcase
-           end
-  if method == "put"
-    http_method_hidden = hidden_field_tag("_method", "PUT") 
-    html_attrs[:method] = "post"
+  if new_record && (this.set_creator(current_user); !can_create?)
+    Hobo::Dryml.last_if = false
+    ""
   else
-    html_attrs[:method] = method
-  end
    
-  if update || !ajax_attrs.empty?
-    message ||= "Creating #{this.class.name.titleize}" if new_record
-    # add an onsubmit to convert to an ajax form if `update` is given
-    function = ajax_updater(:post_form, message, update, ajax_attrs)
-    html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+    method = if method.nil?
+               (action || web_method || new_record) ? "post" : "put"
+             else
+               method.downcase
+             end
+    if method == "put"
+      http_method_hidden = hidden_field_tag("_method", "PUT") 
+      html_attrs[:method] = "post"
+    else
+      html_attrs[:method] = method
+    end
+     
+    if update || !ajax_attrs.empty?
+      message ||= "Creating #{this.class.name.titleize}" if new_record
+      # add an onsubmit to convert to an ajax form if `update` is given
+      function = ajax_updater(:post_form, message, update, ajax_attrs)
+      html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+    end
+     
+    body, field_names = scope.new_scope do
+      scope[:in_form] = true
+      with_form_context { parameters.default }
+    end
+     
+    hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
+     
+    auth_token = if request_forgery_protection_token.nil?
+                   ''
+                 else
+                   element(:input, :type => "hidden", 
+                           :name => request_forgery_protection_token.to_s,
+                           :value => form_authenticity_token)
+                 end
+     
+    page_path_hidden = hidden_field_tag("page_path", view_name) unless method == "get"
+     
+    body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
+     
+    if web_method
+      add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
+    else
+      add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
+    end
+     
+    Hobo::Dryml.last_if = true
+    element("form", html_attrs, body)
   end
-
-  body, field_names = scope.new_scope do
-    scope[:in_form] = true
-    with_form_context { parameters.default }
-  end
-
-  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
-  
-  auth_token = if request_forgery_protection_token.nil?
-                 ''
-               else
-                 element(:input, :type => "hidden", 
-                         :name => request_forgery_protection_token.to_s,
-                         :value => form_authenticity_token)
-               end
-
-  page_path_hidden = hidden_field_tag("page_path", view_name) unless method == "get"
-   
-  body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
-   
-  if web_method
-    add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
-  else
-    add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
-  end
-   
-  element("form", html_attrs, body)
 %></def>
 
 
