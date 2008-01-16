@@ -532,6 +532,13 @@ module Hobo
         self.send("#{attr}=", user.to_s) unless user.guest?
       end
     end
+    
+    
+    # We deliberately give this method an unconventional name to avoid
+    # polluting the application namespace too badly
+    def get_creator
+      self.class.creator_attribute && send(self.class.creator_attribute)
+    end
 
 
     def duplicate
