@@ -5,12 +5,23 @@ bundle_model :Recommendation do
     f.timestamps
   end
 
-  belongs_to :author, (_polymorphic_author_ ? { :polymorphic => true } : { :class_name => _Author_ }).update(:creator => true)
-  belongs_to :target, (_polymorphic_target_ ? { :polymorphic => true } : { :class_name => _Target_ })
+  belongs_to :author, :class_name => _Author_, :polymorphic => :optional, :creator => true
+  belongs_to :target, :class_name => _Target_, :polymorphic => :optional
   
-  def creatable_by?(user);         user == author; end
-  def updatable_by?(user, new);    user == author; end
-  def deletable_by?(deleter);      deleter == author; end
-  def viewable_by?(viewer, field); true end
+  def creatable_by?(user)
+    user == author
+  end
+  
+  def updatable_by?(user, new)
+    user == author || user.administrator?
+  end
+  
+  def deletable_by?(deleter)
+    deleter == author || user.administrator?
+  end
+  
+  def viewable_by?(viewer, field)
+    true
+  end
 
 end
