@@ -145,6 +145,16 @@ module ::Hobo
           end
         end
         super(*(args + [opts]))
+
+        if bundle.options["polymorphic_#{name}"]
+          klass.meta_def "#{name}_fields" do
+            [reflections[name].primary_key_name, "#{name}_type"]
+           end
+        else
+          klass.meta_def "#{name}_fields" do
+            [reflections[name].primary_key_name]
+           end
+        end      
       end
       
       klass.class_eval(&b) if b
