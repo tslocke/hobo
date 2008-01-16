@@ -10,6 +10,7 @@ module Hobo
     
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :delete]
+    FORM_ACTIONS       = [:new, :edit]
     
     class << self
 
@@ -211,7 +212,7 @@ module Hobo
       
       
       def available_auto_actions
-        READ_ONLY_ACTIONS + WRITE_ONLY_ACTIONS + available_auto_collection_actions
+        READ_ONLY_ACTIONS + WRITE_ONLY_ACTIONS + FORM_ACTIONS + available_auto_collection_actions
       end
       
       
