@@ -3,9 +3,10 @@
     <h3>Recommendations</h3>
     <collection part="recommendations"/>
 
-    <h4>Recommend this <type-name:proxy_owner/></h4>
-    <form with="&new_for_current_user" update="recommendations">
-      <field-list/>
+    <p class="recommend-this"><a href="#">Recommend this</a></p>
+    <form style="display:none;" with="&new_for_current_user" update="recommendations">
+      <label for="comment">Optional Comment</label>
+      <input:comment/>
       <submit label="Recommend"/>
     </form>
   </section>
