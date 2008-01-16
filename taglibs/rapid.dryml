@@ -156,8 +156,8 @@
 <def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
   type ||= if this.is_a?(Class)
              this
-           elsif this.respond_to? :proxy_reflection
-             this.proxy_reflection.klass
+           elsif this.respond_to? :member_class
+             this.member_class
            else
              this.class
            end
