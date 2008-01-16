@@ -35,37 +35,21 @@ module Hobo
       
       attr_accessor :template_path_cache
       
-      def add_collection_actions(name)
-        defined_methods = instance_methods
-        
-        show_collection_method = "show_#{name}".to_sym
-        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
-          define_method show_collection_method do
-            hobo_show_collection(name)
-          end
-        end
-          
-        if Hobo.simple_has_many_association?(model.reflections[name])
-          new_method = "new_#{name.to_s.singularize}"
-          if new_method.not_in?(defined_methods) && include_action?(new_method)
-            define_method new_method do
-              hobo_new_in_collection(name)
-            end
-          end
-        end
-      end
-            
+
       def web_methods
         @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
       end
+      
       
       def show_actions
         @show_actions ||= superclass.respond_to?(:show_actions) ? superclass.show_actions : []
       end
       
+      
       def index_actions
         @index_actions ||= superclass.respond_to?(:index_actions) ? superclass.index_actions : []
       end
+      
       
       def collections
         # By default, all has_many associations are published
@@ -76,6 +60,7 @@ module Hobo
                          end
       end
 
+      
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
       end
@@ -156,9 +141,30 @@ module Hobo
           def completions; hobo_completions end if include_action?(:completions)
         end
 
-        collections.each { |c| add_collection_actions(c.to_sym) } 
+        collections.each { |c| def_collection_actions(c.to_sym) } 
       end
       
+      
+      def def_collection_actions(name)
+        defined_methods = instance_methods
+        
+        show_collection_method = name
+        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
+          define_method show_collection_method do
+            hobo_show_collection(name)
+          end
+        end
+          
+        if Hobo.simple_has_many_association?(model.reflections[name])
+          new_method = "new_#{name.to_s.singularize}"
+          if new_method.not_in?(defined_methods) && include_action?(new_method)
+            define_method new_method do
+              hobo_new_in_collection(name)
+            end
+          end
+        end
+      end
+            
       
       def show_action(*names, &block)
         options = names.extract_options!
@@ -186,7 +192,7 @@ module Hobo
       
       def publish_collection(*names)
         collections.concat(names)
-        names.each {|n| add_collection_actions(n)}
+        names.each {|n| def_collection_actions(n)}
       end
       
       
