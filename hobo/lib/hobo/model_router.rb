@@ -130,7 +130,7 @@ module Hobo
       controller.collections.each do |collection|
         named_route("#{singular}_#{collection}",
                     "#{plural}/:id/#{collection}",
-                    :action => collection,
+                    :action => collection.to_s,
                     :conditions => { :method => :get })
 
         if Hobo.simple_has_many_association?(model.reflections[collection])
