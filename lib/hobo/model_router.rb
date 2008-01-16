@@ -128,16 +128,17 @@ module Hobo
     
     def collection_routes
       controller.collections.each do |collection|
-        new_method = Hobo.simple_has_many_association?(model.reflections[collection])
         named_route("#{singular}_#{collection}",
                     "#{plural}/:id/#{collection}",
-                    :action => "show_#{collection}",
+                    :action => collection,
                     :conditions => { :method => :get })
 
-        named_route("new_#{singular}_#{collection.to_s.singularize}",
-                    "#{plural}/:id/#{collection}/new",
-                    :action => "new_#{collection.to_s.singularize}",
-                    :conditions => { :method => :get }) if new_method
+        if Hobo.simple_has_many_association?(model.reflections[collection])
+          named_route("new_#{singular}_#{collection.to_s.singularize}",
+                      "#{plural}/:id/#{collection}/new",
+                      :action => "new_#{collection.to_s.singularize}",
+                      :conditions => { :method => :get }) 
+        end
       end
     end
     
