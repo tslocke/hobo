@@ -228,7 +228,14 @@ module Hobo::Dryml
         parent, field, obj = Hobo.get_field_path(tag_this || this, path)
 
         type = if parent.class.respond_to?(:field_type) && field_type = parent.class.field_type(field)
-                 field_type
+                 # field_type returns Reflections when passed an
+                 # association name, but if we have a real object we'd
+                 # rather have its class
+                 if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) && !obj.is_a?(Array) && !obj.nil?
+                   obj.class
+                 else
+                   field_type
+                 end
                elsif obj == false
                  # In dryml, TrueClass is the 'boolean' class
                  TrueClass

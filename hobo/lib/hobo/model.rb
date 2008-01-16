@@ -244,18 +244,19 @@ module Hobo
       def field_type(name)
         name = name.to_sym
         field_types[name] or
-          reflections[name] or begin
-                                 col = column(name)
-                                 return nil if col.nil?
-                                 case col.type
-                                 when :boolean
-                                   TrueClass
-                                 when :text
-                                   Hobo::Text
-                                 else
-                                   col.klass
-                                 end
-                               end
+          reflections[name] or
+          begin
+            col = column(name)
+            return nil if col.nil?
+            case col.type
+            when :boolean
+              TrueClass
+            when :text
+              Hobo::Text
+            else
+              col.klass
+            end
+          end
       end
       
       
