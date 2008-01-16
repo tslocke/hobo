@@ -1,13 +1,15 @@
 <def tag="recommendations">
-  <section>
+  <section part="recommendations" id="#{dom_id}-recommendations">
     <h3>Recommendations</h3>
-    <collection part="recommendations"/>
+    <collection/>
 
-    <p class="recommend-this"><a href="#">Recommend this</a></p>
-    <form style="display:none;" with="&new_for_current_user" update="recommendations">
-      <label for="comment">Optional Comment</label>
-      <input:comment/>
-      <submit label="Recommend"/>
+    <form:new update="self">
+      <p class="recommend-this"><a href="#">Recommend this</a></p>
+      <div style="display:none;">
+        <label for="comment">Optional Comment</label>
+        <input:comment/>
+        <submit label="Recommend"/>
+      </div>
     </form>
   </section>
 </def>
