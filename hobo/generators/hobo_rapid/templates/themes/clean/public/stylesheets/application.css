@@ -26,7 +26,7 @@ a:hover {
 }
 h1 a, h2 a, h3 a {border: none; background: none;}
 
-input.text, input.string, input.email_address, input.password, input.search, input.integer, input.float, textarea {
+input.text, input.string, input.email-address, input.password, input.search, input.integer, input.float, textarea {
 	border-top:1px solid #7c7c7c;
 	border-left:1px solid #c3c3c3;
 	border-right:1px solid #c3c3c3;
@@ -50,7 +50,7 @@ input.file_upload {
 }
 .button:hover {cursor: pointer;}
 .button:active {border-top: 1px solid #8c8c8c; border-bottom: 1px solid #ddd;}
-.actions {font-size: 11px;}
+.actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
 	margin: 20px 40px; padding: 10px 30px; border-width: 2px 0;
@@ -85,6 +85,7 @@ body.aside-layout {width: 960px;}
 	color: #222; font-size: 11px;
 }
 .aside-content h2 {padding-bottom: 10px; border-bottom: 1px dotted #666;}
+.aside-content h3 {padding-bottom: 5px; border-bottom: 1px dotted #666;}
 .aside-content a {background: none;}
 /* trick to produce equal height columns */
 .aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
