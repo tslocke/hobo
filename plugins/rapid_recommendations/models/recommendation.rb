@@ -20,7 +20,10 @@ bundle_model :Recommendation do
   
   
   def creatable_by?(user)
-    user == author && !find_by_author_id && !duplicate_recommendation? && user != target.get_creator
+    user == author &&               # you can't spoof a recommendation by somebody else
+      !duplicate_recommendation? && # you can't recommend the same thing twice
+      user != target.get_creator && # you can't recommend things you created
+      target != user                # you can't recommend yourself
   end
   
   def updatable_by?(user, new)
