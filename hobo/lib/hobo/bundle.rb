@@ -133,6 +133,20 @@ module ::Hobo
         end
       end
       
+      klass.meta_def :belongs_to do |*args|
+        opts = args.extract_options!
+        name = args.first
+        if opts[:polymorphic] == :optional
+          if bundle.options["polymorphic_#{name}"]
+            opts[:polymorphic] = true
+            opts.delete(:class_name)
+          else
+            opts.delete(:polymorphic)
+          end
+        end
+        super(*(args + [opts]))
+      end
+      
       klass.class_eval(&b) if b
       klass
     end
@@ -169,7 +183,7 @@ module ::Hobo
       new_name_for(name).to_s.constantize.class_eval(&block)
     end
     
-    
+
     def method_missing(name, *args)
       if name.to_s =~ /^_.*_$/
         magic_option(name)
