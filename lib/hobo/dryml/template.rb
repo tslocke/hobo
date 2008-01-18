@@ -74,6 +74,7 @@ module Hobo::Dryml
 
     def create_render_page_method
       erb_src = process_src
+      
       @builder.add_build_instruction(:render_page, :src => erb_src, :line_num => 1)
     end
 
@@ -257,8 +258,7 @@ module Hobo::Dryml
         unsafe_name += suffix
       end
       
-      @def_name     = unsafe_name
-      @def_line_num = element_line_num(el)
+      @def_element = el
       
       alias_of = el.attributes['alias-of']
       extend_with = el.attributes['extend-with']
@@ -290,7 +290,7 @@ module Hobo::Dryml
               # keep line numbers matching up
               "<% #{"\n" * src.count("\n")} %>"
             end
-      @def_name = nil
+      @def_element = nil
       res
     end
     
@@ -334,21 +334,37 @@ module Hobo::Dryml
     end
     
     
-    def wrap_source_with_metadata(content, *metadata)
-      if include_source_metadata
-        "<!--[DRYML:#{metadata * ':'}[-->" + content + "<!--]DRYML]-->"
-      else
+    def wrap_source_with_metadata(content, kind, name, *args)
+      if (!include_source_metadata) || name.in?(["doctype", "if", "else", "unless", "repeat", "do", "with"])
         content
+      else
+        metadata = [kind, name] + args + [@template_path]
+        "<!--[DRYML|#{metadata * '|'}[-->" + content + "<!--]DRYML]-->"
       end
     end
     
     
     def wrap_tag_method_body_with_metadata(content)
-      if @def_name.in? %w(if else do repeat with)
-        content
-      else
-        wrap_source_with_metadata(content, "tag", @def_name, @template_path, @def_line_num)
+      name   = @def_element.attributes['tag']
+      extend = @def_element.attributes['extend-with']
+      for_   = @def_element.attributes['for']
+      name = extend ? "#{name}-with-#{extend}" : name
+      name += " for #{for_}" if for_
+      wrap_source_with_metadata(content, "def", name, element_line_num(@def_element))
+    end
+    
+    
+    def wrap_tag_call_with_metadata(el, content)
+      name = el.expanded_name
+      param = el.attributes['param']
+        
+      if param == "&true"
+        name += " param"
+      elsif param
+        name += " param='#{param}'" 
       end
+        
+      wrap_source_with_metadata(content, "call", name, element_line_num(el))
     end
     
        
@@ -478,7 +494,8 @@ module Hobo::Dryml
              end
 
       call = apply_control_attributes(call, el)
-      maybe_make_part_call(el, "<% _output(#{call}) %>")
+      call = maybe_make_part_call(el, "<% _output(#{call}) %>")
+      wrap_tag_call_with_metadata(el, call)
     end
     
     
@@ -489,8 +506,10 @@ module Hobo::Dryml
     end
     
 
-    def parameter_tags_hash(el)
+    def parameter_tags_hash(el, containing_tag_name=nil)
       call_type = nil
+      
+      containing_tag_name ||= el.expanded_name
       
       param_items = el.map do |node|
         case node
@@ -529,9 +548,9 @@ module Hobo::Dryml
           if is_parameter_tag
             param_name = get_param_name(e)
             if param_name
-              ":#{ruby_name e.name} => merge_tag_parameter(#{param_proc(e)}, all_parameters[:#{param_name}]), "
+              ":#{ruby_name e.name} => merge_tag_parameter(#{param_proc(e, containing_tag_name)}, all_parameters[:#{param_name}]), "
             else
-              ":#{ruby_name e.name} => #{param_proc(e)}, "
+              ":#{ruby_name e.name} => #{param_proc(e, containing_tag_name)}, "
             end
           end
         end
@@ -558,19 +577,10 @@ module Hobo::Dryml
       end
     end
     
-    
-    def tag_parameter_content(el, param_name=el.dryml_name)
-      content = children_to_erb(el)
-      if include_source_metadata && !el.dryml_name.in?(%w(if else do repeat with))
-        wrap_source_with_metadata(content, "param", param_name, @template_path, element_line_num(el))
-      else
-        content
-      end
-    end
 
-    
-    def default_param_proc(el)
-      content = tag_parameter_content(el, 'default')
+    def default_param_proc(el, containing_param_name=nil)
+      content = children_to_erb(el)
+      content = wrap_source_with_metadata(content, "param", containing_param_name, element_line_num(el)) if containing_param_name
       "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{content}<% } #{tag_newlines(el)}}"
     end
     
@@ -580,21 +590,29 @@ module Hobo::Dryml
     end
     
     
-    def param_proc(el)
+    def wrap_replace_parameter(el, name)
+      wrap_source_with_metadata(children_to_erb(el), "replace", name, element_line_num(el))
+    end
+    
+    
+    def param_proc(el, metadata_name_prefix)
       param_name = el.dryml_name
+      metadata_name = "#{metadata_name_prefix}::#{el.name}"
+      
       nl = tag_newlines(el)
             
       if (repl = el.attribute("replace"))
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
         
-        "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{tag_parameter_content(el)}<% } #{nl}}"
+        
+        "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{wrap_replace_parameter(el, metadata_name)}<% } #{nl}}"
       else
         attributes = el.attributes.map do 
           |name, value| ":#{ruby_name name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
         end.compact
         
-        nested_parameters_hash = parameter_tags_hash(el)
+        nested_parameters_hash = parameter_tags_hash(el, metadata_name)
         "proc { [{#{attributes * ', '}}, #{nested_parameters_hash}] #{nl}}"
       end
     end
@@ -827,7 +845,7 @@ module Hobo::Dryml
     end
     
     def include_source_metadata
-      false
+      RAILS_ENV == "development"
     end
 
   end

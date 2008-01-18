@@ -11,7 +11,7 @@ module Hobo::Dryml
       s = renderer.render_page(@view.assigns["this"] || local_assigns[:this], local_assigns)
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
 
-      s.strip
+      s.strip.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
     end
 
   end
