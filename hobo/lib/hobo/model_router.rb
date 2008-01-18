@@ -30,6 +30,8 @@ module Hobo
       end
       
       def add_routes(map)
+        add_dryml_support_routes(map) if RAILS_ENV == "development"
+        
         reset_linkables
         begin 
           ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
@@ -67,6 +69,12 @@ module Hobo
           end
         end
       end
+      
+      
+      def add_dryml_support_routes(map)
+        map.dryml_support "dryml/:action", :controller => "hobo/dryml_support"
+      end
+      
     end
     
 
