@@ -439,7 +439,7 @@ module Hobo::Dryml
     def render_tag(tag_name, attributes)
       method_name = tag_name.gsub('-', '_')
       if respond_to?(method_name)
-        (send(method_name, attributes) + part_contexts_storage_tag).strip
+        (send(method_name, attributes) + part_contexts_storage_tag).strip.gsub(/^(.*?)(<!DOCTYPE.*?>)/m, "\\2\\1")
       else
         false
       end

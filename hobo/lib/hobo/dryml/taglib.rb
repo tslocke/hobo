@@ -38,7 +38,7 @@ module Hobo
                  elsif options[:src] =~ /\//
                    "app/views"
                  else
-                   options[:template_dir]
+                   options[:template_dir].gsub(/^\//, "") # remove leading / if there is one
                  end
           
           filename = "#{RAILS_ROOT}/#{base}/#{options[:src]}.dryml"
