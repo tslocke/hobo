@@ -13,12 +13,14 @@ bundle_model :ForumTopic do
   has_many   :replies, :class_name => _ForumPost_, :foreign_key => 'topic_id', :order => :created_at, :dependent => :destroy
   belongs_to :forum
 
-  def_scope :recent, :order => "last_post_at DESC"
-  
   # See app/models/forum_post.rb for an explanation of :creator => true
   belongs_to :user, :creator => true
 
   belongs_to :last_post_by, :class_name => 'User'
+
+  def_scope :recent, :order => "last_post_at DESC"
+
+  track_viewings :counter_conditions => "unless viewer == self.user"
 
   before_create :set_last_post
 
