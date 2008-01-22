@@ -97,11 +97,12 @@
     view
   else
     attrs = add_classes(attributes, type_and_field)
-    the_input = if this_type.respond_to?(:macro)
-                  if this_type.macro == :belongs_to
+    the_input = if this.respond_to?(:proxy_reflection)
+                  refl = this.proxy_reflection
+                  if refl.macro == :belongs_to
                     belongs_to_input(attrs)
-                  elsif this_type.macro == :has_many
-                    if this_type.options[:through]
+                  elsif refl.macro == :has_many
+                    if refl.options[:through]
                       has_many_through_input(attrs)
                     else
                       has_many_input(attrs)
