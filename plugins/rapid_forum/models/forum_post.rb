@@ -16,6 +16,8 @@ bundle_model :ForumPost do
   # will be set up before the permission methods are called.
   belongs_to :user, :creator => true
 
+  validates_presence_of :body
+
   after_create :update_topic_last_post
 
   # --- Hobo Permissions --- #

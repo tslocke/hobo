@@ -13,3 +13,9 @@
     </primary-content:>
   </show-page-without-forum-topic>
 </def>
+
+<def tag="new-page" extend-with="forum-topic">
+  <new-page-without-forum-topic>
+    <field-list: fields="title,sticky,body"/>
+  </new-page-without-forum-topic>
+</def>

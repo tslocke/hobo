@@ -22,6 +22,8 @@ bundle_model :ForumTopic do
 
   track_viewings :counter_conditions => "unless viewer == self.user"
 
+  validates_presence_of :title, :body
+
   before_create :set_last_post
 
   def has_replies?
@@ -32,19 +34,26 @@ bundle_model :ForumTopic do
     @posts_count ||= (1 + replies.count)
   end
 
+  def unread_posts?(user)
+    unless user.guest?
+      v = viewings.find_by_user_id(user.id)
+      user.created_at < self.last_post_at && (v.nil? || v.updated_at < self.last_post_at)
+    end
+  end
+
   # --- Hobo Permissions --- #
 
   # Anyone can post as long as they don't fake the post as from
   # another user. Also if the post is marked as sticky the creator
   # must be an admin.
   def creatable_by?(user)
-    user == self.user && sticky?.implies(user.administrator?)
+    user == self.user && sticky?.implies(user.administrator?) && view_counter == 0
   end
 
   # Admins can change the sticky flag and the title. 
   def updatable_by?(user, new)
     (user.administrator? && only_changed_fields?(new, :sticky, :title, :body)) || 
-    (user == self.user && same_fields?(new, :user, :forum, :sticky))
+    (user == self.user && same_fields?(new, :user, :forum, :sticky, :view_counter))
   end
 
   # Admins can delete the topic.
