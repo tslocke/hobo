@@ -457,7 +457,11 @@ module Hobo
       
       @this = find_instance_or_not_found(args.first) and
         begin
-          set_status(:not_allowed) unless Hobo.can_view?(current_user, @this)
+          if Hobo.can_view?(current_user, @this)
+            set_status(:valid)
+          else
+            set_status(:not_allowed)
+          end
           set_named_this!
           response_block(&b) or
             if not_allowed?
