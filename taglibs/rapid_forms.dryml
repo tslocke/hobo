@@ -271,7 +271,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  options ||= this_type.klass.find(:all, :conditions => this_type.options[:conditions]).select {|x| can_view?(x)}
+  options ||= this.proxy_reflection.klass.find(:all, :conditions => this.proxy_reflection.options[:conditions]).select {|x| can_view?(x)}
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
