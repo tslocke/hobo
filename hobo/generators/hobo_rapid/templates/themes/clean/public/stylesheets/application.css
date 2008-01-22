@@ -71,7 +71,6 @@ input.file_upload {
 .field-list th {width: 120px;}
 .field-list td {width: auto;}
 
-
 .content-header, .content-body, .content-footer {margin: 10px 45px 15px; padding: 0;}
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
@@ -206,6 +205,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 	float: right; width: 72%;
 }
 ul.collection li {clear: both; margin-left: 0; list-style: none;}
+.empty-collection-message {margin-top: 20px;}
 
 .new-link {margin-top: 20px;}
 
