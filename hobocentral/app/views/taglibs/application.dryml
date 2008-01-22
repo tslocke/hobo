@@ -1,7 +1,7 @@
 <!-- Define your application-wide tags here -->
 
 <include src="rapid" plugin="hobo"/>
-<include src="rapid_forum" plugin="rapid_forum"/>
+<include src="rapid_forum" bundle="rapid_forum"/>
 
 <set-theme name="clean"/>
 
