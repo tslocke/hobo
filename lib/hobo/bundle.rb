@@ -49,7 +49,7 @@ module ::Hobo
     
     def initialize(*args)
       options = defaults.with_indifferent_access
-      options.update(args.extract_options!)
+      options.recursive_update(args.extract_options!)
       
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
       Bundle.bundles[name] = self
@@ -105,6 +105,14 @@ module ::Hobo
         # Roll on Ruby 1.9
         def self.feature(name, &block)
           _feature(name, block)
+        end
+        
+        def method_missing(name, *args)
+          if name.to_s =~ /^_.*_$/
+            self.class.bundle.magic_option(name)
+          else
+            super
+          end
         end
       end
       
