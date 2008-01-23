@@ -505,6 +505,18 @@ module Hobo
           has_many_without_defined_scopes(name, *args + [options], &block)
         end
       end
+      
+      def method_missing(name, *args, &block)
+        name = name.to_s
+        if name =~ /\./
+          parts = name.split(".")
+          s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
+          s.send(parts.last, *args)
+        else
+          super
+        end
+      end
+
     end
     
     
@@ -637,7 +649,7 @@ module Hobo
         value
       end
     end
-    
+        
   end
 end
 
