@@ -1,4 +1,4 @@
-class Hobo::DrymlSupportController < ActionController::Base
+class Hobo::Dryml::DrymlSupportController < ActionController::Base
   
   def edit_source
     dryml_editor = ENV['DRYML_EDITOR']
