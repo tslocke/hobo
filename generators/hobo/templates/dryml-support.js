@@ -118,7 +118,7 @@ var Dryml = {
 
         var filename = item.file.sub("vendor/plugins", "").sub("app/views", "").sub(/^\/+/, "").sub(".dryml", "")
 
-        return $tr($td({class: "file"}, filename), $td(a))
+        return $tr($td({"class": "file"}, filename), $td(a))
     },
 
     removeMenu: function() {
