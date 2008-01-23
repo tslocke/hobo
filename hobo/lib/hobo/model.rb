@@ -513,7 +513,7 @@ module Hobo
           s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
           s.send(parts.last, *args)
         else
-          super
+          super(name.to_sym, *args, &block)
         end
       end
 
