@@ -171,8 +171,8 @@ end
 
 class TrueClass
   
-  def implies(x)
-    x 
+  def implies(x=nil)
+    block_given? ? yield : x 
   end
   
 end
@@ -256,17 +256,6 @@ class Hash
     res
   end
 
-  #alias_method :hobo_original_reject, :reject
-  def rejectX(keys=nil, &b)
-    if b
-      hobo_original_reject(&b)
-    else
-      res = {}.update(self) # can't use dup because it breaks with symbols
-      keys.each {|k| res.delete(k)}
-      res
-    end
-  end
-
   def partition_hash(keys=nil)
     yes = {}
     no = {}
@@ -278,6 +267,17 @@ class Hash
       end
     end
     [yes, no]
+  end
+  
+  def recursive_update(hash)
+    hash.each_pair do |key, value|
+      current = self[key]
+      if current.is_a?(Hash) and value.is_a?(Hash)
+        current.recursive_update(value)
+      else
+        self[key] = value
+      end
+    end
   end
   
   def -(keys)
