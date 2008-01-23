@@ -12,6 +12,7 @@
 
       <do param="scripts">
         <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <javascript name="dryml-support" if="&RAILS_ENV == 'development'" param="dryml-support-javascript"/>
         <hobo-rapid-javascripts param/>
       </do>
     </head>
