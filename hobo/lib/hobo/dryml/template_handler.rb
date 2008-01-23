@@ -11,7 +11,10 @@ module Hobo::Dryml
       s = renderer.render_page(@view.assigns["this"] || local_assigns[:this], local_assigns)
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
 
-      s.strip.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
+      s = s.strip
+      
+      # TODO: Temporary hack to get the dryml metadata comments in the right place
+      s.gsub!(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") if RAILS_ENV == "development"
     end
 
   end
