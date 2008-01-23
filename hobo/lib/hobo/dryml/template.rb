@@ -12,6 +12,8 @@ module Hobo::Dryml
     
     CODE_ATTRIBUTE_CHAR = "&"
     
+    NO_METADATA_TAGS = %w(doctype if else unless repeat do with name type-name)
+    
     SPECIAL_ATTRIBUTES = %w(param merge merge-params merge-attrs 
                             for-type 
                             if unless repeat 
@@ -335,7 +337,7 @@ module Hobo::Dryml
     
     
     def wrap_source_with_metadata(content, kind, name, *args)
-      if (!include_source_metadata) || name.in?(["doctype", "if", "else", "unless", "repeat", "do", "with"])
+      if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
         content
       else
         metadata = [kind, name] + args + [@template_path]
@@ -509,7 +511,8 @@ module Hobo::Dryml
     def parameter_tags_hash(el, containing_tag_name=nil)
       call_type = nil
       
-      containing_tag_name ||= el.expanded_name
+      containing_tag_name
+      metadata_name = containing_tag_name || el.expanded_name
       
       param_items = el.map do |node|
         case node
@@ -548,9 +551,9 @@ module Hobo::Dryml
           if is_parameter_tag
             param_name = get_param_name(e)
             if param_name
-              ":#{ruby_name e.name} => merge_tag_parameter(#{param_proc(e, containing_tag_name)}, all_parameters[:#{param_name}]), "
+              ":#{ruby_name e.name} => merge_tag_parameter(#{param_proc(e, metadata_name)}, all_parameters[:#{param_name}]), "
             else
-              ":#{ruby_name e.name} => #{param_proc(e, containing_tag_name)}, "
+              ":#{ruby_name e.name} => #{param_proc(e, metadata_name)}, "
             end
           end
         end
@@ -558,7 +561,7 @@ module Hobo::Dryml
       
       if call_type == :default_param_only
         with_containing_tag_name(el) do
-          param_items = " :default => #{default_param_proc(el)}, "
+          param_items = " :default => #{default_param_proc(el, containing_tag_name)}, "
         end
       end
       
@@ -597,7 +600,7 @@ module Hobo::Dryml
     
     def param_proc(el, metadata_name_prefix)
       param_name = el.dryml_name
-      metadata_name = "#{metadata_name_prefix}::#{el.name}"
+      metadata_name = "#{metadata_name_prefix}><#{el.name}"
       
       nl = tag_newlines(el)
             
@@ -845,7 +848,8 @@ module Hobo::Dryml
     end
     
     def include_source_metadata
-      RAILS_ENV == "development"
+      @include_source_metadata = RAILS_ENV == "development" && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
+      @include_source_metadata
     end
 
   end
