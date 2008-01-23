@@ -310,8 +310,8 @@ module Hobo
       
       @association = options.delete(:association) ||
         if args.length == 1
-          scopes = args.first
-          @association = scopes.to_s.split(".").inject(model) { |m, name| m.send(name) }
+          scope = args.first
+          @association = model.send(scope)
         elsif args.length == 2
           owner, collection_name = args
           @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
