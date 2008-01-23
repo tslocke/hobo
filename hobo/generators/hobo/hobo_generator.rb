@@ -21,6 +21,7 @@ class HoboGenerator < Rails::Generator::Base
       m.directory File.join("public/hobothemes")
       m.file "application.dryml", File.join("app/views/taglibs/application.dryml")
       m.file "guest.rb", File.join("app/models/guest.rb")
+      m.file "dryml-support.js", File.join("public/javascripts/dryml-support.js")
     end
   end
 
