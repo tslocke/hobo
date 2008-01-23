@@ -66,7 +66,12 @@
                            :value => form_authenticity_token)
                  end
      
-    page_path_hidden = hidden_field_tag("page_path", view_name) unless method == "get"
+    page_path = if request.post? || request.put? && params[:page_path]
+                  params[:page_path]
+                else
+                  view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
+                end
+    page_path_hidden = hidden_field_tag("page_path", page_path) unless method == "get"
      
     body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
      
