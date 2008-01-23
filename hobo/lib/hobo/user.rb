@@ -15,6 +15,7 @@ module Hobo
       base.extend(ClassMethods)
 
       base.class_eval do
+        
         fields do
           crypted_password          :string, :limit => 40
           salt                      :string, :limit => 40
@@ -24,18 +25,23 @@ module Hobo
         
         # Virtual attribute for the unencrypted password
         attr_accessor :password
+        set_field_type :password => :password, :password_confirmation => :password
+        
+        # Virtual attribute for providing the current password when changing password
+        attr_accessor  :current_password
+        set_field_type :current_password => :password
 
         validates_presence_of     :password,                   :if => :password_required?
-        validates_presence_of     :password_confirmation,      :if => :password_required?
         validates_confirmation_of :password,                   :if => :password_required?
-      
+        
+        validate :validate_current_password if :changing_password?
+        
         before_save :encrypt_password
         
         never_show *AUTHENTICATION_FIELDS
         
         attr_protected *AUTHENTICATION_FIELDS
         
-        set_field_type :password => :password, :password_confirmation => :password
         
         password_validations
       end
@@ -125,6 +131,10 @@ module Hobo
       false
     end
     
+    def changing_password?
+      password || password_confirmation
+    end
+
     protected
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
@@ -135,7 +145,14 @@ module Hobo
 
     # Is a password required for login? (or do we have an empty password?)
     def password_required?
-      (crypted_password.blank? && password != nil) || !password.blank?
+      (crypted_password.blank? && password != nil) || !password.blank? || changing_password?
+    end
+    
+    
+
+    
+    def validate_current_password
+      authenticated?(current_password) or errors.add :current_password, "is not correct"
     end
     
   end

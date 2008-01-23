@@ -8,8 +8,17 @@ module Hobo
       attr_reader :user_models
       
       def included(base)
-        base.filter_parameter_logging "password"
-        base.skip_before_filter :login_required, :only => [:login]
+        base.class_eval do 
+          filter_parameter_logging "password"
+          skip_before_filter :login_required, :only => [:login]
+          
+          include_taglib "rapid_user_pages", :plugin => "hobo"
+          
+          show_action :account
+          
+          alias_method_chain :hobo_update, :account_flash
+        end
+        
         user_models << base.model
       end
     end
@@ -19,6 +28,8 @@ module Hobo
     def signup; hobo_signup; end
     
     def logout; hobo_logout; end
+    
+    private
     
     def hobo_login(options={})
       options = LazyHash.new(options)
@@ -89,6 +100,15 @@ module Hobo
       flash[:notice] ||= options[:notice]
       redirect_back_or_default(options[:redirect_to]) unless performed?
     end
+    
+    
+    def hobo_update_with_account_flash(*args)
+      hobo_update_without_account_flash do
+        flash[:notice] = "Changes to your account were saved" if valid? && @this == current_user
+        yield if block_given?
+      end
+    end
+    
     
   end
   

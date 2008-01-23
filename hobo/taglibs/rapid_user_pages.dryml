@@ -1,0 +1,104 @@
+<def tag="signup-page">
+  <page layout="simple" title="Sign up to #{app_name}" merge>
+    <body: class="signup-page" param/>
+
+    <live-search: replace/>
+    <nav: replace/>
+    
+    <content-header: param>
+      <heading param>Sign Up</heading>
+    </content-header>
+    
+    <content-body: param>
+      <error-messages/>
+      <form action="&request.request_uri" param>
+        <field-list fields="login, password, password_confirmation" param>
+          <login-label:><%= model.login_attribute.to_s.titleize %></login-label>
+          <password-confirmation-label:>Confirm Password</password-confirmation-label>
+        </field-list>
+
+        <div class="actions" param="actions">
+          <submit label='Sign Up'/>
+        </div>
+      </form>
+    </content-body>
+
+  </page>
+</def>
+
+
+<def tag="login-page" attrs="remember-me">
+  <page layout="simple" title="Log in to #{app_name}" merge>
+   
+    <body: class="login-page" param/>
+ 
+    <live-search: replace/>
+    <nav: replace/>
+    
+    <content-header: param>
+      <heading param>Log In</heading>
+    </content-header>
+
+    <content-body: param>
+      <form action="&request.request_uri" class="login" param>
+        <labelled-item-list param>
+          <labelled-item>
+            <item-label param="login-label"><%= model.login_attribute.to_s.titleize %></item-label>
+            <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
+          </labelled-item>
+
+          <labelled-item>
+            <item-label param="password-label">Password</item-label>
+            <item-value><input type="password" name="password" id="password" class="string" param="password-input"/></item-value>
+          </labelled-item>
+
+          <labelled-item if="&remember_me">
+            <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
+            <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
+          </labelled-item>
+        </labelled-item-list>
+        <set user="&Hobo::UserController.user_models.first"/>
+        <div class="actions" param="actions">
+          <submit label='Log in' param/><if test="&signup_url(user)" class='nav-item'> or <a href="&signup_url(user)">Sign up</a></if>
+        </div>
+      </form>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="account-disabled-page">
+
+  <page layout="simple" title="#{app_name} - account not available" merge>
+       
+    <body: class="account-disabled-page" param/>
+
+    <content-header: param><heading param>Account is not available</heading></content>
+
+    <content-body: param>
+      <p>Your account is not available at this time.</p>
+    </content-body>
+  </page>
+
+</def>
+
+
+<def tag="account-page">
+
+  <page title="#{name} - Account" merge>
+
+    <body: class="user-account-page #{type_name}" param/>
+
+    <content-header: param>
+      <heading><name/></heading>
+    </content-header:>
+
+    <content-body: param>
+      <error-messages param/>
+      <h2>Change Password</h2>
+      <change-password-form/>
+    </content-body:>
+    
+  </page>
+
+</def>
