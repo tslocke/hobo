@@ -72,7 +72,7 @@ module Hobo
       
       
       def add_dryml_support_routes(map)
-        map.dryml_support "dryml/:action", :controller => "hobo/dryml_support"
+        map.dryml_support "dryml/:action", :controller => "hobo/dryml/dryml_support"
       end
       
     end
