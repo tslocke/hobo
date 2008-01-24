@@ -119,10 +119,6 @@ body.aside-layout {width: 960px;}
 #search-results-panel .card.linkable a {color: black;}
 #search-spinner {position: absolute; top: 6px; right: 7px;}
 
-.account-nav {
-	position: absolute; top: -20px; right: 35px;
-	font-size: 11px; 
-}
 
 ul.main-nav {float: left; margin: 0 10px;}
 .main-nav li {margin-right: 10px;}
@@ -133,12 +129,18 @@ ul.main-nav {float: left; margin: 0 10px;}
 	font-size: 13px; font-weight: bold; text-shadow: black 2px 2px 2px;
 }
 .main-nav a:hover {border: 1px solid #555; border-width: 1px 1px 0; background: #444;}
+
+.account-nav {
+	position: absolute; top: -20px; right: 35px;
+	font-size: 11px;
+}
 .account-nav li {
 	float: left; 
 	margin-left: 0; padding-left: 20px; 
 	color: #ddd;
 	text-shadow: #444 2px 2px 0;
-	list-style: none; }
+	list-style: none;
+}
 .account-nav a {font-weight: bold;}
 .account-nav a:hover {border-bottom: 1px dotted #ddd;}
 
@@ -170,12 +172,12 @@ ul.main-nav {float: left; margin: 0 10px;}
 .new-in-collection-page .content-header h2 {margin-top: 6px; font-size: 14px;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
 
-.show-page .create-new {
+.create-new {
 	margin-top: 20px; padding: 0 30px; border-top: 1px dotted #ddd;
 	background: #f5f5f5;
 }
-.show-page .create-new form .submit-button {margin: 20px 130px;}
-.show-page .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
+.create-new form .submit-button {margin: 20px 130px;}
+.create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
 
 /* styling of generic elements */
 .creator {font-weight: bold;}
@@ -215,6 +217,27 @@ ul.collection li {clear: both; margin-left: 0; list-style: none;}
 .primary-collection h2 {
 	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted black;
 }
+
+.table-plus .header {height: 100%; overflow: hidden;}
+.table-plus .header a {float: left; margin-right: 20px;}
+.table-plus div.search {float: right;}
+.table-plus div.search span {color: #444;}
+.table-plus div.search input.search {margin: 0 5px;}
+.table-plus div.search .button {padding: 2px 4px;}
+
+.table-plus table {width: 100%; margin-top: 20px;}
+.table-plus table th {
+	padding: 2px 10px;
+	color: white; background: #444;
+	font-weight: bold; font-size: 10px;
+}
+.table-plus table th a {color: white;}
+.table-plus table td {
+	padding: 6px 10px; border-bottom: 1px solid #e2e2e2; color: #666;
+}
+.table-plus table td input.button {padding: 1px; margin-left: 10px; }
+.table-plus table td.controls {width: 100px;}
+.table-plus .even {background: #f8f8f8;}
 
 /*******************************************************/
 /* these styles are for the generated front index page */
