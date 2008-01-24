@@ -144,6 +144,8 @@ ul.main-nav {float: left; margin: 0 10px;}
 .account-nav a {font-weight: bold;}
 .account-nav a:hover {border-bottom: 1px dotted #ddd;}
 
+.user-account-page .change-password {width: 350px;}
+.user-account-page .change-password th {width: 150px;}
 
 /* pagination nav, needs a more specific class on the wrapper */
 .content-body .nav {margin-bottom: 10px; font-size: 11px;}
