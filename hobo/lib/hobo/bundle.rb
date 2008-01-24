@@ -47,10 +47,10 @@ module ::Hobo
       private
       
       def eval_ruby_files(dir, filenames)
-        files = if filenames
-                  filenames.map { |f| "#{dir}/#{f}.rb" }
-                else
+        files = if filenames.blank?
                   Dir["#{dir}/*.rb"]
+                else
+                  filenames.map { |f| "#{dir}/#{f}.rb" }
                 end
         
         files.each { |f| instance_eval(File.read(f), f, 1) }
@@ -64,7 +64,7 @@ module ::Hobo
       end
       
       def controllers(*controllers)
-        @controllers = controllers
+        @controllers = controllers.map {|c| c.ends_with?("controller") ? c : "#{c.to_s.pluralize}_controller" }
       end
       
     end
