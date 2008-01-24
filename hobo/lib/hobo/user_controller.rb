@@ -103,7 +103,7 @@ module Hobo
     
     
     def hobo_update_with_account_flash(*args)
-      hobo_update_without_account_flash do
+      hobo_update_without_account_flash(*args) do
         flash[:notice] = "Changes to your account were saved" if valid? && @this == current_user
         yield if block_given?
       end
