@@ -29,6 +29,7 @@ module Hobo
         alias_method_chain :belongs_to, :foreign_key_declaration
         alias_method_chain :belongs_to, :hobo_metadata
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
+        alias_method_chain :attr_accessor, :rich_types
         def inherited(klass)
           fields do
             Hobo.register_model(klass)
@@ -104,6 +105,30 @@ module Hobo
           yield dsl
         else
           dsl.instance_eval(&b)
+        end
+      end
+      
+      
+      # This adds a :type => ??? option to attr_accessor. If this
+      # option is given, the setter will wrap values that are not of
+      # the right type.
+      def attr_accessor_with_rich_types(*attrs)
+        options = attrs.extract_options!
+        type = options[:type]
+        if type
+          type = Hobo.field_types[type] if type.is_a?(Symbol)
+          attrs.each do |attr|
+            set_field_type attr => type
+            define_method "#{attr}=" do |val|
+              unless val.nil? || val.is_a?(type) || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?)
+                val = type.new(val)
+              end
+              instance_variable_set("@#{attr}", val)
+            end
+          end
+          attr_reader *attrs
+        else
+          attr_accessor_without_rich_types(*attrs)
         end
       end
       
