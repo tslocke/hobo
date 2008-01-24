@@ -23,25 +23,20 @@ module Hobo
           remember_token_expires_at :datetime
         end
         
-        # Virtual attribute for the unencrypted password
-        attr_accessor :password
-        set_field_type :password => :password, :password_confirmation => :password
-        
-        # Virtual attribute for providing the current password when changing password
-        attr_accessor  :current_password
-        set_field_type :current_password => :password
-
         validates_presence_of     :password,                   :if => :password_required?
         validates_confirmation_of :password,                   :if => :password_required?
-        
-        validate :validate_current_password if :changing_password?
+
+        # Virtual attributes for setting and changing the password
+        attr_accessor :current_password, :password, :password_confirmation, :type => :password
+
+
+        validate :validate_current_password_when_changing_password
         
         before_save :encrypt_password
         
         never_show *AUTHENTICATION_FIELDS
         
         attr_protected *AUTHENTICATION_FIELDS
-        
         
         password_validations
       end
@@ -143,16 +138,15 @@ module Hobo
       self.crypted_password = encrypt(password)
     end
 
+    
     # Is a password required for login? (or do we have an empty password?)
     def password_required?
       (crypted_password.blank? && password != nil) || !password.blank? || changing_password?
     end
-    
-    
 
     
-    def validate_current_password
-      authenticated?(current_password) or errors.add :current_password, "is not correct"
+    def validate_current_password_when_changing_password
+      changing_password? && !authenticated?(current_password) and errors.add :current_password, "is not correct" 
     end
     
   end
