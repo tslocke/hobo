@@ -272,8 +272,8 @@ module Hobo
      
     def param_name_for_this(foreign_key=false)
       return "" unless form_this
-      name = if foreign_key and this_type.respond_to?(:macro) and this_type.macro == :belongs_to
-               param_name_for(form_this, form_field_path[0..-2] + [this_type.primary_key_name])
+      name = if foreign_key && (refl = this_field_reflection) && refl.macro == :belongs_to
+               param_name_for(form_this, form_field_path[0..-2] + [refl.primary_key_name])
              else
                param_name_for(form_this, form_field_path)
              end
