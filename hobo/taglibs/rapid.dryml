@@ -239,10 +239,10 @@
    
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
-        elsif this_type.respond_to?(:macro)
-          if this_type.macro == :belongs_to
+        elsif refl = this_field_reflection
+          if refl.macro == :belongs_to
             belongs_to_view(attributes)
-          elsif this_type.macro == :has_many
+          elsif refl.macro == :has_many
             has_many_view(attributes)
           end
         else
@@ -357,12 +357,12 @@ in the future - use at your own risk. -->
 
     <do param="default"/>
 
-    <if test="&delete_buttons != false and can_delete?(this)">
+    <if test="&delete_buttons != false && can_delete?(this)">
       <td><delete-button/></td>
     </if>
   </table-for>
   <else>
-    <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
+    <p>There are no <%= this.member_class.name.titleize.pluralize.downcase %></p>
   </else>
   <div>
     <create-button update="&id || part_id"/>

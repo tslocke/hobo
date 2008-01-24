@@ -102,8 +102,7 @@
     view
   else
     attrs = add_classes(attributes, type_and_field)
-    the_input = if this.respond_to?(:proxy_reflection)
-                  refl = this.proxy_reflection
+    the_input = if (refl = this_field_reflection)
                   if refl.macro == :belongs_to
                     belongs_to_input(attrs)
                   elsif refl.macro == :has_many
@@ -253,7 +252,7 @@
   class_or_assoc = if model
                      model.is_a?(String) ? model.constantize : model
                    elsif Hobo.simple_has_many_association?(this)
-                     fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
+                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.id
                      this
                    else
                      raise HoboError.new("invalid context for <create-button>")
@@ -276,7 +275,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  options ||= this.proxy_reflection.klass.find(:all, :conditions => this.proxy_reflection.options[:conditions]).select {|x| can_view?(x)}
+  options ||= this_field_reflection.klass.find(:all, :conditions => this_field_reflection.options[:conditions]).select {|x| can_view?(x)}
   #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
