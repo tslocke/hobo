@@ -52,9 +52,42 @@ module Hobo::Dryml
     attr_accessor 
 
     for attr in [:erb_binding, :part_contexts, :view_name,
-                 :this, :this_parent, :this_field, :this_type,
+                 :this, :this_parent, :this_field,
                  :form_field_path, :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
+    end
+    
+    
+    # The type of this, or when this is nil, the type that would be expected in the current field
+    def this_type
+      @_this_type ||= if this == false
+                        TrueClass
+                      elsif this
+                        this.class
+                      elsif this_parent && this_field && (parent_class = this_parent.class).respond_to?(:field_type)
+                        type = parent_class.field_type(this_field)
+                        if type.is_a?(ActiveRecord::Reflection::AssociationReflection)
+                          reflection = type
+                          if reflection.macro == :has_many
+                            Array
+                          elsif reflection.options[:polymorphic]
+                            # All we know is that it will be some active-record type
+                            ActiveRecord::Base
+                          else
+                            reflection.klass
+                          end
+                        else
+                          type
+                        end
+                      else
+                        # Nothing to go on at all 
+                        Object
+                      end
+    end
+    
+    
+    def this_field_reflection
+      this_parent && this_field && this_parent.class.respond_to?(:reflections) && this_parent.class.reflections[this_field.to_sym]
     end
     
     
@@ -148,17 +181,7 @@ module Hobo::Dryml
 
     
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= if this_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
-                      # Don't blow up with non-existent polymorphic types
-                      return name if this_type.options[:polymorphic] && !Object.const_defined?(this_type.class_name)
-                      this_type.klass
-                    elsif this_type <= Array
-                      this.member_class
-                    else
-                      this_type
-                    end
-      
-      call_type = TrueClass if call_type == FalseClass
+      call_type ||= this.is_a?(Array) ? this.member_class : this_type
 
       while true
         if call_type == ActiveRecord::Base || call_type == Object
@@ -194,6 +217,7 @@ module Hobo::Dryml
               @_this, @_this_parent, @_this_field, @_this_type,
               @_form_field_path]
       @_erb_output = ""
+      @_this_type = nil
       res = yield
       @_erb_output, @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
       res.to_s
@@ -202,14 +226,12 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
-        @_this_parent,@_this_field,@_this_type = if new_this.respond_to?(:proxy_reflection)
-                                                   refl = new_this.proxy_reflection
-                                                   [new_this.proxy_owner, refl.name, refl]
-                                                 else
-                                                   # In dryml, TrueClass is the 'boolean' class
-                                                   t = new_this.class == FalseClass ? TrueClass : new_this.class
-                                                   [nil, nil, t]
-                                                 end
+        @_this_parent, @_this_field = if new_this.respond_to?(:proxy_reflection)
+                                        refl = new_this.proxy_reflection
+                                        [new_this.proxy_owner, refl.name]
+                                      else
+                                        [nil, nil]
+                                      end
         @_this = new_this
         yield
       end
@@ -226,24 +248,7 @@ module Hobo::Dryml
                  [field_path]
                end
         parent, field, obj = Hobo.get_field_path(tag_this || this, path)
-
-        type = if parent.class.respond_to?(:field_type) && field_type = parent.class.field_type(field)
-                 # field_type returns Reflections when passed an
-                 # association name, but if we have a real object we'd
-                 # rather have its class
-                 if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) && !obj.is_a?(Array) && !obj.nil?
-                   obj.class
-                 else
-                   field_type
-                 end
-               elsif obj == false
-                 # In dryml, TrueClass is the 'boolean' class
-                 TrueClass
-               else
-                 obj.class
-               end
-        
-        @_this, @_this_parent, @_this_field, @_this_type = obj, parent, field, type
+        @_this, @_this_parent, @_this_field = obj, parent, field
         @_form_field_path += path if @_form_field_path
         yield
       end
@@ -442,7 +447,11 @@ module Hobo::Dryml
         res = (send(method_name, attributes) + part_contexts_storage_tag).strip
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
-        res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") if RAILS_ENV == "development"
+        if RAILS_ENV == "development"
+          res
+        else
+          res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
+        end
       else
         false
       end
