@@ -14,7 +14,11 @@ module Hobo::Dryml
       s = s.strip
       
       # TODO: Temporary hack to get the dryml metadata comments in the right place
-      s.gsub!(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") if RAILS_ENV == "development"
+      if RAILS_ENV == "development"
+        s
+      else
+        s.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
+      end
     end
 
   end
