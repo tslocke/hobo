@@ -5,8 +5,8 @@
       <div class="search">
         <form param="search-form" method="get" action="">
           <hidden-fields for-query-string skip="page, search_form"/>
-          Search 
-          <input class="search-field" type="search" name="search" value="&params[:search]"/>
+          <span>Search</span>
+          <input class="search" type="search" name="search" value="&params[:search]"/>
           <submit label="Go" class="search-button" param="search-submit"/>
         </form>
       </div>
