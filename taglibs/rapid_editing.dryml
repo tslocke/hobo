@@ -1,8 +1,8 @@
 <def tag="editor" ><%= 
   if !can_edit?
     view(attributes)
-  elsif this_type.respond_to?(:macro)
-    if this_type.macro == :belongs_to
+  elsif (refl = this_field_reflection)
+    if refl.macro == :belongs_to
       belongs_to_editor(attributes)
     else
       has_many_editor(attributes)
@@ -71,7 +71,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
   link_id = "#{this_field_dom_id}_editor" %>
   <span id="#{link_id}" part="rapid-belongs-to-edit">
-    <% select_options = this_type.klass.find(:all).select {|x| can_view?(x)}.map {|x|
+    <% select_options = this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
@@ -80,7 +80,7 @@
                         "Change #{this_field.to_s.titleize}", [link_id],
                         :method => "put",
                         :params => { this_parent.class.name.underscore => {
-                            this_type.primary_key_name => Hobo.raw_js('this.value')
+                            this_field_reflection.primary_key_name => Hobo.raw_js('this.value')
                           } })
     %>
     <select onchange="#{f}">
