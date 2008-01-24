@@ -24,9 +24,10 @@
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account-nav">
-  <ul class="account-nav" param>
+  <ul with="&current_user" class="account-nav" param>
     <if test="&logged_in?">
-      <li class='nav-item' param="logged-in-as">Logged in as <view:login with="&current_user"/></li>
+      <li class='nav-item' param="logged-in-as">Logged in as <view:login/></li>
+      <li class='nav-item' param="account"><a action="account">Account</a></li>
       <li class='nav-item' param="log-out"><a href="&logout_url">Log out</a></li>
     </if>
     <else>
