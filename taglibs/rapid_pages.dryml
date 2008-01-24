@@ -249,10 +249,11 @@
 </def>
 
 
-<def tag="permission-denied-page">
+<def tag="permission-denied-page" attrs="message">
   <page merge>
+    <body: class="permission-denied"/>
     <content-header: param>
-      <heading param>That operation is not allowed</heading>
+      <heading param><message/></heading>
     </content-header>
   </page>
 </def>
@@ -260,6 +261,7 @@
 
 <def tag="not-found-page">
   <page merge>
+    <body: class="not-found"/>
     <content-header: param>
       <heading param>The page you were looking for could not be found</heading>
     </content-header>
