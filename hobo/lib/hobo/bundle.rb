@@ -8,7 +8,12 @@ module ::Hobo
     
     class << self
       
-      attr_accessor :bundles, :plugin
+      # Hobo::Bundle.bundles is a hash of all instantiated bundles by name
+      attr_accessor :bundles
+      
+      # Used by subclasses, e.g MyBundle.plugin is the name of the
+      # plugin the bundle came from
+      attr_accessor :plugin
       
       def inherited(base)
         filename = caller[0].match(/^(.*):\d+/)[1]
@@ -22,8 +27,10 @@ module ::Hobo
         base.models      = []
         base.controllers = []
         
-        eval_ruby_files(base, "#{dirname}/models")
-        eval_ruby_files(base, "#{dirname}/controllers") 
+        base.class_eval do
+          eval_ruby_files("#{dirname}/models", @models)
+          eval_ruby_files("#{dirname}/controllers", @conrtollers) 
+        end
       end
       
       
@@ -39,10 +46,25 @@ module ::Hobo
       
       private
       
-      def eval_ruby_files(base, dir)
-        Dir["#{dir}/*.rb"].each do |f|
-          base.instance_eval(File.read(f), f, 1)
-        end
+      def eval_ruby_files(dir, filenames)
+        files = if filenames
+                  filenames.map { |f| "#{dir}/#{f}.rb" }
+                else
+                  Dir["#{dir}/*.rb"]
+                end
+        
+        files.each { |f| instance_eval(File.read(f), f, 1) }
+      end
+      
+      
+      # Declatations
+      
+      def models(*models)
+        @models = models
+      end
+      
+      def controllers(*controllers)
+        @controllers = controllers
       end
       
     end
