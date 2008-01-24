@@ -681,9 +681,10 @@ module Hobo
 
     
     def permission_denied(options={})
+      options = options.reverse_merge(:message => 'That operation is not allowed')
       if respond_to? :permission_denied_response
         permission_denied_response
-      elsif render_tag("permission-denied-page", { :with => @this }, :status => 403)
+      elsif render_tag("permission-denied-page", { :with => @this, :message => options[:message]}, :status => 403)
         # cool
       else
         message = options[:message] || "Permission Denied"
