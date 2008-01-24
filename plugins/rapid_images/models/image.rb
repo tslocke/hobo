@@ -12,10 +12,11 @@ bundle_model :Image do
     f.timestamps
   end
 
+  # attachment_fu
   has_attachment :content_type => :image, 
-                 :path_prefix => "public/images/#{sym[:images]}",
-                 :max_size => 2.megabytes,
-                 :thumbnails => sym[:thumbnails]
+                 :path_prefix  => "public/images/#{sym[:images]}",
+                 :max_size     => _max_file_size_,
+                 :thumbnails   => sym[:thumbnails]
 
   validates_as_attachment
   
@@ -27,5 +28,6 @@ bundle_model :Image do
   def self.fullsize_images
     self.find(:all,:conditions => ['thumbnail IS NULL'])
   end
-  #        def_scope :fullsize_images, :conditions => ['thumbnail IS NULL']
+  
+  # def_scope :fullsize_images, :conditions => ['thumbnail IS NULL']
 end

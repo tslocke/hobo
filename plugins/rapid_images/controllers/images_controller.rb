@@ -1,7 +1,7 @@
 bundle_model_controller :Images do
   
-  include_taglib "image_pages", :from_plugin => "hobo_images"
-  
+  include_taglib "image_pages", :bundle => _bundle_
+
   def update
     hobo_update do
       redirect_to(:action => :index) if valid?
