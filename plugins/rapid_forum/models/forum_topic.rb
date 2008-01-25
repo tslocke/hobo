@@ -17,7 +17,7 @@ bundle_model :ForumTopic do
 
   def_scope :recent, :order => "last_post_at DESC"
 
-  track_viewings :class_name => "ForumTopicViewing"
+  track_viewings
 
   validates_presence_of :title, :body
 
@@ -33,7 +33,7 @@ bundle_model :ForumTopic do
 
   def unread_posts?(user)
     unless user.guest?
-      v = viewings.find_by_user_id(user.id)
+      v = viewings.find_by_viewer_id(user.id)
       user.created_at < self.last_post_at && (v.nil? || v.updated_at < self.last_post_at)
     end
   end
