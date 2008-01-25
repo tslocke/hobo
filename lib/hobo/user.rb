@@ -23,8 +23,7 @@ module Hobo
           remember_token_expires_at :datetime
         end
         
-        validates_presence_of     :password,                   :if => :password_required?
-        validates_confirmation_of :password,                   :if => :password_required?
+        validates_confirmation_of :password, :if => :password_required?
 
         # Virtual attributes for setting and changing the password
         attr_accessor :current_password, :password, :password_confirmation, :type => :password
@@ -58,7 +57,6 @@ module Hobo
         end
         
         if validate
-          validates_presence_of   attr
           validates_length_of     attr, :within => 3..100
           validates_uniqueness_of attr, :case_sensitive => false
         end
@@ -127,7 +125,7 @@ module Hobo
     end
     
     def changing_password?
-      password || password_confirmation
+      crypted_password? && (password || password_confirmation)
     end
 
     protected
