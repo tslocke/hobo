@@ -3,29 +3,31 @@ module RapidViewTrackingExtensions
   module ModelExtensions
 
     def self.included(mod)
-      base::ClassMethods.send :include, ClassMethods
+      mod::ClassMethods.send :include, ClassMethods
     end
 
     module ClassMethods
+      
       def track_viewings(options={})
         track_users    = options[:track_users]    || true
         count_viewings = options[:count_viewings] || true
-        track_if       = options[:track_if]       || proc {|user, target| !viewer.guest? }
-        count_if       = options[:count_if]       || proc {|user, target| user != target.get_creator }
+        track_if       = options[:track_if]       || proc {|viewer, target| !viewer.guest? }
+        count_if       = options[:count_if]       || proc {|viewer, target| viewer != target.get_creator }
         counter_field  = options[:counter_field]  || :view_counter
-        viewing_class  = options[:viewing_class]  || "Viewing"
+        viewing_class  = options[:class_name]     || "#{name}Viewing"
 
         
-        fields { |f| f.field counter_field, :integer, :default => 0 } if view_counter
+        fields { |f| f.field counter_field, :integer, :default => 0 } if count_viewings
         
-        has_many :viewings, :class_name => viewing_class, :as => options[:as] if track_users
+        has_many :viewings, :class_name => viewing_class, :as => options[:as], :foreign_key => "target_id" if track_users
         
         define_method :view! do |viewer|
           if track_users && track_if[viewer, self]
-            if (v = viewings.find(:viewer => viewer))
+            # FIXME - this doesn't work with polymorphic viewings
+            if (v = viewings.find_by_viewer_id(viewer.id))
               v.save # save it to set new updated_at
             else
-              v.create(:viewer => viewer)
+              viewings.create(:viewer => viewer)
             end
           end
           if count_viewings && count_if[viewer, self]
@@ -34,6 +36,7 @@ module RapidViewTrackingExtensions
         end
         
       end
+
     end
 
   end

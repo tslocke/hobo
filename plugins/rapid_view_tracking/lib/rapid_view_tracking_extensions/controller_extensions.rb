@@ -2,8 +2,8 @@ module RapidViewTrackingExtensions
   
   module ControllerExtensions
 
-    def self.included(base)
-      base.extend ClassMethods
+    def self.included(mod)
+      mod::ClassMethods.send :include, ClassMethods
     end
     
     private
