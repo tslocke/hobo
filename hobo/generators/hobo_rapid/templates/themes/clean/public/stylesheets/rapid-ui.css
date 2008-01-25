@@ -17,11 +17,6 @@ table.new-record textarea, table.new-record input {
 	display: inline;	
 }
 
-.edit-page .content-header {overflow: hidden; height: 100%;}
-.edit-page .content-header h1 {float: left;}
-.edit-page .content-header .delete-button {float: right;}
-form .actions {margin: 30px 0;width: 100%; text-align: center;}
-
 /**** Admin ****/
 
 .admin-banner {
@@ -39,25 +34,6 @@ form .actions {margin: 30px 0;width: 100%; text-align: center;}
 	float: right;
 }
 
-/* rails error message */
-.error-messages {
-	font-family: "Lucida Grande", arial, sans-serif;
-	background: #9d0018;
-	border: 1px solid #7a0013;
-	padding: 15px 30px;
-	color: white;
-	margin-bottom: 20px;
-}
-.error-messages h2 {
-	text-transform: none;
-	letter-spacing: normal;
-	color: white;
-	margin-bottom: 10px;
-}
-.error-messages li {
-	margin-left: 20px;
-}
-
 /********* everything below here came from hobo_rapid.css, needs looking at ********/
 
 /**** Default styling for Rapid ***/
@@ -66,30 +42,6 @@ form .actions {margin: 30px 0;width: 100%; text-align: center;}
 	float: right; margin: 20px;
 	position: fixed; display: none; z-index: 10;
 }
-/*
-#ajax-progress {
-    color: grey;
-    float: right;
-    margin: 20px;
-    position: fixed;
-    background: white;
-    font-family: Tahoma "sans serif";
-    display: none;
-	z-index: 10;
-}
-
-#ajax-progress div {
-    border: 1px dashed grey;
-    margin: 10px;
-    padding: 3px;
-    padding-top: -15px;
-}
-
-#ajax-progress img {
-    padding-left: 6px;
-    vertical-align: middle;
-}
-*/
 
 /* Scriptaculous Autocompleter ---*/
 

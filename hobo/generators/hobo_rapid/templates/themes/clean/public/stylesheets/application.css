@@ -59,6 +59,22 @@ input.file_upload {
 .flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 2px 2px 0;}
 .flash.error {border: 1px solid #900024; background: #BC1C3D; text-shadow: #900024 2px 2px 0;}
 
+/* rails error message */
+.error-messages {
+	background: #BC1C3D;
+	border: 1px solid #900024;
+	padding: 15px 30px;
+	color: white;
+	margin-bottom: 20px;
+	text-shadow: #900024 2px 2px 0;
+}
+.error-messages h2 {
+	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px; text-shadow: #900024 3px 3px 0;
+}
+.error-messages li {margin-left: 20px; list-style: square;}
+
+.field-with-errors input, .field-with-errors textarea, .field-with-errors select {border: 2px solid #BC1C3D;}
+
 #ajax-progress {
 	padding: 8px 20px 8px 40px;
 	border: 1px solid #444;
@@ -159,7 +175,10 @@ ul.main-nav {float: left; margin: 0 10px;}
 .login-page .actions, .signup-page .actions {margin-left: 128px; margin-top: 20px; text-align: left;}
 /*.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}*/
 
-.edit-page .delete-button {margin-top: 25px;}
+.edit-page .content-header {overflow: hidden; height: 100%;}
+.edit-page .content-header h1 {float: left;}
+.edit-page .content-header .delete-button {float: right; margin-top: 25px;}
+form .actions {margin: 30px 0; width: 100%; text-align: center;}
 
 .show-page .content-header {position: relative; border-bottom: 1px dotted black;}
 .show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 2px; margin-right: 70px;}
