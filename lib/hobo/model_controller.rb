@@ -397,6 +397,8 @@ module Hobo
 
     def not_allowed?; @status == :not_allowed; end
     
+    def allowed?; @status != :not_allowed; end
+    
     
     def re_render_form(default_action)
       if params[:page_path]
@@ -457,11 +459,8 @@ module Hobo
       
       @this = find_instance_or_not_found(args.first) and
         begin
-          if Hobo.can_view?(current_user, @this)
-            set_status(:valid)
-          else
-            set_status(:not_allowed)
-          end
+          set_status(:not_allowed) unless Hobo.can_view?(current_user, @this)
+
           set_named_this!
           response_block(&b) or
             if not_allowed?
