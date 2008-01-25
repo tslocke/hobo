@@ -1,6 +1,5 @@
 bundle_model :ForumTopic do
 
-  # See app/models/forum.rb for comments on hobo_model and "fields do"
   fields do
     title          :string
     sticky         :boolean, :default => false
@@ -9,18 +8,16 @@ bundle_model :ForumTopic do
     timestamps
   end
 
-  # See app/models/forum.rb for some comments on the :dependent declaration
   has_many   :replies, :class_name => _ForumPost_, :foreign_key => 'topic_id', :order => :created_at, :dependent => :destroy
   belongs_to :forum
 
-  # See app/models/forum_post.rb for an explanation of :creator => true
   belongs_to :user, :creator => true
 
   belongs_to :last_post_by, :class_name => 'User'
 
   def_scope :recent, :order => "last_post_at DESC"
 
-  track_viewings :counter_conditions => "unless viewer == self.user"
+  track_viewings :class_name => "ForumTopicViewing"
 
   validates_presence_of :title, :body
 
