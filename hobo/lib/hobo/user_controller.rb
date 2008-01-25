@@ -92,10 +92,8 @@ module Hobo
     def hobo_logout(options={})
       options = options.reverse_merge(:notice => "You have logged out.",
                                       :redirect_to => base_url)
-        
-      current_user.forget_me if logged_in?
-      cookies.delete :auth_token
-      reset_session
+
+      logout_current_user
       yield if block_given?
       flash[:notice] ||= options[:notice]
       redirect_back_or_default(options[:redirect_to]) unless performed?
@@ -109,6 +107,14 @@ module Hobo
       end
     end
     
+    private
+    
+    def logout_current_user
+      current_user.forget_me if logged_in?
+      cookies.delete :auth_token
+      reset_session
+      self.current_user = nil
+    end
     
   end
   
