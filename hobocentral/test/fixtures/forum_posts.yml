@@ -1,6 +1,162 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-one:
-  id: 1
-
-two:
-  id: 2
+--- 
+forum_post_32: 
+  topic_id: 11
+  updated_at: 2008-01-05 17:13:16
+  body: "Agreed - I think the ideas behind this project are excellent. But I am waiting for good documentation before investing more time in Hobo. \n\n\
+    - Andy "
+  id: 32
+  user_id: 1
+  created_at: 2008-01-05 17:13:16
+forum_post_21: 
+  topic_id: 7
+  updated_at: 2008-01-05 17:06:33
+  body: |-
+    Rails version is 2.0.1. I am now using hobo 0.7.1. It still shows. 
+    In another post you replied that it is a reoccurring problem with defaults being set and you will be looking into it.:)
+    
+    _________________
+    Hamilton.
+  id: 21
+  user_id: 1
+  created_at: 2008-01-05 17:06:33
+forum_post_33: 
+  topic_id: 11
+  updated_at: 2008-01-16 21:21:03
+  body: for reals
+  id: 33
+  user_id: 38
+  created_at: 2008-01-16 21:21:03
+forum_post_22: 
+  topic_id: 9
+  updated_at: 2008-01-05 17:08:41
+  body: |-
+    Code:
+    
+    <page> 
+      <scripts:> 
+        <param-content/> 
+        <!-- your stuff here --> 
+      </scripts:> 
+    </page>
+  id: 22
+  user_id: 32
+  created_at: 2008-01-05 17:08:41
+forum_post_23: 
+  topic_id: 9
+  updated_at: 2008-01-05 17:08:56
+  body: |-
+    For others the following might also be of help: 
+    
+    
+    Code:
+    
+    <head:> 
+    <param-content/> 
+    <link href="/stylesheets/foo.css" media="all" 
+              rel="stylesheet" type="text/css" /> 
+    </head> 
+    
+    
+    This adds an extra stylesheet in the header
+  id: 23
+  user_id: 1
+  created_at: 2008-01-05 17:08:56
+forum_post_24: 
+  topic_id: 9
+  updated_at: 2008-01-05 17:09:10
+  body: We have a param called "stylesheets" which you can use instead of "head". It doesn't really make much difference except that your extra stuff will get put with the other stylesheet includes rather than at the end of head.
+  id: 24
+  user_id: 32
+  created_at: 2008-01-05 17:09:10
+forum_post_25: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:10:34
+  body: Since I started using DRYML I have never used a partial. Defining tags just feels nicer to me. Do you have any reason why you are using partials instead of defining tags?
+  id: 25
+  user_id: 32
+  created_at: 2008-01-05 17:10:34
+forum_post_26: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:10:44
+  body: |-
+    I use partials to update sections of the page via AJAX.
+    
+    _________________
+    -- 
+    http://www.blizzo.com
+  id: 26
+  user_id: 1
+  created_at: 2008-01-05 17:10:44
+forum_post_27: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:10:55
+  body: Yes, I guessed that it might be that. There are ways to do that in DRYML without using partials but since they are not documented it is totally understandable that you would still be using partials. The simplest way is to get your ajax method to render a tag instead of a partial by calling render_tag("tag-name", :with => your_context)
+  id: 27
+  user_id: 32
+  created_at: 2008-01-05 17:10:55
+forum_post_28: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:11:05
+  body: |-
+    Thats fine, but that would require a non-trivial amount of rework. I can see moving to that in the future, but I would still like to see if the root of this behavior could be addressed. I am looking forward to the end of this documentation cycle for Hobo. I inherited this code and getting up to speed on it has been difficult.
+    
+    _________________
+    -- 
+    http://www.blizzo.com
+  id: 28
+  user_id: 1
+  created_at: 2008-01-05 17:11:05
+forum_post_30: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:11:49
+  body: |-
+    Doh, the developer who created that file forgot to use the dryml extension, so that is what did it.
+    
+    _________________
+    -- 
+    http://www.blizzo.com
+  id: 30
+  user_id: 1
+  created_at: 2008-01-05 17:11:49
+forum_post_29: 
+  topic_id: 10
+  updated_at: 2008-01-05 17:11:37
+  body: |-
+    Quote:
+    the partial within the partial within the view ignores the tag and 
+    renders it as plain text. 
+    
+    Does the partial that is not working correctlt have the .dryml 
+    filename suffix? 
+    
+    What about if you render that same partial from a view rather than 
+    from another parital? Does that fix it? 
+    
+    Tom
+  id: 29
+  user_id: 1
+  created_at: 2008-01-05 17:11:37
+forum_post_31: 
+  topic_id: 11
+  updated_at: 2008-01-05 17:13:02
+  body: |-
+    It's true Daniel. 
+    
+    Unfortunately writing docs is a huge task and doesn't pay the bills. 
+    Still, we're chipping away at it. Hobo will be documented very well. 
+    In the mean time, patience is required :-) 
+    
+    Tom
+  id: 31
+  user_id: 1
+  created_at: 2008-01-05 17:13:02
+forum_post_20: 
+  topic_id: 7
+  updated_at: 2008-01-05 17:06:07
+  body: |-
+    Which version of Rails are you using? 
+    
+    T
+  id: 20
+  user_id: 32
+  created_at: 2008-01-05 17:06:07

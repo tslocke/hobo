@@ -1,6 +1,25 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-one:
-  id: 1
-
-two:
+--- 
+two: 
+  updated_at: 2008-01-05 17:01:33
+  title: Hobo Dev
   id: 2
+  description: Discussion of the development of Hobo. For them that likes to take a look under the hood.
+  created_at: 2008-01-05 16:59:29
+forum_3: 
+  updated_at: 2008-01-05 17:02:00
+  title: Hobo Tags
+  id: 3
+  description: Upload your tags here, discuss them and share them with others.
+  created_at: 2008-01-05 17:00:45
+forum_4: 
+  updated_at: 2008-01-05 17:02:15
+  title: Hobo Apps
+  id: 4
+  description: Post your Hobo developed application here and get free publicity, advice and maybe even some test users?
+  created_at: 2008-01-05 17:02:15
+one: 
+  updated_at: 2008-01-05 16:57:48
+  title: Hobo Users
+  id: 1
+  description: Discussion and support for using Hobo in your Rails apps.
+  created_at: 2007-12-23 22:17:48
