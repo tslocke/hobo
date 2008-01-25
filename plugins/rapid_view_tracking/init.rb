@@ -1,5 +1,5 @@
 require 'rapid_view_tracking'
 
-ActiveRecord::Base.send :include, RapidViewTracking::ModelExtensions
+Hobo::Model.send :include, RapidViewTrackingExtensions::ModelExtensions
 
-Hobo::ModelController.send :include, RapidViewTracking::ModelControllerExtensions
+Hobo::ModelController.send :include, RapidViewTrackingExtensions::ControllerExtensions
