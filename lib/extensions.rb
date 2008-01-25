@@ -227,7 +227,7 @@ module Enumerable
   def rest
     self[1..-1]
   end
-
+  
 end
 
 class Hash
@@ -290,6 +290,11 @@ class Hash
     res = {}
     keys.each {|k| res[k] = self[k] if has_key?(k)}
     res    
+  end
+  
+  
+  def get(*args)
+    args.map {|a| self[a] }
   end
   
 end
