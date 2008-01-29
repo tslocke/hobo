@@ -181,7 +181,7 @@
   <page merge>    
     <body: class="edit-page #{this.class.name.underscore}" param/>
     <content-header: param>
-      <heading><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
+      <heading param><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
       <delete-button in-place="&false" label="Remove This #{this.class.name}" param/>
     </content-header>
 
@@ -202,7 +202,7 @@
 <def tag="new-in-collection-page">
   <set association-name="&@association.proxy_reflection.name.to_s.singularize.titleize"/>
   <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{type_name(:with => @owner)} #{type_name}" param/>
+    <body: class="new-in-collection-page #{type_name(:with => @owner, :dasherize => true)} #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param>New <association-name/></heading>
       <sub-heading param>For: <a with="&@owner" /></sub-heading>
@@ -323,9 +323,6 @@
     </div>
   </div>
 </def>
-
-
-<def tag="app-name"><%= @hobo_app_name ||= File.basename(Dir.chdir(RAILS_ROOT) { Dir.getwd }).strip.titleize %></def>
 
 
 <def tag="default-page-title"><%= t = this.to_s; ; "#{t.blank? ? '' : t + ' - '}#{app_name}" %></def>
