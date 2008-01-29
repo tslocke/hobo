@@ -14,7 +14,9 @@ module RapidViewTrackingExtensions
         track_if       = options[:track_if]       || proc {|viewer, target| !viewer.guest? }
         count_if       = options[:count_if]       || proc {|viewer, target| viewer != target.get_creator }
         counter_field  = options[:counter_field]  || :view_counter
-        viewing_class  = options[:class_name]     || "#{name}Viewing"
+
+        default_class_name = options[:as] ? "Viewing" : "#{name}Viewing"
+        viewing_class  = options[:class_name] || default_class_name
 
         
         fields { |f| f.field counter_field, :integer, :default => 0 } if count_viewings
