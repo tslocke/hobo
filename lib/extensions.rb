@@ -121,15 +121,22 @@ class Object
   
   # metaid
   def metaclass; class << self; self; end; end
-  def meta_eval &blk; metaclass.instance_eval &blk; end
+  
+  def meta_eval(src=nil, &blk)
+    if src
+      meta_eval.instance_eval(src)
+    else
+      metaclass.instance_eval &blk
+    end
+  end
 
   # Adds methods to a metaclass
-  def meta_def name, &blk
+  def meta_def(name, &blk)
     meta_eval { define_method name, &blk }
   end
 
   # Defines an instance method within a class
-  def class_def name, &blk
+  def class_def(name, &blk)
     class_eval { define_method name, &blk }
   end
   
@@ -227,7 +234,44 @@ module Enumerable
   def rest
     self[1..-1]
   end
+
+  class MultiSender
+ 
+    undef_method(*(instance_methods - %w*__id__ __send__*))
+
+    def initialize(enumerable, method)
+      @enumerable = enumerable
+      @method     = method
+    end
+
+    def method_missing(name, *args, &block)
+      @enumerable.send(@method) { |x| x.send(name, *args, &block) }
+    end
+    
+  end
   
+  def *()
+    MultiSender.new(self, :map)
+  end
+  
+  def with
+    MultiSender.new(self, :select)
+  end
+  
+end
+
+class Array
+  
+  alias_method :multiply, :*
+  
+  def *(rhs=nil)
+    if rhs
+      multiply(rhs)
+    else
+      Enumerable::MultiSender.new(self, :map)
+    end
+  end
+
 end
 
 class Hash
@@ -292,6 +336,7 @@ class Hash
     res    
   end
   
+  alias_method :| , :merge
   
   def get(*args)
     args.map {|a| self[a] }
@@ -331,8 +376,7 @@ class HashWithIndifferentAccess
     end
     [yes, no]
   end
-
-
+  
 end
 
 
