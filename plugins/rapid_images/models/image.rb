@@ -13,10 +13,10 @@ bundle_model :Image do
   end
 
   # attachment_fu
-  has_attachment :content_type => :image, 
-                 :path_prefix  => "public/images/#{sym[:images]}",
+  has_attachment(:content_type => :image, 
+                 :path_prefix  => "public/#{_image_path_prefix_}",
                  :max_size     => _max_file_size_,
-                 :thumbnails   => sym[:thumbnails]
+                 :thumbnails   => _thumbnails_)
 
   validates_as_attachment
   
@@ -25,9 +25,6 @@ bundle_model :Image do
   def deletable_by?(user);       user.administrator?; end
   def viewable_by?(user, field); true;  end
   
-  def self.fullsize_images
-    self.find(:all,:conditions => ['thumbnail IS NULL'])
-  end
+  def_scope :fullsize, :conditions => ['thumbnail IS NULL']
   
-  # def_scope :fullsize_images, :conditions => ['thumbnail IS NULL']
 end

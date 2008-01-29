@@ -1,0 +1,12 @@
+<include src="rapid_images"/>
+
+<def tag="account-page" extend-with="icon-upload">
+  <account-page-without-icon-upload merge>
+
+    <content-body: param>
+      <param-content/>
+      <choose-icon param/>
+    </content-body:>
+
+  </account-page-without-icon-upload>
+</def>

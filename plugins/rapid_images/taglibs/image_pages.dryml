@@ -1,45 +1,43 @@
-<include src="hobo_images"/>
+<include src="rapid_images"/>
 
-<def tag="NewPage">
-  <AdminPage>
-    <content_body>
-      <upload_new_image with="&this.class"/>
-    </content_body>
-  </AdminPage>
+<def tag="new-page">
+  <page merge>
+    <content-body: param>
+      <upload-new-image with="&this.class"/>
+    </content-body>
+  </page>
 </def>
 
-<def tag="IndexPage">
-  <AdminPage title="Your Images">
-    <content>
+<def tag="index-page">
+  <page title="Your Images" merge>
+    <content:>
       <h1>Your Images</h1>
-      <UL class="image-list">
-        <li>
-          <show_thumbnail/>
+      <ul class="image-list">
+        <li:>
+          <show-thumbnail/>
           <span class="file-name"><view:filename/></span>
           <span class="file-note"><view:width/>x<view:height/></span>
-          <delete_button image="admin/small_close.png"/>
+          <delete-button image="admin/small_close.png"/>
         </li>
-      </UL>
-      <clearer/>
-      <upload_new_image with="&@model"/>
+      </ul>
+      <upload-new-image with="&@model"/>
     </content>
-  </AdminPage>
+  </page>
 </def>
 
-<def tag="ShowPage">
-  <AdminPage title="&this.filename" merge>
-    <content_body>
+<def tag="show-page">
+  <page title="&this.filename" merge>
+    <content-body:>
       <div class="edit-image">
-        <show_image/>
+        <show-image/>
         <h2><view:filename/></h2>
         <form param>
           <do param="form_fields">
           <p>Image Label (Optional)</p><p><input:label/></p>
           </do>
-          <p param="submit"><submit label="update"/> or <a with="&this.class">return to images</a></p>
+          <p param="submit"><submit label="update"/> or <a:class>return to images</a></p>
         </form>
-        <clearer/>
       </div>
-    </content_body>
-  </AdminPage>
+    </content-body>
+  </page>
 </def>
