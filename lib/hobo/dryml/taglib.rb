@@ -14,10 +14,9 @@ module Hobo
             taglib.reload
           else
             src_file = taglib_filename(options)
-            renames = (bundle = options[:bundle] and
-                       Bundle.bundles[bundle]._?.renames)
+            bundle = options[:bundle] && Bundle.bundles[options[:bundle]]
      
-            taglib = Taglib.new(src_file, renames)
+            taglib = Taglib.new(src_file, bundle)
             @cache[options] = taglib
           end
           taglib
@@ -48,9 +47,9 @@ module Hobo
      
       end
      
-      def initialize(src_file, renames)
+      def initialize(src_file, bundle)
         @src_file = src_file
-        @renames = renames
+        @bundle = bundle
         load
       end
      
@@ -84,7 +83,7 @@ module Hobo
           end
           
         end
-        template = Template.new(File.read(@src_file), @module, @src_file, @renames)
+        template = Template.new(File.read(@src_file), @module, @src_file, @bundle)
         template.compile([], [])
         @last_load_time = File.mtime(@src_file)
       end

@@ -30,19 +30,19 @@ module Hobo::Dryml
       end
     end
 
-    def initialize(src, environment, template_path, renames={})
+    def initialize(src, environment, template_path, bundle=nil)
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
-      @class_renames = renames
+      @bundle = bundle
 
-      @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(@template_path)
+      @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
 
       @last_element = nil
     end
 
-    attr_reader :tags, :template_path, :class_renames
+    attr_reader :tags, :template_path, :bundle
     
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
@@ -842,12 +842,11 @@ module Hobo::Dryml
     end
     
     def rename_class(name)
-      name = name[1..-2]
-      name = class_renames[name] while class_renames.has_key?(name)
-      name
+      @bundle && name.starts_with?("_") ? @bundle.send(name) : name
     end
     
     def include_source_metadata
+      return false
       @include_source_metadata = RAILS_ENV == "development" && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
       @include_source_metadata
     end
