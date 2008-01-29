@@ -55,6 +55,11 @@ module Hobo
       m, field = *name.to_s.match(/^(.*)_is$/)
       if m
         if (refl = model.reflections[field.to_sym]) && refl.macro == :belongs_to
+          if refl.options[:polymorphic] && !val.nil?
+            return WhereFragment.new("#{_query_table}.#{refl.primary_key_name} = ? AND #{_query_table}.#{refl.name}_type = ?",
+                                     args[0].id, args[0].class.name)
+          end
+          
           field = refl.primary_key_name
           val = args[0] && args[0].id
           raise HoboError.new("don't use self in query blocks") if val == self
