@@ -2,6 +2,7 @@ require 'extensions'
 
 module ::Hobo
   
+  
   class Bundle
     
     @bundles = HashWithIndifferentAccess.new
@@ -13,41 +14,59 @@ module ::Hobo
       
       # Used by subclasses, e.g MyBundle.plugin is the name of the
       # plugin the bundle came from
-      attr_accessor :plugin
+      attr_reader :plugin
+      
+      attr_reader :model_declarations, :controller_declarations
+      
+      attr_accessor :dirname
       
       def inherited(base)
         filename = caller[0].match(/^(.*):\d+/)[1]
-        dirname = filename.match(%r(^.*/plugins/[^/]+))[0]
-        base.plugin = File.basename(dirname)
+        base.dirname = filename.match(%r(^.*/plugins/[^/]+))[0]
+      end
+
+      
+      def load_models_and_controllers
+        return if models_and_controllers_loaded?
         
-        base.meta_eval do 
-          attr_accessor :models, :controllers
-        end
+        @plugin = File.basename(dirname)
         
-        base.models      = []
-        base.controllers = []
+        @model_declarations      = []
+        @controller_declarations = []
         
-        base.class_eval do
+        class_eval do
           eval_ruby_files("#{dirname}/models", @models)
-          eval_ruby_files("#{dirname}/controllers", @conrtollers) 
+          eval_ruby_files("#{dirname}/controllers", @controllers)
         end
       end
       
+      def [](bundle_name)
+        bundles[bundle_name]
+      end
+      
+
+      private
       
       def bundle_model(name, &block)
-        models << [name, block]
+        @model_declarations << [name, block]
       end
 
       
       def bundle_model_controller(model_name, &block)
-        controllers << [model_name, block]
+        @controller_declarations << [model_name, block]
+      end
+
+      
+      def models_and_controllers_loaded?
+        @model_declarations
       end
       
       
-      private
       
       def eval_ruby_files(dir, filenames)
-        files = if filenames.blank?
+        files = if filenames == [:none]
+                  []
+                elsif filenames.blank? || filenames == [:all]
                   Dir["#{dir}/*.rb"]
                 else
                   filenames.map { |f| "#{dir}/#{f}.rb" }
@@ -64,12 +83,17 @@ module ::Hobo
       end
       
       def controllers(*controllers)
-        @controllers = controllers.map {|c| c.ends_with?("controller") ? c : "#{c.to_s.pluralize}_controller" }
+        @controllers = controllers.map {|c| case c.to_s
+                                              when /controller$/, "all", "none" then c
+                                              else "#{c.to_s.pluralize}_controller" 
+                                            end }
       end
       
     end
     
     def initialize(*args)
+      self.class.load_models_and_controllers
+      
       options = defaults.with_indifferent_access
       options.recursive_update(args.extract_options!)
       
@@ -100,18 +124,53 @@ module ::Hobo
     
     
     def create_models
-      self.class.models.each do |name, block|
-        klass = make_class(new_name_for(name), ActiveRecord::Base) do
-          hobo_model
+      self.class.model_declarations.each do |name, block|
+        klass = make_class(new_name_for(name), ActiveRecord::Base)
+        
+        klass.meta_def :belongs_to_with_optional_polymorphism do |*args|
+          opts = args.extract_options!
+          
+          if opts[:polymorphic] == :optional
+            if bundle.options["polymorphic_#{name}"]
+              opts[:polymorphic] = true
+              opts.delete(:class_name)
+            else
+              opts.delete(:polymorphic)
+            end
+          end
+          belongs_to_without_optional_polymorphism(name, opts)
         end
-        klass.class_eval(&block)
+        klass.meta_eval { alias_method_chain :belongs_to, :optional_polymorphism }
+        
+        klass.class_eval { hobo_model }
+        
+        # FIXME this extension breaks passing a block to belongs_to
+        klass.meta_def :belongs_to_with_alias do |*args|
+          opts = args.extract_options!
+          name = args.first.to_sym
+          
+          alias_name = opts.delete(:alias)
+          
+          belongs_to_without_alias(name, opts)
+
+          if alias_name && name != alias_name
+            klass.send(:alias_method, alias_name, name)
+            # alias scopes too
+            klass.send(:alias_scope, "#{alias_name}_is",     "#{name}_is")
+            klass.send(:alias_scope, "#{alias_name}_is_not", "#{name}_is_not")
+          end
+          
+        end
+        klass.meta_eval { alias_method_chain :belongs_to, :alias }
+
+        klass.class_eval(&block)        
       end
     end
     
     
     def create_controllers
       bundle = self
-      self.class.controllers.each do |model_name, block|
+      self.class.controller_declarations.each do |model_name, block|
         klass = make_class("#{new_name_for(model_name).to_s.pluralize}Controller", ApplicationController) do 
           hobo_model_controller
         end
@@ -163,44 +222,24 @@ module ::Hobo
         end
       end
       
-      klass.meta_def :belongs_to do |*args|
-        opts = args.extract_options!
-        name = args.first
-        if opts[:polymorphic] == :optional
-          if bundle.options["polymorphic_#{name}"]
-            opts[:polymorphic] = true
-            opts.delete(:class_name)
-          else
-            opts.delete(:polymorphic)
-          end
-        end
-        super(*(args + [opts]))
-
-        if bundle.options["polymorphic_#{name}"]
-          klass.meta_def "#{name}_fields" do
-            [reflections[name].primary_key_name, "#{name}_type"]
-           end
-        else
-          klass.meta_def "#{name}_fields" do
-            [reflections[name].primary_key_name]
-           end
-        end      
-      end
-      
       klass.class_eval(&b) if b
+      
       klass
     end
     
     
     def new_name_for(name)
-      while renames.has_key?(name)
-        name = renames[name] 
-        name2 = name.to_s.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
-        
-        # Make sure symbols stay symbols
-        name = name.is_a?(Symbol) ? name2.to_sym : name2
+      while true
+        if renames.has_key?(name)
+          name = renames[name]
+        elsif name.to_s =~ /_.*?_/
+          name2 = name.to_s.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
+          # Make sure symbols stay symbols
+          name = name.is_a?(Symbol) ? name2.to_sym : name2
+        else
+          return name
+        end
       end
-      name
     end
     
     
@@ -267,7 +306,15 @@ module ::Hobo
       external_options = self.options[option_name]
       external_options = {} if external_options.nil? || external_options == true
       name = "#{self.name}_#{option_name}"
-      class_name.to_s.constantize.new(name, external_options.merge(local_options).merge(renames))
+
+      sub_bundle_options = external_options.merge(local_options).merge(renames)
+      sub_bundle = class_name.to_s.constantize.new(name, sub_bundle_options)
+      
+      conflicting_renames = (renames.keys & sub_bundle.renames.keys).select { |k| renames[k] != sub_bundle.renames[k] }
+      unless conflicting_renames.empty?
+        raise ArgumentError, "Conflicting renames in included bundle '#{name}' of '#{self.name}': #{conflicting_renames * ', '}"
+      end
+      renames.update(sub_bundle.renames)
       self.options["#{option_name}_bundle"] = name
     end
 
