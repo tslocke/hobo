@@ -1,8 +1,20 @@
 module Hobo::RapidHelper
 
-  def options_for_hobo_ajax(options)
-    js_options = build_callbacks(options)
+  def rapid_build_callbacks(options)
+    callbacks = {}
+    options.each do |callback, code|
+      if AJAX_CALLBACKS.include?(callback.to_sym)
+        name = 'on' + callback.to_s.capitalize
+        callbacks[name] = "function(request){#{code}}"
+      end
+    end
+    callbacks
+  end
 
+
+  def options_for_hobo_ajax(options)
+    js_options = rapid_build_callbacks(options)
+    
     js_options['asynchronous']  = false if options[:type] == :synchronous
     js_options['method']        = method_option_to_s(options[:method]) if options[:method]
     js_options['evalScripts']   = false if options[:script] == false
@@ -96,9 +108,11 @@ module Hobo::RapidHelper
     
   
 
-  AJAX_ATTRS = [:before, :success, :failure, :complete, :type, :method,
-                :script, :form, :params, :confirm,
-                :reset_form, :refocus_form, :result_update, :spinner_next_to]
+  AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
+  
+  AJAX_ATTRS = AJAX_CALLBACKS + [:type, :method,
+                                 :script, :form, :params, :confirm,
+                                 :reset_form, :refocus_form, :result_update, :spinner_next_to]
 
 
   def editor_class
