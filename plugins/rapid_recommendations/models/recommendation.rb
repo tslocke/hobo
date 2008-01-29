@@ -6,16 +6,11 @@ bundle_model :Recommendation do
   end
 
   belongs_to :author, :class_name => _Author_, :polymorphic => :optional, :creator => true
-  belongs_to :target, :class_name => _Target_, :polymorphic => :optional
+  belongs_to _target_, :class_name => _Target_, :polymorphic => :optional, :alias => :target
 
   
   def duplicate_recommendation?
-    # these methods are provided by the bundle; they return either the
-    # fkey or fkey + type-name pair, according to whether the
-    # association was set polymorphic or not.
-    fields = self.class.author_fields + self.class.target_fields
-    conditions = fields.map_hash {|f| send(f) }
-    self.class.find(:first, :conditions => conditions)
+    self.class.author_is(author).target_is(target).first
   end
   
   
