@@ -2,13 +2,17 @@ module Hobo::Dryml
   
   class DRYMLBuilder
 
-    def initialize(template_path)
-      @template_path = template_path
+    def initialize(template)
+      @template = template
       @build_instructions = Array.new
       @part_names = []
     end
     
-    attr_reader :template_path
+    attr_reader :template
+    
+    def template_path
+      template.template_path
+    end
 
 
     def set_environment(environment)
@@ -104,7 +108,12 @@ module Hobo::Dryml
         import_module(options[:module].constantize, options[:as])
       else
         template_dir = File.dirname(template_path)
-        taglib = Taglib.get(options.merge(:template_dir => template_dir))
+        options = options.merge(:template_dir => template_dir)
+        
+        # Pass on the current bundle, if there is one, to the sub-taglib
+        options[:bundle] = template.bundle.name unless template.bundle.nil? || options[:bundle] || options[:plugin]
+        
+        taglib = Taglib.get(options)
         taglib.import_into(@environment, options[:as])
       end
     end
