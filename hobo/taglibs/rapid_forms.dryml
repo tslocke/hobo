@@ -31,7 +31,7 @@
     Hobo::Dryml.last_if = false
     ""
   else
-   
+
     method = if method.nil?
                (action || web_method || new_record) ? "post" : "put"
              else
@@ -193,7 +193,7 @@
 
   url = object_url(this, method)
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
-  if update || result_update
+  if update || result_update || !ajax_attrs.empty?
     message ||= method.titleize
     func = ajax_updater(url, message, update,
                         ajax_attributes.merge(:params => params, :result_update => result_update))
@@ -357,6 +357,8 @@
 </def>
 
 
-<def tag="after-submit" attrs="uri">
-  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit"/>
+<def tag="after-submit" attrs="uri, stay-here, go-back">
+  <% uri = request.request_uri if stay_here %>
+  <% uri = session[:previous_uri] if go_back %>
+  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
 </def>
