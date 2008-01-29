@@ -28,8 +28,14 @@ module Hobo
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
         alias_method_chain :belongs_to, :hobo_metadata
+        alias_method_chain :belongs_to, :scopes
+        
+        alias_method_chain :has_one, :new_method
+        
         alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
+        
         alias_method_chain :attr_accessor, :rich_types
+        
         def inherited(klass)
           fields do
             Hobo.register_model(klass)
@@ -133,9 +139,8 @@ module Hobo
       end
       
       
-      def belongs_to_with_foreign_key_declaration(name, *args, &block)
-        options = args.extract_options!
-        res = belongs_to_without_foreign_key_declaration(name, *args + [options], &block)
+      def belongs_to_with_foreign_key_declaration(name, options={}, &block)
+        res = belongs_to_without_foreign_key_declaration(name, options, &block)
         refl = reflections[name]
         fkey = refl.primary_key_name
         column_options = {}
@@ -150,10 +155,36 @@ module Hobo
       end
       
       
-      def belongs_to_with_hobo_metadata(name, *args, &block)
-        options = args.extract_options!
+      def belongs_to_with_hobo_metadata(name, options={}, &block)
         self.creator_attribute = name.to_sym if options.delete(:creator)
-        belongs_to_without_hobo_metadata(name, *args + [options], &block)
+        belongs_to_without_hobo_metadata(name, options, &block)
+      end
+      
+      
+      def belongs_to_with_scopes(name, options={}, &block)
+        belongs_to_without_scopes(name, options, &block)
+        key = reflections[name].primary_key_name
+        if options[:polymorphic]
+          def_scope "#{name}_is" do |record|
+            { :conditions => ["#{table_name}.#{key} = ? AND #{name}_type = ?", record.id, record.class.name] }
+          end
+          def_scope "#{name}_is_not" do |record|
+            { :conditions => ["#{table_name}.#{key} <> ? OR #{name}_type <> ?", record.id, record.class.name] }
+          end
+        else
+          def_scope "#{name}_is" do |record|
+            { :conditions => ["#{table_name}.#{key} = ?", record.id] }
+          end
+          def_scope "#{name}_is_not" do |record|
+            { :conditions => ["#{table_name}.#{key} <> ?", record.id] }
+          end
+        end
+      end
+      
+      
+      def has_one_with_new_method(name, options={}, &block)
+        has_one_without_new_method(name, options)
+        class_eval "def new_#{name}(attributes={}); build_#{name}(attributes, false); end"
       end
 
 
@@ -451,6 +482,12 @@ module Hobo
       end
       
       
+      def alias_scope(new_name, old_name)
+        metaclass.send(:alias_method, new_name, old_name)
+        defined_scopes[new_name] = defined_scopes[old_name]
+      end
+      
+      
       module DefinedScopeProxyExtender
         
         attr_accessor :reflections
@@ -520,14 +557,13 @@ module Hobo
       end
       
       
-      def has_many_with_defined_scopes(name, *args, &block)
-        options = args.extract_options!
+      def has_many_with_defined_scopes(name, options={}, &block)
         if options.has_key?(:extend) || block
           # Normal has_many
-          has_many_without_defined_scopes(name, *args + [options], &block)
+          has_many_without_defined_scopes(name, options, &block)
         else
           options[:extend] = DefinedScopeProxyExtender
-          has_many_without_defined_scopes(name, *args + [options], &block)
+          has_many_without_defined_scopes(name, options, &block)
         end
       end
       
