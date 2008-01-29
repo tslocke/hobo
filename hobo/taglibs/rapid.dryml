@@ -75,7 +75,7 @@
                 <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
-                <a param="edit-link">Edit</a>
+                <a param="edit-link" action="edit">Edit</a>
                 <delete-button param/>
               </td>
             </if>
@@ -344,9 +344,6 @@
   <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
-
-
-<def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
 
 <!-- The Tags defined below here are a bit rough and will be improved
