@@ -12,7 +12,12 @@ class RapidBlog < Hobo::Bundle
   end
   
   def defaults
-    { :format => :html, :comments => true, :author => true, :Author => :User }
+    { :format => :html, :comments => true, :author => true, 
+      :feed => { 
+        :scope => :recent,
+        :description => ""
+      },
+      :Author => :User }
   end
   
 end

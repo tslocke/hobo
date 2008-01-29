@@ -2,10 +2,17 @@
 
 <def tag="page" extend-with="rapid-blog">
   <page-without-rapid-blog merge>
+
     <stylesheets: param>
       <param-content/>
       <stylesheet name="rapid-blog"/>
     </stylesheets>
+
+    <head:>
+      <param-content/>
+      <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="#{@rss_alternative_url}" />
+    </head:>
+
   </page-without-rapid-blog>
 </def>
 
