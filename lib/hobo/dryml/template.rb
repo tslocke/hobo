@@ -846,7 +846,6 @@ module Hobo::Dryml
     end
     
     def include_source_metadata
-      return false
       @include_source_metadata = RAILS_ENV == "development" && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
       @include_source_metadata
     end
