@@ -2,11 +2,12 @@ module ActionView
 
   class Base
 
-    alias_method :render_file_without_hobo, :render_file
-    def render_file(template_path, *args)
+    def render_file_with_dryml(template_path, *args)
       @hobo_template_path = template_path
-      render_file_without_hobo(template_path, *args)
+      render_file_without_dryml(template_path, *args)
     end
+
+    alias_method_chain :render_file, :dryml
 
   end
 
