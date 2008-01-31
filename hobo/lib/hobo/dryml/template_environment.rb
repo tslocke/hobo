@@ -448,9 +448,9 @@ module Hobo::Dryml
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
         if RAILS_ENV == "development"
-          res
-        else
           res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
+        else
+          res
         end
       else
         false
