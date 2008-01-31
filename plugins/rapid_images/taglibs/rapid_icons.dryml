@@ -1,13 +1,15 @@
 <def tag="icon" attrs="size">
   <% size ||= "medium" %>
-  <img src="#{this.icon.public_filename(size.to_sym)}" alt="#{this.icon.label}" if="icon"/>
+  <do with="&this.icon || this.default_icon">
+    <img src="#{this.public_filename(size)}" alt="#{this.label}"/>
+  </do>
 </def>
 
 
 <def tag="choose-icon">
-  <h2 param>Account Picture</h2>
+  <h2 param="heading"><type-name/> Icon</h2>
 
-  <icon param/><else><p param="no-icon-message">You have not uplaoded an icon yet</p></else>
+  <icon param/><else><p param="no-icon-message">You have not uploaded an icon yet</p></else>
 
   <section class="icon-upload">
     <upload-image-form:new_icon param>

@@ -52,6 +52,10 @@ class RapidIcons < Hobo::Bundle
               :class_name  => options.fetch(:class_name, default_class_name),
               :as          => options[:as],
               :foreign_key => options[:foreign_key])
+              
+      define_method :default_icon do
+        self.class.reflections[:icon].klass.new(:filename => 'default.jpg')
+      end
             
     end
     
