@@ -385,7 +385,7 @@ var Hobo = {
         if(t = $('ajax-progress-text')) Element.update(t, message);
         if(e = $('ajax-progress')) {
             if (nextTo) {
-                var pos = nextTo.cumulativeOffset()
+                var pos = $(nextTo).cumulativeOffset()
                 e.style.top = pos.top + "px"
                 e.style.left = (pos.left + nextTo.offsetWidth) + "px"
             }
