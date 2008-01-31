@@ -87,12 +87,10 @@ module Hobo
         page << renderer.part_contexts_storage if renderer
       end
     end
-
-
-    def render_tag(tag, options={}, render_options={})
-      add_variables_to_assigns
-      text = Hobo::Dryml.render_tag(@template, tag, options)
-      text && render({:text => text, :layout => false }.merge(render_options))
+    
+    
+    def dryml_context
+      @this
     end
 
 
