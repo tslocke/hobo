@@ -1,5 +1,11 @@
 class Module
   
+  def included_in_class_callbacks(base)
+    if base.is_a?(Class)
+      included_modules.each { |m| m.included_in_class(base) if m.respond_to?(:included_in_class) }
+    end
+  end
+  
   def inheriting_attr_accessor(*names)
     for name in names
       class_eval %{
@@ -254,7 +260,7 @@ module Enumerable
     MultiSender.new(self, :map)
   end
   
-  def with
+  def where
     MultiSender.new(self, :select)
   end
   
