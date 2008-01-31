@@ -10,7 +10,7 @@ module Hobo
       def included(base)
         base.class_eval do 
           filter_parameter_logging "password"
-          skip_before_filter :login_required, :only => [:login]
+          skip_before_filter :login_required, :only => [:login, :signup]
           
           include_taglib "rapid_user_pages", :plugin => "hobo"
           
@@ -50,7 +50,7 @@ module Hobo
           if block_given? && !yield
             # block returned false - cancel this login
             self.current_user = old_user
-            hobo_render(:account_disabled)
+            render :action => :account_disabled
           else
             if params[:remember_me] == "1"
               current_user.remember_me
@@ -61,8 +61,6 @@ module Hobo
           end
         end
       end
-
-      hobo_render unless performed?
     end
 
     
@@ -76,15 +74,10 @@ module Hobo
           if valid?
             flash[:notice] ||= "Thanks for signing up!"
             redirect_back_or_default(home_page)
-          elsif invalid?
-            hobo_render
-          elsif not_allowed?
-            permission_denied
           end
       else
         @this = @user = model.new
         yield if block_given?
-        hobo_render unless performed?
       end
     end
 
@@ -110,10 +103,12 @@ module Hobo
     private
     
     def logout_current_user
-      current_user.forget_me if logged_in?
-      cookies.delete :auth_token
-      reset_session
-      self.current_user = nil
+      if logged_in?
+        current_user.forget_me
+        cookies.delete :auth_token
+        reset_session
+        self.current_user = nil
+      end
     end
     
   end
