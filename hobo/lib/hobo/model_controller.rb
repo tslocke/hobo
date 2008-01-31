@@ -419,8 +419,9 @@ module Hobo
     end
     
 
-    def hobo_show(object=nil, &b)
-      self.this ||= object || find_instance
+    def hobo_show(*args, &b)
+      options = args.extract_options!  # OK so there are no options, but just to keep the API consistent :-)
+      self.this ||= args.first || find_instance
       response_block(&b)
     end
     
