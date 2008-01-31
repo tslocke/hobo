@@ -329,8 +329,7 @@ module Hobo
         name = name.to_sym
         
         field_types[name] or
-          begin
-            refl = reflections[name]
+          if (refl = reflections[name])
             if refl.macro.in?(:has_one, :belongs_to)
               refl.klass
             else
