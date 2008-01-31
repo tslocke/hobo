@@ -204,8 +204,10 @@ module Hobo
       if field.nil?
         if respond_to?(:editable_by?)
           object.editable_by?(person) 
-        else
+        elsif respond_to?(:updatable_by?)
           object.updatable_by?(person, nil)
+        else
+          false
         end
         
       else
