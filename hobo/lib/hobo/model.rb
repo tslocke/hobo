@@ -2,6 +2,8 @@ module Hobo
 
   module Model
     
+    class PermissionDeniedError < RuntimeError; end
+    
     NAME_FIELD_GUESS      = %w(name title)
     PRIMARY_CONTENT_GUESS = %w(description body content profile)
     SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
@@ -18,12 +20,17 @@ module Hobo
     Hobo.field_types.update(PLAIN_TYPES)
     
     def self.included(base)
-      Hobo.register_model(base)
       base.extend(ClassMethods)
+      
+      included_in_class_callbacks(base)
+
+      Hobo.register_model(base)
+
       base.class_eval do
         alias_method_chain :attributes=, :hobo_type_conversion
         default_scopes
       end
+      
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :foreign_key_declaration
@@ -43,15 +50,30 @@ module Hobo
           end
         end
       end
+      
     end
-
+    
     module ClassMethods
       
       # include methods also shared by CompositeModel
-      include ModelSupport::ClassMethods
+      #include ModelSupport::ClassMethods
       
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
+      
+      def user_new(user, attributes={})
+        record = new(attributes)
+        record.user_changes(user)
+        record
+      end
+      
+      
+      def user_create(user, attributes={})
+        record = new(attributes)
+        record.user_save_changes(user)
+        record
+      end
+      
       
       def default_scopes
         def_scope :recent do |*args|
@@ -93,6 +115,11 @@ module Hobo
       
       private
       
+      
+      def validate_virtual_field(*args)
+        validates_each(*args) {|record, field, value| msg = value.validate and errors.add(field, msg) if value.respond_to?(:validate) }
+      end
+      
       def return_type(type)
         @next_method_type = type
       end
@@ -132,6 +159,7 @@ module Hobo
               instance_variable_set("@#{attr}", val)
             end
           end
+          
           attr_reader *attrs
         else
           attr_accessor_without_rich_types(*attrs)
@@ -299,9 +327,16 @@ module Hobo
       
       def field_type(name)
         name = name.to_sym
+        
         field_types[name] or
-          reflections[name] or
           begin
+            refl = reflections[name]
+            if refl.macro.in?(:has_one, :belongs_to)
+              refl.klass
+            else
+              refl
+            end
+          end or begin
             col = column(name)
             return nil if col.nil?
             case col.type
@@ -414,159 +449,11 @@ module Hobo
       end
       
       
-      class ScopedProxy
-        
-        def initialize(klass, scope)
-          @klass = klass
-          
-          # If there's no :find, or :create specified, assume it's a find scope
-          @scope = if scope.has_key?(:find) || scope.has_key?(:create)
-                     scope
-                   else
-                     { :find => scope }
-                   end
-        end
-        
-        
-        def method_missing(name, *args, &block)
-          if name.to_sym.in?(@klass.defined_scopes.keys)
-            proxy = @klass.send(name, *args)
-            proxy.instance_variable_set("@parent_scope", self)
-            proxy
-          else
-            _apply_scope { @klass.send(name, *args, &block) }
-          end
-        end
-        
-        def all
-          self.find(:all)
-        end
-        
-        def first
-          self.find(:first)
-        end
-        
-        def member_class
-          @klass
-        end
-        
-        private
-        def _apply_scope
-          if @parent_scope
-            @parent_scope.send(:_apply_scope) do
-              @scope ? @klass.send(:with_scope, @scope) { yield } : yield
-            end
-          else
-            @scope ? @klass.send(:with_scope, @scope) { yield } : yield
-          end
-        end
-        
-      end
-      (Object.instance_methods + 
-       Object.private_instance_methods +
-       Object.protected_instance_methods).each do |m|
-        ScopedProxy.send(:undef_method, m) unless
-          m.in?(%w{initialize method_missing send instance_variable_set instance_variable_get puts}) || m.starts_with?('_')
+      def has_inheritance_column?
+        columns_hash.include?(inheritance_column)
       end
       
-      attr_accessor :defined_scopes
 
-      
-      def def_scope(name, scope=nil, &block)
-        @defined_scopes ||= {}
-        @defined_scopes[name.to_sym] = block || scope
-        
-        meta_def(name) do |*args|
-          ScopedProxy.new(self, block ? block.call(*args) : scope)
-        end
-      end
-      
-      
-      def alias_scope(new_name, old_name)
-        metaclass.send(:alias_method, new_name, old_name)
-        defined_scopes[new_name] = defined_scopes[old_name]
-      end
-      
-      
-      module DefinedScopeProxyExtender
-        
-        attr_accessor :reflections
-        
-        def method_missing(name, *args, &block)
-          scope = (proxy_reflection.klass.respond_to?(:defined_scopes) and
-                   scopes = proxy_reflection.klass.defined_scopes and 
-                   scopes[name.to_sym])
-          
-          scope = scope.call(*args) if scope.is_a?(Proc)
-          
-          # If there's no :find, or :create specified, assume it's a find scope
-          find_scope = if scope && (scope.has_key?(:find) || scope.has_key?(:create))
-                         scope[:find]
-                       else
-                         scope
-                       end
-          
-          if find_scope
-            scope_name = "@#{name.to_s.gsub('?','')}_scope"
-
-            # Calling instance_variable_get directly causes self to
-            # get loaded, hence this trick
-            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call(scope_name)
-            
-            unless assoc
-              options = proxy_reflection.options
-              has_many_conditions = options[:conditions]
-              has_many_conditions = nil if has_many_conditions.blank?
-              source = proxy_reflection.source_reflection
-              scope_conditions = find_scope[:conditions]
-              scope_conditions = nil if scope_conditions.blank?
-              conditions = if has_many_conditions && scope_conditions
-                             "(#{sanitize_sql scope_conditions}) AND (#{sanitize_sql has_many_conditions})"
-                           else
-                             scope_conditions || has_many_conditions
-                           end
-              
-              options = options.merge(find_scope).update(:class_name => proxy_reflection.klass.name,
-                                                         :foreign_key => proxy_reflection.primary_key_name)
-              options[:conditions] = conditions unless conditions.blank?
-              options[:source] = source.name if source
-
-              r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
-                                                                      name,
-                                                                      options,
-                                                                      proxy_owner.class)
-              
-              @reflections ||= {}
-              @reflections[name] = r
-              
-              assoc = if source
-                        ActiveRecord::Associations::HasManyThroughAssociation
-                      else
-                        ActiveRecord::Associations::HasManyAssociation
-                      end.new(self.proxy_owner, r)
-
-              # Calling directly causes self to get loaded
-              Kernel.instance_method(:instance_variable_set).bind(self).call(scope_name, assoc)
-            end
-            assoc
-          else
-            super
-          end
-        end
-        
-      end
-      
-      
-      def has_many_with_defined_scopes(name, options={}, &block)
-        if options.has_key?(:extend) || block
-          # Normal has_many
-          has_many_without_defined_scopes(name, options, &block)
-        else
-          options[:extend] = DefinedScopeProxyExtender
-          has_many_without_defined_scopes(name, options, &block)
-        end
-      end
-      
       def method_missing(name, *args, &block)
         name = name.to_s
         if name =~ /\./
@@ -578,6 +465,45 @@ module Hobo
         end
       end
 
+    end # --- of ClassMethods --- #
+    
+    
+    include Scopes
+    
+    
+    def user_changes(user, changes={})
+      if new_record?
+        self.attributes = changes
+        set_creator(user) 
+        raise PermissionDeniedError unless Hobo.can_create?(user, self)
+      else
+        original = duplicate
+        # 'duplicate' can cause these to be set, but they can conflict
+        # with the changes so we clear them
+        clear_aggregation_cache
+        clear_association_cache
+        
+        self.attributes = changes
+        
+        raise PermissionDeniedError unless Hobo.can_update?(user, original, self)
+      end        
+    end
+    
+    
+    def user_save_changes(user, changes={})
+      user_changes(user, changes)
+      save
+    end
+    
+    
+    def user_view(user)
+      raise PermissionDeniedError unless Hobo.can_view?(user, self)
+    end
+    
+    
+    def user_destory(user)
+      raise PermissionDeniedError unless Hobo.can_delete?(user, self)
+      destroy
     end
     
     
@@ -594,6 +520,11 @@ module Hobo
 
     
     def set_creator(user)
+      set_creator!(user) unless get_creator
+    end
+    
+    
+    def set_creator!(user)
       attr = self.class.creator_attribute
       return unless attr
       
@@ -616,19 +547,20 @@ module Hobo
 
 
     def duplicate
-      res = self.class.new
-      res.instance_variable_set("@attributes", @attributes.dup)
-      res.instance_variable_set("@new_record", nil) unless new_record?
+      copy = self.class.new
+      copy.copy_instance_variables_from(self)
+      copy.instance_variable_set("@attributes", @attributes.dup)
+      copy.instance_variable_set("@new_record", nil) unless new_record?
       
       # Shallow copy of belongs_to associations
       for refl in self.class.reflections.values
         if refl.macro == :belongs_to and (target = self.send(refl.name))
-          bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
+          bta = ActiveRecord::Associations::BelongsToAssociation.new(copy, refl)
           bta.replace(target)
-          res.instance_variable_set("@#{refl.name}", bta)
+          copy.instance_variable_set("@#{refl.name}", bta)
         end
       end
-      res
+      copy
     end
 
 
@@ -678,7 +610,8 @@ module Hobo
     end
 
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) and field_type.macro.in?([:belongs_to, :has_one])
+      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) &&
+          field_type.macro.in?([:belongs_to, :has_one])
         if value.is_a?(String) && value.starts_with?('@')
           Hobo.object_from_dom_id(value[1..-1])
         else
