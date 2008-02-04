@@ -491,12 +491,12 @@ module Hobo
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      in_place_edit = changes.size == 1 && params[:render]
-      update_response(in_place_edit, &b)
+      in_place_edit_filed = changes.keys.first if changes.size == 1 && params[:render]
+      update_response(in_place_edit_field, &b)
     end
     
     
-    def update_response(in_place_edit=false, &b)
+    def update_response(in_place_edit_filed=nil, &b)
       flash[:notice] = "Changes to the #{@this.class.name.humanize.downcase} were saved" if !request.xhr? && valid?
       
       response_block(&b) or 
@@ -508,7 +508,7 @@ module Hobo
             wants.js do
               if in_place_edit
                 # Decreasingly hacky support for the scriptaculous in-place-editor
-                new_val = Hobo::Dryml.render_tag(@template, "view", :field => changes.keys.first, :no_wrapper => true)
+                new_val = Hobo::Dryml.render_tag(@template, "view", :field => in_place_edit_field, :no_wrapper => true)
                 hobo_ajax_response(this, :new_field_value => new_val)
               else
                 hobo_ajax_response(this)
