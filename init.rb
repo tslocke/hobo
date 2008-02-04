@@ -5,6 +5,7 @@ require 'active_record/has_many_association'
 require 'active_record/has_many_through_association'
 require 'active_record/table_definition'
 require 'active_record/association_proxy'
+require 'active_record/association_reflection'
 require 'action_view_extensions/base'
 
 require 'hobo'
