@@ -491,12 +491,12 @@ module Hobo
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
       
-      in_place_edit_filed = changes.keys.first if changes.size == 1 && params[:render]
+      in_place_edit_field = changes.keys.first if changes.size == 1 && params[:render]
       update_response(in_place_edit_field, &b)
     end
     
     
-    def update_response(in_place_edit_filed=nil, &b)
+    def update_response(in_place_edit_field=nil, &b)
       flash[:notice] = "Changes to the #{@this.class.name.humanize.downcase} were saved" if !request.xhr? && valid?
       
       response_block(&b) or 
