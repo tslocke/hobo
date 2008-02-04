@@ -555,14 +555,14 @@ module Hobo
 
       if collection.is_a?(String, Symbol)
         @owner = find_instance
-        self.this = @owner.send(collection)
+        @association = @owner.send(collection)
       else
         @owner = collection.proxy_owner
-        self.this = collection
+        @association = collection
       end
       
-      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner, this.proxy_reflection.association_name)
-      paginated_find(@owner, collection, options)
+      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner, @association.proxy_reflection.association_name)
+      self.this = paginated_find(@owner, collection, options)
       
       response_block(&b)
     end
