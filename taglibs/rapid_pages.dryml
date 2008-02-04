@@ -31,7 +31,7 @@
         <live-search param if="&defined_route? :site_search"/>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
-          <magic-nav class="main-nav" param="main-nav"/>
+          <do param="main-nav"><magic-nav class="main-nav"/></do>
         </nav>
       </header>
       <section class="page-content" param="content">
@@ -224,14 +224,14 @@
 
 
 <def tag="show-collection-page">
-  <% title = "#{@reflection.name.to_s.titleize} for #{name(:with => @owner)}" %>
+  <% title = "#{params[:action]} for #{name(:with => @owner)}" %>
   <page title="&title" merge>
     <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
           param/>
     <content-header: param>
       <nav>Back to <a with="&@owner"/></nav>
       <heading><%= title %></heading>
-      <sub-heading><count with="&@pages.item_count" label="&@reflection.klass.name.titleize"/></sub-heading>
+      <sub-heading><count with="&@pages.item_count" label="&params[:action]"/></sub-heading>
     </content-header>
 
     <content-body: param>
@@ -241,8 +241,8 @@
       
       <nav param="bottom-pagination-nav"><page-nav param/></nav>
       
-      <nav if="&Hobo.simple_has_many_association?(@association)" param="new-link">
-        <a to="&@association" action="new"/>
+      <nav if="&Hobo.simple_has_many_association?(this)" param="new-link">
+        <a action="new"/>
       </nav>
     </content-body>
   </page>
@@ -250,6 +250,7 @@
 
 
 <def tag="permission-denied-page" attrs="message">
+  <% message ||= "That operation is not allowed" %>
   <page merge>
     <body: class="permission-denied"/>
     <content-header: param>
