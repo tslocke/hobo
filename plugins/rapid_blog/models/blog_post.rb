@@ -30,10 +30,26 @@ bundle_model :BlogPost do
   def self.all_posts_by_month
     find(:all, :order => 'created_at DESC').group_by {|i|i.created_at.beginning_of_month}.sort.reverse
   end
+  
+  
+  # --- Permissions --- #
+  
+  def allow_access?(user)
+    user.administrator? || (features_author? && author == user)
+  end
 
-  def creatable_by?(user);       user.administrator? && features_author?.implies { author == user } end
-  def updatable_by?(user, new);  user.administrator? && features_author?.implies { author == user } end
-  def deletable_by?(user);       user.administrator? && features_author?.implies { author == user } end
+  def creatable_by?(user)
+    allow_access?(user) && published_at.nil?
+  end
+  
+  def updatable_by?(user, new)
+    allow_access?(user) && same_fields?(new, :author, :published_at)
+  end
+  
+  def deletable_by?(user)
+    allow_access?(user)
+  end
+  
   def viewable_by?(user, field); true;  end
    
 end
