@@ -33,6 +33,8 @@ class RapidIcons < Hobo::Bundle
     end
     
     customize :_Target_IconsController do 
+      
+      remove_method :index
 
       def create
         hobo_create do 
