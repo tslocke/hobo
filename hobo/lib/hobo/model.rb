@@ -402,7 +402,7 @@ module Hobo
       def count(*args, &b)
         if b
           sql = ModelQueries.new(self).instance_eval(&b).to_sql
-          options = extract_options_from_args!(args)
+          options = args.extract_options!
           super(*args + [options.merge(:conditions => sql)])
         else
           super(*args)
@@ -547,7 +547,7 @@ module Hobo
 
     def duplicate
       copy = self.class.new
-      copy.copy_instance_variables_from(self)
+      copy.copy_instance_variables_from(self, ["@attributes_cache"])
       copy.instance_variable_set("@attributes", @attributes.dup)
       copy.instance_variable_set("@new_record", nil) unless new_record?
       
