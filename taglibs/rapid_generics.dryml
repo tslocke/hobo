@@ -43,7 +43,13 @@
     <li:><card param/></li:>
   </ul>
   <p class="empty-collection-message" if="&this.empty?" param="empty-message">
-    <% label = this.respond_to?(:proxy_reflection) ? this.proxy_reflection.name.to_s : (this.respond_to?(:member_class) ? this.member_class.name : type_name(:plural => true)).pluralize.humanize.downcase.to_s %>
+    <% label = if this.respond_to?(:proxy_reflection)
+                 this.proxy_reflection.association_name.to_s
+               elsif this.respond_to?(:member_class)
+                 this.member_class.name
+               else
+                 type_name(:plural => true).pluralize.humanize.downcase.to_s 
+               end %>
     There are no <%= label %>
   </p>
 </def>
