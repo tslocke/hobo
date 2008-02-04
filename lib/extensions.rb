@@ -41,7 +41,8 @@ class Module
   def delegate(*methods)
     options = methods.pop
     unless options.is_a?(Hash) && to = options[:to]
-      raise ArgumentError, "Delegation needs a target. Supply an options hash with a :to key as the last argument (e.g. delegate :hello, :to => :greeter)."
+      raise ArgumentError, ("Delegation needs a target. Supply an options hash with a :to key"  +
+                            "as the last argument (e.g. delegate :hello, :to => :greeter).")
     end
 
     methods.each do |method|
@@ -56,7 +57,7 @@ class Module
   private
   
   def bool_attr_accessor(*args)
-    options = extract_options_from_args!(args)
+    options = args.extract_options!
     (args + options.keys).each {|n| class_eval "def #{n}=(x); @#{n} = x; end" }
     
     args.each {|n| class_eval "def #{n}?; !!@#{n}; end" }
@@ -77,12 +78,15 @@ end
 
 module Kernel
 
-  def extract_options_from_args!(args) #:nodoc:
-    args.last.is_a?(Hash) ? args.pop : {}
-  end
-  
   def it() It.new end
   alias its it
+  
+  def classy_module(&b)
+    m = Module.new
+    m.meta_def :included do |base|
+      base.class_eval &b
+    end
+  end
   
 end
 
@@ -149,10 +153,16 @@ class Object
   def _?()
     self
   end
+  
+  def try
+    CallIfAvailable.new(self)
+  end
+  
+  
 
 end
 
-
+  
 class NilClass
   def _?()
     SafeNil.instance
@@ -160,7 +170,7 @@ class NilClass
 end
 
 
-class SafeNil
+class SafeNil 
   include Singleton
   
   def method_missing(method, *args, &b)
@@ -178,6 +188,21 @@ def DelegateClass(klass)
     end
   end
   c
+end
+
+class BlankSlate
+  instance_methods.reject { |m| m =~ /^__/ }.each { |m| undef_method m }
+  def initialize(me)
+    @me = me
+  end
+end
+
+class CallIfAvailable < BlankSlate
+  
+  def method_missing(name, *args, &b)
+    @me.send(name, *args, &b) if @me.respond_to?(name)
+  end
+  
 end
 
 
