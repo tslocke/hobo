@@ -506,7 +506,7 @@ module Hobo
               redirect_to destination_after_submit
             end
             wants.js do
-              if in_place_edit
+              if in_place_edit_field
                 # Decreasingly hacky support for the scriptaculous in-place-editor
                 new_val = Hobo::Dryml.render_tag(@template, "view", :field => in_place_edit_field, :no_wrapper => true)
                 hobo_ajax_response(this, :new_field_value => new_val)
