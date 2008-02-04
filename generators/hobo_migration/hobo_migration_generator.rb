@@ -11,7 +11,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
   def table_model_classes
     ActiveRecord::Base.send(:subclasses).
       reject {|c| c.name.starts_with?("CGI::") }.
-      select {|c| c.superclass == ActiveRecord::Base}
+      select {|c| c.descends_from_active_record? }
   end
 
   def manifest
