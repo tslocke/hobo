@@ -547,16 +547,18 @@ module Hobo
     end
  
     
-    def hobo_show_collection(collection, options={}, &b)
-      options = LazyHash.new(options)
+    def hobo_show_collection(collection, *args, &b)
+      options = LazyHash.new(args.extract_options!)
+
+      @owner = args.first || collection.try.proxy_owner || find_instance
       
       self.this ||= if collection.is_a?(Array)
+                      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner)
                       collection
-                    else
-                      paginated_find(find_instance, collection, options)
+                   else
+                      raise Hobo::Model::PermisionDenied unless Hobo.can_view?(current_user, @owner, collection)
+                      paginated_find(@owner, collection, options)
                     end
-      
-      raise Hobo::Model::PermisionDenied unless Hobo.can_view?(current_user, this.proxy_owner, this.association_name)
       
       response_block(&b)
     end
