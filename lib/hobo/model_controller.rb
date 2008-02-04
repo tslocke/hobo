@@ -296,11 +296,14 @@ module Hobo
       
       @association = options.delete(:association) ||
         if args.length == 1
-          scope = args.first
-          @association = model.send(scope)
+          if args.first.is_a?(String, Symbol)
+            @association = model.send(args.first)
+          else
+            @association = args.first
+          end
         elsif args.length == 2
           owner, collection_name = args
-          @association = collection_name.to_s.split(".").inject(owner) { |m, name| m.send(name) }
+          @association = owner.send(collection_name)
         end
       @reflection = @association.proxy_reflection if @association._?.respond_to?(:proxy_reflection)
       
@@ -550,15 +553,16 @@ module Hobo
     def hobo_show_collection(collection, *args, &b)
       options = LazyHash.new(args.extract_options!)
 
-      @owner = args.first || collection.try.proxy_owner || find_instance
+      if collection.is_a?(String, Symbol)
+        @owner = find_instance
+        self.this = @owner.send(collection)
+      else
+        @owner = collection.proxy_owner
+        self.this = collection
+      end
       
-      self.this ||= if collection.is_a?(Array)
-                      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner)
-                      collection
-                   else
-                      raise Hobo::Model::PermisionDenied unless Hobo.can_view?(current_user, @owner, collection)
-                      paginated_find(@owner, collection, options)
-                    end
+      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner, this.proxy_reflection.association_name)
+      paginated_find(@owner, collection, options)
       
       response_block(&b)
     end
