@@ -762,7 +762,7 @@ module Hobo::Dryml
     
 
     def attribute_to_ruby(*args)
-      options = extract_options_from_args!(args)
+      options = args.extract_options!
       attr, el = args
       
       dryml_exception('erb scriptlet not allowed in this attribute (use #{ ... } instead)', el) if
@@ -846,6 +846,7 @@ module Hobo::Dryml
     end
     
     def include_source_metadata
+      return false
       @include_source_metadata = RAILS_ENV == "development" && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
       @include_source_metadata
     end
