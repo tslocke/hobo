@@ -16,10 +16,21 @@
   </page-without-rapid-blog>
 </def>
 
+
 <def tag="index-page" extend-with="rapid-blog">
   <index-page-without-rapid-blog merge>
+    <content-header: replace/>
+    <content-body:>
+      <blog-post-summary repeat param/>
+    </content-body>
+  </index-page-without-rapid-blog>
+</def>
+
+
+<def tag="archive-page">
+  <page merge>
     <content-body:>
       <blog-posts-list-by-month with="&@posts_by_month" param />
     </content-body>
-  </index-page-without-rapid-blog>
+  </page>
 </def>
