@@ -612,6 +612,7 @@ module Hobo
       if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) &&
           field_type.macro.in?([:belongs_to, :has_one])
         if value.is_a?(String) && value.starts_with?('@')
+          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
           Hobo.object_from_dom_id(value[1..-1])
         else
           value
