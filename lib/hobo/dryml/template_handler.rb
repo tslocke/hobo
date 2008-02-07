@@ -51,7 +51,8 @@ module ActionController
     def render_for_file_with_dryml(template_path, *args)
       if template_path !~ /^\// &&                             # not an absolute path (e.g. an exception ERB template)
           !template_exists?(template_path) &&                  # no template available in app/views
-          render_tag("#{params[:action].to_s.dasherize}-page") # returns true if tag was found
+          tag_name = "#{File.basename(template_path).dasherize}-page"
+          render_tag(tag_name) # returns true if tag was found
         # The template was missing but a DRYML <page> tag was used instead
       else
         render_for_file_without_dryml(template_path, *args)
