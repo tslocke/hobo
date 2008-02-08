@@ -109,10 +109,10 @@ module Hobo
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 
-    def find_by_search(query, search_targets)
+    def find_by_search(query, search_targets=nil)
       search_targets ||= begin
         # By default, search all models, but filter out...
-        Hobo.model.select do |m| 
+        Hobo.models.select do |m| 
           ModelRouter.linkable?(nil, m, :show) && # ...non-linkables
             model.search_columns.any?             # and models with no search-columns
         end
