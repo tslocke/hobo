@@ -49,7 +49,7 @@ module Hobo
     def method_missing(name, *args)
       check_column = proc do |col|
         raise HoboError.new("no such column '#{col}' in query") unless
-          model.columns.every(:name).include? col
+          model.columns.*.name.include? col
       end
 
       m, field = *name.to_s.match(/^(.*)_is$/)

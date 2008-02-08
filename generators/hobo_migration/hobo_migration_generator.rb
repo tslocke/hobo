@@ -21,15 +21,15 @@ class HoboMigrationGenerator < Rails::Generator::Base
     # Force load of hobo models
     Hobo.models
     
-    ignore_model_names = Hobo::Migrations.ignore.every(:underscore)
+    ignore_model_names = Hobo::Migrations.ignore.*.underscore
     
     models, ignore_models = table_model_classes.partition do |m|
       m.name.underscore.not_in?(ignore_model_names) && m < Hobo::Model
     end
-    ignore_tables = ignore_models.every(:table_name) | Hobo::Migrations.ignore_tables
+    ignore_tables = ignore_models.*.table_name | Hobo::Migrations.ignore_tables
     
     models_by_table_name = models.index_by {|m| m.table_name}
-    model_table_names = models.every(:table_name)
+    model_table_names = models.*.table_name
     db_tables = connection.tables - ignore_tables
 
     to_create = model_table_names - db_tables
@@ -155,8 +155,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
     new_table_name = model.table_name
     
     db_columns = model.connection.columns(current_table_name).index_by{|c|c.name} - [model.primary_key]
-    model_column_names = model.field_specs.keys.every(:to_s)
-    db_column_names = db_columns.keys.every(:to_s)
+    model_column_names = model.field_specs.keys.*.to_s
+    db_column_names = db_columns.keys.*.to_s
     
     to_add = model_column_names - db_column_names
     to_remove = db_column_names - model_column_names - [model.primary_key.to_sym]

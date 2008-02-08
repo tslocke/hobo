@@ -41,7 +41,7 @@ module Hobo
 
     
     def models=(models)
-      @models = models.every(:name)
+      @models = models.*.name
     end
 
     
@@ -52,7 +52,7 @@ module Hobo
         end
         @models_loaded = true
       end
-      @models.every(:constantize)
+      @models.*.constantize
     end
 
     
@@ -324,7 +324,7 @@ module Hobo
                                 else
                                     File.join(File.dirname(__FILE__), "hobo/static_tags")
                                 end
-                         File.readlines(path).every(:chop)
+                         File.readlines(path).*.chop
                        end
     end
     

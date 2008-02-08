@@ -217,7 +217,7 @@ module Hobo::Dryml
     def declared_attributes(def_element)
       attrspec = def_element.attributes["attrs"]
       attr_names = attrspec ? attrspec.split(/\s*,\s*/).map{ |n| n.underscore.to_sym } : []
-      invalids = attr_names & ([:with, :field, :this] + SPECIAL_ATTRIBUTES.every(:to_sym))
+      invalids = attr_names & ([:with, :field, :this] + SPECIAL_ATTRIBUTES.*.to_sym)
       dryml_exception("invalid attrs in def: #{invalids * ', '}", def_element) unless invalids.empty?
       attr_names
     end

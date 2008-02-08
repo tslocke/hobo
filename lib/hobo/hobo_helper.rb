@@ -296,7 +296,7 @@ module Hobo
     def transpose_with_field(field, collection=nil)
       collection ||= this
       matrix = collection.map {|obj| obj.send(field) }
-      max_length = matrix.every(:length).max
+      max_length = matrix.*.length.max
       matrix = matrix.map do |a|
         a + [nil] * (max_length - a.length)
       end
