@@ -13,13 +13,13 @@ module Hobo
     class << self 
       
       def with_values(*values)
-        @values = values.every(:to_s)
+        @values = values.*.to_s
       end
       
       attr_accessor :values
       
       def for(*values)
-        values = values.every(:to_s)
+        values = values.*.to_s
         c = Class.new(EnumString) do
           values.each do |v|
             define_method("#{v.underscore}?") { self == v }

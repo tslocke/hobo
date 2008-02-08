@@ -87,30 +87,30 @@ module Hobo
       
       def name_attribute
         @name_attribute ||= begin
-                              cols = columns.every :name
-                              NAME_FIELD_GUESS.detect {|f| f.in? columns.every(:name) }
+                              cols = columns.*.name
+                              NAME_FIELD_GUESS.detect {|f| f.in? columns.*.name }
                             end
       end
       
 
       def primary_content_attribute
         @primary_content_attribute ||= begin
-                                         cols = columns.every :name
-                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
+                                         cols = columns.*.name
+                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.*.name }
                                        end
       end
       
       def dependent_collections
         reflections.values.select do |refl| 
           refl.macro == :has_many && refl.options[:dependent]
-        end.every(:name)
+        end.*.name
       end
       
       
       def dependent_on
         reflections.values.select do |refl| 
           refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
-        end.every(:name)
+        end.*.name
       end
       
       private
@@ -256,7 +256,7 @@ module Hobo
 
       def never_show(*fields)
         @hobo_never_show ||= []
-        @hobo_never_show.concat(fields.every(:to_sym))
+        @hobo_never_show.concat(fields.*.to_sym)
       end
 
       def never_show?(field)
@@ -267,7 +267,7 @@ module Hobo
       def set_search_columns(*columns)
         class_eval %{
           def self.search_columns
-            %w{#{columns.every(:to_s) * ' '}}
+            %w{#{columns.*.to_s * ' '}}
           end
         }
       end
@@ -425,7 +425,7 @@ module Hobo
       end
 
       def search_columns
-        cols = columns.every(:name)
+        cols = columns.*.name
         SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
       end
       
@@ -573,8 +573,8 @@ module Hobo
     def only_changed_fields?(other, *changed_fields)
       return true if other.nil?
       
-      changed_fields = changed_fields.flatten.every(:to_s)
-      all_cols = self.class.columns.every(:name) - []
+      changed_fields = changed_fields.flatten.*.to_s
+      all_cols = self.class.columns.*.name - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
     
