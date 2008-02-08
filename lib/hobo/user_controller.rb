@@ -47,10 +47,12 @@ module Hobo
           
           # If supplied, a block can be used to test if this user is
           # allowed to log in (e.g. the account may be disabled)
-          if block_given? && !yield
+          account_available = block_given? ? yield : true
+
+          if !account_available
             # block returned false - cancel this login
             self.current_user = old_user
-            render :action => :account_disabled
+            render :action => :account_disabled unless performed?
           else
             if params[:remember_me] == "1"
               current_user.remember_me
