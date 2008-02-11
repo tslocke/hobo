@@ -1,3 +1,6 @@
+# gem dependencies
+require_gem 'hobo-support', "= 0.1"
+
 # Monkey patches, ooh ooh
 require 'extensions'
 require 'rexml'
