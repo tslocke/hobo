@@ -251,7 +251,7 @@ module Hobo
         @default_order = order
       end
       
-      inheriting_attr_accessor :default_order, :id_name_options
+      inheriting_attr_reader :default_order, :id_name_options
 
 
       def never_show(*fields)
