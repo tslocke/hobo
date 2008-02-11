@@ -120,7 +120,7 @@ module Hobo
       
       query_words = ActiveRecord::Base.connection.quote_string(query).split
                     
-      Hash.build(search_targets) do |search_target|
+      search_targets.build_hash do |search_target|
         conditions = query_words.map do |word| 
           "(" + search_target.search_columns.map { |column| %(#{column} like "%#{word}%") }.join(" or ") + ")"
         end.join(" and ")
