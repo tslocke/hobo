@@ -56,8 +56,8 @@ input.file_upload {
 	margin: 20px 40px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
-.flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 2px 2px 0;}
-.flash.error {border: 1px solid #900024; background: #BC1C3D; text-shadow: #900024 2px 2px 0;}
+.flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
+.flash.error {border: 1px solid #900024; background: #BC1C3D; text-shadow: #900024 1px 1px 0;}
 
 /* rails error message */
 .error-messages {
@@ -66,10 +66,10 @@ input.file_upload {
 	padding: 15px 30px;
 	color: white;
 	margin-bottom: 20px;
-	text-shadow: #900024 2px 2px 0;
+	text-shadow: #900024 1px 1px 0;
 }
 .error-messages h2 {
-	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px; text-shadow: #900024 3px 3px 0;
+	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px; text-shadow: #900024 2px 2px 0;
 }
 .error-messages li {margin-left: 20px; list-style: square;}
 
@@ -79,7 +79,7 @@ input.file_upload {
 	padding: 8px 20px 8px 40px;
 	border: 1px solid #444;
 	color: #cfc; background: black url(../images/spinner.gif) no-repeat 10px 8px;
-	font-size: 13px; font-weight: bold; text-shadow: black 2px 2px 2px;
+	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
 }
 
 .article {margin: 20px 0; border-top: 1px dotted #ccc;}
@@ -142,7 +142,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 	display: block;
 	padding: 5px 15px 7px; border: 1px solid #313131; border-width: 1px 1px 0;
 	background: #282828;
-	font-size: 13px; font-weight: bold; text-shadow: black 2px 2px 2px;
+	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
 }
 .main-nav a:hover {border: 1px solid #555; border-width: 1px 1px 0; background: #444;}
 
@@ -154,7 +154,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 	float: left; 
 	margin-left: 0; padding-left: 20px; 
 	color: #ddd;
-	text-shadow: #444 2px 2px 0;
+	text-shadow: #444 1px 1px 0;
 	list-style: none;
 }
 .account-nav a {font-weight: bold;}
