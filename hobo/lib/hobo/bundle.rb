@@ -1,7 +1,4 @@
-require 'extensions'
-
 module ::Hobo
-  
   
   class Bundle
     
