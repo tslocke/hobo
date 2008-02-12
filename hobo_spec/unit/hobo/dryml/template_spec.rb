@@ -58,7 +58,8 @@ describe Template do
   end
   
   it "should allow close tags to ommit the :field_name part" do 
-    compile_dryml("<foo:name></foo>").should == '<% _output(foo({:field => "name"}, {})) %>'
+    compile_dryml("<foo:name></foo>").should == 
+      '<% _output(foo({:field => "name"}, { :default => proc { |_foo__default_content| new_context { %><% } }, })) %>'
   end
 
   it "should compile tag calls with merge-attrs" do

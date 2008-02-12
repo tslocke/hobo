@@ -489,7 +489,13 @@ module Hobo::Dryml
                elsif (call_type = polymorphic_call_type(el))
                  "send(find_polymorphic_tag(:#{ruby_name name}, #{call_type}), #{attributes}, #{parameters})"
                elsif attributes == "{}" && parameters == "{}"
-                 "#{ruby_name name}.to_s"
+                 if name =~ /^[A-Z]/
+                   # it's a tag with a cap name - not a local
+                   "#{ruby_name name}()"
+                 else
+                   # could be a tag or a local variable
+                   "#{ruby_name name}.to_s"
+                 end
                else
                  "#{ruby_name name}(#{attributes}, #{parameters})"
                end
@@ -511,29 +517,17 @@ module Hobo::Dryml
     def parameter_tags_hash(el, containing_tag_name=nil)
       call_type = nil
       
-      containing_tag_name
       metadata_name = containing_tag_name || el.expanded_name
       
       param_items = el.map do |node|
         case node
         when REXML::Text
           text = node.to_s
-          if text.blank?
-            # include whitespace in hash literal to keep line numbers
-            # matching
-            text
-          else
-            case call_type
-            when nil
-              call_type = :default_param_only
-              text
-            when :default_param_only
-              text
-            when :named_params
-              dryml_exception("mixed content and parameter tags", el)
-            end
+          unless text.blank?
+            dryml_exception("mixed content and parameter tags", el) if call_type == :named_params
+            call_type = :default_param_only
           end
-          node.to_s
+          text
         when REXML::Element
           e = node
           is_parameter_tag = e.parameter_tag?
@@ -559,7 +553,7 @@ module Hobo::Dryml
         end
       end.join
       
-      if call_type == :default_param_only
+      if call_type == :default_param_only || (el.children.empty? && el.has_end_tag?)
         with_containing_tag_name(el) do
           param_items = " :default => #{default_param_proc(el, containing_tag_name)}, "
         end
@@ -648,7 +642,7 @@ module Hobo::Dryml
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
-      items << ":field => \"#{el.name}\"" if el.expanded_name =~ /:/
+      items << ":field => \"#{el.name}\"" if el.expanded_name =~ /:./
       
       items = items.join(", ")
       
@@ -729,17 +723,17 @@ module Hobo::Dryml
     
     
     def apply_control_attributes(expression, el)
-      if_, unless_, repeat = controls = %w(if unless repeat).map {|x| el.attributes[x]}
-      controls.compact!
+      controls = %w(if unless repeat).map_hash { |x| el.attributes[x] }.compact
       
       dryml_exception("You can't have multiple control attributes on the same element", el) if
         controls.length > 1
       
-      val = controls.first
+      attr = controls.keys.first
+      val = controls.values.first
       if val.nil?
         expression
       else
-        control = if val == "&true"
+        control = if !el.attribute(attr).has_rhs?
                     "this"
                   elsif is_code_attribute?(val)
                     "#{val[1..-1]}"
@@ -748,13 +742,14 @@ module Hobo::Dryml
                   end
         
         x = gensym
-        if if_
+        case attr
+        when "if"
           "(if !(#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
             "else (Hobo::Dryml.last_if = false; ''); end)"
-        elsif unless_
+        when "unless" 
           "(if (#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
             "else (Hobo::Dryml.last_if = false; ''); end)"
-        elsif repeat
+        when "repeat"
           "repeat_attribute(#{control}) { #{expression} }"
         end
       end

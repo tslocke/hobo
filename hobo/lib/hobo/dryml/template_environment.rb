@@ -167,13 +167,13 @@ module Hobo::Dryml
     end
     
     def call_polymorphic_tag(name, *args)
-      name = name.gsub('-', '_')
+      name = name.to_s.gsub('-', '_')
       type = args.first.is_a?(Class) ? args.shift : nil
       attributes, parameters = args
       
       tag = find_polymorphic_tag(name, type)
       if tag != name
-        send(tag, attributes, parameters || {})
+        send(tag, attributes || {}, parameters || {})
       else
         nil
       end
@@ -215,7 +215,7 @@ module Hobo::Dryml
     def new_context
       ctx = [ @_erb_output,
               @_this, @_this_parent, @_this_field, @_this_type,
-              @_form_field_path]
+              @_form_field_path ]
       @_erb_output = ""
       @_this_type = nil
       res = yield
