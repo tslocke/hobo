@@ -44,7 +44,7 @@
 <def tag="editor" for="big_integer"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
 <def tag="editor" for="Hobo::EnumString">
- <string-select-editor values="&this_type.values"/>
+ <string-select-editor values="&this_type.values" merge/>
 </def>
 
 
