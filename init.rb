@@ -1,8 +1,8 @@
 # gem dependencies
-require_gem 'hobo-support', "= 0.1"
+gem 'hobosupport', "= 0.1"
+require 'hobosupport'
 
 # Monkey patches, ooh ooh
-require 'extensions'
 require 'rexml'
 require 'active_record/has_many_association'
 require 'active_record/has_many_through_association'
