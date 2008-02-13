@@ -9,7 +9,7 @@ module Hobo
     PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
     
     READ_ONLY_ACTIONS  = [:index, :show]
-    WRITE_ONLY_ACTIONS = [:create, :update, :delete]
+    WRITE_ONLY_ACTIONS = [:create, :update, :destroy]
     FORM_ACTIONS       = [:new, :edit]
     
     class << self
