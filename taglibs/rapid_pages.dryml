@@ -27,7 +27,7 @@
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
-        <heading param="app-name"><a href="/#{base_url}"><app-name/></a></heading>
+        <heading param="app-name"><a href="#{base_url}/"><app-name/></a></heading>
         <live-search param if="&defined_route? :site_search"/>
         <nav param>
           <account-nav if="&Hobo::UserController.user_models.first" param/>
@@ -69,7 +69,7 @@
     <body: class="index-page #{@model.name.underscore}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
-      <p class="note" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
+      <p class="note" if="any?" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
     </content-header>
 
     <content-body: param>
@@ -116,8 +116,8 @@
 </def>
 
 
-<def tag="show-page">
-  <set primary-collection-name="&params[:primary_collection] || self.primary_collection_name"/>
+<def tag="show-page" attrs="primary-collection">
+  <set primary-collection-name="&primary_collection || self.primary_collection_name"/>
   <page merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name :dasherize => true}" param/>
     <content-header: param>
@@ -164,7 +164,7 @@
     </content-body:>
     <aside: param>
       <section class="preview-collections">
-        <with-fields fields="&secondary_collection_names">
+        <with-fields fields="&non_through_collections - [primary_collection_name.to_sym]">
           <section class="#{this_field.dasherize} collection">
             <h2><this-field.titleize/></h2>
             <collection with="&this.limit(6)"/>

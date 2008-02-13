@@ -110,9 +110,9 @@ module Hobo::RapidHelper
 
   AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
   
-  AJAX_ATTRS = AJAX_CALLBACKS + [:type, :method,
-                                 :script, :form, :params, :confirm,
-                                 :reset_form, :refocus_form, :result_update, :spinner_next_to]
+  AJAX_ATTRS = AJAX_CALLBACKS + [ :type, :method,
+                                  :script, :form, :params, :confirm,
+                                  :reset_form, :refocus_form, :result_update, :spinner_next_to ]
 
 
   def editor_class
@@ -135,11 +135,11 @@ module Hobo::RapidHelper
   end
 
 
-  def secondary_collection_names(object=this)
-    secondary_collection_names = object.class.reflections.values.select do |refl| 
+  def non_through_collections(object=this)
+    names = object.class.reflections.values.select do |refl| 
       refl.macro == :has_many
     end.*.name
     
-    (secondary_collection_names - through_collection_names) - [primary_collection_name]
+    names - through_collection_names
   end
 end
