@@ -500,7 +500,7 @@ module Hobo
     end
     
     
-    def user_destory(user)
+    def user_destroy(user)
       raise PermissionDeniedError unless Hobo.can_delete?(user, self)
       destroy
     end
