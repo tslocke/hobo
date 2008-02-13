@@ -139,7 +139,7 @@ module Hobo::Dryml
 
 
     def strip_suppressed_whiteaspace(s)
-      s.gsub(/ -(\s*\n\s*)/, '<% \1 %>')
+      s # s.gsub(/ -(\s*\n\s*)/, '<% \1 %>')
     end
     
     
