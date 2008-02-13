@@ -20,14 +20,16 @@
     <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
       <a if="&linkable?"/>
-      <div class="content" param="content">
-        <primary-content if="&!linkable?"/>
+      <div class="content" param="content" if="&!linkable?">
+        <primary-content/>
       </div>
       <creation-details/>
-      <set primary-collection="&primary_collection_name"/>
-      <if test="&primary_collection">
-      <span class="dependents"><count field="&primary_collection"/></span>
-      </if>
+      <do param="counter">
+        <set primary-collection="&primary_collection_name"/>
+        <if test="&primary_collection">
+          <span class="dependents"><count field="&primary_collection"/></span>
+        </if>
+      </do>
     </div>
   </if>
 </def>
@@ -44,9 +46,9 @@
   </ul>
   <p class="empty-collection-message" if="&this.empty?" param="empty-message">
     <% label = if this.respond_to?(:proxy_reflection)
-                 this.proxy_reflection.association_name.to_s
+                 this.proxy_reflection.association_name.to_s.humanize.downcase
                elsif this.respond_to?(:member_class)
-                 this.member_class.name
+                 this.member_class.name.humanize.downcase
                else
                  type_name(:plural => true).pluralize.humanize.downcase.to_s 
                end %>
