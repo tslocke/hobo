@@ -474,7 +474,7 @@ module Hobo
           respond_to do |wants|
             wants.html { re_render_form(:new) }
             wants.js   { render(:status => 500,
-                                :text => ("There was a problem creating that #{this.class.name.humanize.downcase}.\n" +
+                                :text => ("Couldn't create the #{this.class.name.titleize.downcase}.\n" +
                                           this.errors.full_messages.join("\n"))) }
           end
         end
