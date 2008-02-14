@@ -1,4 +1,5 @@
 bundle_model :ForumMembership do
+
   fields do
     moderator :boolean
     timestamps

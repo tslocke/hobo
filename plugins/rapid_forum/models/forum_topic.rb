@@ -9,6 +9,7 @@ bundle_model :ForumTopic do
   end
 
   has_many   :replies, :class_name => _ForumPost_, :foreign_key => 'topic_id', :order => :created_at, :dependent => :destroy
+  
   belongs_to :forum
 
   belongs_to :user, :creator => true
