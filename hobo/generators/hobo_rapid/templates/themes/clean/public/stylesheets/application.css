@@ -53,7 +53,7 @@ input.file_upload {
 .actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
-	margin: 20px 40px; padding: 10px 30px; border-width: 2px 0;
+	margin: 0 40px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
 .flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
@@ -87,7 +87,7 @@ input.file_upload {
 .field-list th {width: 120px;}
 .field-list td {width: auto;}
 
-.content-header, .content-body, .content-footer {margin: 10px 45px 15px; padding: 0;}
+.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
@@ -198,7 +198,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 	background: #f5f5f5;
 }
 .create-new form .submit-button {margin: 20px 130px;}
-.create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
+.primary-collection .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
 
 /* styling of generic elements */
 .creator {font-weight: bold;}
@@ -259,6 +259,7 @@ ul.collection li {clear: both; margin-left: 0; list-style: none;}
 .table-plus table td input.button {padding: 1px; margin-left: 10px; }
 .table-plus table td.controls {width: 100px;}
 .table-plus .even {background: #f8f8f8;}
+
 
 /*******************************************************/
 /* these styles are for the generated front index page */
