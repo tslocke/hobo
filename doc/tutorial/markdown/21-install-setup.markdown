@@ -1,4 +1,4 @@
-## Installing Hobo
+## Setup and Installing Hobo
 
 ### Pre-requisites
 

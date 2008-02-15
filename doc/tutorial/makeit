@@ -4,10 +4,14 @@ require 'rubygems'
 require 'appscript'
 require 'maruku'
 
-TUTORIAL_CHAPTERS = %w(overview getting-started model-layer controllers dryml)
+#TUTORIAL_CHAPTERS = %w(overview getting-started model-layer controllers dryml)
 
-TUTORIAL_CHAPTERS.each do |chapter_name|
-  html = Maruku.new(File.read("#{chapter_name}.txt")).to_html
+#TUTORIAL_CHAPTERS.each do |chapter_name|
+Dir["markdown/*.markdown"].each do |chapter_file|
+  chapter_file =~ /markdown\/(\S*).markdown/
+  chapter_name = $1
+  puts chapter_name
+  html = Maruku.new(File.read(chapter_file)).to_html
 
   # Write html for conversion to PDF (below)
   File.open("#{chapter_name}.html", 'w') do |f|

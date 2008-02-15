@@ -4,3 +4,6 @@ In this quick-start we'll run through the creation of the "POD" classified adver
 
 For this guide we're going to assume that you're working with a text-editor and command-line terminal.
 
+1. [Setup and Installing Hobo](21-install-setup.html)
+2. [Creating A Blank Application](22-blank-app.html)
+3. [Adding Models and Controllers](23-models-controllers.html)
