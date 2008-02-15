@@ -1,11 +1,12 @@
 # Getting Started
 
-In this quick-start we'll run through the creation of the "POD" classified adverts application which was featured in the early Hobo screencasts. At the time of writing those screencasts are very out-dated, but this guide brings things up to date with Hobo 0.7.1
+In this quick-start we'll run through the creation of the "POD" classified adverts application which was featured in the early Hobo screencasts. At the time of writing those screencasts are very out-dated, but this guide brings things up to date with Hobo 0.7.2.
 
 For this guide we're going to assume that you're working with a text-editor and command-line terminal.
 
+## Installing Hobo
 
-## Pre-requisites
+### Pre-requisites
 
 The main dependency for Hobo is, of course, Ruby on Rails. Hobo needs at least Rails 2.0, but it's best to get the latest version (2.0.2 at the time of writing). Rails has a few dependencies itself of course, but rather than duplicating the instructions here, just follow the instructions on the main Rails site:
 
@@ -23,7 +24,7 @@ Hobo also requires a database. Before Rails 2.0.2 the default was MySQL. It just
  * [sqlite.org: download SQLite](http://www.sqlite.org/download.html)
 
 
-## Installing Hobo
+### Installing Hobo
 
 In the process of getting Rails up and running you will install RubyGems, the package-manager for Ruby. That means installing Hobo is as easy as:
 
@@ -32,7 +33,9 @@ In the process of getting Rails up and running you will install RubyGems, the pa
 That will give you the `hobo` command, which can be used to create a new Hobo application.
 
 
-## Creating a blank application
+## Creating A Blank Application
+
+### The `hobo` command
 
 Get yourself in a directory where you want your Hobo app to be kept, and:
 
@@ -63,11 +66,13 @@ You should see the following: (lots of details removed for brevity)
           
 A directory is created called pod, have a look at the files that have been created. This is mostly a standard Rails app, but if you are familiar with the file structure that Rails creates you will notice there are some extra things here and there. In particular you will see that Hobo has been installed in `vendor/plugins`
 
-## Create the database
+From here on, all the commands have to be executed in the main directory of your application.
 
-If you're using MySQL you now need to create the database:
+### Database setup
 
-    mysqladmin create pod_development
+If you're using Sqlite, `config/database.yml` is already set up for you and you don't need to create a dababase. If you're using MySQL you now need to modify `config/database.yml` and create the database.
+
+### Migration generator
     
 By default, the `hobo` command creates a user model. The database table for this model needs to be created. The migration generator can do this for us:
 
@@ -82,7 +87,7 @@ You should see:
       t.string   :remember_token
       t.datetime :remember_token_expires_at
       t.string   :username
-      t.boolean  :administrator
+      t.boolean  :administrator, :default => false
       t.datetime :created_at
       t.datetime :updated_at
     end
@@ -92,13 +97,12 @@ You should see:
     drop_table :users
     ----------------------------------
     What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?
+{: .ruby}
     
 Respond with `m` and then give something like "add users" as the filename. The migration file will be created in db/migrate, and the `users` table will be created.
 
-    
+  
 ## Start the app
-
-From here on, all the commands have to be given in the main directory of your application.
 
 Launch Rails' built in development server with:
 
@@ -106,8 +110,7 @@ Launch Rails' built in development server with:
     
 And point your browser at `http://localhost:3000`. You should see:
 
-<img src="images/front-page.png">
-
+![Front Page](images/front-page.png)
 
 ## Sign-up and Log-in
 

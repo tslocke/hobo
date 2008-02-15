@@ -18,6 +18,7 @@ In Rails terms, we would write:
     class Category < ActiveRecord::Base
       has_many :adverts
     end
+{: .ruby}
 
 The models need some data in them. Users won't need any extra fields beyond what hobo gives us automatically, but adverts will need a title and a body, and categories will need a name. With Hobo we declare the fields inside the models. We would code this as follows (don't do anything yet -- this is just to give you an overview of the data-model):
 
@@ -36,7 +37,8 @@ The models need some data in them. Users won't need any extra fields beyond what
       end
       has_many :adverts
     end
-    
+{: .ruby}
+
 OK let's go ahead and create these models. As mentioned, `User` is already done. Let's generate `Advert` and `Category`
 
 (Tip: keep the development server running in its terminal, and open up a new terminal in which to run these commands. That way you can just refresh the browser when you want to see the changes to the web-app)
@@ -58,6 +60,7 @@ We need to edit the files that have been created in `app/models`. Let's start wi
       # --- Hobo Permissions --- #
       # Ignore everything below here for now
     end
+{: .ruby}
     
 There are a few differences from the skeleton file we described above. Firstly, there are four stub methods for Hobo's permission system -- we'll ignore those for now. There's the `hobo_model` declaration, which all Hobo-enhanced models need, and there's the word `timestamps` in the `fields` block. `timestamps` tells Hobo to add the standard `created_at` and `updated_at` fields to this model (Active Record will maintain these fields automatically).
 
@@ -65,6 +68,7 @@ We need to add the two associations:
 
     belongs_to :user
     belongs_to :category
+{: .ruby}
 
 And the two fields:
     
@@ -73,6 +77,7 @@ And the two fields:
       body  :text
       timestamps
     end
+{: .ruby}
     
 The file should end up looking like this:
     
@@ -92,7 +97,7 @@ The file should end up looking like this:
       # --- Hobo Permissions --- #
       # Don't change anything below here yet
     end
-    
+{: .ruby}
 
 Similarly, edit the `app/models/category.rb` to look like this:
 
@@ -111,6 +116,7 @@ Similarly, edit the `app/models/category.rb` to look like this:
       # --- Hobo Permissions --- #
       # Don't change anything below here yet
     end
+{: .ruby}
     
 Finally, we need to add just one thing to `app/models/user.rb` -- the `has_many :adverts` declaration. The file should end up looking like this:
 
@@ -131,6 +137,7 @@ Finally, we need to add just one thing to `app/models/user.rb` -- the `has_many 
       # --- Hobo Permissions --- #
       # Don't change anything below here yet
     end
+{: .ruby}
     
 With those changes in place, we're ready to create the database tables:
 
@@ -138,7 +145,7 @@ With those changes in place, we're ready to create the database tables:
     
 That should output:
 
-    ---------- Up Migration ----------
+    --------- Up Migration ----------
     create_table :adverts do |t|
       t.string   :title
       t.text     :body
@@ -160,6 +167,7 @@ That should output:
     drop_table :categories
     ----------------------------------
     What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?
+{: .ruby}
     
 Notice how the generator knows to create the two foreign keys on the adverts table according to Active Record conventions. Respond with `m` and give something like "add adverts and categories" as the migration name.
 
@@ -213,6 +221,7 @@ File: app/models/category.rb
     def viewable_by?(user, field)
       true
     end
+{: .ruby}
     
 This means, no one is allowed to create, change or delete categories, but anyone can view them. We want to allow the administrator to make any changes, so we'll edit the file like this:
 
@@ -235,6 +244,7 @@ File: app/models/category.rb
     def viewable_by?(user, field)
       true
     end
+{: .ruby}
 
 What's happening here? Whenever Hobo needs to know if a user is allowed to make a change, it calls one of these methods, passing the currently logged in user. If the method returns true, the operation is allowed, otherwise it is not. By returning `user.administrator?`, we're effectively saying that the administrator can perform this operation, but no-one else can.
 
@@ -273,6 +283,7 @@ File: app/models/advert.rb
     def viewable_by?(user, field)
       true
     end
+{: .ruby}
 
 What we're saying here is that anyone who is logged in is allowed to create, change and delete any advert. That's far too permissive but it's a start. Try logging in as someone other than admin and creating some adverts.
 
@@ -283,6 +294,7 @@ All of this is easily handled by Hobo's permission system. First of all we need 
 File: app/models/advert.rb
 
     belongs_to :user, :creator => true
+{: .ruby}
     
 Next we need to alter the permissions so that the user is not allowed to manually set the user. This requires a bit more understanding of the permission system. We'll take the create and update stages in turn.
 
@@ -295,12 +307,14 @@ File: app/models/advert.rb
     def creatable_by?(user)
       self.user == user
     end
+{: .ruby}
     
 To paraphrase, we're stating that the currently logged in user (the `user` parameter) can create this advert, as long as they are the same user as specified in the `self.user` association. In other words, you can only create your own adverts. We could go further and write:
 
     def creatable_by?(user)
       self.user == user || user.administrator?
     end
+{: .ruby}
     
 Which would exempt the administrator from this restriction, allowing them to create adverts that belong to any user.
 
@@ -311,6 +325,7 @@ If you create an advert and then navigate to its edit page, you'll see that the 
 `updatable_by?` works slightly differently to the other permission methods. When an update to a record is attempted (e.g. by a form submission), Hobo retrieves the record from the database, and creates a *duplicate* of it. The changes are made to the duplicate. The `updatable_by?` method is then called on the original *unchanged* record, passing the changed record as the `new` parameter. So when we implement:
 
     def updatable_by?(user, new)
+{: .ruby}
     
 On our advert model, we know that `self` is the advert as it now exists in the database, `user` is the user attempting to make the change, and `new` is the proposed new state of the advert. This gives us all the information we need to propose pretty much any security restriction.
 
@@ -319,12 +334,14 @@ There are two restrictions we need in this case: a user should only be able to m
     def updatable_by?(user, new)
       user == self.user && same_fields?(new, :user)
     end
+{: .ruby}
     
 Or, if we want to allow administrators to do whatever they like:
 
     def updatable_by?(user, new)
       (user == self.user && same_fields?(new, :user)) || user.administrator?
     end
+{: .ruby}
     
 If you make this change, you should see two changes in the UI: the edit-advert form in the app no longer contains a user selector, and there is no edit link at all for adverts belonging to other users.
 
@@ -343,6 +360,7 @@ In our app, there's really only one such relationship: adverts exist "inside" ca
 File: app/models/category.rb
 
     has_many :adverts, :dependent => :destroy
+{: .ruby}
     
 That's it. You should see a couple of changes in the UI:
 
@@ -354,6 +372,7 @@ It also makes sense that when a user is deleted from this app, their adverts sho
 File: app/models/user.rb
 
     has_many :adverts, :dependent => :destroy
+{: .ruby}
     
 If you click on one of the user links in the app, you should now see that all of a user's adverts are listed. Remember it's very easy to change this if the assumptions built in to the automatic pages don't work for your application -- these are just useful defaults.
 

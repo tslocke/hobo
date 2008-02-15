@@ -8,7 +8,7 @@ The front page and main nav bar decide which models to show based on the presenc
 
 Hobo generates routes automatically by inspecting the controllers. Here's what the adverts controller looks like:
 
-File: app/controllers/adverts_controller.rb
+File: `app/controllers/adverts_controller.rb`
 
     class AdvertsController < ApplicationController
 
@@ -28,7 +28,7 @@ The line `auto_actions :all` causes the standard set of RESTful actions to be ad
 
 The `auto_actions` declaration can be given an `:except` clause to eliminate specific actions. Try modifying that line to:
 
-File: app/controllers/adverts_controller.rb
+File: `app/controllers/adverts_controller.rb`
 
     auto_actions :all, :except => :index
     
@@ -42,7 +42,7 @@ The "New Category" page is a bit overkill -- a whole page for a form with a sing
 
 Step one is to remove the "New Category" page. Modify the `auto_actions` in the Categories controller, much as we did with the Adverts controller:
 
-File: app/controllers/categories_controller.rb
+File: `app/controllers/categories_controller.rb`
 
     auto_actions :all, :except => :new
     
