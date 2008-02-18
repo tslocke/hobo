@@ -8,6 +8,8 @@ bundle_model :Comment do
   end
 
   belongs_to _comment_target_
+
+  validates_presence_of :body
   
   feature :author_model do
     belongs_to :author, :class_name => _Author_, :creator => true
