@@ -3,7 +3,7 @@
     <h2 param="title"><a><view:title/></a></h2>
     <do if="features_comments?">
       <p class="date-comment-summary">
-        <span class="created-at"><view:created_at/></span>
+        <span class="created-at"><view:published_at/></span>
         <count:comments if-any/>
         <else><span param="no-comments">No comments</span></else>
       </p>

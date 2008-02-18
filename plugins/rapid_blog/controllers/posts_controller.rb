@@ -23,6 +23,11 @@ bundle_model_controller :BlogPost do
     end
   end
 
+
+  index_action :archive do
+    @this = model.all_posts_by_month
+  end
+
   
   private
   

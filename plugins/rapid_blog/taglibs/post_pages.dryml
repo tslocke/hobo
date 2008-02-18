@@ -26,11 +26,17 @@
   </index-page-without-rapid-blog>
 </def>
 
+<def tag="show-page" extend-with="rapid-blog">
+  <show-page-without-rapid-blog merge>
+    <field-list: replace/>
+  </show-page-without-rapid-blog>
+</def>
+
 
 <def tag="archive-page">
-  <page merge>
+  <page merge title="Blog Post Archive">
     <content-body:>
-      <blog-posts-list-by-month with="&@posts_by_month" param />
+      <blog-posts-list-by-month param />
     </content-body>
   </page>
 </def>
