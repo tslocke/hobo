@@ -1,0 +1,19 @@
+# HoboSupport - Methodphitamine
+
+    >> require 'hobosupport'
+    >> HoboSupport::VERSION
+    => "0.1"
+
+## Kernel#it and Kernel#its
+
+A nice hack from Jay Phillips, christened "Methodphitamine". The low-down is in the [original blog post][1].
+
+[1]: http://jicksta.com/articles/2007/08/04/the-methodphitamine
+
+    >> (1..10).select &it % 2 == 0
+    => [2, 4, 6, 8, 10]
+    >> %w(a few short words).map &its.length
+    => [1, 3, 5, 5]
+    
+Note that `it` and `its` are identical. They just read better in different contexts. Note that methodphitamine is also released directly by Jay (simply `gem install methodphitamine`) but it's small enough that it seemed easier to add it to HoboSupport and avoid an extra dependency. Thanks to Jay.
+

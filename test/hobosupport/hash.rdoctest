@@ -1,0 +1,124 @@
+# HoboSupport - Hash extensions
+
+    >> require 'hobosupport'
+    >> HoboSupport::VERSION
+    => "0.1"
+    
+## Hash#select_hash
+
+* `hash.select_hash { |key, value| block } => hash`
+* `hash.select_hash { |value| block } => hash`
+
+This is the Hash version of `Enumerable#select`. i.e. a way to create a new hash with only some of the items still present. The block is passed each key value pair. The new hash only contains items for which the block returned true.
+
+    >> {1=>2, 3=>4, 6=>5}.select_hash { |key, value| key < value }
+    => {1=>2, 3=>4}
+    
+You can also give a block that takes one argument, in which case the block is given the value only
+
+    >> {1=>2, 3=>4, 6=>5}.select_hash { |value| value != 2 }
+    => {3=>4, 6=>5}
+    
+
+## Hash#map_hash
+
+* `hash.map_hash { |key, value| block } => hash`
+* `hash.map_hash { |value| block } => hash`
+
+Applies a function to each *value* in a Hash, resulting in a new hash with the same keys but new values. The block is passed each key, value pair and should return the new value
+
+    >> {1=>2, 3=>4, 6=>5}.map_hash { |key, value| key < value }
+    => {1=>true, 3=>true, 6=>false}
+    
+You can also give a block which takes one argument, in which case only the value is passed in
+
+    >> {1=>2, 3=>4, 6=>5}.map_hash { |value| value * 100 }
+    => {1=>200, 3=>400, 6=>500 }
+
+    
+## Hash#partition_hash
+
+* `hash.partition_hash(keys) => [hash1, hash2]`
+* `hash.partition_hash { |key, value| block } => hash`
+
+Returns an array of two hashes, the first with all the key/value pairs where the key was in passed Enumerable, the second with the remaining key/value pairs
+
+    >> {1=>2, 3=>4, 6=>5}.partition_hash([1, 3])
+    => [{1=>2, 3=>4}, {6=>5}]
+    
+When passed a block, each pair is passed to the block in turn. The result is two hashes, the first containing those pairs for which the block returned true, the second with the remaining pairs
+
+    >> {1=>2, 3=>4, 6=>5}.partition_hash { |key, value| key < value }
+    => [{1=>2, 3=>4}, {6=>5}]
+    
+## Hash.recursive_update
+
+* `hash.recursive_update(hash2)`
+
+Like `#update` but where a sub-hash would overwrite another sub-hash, they are instead also merged, recursively
+
+    >> h = { :a => 1, :b => { :x => 10 } }
+    >> h.recursive_update({ :c => 3, :b => { :y => 20 } })
+    >> h
+    => { :a => 1, :b => { :x => 10, :y => 20}, :c => 3 }
+
+
+## Hash#-
+
+* `hash - array => hash`
+
+Returns a new hash, the left-hand-side hash with all pairs removed where the key is present in the right-hand-side array.
+
+    >> {1=>2, 3=>4, 6=>5} - [1, 3]
+    => {6 => 5}
+    
+## Hash#&
+
+* `hash & array => array`
+
+Returns a new array, the left hand side hash restricted to pairs where the key is present in the right-hand-side array
+
+    >> {1=>2, 3=>4, 6=>5} & [1, 3]
+    => {1=>2, 3=>4}
+    
+## Hash#|
+
+* `hash | hash => hash`
+
+An alias for merge
+
+    >> {1 => 2} | {1 => 3, 2 => 4}
+    => {1 => 3, 2 => 4}
+    
+    
+## Hash#get
+
+* `hash.get(*args) => hash`
+
+Returns an array of values for the given keys. Useful for extracting a few options into local variables.
+
+    >> {1=>2, 3=>4, 6=>5}.get(1, 3)
+    => [2, 4]
+    
+## Hash#compact
+
+* `hash.compact => hash`
+
+Returns a hash with the same items as the receiver except those where the value is nil
+
+    >> {1=>'a', 2=>nil, 3=>'b'}.compact
+    => {1=>'a', 3=>'b'}
+    
+## Hash#compact
+
+* `hash.compact!`
+
+Removes every pair from the hash where the value is nil
+
+    >> h = {1=>'a', 2=>nil, 3=>'b'}
+    >> h.compact!
+    >> h
+    => {1=>'a', 3=>'b'}
+    
+
+

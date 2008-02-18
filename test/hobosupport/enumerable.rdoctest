@@ -1,0 +1,130 @@
+# HoboSupport - Eumerable extensions
+
+    >> require 'hobosupport'
+    >> HoboSupport::VERSION
+    => "0.1"
+
+## Enumerable#search
+
+* `enum.search(not_found) { |element| block}`
+
+Iterates through an enumerable passing each element in turn to the block. Returns the first true value returned by the block, or `not_found` if the block never returns a true value.
+
+E.g. The length of the first word that starts with a capital letter
+
+    >> %w(my name is Fred).search { |s| s.length if s =~ /^[A-Z]/ }
+    => 4
+    
+## Enumerable#map_with_index
+
+* `enum.map_with_index { |element, index| block }`
+
+Just like #map but the block gets the element and the index.
+
+    >> %w(some short words).map_with_index { |s, i| s * i }
+    => ["", "short", "wordswords"]
+    
+## Enumerable#build_hash
+
+* `enum.build_hash { |element| block }`
+
+The block is passed each element in turn and should return a key/value pair. If the block returns nil, nothing is added to the hash.
+
+    >> %w(some short words).build_hash { |s| [s, s.length] unless s == "short" }
+    => {"some"=>4, "words"=>5}
+    
+
+## Enumerable#map_hash
+
+* `enum.map_hash { |element| block }`
+
+Each element is passed to the block. Returns a hash where the keys are the elements from the enumerable, and the values are those returned by the block for the given key.
+
+    >> %w(some short words).map_hash { |s| s.length }
+    => {"some"=>4, "short"=>5, "words"=>5}
+
+## Enumerable#rest
+
+Shorthand for `enum[1..-1]`
+
+    >> %w(some short words).rest
+    => ["short", "words"]
+    
+    
+## Enumerable#*
+
+Shorthand for `map` when you need to map a single method call on the elements.
+
+    >> %w(some short words).*.length
+    => [4, 5, 5]
+    
+## Enumerable#where
+
+Shorthand for `select` when you need to select on a single method call.
+
+    >> %w(some short words).where.include?("r")
+    => ["short", "words"]
+    
+## Enumerable#where_not
+
+Shorthand for `reject` when you need to reject on a single method call.
+
+    >> %w(some short words).where_not.include?("r")
+    => ["some"]
+    
+## Enumerable#drop_while
+
+* `enum.drop_while { |element| block }`
+
+Passes each element in turn to the block until the block returns false. Returns the remaining elements in a new array.
+
+    >> %w(this is a nice example).drop_while { |s| s.length > 1 }
+    => ["a", "nice", "example"]
+    
+There is also a destructive version for arrays
+
+    >> a = %w(this is a nice example)
+    >> a.drop_while! { |s| s.length > 1 }
+    >> a
+    => ["a", "nice", "example"]
+    
+
+## Enumerable#take_while
+
+* `enum.take_while { |element| block }`
+
+Passes each element in turn to the block until the block returns false. Returns a new with the elements for which the block returned true
+
+    >> %w(this is a nice example).take_while { |s| s.length > 1 }
+    => ["this", "is"]
+
+
+## Object#in?
+
+* `obj.in?(enum)`
+
+Shorthand for `enum.include?(obj)`
+
+    >> 3.in?(0..10)
+    => true
+    >> 300.in?(0..10)
+    => false
+
+`in?` treats nil as an empty enumeration:
+
+    >> 3.in?(nil)
+    => false
+
+## Object#not_in?
+
+* `obj.not_in?(enum)`
+
+    >> 3.not_in?(0..10)
+    => false
+    >> 300.not_in?(0..10)
+    => true
+
+`not_in?` treats nil as an empty enumeration:
+
+    >> 3.not_in?(nil)
+    => true

@@ -1,0 +1,53 @@
+# HoboSupport
+
+HoboSupport is a mixed bag of core ruby extensions that have been extracted from the [Hobo][] project
+
+[Hobo]: http://hobocentral.net
+
+    >> require 'hobosupport'
+    >> HoboSupport::VERSION
+    => "0.1"
+
+## Object extensions
+
+### Object#is_a?
+
+Extended to allow multiple types to be checked in one go
+
+    >> "foo".is_a?(String, Symbol)
+    => true
+    >> :foo.is_a?(String, Symbol)
+    => true
+    >> 1.is_a?(String, Symbol)
+    => false
+    
+Still works the old way
+
+    >> "foo".is_a?(String)
+    => true
+    >> :foo.is_a?(String)
+    => false
+    
+    
+## Method call extensions
+
+### Object#_?
+
+We have the "." operator to call methods on objects. These extensions introduce two "special dots". "`._?.`" only calls the method if the receiver is not `nil`.
+
+    >> "foo"._?.length
+    => 3
+    >> nil._?.length
+    => nil
+    
+
+### Object#try
+
+"`.try`" only calls the method if the receiver responds to that method.
+
+    >> "foo".try.length
+    => 3
+    >> :foo.try.length
+    => nil
+
+
