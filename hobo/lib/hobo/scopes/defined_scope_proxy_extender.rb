@@ -8,7 +8,7 @@ module Hobo
       
       def method_missing(name, *args, &block)
         if (scope = named_scope(name))
-          association_proxy_for_scope(name, scope, *args)
+          association_proxy_for_scope(name, scope, args)
         else
           super
         end

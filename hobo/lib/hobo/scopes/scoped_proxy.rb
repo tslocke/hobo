@@ -36,10 +36,10 @@ module Hobo
       def _apply_scope
         if @parent_scope
           @parent_scope.send(:_apply_scope) do
-            @scope ? @klass.send(:with_scope, @scope) { yield } : yield
+            @scope ? @klass.send(:with_scope, :find => @scope) { yield } : yield
           end
         else
-          @scope ? @klass.send(:with_scope, @scope) { yield } : yield
+          @scope ? @klass.send(:with_scope, :find => @scope) { yield } : yield
         end
       end
       
