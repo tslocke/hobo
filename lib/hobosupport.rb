@@ -1,3 +1,5 @@
+require 'activesupport'
+
 require "hobosupport/fixes"
 require 'hobosupport/blankslate'
 require 'hobosupport/methodcall'
