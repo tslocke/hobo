@@ -52,8 +52,12 @@ end
 
 class CallIfAvailable < BlankSlate
   
+  def initialize(target)
+    @target = target
+  end
+  
   def method_missing(name, *args, &b)
-    @me.send(name, *args, &b) if @me.respond_to?(name)
+    @target.send(name, *args, &b) if @target.respond_to?(name)
   end
   
 end
