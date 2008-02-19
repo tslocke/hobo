@@ -1,5 +1,4 @@
 # gem dependencies
-gem 'hobosupport', "= 0.1"
 require 'hobosupport'
 
 # Monkey patches, ooh ooh

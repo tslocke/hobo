@@ -27,6 +27,7 @@ module Hobo
       Hobo.register_model(base)
 
       base.class_eval do
+        inheriting_cattr_reader :default_order, :id_name_options
         alias_method_chain :attributes=, :hobo_type_conversion
         default_scopes
       end
@@ -251,8 +252,6 @@ module Hobo
         @default_order = order
       end
       
-      inheriting_attr_reader :default_order, :id_name_options
-
 
       def never_show(*fields)
         @hobo_never_show ||= []
