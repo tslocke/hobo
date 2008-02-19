@@ -20,18 +20,25 @@ module Hobo
       end
       
       
-      def association_proxy_for_scope(name, scope, args)
-        scope_name = "@#{name.to_s.gsub('?','')}_scope"
-
-        # Calling instance_variable_get or set directly causes self to
-        # get loaded, hence the 'bind' tricks
-        
-        Kernel.instance_method(:instance_variable_get).bind(self).call(scope_name) or
-          begin
-            scope = scope.call(*args) if scope.is_a?(Proc)
-            assoc = create_association_proxy_for_scope(name, scope)
-            Kernel.instance_method(:instance_variable_set).bind(self).call(scope_name, assoc)
-          end
+      def association_proxy_for_scope(name, scope_or_proc, args)
+        if scope_or_proc.is_a?(Proc)
+          scope = scope_or_proc.call(*args)
+          create_association_proxy_for_scope(name, scope)
+        else
+          # This scope is not parameterised so we can cache the
+          # association-proxy in an instance variable
+          scope = scope_or_proc
+          scope_ivar = "@#{name.to_s.gsub('?','')}_scope"
+          
+          # Some craziness here -- calling instance_variable_get or
+          # set directly causes self to get loaded, hence the 'bind'
+          # tricks
+          Kernel.instance_method(:instance_variable_get).bind(self).call(scope_ivar) or
+            begin
+              assoc = create_association_proxy_for_scope(name, scope)
+              Kernel.instance_method(:instance_variable_set).bind(self).call(scope_ivar, assoc)
+            end
+        end
       end
       
       
