@@ -6,13 +6,7 @@ module Hobo
       
       def initialize(klass, scope)
         @klass = klass
-        
-        # If there's no :find, or :create specified, assume it's a find scope
-        @scope = if scope.has_key?(:find) || scope.has_key?(:create)
-                   scope
-                 else
-                   { :find => scope }
-                 end
+        @scope = scope
       end
       
       
