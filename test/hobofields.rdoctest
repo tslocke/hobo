@@ -1,0 +1,124 @@
+# HoboFields
+
+HoboFields provides two main features:
+
+ * An extension to ActiveRecord that provides rich field types such as "markdown text" or "email address"
+ * A generator that writes your migrations for you. Your migration writing days are over.
+ 
+This is all done using a declaration of your fields that you put in your models, for example
+
+    class BlogPost < ActiveRecord::Base
+    
+      fields do
+        title :string
+        body  :text
+      end
+      
+    end
+
+To start, we need to configure ActiveSupport for auto-loading
+
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> Dependencies.load_paths << '.'
+    >> Dependencies.mechanism = :require
+    
+And we'll require:
+
+    >> require 'activerecord'
+    >> require 'hobofields'
+
+We also need to get ActiveRecord set up with a database connection
+
+    >> mysql_database = "hobofields_doctest"
+    >> system("mysqladmin create #{mysql_database}") or 
+         raise "could not create database"
+    >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+                                               :database => mysql_database,
+                                               :host => "localhost")
+
+## The migration generator
+
+Now that we're connected to the database, we can run the migration generator. Normally you would use the Rails generator interface. You would type
+
+    $ script/generator hobo_migration
+    
+in your Rails app, and the migration file would be created in `db/migrate`. 
+
+In order to demonstrate the generator in this doctest script however, we'll be using the migration generator's Ruby API. The method `HoboFields::MigrationGenerator.run` returns a pair of strings -- the up migration and the down migration. 
+
+The database is empty and no ActiveRecord models exist, so it's going to tell us there is nothing to do. 
+
+
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
+  
+
+
+### Models without `fields do` are ignored
+
+The migration generator only takes into account classes that use HoboFields, i.e. classes with a `fields do` declaration. Models without this are ignored:
+
+    >> class Advert < ActiveRecord::Base; end
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
+
+
+### Create the table
+
+Now we add a `fields do` declaration, and the generator creates the `create_table` migration.
+    
+    >> 
+    class Advert < ActiveRecord::Base
+      fields do
+        name :string
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    =>>
+    create_table :adverts do |t|
+      t.string :name
+    end
+    END
+    >> down
+    => "drop_table :adverts"
+    
+This adds a range of class-methods to our model. 
+
+### `attr_type`
+
+Returns the type declared for a given field or attribute
+
+>> Advert.attr_type 'name'
+=> :string
+
+    
+
+## Cleanup
+
+    >> system  "mysqladmin --force drop #{mysql_database}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

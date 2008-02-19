@@ -1,0 +1,38 @@
+<h1 id="hobofields">HoboFields</h1>
+
+<p>HoboFields provides two main features:</p>
+
+<ul>
+<li>An extension to ActiveRecord that provides rich field types, for example &#8220;markdown text&#8221; or &#8220;email address&#8221;</li>
+<li>A generator that writes your migrations for you. No, really. Your whole migrations, up and down. Your migration writing days are over.</li>
+</ul>
+
+<p>This is all done using a declaration of your fields that you put in your models, for example</p>
+
+<pre><code>class BlogPost &lt; ActiveRecord::Base
+
+  fields do
+    title :string
+    body  :text
+  end
+
+end
+</code></pre>
+
+<p>To start, we need to configure ActiveSupport for auto-loading</p>
+
+<pre><code>&gt;&gt; require 'rubygems'
+&gt;&gt; require 'activesupport'
+&gt;&gt; Dependencies.load_paths &lt;&lt; '.'
+&gt;&gt; Dependencies.mechanism = :require
+</code></pre>
+
+<p>And we&#8217;ll require:</p>
+
+<pre><code>&gt;&gt; require 'activerecord'
+&gt;&gt; require 'hobofields'
+</code></pre>
+
+<p>We also need to get ActiveRecord set up with a database connection</p>
+
+<h2 id="declaringfields">Declaring fields</h2>
