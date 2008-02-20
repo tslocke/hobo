@@ -20,7 +20,7 @@ class Module
     names_with_defaults = (names.pop if names.last.is_a?(Hash)) || {}
     
     names_with_defaults.each do |name, default|
-      instance_variable_set("@#{name}", default) unless superclass.respond_to?(name)
+      instance_variable_set("@#{name}", default) unless !instance_variable_get("@#{name}").nil? || superclass.respond_to?(name)
     end
     
     (names + names_with_defaults.keys).each do |name|
