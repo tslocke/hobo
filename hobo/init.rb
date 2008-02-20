@@ -1,6 +1,9 @@
 # gem dependencies
 require 'hobosupport'
 
+# Force load:
+HoboFields
+
 # Monkey patches, ooh ooh
 require 'rexml'
 require 'active_record/has_many_association'
@@ -13,7 +16,6 @@ require 'hobo'
 require 'hobo/dryml'
 
 require 'hobo/model'
-require 'hobo/field_declaration_dsl'
 
 require 'hobo/dryml/template'
 require 'hobo/dryml/taglib'
@@ -21,16 +23,6 @@ require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
 require 'extensions/test_case' if RAILS_ENV == "test"
-
-# Rich data types
-require "hobo/html_string"
-require "hobo/markdown_string"
-require "hobo/textile_string"
-require "hobo/password_string"
-require "hobo/text"
-require "hobo/email_address"
-require "hobo/enum_string"
-require "hobo/percentage"
 
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
@@ -67,3 +59,14 @@ end
 # Default settings
 
 Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
+
+
+module ::Hobo
+  # Empty class to represent the boolean type.
+  class Boolean; end
+end
+
+
+if defined? HoboFields
+  HoboFields.never_wrap(Hobo::Undefined)
+end

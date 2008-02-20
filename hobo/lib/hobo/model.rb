@@ -8,16 +8,6 @@ module Hobo
     PRIMARY_CONTENT_GUESS = %w(description body content profile)
     SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
     
-    PLAIN_TYPES = { :boolean       => TrueClass,
-                    :date          => Date,
-                    :datetime      => Time,
-                    :integer       => Fixnum,
-                    :big_integer   => BigDecimal,
-                    :float         => Float,
-                    :string        => String
-                  }
-    
-    Hobo.field_types.update(PLAIN_TYPES)
     
     def self.included(base)
       base.extend(ClassMethods)
@@ -34,15 +24,10 @@ module Hobo
       
       class << base
         alias_method_chain :has_many, :defined_scopes
-        alias_method_chain :belongs_to, :foreign_key_declaration
-        alias_method_chain :belongs_to, :hobo_metadata
+        alias_method_chain :belongs_to, :creator_metadata
         alias_method_chain :belongs_to, :scopes
         
         alias_method_chain :has_one, :new_method
-        
-        alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
-        
-        alias_method_chain :attr_accessor, :rich_types
         
         def inherited(klass)
           fields do
@@ -61,6 +46,18 @@ module Hobo
       
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
+      
+      
+      def field_added(name, type, args, options)
+        self.name_attribute            = name.to_sym if options.delete(:name)
+        self.primary_content_attribute = name.to_sym if options.delete(:primary_content)
+        self.creator_attribute         = name.to_sym if options.delete(:creator)
+        validate = options.delete(:validate) {true}
+        
+        #FIXME - this should be in Hobo::User
+        send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
+      end
+      
       
       def user_new(user, attributes={})
         record = new(attributes)
@@ -116,77 +113,10 @@ module Hobo
       
       private
       
-      
-      def validate_virtual_field(*args)
-        validates_each(*args) {|record, field, value| msg = value.validate and errors.add(field, msg) if value.respond_to?(:validate) }
-      end
-      
-      def return_type(type)
-        @next_method_type = type
-      end
-      
-      def method_added(name)
-        if @next_method_type
-          set_field_type(name => @next_method_type)
-          @next_method_type = nil
-        end
-      end
-      
-      
-      def fields(&b)
-        dsl = FieldDeclarationsDsl.new(self)
-        if b.arity == 1
-          yield dsl
-        else
-          dsl.instance_eval(&b)
-        end
-      end
-      
-      
-      # This adds a :type => ??? option to attr_accessor. If this
-      # option is given, the setter will wrap values that are not of
-      # the right type.
-      def attr_accessor_with_rich_types(*attrs)
-        options = attrs.extract_options!
-        type = options[:type]
-        if type
-          type = Hobo.field_types[type] if type.is_a?(Symbol)
-          attrs.each do |attr|
-            set_field_type attr => type
-            define_method "#{attr}=" do |val|
-              unless val.nil? || val.is_a?(type) || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?)
-                val = type.new(val)
-              end
-              instance_variable_set("@#{attr}", val)
-            end
-          end
-          
-          attr_reader *attrs
-        else
-          attr_accessor_without_rich_types(*attrs)
-        end
-      end
-      
-      
-      def belongs_to_with_foreign_key_declaration(name, options={}, &block)
-        res = belongs_to_without_foreign_key_declaration(name, options, &block)
-        refl = reflections[name]
-        fkey = refl.primary_key_name
-        column_options = {}
-        column_options[:null] = options[:null] if options.has_key?(:null)
-        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer, column_options)
-        if refl.options[:polymorphic]
-          type_col = "#{name}_type"
-          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
-          never_show(type_col)
-        end
-        res
-      end
-      
-      
-      def belongs_to_with_hobo_metadata(name, options={}, &block)
+            
+      def belongs_to_with_creator_metadata(name, options={}, &block)
         self.creator_attribute = name.to_sym if options.delete(:creator)
-        belongs_to_without_hobo_metadata(name, options, &block)
+        belongs_to_without_creator_metadata(name, options, &block)
       end
       
       
@@ -214,37 +144,6 @@ module Hobo
       def has_one_with_new_method(name, options={}, &block)
         has_one_without_new_method(name, options)
         class_eval "def new_#{name}(attributes={}); build_#{name}(attributes, false); end"
-      end
-
-
-      def acts_as_list_with_fields(options = {})
-        fields { |f| f.send(options._?[:column] || "position", :integer) }
-        acts_as_list_without_fields(options)
-      end
-
-
-      def field_specs
-        @field_specs ||= HashWithIndifferentAccess.new
-      end
-      public :field_specs
-      
-      def set_field_type(types)
-        types.each_pair do |field, type|
-          type_class = Hobo.field_types[type] || type
-          field_types[field] = type_class
-          
-          if type_class && "validate".in?(type_class.instance_methods)
-            self.validate do |record|
-              v = record.send(field)._?.validate
-              record.errors.add(field, v) if v.is_a?(String)
-            end
-          end
-        end
-      end
-      
-      
-      def field_types
-        @hobo_field_types ||= superclass.respond_to?(:field_types) ? superclass.field_types : {}
       end
       
       
@@ -324,36 +223,7 @@ module Hobo
       attr_reader :id_name_column
 
       
-      def field_type(name)
-        name = name.to_sym
-        
-        field_types[name] or
-          if (refl = reflections[name])
-            if refl.macro.in?([:has_one, :belongs_to])
-              refl.klass
-            else
-              refl
-            end
-          end or begin
-            col = column(name)
-            return nil if col.nil?
-            case col.type
-            when :boolean
-              TrueClass
-            when :text
-              Hobo::Text
-            else
-              col.klass
-            end
-          end
-      end
-      
-      
-      def column(name)
-        columns.find {|c| c.name == name.to_s} rescue nil
-      end
-      
-      
+      # FIXME: Get rid of this junk :-)
       def conditions(*args, &b)
         if args.empty?
           ModelQueries.new(self).instance_eval(&b)._?.to_sql
@@ -362,7 +232,7 @@ module Hobo
         end
       end
       
-
+      # FIXME: Get rid of the model-queries stuff from here
       def find(*args, &b)
         options = args.extract_options!
         if args.first.in?([:all, :first]) && options[:order] == :default
@@ -409,26 +279,18 @@ module Hobo
       end
 
 
-      def subclass_associations(association, *subclass_associations)
-        refl = reflections[association]
-        for assoc in subclass_associations
-          class_name = assoc.to_s.classify
-          options = { :class_name => class_name, :conditions => "type = '#{class_name}'" }
-          options[:source] = refl.source_reflection.name if refl.source_reflection
-          has_many(assoc, refl.options.merge(options))
-        end
-      end
-
       def creator_type
         reflections[creator_attribute]._?.klass
       end
 
+      
       def search_columns
         cols = columns.*.name
         SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
       end
       
-      # This should really be a method on AssociationReflection
+      
+      # FIXME: This should really be a method on AssociationReflection
       def reverse_reflection(association_name)
         refl = reflections[association_name]
         return nil if refl.options[:conditions]
@@ -511,7 +373,7 @@ module Hobo
     
     
     def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
-      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
+      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.attr_type(k), v) }
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
       
@@ -581,17 +443,11 @@ module Hobo
       CompositeModel.new_for([self, object])
     end
     
-    def created_date
-      created_at.to_date
-    end
-    
-    def modified_date
-      modified_at.to_date
-    end
 
     def typed_id
       id ? "#{self.class.name.underscore}_#{self.id}" : nil
     end
+
     
     def to_s
       if self.class.name_attribute
@@ -601,12 +457,15 @@ module Hobo
       end
     end
     
+    
     private
+    
     
     def parse_datetime(s)
       defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
     end
 
+    
     def convert_type_for_mass_assignment(field_type, value)
       if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) &&
           field_type.macro.in?([:belongs_to, :has_one])
@@ -635,7 +494,7 @@ module Hobo
         else
           value
         end
-      elsif field_type <= TrueClass
+      elsif field_type <= Hobo::Boolean
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
       else
         # primitive field
@@ -646,50 +505,6 @@ module Hobo
   end
 end
 
-
-# Hack AR to get Hobo type wrappers in
-
-module ActiveRecord::AttributeMethods::ClassMethods
-
-  # Define an attribute reader method.  Cope with nil column.
-  def define_read_method(symbol, attr_name, column)
-    cast_code = column.type_cast_code('v') if column
-    access_code = cast_code ? "(v=@attributes['#{attr_name}']) && #{cast_code}" : "@attributes['#{attr_name}']"
-
-    unless attr_name.to_s == self.primary_key.to_s
-      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) " +
-                                       "unless @attributes.has_key?('#{attr_name}'); ")
-    end
-
-    # This is the Hobo hook - add a type wrapper around the field
-    # value if we have a special type defined
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
-            "val = begin; #{access_code}; end; " +
-              "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; self.class.field_type(:#{attr_name}).new(val); end"
-          else
-            access_code
-          end
-    
-    evaluate_attribute_method(attr_name, 
-                              "def #{symbol}; @attributes_cache['#{attr_name}'] ||= begin; #{src}; end; end")
-  end
-  
-  def define_write_method(attr_name)
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(attr_name)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
-            "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; self.class.field_type(:#{attr_name}).new(val); end"
-          else
-            "val"
-          end
-    evaluate_attribute_method(attr_name, "def #{attr_name}=(val); " + 
-                              "write_attribute('#{attr_name}', #{src});end", "#{attr_name}=")
-    
-  end
-
-end
 
 class ActiveRecord::Base
   alias_method :has_hobo_method?, :respond_to_without_attributes?

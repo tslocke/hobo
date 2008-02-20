@@ -54,6 +54,8 @@ module Hobo
       
       def add_routes_for(map, subsite)
         module_name = subsite._?.camelize
+        
+        # FIXME: This should go directly to the controllers, not load the models first.
         Hobo.models.each do |model|
           controller_name = "#{model.name.pluralize}Controller"
           is_defined = if subsite 
