@@ -5,19 +5,14 @@ module Hobo
   class RawJs < String; end
 
   @models = []
-  @field_types = HashWithIndifferentAccess.new
   
   class << self
 
-    attr_accessor :current_theme, :field_types
+    attr_accessor :current_theme
     attr_writer :developer_features
     
-    def symbolic_type_name(type)
-      field_types.index(type)
-    end
-    
     def type_id(type)
-      symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
+      HoboFields.to_name(type) || type.name.underscore.gsub("/", "__")
     end
 
     def developer_features?
@@ -110,13 +105,15 @@ module Hobo
     end
 
     def find_by_search(query, search_targets=nil)
-      search_targets ||= begin
-        # By default, search all models, but filter out...
-        Hobo.models.select do |m| 
+      search_targets ||= 
+        begin
+          # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
+          # By default, search all models, but filter out...
+          Hobo.models.select do |m| 
           ModelRouter.linkable?(nil, m, :show) && # ...non-linkables
             model.search_columns.any?             # and models with no search-columns
+          end
         end
-      end
       
       query_words = ActiveRecord::Base.connection.quote_string(query).split
                     
@@ -134,6 +131,8 @@ module Hobo
       Hobo::ModelRouter.add_routes(m)
     end
 
+    
+    # FIXME: This method won't be needed
     def all_models
       Hobo.models.map { |m| m.name.underscore }
     end

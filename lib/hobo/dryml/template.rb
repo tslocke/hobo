@@ -202,7 +202,7 @@ module Hobo::Dryml
 
     def set_element(el)
       assigns = el.attributes.map do |name, value|
-        dryml_exception(el, "invalid name in set") unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
+        dryml_exception("invalid name in <set>", el) unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
         "#{ruby_name name} = #{attribute_to_ruby(value)}; "
       end.join
       code = apply_control_attributes("begin; #{assigns}; end", el)
@@ -212,7 +212,7 @@ module Hobo::Dryml
     
     def set_scoped_element(el)
       assigns = el.attributes.map do |name, value|
-        dryml_exception(el, "invalid name in set-scoped") unless name =~ DRYML_NAME_RX
+        dryml_exception("invalid name in <set-scoped>", el) unless name =~ DRYML_NAME_RX
         "scope[:#{ruby_name name}] = #{attribute_to_ruby(value)}; "
       end.join
       "<% scope.new_scope { #{assigns}#{tag_newlines(el)} %>#{children_to_erb(el)}<% } %>"
@@ -251,11 +251,10 @@ module Hobo::Dryml
       unsafe_name = el.attributes["tag"]
       name = Hobo::Dryml.unreserve(unsafe_name)
       if (for_type = el.attributes['for'])
-        type_name = case for_type
-                    when /^[a-z]/
+        type_name = if defined?(HoboFields) && for_type =~ /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
-                      Hobo.field_types[for_type].name
-                    when /^_.*_$/
+                      HoboFields.to_class(for_type).name
+                    elsif for_type =~ /^_.*_$/
                       rename_class(for_type)
                     else
                       for_type
@@ -459,8 +458,8 @@ module Hobo::Dryml
         'this_type'
       elsif t =~ /^[A-Z]/
         t
-      elsif t =~ /^[a-z]/
-        "Hobo.field_types[:#{t}]"
+      elsif t =~ /^[a-z]/ && defined? HoboFields.to_class
+        "Hobo.to_class(:#{t})"
       elsif is_code_attribute?(t)
         t[1..-1]
       else

@@ -60,12 +60,12 @@ module Hobo::Dryml
     
     # The type of this, or when this is nil, the type that would be expected in the current field
     def this_type
-      @_this_type ||= if this == false
-                        TrueClass
+      @_this_type ||= if this == false || this == true
+                        Hobo::Boolean
                       elsif this
                         this.class
-                      elsif this_parent && this_field && (parent_class = this_parent.class).respond_to?(:field_type)
-                        type = parent_class.field_type(this_field)
+                      elsif this_parent && this_field && (parent_class = this_parent.class).respond_to?(:attr_type)
+                        type = parent_class.attr_type(this_field)
                         if type.is_a?(ActiveRecord::Reflection::AssociationReflection)
                           reflection = type
                           if reflection.macro == :has_many
