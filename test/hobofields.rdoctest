@@ -1,0 +1,223 @@
+# HoboFields
+
+HoboFields provides two main features:
+
+ * An extension to ActiveRecord that provides rich field types such as "markdown text" or "email address"
+ * A generator that writes your migrations for you. Your migration writing days are over.
+ 
+This is all done using a declaration of your fields that you put in your models, for example
+
+    class BlogPost < ActiveRecord::Base
+    
+      fields do
+        title :string
+        body  :text
+      end
+      
+    end
+
+To start, we need to configure ActiveSupport for auto-loading
+
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> Dependencies.load_paths << '.'
+    >> Dependencies.mechanism = :require
+    
+And we'll require:
+
+    >> require 'activerecord'
+    >> require 'hobofields'
+
+We also need to get ActiveRecord set up with a database connection
+
+    >> mysql_database = "hobofields_doctest"
+    >> system("mysqladmin create #{mysql_database}") or 
+         raise "could not create database"
+    >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+                                               :database => mysql_database,
+                                               :host => "localhost")
+
+## The migration generator -- introduction
+
+Now that we're connected to the database, we can run the migration generator. Normally you would use the Rails generator interface. You would type
+
+    $ script/generator hobo_migration
+    
+in your Rails app, and the migration file would be created in `db/migrate`. 
+
+In order to demonstrate the generator in this doctest script however, we'll be using the migration generator's Ruby API. The method `HoboFields::MigrationGenerator.run` returns a pair of strings -- the up migration and the down migration. 
+
+The database is empty and no ActiveRecord models exist, so it's going to tell us there is nothing to do. 
+
+
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
+  
+
+
+### Models without `fields do` are ignored
+
+The migration generator only takes into account classes that use HoboFields, i.e. classes with a `fields do` declaration. Models without this are ignored:
+
+    >> class Advert < ActiveRecord::Base; end
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
+
+
+### Create the table
+
+Now we add a `fields do` declaration, and the generator creates the `create_table` migration.
+    
+    >> 
+    class Advert < ActiveRecord::Base
+      fields do
+        name :string
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    =>""
+    create_table :adverts do |t|
+      t.string :name
+    end
+    >> down
+    => "drop_table :adverts"
+    
+Normally the generator would create a migration that we could run with `rake db:create`. We can achieve this in irb like this:
+
+    >> ActiveRecord::Migration.class_eval up
+    >> Advert.columns.*.name
+    => ["id", "name"]
+    
+We'll define a method to make that easier next time
+
+    >>
+    def migrate
+      up, down = HoboFields::MigrationGenerator.run
+      ActiveRecord::Migration.class_eval(up)
+      ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+      [up, down]
+    end
+
+We'll have a look at the migration generator in more detail later, first we'll have a look at the extra features HoboFields has added to the model.
+
+## Model Extensions
+
+### `attr_type`
+
+Returns the type (i.e. class) declared for a given field or attribute
+
+    >> Advert.attr_type :name
+    => String
+
+
+### `validate_virtual_field`
+
+TODO
+
+### `column`
+
+A shorthand for accessing column metadata
+
+    >> col = Advert.column :name
+    >> col.name
+    "name"
+    >> col.klass
+    >> String
+
+
+## Field validations
+
+
+### Required fields
+
+    >> 
+    class Advert < ActiveRecord::Base
+      fields do
+        name :string, :required
+      end
+    end
+    >> a = Advert.new
+    >> a.valid?
+    => false
+    >> a.errors.full_messages
+    => ["Name can't be blank"]
+    >> a.name = "Jimbo"
+    >> a.save
+    => true
+    
+    
+### Unique fields
+    
+    >> 
+    class Advert < ActiveRecord::Base
+      fields do
+        name :string, :unique
+      end
+    end
+    >> a = Advert.new :name => "Jimbo"
+    >> a.valid?
+    => false
+    >> a.errors.full_messages
+    => ["Name has already been taken"]
+    >> a.name = "Sambo"
+    >> a.save
+    => true
+    
+## Rich Types
+
+    >> 
+    class Advert < ActiveRecord::Base
+      fields do
+        body :html
+      end
+    end
+    >> up, down = migrate
+    >> up
+    => "add_column :adverts, :body, :text"
+    >> down
+    => "remove_column :adverts, :body"
+
+    >> a = Advert.new :name => "Giant Peach"
+    >> a.body = "My nice shiny blog post"
+    >> a.body 
+    => "My nice shiny blog post"
+    >> a.body.class
+    => HoboFields::HtmlString
+    
+Check that it's still the right type after a database find
+
+    >> a.save
+    => true
+    >> a = Advert.find(a.id)
+    >> a.body.class
+    => HoboFields::HtmlString
+    
+
+## Cleanup
+
+    >> system  "mysqladmin --force drop #{mysql_database}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
