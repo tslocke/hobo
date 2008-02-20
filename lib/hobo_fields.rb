@@ -1,12 +1,16 @@
-gem 'hobosupport', "= 0.1"
 require 'hobosupport'
+
+module Hobo
+  # Empty class to represent the boolean type.
+  class Boolean; end
+end
 
 module HoboFields
   
   extend self
   
   PLAIN_TYPES = { 
-    :boolean       => Boolean,
+    :boolean       => Hobo::Boolean,
     :date          => Date,
     :datetime      => Time,
     :integer       => Fixnum,
@@ -20,18 +24,24 @@ module HoboFields
 
   attr_reader :field_types
   
-  def to_type(type)
-    if type.is_a?(Symbol)  
-      field_types[type] 
-    else
-      # Assume it's already a type
-      type
+  def to_class(type)
+    case type
+    when Symbol; field_types[type] 
+    when String; field_types[type.to_sym] 
+    else type # assume it's already a class
     end
   end
   
   
+  def to_name(type)
+    field_types.index(type)
+  end
+
+  
   def can_wrap?(val)
-    !@never_wrap_types.include?(val.class)
+    # Make sure we get the *real* class
+    klass = Object.instance_method(:class).bind(val).call
+    !@never_wrap_types.any? { |c| klass <= c }
   end
   
   
@@ -50,6 +60,19 @@ module HoboFields
   end
   
 end
+
+
+# Rich data types
+require "hobo_fields/html_string"
+require "hobo_fields/markdown_string"
+require "hobo_fields/textile_string"
+require "hobo_fields/password_string"
+require "hobo_fields/text"
+require "hobo_fields/email_address"
+require "hobo_fields/enum_string"
+require "hobo_fields/percentage"
+
+
 
 # Add the fields do declaration to ActiveRecord::Base
 ActiveRecord::Base.send(:include, HoboFields::FieldsDeclaration)
@@ -71,10 +94,10 @@ module ActiveRecord::AttributeMethods::ClassMethods
 
     # This is the Hobo hook - add a type wrapper around the field
     # value if we have a special type defined
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
+    src = if connected? && (type_wrapper = try.attr_type(symbol)) &&
+              type_wrapper.is_a?(Class) && type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values)
             "val = begin; #{access_code}; end; " +
-              "if HoboFields.can_wrap?(val); self.class.field_type(:#{attr_name}).new(val); else; val; end"
+              "if HoboFields.can_wrap?(val); self.class.attr_type(:#{attr_name}).new(val); else; val; end"
           else
             access_code
           end
@@ -84,15 +107,14 @@ module ActiveRecord::AttributeMethods::ClassMethods
   end
   
   def define_write_method(attr_name)
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(attr_name)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
-            "wrapper_type = self.class.field_type(:#{attr_name}); " +
-              "if !val.is_a?(wrapper_type) && HoboFields.can_wrap?(val); wrapper_type.new(val); else; val; end"
+    src = if connected? && (type_wrapper = try.attr_type(attr_name)) &&
+              type_wrapper.is_a?(Class) && type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values)
+            "begin; wrapper_type = self.class.attr_type(:#{attr_name}); " +
+              "if !val.is_a?(wrapper_type) && HoboFields.can_wrap?(val); wrapper_type.new(val); else; val; end; end"
           else
             "val"
           end
-    evaluate_attribute_method(attr_name, "def #{attr_name}=(val); " + 
-                              "write_attribute('#{attr_name}', #{src});end", "#{attr_name}=")
+    evaluate_attribute_method(attr_name, "def #{attr_name}=(val); write_attribute('#{attr_name}', #{src});end", "#{attr_name}=")
     
   end
 

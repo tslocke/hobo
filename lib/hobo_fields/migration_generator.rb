@@ -91,16 +91,18 @@ module HoboFields
     
     
     def extract_column_renames!(to_add, to_remove, table_name)
-      column_renames = renames._?[table_name.to_sym]
-      if column_renames
-        # A hash of table renames has been provided
-
+      if renames
         to_rename = {}
-        column_renames.each_pair do |old_name, new_name|
-          if to_create.delete(new_name) && to_drop.delete(old_name)
-            to_rename[old_name] = new_name
-          else
-            raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"
+        column_renames = renames._?[table_name.to_sym]
+        if column_renames
+          # A hash of table renames has been provided
+
+          column_renames.each_pair do |old_name, new_name|
+            if to_create.delete(new_name) && to_drop.delete(old_name)
+              to_rename[old_name] = new_name
+            else
+              raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"
+            end
           end
         end
         to_rename

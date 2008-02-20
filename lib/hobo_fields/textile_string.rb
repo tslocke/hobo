@@ -11,7 +11,9 @@ class Hobo::TextileString < String
       textilized.to_html
     end
   end  
-  
+
+  HoboFields.register_type(:textile, self)
+
 end
 
 class RedCloth
@@ -22,4 +24,3 @@ class RedCloth
   end 
 end
 
-Hobo.field_types[:textile] = Hobo::TextileString

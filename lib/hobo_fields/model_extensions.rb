@@ -44,7 +44,7 @@ module HoboFields
       options = attrs.extract_options!
       type = options[:type]
       if type
-        type = HoboFields.to_type(type)
+        type = HoboFields.to_class(type)
         attrs.each do |attr|
           declare_attr_type attr, type
           define_method "#{attr}=" do |val|
@@ -64,8 +64,8 @@ module HoboFields
     
     # Extend belongs_to so that it creates a FieldSpec for the foreign key
     def self.belongs_to_with_field_declarations(name, options={}, &block)
-      res = belongs_to_without_foreign_key_declaration(name, options, &block)
-      refl = reflections[name]
+      res = belongs_to_without_field_declarations(name, options, &block)
+      refl = reflections[name.to_sym]
       fkey = refl.primary_key_name
       column_options = {}
       column_options[:null] = options[:null] if options.has_key?(:null)
@@ -73,8 +73,6 @@ module HoboFields
       declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
       res
     end
-    alias_class_method_chain :belongs_to, :field_declarations
-
     
     
     # Declares the "foo_type" field that accompanies the "foo_id"
@@ -92,7 +90,7 @@ module HoboFields
     # does not effect the attribute in any way - it just records the
     # metadata.
     def self.declare_attr_type(name, type)
-      attr_types[field] = HoboFields.to_type(type)
+      attr_types[name] = HoboFields.to_class(type)
     end
 
 
@@ -102,20 +100,10 @@ module HoboFields
     # declarations.
     def self.declare_field(name, type, *args)
       options = args.extract_options!      
-      field_added(name, type, args, options)
+      try.field_added(name, type, args, options)
+      add_validations_for_field(name, type, args, options)
       declare_attr_type(name, type) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
-    end
-    
-    
-    # Hook to allow metadata to be extracted from field declarations
-    def self.field_added(name, type, args, options)
-      # FIXME: Pre-extraction, these things happened - they need a home      
-      #self.name_attribute            = name.to_sym if options.delete(:name)
-      #self.primary_content_attribute = name.to_sym if options.delete(:primary_content)
-      #self.creator_attribute         = name.to_sym if options.delete(:creator)
-      #validate = options.delete(:validate) {true}
-      #self.try.login_attribute=(name.to_sym, validate) if options.delete(:login)
     end
     
     
@@ -124,11 +112,12 @@ module HoboFields
     def self.add_validations_for_field(name, type, args, options)
       validates_presence_of   name if :required.in?(args)
       validates_uniqueness_of name if :unique.in?(args)
-              
+
+      type_class = HoboFields.to_class(type)
       if type_class && "validate".in?(type_class.public_instance_methods)
         self.validate do |record|
-          v = record.send(field)._?.validate
-          record.errors.add(field, v) if v.is_a?(String)
+          v = record.send(name)._?.validate
+          record.errors.add(name, v) if v.is_a?(String)
         end
       end
     end
@@ -146,11 +135,9 @@ module HoboFields
     # the association is a collection (has_many or habtm) return the
     # AssociationReflection instead
     def self.attr_type(name)
-      name = name.to_sym
-      
       attr_types[name] or
         
-        if (refl = reflections[name])
+        if (refl = reflections[name.to_sym])
           if refl.macro.in?([:has_one, :belongs_to])
             refl.klass
           else
@@ -158,12 +145,13 @@ module HoboFields
           end
         end or
         
-        (col = column(name) and HoboFields::PLAIN_TYPES[col.type] || col.klass)
+        (col = column(name.to_s) and HoboFields::PLAIN_TYPES[col.type] || col.klass)
     end
     
     
     # Return the entry from #columns for the named column 
     def self.column(name)
+      name = name.to_s
       columns.find {|c| c.name == name } 
     end
     

@@ -10,7 +10,7 @@ module HoboFields
       
     end
     
-    FieldDeclarationsDsl.send(:include, DeclarationHelper)
+    FieldDeclarationDsl.send(:include, DeclarationHelper)
 
     
     class << self 

@@ -17,17 +17,17 @@ module HoboFields
     
     def sql_type
       options[:sql_type] or begin
-                              if type.in?(native_types)
+                              if native_type?(type)
                                 type
                               else
-                                field_type = type.is_a?(Class) ? type : Hobo.field_types[type]
-                                field_type && field_type::COLUMN_TYPE or raise UnknownSqlTypeError, [model, name, type]
+                                field_class = HoboFields.to_class(type)
+                                field_class && field_class::COLUMN_TYPE or raise UnknownSqlTypeError, "#{model}.#{name}::#{type}"
                               end
                             end
     end
     
     def limit
-      options[:limit] || types[sql_type][:limit]
+      options[:limit] || native_types[sql_type][:limit]
     end
     
     def precision
@@ -59,8 +59,12 @@ module HoboFields
     
     private
     
+    def native_type?(type)
+      type.in?(native_types.keys - [:primary_key])
+    end
+    
     def native_types
-      model.connection.native_database_types.keys - [:primary_key]
+      model.connection.native_database_types
     end
     
   end
