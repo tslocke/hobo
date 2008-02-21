@@ -73,6 +73,9 @@ module HoboFields
       declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
       res
     end
+    class << self
+      alias_method_chain :belongs_to, :field_declarations
+    end
     
     
     # Declares the "foo_type" field that accompanies the "foo_id"
