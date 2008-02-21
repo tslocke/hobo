@@ -624,7 +624,7 @@ module Hobo::Dryml
     
     def prepend_parameter_tag_hash_item(el, metadata_name)
       name = el.name.sub(/^prepend-/, "")
-      ":#{ruby_namename} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" + 
+      ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" + 
         children_to_erb(el) + param_content_element(name) +
         "<% } } } ] }"
     end
