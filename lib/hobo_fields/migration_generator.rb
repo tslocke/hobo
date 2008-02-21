@@ -20,7 +20,7 @@ module HoboFields
     def initialize(ambiguity_resolver=nil)
       @ambiguity_resolver = ambiguity_resolver
       @drops = []
-      @renames = {}
+      @renames = nil
 
       # Force load of hobo models
       # FIXME: Can we remove this knoweldge of Hobo?
@@ -108,7 +108,7 @@ module HoboFields
         to_rename
         
       elsif @ambiguity_resolver
-        @ambiguity_resolver.extract_renames!(to_add, to_remove, "column", "#{new_table_name}.")
+        @ambiguity_resolver.extract_renames!(to_add, to_remove, "column", "#{table_name}.")
 
       else
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities in table #{table_name}"
