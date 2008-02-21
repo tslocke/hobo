@@ -1,7 +1,7 @@
 <def tag="icon" attrs="size">
   <% size ||= "medium" %>
   <do with="&this.icon || this.default_icon">
-    <img src="#{this.public_filename(size)}" alt="#{this.label}"/>
+    <img src="#{this.public_filename(size)}" alt="#{this.label}" class="icon"/>
   </do>
 </def>
 
