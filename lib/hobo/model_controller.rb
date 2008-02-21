@@ -408,12 +408,13 @@ module Hobo
 
       @model = model
       self.this ||= if collection.blank?
-                     paginated_find(options)
-                   elsif collection.is_a?(String, Symbol)
-                     paginated_find(collection, options) # a scope name
-                   else
-                     collection
-                  end
+                      paginated_find(options)
+                    elsif collection.respond_to?(:each)
+                      collection
+                    else
+                      # assume its a scope (a scope name or an actual scope object)
+                      paginated_find(collection, options) # a scope name
+                    end
     end
     
 
