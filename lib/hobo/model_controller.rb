@@ -319,12 +319,7 @@ module Hobo
       paginate = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
       options.delete(:paginate)
       if paginate
-        total_number = options.delete(:total_number) ||
-          begin
-            # If there is a conditions block, it may depend on the includes
-            count_options = conditions_proc ? { :include => options[:include] } : {}
-            model_or_assoc.count(count_options, &conditions_proc)
-          end
+        total_number = options.delete(:total_number) || model_or_assoc.count(options, &conditions_proc)
         
         @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
 
