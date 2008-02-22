@@ -109,11 +109,12 @@ module Hobo
 
 
     def site_search(query)
-      results = Hobo.find_by_search(query).select {|r| Hobo.can_view?(current_user, r, nil)}
+      results = Hobo.find_by_search(query).select{|r| Hobo.can_view?(current_user, r, nil)}
       if results.empty?
         render :text => "<p>Your search returned no matches.</p>"
       else
-        render_tags(results, :search_card, :for_type => true)
+        # TODO: call one tag that renders all the search results with headings for each model
+        render_tags(results.map {|r|r.last}.flatten, :search_card, :for_type => true)
       end
     end
 
