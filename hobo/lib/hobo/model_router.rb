@@ -21,7 +21,7 @@ module Hobo
         @linkable = Hash.new {|h, k| h[k] = Hash.new {|h, k| h[k] = {} } }
       end
       
-      def linkable(subsite, klass, action)
+      def linkable!(subsite, klass, action)
         @linkable[subsite][klass.name][action] = true
       end
       
@@ -65,8 +65,7 @@ module Hobo
                        end
           controller_filename = File.join(*["#{APP_ROOT}/controllers", subsite, "#{controller_name.underscore}.rb"].compact) 
           if is_defined || File.exists?(controller_filename)
-            owner_module = subsite ? module_name.constantize : Object
-            controller = owner_module.const_get(controller_name)
+            controller = (subsite ? "#{module_name}::#{controller_name}" : controller_name).constantize
             ModelRouter.new(map, model, controller, subsite)
           end
         end
@@ -201,7 +200,7 @@ module Hobo
     
     
     def linkable_route(name, route, action, options)
-      named_route(name, route, options.merge(:action => action.to_s)) and self.class.linkable(subsite, model, action)
+      named_route(name, route, options.merge(:action => action.to_s)) and self.class.linkable!(subsite, model, action)
     end
     
    
