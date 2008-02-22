@@ -111,7 +111,7 @@ module Hobo
           # By default, search all models, but filter out...
           Hobo.models.select do |m| 
           ModelRouter.linkable?(nil, m, :show) && # ...non-linkables
-            model.search_columns.any?             # and models with no search-columns
+            m.search_columns.any?             # and models with no search-columns
           end
         end
       
