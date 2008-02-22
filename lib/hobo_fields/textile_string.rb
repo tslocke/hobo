@@ -1,21 +1,24 @@
-class Hobo::TextileString < String
+module HoboFields
+  
+  class TextileString < String
 
-  COLUMN_TYPE = :text
+    COLUMN_TYPE = :text
 
-  def to_html
-    if blank?
-      ""
-    else
-      textilized = RedCloth.new(self, [ :hard_breaks ])
-      textilized.hard_breaks = true if textilized.respond_to?("hard_breaks=")
-      textilized.to_html
-    end
-  end  
+    def to_html
+      if blank?
+        ""
+      else
+        textilized = RedCloth.new(self, [ :hard_breaks ])
+        textilized.hard_breaks = true if textilized.respond_to?("hard_breaks=")
+        textilized.to_html
+      end
+    end  
 
-  HoboFields.register_type(:textile, self)
+    HoboFields.register_type(:textile, self)
+
+  end
 
 end
-
 class RedCloth
   # Patch for RedCloth.  Fixed in RedCloth r128 but _why hasn't released it yet.
   # http://code.whytheluckystiff.net/redcloth/changeset/128
