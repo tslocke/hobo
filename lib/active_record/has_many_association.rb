@@ -18,7 +18,7 @@ module ActiveRecord::Associations
       record = @reflection.klass.new(attributes)
       if hobo_has_many?
         set_belongs_to_association_for(record)
-        set_reverse_association(record)
+        set_reverse_association(record) unless proxy_reflection.options[:as]
       end
       record
     end
