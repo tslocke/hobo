@@ -496,7 +496,7 @@ HasManyThroughInput = Behavior.create({
         var select = this.element.down('select')
         var selected = select.options[select.selectedIndex]
         if (selected.style.display != "none" & selected.value != "") {
-            var newItem = strToDom(this.element.down('.item-proto').innerHTML)
+            var newItem = DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML)
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             newItem.down('input[type=hidden]').value = selected.innerHTML
