@@ -1,7 +1,11 @@
-class Hobo::PasswordString < String
+module HoboFields
   
-  COLUMN_TYPE = :string
-  
-  HoboFields.register_type(:password, self)
+  class PasswordString < String
+    
+    COLUMN_TYPE = :string
+    
+    HoboFields.register_type(:password, self)
+
+  end
 
 end

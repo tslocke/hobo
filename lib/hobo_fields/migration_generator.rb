@@ -21,17 +21,23 @@ module HoboFields
       @ambiguity_resolver = ambiguity_resolver
       @drops = []
       @renames = nil
-
-      # Force load of hobo models
-      # FIXME: Can we remove this knoweldge of Hobo?
-      Hobo.models if defined? Hobo
     end
     
     attr_accessor :renames
-
+    
+    def load_rails_models
+      if defined? RAILS_ROOT
+        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+        end
+      end
+    end
+    
+    
     # Returns an array of model classes that *directly* extend
     # ActiveRecord::Base, excluding anything in the CGI module
     def table_model_classes
+      load_rails_models
       ActiveRecord::Base.send(:subclasses).where.descends_from_active_record?.reject {|c| c.name.starts_with?("CGI::") }
     end 
     
@@ -49,7 +55,7 @@ module HoboFields
     # Returns an array of model classes and an array of table names
     # that generation needs to take into account
     def models_and_tables
-      ignore_model_names = MigrationGenerator.ignore.*.underscore
+      ignore_model_names = MigrationGenerator.ignore.map &it.to_s.underscore
       
       models, ignore_models = table_model_classes.partition do |m|
         m.name.underscore.not_in?(ignore_model_names) && m < HoboFields::ModelExtensions
@@ -72,7 +78,7 @@ module HoboFields
           if new_name.is_a?(Hash)
             # These are field renames -- skip
           else
-            if to_create.delete(new_name) && to_drop.delete(old_name)
+            if to_create.delete(new_name.to_s) && to_drop.delete(old_name.to_s)
               to_rename[old_name] = new_name
             else
               raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"
@@ -98,7 +104,7 @@ module HoboFields
           # A hash of table renames has been provided
 
           column_renames.each_pair do |old_name, new_name|
-            if to_create.delete(new_name) && to_drop.delete(old_name)
+            if to_add.delete(new_name.to_s) && to_remove.delete(old_name.to_s)
               to_rename[old_name] = new_name
             else
               raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"

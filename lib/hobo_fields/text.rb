@@ -2,12 +2,12 @@ module HoboFields
   
   class Text < String
     
-    include ERB::Util
+    HTML_ESCAPE = { '&' => '&amp;', '"' => '&quot;', '>' => '&gt;', '<' => '&lt;' }
     
     COLUMN_TYPE = :text
     
     def to_html
-      html_escape(self)
+      s.to_s.gsub(/[&"><]/) { |special| HTML_ESCAPE[special] }
     end
     
   end
