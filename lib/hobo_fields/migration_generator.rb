@@ -75,14 +75,13 @@ module HoboFields
 
         to_rename = {}
         renames.each_pair do |old_name, new_name|
-          if new_name.is_a?(Hash)
-            # These are field renames -- skip
+          new_name = new_name[:table_name] if new_name.is_a?(Hash)
+          next unless new_name
+          
+          if to_create.delete(new_name.to_s) && to_drop.delete(old_name.to_s)
+            to_rename[old_name] = new_name
           else
-            if to_create.delete(new_name.to_s) && to_drop.delete(old_name.to_s)
-              to_rename[old_name] = new_name
-            else
-              raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"
-            end
+            raise MigrationGeneratorError, "Invalid table rename specified: #{old_name} => #{new_name}"
           end
         end
         to_rename
