@@ -169,7 +169,7 @@
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
-<def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
+<def tag="input" for="HoboFields::EnumString" attrs="labels,titleize">
   <% labels ||= {} %>
   <% titleize = true if titleize.nil? %>
   <select name="#{param_name_for_this}" merge-attrs>
