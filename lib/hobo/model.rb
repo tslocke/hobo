@@ -25,7 +25,6 @@ module Hobo
       class << base
         alias_method_chain :has_many, :defined_scopes
         alias_method_chain :belongs_to, :creator_metadata
-        alias_method_chain :belongs_to, :scopes
         
         alias_method_chain :has_one, :new_method
         
@@ -119,28 +118,7 @@ module Hobo
         belongs_to_without_creator_metadata(name, options, &block)
       end
       
-      
-      def belongs_to_with_scopes(name, options={}, &block)
-        belongs_to_without_scopes(name, options, &block)
-        key = reflections[name].primary_key_name
-        if options[:polymorphic]
-          def_scope "#{name}_is" do |record|
-            { :conditions => ["#{table_name}.#{key} = ? AND #{name}_type = ?", record.id, record.class.name] }
-          end
-          def_scope "#{name}_is_not" do |record|
-            { :conditions => ["#{table_name}.#{key} <> ? OR #{name}_type <> ?", record.id, record.class.name] }
-          end
-        else
-          def_scope "#{name}_is" do |record|
-            { :conditions => ["#{table_name}.#{key} = ?", record.id] }
-          end
-          def_scope "#{name}_is_not" do |record|
-            { :conditions => ["#{table_name}.#{key} <> ?", record.id] }
-          end
-        end
-      end
-      
-      
+            
       def has_one_with_new_method(name, options={}, &block)
         has_one_without_new_method(name, options)
         class_eval "def new_#{name}(attributes={}); build_#{name}(attributes, false); end"
@@ -317,12 +295,19 @@ module Hobo
       def method_missing(name, *args, &block)
         name = name.to_s
         if name =~ /\./
-          parts = name.split(".")
-          s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
-          s.send(parts.last, *args)
+          call_method_chain(name, args, &block)
+        elsif create_automatic_scope(name)
+          send(name, *args, &block)
         else
           super(name.to_sym, *args, &block)
         end
+      end
+
+      
+      def call_method_chain(chain, args, &block)
+        parts = chain.split(".")
+        s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
+        s.send(parts.last, *args)
       end
 
     end # --- of ClassMethods --- #
