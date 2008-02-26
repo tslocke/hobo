@@ -18,7 +18,7 @@
 <def tag="card">
   <if test="&can_view?">
     <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
-    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly" merge-attrs>
       <a if="&linkable?"/>
       <div class="content" param="content" if="&!linkable?">
         <primary-content/>
