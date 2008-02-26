@@ -152,9 +152,8 @@ module ::Hobo
 
           if alias_name && name != alias_name
             klass.send(:alias_method, alias_name, name)
-            # alias scopes too
-            klass.send(:alias_scope, "#{alias_name}_is",     "#{name}_is")
-            klass.send(:alias_scope, "#{alias_name}_is_not", "#{name}_is_not")
+            # make the aliased name available in the classes metadata
+            klass.reflections[alias_name] = klass.reflections[name]
           end
           
         end
