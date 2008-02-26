@@ -4,6 +4,8 @@ module Hobo
     
     class ScopedProxy
       
+      #include AutomaticScopes
+      
       def initialize(klass, scope)
         @klass = klass
         @scope = scope
@@ -11,7 +13,7 @@ module Hobo
       
       
       def method_missing(name, *args, &block)
-        if name.to_sym.in?(@klass.defined_scopes.keys)
+        if name.to_sym.in?(@klass.defined_scopes.keys) || @klass.create_automatic_scope(name)
           proxy = @klass.send(name, *args)
           proxy.instance_variable_set("@parent_scope", self)
           proxy
