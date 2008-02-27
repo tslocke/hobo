@@ -23,7 +23,7 @@ module Hobo
       end
       
       class << base
-        alias_method_chain :has_many, :defined_scopes
+        alias_method_chain :has_many,   :defined_scopes
         alias_method_chain :belongs_to, :creator_metadata
         
         alias_method_chain :has_one, :new_method
