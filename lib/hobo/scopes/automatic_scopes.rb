@@ -61,7 +61,7 @@ module Hobo
 
 
         # team_is(a_team)
-        elsif name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?(:has_one, :belongs_to)
+        elsif name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
           
           if refl.options[:polymorphic]
             def_scope do |record|
@@ -76,7 +76,7 @@ module Hobo
           end
             
         # team_is(a_team)
-        elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?(:has_one, :belongs_to)
+        elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
           
           if refl.options[:polymorphic]
             def_scope do |record|
