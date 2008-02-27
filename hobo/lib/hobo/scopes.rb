@@ -45,7 +45,7 @@ module Hobo
         end
       end
       
-            
+
       # --- monkey-patches to allow :scope key on has_many, has_one and belongs_to ---
    
       def create_has_many_reflection(association_id, options, &extension)

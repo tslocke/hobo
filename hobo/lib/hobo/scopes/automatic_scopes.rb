@@ -23,58 +23,70 @@ module Hobo
       def create_scope
         matched_scope = true
         
-        # with_player(a_player)
-        if name =~ /^with_(.*)/ && (refl = reflection($1.pluralize))
-          
-          def_scope do |record|
-            { :include => refl.name, :conditions => ["#{primary_key_column refl} = ?", record] }
-          end
-          
         # with_players(player1, player2)
-        elsif name =~ /^with_(.*)/ && (refl = reflection($1))
+        if name =~ /^with_(.*)/ && (refl = reflection($1))
           
           def_scope do |*records|
-            records = records.flatten
-            { :include => refl.name, :conditions => ["#{primary_key_column refl} in (?)", records] }
+            records = records.flatten.compact.map {|r| find_if_named(refl, r) }
+            exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
+            { :conditions => [exists_sql] + records }
           end
+
+        # with_player(a_player)
+        elsif name =~ /^with_(.*)/ && (refl = reflection($1.pluralize))
           
-
-        # without_player(a_player)
-        elsif name =~ /^without_(.*)/ && (refl = reflection($1.pluralize))
-
+          exists_sql = exists_sql_condition(refl)
           def_scope do |record|
-            { :include => refl.name, :conditions => ["#{primary_key_column refl} <> ?", record] }
+            record = find_if_named(refl, record)
+            { :conditions => [exists_sql, record] }
           end
           
         # without_players(player1, player2)
-        elsif name =~ /^with_(.*)/ && (refl = reflection($1))
+        elsif name =~ /^without_(.*)/ && (refl = reflection($1))
           
           def_scope do |*records|
-            records = records.flatten
-            { :include => refl.name, :conditions => ["#{primary_key_column refl} not in (?)", records] }
+            records = records.flatten.compact.map {|r| find_if_named(refl, r) }
+            exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
+            { :conditions => ["NOT (#{exists_sql})"] + records }
           end
+
+        # without_player(a_player)
+        elsif name =~ /^without_(.*)/ && (refl = reflection($1.pluralize))
           
-        elsif name =~ /^(.*)_is$/ && (refl = reflection($1))
+          exists_sql = exists_sql_condition(refl)
+          def_scope do |record|
+            record = find_if_named(refl, record)
+            { :conditions => ["NOT #{exists_sql}", record] }
+          end
+
+
+        # team_is(a_team)
+        elsif name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?(:has_one, :belongs_to)
           
           if refl.options[:polymorphic]
             def_scope do |record|
+              record = find_if_named(refl, record)
               { :conditions => ["#{foreign_key_column refl} = ? AND #{$1}_type = ?", record, record.class.name] }
             end
           else
             def_scope do |record|
+              record = find_if_named(refl, record)
               { :conditions => ["#{foreign_key_column refl} = ?", record] }
             end
           end
             
-        elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1))
+        # team_is(a_team)
+        elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?(:has_one, :belongs_to)
           
           if refl.options[:polymorphic]
             def_scope do |record|
-              { :conditions => ["#{foreign_key_column refl} <> ? OR #{name}_type <> ?", record.id, record.class.name] }
+              record = find_if_named(refl, record)
+              { :conditions => ["#{foreign_key_column refl} <> ? OR #{name}_type <> ?", record, record.class.name] }
             end
           else
             def_scope do |record|
-              { :conditions => ["#{foreign_key_column refl} <> ?", record.id] }
+              record = find_if_named(refl, record)
+              { :conditions => ["#{foreign_key_column refl} <> ?", record] }
             end
           end
 
@@ -82,6 +94,37 @@ module Hobo
           matched_scope = false
         end
         matched_scope
+      end
+      
+      
+      def exists_sql_condition(reflection)
+        owner = @klass
+        owner_primary_key = "#{owner.table_name}.#{owner.primary_key}"
+        if reflection.options[:through]
+          join_table   = reflection.through_reflection.klass.table_name
+          source_fkey  = reflection.source_reflection.primary_key_name
+          owner_fkey   = reflection.through_reflection.primary_key_name
+          "EXISTS (SELECT * FROM #{join_table} " + 
+            "WHERE #{join_table}.#{source_fkey} = ? AND #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+        else
+          related     = reflection.klass
+          foreign_key = reflection.primary_key_name
+          
+          "EXISTS (SELECT * FROM #{related.table_name} " + 
+            "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key} AND " +
+            "#{related.table_name}.#{related.primary_key} = ?"
+        end
+      end
+        
+      
+      
+      def find_if_named(reflection, string_or_record)
+        if string_or_record.is_a?(String)
+          # FIXME: We need to ressurect the id_name concept
+          reflection.klass.find_by_name(string_or_record)
+        else
+          string_or_record
+        end
       end
       
       
@@ -93,15 +136,6 @@ module Hobo
         @klass.send(:def_scope, name, options, &block)
       end
       
-      
-      
-      
-      def with_association(klass, refl)
-      end
-      
-      def without_association(klass, refl)
-      end
-
       def primary_key_column(refl)
         "#{refl.klass.table_name}.#{refl.klass.primary_key}"
       end
@@ -109,7 +143,7 @@ module Hobo
       def foreign_key_column(refl)
         "#{@klass.table_name}.#{refl.primary_key_name}"
       end
-      
+            
     end
     
   end
