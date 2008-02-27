@@ -431,8 +431,14 @@ var Hobo = {
         return pluralisations[s] || s + "s"
     },
 
-    addUrlParams: function(params) {
+    addUrlParams: function(params, options) {
         params = $H(window.location.search.toQueryParams()).merge(params)
+
+        if (options.remove) {
+            var remove = (options.remove instanceof Array) ? options.remove : [options.remove]
+            remove.each(function(k) { params.unset(k) })
+        }
+
         return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
     }
 
@@ -524,8 +530,20 @@ HasManyThroughInput = Behavior.create({
 
 Event.addBehavior({
     'div.has-many-through.input' : HasManyThroughInput(),
-		'.association-count:click' : function(e) {
-			new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
-			Event.stop(e);
-		}
+    '.association-count:click' : function(e) {
+	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
+	Event.stop(e);
+    },
+    'select.filter:change': function(event) {
+        var param_name = this.id.gsub("-", "_")
+        var params = {}
+        remove = [ 'page' ]
+	if (this.value == '') { 
+            remove.push(param_name) 
+        } else {
+            params[param_name] = this.value
+	}
+	location.href = Hobo.addUrlParams(params, {remove: remove})
+    }
+
 });
