@@ -72,8 +72,8 @@ module Hobo
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
       end
-
-
+      
+      
       def autocomplete_for(attr, options={}, &b)
         options = options.reverse_merge(:limit => 15)
         options[:data_filters_block] = b
@@ -233,6 +233,23 @@ module Hobo
     
 
     protected
+    
+    def filter(*args)
+      filters = args.extract_options!
+      model = args.first.is_a?(Class) ? args.first : self.model
+      
+      result = model
+      filters.each_pair do |scope, parameter|
+        if parameter.is_a?(Array)
+          args = parameter.map { |p| params[p] }
+          result = result.send(scope, *args) unless args.compact.empty?
+        else
+          arg = params[parameter]
+          result = result.send(scope, arg) unless arg.nil?
+        end
+      end
+      result
+    end
     
     def data_filter(name, &b)
       @data_filters ||= HashWithIndifferentAccess.new
