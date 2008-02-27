@@ -217,6 +217,7 @@
 
 
 <def tag="delete-button" attrs="label, message, update, in-place, image, confirm, fade, subsite"><%=
+  in_place = false if in_place.nil? && this == @this
   if (Hobo::Dryml.last_if = can_delete?)
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
