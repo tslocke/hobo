@@ -424,7 +424,7 @@ module Hobo
       collection = args.first
 
       @model = model
-      self.this ||= if collection.blank?
+      self.this ||= if collection.nil?
                       paginated_find(options)
                     elsif collection.respond_to?(:each)
                       collection
