@@ -3,6 +3,7 @@ module Hobo
   module Model
     
     class PermissionDeniedError < RuntimeError; end
+    class NoNameError < RuntimeError; end
     
     NAME_FIELD_GUESS      = %w(name title)
     PRIMARY_CONTENT_GUESS = %w(description body content profile)
@@ -17,9 +18,8 @@ module Hobo
       Hobo.register_model(base)
 
       base.class_eval do
-        inheriting_cattr_reader :default_order, :id_name_options
+        inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
-        default_scopes
       end
       
       class << base
@@ -46,6 +46,13 @@ module Hobo
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
       
+      def named(*args)
+        raise NoNameError, "Model #{name} has no name attribute" unless name_attribute
+        send("find_by_#{name_attribute}", *args)
+      end
+      
+      alias_method :[], :named
+      
       
       def field_added(name, type, args, options)
         self.name_attribute            = name.to_sym if options.delete(:name)
@@ -71,16 +78,6 @@ module Hobo
         record
       end
       
-      
-      def default_scopes
-        def_scope :recent do |*args|
-          count = args.first || 3
-          { :limit => count, :order => "#{table_name}.created_at DESC" }
-        end
-        def_scope :limit do |count|
-          { :limit => count }
-        end
-      end
       
       def name_attribute
         @name_attribute ||= begin
@@ -135,11 +132,7 @@ module Hobo
         @hobo_never_show.concat(fields.*.to_sym)
       end
 
-      def never_show?(field)
-        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
-      end
-      public :never_show?
-
+      
       def set_search_columns(*columns)
         class_eval %{
           def self.search_columns
@@ -148,95 +141,29 @@ module Hobo
         }
       end
       
-
-      def id_name(*args)
-        @id_name_options = [] + args
-        
-        underscore = args.delete(:underscore)
-        insenstive = args.delete(:case_insensitive)
-        id_name_field = args.first || :name
-        @id_name_column = id_name_field.to_s
-
-        if underscore
-          class_eval %{
-            def id_name(underscore=false)
-              underscore ? #{id_name_field}.gsub(' ', '_') : #{id_name_field}
-            end
-          }
-        else
-          class_eval %{
-            def id_name(underscore=false)
-              #{id_name_field}
-            end
-          }
-        end
-        
-        key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
-        finder = if insenstive
-          "find(:first, options.merge(:conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase]))"
-        else
-          "find_by_#{id_name_field}(#{key}, options)"
-        end
-
-        class_eval %{
-          def self.find_by_id_name(id_name, options={})
-            #{finder}
-          end
-        }
-        
-        model = self
-        validate do
-          erros.add id_name_field, "is taken" if model.find_by_id_name(name)
-        end
-        validates_format_of id_name_field, :with => /^[^_]+$/, :message => "cannot contain underscores" if
-          underscore
-      end
-
-      public
       
-      def id_name?
-        respond_to?(:find_by_id_name)
+      public
+
+      
+      def never_show?(field)
+        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
+      
 
       attr_reader :id_name_column
 
       
-      # FIXME: Get rid of this junk :-)
-      def conditions(*args, &b)
-        if args.empty?
-          ModelQueries.new(self).instance_eval(&b)._?.to_sql
-        else
-          ModelQueries.new(self).instance_exec(*args, &b)._?.to_sql
-        end
-      end
-      
-      # FIXME: Get rid of the model-queries stuff from here
       def find(*args, &b)
         options = args.extract_options!
-        if args.first.in?([:all, :first]) && options[:order] == :default
+        if options[:order] == :default
           options = if default_order.blank?
-                      options - [:order]
+                      options.except :order
                     else
                       options.merge(:order => "#{table_name}.#{default_order}")
                     end
         end
-          
-        res = if b && !(block_conditions = conditions(&b)).blank?
-                c = if !options[:conditions].blank?
-                      "(#{sanitize_sql options[:conditions]}) AND (#{sanitize_sql block_conditions})"
-                    else
-                      block_conditions
-                    end
-                super(args.first, options.merge(:conditions => c))
-              else
-                super(*args + [options])
-              end
-        if args.first == :all
-          def res.member_class
-            @member_class
-          end
-          res.instance_variable_set("@member_class", self)
-        end
+        res = super(*args + [options])
+        res.metaclass_eval "def member_class; #{name}; end" if res.is_a?(Array)
         res
       end
       
@@ -246,17 +173,6 @@ module Hobo
       end
       
       
-      def count(*args, &b)
-        if b
-          sql = ModelQueries.new(self).instance_eval(&b).to_sql
-          options = args.extract_options!
-          super(*args + [options.merge(:conditions => sql)])
-        else
-          super(*args)
-        end
-      end
-
-
       def creator_type
         reflections[creator_attribute]._?.klass
       end
@@ -416,6 +332,7 @@ module Hobo
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
+    
     def only_changed_fields?(other, *changed_fields)
       return true if other.nil?
       
@@ -423,6 +340,7 @@ module Hobo
       all_cols = self.class.columns.*.name - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
+    
     
     def compose_with(object, use=nil)
       CompositeModel.new_for([self, object])
@@ -488,6 +406,7 @@ module Hobo
     end
         
   end
+  
 end
 
 
