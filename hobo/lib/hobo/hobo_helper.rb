@@ -70,15 +70,7 @@ module Hobo
                   [base, controller_name]
                 else
                   raise HoboError.new("invalid object url: new for existing object") if action == "new"
-     
-                  klass = obj.class
-                  id = if klass.id_name?
-                         obj.id_name(true)
-                       else
-                         obj.to_param
-                       end
-                  
-                  [base, controller_name, id]
+                  [base, controller_name, obj.to_param]
                 end
                 
               elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
