@@ -29,15 +29,3 @@ class Object
   end
   
 end
-
-
-# --- Rails extensions --- #
-
-# Nice tip from Jamis Buck
-if defined? ActiveRecord
-  class << ActiveRecord::Base
-    alias_method :[], :find
-  end
-end
-
-
