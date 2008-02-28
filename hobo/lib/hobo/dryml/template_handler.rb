@@ -52,8 +52,9 @@ module ActionController
       if template_path !~ /^\// &&                             # not an absolute path (e.g. an exception ERB template)
           !template_exists?(template_path) &&                  # no template available in app/views
           tag_name = "#{File.basename(template_path).dasherize}-page"
-          render_tag(tag_name) # returns true if tag was found
-        # The template was missing but a DRYML <page> tag was used instead
+
+          # The template was missing, try to use a DRYML <page> tag instead
+          render_tag(tag_name) or raise ActionController::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
       else
         render_for_file_without_dryml(template_path, *args)
       end
