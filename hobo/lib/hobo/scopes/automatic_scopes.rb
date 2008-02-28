@@ -89,9 +89,26 @@ module Hobo
               { :conditions => ["#{foreign_key_column refl} <> ?", record] }
             end
           end
-
+          
         else
-          matched_scope = false
+        
+          case name
+            
+          when "recent"
+            def_scope do |*args|
+              count = args.first || 3
+              { :limit => count, :order => "#{table_name}.created_at DESC" }
+            end
+            
+          when "limit"
+            def_scope do |count|
+              { :limit => count }
+            end
+            
+          else
+            matched_scope = false
+          end
+          
         end
         matched_scope
       end
@@ -120,8 +137,8 @@ module Hobo
       
       def find_if_named(reflection, string_or_record)
         if string_or_record.is_a?(String)
-          # FIXME: We need to ressurect the id_name concept
-          reflection.klass.find_by_name(string_or_record)
+          name = string_or_record
+          reflection.klass.named(name)
         else
           string_or_record
         end
