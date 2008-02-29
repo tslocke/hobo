@@ -23,6 +23,9 @@ module Hobo
       def create_scope
         matched_scope = true
         
+        
+        # --- Association Queries --- #
+        
         # with_players(player1, player2)
         if name =~ /^with_(.*)/ && (refl = reflection($1))
           
@@ -59,7 +62,6 @@ module Hobo
             { :conditions => ["NOT #{exists_sql}", record] }
           end
 
-
         # team_is(a_team)
         elsif name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
           
@@ -90,6 +92,100 @@ module Hobo
             end
           end
           
+        
+        # --- Column Queries --- #
+          
+        # name_is(str)
+        elsif name =~ /^(.*)_is$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} = ?", str] }
+          end
+          
+        # name_is_not(str)
+        elsif name =~ /^(.*)_is_not$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} <> ?", str] }
+          end
+          
+        # name_contains(str)
+        elsif name =~ /^(.*)_contains$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} LIKE ?", "%#{str}%"] }
+          end
+          
+        # name_does_not_contain
+        elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} NOT LIKE ?", "%#{str}%"] }
+          end
+          
+        # name_starts(str)
+        elsif name =~ /^(.*)_contains$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} LIKE ?", "#{str}%"] }
+          end
+          
+        # name_does_not_start
+        elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} NOT LIKE ?", "#{str}%"] }
+          end
+          
+        # name_ends(str)
+        elsif name =~ /^(.*)_contains$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} LIKE ?", "%#{str}"] }
+          end
+          
+        # name_does_not_end(str)
+        elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+
+          def_scope do |str|
+            { :conditions => ["#{column_sql(col)} NOT LIKE ?", "%#{str}"] }
+          end
+          
+        # published
+        elsif (col = column($1)) && (col.type == :boolean)
+
+          def_scope do 
+            { :conditions => "#{column_sql(col)} = 1" }
+          end
+        
+        # not_published
+        elsif (col = column($1)) && (col.type == :boolean)
+
+          def_scope do 
+            { :conditions => "#{column_sql(col)} <> 1" }
+          end
+          
+        # published_before(time)
+        elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+
+          def_scope do |time|
+            { :conditions => ["#{column_sql(col)} < ?", time] }
+          end
+        
+        # published_after(time)
+        elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+
+          def_scope do |time|
+            { :conditions => ["#{column_sql(col)} > ?", time] }
+          end
+
+        # published_between(time1, time2)
+        elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+
+          def_scope do |time1, time2|
+            { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} =< ?", time1, time2] }
+          end
+
         else
         
           case name
@@ -105,12 +201,23 @@ module Hobo
               { :limit => count }
             end
             
+          when "order_by"
+            def_scope do |*args|
+              fields, asc = args
+              { :order => "#{field} #{asc._?.upcase}" }
+            end
+            
           else
             matched_scope = false
           end
           
         end
         matched_scope
+      end
+      
+      
+      def column_sql(column)
+        "#{@klass.table_name}.#{column.name}"
       end
       
       
@@ -132,8 +239,7 @@ module Hobo
             "#{related.table_name}.#{related.primary_key} = ?"
         end
       end
-        
-      
+              
       
       def find_if_named(reflection, string_or_record)
         if string_or_record.is_a?(String)
@@ -145,17 +251,25 @@ module Hobo
       end
       
       
+      def column(name)
+        @klass.column(name)
+      end
+      
+      
       def reflection(name)
         @klass.reflections[name.to_sym]
       end
       
+      
       def def_scope(options={}, &block)
         @klass.send(:def_scope, name, options, &block)
       end
+
       
       def primary_key_column(refl)
         "#{refl.klass.table_name}.#{refl.klass.primary_key}"
       end
+      
       
       def foreign_key_column(refl)
         "#{@klass.table_name}.#{refl.primary_key_name}"
