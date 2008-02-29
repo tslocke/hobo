@@ -74,20 +74,14 @@ module Hobo
       end
       
       
-      def autocomplete_for(attr, options={}, &b)
+      def autocomplete_for(field, options={})
         options = options.reverse_merge(:limit => 15)
-        options[:data_filters_block] = b
-        @completers ||= HashWithIndifferentAccess.new
-        @completers[attr.to_sym] = options
+        index_action "complete_#{field}" do
+          hobo_completions(model.limit(options[:limit]).send("#{field}_contains", params[:query]))
+        end
       end
 
 
-      def autocompleter(name)
-        (@completers && @completers[name]) ||
-          (superclass.respond_to?(:autocompleter) && superclass.autocompleter(name))
-      end
-      
-      
       def web_method(web_name, options={}, &block)
         web_methods << web_name.to_sym
         method = options.delete(:method) || web_name
@@ -234,138 +228,59 @@ module Hobo
 
     protected
     
-    def filter(*args)
+    
+    def filter_scopes(*args)
       filters = args.extract_options!
-      model = args.first.is_a?(Class) ? args.first : self.model
+      finder = args.first || self.model
       
-      result = model
       filters.each_pair do |scope, parameter|
         if parameter.is_a?(Array)
           args = parameter.map { |p| params[p] }
-          result = result.send(scope, *args) unless args.compact.empty?
+          finder = finder.send(scope, *args) unless args.compact.empty?
         else
           arg = params[parameter]
-          result = result.send(scope, arg) unless arg.nil?
+          finder = finder.send(scope, arg) unless arg.nil?
         end
       end
-      result
+      finder
     end
     
-    def data_filter(name, &b)
-      @data_filters ||= HashWithIndifferentAccess.new
-      @data_filters[name] = b
-    end
     
-    def search(*args)
-      if args.first.is_a?(Class)
-        model, search_string, *columns = args
-      else
-        model = self.model
-        search_string, *columns = args
-      end
-      return nil if search_string.blank?
+    def sort_fields(*args)
+      finder = args.first.is_a?(Class) ? args.shift : model
       
-      model.conditions do
-        words = search_string.split
-        terms = words.map do |word|
-          cols = columns.map do |c|
-            if c.is_a?(Symbol)
-              send("#{c}_contains", word)
-            elsif c.is_a?(Hash)
-              c.map do |k, v| 
-                related = send(k)
-                v = [v] unless v.is_a?(Array)
-                v.map { |related_col| related.send("#{related_col}_contains", word) }
-              end
-            end
-          end.flatten
-          any?(*cols)
-        end
-        all?(*terms)
-      end
-    end
-    
-    attr_accessor :data_filters
-    
+      _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
 
-    # --- Action implementation helpers --- #
-    
-    def find_instance(*args)
-      options = args.extract_options!
-      id = args.first || params[:id]
-      
-      if model.id_name? and id !~ /^\d+$/
-        model.find_by_id_name(id, options)
-      else
-        model.find(id, options)
-      end
-    end
-    
-    
-    def paginated_find(*args, &b)
-      options = args.extract_options!
-      filter_conditions = data_filter_conditions
-      conditions_proc = if b && filter_conditions
-                          proc { block(b) & block(filter_conditions) }
-                        else
-                          b || filter_conditions
-                        end
-      
-      @association = options.delete(:association) ||
-        if args.length == 1
-          if args.first.is_a?(String, Symbol)
-            @association = model.send(args.first)
-          else
-            @association = args.first
-          end
-        elsif args.length == 2
-          owner, collection_name = args
-          @association = owner.send(collection_name)
-        end
-      @reflection = @association.proxy_reflection if @association._?.respond_to?(:proxy_reflection)
-      
-      model_or_assoc, @member_class = if @association
-                                        [@association, @association.member_class]
-                                      else
-                                        [model, model]
-                                      end
-
-      page_size = options.delete(:page_size) || 20
-      page = options.delete(:page) || params[:page]
-      
-      paginate = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
-      options.delete(:paginate)
-      if paginate
-        total_number = options.delete(:total_number) || model_or_assoc.count(options, &conditions_proc)
-        
-        @pages = ::ActionController::Pagination::Paginator.new(self, total_number, page_size, page)
-
-        options = options.reverse_merge(:limit  => @pages.items_per_page,
-                                        :offset => @pages.current.offset)
-      end
-      
-      unless options.has_key?(:order)
-        _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
-        if field
+      if field
+        fields = args.*.to_s
+        if field.in?(fields)
           @sort_field = field
           @sort_direction = desc ? "desc" : "asc"
-          
+        
           table, column = if field =~ /^(.*)\.(.*)$/
                             [$1.camelize.constantize.table_name, $2]
                           else
-                            [@member_class.table_name, field]
-                         end
-          options[:order] = "#{table}.#{column} #{@sort_direction}"
-        elsif !@association
-          options[:order] = :default
+                            [finder.table_name, field]
+                          end
+          finder = finder.order("#{table}.#{column}", @sort_direction)
         end
       end
-      
-      model_or_assoc.find(:all, options, &conditions_proc) 
+      finder
     end
+    
+    
+    # --- Action implementation helpers --- #
+    
 
-
+    def find_instance(*args)
+      options = args.extract_options!
+      id = args.first || params[:id]
+      model.user_find(current_user, id, options)
+    end
+    
+    
     def invalid?; !valid?; end
+    
     
     def valid?; this.errors.empty?; end
 
@@ -417,51 +332,54 @@ module Hobo
       end
     end
     
+    def paginate(finder, options)
+      do_pagination = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
+      if do_pagination && !finder.respond_to?(:paginate)
+        do_pagination = false
+        logger.warn "Hobo::ModelController: Pagination is not available. To enable, please install will_paginate or a duck-type compatible paginator"
+      end
+
+      if do_pagination
+        finder.paginate(options)
+      else
+        finder.find(:all, options)
+      end
+    end
+    
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
-      options = LazyHash.new(args.extract_options!)
-      collection = args.first
-
-      @model = model
-      self.this ||= if collection.nil?
-                      paginated_find(options)
-                    elsif collection.respond_to?(:each)
-                      collection
-                    else
-                      # assume its a scope (a scope name or an actual scope object)
-                      paginated_find(collection, options) # a scope name
-                    end
+      options = args.extract_options!
+      finder = args.first || model
+      self.this = finder.paginate(options)
+      response_block(&b)
     end
     
 
     def hobo_show(*args, &b)
-      options = args.extract_options!  # OK so there are no options, but just to keep the API consistent :-)
-      self.this ||= args.first || find_instance
+      options = args.extract_options!
+      self.this ||= find_instance(options)
       response_block(&b)
     end
     
     
-    def hobo_new(*args, &b)
-      options = LazyHash.new(args.extract_options!)
-      self.this ||= args.first || model.new
+    def hobo_new(new_record=nil, &b)
+      self.this = new_record || model.new
       this.user_changes(current_user) # set_creator and permission check
       response_block(&b)
     end
     
     
     def hobo_create(*args, &b)
-      options = LazyHash.new(args.extract_options!)
-      
-      self.this ||= args.first || new_for_create
+      options = args.extract_options!
+      self.this = args.first || new_for_create
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters)
-      
       create_response(&b)
     end
     
     
     def attribute_parameters
-      params[@this.class.name.underscore]
+      params[this.class.name.underscore]
     end
     
 
@@ -495,7 +413,7 @@ module Hobo
     
 
     def hobo_update(*args, &b)
-      options = LazyHash.new(args.extract_options!)
+      options = args.extract_options!
       
       self.this ||= args.first || find_instance
       changes = options[:attributes] || attribute_parameters
@@ -543,13 +461,10 @@ module Hobo
     
     
     def hobo_destroy(*args, &b)
-      options = LazyHash.new(args.extract_options!)
-
+      options = args.extract_options!
       self.this ||= args.first || find_instance
-
       this.user_destroy(current_user)
       flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
-
       destroy_response(&b)
     end
     
@@ -563,56 +478,30 @@ module Hobo
     end
  
     
-    def hobo_show_collection(collection, *args, &b)
-      options = LazyHash.new(args.extract_options!)
-
-      if collection.is_a?(String, Symbol)
-        @owner = find_instance
-        @association = @owner.send(collection)
-      else
-        @owner = collection.proxy_owner
-        @association = collection
-      end
-      
-      raise Hobo::Model::PermissionDeniedError unless Hobo.can_view?(current_user, @owner, @association.proxy_reflection.association_name)
-      self.this = paginated_find(@owner, collection, options)
-      
+    def hobo_show_collection(association, *args, &b)
+      options = args.extract_options!
+      association = find_instance.send(association) if association.is_a?(String, Symbol)
+      association.proxy_owner.user_view(current_user, association.proxy_reflection.association_name) # permission check
+      self.this = association.paginate(options)
       response_block(&b)
     end
+    
     
     # TODO: This action needs some more tidying up    
-    def hobo_new_in_collection(collection, *args, &b)
-      options = LazyHash.new(args.extract_options!)
-
-      @association = collection.is_a?(Array) ? collection : find_instance.send(collection)
-
-      self.this ||= args.first || @association.new
-      this.user_changes(current_user)
-      
+    def hobo_new_in_collection(association, *args, &b)
+      options = args.extract_options!
+      association = find_instance.send(association) if association.is_a?(String, Symbol)
+      self.this = args.first || @association.new
+      this.user_changes(current_user) # set_creator and permission check
       response_block(&b)
     end
     
 
-    def hobo_completions
-      opts = self.class.autocompleter(params[:for])
-      if opts
-        # Eval any defined filters
-        instance_eval(&opts[:data_filters_block]) if opts[:data_filters_block]
-        conditions = data_filter_conditions
-        q = params[:query]
-        items = model.find(:all) { all?(send("#{attr}_contains", q), conditions && block(conditions)) }
-
-        render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
-      else
-        render :text => "No completer for #{attr}", :status => 404
-      end
+    def hobo_completions(finder)
+      items = finder.find(:all)
+      render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
     end
     
-    #def hobo_create_in_collection(collection, options={}, &b)
-    #  hobo_create do
-    #    hobo_new_in_collection(collection, :this => @this, &b)
-    #  end
-    #end
     
     
     # --- Response helpers --- #
@@ -687,16 +576,6 @@ module Hobo
 
     def model
       self.class.model
-    end
-    
-
-    def data_filter_conditions
-      active_filters = data_filters && (params.keys & data_filters.keys)
-      filters = data_filters
-      params = self.params
-      proc do
-        all?(*active_filters.map {|f| instance_exec(params[f], &filters[f])})
-      end unless active_filters.blank?
     end
     
   end
