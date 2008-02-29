@@ -1,5 +1,7 @@
 # From: http://jicksta.com/articles/2007/08/04/the-methodphitamine
 
+require 'blankslate'
+
 module Kernel
 
   def it() It.new end
