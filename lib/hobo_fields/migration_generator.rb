@@ -104,7 +104,7 @@ module HoboFields
 
           column_renames.each_pair do |old_name, new_name|
             if to_add.delete(new_name.to_s) && to_remove.delete(old_name.to_s)
-              to_rename[old_name] = new_name
+              to_rename[old_name.to_s] = new_name.to_s
             else
               raise MigrationGeneratorError, "Invalid rename specified: #{old_name} => #{new_name}"
             end
@@ -206,7 +206,7 @@ module HoboFields
         "rename_column :#{new_table_name}, :#{new_name}, :#{old_name}"
       end
       
-      to_add = to_add.sort_by{|c| model.field_specs[c].position }
+      to_add = to_add.sort_by {|c| model.field_specs[c].position }
       adds = to_add.map do |c|
         spec = model.field_specs[c]
         args = [":#{spec.sql_type}"] + format_options(spec.options, spec.sql_type)
@@ -240,7 +240,7 @@ module HoboFields
           
           changes << "change_column :#{new_table_name}, :#{c}, " + 
             ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
-          back = change_column_back(new_table_name, c)
+          back = change_column_back(new_table_name, col_name)
           undo_changes << back unless back.blank?
         else
           nil
