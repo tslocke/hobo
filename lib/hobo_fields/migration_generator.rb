@@ -267,6 +267,7 @@ module HoboFields
       res.string.strip.gsub("\n  ", "\n")
     end
     
+    
     def column_options_from_reverted_table(table, column)
       revert = revert_table(table)
       if (md = revert.match(/\s*t\.column\s+"#{column}",\s+(:[a-zA-Z0-9_]+)(?:,\s+(.*?)$)?/m))
@@ -285,6 +286,7 @@ module HoboFields
       type, options = column_options_from_reverted_table(table, column)
       "change_column :#{table}, :#{column}, #{type}#{', ' + options.strip if options}"
     end
+    
 
     def revert_column(table, column)
       type, options = column_options_from_reverted_table(table, column)
