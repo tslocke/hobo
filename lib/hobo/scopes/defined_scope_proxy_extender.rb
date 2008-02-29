@@ -61,9 +61,13 @@ module Hobo
                      end
         
         options = options.merge(scope).update(:class_name => proxy_reflection.klass.name,
-                                                   :foreign_key => proxy_reflection.primary_key_name)
+                                              :foreign_key => proxy_reflection.primary_key_name)
         options[:conditions] = conditions unless conditions.blank?
         options[:source] = source.name if source
+        
+        options[:limit]   = scope[:limit]   if scope[:limit]
+        options[:order]   = scope[:order]   if scope[:order]
+        options[:include] = scope[:include] if scope[:include]
 
         r = ScopeReflection.new(:has_many, name, options, proxy_owner.class, proxy_reflection.name)
         
