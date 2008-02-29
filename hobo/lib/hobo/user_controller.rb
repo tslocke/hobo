@@ -32,7 +32,6 @@ module Hobo
     private
     
     def hobo_login(options={})
-      options = LazyHash.new(options)
       login_attr = model.login_attribute.to_s.titleize.downcase
       options.reverse_merge!(:success_notice => "You have logged in.",
                              :failure_notice => "You did not provide a valid #{login_attr} and password.")
