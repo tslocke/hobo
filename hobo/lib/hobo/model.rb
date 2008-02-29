@@ -65,6 +65,13 @@ module Hobo
       end
       
       
+      def user_find(user, *args)
+        record = find(*args)
+        raise PermissionDeniedError unless Hobo.can_view?(user, self)
+        record
+      end
+      
+      
       def user_new(user, attributes={})
         record = new(attributes)
         record.user_changes(user)
@@ -257,8 +264,8 @@ module Hobo
     end
     
     
-    def user_view(user)
-      raise PermissionDeniedError unless Hobo.can_view?(user, self)
+    def user_view(user, field=nil)
+      raise PermissionDeniedError unless Hobo.can_view?(user, self, field)
     end
     
     
