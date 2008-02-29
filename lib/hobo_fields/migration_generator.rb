@@ -4,11 +4,11 @@ module HoboFields
   
   class MigrationGenerator
     
+    @ignore_models = []
     @ignore_tables = []
-    @ignore = []
     
     class << self
-      attr_accessor :ignore, :ignore_tables
+      attr_accessor :ignore_models, :ignore_tables
     end
     
     def self.run(renames={})
@@ -55,14 +55,9 @@ module HoboFields
     # Returns an array of model classes and an array of table names
     # that generation needs to take into account
     def models_and_tables
-      ignore_model_names = MigrationGenerator.ignore.map &it.to_s.underscore
-      
-      models, ignore_models = table_model_classes.partition do |m|
-        m.name.underscore.not_in?(ignore_model_names) && m < HoboFields::ModelExtensions
-      end
-      ignore_tables = ignore_models.*.table_name | MigrationGenerator.ignore_tables
-      db_tables = connection.tables - ignore_tables
-      
+      ignore_model_names = MigrationGenerator.ignore_models.map &it.to_s.underscore
+      models = table_model_classes.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
+      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s      
       [models, db_tables]
     end
     
@@ -79,7 +74,7 @@ module HoboFields
           next unless new_name
           
           if to_create.delete(new_name.to_s) && to_drop.delete(old_name.to_s)
-            to_rename[old_name] = new_name
+            to_rename[old_name.to_s] = new_name.to_s
           else
             raise MigrationGeneratorError, "Invalid table rename specified: #{old_name} => #{new_name}"
           end
@@ -220,7 +215,7 @@ module HoboFields
         "remove_column :#{new_table_name}, :#{c}"
       end
       undo_removes = to_remove.map do |c|
-        revert_column(new_table_name, c)
+        revert_column(current_table_name, c)
       end
       
       old_names = to_rename.invert
@@ -240,7 +235,7 @@ module HoboFields
           
           changes << "change_column :#{new_table_name}, :#{c}, " + 
             ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
-          back = change_column_back(new_table_name, col_name)
+          back = change_column_back(current_table_name, col_name)
           undo_changes << back unless back.blank?
         else
           nil
