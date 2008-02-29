@@ -7,6 +7,7 @@
 
 require 'delegate'
 require 'singleton'
+require 'blankslate'
 
 class Object
 
