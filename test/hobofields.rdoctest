@@ -210,7 +210,7 @@ Let's apply that change to the database
         body :text
       end
     end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = migrate
     >> up
     => 'change_column :adverts, :title, :string, :default => "Untitled"'
     >> down
@@ -234,14 +234,21 @@ The migration generator respects the `set_table_name` declaration, although as b
     => "rename_table :adverts, :ads"
     >> down
     => "rename_table :ads, :adverts"
+    
+Set the table name back to what it should be and confirm we're in sync:
+
+    >> class Advert; set_table_name "adverts"; end
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
 
 ### Drop a table
 
 If you delete a model, the migration generator will create a `drop_table` migration. Unfortunately there's no way to remove the Advert class we've defined from the doctest session, but we can tell the migration generator to ignore it.
 
+    >> HoboFields::MigrationGenerator.ignore_models = [ :advert ]
+    
 Dropping tables is where the automatic down-migration really comes in handy:
 
-    >> HoboFields::MigrationGenerator.ignore = [ :advert ]
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
     => "drop_table :adverts"
@@ -249,29 +256,94 @@ Dropping tables is where the automatic down-migration really comes in handy:
     =>""
     create_table "adverts", :force => true do |t|
       t.text   "body"
-      t.string "title"
+      t.string "title", :default => "Untitled"
     end
     >>
     
     
+### Rename a table
+
+As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement'. Remember 'Advert' is being ignored so it's as if we renamed the definition in our models directory.
+
+    >>
+    class Advertisement < ActiveRecord::Base
+      fields do
+        title :string, :default => "Untitled"
+        body :text
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :advertisements)
+    >> up
+    => "rename_table :adverts, :advertisements"
+    >> down
+    => "rename_table :advertisements, :adverts"
+    
+Now that we've seen the renaming we'll switch the 'ignore' setting to ignore that 'Advertisements' class.
+    
+    >> HoboFields::MigrationGenerator.ignore_models = [ :advertisement ]
+    
+## The migration generator -- coping with multiple changes
+    
+The migration generator is designed to create complete migrations even if many changes to the models have taken place.
+
+First let's confirm we're in a known state. One model, 'Advert', with a string 'title' and text 'body':
+
+    >> Advert.connection.tables
+    => ["adverts"]
+    >> Advert.columns.*.name
+    => ["id", "body", "title"]
+    >> HoboFields::MigrationGenerator.run
+    => ["", ""]
+    
+
+### Rename a column and change the default
+
+    >> Advert.field_specs.clear
+    >>
+    class Advert
+      fields do
+        name :string, :default => "No Name"
+        body :text
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run(:adverts => {:title => :name})
+    >> up
+    =>""
+    rename_column :adverts, :title, :name
+    change_column :adverts, :name, :string, :default => "No Name"
+    >> down
+    =>""
+    rename_column :adverts, :name, :title
+    change_column :adverts, :title, :string, :default => "Untitled"
+    >>
     
     
+### Rename a table and add a column
     
+    >> HoboFields::MigrationGenerator.ignore_models << :advert
+    class Ad < ActiveRecord::Base
+      fields do
+        title      :string, :default => "Untitled"
+        body       :text
+        created_at :datetime
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
+    >> up
+    =>""
+    rename_table :adverts, :ads
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    add_column :ads, :created_at, :datetime
+    >>
+
+
+
+
+
+
+
+
+
     
     
     
