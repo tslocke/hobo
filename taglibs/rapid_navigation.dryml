@@ -42,7 +42,7 @@
 <!--- Pagination Navigation -->
 
 <def tag="page-nav" attrs="params">
-  <if test="&@pages && @pages.length > 1">
+  <if test="&this.try.page_count > 1">
     <page-n-of-count/> - 
     <first-page-link params="&params">|&lt;</first-page-link>
     <previous-page-link params="&params">Previous</previous-page-link>
@@ -53,40 +53,41 @@
 
 
 <def tag="page-n-of-count">
-  Page <%= @pages.current_page.number %> of <%= @pages.length %>
+  Page <%= this.current_page %> of <%= this.page_count %>
 </def>
 
 
 <def tag="previous-page-link">
-  <a if="&@pages && @pages.current.previous"
-     href="&url_for(params.merge(:page => @pages.current.previous))">
+  <a if="&this.try.previous_page"
+     href="&url_for(params.merge(:page => this.previous_page))">
     <do param="default">&laquo; Previous page</do>
   </a>
 </def>
 
 
 <def tag="next-page-link">
-  <a if="&@pages && @pages.current.next"
-     href="&url_for(params.merge(:page => @pages.current.next))">
+  <a if="&this.try.next_page"
+     href="&url_for(params.merge(:page => this.next_page))">
     <do param="default">Next page &raqou;</do>
   </a>
 </def>
 
 
 <def tag="first-page-link">
-  <a if="&@pages && @pages.first_page && @pages.current != @pages.first_page"
-     href="&url_for(params.merge(:page => @pages.first_page))">
+  <a if="&this.try.current_page && this.current_page != 1"
+     href="&url_for(params.merge(:page => 1))">
     <do param="default">&laquo; First page</do>
   </a>
 </def>
 
 
 <def tag="last-page-link">
-  <a if="&@pages && @pages.last_page && @pages.current != @pages.last_page"
-     href="&url_for(params.merge(:page => @pages.last_page))">
+  <a if="&this.try.current_page && this.current_page != this.page_count"
+     href="&url_for(params.merge(:page => this.page_count))">
     <do param="default">Last page &raquo;</do>
   </a>
 </def>
+
 
 <!-- magic nav, just to get you started -->
 <!-- write your own navigation using the <navigation> tag -->
