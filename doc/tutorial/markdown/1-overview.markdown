@@ -1,3 +1,5 @@
+[Back to contents](index.html)
+
 # Overview
 
 Hobo is a plugin for Ruby on Rails that brings a number of extensions, some small some large, to Rails application development. The common theme to these extensions is rapid development. Like Rails itself, Hobo encapsulates a number of opinions about web application development. The opinion that is most central to Hobo is this: we have found that  there is a great deal of similarity from one web application to the next. Much more similarity in fact, than is supported by today's frameworks. We would rather implement this stuff once. Of course this idea is common to all frameworks -- everything that Rails provides is there because many or all web applications will need it: database connectivity, session management, working with HTTP, etc. etc. The difference with Hobo is that we are trying to take this idea to a much higher level than is normally expected from a web framework. The ultimate goal is: don't program your application, just declare it.
@@ -48,3 +50,5 @@ Because Hobo might do a lot more than you have come to expect from a web framewo
    * Ruby extensions :: This is Hobo's answer to Active Support - a grab bag of useful Ruby extensions to make your coding a little easier.
   
 Hopefully this overview gives you a feel for what Hobo is all about. There's nothing like trying it though, so move on to the Quick-Start Guide and have a go!
+
+Next: [Getting Started](2-getting-started.html)

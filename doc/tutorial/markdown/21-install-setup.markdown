@@ -26,4 +26,4 @@ In the process of getting Rails up and running you will install RubyGems, the pa
     
 That will give you the `hobo` command, which can be used to create a new Hobo application.
 
-
+Next: [Creating A Blank Application](22-blank-app.html)

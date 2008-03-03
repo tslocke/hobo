@@ -33,6 +33,8 @@ A directory is created called pod, have a look at the files that have been creat
 
 From here on, all the commands have to be executed in the main directory of your application.
 
+    cd pod
+
 ### Database setup
 
 If you're using Sqlite, `config/database.yml` is already set up for you and you don't need to create a dababase. If you're using MySQL you now need to modify `config/database.yml` and create the database.
@@ -82,3 +84,5 @@ And point your browser at `http://localhost:3000`. You should see:
 You should find that you are already able to sign up as a new user, and log in and out.
 
 We now have a basic Hobo app up and running with the default theme. Of course the app doesn't do much at this stage. To add functionality, the first step is to create some models.
+
+Next: [Adding Models and Controllers](23-models-controllers.html)

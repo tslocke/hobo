@@ -186,6 +186,6 @@ Refresh the browser and you should see:
 
 <img src="images/front-with-models.png">
 
-You can also browse to "Adverts" and "Categories" pages.
+TODO: bigger tour of the generated app, explain the routes created by model controllers, explain the first signed up user is admin
 
-
+Next: [Customizing the App](3-customizing-the-app.html)

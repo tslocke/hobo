@@ -1,8 +1,8 @@
-# Customising controllers
+## Customising controllers
 
 In this  chapter we'll make a few small controller changes and see how the automatic pages respond to give us a still more tailored UI.
 
-## Removing an 'index' page
+### Removing an 'index' page
 
 The front page and main nav bar decide which models to show based on the presence of an index page, or, more accurately an index *route*. For example, "Adverts" appears in the main nav because the route `/adverts` exists. If we decided we only wanted adverts to be reachable via their categories, that route would not be needed.
 
@@ -34,7 +34,7 @@ File: `app/controllers/adverts_controller.rb`
     
 and then refreshing the browser. You should see the "Adverts" link disappear from the main nav (and from the front page too).
 
-## Removing a 'new' page
+### Removing a 'new' page
 
 Make sure you're logged in to the app as 'admin', and click on "Categories" in the nav-bar. You'll see a "New Category" link at the bottom of the page. That leads to a page with a simple form for creating a new category.
 
@@ -48,6 +48,8 @@ File: `app/controllers/categories_controller.rb`
     
 There is no step two :-) The automatic index page detects the absence of a new page and gives us an in-line form.
 
-## Moving on
+### Moving on
 
 OK that's probably about as far as we can go with refining this app while sticking with the fully automatic UI. If this app was expected to have a short life-span or small number of users, you might well decide that the current UI is good enough. Congratulations! You just created a finished web-app with just a handful of lines of code. For apps that you want to take up a level though, you're going to want to hand-tailor the UI. That's where DRYML comes in, which is the topic of the next chapter.
+
+Next: [DRYML](4-dryml.html)

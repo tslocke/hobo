@@ -53,23 +53,22 @@ code span.symbol {
 	color: #07DFFC;
 }
 
-/** HTML **/
-code.html span.tag {
-	color: #fff;
+/** DRYML **/
+code span.tag {
+	color: #FF8400;
 }
 
-code.html span.attribute {
-	color: #FFD500;
+code span.parameter {
+	color: #bb4400;
 }
 
-code.html span.string {
-	color: #99FF00;
+code span.attribute {
+	color: #6BCFF7;
 }
 
-code.html span.comment {
-	color: #999;
-}
-
-code.html span.doctype {
+code span.doctype {
 	color: #D7FF80;
+}
+pre.dryml code span.string {
+	color: #cfa;
 }
