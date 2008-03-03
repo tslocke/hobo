@@ -231,7 +231,7 @@
     <content-header: param>
       <nav>Back to <a with="&@owner"/></nav>
       <heading><%= title %></heading>
-      <sub-heading><count with="&@pages.item_count" label="&params[:action]"/></sub-heading>
+      <sub-heading><count with="&this.try.total_entries || this.length" label="&params[:action]"/></sub-heading>
     </content-header>
 
     <content-body: param>
