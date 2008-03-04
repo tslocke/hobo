@@ -52,10 +52,10 @@
     <li:><card param/></li:>
   </ul>
   <p class="empty-collection-message" if="&this.empty?" param="empty-message">
-    <% label = if this.respond_to?(:proxy_reflection)
-                 this.proxy_reflection.association_name.to_s.humanize.downcase
-               elsif this.respond_to?(:member_class)
-                 this.member_class.name.humanize.downcase
+    <% label = if (refl = this.try.proxy_reflection)
+                 refl.association_name.to_s.humanize.downcase
+               elsif (klass = this.try.member_class)
+                 klass.name.humanize.downcase.pluralize
                else
                  type_name(:plural => true).pluralize.humanize.downcase.to_s 
                end %>
