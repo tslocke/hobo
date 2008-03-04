@@ -75,10 +75,13 @@
      
     body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
      
-    if web_method
-      add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
-    else
-      add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
+    
+    if action.nil? # don't add automatic css classes if the action was specified
+      if web_method
+        add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
+      else
+        add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
+      end
     end
      
     Hobo::Dryml.last_if = true
@@ -363,4 +366,15 @@
   <% uri = request.request_uri if stay_here %>
   <% uri = session[:previous_uri] if go_back %>
   <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
+</def>
+
+
+<def tag="hidden-field" attrs="name, value"><input type="hidden" name="&name" value="&value" merge-attrs/></def>
+
+
+<def tag="select-menu" attrs="options, selected, first-option, first-value">
+  <select merge-attrs param="default">
+    <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
+    <do param="options"><%= options_for_select(options, selected) %></do>
+  </select>
 </def>
