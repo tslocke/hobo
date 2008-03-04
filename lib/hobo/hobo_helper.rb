@@ -217,12 +217,14 @@ module Hobo
           object = this
         end
       end
-      
-      if !field and object.respond_to?(:proxy_reflection)
-        Hobo.can_view?(current_user, object.proxy_owner, object.proxy_reflection.name)
-      else
-        Hobo.can_view?(current_user, object, field)
-      end
+
+      @can_view_cache ||= {}
+      @can_view_cache[ [object, field] ] ||= 
+        if !field and object.respond_to?(:proxy_reflection)
+          Hobo.can_view?(current_user, object.proxy_owner, object.proxy_reflection.name)
+        else
+          Hobo.can_view?(current_user, object, field)
+        end
     end
      
      
