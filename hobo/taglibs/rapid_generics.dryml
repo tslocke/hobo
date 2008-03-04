@@ -15,22 +15,29 @@
   </a>
 </def>
 
-<def tag="card">
+<def tag="base-card">
   <if test="&can_view?">
-    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
-    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly" merge-attrs>
-      <a if="&linkable?"/>
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
+      <h3 param="title"><a if="&linkable?"/></h3>
       <div class="content" param="content" if="&!linkable?">
         <primary-content/>
       </div>
-      <creation-details/>
+      <creation-details param/>
       <do param="counter">
         <set primary-collection="&primary_collection_name"/>
         <if test="&primary_collection">
           <span class="dependents"><count field="&primary_collection"/></span>
         </if>
       </do>
+      <delete-button label="X" unless="&linkable?(this, :edit)" param/>
     </div>
+  </if>
+</def>
+
+<def tag="card">
+  <if test="&can_view?">
+    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
+    <base-card unless="&poly" merge/>
   </if>
 </def>
 
@@ -52,7 +59,16 @@
                else
                  type_name(:plural => true).pluralize.humanize.downcase.to_s 
                end %>
-    There are no <%= label %>
+    There are no <%= label.pluralize %>
   </p>
 </def>
 
+<def tag="collection-preview" attrs="limit">
+  <% limit ||= 6 %>
+  <div class="collection-preview" merge-attrs>
+    <h2><do param="heading"><this-field.titleize/></do> <span param="show-all-link" if="&linkable?">(<a>show all</a>)</span></h2>
+    <collection with="&this.limit(limit)" param>
+      <card: class="small"/>
+    </collection>
+  </div>
+</def>
