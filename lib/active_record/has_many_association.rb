@@ -28,18 +28,6 @@ module ActiveRecord::Associations
       proxy_reflection.klass
     end
     
-    
-    def find_with_block(*args, &b)
-      if b
-        options = args.extract_options!
-        args << options.merge(:conditions => member_class.conditions(&b))
-        find_without_block(*args)
-      else
-        find_without_block(*args)
-      end
-    end
-    alias_method_chain :find, :block
-    
     private
     
     def set_reverse_association(object)
