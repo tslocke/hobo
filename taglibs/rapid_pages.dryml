@@ -64,12 +64,13 @@
 
 
 <def tag="index-page">
-  <% model_name = @model.name.titleize %>
+  <set model="&this.try.member_class || self.model"/>
+  <set model-name="&model.name.titleize"/>
   <page title="All #{model_name.pluralize}" merge>
-    <body: class="index-page #{@model.name.underscore}" param/>
+    <body: class="index-page #{model.name.underscore}" param/>
     <content-header: param>
       <heading param><%= model_name.pluralize %></heading>
-      <p class="note" if="any?" param>There <do with="&@model"><count part="item-count" prefix="are"/></do></p>
+      <p class="note" if="any?" param>There <count part="item-count" prefix="are"/></p>
     </content-header>
 
     <content-body: param>
@@ -81,9 +82,9 @@
     </content-body>
     
     <content-footer: param>
-      <a to="&@model" action="new" param="new-link" if="&linkable?(@model, :new)"/>
+      <a to="&model" action="new" param="new-link" if="&linkable?(model, :new)"/>
       <else>
-        <do with="&new_for_current_user @model">
+        <do with="&new_for_current_user model">
           <section class="create-new" if="&can_create?">
             <h2>New <type-name/></h2>
             <form><field-list/><submit label="Create #{type_name}"/></form>
