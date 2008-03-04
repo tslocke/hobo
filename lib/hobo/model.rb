@@ -16,6 +16,8 @@ module Hobo
       included_in_class_callbacks(base)
 
       Hobo.register_model(base)
+      
+      patch_will_paginate
 
       base.class_eval do
         inheriting_cattr_reader :default_order
@@ -37,6 +39,27 @@ module Hobo
       end
       
     end
+    
+    def self.patch_will_paginate
+      if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
+        
+        WillPaginate::Collection.class_eval do
+          attr_accessor :member_class
+        end
+        
+        WillPaginate::Finder::ClassMethods.class_eval do
+          def paginate_with_member_class(*args, &block)
+            collection = paginate_without_member_class(*args, &block)
+            collection.member_class = self
+            collection
+          end
+          alias_method_chain :paginate, :member_class
+          
+        end
+        
+      end
+    end
+
     
     module ClassMethods
       
