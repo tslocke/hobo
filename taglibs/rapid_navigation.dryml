@@ -42,12 +42,12 @@
 <!--- Pagination Navigation -->
 
 <def tag="page-nav" attrs="params">
-  <if test="&this.try.page_count > 1">
+  <if test="&this.try.page_count._? > 1">
     <page-n-of-count/> - 
-    <first-page-link params="&params">|&lt;</first-page-link>
-    <previous-page-link params="&params">Previous</previous-page-link>
-    <next-page-link params="&params">Next</next-page-link>
-    <last-page-link params="&params">&gt|</last-page-link>
+    <first-page-link    params="&params" param>|&lt;</first-page-link>
+    <previous-page-link params="&params" param>Previous</previous-page-link>
+    <next-page-link     params="&params" param>Next</next-page-link>
+    <last-page-link     params="&params" param>&gt|</last-page-link>
   </if>
 </def>
 
