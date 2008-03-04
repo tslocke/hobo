@@ -307,22 +307,22 @@
 
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="count" attrs="label, prefix, if-any"><%=
+<def tag="count" attrs="label, prefix, if-any, lowercase"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
-  if this.is_a?(Class) and this < ActiveRecord::Base
-    c = this.count
-    label ||= this.name.titleize
-  else
-    label ||= this.respond_to?(:proxy_reflection) && this.proxy_reflection.name.to_s.singularize.titleize
-    c = if this.is_a?(Fixnum)
-          this
-        elsif this.respond_to?(:count)
-          this.count
-        else
-          this.length
-        end
-  end
+  c = this.try.to_int || this.try.total_entries || this.try.count || this.try.length
+
+  label ||= if this.is_a?(Class) and this < ActiveRecord::Base
+              this.name.titleize
+            elsif (refl = this.try.proxy_reflection)
+              refl.name.to_s.singularize.titleize
+            elsif (klass = this.try.member_class)
+              klass.name.titleize
+            else
+              controller.model.name.titleize
+            end
+
+  label = label.downcase if lowercase
    
   Hobo::Dryml.last_if = c > 0 if if_any
   if if_any && c == 0
@@ -332,7 +332,7 @@
    
     if prefix.in? %w(are is)
       p = c == 1 ? "is" : "are"
-      p + ' ' + main
+      p + ' ' + main.to_s
     else
       main
     end
@@ -435,3 +435,14 @@ in the future - use at your own risk. -->
 <def tag="A-or-An" attrs="word"><%=
   (word =~ /^[aeiouh]/i ? "An " : "A ") + word
 %></def>
+
+
+<def tag="filter-menu" attrs="param-name, options, no-filter">
+  <form action="&request.request_uri" method="get" class="filter-menu">
+    <hidden-field name="filter-parameter" value="&param_name"/>
+    <select-menu name="&param_name" options="&options" selected="&params[param_name]" first-option="&no_filter" merge-params/>
+  </form>
+</def>
+
+
+<def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
