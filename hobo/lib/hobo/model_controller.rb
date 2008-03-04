@@ -229,18 +229,13 @@ module Hobo
     protected
     
     
-    def filter_scopes(*args)
+    def filter_by(*args)
       filters = args.extract_options!
       finder = args.first || self.model
       
-      filters.each_pair do |scope, parameter|
-        if parameter.is_a?(Array)
-          args = parameter.map { |p| params[p] }
-          finder = finder.send(scope, *args) unless args.compact.empty?
-        else
-          arg = params[parameter]
-          finder = finder.send(scope, arg) unless arg.nil?
-        end
+      filters.each_pair do |scope, arg|
+        dont_filter = arg.is_a?(Array) ? arg.compact.empty? : arg.nil?
+        finder = finder.send(scope, arg) unless dont_filter
       end
       finder
     end
@@ -350,6 +345,7 @@ module Hobo
 
     def hobo_index(*args, &b)
       options = args.extract_options!
+      options = options.reverse_merge(:page => params[:page] || 1)
       finder = args.first || model
       self.this = finder.paginate(options)
       response_block(&b)
@@ -480,6 +476,7 @@ module Hobo
     
     def hobo_show_collection(association, *args, &b)
       options = args.extract_options!
+      options = options.reverse_merge(:page => params[:page] || 1)
       association = find_instance.send(association) if association.is_a?(String, Symbol)
       association.proxy_owner.user_view(current_user, association.proxy_reflection.association_name) # permission check
       self.this = association.paginate(options)
@@ -537,11 +534,7 @@ module Hobo
     
     def this=(object)
       ivar = if object.is_a?(Array)
-               if object.respond_to?(:member_class)
-                 object.member_class.name.underscore.pluralize
-               else
-                 model.name.underscore.pluralize
-               end
+               (object.try.member_class || model).name.underscore.pluralize
              else
                model.name.underscore
              end
@@ -573,6 +566,7 @@ module Hobo
 
     # --- end filters --- #
     
+    public
 
     def model
       self.class.model
