@@ -201,9 +201,9 @@ module Hobo
       return false if !can_view?(person, object, field)
       
       if field.nil?
-        if respond_to?(:editable_by?)
+        if object.has_hobo_method?(:editable_by?)
           object.editable_by?(person) 
-        elsif respond_to?(:updatable_by?)
+        elsif object.has_hobo_method?(:updatable_by?)
           object.updatable_by?(person, nil)
         else
           false
