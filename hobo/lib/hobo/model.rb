@@ -44,13 +44,15 @@ module Hobo
       if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
         
         WillPaginate::Collection.class_eval do
-          attr_accessor :member_class
+          attr_accessor :member_class, :association_name, :owner
         end
         
         WillPaginate::Finder::ClassMethods.class_eval do
           def paginate_with_member_class(*args, &block)
             collection = paginate_without_member_class(*args, &block)
             collection.member_class = self
+            collection.association_name = try.association_name 
+            collection.owner = try.proxy_owner
             collection
           end
           alias_method_chain :paginate, :member_class
@@ -378,7 +380,7 @@ module Hobo
     
 
     def typed_id
-      id ? "#{self.class.name.underscore}_#{self.id}" : nil
+      "#{self.class.name.underscore}_#{self.id}" if id 
     end
 
     
