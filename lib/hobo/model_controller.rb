@@ -36,6 +36,7 @@ module Hobo
       end
       
     end
+    
 
     module ClassMethods
 
@@ -478,8 +479,11 @@ module Hobo
       options = args.extract_options!
       options = options.reverse_merge(:page => params[:page] || 1)
       association = find_instance.send(association) if association.is_a?(String, Symbol)
-      association.proxy_owner.user_view(current_user, association.proxy_reflection.association_name) # permission check
+      if association.respond_to?(:proxy_owner)
+        association.proxy_owner.user_view(current_user, association.proxy_reflection.association_name) # permission check
+      end
       self.this = association.paginate(options)
+      dryml_fallback_tag("show_collection_page")
       response_block(&b)
     end
     
