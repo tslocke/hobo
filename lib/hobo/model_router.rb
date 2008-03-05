@@ -30,9 +30,8 @@ module Hobo
       end
       
       def add_routes(map)
-        add_dryml_support_routes(map) if RAILS_ENV == "development"
-        
         reset_linkables
+        
         begin 
           ActiveRecord::Base.connection.reconnect! unless ActiveRecord::Base.connection.active?
         rescue
@@ -49,6 +48,8 @@ module Hobo
         # Any directory inside app/controllers defines a subsite
         subsites = Dir["#{APP_ROOT}/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
         subsites.each { |subsite| add_routes_for(map, subsite) }
+        
+        add_developer_routes(map) if Hobo.developer_features?
       end
       
       
@@ -72,8 +73,9 @@ module Hobo
       end
       
       
-      def add_dryml_support_routes(map)
+      def add_developer_routes(map)
         map.dryml_support "dryml/:action", :controller => "hobo/dryml/dryml_support"
+        map.dev_support   "dev/:action",   :controller => "hobo/dev"
       end
       
     end
