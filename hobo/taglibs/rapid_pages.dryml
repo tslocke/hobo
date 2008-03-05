@@ -30,7 +30,7 @@
         <heading param="app-name"><a href="#{base_url}/"><app-name/></a></heading>
         <live-search param if="&defined_route? :site_search"/>
         <nav param>
-          <account-nav if="&Hobo::UserController.user_models.first" param/>
+          <account-nav if="&Hobo::User.default_user_model" param/>
           <do param="main-nav"><magic-nav class="main-nav"/></do>
         </nav>
       </header>
@@ -221,14 +221,14 @@
 
 
 <def tag="show-collection-page">
-  <% title = "#{params[:action]} for #{name(:with => @owner)}" %>
+  <% title = "#{this.association_name.to_s.titleize} for #{name(:with => this.owner)}" %>
   <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => @owner)} #{type_name(:pluralize => true)}"
+    <body: class="show-collection-page #{type_name(:with => this.owner)} #{type_name(:pluralize => true)}"
           param/>
     <content-header: param>
-      <nav>Back to <a with="&@owner"/></nav>
+      <nav>Back to <a:owner/></nav>
       <heading><%= title %></heading>
-      <sub-heading><count with="&this.try.total_entries || this.length" label="&params[:action]"/></sub-heading>
+      <sub-heading><count/></sub-heading>
     </content-header>
 
     <content-body: param>
