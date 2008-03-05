@@ -31,7 +31,7 @@
       <li class='nav-item' param="log-out"><a href="&logout_url">Log out</a></li>
     </if>
     <else>
-      <set user="&Hobo::UserController.user_models.first"/>
+      <set user="&Hobo::User.default_user_model"/>
       <li class='nav-item' param="log-in"><a href="&login_url(user)">Log in</a></li>
       <li if="&signup_url(user)" class="nav-item" param="sign-up"><a href="&signup_url(user)">Sign up</a></li>
     </else>
