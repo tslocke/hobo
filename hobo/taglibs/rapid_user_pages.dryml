@@ -57,7 +57,7 @@
             <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
           </labelled-item>
         </labelled-item-list>
-        <set user="&Hobo::UserController.user_models.first"/>
+        <set user="&Hobo::User.default_user_model"/>
         <div class="actions" param="actions">
           <submit label='Log in' param/><if test="&signup_url(user)" class='nav-item'> or <a href="&signup_url(user)">Sign up</a></if>
         </div>
