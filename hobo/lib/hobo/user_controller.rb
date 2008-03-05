@@ -2,11 +2,7 @@ module Hobo
 
   module UserController
 
-    @user_models = []
-
     class << self
-      attr_reader :user_models
-      
       def included(base)
         base.class_eval do 
           filter_parameter_logging "password"
@@ -18,8 +14,6 @@ module Hobo
           
           alias_method_chain :hobo_update, :account_flash
         end
-        
-        user_models << base.model
       end
     end
     
