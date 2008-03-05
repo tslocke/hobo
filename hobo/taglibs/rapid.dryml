@@ -312,15 +312,11 @@
    
   c = this.try.to_int || this.try.total_entries || this.try.count || this.try.length
 
-  label ||= if this.is_a?(Class) and this < ActiveRecord::Base
-              this.name.titleize
-            elsif (refl = this.try.proxy_reflection)
-              refl.name.to_s.singularize.titleize
-            elsif (klass = this.try.member_class)
-              klass.name.titleize
+  label ||= if this.is_a?(Class)
+              this.name
             else
-              controller.model.name.titleize
-            end
+              (this.try.association_name || this.try.member_class._?.name)
+            end.to_s.titleize
 
   label = label.downcase if lowercase
    
