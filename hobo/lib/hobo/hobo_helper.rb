@@ -276,17 +276,6 @@ module Hobo
     end
      
      
-    def selector_type
-      if this.is_a? ActiveRecord::Base
-        this.class
-      elsif this.respond_to? :member_class
-        this.member_class
-      elsif this == @this
-        @model
-      end
-    end
-     
-     
     def transpose_with_field(field, collection=nil)
       collection ||= this
       matrix = collection.map {|obj| obj.send(field) }
