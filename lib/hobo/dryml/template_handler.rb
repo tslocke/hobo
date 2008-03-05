@@ -35,6 +35,10 @@ module ActionController
       @this
     end
     
+    def dryml_fallback_tag(tag_name)
+      @dryml_fallback_tag = tag_name
+    end
+    
     def render_tag(tag, options={}, render_options={})
       add_variables_to_assigns
       
@@ -51,7 +55,7 @@ module ActionController
     def render_for_file_with_dryml(template_path, *args)
       if template_path !~ /^\// &&                             # not an absolute path (e.g. an exception ERB template)
           !template_exists?(template_path) &&                  # no template available in app/views
-          tag_name = "#{File.basename(template_path).dasherize}-page"
+          tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
 
           # The template was missing, try to use a DRYML <page> tag instead
           render_tag(tag_name) or raise ActionController::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
