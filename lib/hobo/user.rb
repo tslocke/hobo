@@ -4,6 +4,12 @@ module Hobo
 
   module User
     
+    @user_models = []
+    
+    def self.default_user_model
+      @user_models.first._?.constantize
+    end
+    
     AUTHENTICATION_FIELDS = [:salt, :crypted_password, :remember_token, :remember_token_expires_at]
 
     # Extend the base class with AuthenticatedUser functionality
@@ -12,6 +18,8 @@ module Hobo
     # - plaintext password validation
     # - login token for rembering a login during multiple browser sessions
     def self.included(base)
+      @user_models << base.name
+      
       base.extend(ClassMethods)
 
       base.class_eval do
