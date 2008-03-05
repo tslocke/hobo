@@ -352,9 +352,6 @@ module Hobo
       if target.is_a?(Class)
         klass = target
         action ||= :index
-      elsif target.respond_to?(:member_class)
-        klass = target.member_class
-        action ||= :show
       else
         klass = target.class
         action ||= :show
