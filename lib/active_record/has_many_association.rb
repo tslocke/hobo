@@ -28,6 +28,10 @@ module ActiveRecord::Associations
       proxy_reflection.klass
     end
     
+    def association_name
+      proxy_reflection.association_name
+    end
+    
     private
     
     def set_reverse_association(object)

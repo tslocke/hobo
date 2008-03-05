@@ -6,6 +6,10 @@ module ActiveRecord::Associations
       proxy_reflection.klass
     end
 
+    def association_name
+      proxy_reflection.association_name
+    end
+
   end
 
 end
