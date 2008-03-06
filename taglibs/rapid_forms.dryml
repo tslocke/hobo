@@ -231,7 +231,7 @@
     add_classes!(attributes,
                  image ? "image-button" : "button",
                  "delete-button delete-#{this.class.name.underscore.dasherize}-button")
-    url = object_url(this, "destroy", :subsite => subsite)
+    url = object_url(this, :method => :delete, :subsite => subsite)
     if in_place == false
       attributes[:confirm] = confirm if confirm
       button_to(label, url, attributes)

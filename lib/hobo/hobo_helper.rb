@@ -56,8 +56,9 @@ module Hobo
       end
       
       action ||= case options[:method]._?.to_sym
-                 when :put;  :update
-                 when :post; :create  
+                 when :put;    :update
+                 when :post;   :create
+                 when :delete; :destroy
                  else; obj.is_a?(Class) ? :index : :show
                  end
 
