@@ -388,16 +388,9 @@ in the future - use at your own risk. -->
 </def>
 
 
-<def tag="you" attrs="have, are">
-  <if test="&this == current_user">you <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
-</def>
+<def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou #{'have' if have}#{'are' if are}#{'do' if do_}" %></if><else><do param="default"><name/> <%= "#{'has' if have}#{'is' if are}#{'does' if do_}" %></do></else></def>
 
-
-<def tag="You" attrs="have, are">
-  <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
-</def>
+<def tag="You"><you merge titleize/></def>
 
 <def tag="your">
   <if test="&this == current_user">your</if>
