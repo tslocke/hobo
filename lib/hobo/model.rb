@@ -44,18 +44,17 @@ module Hobo
       if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
         
         WillPaginate::Collection.class_eval do
-          attr_accessor :member_class, :association_name, :owner
+          attr_accessor :member_class, :origin_object, :origin_attribute
         end
         
         WillPaginate::Finder::ClassMethods.class_eval do
-          def paginate_with_member_class(*args, &block)
-            collection = paginate_without_member_class(*args, &block)
-            collection.member_class = self
-            collection.association_name = try.association_name 
-            collection.owner = try.proxy_owner
-            collection
+          def paginate_with_hobo_metadata(*args, &block)
+            returning paginate_without_hobo_metadata(*args, &block) do |collection|
+              collection.origin_object    = try.proxy_owner
+              collection.origin_attribute = try.proxy_reflection._?.name
+            end
           end
-          alias_method_chain :paginate, :member_class
+          alias_method_chain :paginate, :hobo_metadata
           
         end
         
@@ -99,7 +98,7 @@ module Hobo
       
       def user_new(user, attributes={})
         record = new(attributes)
-        record.user_changes(user)
+        record.user_changes(user) or PermissionDeniedError
         record
       end
       
@@ -108,6 +107,12 @@ module Hobo
         record = new(attributes)
         record.user_save_changes(user)
         record
+      end
+      
+      
+      def user_can_create?(user, attributes={})
+        record = new(attributes)
+        record.user_changes(user)
       end
       
       
@@ -138,6 +143,12 @@ module Hobo
           refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
         end.*.name
       end
+      
+      
+      def default_dependent_on
+        dependent_on.first
+      end
+      
       
       private
       
@@ -194,11 +205,11 @@ module Hobo
                       options.merge(:order => "#{table_name}.#{default_order}")
                     end
         end
-        res = super(*args + [options])
-        res.metaclass_eval "def member_class; #{name}; end" if res.is_a?(Array)
-        res
+        result = super(*args + [options])
+        result.member_class = self if result.is_a?(Array)
+        result
       end
-      
+
       
       def all(options={})
         find(:all, options.reverse_merge(:order => :default))
@@ -257,6 +268,15 @@ module Hobo
         s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
         s.send(parts.last, *args)
       end
+      
+      
+      def to_url_path
+        "#{name.underscore.pluralize}"
+      end
+      
+      def typed_id
+        HoboFields.to_name(self) || name.underscore.gsub("/", "__")
+      end
 
     end # --- of ClassMethods --- #
     
@@ -264,11 +284,16 @@ module Hobo
     include Scopes
     
     
+    def to_url_path
+      "#{self.class.to_url_path}/#{to_param}" unless new_record?
+    end
+    
+    
     def user_changes(user, changes={})
       if new_record?
         self.attributes = changes
         set_creator(user) 
-        raise PermissionDeniedError unless Hobo.can_create?(user, self)
+        Hobo.can_create?(user, self)
       else
         original = duplicate
         # 'duplicate' can cause these to be set, but they can conflict
@@ -278,17 +303,23 @@ module Hobo
         
         self.attributes = changes
         
-        raise PermissionDeniedError unless Hobo.can_update?(user, original, self)
+        Hobo.can_update?(user, original, self)
       end        
     end
     
     
+    def user_can_create?(user, attributes={})
+      raise ArgumentError, "Called #user_can_create? on existing record" unless new_record?
+      user_changes(user, attributes)
+    end
+      
+
     def user_save_changes(user, changes={})
-      user_changes(user, changes)
+      user_changes(user, changes) or raise PermissionDeniedError
       save
     end
     
-    
+
     def user_view(user, field=nil)
       raise PermissionDeniedError unless Hobo.can_view?(user, self, field)
     end

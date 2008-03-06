@@ -207,17 +207,9 @@
     else
       # Link to an existing object
 
-      if target.is_a?(Array) && !target.respond_to?(:proxy_reflection) && target.respond_to?(:member_class)
-        # Not much to go on here - last guess is that this is an index page
-        target = target.member_class
-      end
-      
       content = name if content.blank?
       
-      # Do we want automatic disabling of links to thinks that are not
-      # linkable?
-      only_if_linkable = format.blank?
-      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => only_if_linkable))
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
       if href.nil?
         # This target is registered with ModelRouter as not linkable
         content
@@ -247,8 +239,9 @@
             has_many_view(attributes)
           end
         else
-          attrs = add_classes(attributes, "view", type_id, type_and_field)
-          attrs['hobo-model-id'] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
+          attrs = add_classes(attributes, "view", type_and_field)
+          id = dom_id
+          attrs['hobo-model-id'] = id unless id == "nil"
          
           view_tag = find_polymorphic_tag("view")
           

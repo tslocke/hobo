@@ -128,43 +128,41 @@ module Hobo::Dryml
     end
 
     
-    def this_field_dom_id
-      if this_parent && this_field
-        Hobo.dom_id(this_parent, this_field)
-      else
-        Hobo.dom_id(this)
+    def dom_id(object=nil, attribute=nil)      
+      if object.nil?
+        # nothing passed -- use context
+        if this_parent && this_field
+          object, attribute = this_parent, this_field
+        else
+          object = this
+        end
       end
-    end
-
-    
-    def context_id
-      if this_parent and this_parent.is_a?(ActiveRecord::Base) and this_field
-        this_field_dom_id
-      elsif this.respond_to?(:typed_id)
-        this.typed_id
-      elsif this.is_a?(Array) and !this.respond_to?(:proxy_reflection)
+      
+      id = object.try.typed_id
+      if id
+        attribute ? "#{id}_#{attribute}" : id
+      else
         "nil"
-      else
-        Hobo.dom_id(this)
       end
     end
-
+    
     
     def call_part(dom_id, part_name, part_this=nil, *locals)
       res = ''
       if part_this
         new_object_context(part_this) do
-          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          @_part_contexts[dom_id] = PartContext.new(part_name, dom_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       else
         new_context do
-          @_part_contexts[dom_id] = PartContext.new(part_name, context_id, locals)
+          @_part_contexts[dom_id] = PartContext.new(part_name, dom_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       end
       res
     end
+
     
     def call_polymorphic_tag(name, *args)
       name = name.to_s.gsub('-', '_')
@@ -181,7 +179,7 @@ module Hobo::Dryml
 
     
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= (this.is_a?(Array) && this.try.member_class) || this_type
+      call_type ||= (this.is_a?(Array) && this.respond_to?(:member_class) && this.try.member_class) || this_type
 
       while true
         if call_type == ActiveRecord::Base || call_type == Object
@@ -226,12 +224,7 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
-        @_this_parent, @_this_field = if new_this.respond_to?(:proxy_reflection)
-                                        refl = new_this.proxy_reflection
-                                        [new_this.proxy_owner, refl.name]
-                                      else
-                                        [nil, nil]
-                                      end
+        @_this_parent, @_this_field = new_this.origin if new_this.respond_to?(:origin) 
         @_this = new_this
         yield
       end

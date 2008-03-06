@@ -11,9 +11,6 @@ module Hobo
     attr_accessor :current_theme
     attr_writer :developer_features
     
-    def type_id(type)
-      HoboFields.to_name(type) || type.name.underscore.gsub("/", "__")
-    end
 
     def developer_features?
       @developer_features
@@ -82,25 +79,6 @@ module Hobo
     end
 
     def dom_id(obj, attr=nil)
-      if obj.nil?
-        raise ArgumentError, "Tried to get dom id of nil.#{attr}" if attr
-        return 'nil'
-      end
-
-      if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
-        attr = obj.proxy_reflection.name
-        obj = obj.proxy_owner
-      elsif obj.is_a?(Class)
-        return type_id(obj)
-      elsif !obj.respond_to?(:typed_id)
-        return (if attr
-                  dom_id(get_field(obj, attr))
-                elsif obj.respond_to?(:id)
-                  "#{obj.class.name.underscore}_#{obj.id}"
-                else
-                  raise ArgumentError, "Can't create dom id for #{obj.inspect}"
-                end)
-      end
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 

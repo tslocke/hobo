@@ -24,6 +24,7 @@ module Hobo::RapidHelper
     js_options['resetForm']     = options[:reset_form] if options.has_key?(:reset_form)
     js_options['refocusForm']   = options[:refocus_form] if options.has_key?(:refocus_form)
     js_options['spinnerNextTo'] = options[:spinner_next_to] if options.has_key?(:spinner_next_to)
+    js_options['message']       = options[:message] if options[:message]
     
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
@@ -51,7 +52,7 @@ module Hobo::RapidHelper
   end
 
 
-  def ajax_updater(url_or_form, message, update, options={})
+  def ajax_updater(url_or_form, update, options={})
     options ||= {}
     options.symbolize_keys!
     
@@ -61,7 +62,7 @@ module Hobo::RapidHelper
                js_str(url_or_form)
              end
     js_options = options_for_hobo_ajax(options)
-    args = [target, js_str(message || "..."), js_updates(update), js_options].compact
+    args = [target, js_updates(update), js_options].compact
     
     confirm = options.delete(:confirm)
     
@@ -95,7 +96,7 @@ module Hobo::RapidHelper
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
     attributes = add_classes(attributes, behaviour_class)
-    attributes.update(:hobo_model_id => this_field_dom_id,
+    attributes.update(:hobo_model_id => dom_id,
                       :hobo_blank_message => blank_message,
                       :if_blank => blank_message,
                       :no_wrapper => false)
@@ -111,7 +112,7 @@ module Hobo::RapidHelper
   AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
   
   AJAX_ATTRS = AJAX_CALLBACKS + [ :type, :method,
-                                  :script, :form, :params, :confirm,
+                                  :script, :form, :params, :confirm, :message,
                                   :reset_form, :refocus_form, :result_update, :spinner_next_to ]
 
 
