@@ -42,7 +42,8 @@ module Hobo
       if current_user.guest? 
         username, passwd = get_auth_data
         self.current_user = auth_model.authenticate(username, passwd) || nil if username && passwd && auth_model
-      elsif authorized? && (user_model.nil? || current_user.is_a?(user_model))
+      end
+      if logged_in? &&  authorized? && (user_model.nil? || current_user.is_a?(user_model))
         true
       else
         access_denied(auth_model)
