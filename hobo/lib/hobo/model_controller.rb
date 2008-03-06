@@ -492,7 +492,7 @@ module Hobo
     def hobo_new_in_collection(association, *args, &b)
       options = args.extract_options!
       association = find_instance.send(association) if association.is_a?(String, Symbol)
-      self.this = args.first || @association.new
+      self.this = args.first || association.new
       this.user_changes(current_user) # set_creator and permission check
       response_block(&b)
     end

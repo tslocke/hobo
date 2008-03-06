@@ -50,6 +50,7 @@ module Hobo
         WillPaginate::Finder::ClassMethods.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
             returning paginate_without_hobo_metadata(*args, &block) do |collection|
+              collection.member_class     = self
               collection.origin_object    = try.proxy_owner
               collection.origin_attribute = try.proxy_reflection._?.name
             end

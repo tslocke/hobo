@@ -197,22 +197,22 @@
 
 
 <def tag="new-in-collection-page">
-  <set association-name="&@association.proxy_reflection.name.to_s.singularize.titleize"/>
+  <set association-name="&this.origin_attribute.to_s.singularize.titleize"/>
   <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{type_name(:with => @owner, :dasherize => true)} #{type_name :dasherize => true}" param/>
+    <body: class="new-in-collection-page #{type_name(:with => this.origin_object, :dasherize => true)} #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param>New <association-name/></heading>
-      <sub-heading param>For: <a with="&@owner" /></sub-heading>
+      <sub-heading param>For: <a:origin_object/></sub-heading>
     </content-header>
 
     <content-body: param>
       <error-messages/>
 
       <form param>
-        <field-list skip="#{@owner.class.reverse_reflection(@association.proxy_reflection.name).name}"
+        <field-list skip="#{this.origin_object.class.reverse_reflection(@association.proxy_reflection.name).name}"
                     skip-associations="has_many" param/>
         <div class="actions" param="actions">
-          <submit label="Create #{association_name}" param/><do param="back-link"> or <a with="&@owner">Cancel</a></do>
+          <submit label="Create #{association_name}" param/><do param="back-link"> or <a:origin_object>Cancel</a></do>
         </div>
       </form>
     </content-body>
@@ -221,12 +221,12 @@
 
 
 <def tag="show-collection-page">
-  <% title = "#{this.association_name.to_s.titleize} for #{name(:with => this.owner)}" %>
+  <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin_object)}" %>
   <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.owner)} #{type_name(:pluralize => true)}"
+    <body: class="show-collection-page #{type_name(:with => this.origin_object)} #{type_name(:pluralize => true) rescue debugger}"
           param/>
     <content-header: param>
-      <nav>Back to <a:owner/></nav>
+      <nav>Back to <a:origin_object/></nav>
       <heading><%= title %></heading>
       <sub-heading><count/></sub-heading>
     </content-header>
