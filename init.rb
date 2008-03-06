@@ -70,3 +70,32 @@ end
 if defined? HoboFields
   HoboFields.never_wrap(Hobo::Undefined)
 end
+
+
+# Add support for type metadata to arrays
+class ::Array
+  
+  attr_accessor :member_class, :origin_object, :origin_attribute
+  
+  def origin
+    [origin_object, origin_attribute]
+  end
+  
+  def to_url_path
+    base_path = origin_object.try.to_url_path
+    "#{base_path}/#{origin_attribute}" unless base_path.blank?
+  end
+  
+  def typed_id
+    origin_id = origin_object.try.typed_id
+    "#{origin_object}_#{origin_attribute}" if origin_id
+  end
+  
+end
+
+
+class NilClass
+  def typed_id
+    "nil"
+  end
+end
