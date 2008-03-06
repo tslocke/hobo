@@ -37,7 +37,7 @@ var Hobo = {
 
         var opts = Object.merge(options || {}, { params: params})
         Hobo.ajaxRequest(Hobo.putUrl(el),
-                         el.getAttribute("hobo-ajax-message") || "Changing...",
+                         el.getAttribute("hobo-ajax-message") || "Saving...",
                          updates,
                          opts)
     },
@@ -73,11 +73,12 @@ var Hobo = {
         return params.join('&')
     },
 
-    ajaxRequest: function(url_or_form, message, updates, options) {
+    ajaxRequest: function(url_or_form, updates, options) {
         options = Object.merge({ asynchronous:true,
                                  evalScripts:true,
                                  resetForm: false,
-                                 refocusForm: false
+                                 refocusForm: false,
+                                 message: "Saving..."
                                }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
@@ -104,7 +105,7 @@ var Hobo = {
             params.push(Form.serialize(form))
         }
 
-        Hobo.showSpinner(message, options.spinnerNextTo)
+        Hobo.showSpinner(options.message, options.spinnerNextTo)
         var complete = function() {
             if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
@@ -534,14 +535,14 @@ Event.addBehavior({
 	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
 	Event.stop(e);
     },
-    'select.filter:change': function(event) {
-        var param_name = this.id.gsub("-", "_")
+    'form.filter-menu select:change': function(event) {
+        var paramName = this.up('form').down('input[type=hidden]').value
         var params = {}
         remove = [ 'page' ]
 	if (this.value == '') { 
-            remove.push(param_name) 
+            remove.push(paramName)
         } else {
-            params[param_name] = this.value
+            params[paramName] = this.value
 	}
 	location.href = Hobo.addUrlParams(params, {remove: remove})
     }
