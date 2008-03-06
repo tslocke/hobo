@@ -18,15 +18,22 @@ module Hobo
     class << self
       
       def reset_linkables
-        @linkable = Hash.new {|h, k| h[k] = Hash.new {|h, k| h[k] = {} } }
+        @linkable =Set.new
       end
       
-      def linkable!(subsite, klass, action)
-        @linkable[subsite][klass.name][action] = true
+      def linkable_key(klass, action, options)
+        opts = options.map { |k, v| "#{k}=#{v}" if v }.compact.join(', ')
+        "#{klass.name}/#{action}/#{opts}"
       end
       
-      def linkable?(subsite, klass, action)
-        @linkable[subsite][klass.name][action]
+      def linkable!(klass, action, options={})
+        options[:method] ||= :get
+        @linkable << linkable_key(klass, action, options)
+      end
+      
+      def linkable?(klass, action, options={})
+        options[:method] ||= :get
+        @linkable.member? linkable_key(klass, action, options)
       end
       
       def add_routes(map)
@@ -124,6 +131,9 @@ module Hobo
     def resource_routes
       # We re-implement resource routing - routes are not created for
       # actions that the controller does not provide
+      
+      # FIX ME -- what about routes with formats (e.g. .xml)?
+      
       linkable_route(plural, plural, :index, :conditions => { :method => :get })
                                                                                                                           
       linkable_route("new_#{singular}",  "#{plural}/new",      :new,  :conditions => { :method => :get })  
@@ -202,7 +212,11 @@ module Hobo
     
     
     def linkable_route(name, route, action, options)
-      named_route(name, route, options.merge(:action => action.to_s)) and self.class.linkable!(subsite, model, action)
+      named_route(name, route, options.merge(:action => action.to_s)) and 
+        begin
+          linkable_options = { :method => options[:conditions][:method], :subsite => subsite }
+          self.class.linkable!(model, action, linkable_options)
+        end
     end
     
    

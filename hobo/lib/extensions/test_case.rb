@@ -102,7 +102,7 @@ class Test::Unit::TestCase
     def replace_objects_in_params!(hash)
       hash.each do |k,v|
         if v.is_a? ActiveRecord::Base
-          hash[k] = "@" + Hobo.dom_id(v)
+          hash[k] = "@" + v.typed_id
         elsif v.is_a? Hash
           replace_objects_in_params!(v)
         end

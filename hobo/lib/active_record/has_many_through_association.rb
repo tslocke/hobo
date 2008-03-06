@@ -5,8 +5,12 @@ module ActiveRecord::Associations
     def member_class
       proxy_reflection.klass
     end
+    
+    def origin_object
+      proxy_owner
+    end
 
-    def association_name
+    def origin_attribute
       proxy_reflection.association_name
     end
 

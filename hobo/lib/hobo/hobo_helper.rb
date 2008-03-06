@@ -47,51 +47,35 @@ module Hobo
       obj, action = args
       action &&= action.to_s
       
-      controller_name = controller_for(obj)
+      options, params = params.partition_hash([:subsite, :method, :format])
+      options[:subsite] ||= self.subsite
       
-      subsite = params[:subsite] || self.subsite
-      
-      # TODO - what if you want if_available as a query param?
-      if_available = params.delete(:if_available)
-      return nil if if_available && 
-        ((action.nil? && obj.respond_to?(:typed_id) && !linkable?(obj.class, :show,  :subsite => subsite)) ||
-         (action.nil? && obj.is_a?(Class) &&           !linkable?(obj,       :index, :subsite => subsite)))
-      
-      base = subsite.blank? ? base_url : "/#{subsite}#{base_url}"
-      
-      parts = if obj.is_a? Class
-                [base, controller_name]
-                
-              elsif obj.is_a? Hobo::CompositeModel
-                [base, controller_name, obj.to_param]
-                
-              elsif obj.is_a? ActiveRecord::Base
-                if obj.new_record?
-                  [base, controller_name]
-                else
-                  raise HoboError.new("invalid object url: new for existing object") if action == "new"
-                  [base, controller_name, obj.to_param]
-                end
-                
-              elsif obj.is_a? Array    # warning - this breaks if we use `case/when Array`
-                owner = obj.proxy_owner
-                new_model = obj.proxy_reflection.klass
-                [object_url(owner), obj.proxy_reflection.name]
-                
-              else
-                raise HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
-              end
-      url = parts.join("/")
-
-      case action
-      when nil       # do nothing
-      when "destroy" then params["_method"] = "DELETE"
-      when "update"  then params["_method"] = "PUT"
-      else url += "/#{action}" 
+      if obj.try.new_record?
+        obj = obj.class
+        options[:method] ||= :post
       end
+      
+      action ||= case options[:method]._?.to_sym
+                 when :put;  :update
+                 when :post; :create  
+                 else; obj.is_a?(Class) ? :index : :show
+                 end
 
-      params = make_params(params - [:subsite])
-      params.blank? ? url : "#{url}?#{params}"
+      if linkable?((obj.is_a?(Class) ? obj : obj.class), action, options)
+
+        path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
+        url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
+
+        case action
+        when nil, :index, :show, :create # do nothing
+        when "destroy" then params["_method"] = "DELETE"
+        when "update"  then params["_method"] = "PUT"
+        else url += "/#{action}" 
+        end
+
+        params = make_params(params)
+        params.blank? ? url : "#{url}?#{params}"
+      end
     end
      
      
@@ -119,30 +103,19 @@ module Hobo
       hash.map {|k,v| _as_params(k, v)}.join("&")
     end
      
-     
-    def dom_id(*args)
-      if args.length == 0
-        Hobo.dom_id(this)
-      else
-        Hobo.dom_id(*args)
-      end
-    rescue ArgumentError
-      ""
-    end
-    
     
     def type_id(type=nil)
-      type ||= this.is_a?(Class) ? this : this_type
-      type == NilClass ? "" : Hobo.type_id(type || this.class)
+      type ||= (this.is_a?(Class) && this) || this_type || this.class
+      type.typed_id
     end
-    
+
     
     def type_and_field(*args)
       if args.empty?
-        this_parent && this_field && "#{Hobo.type_id(this_parent.class)}_#{this_field}"
+        "#{this_parent.class.typed_id}_#{this_field}" if this_parent && this_field
       else
         type, field = args
-        "#{Hobo.type_id(type)}_#{field}"
+        "#{type.typed_id}_#{field}"
       end
     end
      
@@ -195,8 +168,8 @@ module Hobo
       else
         object, field = args.length == 2 ? args : [this, args.first]
         
-        if !field and object.respond_to?(:proxy_reflection)
-          Hobo.can_edit?(current_user, object.proxy_owner, object.proxy_reflection.name)
+        if !field && object.respond_to?(:origin)
+          Hobo.can_edit?(current_user, object.origin_object, object.origin_attribute)
         else
           Hobo.can_edit?(current_user, object, field)
         end
@@ -220,8 +193,8 @@ module Hobo
 
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||= 
-        if !field and object.respond_to?(:proxy_reflection)
-          Hobo.can_view?(current_user, object.proxy_owner, object.proxy_reflection.name)
+        if !field && object.respond_to?(:origin)
+          Hobo.can_view?(current_user, object.origin_object, object.origin_attribute)
         else
           Hobo.can_view?(current_user, object, field)
         end
@@ -357,7 +330,7 @@ module Hobo
         action ||= :show
       end      
       
-      Hobo::ModelRouter.linkable?(subsite, klass, action.to_sym)
+      Hobo::ModelRouter.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
    
     
@@ -379,7 +352,7 @@ module Hobo
     def log_debug(*args)
       logger.debug("\n### DRYML Debug ###")
       logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
-      logger.debug("DRYML THIS = #{Hobo.dom_id(this) rescue this.inspect}")
+      logger.debug("DRYML THIS = #{this.typed_id rescue this.inspect}")
       logger.debug("###################\n")
       args.first unless args.empty?
     end

@@ -303,14 +303,14 @@ module Hobo
       # The after_submit post parameter takes priority
       params[:after_submit] || 
         
-        # Then try the records show page
-        object_url(@this, :if_available => true) || 
+        # Then try the record's show page
+        object_url(@this) || 
         
         # Then the show page of the 'owning' object if there is one
-        (@this.dependent_on.first && object_url(@this.dependent_on.first, :if_available => true)) ||
+        (@this.class.default_dependent_on && object_url(@this.class.default_dependent_on)) ||
         
         # Last try - the index page for this model
-        object_url(@this.class, :if_available => true) ||
+        object_url(@this.class) ||
         
         # Give up
         home_page
@@ -479,8 +479,8 @@ module Hobo
       options = args.extract_options!
       options = options.reverse_merge(:page => params[:page] || 1)
       association = find_instance.send(association) if association.is_a?(String, Symbol)
-      if association.respond_to?(:proxy_owner)
-        association.proxy_owner.user_view(current_user, association.proxy_reflection.association_name) # permission check
+      if association.respond_to?(:origin)
+        association.origin_object.user_view(current_user, association.origin_name) # permission check
       end
       self.this = association.paginate(options)
       dryml_fallback_tag("show_collection_page")
