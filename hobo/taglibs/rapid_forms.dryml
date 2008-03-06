@@ -33,7 +33,7 @@
 
   html_attrs[:action] = action || object_url(this, web_method)
    
-  if html_attrs[:action].blank? || (new_record && !this.user_can_create?(current_user))
+  if html_attrs[:action].nil? || (new_record && !this.user_can_create?(current_user))
     Hobo::Dryml.last_if = false
     ""
   else
