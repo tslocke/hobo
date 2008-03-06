@@ -22,7 +22,7 @@ module Hobo
       end
       
       def linkable_key(klass, action, options)
-        opts = options.map { |k, v| "#{k}=#{v}" if v }.compact.join(', ')
+        opts = options.map { |k, v| "#{k}=#{v}" unless v.blank? }.compact.join(',')
         "#{klass.name}/#{action}/#{opts}"
       end
       
@@ -149,16 +149,16 @@ module Hobo
     
     def collection_routes
       controller.collections.each do |collection|
-        named_route("#{singular}_#{collection}",
-                    "#{plural}/:id/#{collection}",
-                    :action => collection.to_s,
-                    :conditions => { :method => :get })
+        linkable_route("#{singular}_#{collection}",
+                       "#{plural}/:id/#{collection}",
+                       collection.to_s,
+                       :conditions => { :method => :get })
 
         if Hobo.simple_has_many_association?(model.reflections[collection])
-          named_route("new_#{singular}_#{collection.to_s.singularize}",
-                      "#{plural}/:id/#{collection}/new",
-                      :action => "new_#{collection.to_s.singularize}",
-                      :conditions => { :method => :get }) 
+          linkable_route("new_#{singular}_#{collection.to_s.singularize}",
+                         "#{plural}/:id/#{collection}/new",
+                         "new_#{collection.to_s.singularize}",
+                         :conditions => { :method => :get }) 
         end
       end
     end
@@ -166,33 +166,30 @@ module Hobo
     
     def web_method_routes
       controller.web_methods.each do |method|
-        named_route("#{plural.singularize}_#{method}", "#{plural}/:id/#{method}",
-                    :action => method.to_s, :conditions => { :method => :post })
+        linkable_route("#{plural.singularize}_#{method}", "#{plural}/:id/#{method}", method.to_s, :conditions => { :method => :post })
       end
     end
     
     
     def index_action_routes
       controller.index_actions.each do |view|
-        named_route("#{view}_#{plural}", "#{plural}/#{view}",
-                    :action => view.to_s, :conditions => { :method => :get })
+        linkable_route("#{view}_#{plural}", "#{plural}/#{view}", view.to_s, :conditions => { :method => :get })
       end
     end
 
     
     def show_action_routes
       controller.show_actions.each do |view|
-        named_route("#{plural.singularize}_#{view}", "#{plural}/:id/#{view}",
-                    :action => view.to_s, :conditions => { :method => :get })
+        linkable_route("#{plural.singularize}_#{view}", "#{plural}/:id/#{view}", view.to_s, :conditions => { :method => :get })
       end
     end
     
         
     def user_routes
       prefix = plural == "users" ? "" : "#{singular}_"
-      named_route("#{singular}_login",  "#{prefix}login",  :action => 'login')
-      named_route("#{singular}_logout", "#{prefix}logout", :action => 'logout')
-      named_route("#{singular}_signup", "#{prefix}signup", :action => 'signup')
+      linkable_route("#{singular}_login",  "#{prefix}login",  'login')
+      linkable_route("#{singular}_logout", "#{prefix}logout", 'logout')
+      linkable_route("#{singular}_signup", "#{prefix}signup", 'signup')
     end
     
     
@@ -211,10 +208,10 @@ module Hobo
     end
     
     
-    def linkable_route(name, route, action, options)
+    def linkable_route(name, route, action, options={})
       named_route(name, route, options.merge(:action => action.to_s)) and 
         begin
-          linkable_options = { :method => options[:conditions][:method], :subsite => subsite }
+          linkable_options = { :method => options[:conditions]._?[:method], :subsite => subsite }
           self.class.linkable!(model, action, linkable_options)
         end
     end
