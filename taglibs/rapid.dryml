@@ -316,7 +316,7 @@
               this.name
             else
               (this.try.association_name || this.try.member_class._?.name)
-            end.to_s.titleize
+            end.to_s.singularize.titleize
 
   label = label.downcase if lowercase
    
