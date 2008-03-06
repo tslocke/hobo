@@ -44,14 +44,14 @@ module Hobo
       if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
         
         WillPaginate::Collection.class_eval do
-          attr_accessor :member_class, :origin_object, :origin_attribute
+          attr_accessor :member_class, :origin, :origin_attribute
         end
         
         WillPaginate::Finder::ClassMethods.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
             returning paginate_without_hobo_metadata(*args, &block) do |collection|
               collection.member_class     = self
-              collection.origin_object    = try.proxy_owner
+              collection.origin           = try.proxy_owner
               collection.origin_attribute = try.proxy_reflection._?.name
             end
           end

@@ -224,7 +224,7 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
-        @_this_parent, @_this_field = new_this.origin if new_this.respond_to?(:origin) 
+        @_this_parent, @_this_field = [new_this.origin, new_this.origin_attribute] if new_this.respond_to?(:origin) 
         @_this = new_this
         yield
       end

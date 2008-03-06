@@ -199,20 +199,20 @@
 <def tag="new-in-collection-page">
   <set association-name="&this.origin_attribute.to_s.singularize.titleize"/>
   <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{type_name(:with => this.origin_object, :dasherize => true)} #{type_name :dasherize => true}" param/>
+    <body: class="new-in-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param>New <association-name/></heading>
-      <sub-heading param>For: <a:origin_object/></sub-heading>
+      <sub-heading param>For: <a:origin/></sub-heading>
     </content-header>
 
     <content-body: param>
       <error-messages/>
 
       <form param>
-        <field-list skip="#{this.origin_object.class.reverse_reflection(@association.proxy_reflection.name).name}"
+        <field-list skip="#{this.origin.class.reverse_reflection(@association.proxy_reflection.name).name}"
                     skip-associations="has_many" param/>
         <div class="actions" param="actions">
-          <submit label="Create #{association_name}" param/><do param="back-link"> or <a:origin_object>Cancel</a></do>
+          <submit label="Create #{association_name}" param/><do param="back-link"> or <a:origin>Cancel</a></do>
         </div>
       </form>
     </content-body>
@@ -221,12 +221,12 @@
 
 
 <def tag="show-collection-page">
-  <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin_object)}" %>
+  <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin)}" %>
   <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.origin_object)} #{type_name(:pluralize => true) rescue debugger}"
+    <body: class="show-collection-page #{type_name(:with => this.origin)} #{type_name(:pluralize => true) rescue debugger}"
           param/>
     <content-header: param>
-      <nav>Back to <a:origin_object/></nav>
+      <nav>Back to <a:origin/></nav>
       <heading><%= title %></heading>
       <sub-heading><count/></sub-heading>
     </content-header>
