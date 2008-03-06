@@ -480,7 +480,7 @@ module Hobo
       options = options.reverse_merge(:page => params[:page] || 1)
       association = find_instance.send(association) if association.is_a?(String, Symbol)
       if association.respond_to?(:origin)
-        association.origin_object.user_view(current_user, association.origin_attribute) # permission check
+        association.origin.user_view(current_user, association.origin_attribute) # permission check
       end
       self.this = association.paginate(options)
       dryml_fallback_tag("show_collection_page")

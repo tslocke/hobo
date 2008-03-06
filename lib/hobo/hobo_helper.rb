@@ -170,7 +170,7 @@ module Hobo
         object, field = args.length == 2 ? args : [this, args.first]
         
         if !field && object.respond_to?(:origin)
-          Hobo.can_edit?(current_user, object.origin_object, object.origin_attribute)
+          Hobo.can_edit?(current_user, object.origin, object.origin_attribute)
         else
           Hobo.can_edit?(current_user, object, field)
         end
@@ -195,7 +195,7 @@ module Hobo
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||= 
         if !field && object.respond_to?(:origin)
-          Hobo.can_view?(current_user, object.origin_object, object.origin_attribute)
+          Hobo.can_view?(current_user, object.origin, object.origin_attribute)
         else
           Hobo.can_view?(current_user, object, field)
         end

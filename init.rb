@@ -75,11 +75,7 @@ end
 # Add support for type metadata to arrays
 class ::Array
   
-  attr_accessor :member_class, :origin_object, :origin_attribute
-  
-  def origin
-    [origin_object, origin_attribute]
-  end
+  attr_accessor :member_class, :origin, :origin_attribute
   
   def to_url_path
     base_path = origin_object.try.to_url_path
