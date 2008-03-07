@@ -42,8 +42,7 @@ module Hobo
 
       attr_writer :model
       
-      attr_accessor :template_path_cache
-      
+      attr_accessor :template_path_cache      
 
       def web_methods
         @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
@@ -289,11 +288,6 @@ module Hobo
       else
         render :action => default_action
       end
-    end
-    
-    
-    def model_for(controller_name)
-      "#{controller_name.camelize}Controller".constantize.model
     end
     
     
