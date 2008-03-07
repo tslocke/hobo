@@ -50,9 +50,8 @@ module Hobo
       options, params = params.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
       
-      if obj.try.new_record?
+      if options[:method].to_s == 'post' && obj.try.new_record?
         obj = obj.class
-        options[:method] ||= :post
       end
       
       action ||= case options[:method]._?.to_sym
@@ -112,12 +111,8 @@ module Hobo
 
     
     def type_and_field(*args)
-      if args.empty?
-        "#{this_parent.class.typed_id}_#{this_field}" if this_parent && this_field
-      else
-        type, field = args
-        "#{type.typed_id}_#{field}"
-      end
+      type, field = args.empty? ? [this_parent.class, this_field] : args
+      "#{type.typed_id}_#{field}" if type.respond_to?(:typed_id)
     end
      
      
