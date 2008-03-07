@@ -239,15 +239,16 @@
             has_many_view(attributes)
           end
         else
-          attrs = add_classes(attributes, "view", type_and_field)
-          id = dom_id
-          attrs['hobo-model-id'] = id unless id == "nil"
          
           view_tag = find_polymorphic_tag("view")
           
           if view_tag == "view" # i.e. it didn't find a type specific tag
             raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
           else
+            attrs = add_classes(attributes, "view", type_and_field)
+            id = dom_id
+            attrs['hobo-model-id'] = id unless id == "nil"
+
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)
             
@@ -422,7 +423,7 @@ in the future - use at your own risk. -->
 <def tag="filter-menu" attrs="param-name, options, no-filter">
   <form action="&request.request_uri" method="get" class="filter-menu">
     <hidden-field name="filter-parameter" value="&param_name"/>
-    <select-menu name="&param_name" options="&options" selected="&params[param_name]" first-option="&no_filter" merge-params/>
+    <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
   </form>
 </def>
 
