@@ -83,8 +83,8 @@ class ::Array
   end
   
   def typed_id
-    origin_id = origin_object.try.typed_id
-    "#{origin_object}_#{origin_attribute}" if origin_id
+    origin_id = origin.try.typed_id
+    "#{origin_id}_#{origin_attribute}" if origin_id
   end
   
 end
