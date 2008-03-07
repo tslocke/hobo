@@ -570,7 +570,8 @@ module Hobo::Dryml
                        elsif is_code_attribute?(merge_params)
                          merge_params[1..-1]
                        else
-                         dryml_exception("invalid merge_params", el)
+                         merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_")
+                         "all_parameters & #{merge_param_names.inspect}"
                        end
         "{#{param_items}}.merge((#{extra_params}) || {})"
       else
@@ -703,7 +704,7 @@ module Hobo::Dryml
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
-      items << ":field => \"#{el.name}\"" if el.expanded_name =~ /:./
+      items << ":field => \"#{ruby_name el.name}\"" if el.expanded_name =~ /:./
       
       items = items.join(", ")
       
