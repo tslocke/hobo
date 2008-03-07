@@ -31,7 +31,7 @@
              method.downcase
            end
 
-  html_attrs[:action] = action || object_url(this, web_method)
+  html_attrs[:action] = action || object_url(this, web_method, :method => method)
    
   if html_attrs[:action].nil? || (new_record && !this.user_can_create?(current_user))
     Hobo::Dryml.last_if = false
