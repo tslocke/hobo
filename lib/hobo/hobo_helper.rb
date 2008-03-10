@@ -42,10 +42,10 @@ module Hobo
     end
      
      
-    def object_url(*args)
+    def object_url(obj, *args)
       params = args.extract_options!
-      obj, action = args
-      action &&= action.to_s
+      action = args.first
+      action &&= action.to_sym
       
       options, params = params.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
@@ -54,10 +54,10 @@ module Hobo
         obj = obj.class
       end
       
-      action ||= case options[:method]._?.to_sym
-                 when :put;    :update
-                 when :post;   :create
-                 when :delete; :destroy
+      action ||= case options[:method].to_s
+                 when 'put';    :update
+                 when 'post';   :create
+                 when 'delete'; :destroy
                  else; obj.is_a?(Class) ? :index : :show
                  end
 
@@ -68,8 +68,8 @@ module Hobo
 
         case action
         when nil, :index, :show, :create # do nothing
-        when "destroy" then params["_method"] = "DELETE"
-        when "update"  then params["_method"] = "PUT"
+        when :destroy then params["_method"] = "DELETE"
+        when :update  then params["_method"] = "PUT"
         else url += "/#{action}" 
         end
 
