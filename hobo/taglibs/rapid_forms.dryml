@@ -219,7 +219,8 @@
 
 <def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
   in_place = false if in_place.nil? && this == @this
-  if (Hobo::Dryml.last_if = can_delete?)
+  url = object_url(this, :method => :delete, :subsite => subsite)
+  if (Hobo::Dryml.last_if = url && can_delete?)
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
                                   else
@@ -231,15 +232,17 @@
     add_classes!(attributes,
                  image ? "image-button" : "button",
                  "delete-button delete-#{this.class.name.underscore.dasherize}-button")
-    url = object_url(this, :method => :delete, :subsite => subsite)
-    if in_place == false
-      attributes[:confirm] = confirm if confirm
-      button_to(label, url, attributes)
-    else
-      fade = true if fade.nil?
-      attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
-      element(:input, attributes)
+    if url
+      if in_place == false
+        attributes[:confirm] = confirm if confirm
+        attributes[:method] = :delete
+        button_to(label, url, attributes)
+      else
+        fade = true if fade.nil?
+        attributes[:value] = label
+        attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
+        element(:input, attributes)
+      end
     end
   else
     ""
