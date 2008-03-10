@@ -40,7 +40,9 @@ module Hobo
     def subsite
       params[:controller].match(/([^\/]+)\//)._?[1]
     end
-     
+
+    
+    IMPLICIT_ACTIONS = [:index, :show, :create, :update, :destroy]
      
     def object_url(obj, *args)
       params = args.extract_options!
@@ -66,12 +68,7 @@ module Hobo
         path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
         url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
 
-        case action
-        when nil, :index, :show, :create # do nothing
-        when :destroy then params["_method"] = "DELETE"
-        when :update  then params["_method"] = "PUT"
-        else url += "/#{action}" 
-        end
+        url += "/#{action}" unless action.in?(IMPLICIT_ACTIONS)
 
         params = make_params(params)
         params.blank? ? url : "#{url}?#{params}"
