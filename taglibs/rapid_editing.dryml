@@ -8,7 +8,7 @@
       has_many_editor(attributes)
     end
   else
-    attrs = add_classes(attributes, "#{type_and_field}", "editor")
+    attrs = add_classes(attributes, type_id, type_and_field, "editor")
     call_polymorphic_tag("editor", attrs) or
       raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
                           "(#{this.inspect}:#{this_type})")
