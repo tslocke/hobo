@@ -103,7 +103,7 @@
   elsif !can_edit?
     view
   else
-    attrs = add_classes(attributes, type_and_field)
+    attrs = add_classes(attributes, type_id, type_and_field)
     the_input = if (refl = this_field_reflection)
                   if refl.macro == :belongs_to
                     belongs_to_input(attrs)
