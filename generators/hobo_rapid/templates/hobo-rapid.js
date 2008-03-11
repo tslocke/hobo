@@ -536,7 +536,7 @@ Event.addBehavior({
 	Event.stop(e);
     },
     'form.filter-menu select:change': function(event) {
-        var paramName = this.up('form').down('input[type=hidden]').value
+        var paramName = this.up('form').down('input[type=hidden]').value.gsub("-", "_")
         var params = {}
         remove = [ 'page' ]
 	if (this.value == '') { 
