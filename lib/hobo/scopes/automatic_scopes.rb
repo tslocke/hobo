@@ -203,7 +203,7 @@ module Hobo
             
           when "order_by"
             def_scope do |*args|
-              fields, asc = args
+              field, asc = args
               { :order => "#{field} #{asc._?.upcase}" }
             end
             
