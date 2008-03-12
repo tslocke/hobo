@@ -155,13 +155,8 @@
 %></def>
 
 <def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
-  type ||= if this.is_a?(Class)
-             this
-           elsif this.respond_to? :member_class
-             this.member_class
-           else
-             this.class
-           end
+  type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
+
   name = dasherize ? type.name.underscore.dasherize : type.name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
