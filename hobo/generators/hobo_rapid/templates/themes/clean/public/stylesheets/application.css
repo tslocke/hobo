@@ -53,7 +53,7 @@ input.file_upload {
 .actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
-	margin: 20px 40px; padding: 10px 30px; border-width: 2px 0;
+	margin: 0px 40px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
 .flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
@@ -89,6 +89,7 @@ input.file_upload {
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header, .content-body {padding-bottom: 15px;}
+.content-header {margin-top: 20px;}
 .content-footer {padding-bottom: 20px;}
 
 /* aside layout */
