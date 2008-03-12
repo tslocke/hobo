@@ -48,7 +48,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     routes_path = File.join(RAILS_ROOT, "config/routes.rb")
     name = full_class_path
 
-    route = ("  map.search  'site_search', :controller => '#{name}', :action => 'search'\n" +
+    route = ("  map.site_search  'search', :controller => '#{name}', :action => 'search'\n" +
              "  map.homepage '', :controller => '#{name}', :action => 'index'")
 
     route_src = File.read(routes_path)
