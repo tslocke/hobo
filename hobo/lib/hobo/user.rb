@@ -61,7 +61,7 @@ module Hobo
         @login_attribute = attr = attr.to_sym
         unless attr == :login
           alias_attribute(:login, attr)
-          declare_attr_type(:login, attr_type(attr))
+          declare_attr_type(:login, attr_type(attr)) if table_exists? # this breaks if the table doesn't exist
         end
         
         if validate
