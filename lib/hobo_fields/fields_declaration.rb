@@ -7,11 +7,13 @@ module HoboFields
       # functionality included automatically, but make sure we only include it once
       include HoboFields::ModelExtensions unless HoboFields::ModelExtensions.in?(included_modules)
       
-      dsl = FieldDeclarationDsl.new(self)
-      if b.arity == 1
-        yield dsl
-      else
-        dsl.instance_eval(&b)
+      if b
+        dsl = FieldDeclarationDsl.new(self)
+        if b.arity == 1
+          yield dsl
+        else
+          dsl.instance_eval(&b)
+        end
       end
     end
     
