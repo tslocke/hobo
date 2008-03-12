@@ -99,8 +99,12 @@ module Hobo
       
       def user_new(user, attributes={})
         record = new(attributes)
-        record.user_changes(user) or PermissionDeniedError
-        record
+        record.user_changes(user) and record
+      end
+      
+      
+      def user_new!(user, attributes={})
+        user_new(user, attributes) or raise PermissionDeniedError
       end
       
       
