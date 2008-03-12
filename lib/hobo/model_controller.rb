@@ -322,7 +322,7 @@ module Hobo
       end
     end
     
-    def paginate(finder, options)
+    def find_or_paginate(finder, options)
       do_pagination = options.fetch(:paginate, request.format.in?(PAGINATE_FORMATS))
       if do_pagination && !finder.respond_to?(:paginate)
         do_pagination = false
@@ -332,24 +332,24 @@ module Hobo
       if do_pagination
         finder.paginate(options)
       else
-        finder.find(:all, options)
+        finder.all(options)
       end
     end
+    
     
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
-      options = args.extract_options!
-      options = options.reverse_merge(:page => params[:page] || 1)
+      options = args.extract_options!.reverse_merge(:page => params[:page] || 1)
       finder = args.first || model
-      self.this = finder.paginate(options)
+      self.this = find_or_paginate(finder, options)
       response_block(&b)
     end
     
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this ||= find_instance(options)
+      self.this = find_instance(options)
       response_block(&b)
     end
     
@@ -470,15 +470,14 @@ module Hobo
  
     
     def hobo_show_collection(association, *args, &b)
-      options = args.extract_options!
-      options = options.reverse_merge(:page => params[:page] || 1)
+      options = args.extract_options!.reverse_merge(:page => params[:page] || 1)
       association = find_instance.send(association) if association.is_a?(String, Symbol)
       if association.respond_to?(:origin)
         association.origin.user_view(current_user, association.origin_attribute) # permission check
       end
-      self.this = association.paginate(options)
+      self.this = find_or_paginate(association, options)
       dryml_fallback_tag("show_collection_page")
-      response_block(&b)
+      response_block(&b) 
     end
     
     
