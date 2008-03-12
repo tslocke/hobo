@@ -255,6 +255,7 @@ module Hobo
       def method_missing(name, *args, &block)
         name = name.to_s
         if name =~ /\./
+          # FIXME: Do we need this now?
           call_method_chain(name, args, &block)
         elsif create_automatic_scope(name)
           send(name, *args, &block)
