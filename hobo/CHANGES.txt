@@ -1,3 +1,504 @@
+=== Release 0.7.3 ===
+
+hobo command -- options are now:
+
+  --user-model <model-name-or-false>
+  --svn                               # Use 'svn co' to checkout Hobo
+  --create-dbs                        # Run rake db:create:all
+  --hobo-src <path to hobo src>
+  -d | --database <database>          # e.g. mysql, sqlite
+
+
+Core extentions
+
+  Extracted from Hobo into new project: HoboSupport
+
+  Some notable changes:
+
+    #every has gone: users.every(:name) is now users.*.name
+
+
+hobo generator
+ 
+  application.dryml now has a generated <app-name> tag
+
+
+hobo_front_controller generator
+
+  Generated "search" route is now called "site_search"
+
+  Removed unused --no-user option
+
+
+hobo_migration_generator
+
+  Removed from Hobo - now part of the HoboFields spinn-off project
+
+
+New generator hobo_model_resource creates a model + controller pair
+
+
+Rapid Javascripts
+
+  Default ajax message changed to "Saving..."
+
+  Hobo.ajaxRequest now takes the message as an option (was the second argument)
+
+  Fix to showing the ajax spinner in the right place in IE
+
+  Hobo.addUrlParams now has an option to remove specified parameters
+
+  Fixes to HasManyThroughInput behaviour
+
+  New behaviour supporting filtering (e.g. on index pages) using <select> tags
+
+
+Rich data types
+
+  These are all part of the HoboFields project now
+
+  Booleans are now represented by the type Hobo::Boolean which is still part of Hobo
+
+
+Active record extensions
+
+  Monkey-patch to make AR complain less about missing classes for
+  polymorphic associations
+
+
+The block-based "composable query mechanism" is gone. Named scopes are much better.
+
+
+Hobo's original implementation of what later became "Sexy Migrations" is gone.
+
+
+Hobo module utility methods
+
+  Hobo.field_types and Hobo.symbolic_type_name are gone - now part of
+  HoboFields
+
+  Fixes to can_edit?
+
+
+Site-search:
+
+  Now automatically skips searching of non-linkable models.
+
+  Can now be passed an array of models (including scoped finders) to search
+
+  Now renders <search-card> instead of <card>
+
+
+New feature: Hobo::DevController
+
+  A controller that adds developer support features (not in production
+  mode). For now it just adds a method that can be used to change the current_user:
+
+    /dev/set_current_user?name=Fred+Bloggs
+
+    Very useful
+
+
+Hobo Routing
+
+  Hobo::ModelRouter.linkable? can now be used with all the routes
+  created by Hobo.
+
+
+Hobo helpers
+
+  object_url now always returns nil if the URL requested is not a
+  route known to Hobo routing
+
+
+  object_url never includes _method= in the query string
+
+  dom_id is now moved to DRYML's TemplateEnvironment
+
+  can_view? now utilises some simple cacheing
+
+  signup_url now defaults to the 
+
+  linkable? no longer accepts an array as parameter
+
+
+Rapid helpers
+
+  ajax_updater(url_or_form, message, update, options) is now
+  ajax_updater(url_or_form, update, options) (message has become an
+  option)
+
+
+DRYML
+
+  DRYML integration changes -- this is a start to the work of
+  extracting DRYML from Hobo.
+
+    The fallback from a template file to a tag, e.g. from index.dryml
+    to <index-page/> is now handled by DRYML, not by Hobo's model
+    controller. You can customise the chosed tag by calling
+
+      dryml_fallback_tag("my-tag") from your controller action
+
+    The default DRYML context is now the value returned by
+    #dryml_context (was previously the value of @this). #dryml_context
+    returns @this by default but can be overridden.
+
+  <include src="mytags" bundle="foo">
+
+    includes a taglib from the plugin that the 'foo' bundle came from,
+    and puts into effect any class renames from that bundle (for
+    polymorphic tags).
+
+  Fix - tags with capitalised names now work
+
+  <my-param:></my-param:> can now be used to clear the contents of a
+  parameter. It's not the same as <my-param:/> (which does nothing)
+
+  New psuedo parameters for insterting content in and around
+  parameters. e.g. for a param 'title':
+
+    <before-title:> and <after-title:> for insterting content
+    immediately before and after the parameter.
+
+    <append-content:> and <prepend-content:> for inserting content at
+    the begining and end of the default content.
+
+    Note these are all just syntactic sugar for things you can do
+    already with <param-content/> and <title: replace> / 
+    <title: restore/>
+
+  When changing the context with the ':' shorthand, now use dashes,
+  not underscores (the idea being that underscores are soley for use
+  in Ruby code
+
+    e.g. <with:my-field>
+
+  Control attributes <my-tag if> is equivalent to <my-tag if="&this"/>
+  (remember these test for blank? / not blank?, not Ruby trueness)
+    
+  this_type now never returns AssociationReflections,
+  this_field_reflection does
+
+  this_type now returns Hobo::Boolean for boolean types.
+
+  this_field_dom_id is now just dom_id -- pass an object and an
+  attriubte, or nothing to default to this and this_field
+
+  Can now do merge-params="param1, param2" to merge just the named
+  params
+
+  Fix: <foo:foo> (i.e. field name same as tag name)
+
+  Fix: using alias-of with a reserved word was broken
+
+  
+Hobo models
+
+  New method Model.named to find things by name,
+  e.g. Category.named("Cars"), also aliased as Category["Cars"]
+
+  Various new methods to support permission. This moves much of the
+  logic into the model (from Hobo::ModelController). These methods are
+  all passed, as the first argument, the user performing the action. A
+  Hobo::Model::PermissionDeniedError is raised if the permission check
+  fails.
+
+    Class methods:
+
+    user_find    -- find with view-permission check
+    user_new     -- new with create-permission check
+    user_create  -- create with create-permission check
+
+    user_can_create? -- test to see if a user is allowed to create the model.
+
+    Instace methods:
+
+    user_can_create?
+    user_save_changes
+    user_view
+    user_destroy
+
+  Models now get a new_foo method for each has_one :foo
+
+  The old id_name system is gone. Will be coming back in various
+  guises (e.g. see .named above)
+
+  def_scope implementation factored out into separate modules
+
+  New metod #get_creator returns the value of the creator attribute
+  (if there is one)
+
+  Various features exrtacted and now part of HoboFields
+
+
+Scopes
+
+  Note: Hobo will probably switch to has_finder which provides
+  (nearly) all the functionality of Hobo's scopes and has a superior
+  implementation. We'll extend has_finder to add the bits that it is
+  missing.
+
+  The implementation of scopes has been factored out into separate models.
+
+  Large new set of automatically defined scopes. These are defined
+  automatically when you call them for the first time, much like the
+  magic finders in ActiveRecord (e.g. find_by_name_and_address):
+
+    For every has_many relationship (e.g. tags)
+
+      with_tag(t)             -- find records that have tag c
+      with_tags(a, b, c)      -- find records that have all these tags
+      without_tag(t)
+      without_tags(a, b, c)
+
+    For every belongs_to and has_one (e.g. manager)
+
+      manager_is(m)
+      manager_is_not(m)
+
+    For every regular field (e.g. name)
+
+      name_is(x)
+      name_is_not(x)
+
+    For textual fields
+
+      name_contains(x)
+      name_does_not_contain(x)
+      name_starts(x)
+      name_does_not_start(x)
+      name_ends(x)
+      name_does_not_end(x)
+
+    For boolean fields (e.g. published)
+
+      published
+      not_published
+      
+    For the various date/time columns (these must end _at, e.g. pulished_at)
+
+      published_before(x)
+      published_after(x)
+      published_between(x, y)
+
+    And finally
+
+      order_by(field_name) -- add an ORDER BY clause
+      limit(n)             -- add a LIMIT clause
+      recent(n)            -- orders by created_at and limits to n records
+      
+
+
+Hobo model controller
+
+  Permission and not-found errors are now handled centrally using the
+  new rescue_from declaration in Rails. No need to worry about these
+  in individual actions.
+
+  All the hobo actions (hobo_show, hobo_new etc) are greatly
+  simplified. Much of the logic has been moved elsewhere, so it's now
+  a lot easier to avoid using those actions at all and still get the
+  usual features such as permission checks, fallback on page tags etc.
+
+    hobo_index now takes a "finder" (model class or scoped model
+    class) as the first argument. If you want to retrieve the
+    collection yourself, there's no reason to call hobo_index at all -
+    just write a regular Rails style action.
+
+    The hobo_actions don't set any extra instance variables any more
+    beyond @this. e.g. hobo_show_collection doesn't set @owner,
+    because you can now use this.origin
+
+  As part of the previous change, #not_allowed? is gone.
+
+  Some work on autocomplete - might be working now :-)
+
+  auto_actions -- can now say
+
+    auto_actions :write_only # just gives you create, update and destroy
+    auto_actions :read_only  # gives you all except the above three
+
+  Support for scopes on declarative index actions:
+
+    index_action :scope => :my_scope 
+
+  New method filter_by for easily adding filtering to index actions, e.g.
+
+    # assuming category and price_range are scopes defined on the current model
+    def index
+      finder = filter_by(:category => params[:category], price_range => [params[:min_price], params[:max_price])
+      hobo_index finder
+    end
+
+  The old data_filters stuff is gone. This was based on the
+  "composable query" thing which is gone too (see above).
+
+  Dependency on classic_pagination is gone. Now uses will_paginate
+
+
+
+User model
+
+  Hobo::UserController.user_models is now Hobo::User.user_models
+
+  New method Hobo::User.default_user_model returns the user model used
+  in various places if no model is specified.
+
+  Now requires the current password to be provided when changing the
+  password (at the model level and in the related rapid-pages)
+
+  User.login_attr renamed to User.login_attribute
+
+
+User controller
+
+  Now includes the rapid_user_pages taglib (these have been separated
+  from the main rapid-pages taglib)
+
+  New helper: logout_current_user
+
+
+Bundles
+
+  Support for multiple bundles per plugin -- bundles can now be
+  selective about which models and controllers they include.
+
+  Adding support for:   belongs_to :foo, :polymorphic => :optional
+  
+  Magic option names are now available inside the model and controller *instances*
+
+  Bundle options with defaults now work with nested option hashes
+
+  belongs_to in a bundle model can now be given an :alias option - an
+  alias of the (parameterised) belongs_to is created so that the model
+  has a known API
+
+
+Core DRYML tags
+
+  <wrap> can be given a parameter="..." attribute to wrap the content
+  in a template using the given parameter name.
+
+  <repeat> can now be used with <else> (i.e. the collection was empty)
+
+
+Rapid tags: general
+
+  New standardised API for getting metadata from collections
+
+    #association_name returns th, er, name of the association. If
+    called on a named scope it returns the original association name,
+    not the scope name
+
+    #member_class returns the (expected) class of items in the array
+
+    #origin returns the object from which the collection was obtained
+
+    #origin_attribute returns the name of the attribute from which the
+    collection was obtained
+
+    So, unless something has changed:
+     
+      collection.origin.send(collection.origin_attribute) == collection
+
+    This API is made available on all association proxies, regular
+    arrays and will_paginate collections.
+
+  New taglib - rapid_generics - provides various tags used by the
+  default pages. These tags are designed to work generically with your
+  models, but can also be customised of course.
+
+  <table> -- the "Edit" link now goes to action="edit" (was linking to
+  the show page)
+
+  <count> is now better at guessing the label to use, also now
+  supports <count lowercase/> to downcase the label.
+
+  <clearer> is gone - hooray for overflow: hidden
+
+  Added do to <you> as in: <you do/>
+
+  New tag <filter-menu/> creates a form with a <select>. Used for
+  adding menu-based filters to index pages.
+
+  New tag <comma-list>
+
+
+Rapid tags: editing
+
+  <editor> now merges params and attributes (e.g. you can add your own css classes)
+
+  Most ajax controls now just give "Saving..." as the default ajax
+  message.
+
+
+Rapid tags: forms
+
+  <form> (without an action attribute) now renders nothing if the
+  calculated action is not linkable
+
+  If you provide action="..." to <form> (i.e. a manual form) the
+  automatic css classes are not added.
+
+  <delete-button> now renders nothing if the destory action is not linkable
+
+  <delete-button> now automatically switche to non-in-place delete if
+  the thing being deleted is the top-level context if the page.
+
+  New tag <select-menu>
+
+  <remote-method-button> now switches to in-place mode if you give any
+  ajax attribute (e.g. success="...")
+
+  <after-submit> -- can now do
+
+    <after-submit go-back> (requires session[:previous_uri])
+    
+    and
+
+    <after-submit stay-here>
+
+  
+Rapid tags: navigation
+
+  Now assumes will_paginate style pagination instead of classic_pagination
+
+  <account-nav> now proivides a link to the account page by default
+
+  <account-nav> now provides a complete set of parameters for customisation
+
+
+Rapid tags: pages
+
+  login, signup and account-disabled pages have been moved out to
+  rapid-user-pages
+
+  simple-layout -- the main-nav parameter is now on a wrapper around
+  <magic-nav> rather than actually on <magic-nav>, so this now works
+  as you'd expect:
+
+    <main-nav:> --- your nav here --- </main-nav:>
+
+  aside-layout -- the aside now appears in the output even if it's
+  empty
+
+  <show-page> -- various improvements and new parameters
+
+  <permission-denied-page> now sets a body class, and the message can
+  be changed with an attribute.
+
+  <app-name> is gone -- this is now automatically generated in your
+  application.dryml (you may need to manually add this to existing
+  apps)
+
+
+Rapid tags: plus
+
+  New tag <change-password-form>
+
+
+
 === Release 0.7.2 ===
 
 Migration generator
