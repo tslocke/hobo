@@ -89,7 +89,6 @@ input.file_upload {
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header, .content-body {padding-bottom: 15px;}
-.content-header {margin-top: 20px;}
 .content-footer {padding-bottom: 20px;}
 
 /* aside layout */
@@ -107,7 +106,7 @@ body.aside-layout {width: 960px;}
 .aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
 
 
-.page-header {position: relative; margin-top: 20px; padding: 20px 0 0; color: white; background: black;}
+.page-header {position: relative; margin: 20px 0; padding: 20px 0 0; color: white; background: black;}
 .page-header h1 {
 	margin: 0; padding: 0 30px 30px; 
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
