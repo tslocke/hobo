@@ -330,7 +330,7 @@ module Hobo
       end
 
       if do_pagination
-        finder.paginate(options)
+        finder.paginate(options.reverse_merge(:page => params[:page] || 1))
       else
         finder.all(options)
       end
@@ -340,7 +340,7 @@ module Hobo
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
-      options = args.extract_options!.reverse_merge(:page => params[:page] || 1)
+      options = args.extract_options!
       finder = args.first || model
       self.this = find_or_paginate(finder, options)
       response_block(&b)
@@ -470,7 +470,7 @@ module Hobo
  
     
     def hobo_show_collection(association, *args, &b)
-      options = args.extract_options!.reverse_merge(:page => params[:page] || 1)
+      options = args.extract_options!
       association = find_instance.send(association) if association.is_a?(String, Symbol)
       if association.respond_to?(:origin)
         association.origin.user_view(current_user, association.origin_attribute) # permission check
