@@ -183,15 +183,15 @@
       # Link to a new object form
       new_record = target.new
       new_record.set_creator(current_user)
-      if can_create?(new_record)
-        
+      href = object_url(target, "new", params._?.merge(:subsite => subsite))
+      
+      if href && can_create?(new_record)
         new_class_name = if target.respond_to?(:proxy_reflection)
                            target.proxy_reflection.klass.name
                          else
                            target.name
                          end
 
-        href = object_url(target, "new", params._?.merge(:subsite => subsite))
         add_classes!(attributes, "new-#{new_class_name.underscore}-link")
         content = "New #{new_class_name.titleize}" if content.blank?
         element(:a, attributes.update(:href => href), content)
