@@ -138,6 +138,10 @@ module HoboFields
     # the association is a collection (has_many or habtm) return the
     # AssociationReflection instead
     def self.attr_type(name)
+      if attr_types.nil? && self != self.name.constantize
+        raise RuntimeError, "attr_types called on a stale class object (#{self.name}). Avoid storing persistent refereces to classes"
+      end
+      
       attr_types[name] or
         
         if (refl = reflections[name.to_sym])
