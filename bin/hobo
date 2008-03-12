@@ -12,7 +12,7 @@ Options:
   --svn                               # Use 'svn co' to checkout Hobo
   --create-dbs                        # Run rake db:create:all
   --hobo-src <path to hobo src>
-  --d | --database <database>         # e.g. mysql, sqlite
+  -d | --database <database>         # e.g. mysql, sqlite
 "
 
 HOBO_REPO = "svn://hobocentral.net/hobo/trunk/hobo"
@@ -52,7 +52,7 @@ until ARGV.empty?
     user_model = arg == "false" ? nil : arg
   when "--svn"
     hobo_svn = true
-  when "--db"
+  when "--create-dbs"
     create_db = true
   when "--hobo-src"
     hobo_src = "../" + ARGV.shift
