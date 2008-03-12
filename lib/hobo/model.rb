@@ -311,6 +311,11 @@ module Hobo
     end
     
     
+    def user_changes!(user, changes={})
+      user_changes(user, changes) or raise PermissionDeniedError
+    end
+    
+    
     def user_can_create?(user, attributes={})
       raise ArgumentError, "Called #user_can_create? on existing record" unless new_record?
       user_changes(user, attributes)
