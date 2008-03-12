@@ -12,7 +12,6 @@
 
       <do param="scripts">
         <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
-        <javascript name="dryml-support" if="&RAILS_ENV == 'development'" param="dryml-support-javascript"/>
         <hobo-rapid-javascripts param/>
       </do>
     </head>
@@ -66,12 +65,12 @@
 <def tag="index-page">
   <set model="&this.try.member_class || self.model"/>
   <set model-name="&model.name.titleize"/>
-  <page title="All #{model_name.pluralize}" merge>
-    <body: class="index-page #{model.name.underscore}" param/>
+  <page title="All #{type_name :with => model, :pluralize => true}" merge>
+    <body: class="index-page #{type_id model}" param/>
     <content-header: param>
-      <heading param><%= model_name.pluralize %></heading>
-      <p class="note" if="any?" param>There <count part="item-count" prefix="are"/></p>
-    </content-header>
+      <heading param><type-name with="&model"/></heading>
+      <p class="note" if param>There <count part="item-count" prefix="are"/></p>
+    </content-header:>
 
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
@@ -82,16 +81,16 @@
     </content-body>
     
     <content-footer: param>
-      <a to="&model" action="new" param="new-link" if="&linkable?(model, :new)"/>
+      <a to="&model" action="new" param="new-link"/>
       <else>
-        <do with="&new_for_current_user model">
-          <section class="create-new" if="&can_create?">
+        <if with="&model.user_new current_user">
+          <section class="create-new">
             <h2>New <type-name/></h2>
             <form><field-list/><submit label="Create #{type_name}"/></form>
           </section>
-        </do>
+        </if>
       </else>
-    </content-footer>
+    </content-footer:>
   </page>
 </def>
 
@@ -176,10 +175,10 @@
 
 <def tag="edit-page">
   <page merge>    
-    <body: class="edit-page #{this.class.name.underscore}" param/>
+    <body: class="edit-page #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
-      <delete-button in-place="&false" label="Remove This #{this.class.name}" param/>
+      <delete-button label="Remove This #{type_name}" param/>
     </content-header>
 
     <content-body: param>
