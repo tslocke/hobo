@@ -193,7 +193,7 @@ module Hobo
           when "recent"
             def_scope do |*args|
               count = args.first || 3
-              { :limit => count, :order => "#{table_name}.created_at DESC" }
+              { :limit => count, :order => "#{@klass.table_name}.created_at DESC" }
             end
             
           when "limit"
