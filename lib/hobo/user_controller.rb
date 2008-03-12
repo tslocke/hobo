@@ -61,17 +61,15 @@ module Hobo
     
     def hobo_signup(&b)
       if request.post?
-        @user = model.new(params[model.name.underscore])
-        @this = @user
-        save_and_set_status!(@user)
-        self.current_user = @user if valid?
+        self.this = model.user_create(current_user, params[model.name.underscore])
+        self.current_user = this if valid?
         response_block(&b) or
           if valid?
             flash[:notice] ||= "Thanks for signing up!"
             redirect_back_or_default(home_page)
           end
       else
-        @this = @user = model.new
+        self.this = model.new
         yield if block_given?
       end
     end
