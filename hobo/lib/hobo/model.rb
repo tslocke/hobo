@@ -198,9 +198,6 @@ module Hobo
       end
       
 
-      attr_reader :id_name_column
-
-      
       def find(*args, &b)
         options = args.extract_options!
         if options[:order] == :default
