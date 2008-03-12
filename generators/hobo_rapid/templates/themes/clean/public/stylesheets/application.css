@@ -53,7 +53,7 @@ input.file_upload {
 .actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
-	margin: 0 40px; padding: 10px 30px; border-width: 2px 0;
+	margin: 20px 40px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
 .flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
