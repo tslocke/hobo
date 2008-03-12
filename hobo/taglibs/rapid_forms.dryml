@@ -23,7 +23,7 @@
 <def tag="form" attrs="update, hidden-fields, action, method, web-method"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
-  new_record = this.respond_to?(:new_record?) && this.new_record?
+  new_record = this.try.new_record?
 
   method = if method.nil?
              (action || web_method || new_record) ? "post" : "put"
