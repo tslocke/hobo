@@ -7,8 +7,6 @@ class Category < ActiveRecord::Base
     timestamps
   end
   
-  id_name
-  
   has_many :categorisations
   has_many :posts, :through => :categorisations
   

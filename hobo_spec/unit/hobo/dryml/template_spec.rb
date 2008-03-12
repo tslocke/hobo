@@ -482,8 +482,8 @@ describe Template do
   
   it "should allow tags to be selected based on types" do
     tags = %(<def tag="do"><%= parameters.default %></def>
-             <def tag="t" for="String">A string</def>
-             <def tag="t" for="TrueClass">A boolean</def>)
+             <def tag="t" for="string">A string</def>
+             <def tag="t" for="boolean">A boolean</def>)
 
     eval_dryml(tags + '<do with="&\'foo\'"><%= call_polymorphic_tag(:t) %></do>').should == "A string"
     eval_dryml(tags + '<do with="&false"><%= call_polymorphic_tag(:t) %></do>').should == "A boolean"
@@ -605,15 +605,15 @@ describe Template do
   
   # --- Whitespace Suppression --- #
   
-  it "should remove allow newlines to be removed by adding a ' -' at the end of a line" do 
-    src = <<-END
-<def tag="t"> -
-  My Tag -
-</def>
-<p><t/></p>
-END
-    eval_dryml(src).should == "<p>My Tag</p>"
-  end
+#  it "should remove allow newlines to be removed by adding a ' -' at the end of a line" do 
+#    src = <<-END
+#<def tag="t"> -
+#  My Tag -
+#</def>
+#<p><t/></p>
+#END
+#    eval_dryml(src).should == "<p>My Tag</p>"
+#  end
   
   
   # --- Testing for parameters --- #
