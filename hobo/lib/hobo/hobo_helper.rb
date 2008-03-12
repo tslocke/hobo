@@ -288,7 +288,11 @@ module Hobo
 
     # Sign-up url for a given user record or user class
     def signup_url(user_or_class=nil)
-      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
+      c = case user_or_class
+          when Class; user_or_class
+          when nil;   Hobo::User.default_user_model
+          else user_or_class
+          end
       send("#{c.name.underscore}_signup_url") rescue nil
     end
     
