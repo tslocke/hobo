@@ -323,7 +323,7 @@ module Hobo
       
 
     def user_save_changes(user, changes={})
-      user_changes(user, changes) or raise PermissionDeniedError
+      user_changes!(user, changes)
       save
     end
     
