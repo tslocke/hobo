@@ -88,7 +88,7 @@ module Hobo
           # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
           # By default, search all models, but filter out...
           Hobo.models.select do |m| 
-          ModelRouter.linkable?(nil, m, :show) && # ...non-linkables
+          ModelRouter.linkable?(m, :show) && # ...non-linkables
             m.search_columns.any?             # and models with no search-columns
           end
         end
