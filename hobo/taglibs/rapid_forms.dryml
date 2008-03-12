@@ -38,8 +38,9 @@
     ""
   else
     if method == "put"
+      # browsers don't support put -- use post and add the Rails _method hack
       http_method_hidden = hidden_field_tag("_method", "PUT") 
-      html_attrs[:method] = "post"
+      html_attrs[:method] = "post" 
     else
       html_attrs[:method] = method
     end
