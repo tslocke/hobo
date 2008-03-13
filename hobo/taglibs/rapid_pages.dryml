@@ -208,7 +208,7 @@
       <error-messages/>
 
       <form param>
-        <field-list skip="#{this.origin.class.reverse_reflection(@association.proxy_reflection.name).name}"
+        <field-list skip="#{this.origin.class.reverse_reflection(this.association_name).name}"
                     skip-associations="has_many" param/>
         <div class="actions" param="actions">
           <submit label="Create #{association_name}" param/><do param="back-link"> or <a:origin>Cancel</a></do>
