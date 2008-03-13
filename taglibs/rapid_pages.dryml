@@ -148,17 +148,20 @@
           <collection part="primary-collection"/>
         </do>
 
-        <do with="&new_for_current_user">
-          <section class="create-new" if="&!linkable?(:new) && can_create?">
-            <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
-            <form update="primary-collection, primary-collection-count" message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
-              <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
-                          skip-associations="has_many" param="primary-collection-field-list"/>
-              <submit label="Create #{primary_collection_name.singularize.titleize}"/>
-            </form>
-          </section>
-        </do>
-        <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
+        <if test="can_create?">
+          <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
+          <else>
+            <section class="create-new" with="&new_for_current_user">
+              <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
+              <form update="primary-collection, primary-collection-count"
+                    message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
+                <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
+                            skip-associations="has_many" param="primary-collection-field-list"/>
+                <submit label="Create #{primary_collection_name.singularize.titleize}"/>
+              </form>
+            </section>
+          </else>
+        </if>
       </section>
 
     </content-body:>
@@ -196,22 +199,23 @@
 
 
 <def tag="new-in-collection-page">
-  <set association-name="&this.origin_attribute.to_s.singularize.titleize"/>
+  <set association-name="&@association.origin_attribute.to_s"/>
   <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name :dasherize => true}" param/>
+    <body: class="new-in-collection-page #{association_name.underscore.dasherize} #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <heading param>New <association-name/></heading>
-      <sub-heading param>For: <a:origin/></sub-heading>
+      <heading param>New <association-name.singularize.titleize/></heading>
+      <sub-heading param>For: <a with="&@association.origin"/></sub-heading>
     </content-header>
 
     <content-body: param>
       <error-messages/>
 
       <form param>
-        <field-list skip="#{this.origin.class.reverse_reflection(this.association_name).name}"
+        <field-list skip="#{@association.origin.class.reverse_reflection(association_name.to_sym).name}"
                     skip-associations="has_many" param/>
         <div class="actions" param="actions">
-          <submit label="Create #{association_name}" param/><do param="back-link"> or <a:origin>Cancel</a></do>
+          <submit label="Create #{association_name.singularize.titleize}" param/>
+          <do param="back-link"> or <a with="&@association.origin">Cancel</a></do>
         </div>
       </form>
     </content-body>
