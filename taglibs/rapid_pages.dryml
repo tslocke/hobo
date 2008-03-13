@@ -256,11 +256,12 @@
 </def>
 
 
-<def tag="not-found-page">
+<def tag="not-found-page" attrs="message">
+  <% message ||= "The page you were looking for could not be found" %>
   <page merge>
     <body: class="not-found"/>
     <content-header: param>
-      <heading param>The page you were looking for could not be found</heading>
+      <heading param><message/></heading>
     </content-header>
   </page>
 </def>
