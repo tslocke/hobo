@@ -125,6 +125,16 @@ module Hobo
     end
     
     
+    def can_create_in_association?(array_or_reflection)
+      refl = 
+        (array_or_reflection.is_a?(ActiveRecord::Reflection::AssociationReflection) and array_or_reflection) or
+        array_or_reflection.try.proxy_reflection or
+        (origin = array_or_reflection.try.origin and origin.send(array_or_reflection.origin_attribute).try.proxy_reflection)
+
+      refl && refl.macro == :has_many && (!refl.through_reflection) && (!refl.options[:conditions])      
+    end
+    
+    
     def get_field(object, field)
       return nil if object.nil?
       if field.to_s =~ /^\d+$/

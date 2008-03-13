@@ -147,16 +147,16 @@ module Hobo::Dryml
     end
     
     
-    def call_part(dom_id, part_name, part_this=nil, *locals)
+    def call_part(part_node_id, part_name, part_this=nil, *locals)
       res = ''
       if part_this
         new_object_context(part_this) do
-          @_part_contexts[dom_id] = PartContext.new(part_name, dom_id, locals)
+          @_part_contexts[part_node_id] = PartContext.new(part_name, dom_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       else
         new_context do
-          @_part_contexts[dom_id] = PartContext.new(part_name, dom_id, locals)
+          @_part_contexts[part_node_id] = PartContext.new(part_name, dom_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       end
