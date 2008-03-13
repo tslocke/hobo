@@ -46,29 +46,41 @@ module Hobo
      
     def object_url(obj, *args)
       params = args.extract_options!
-      action = args.first
-      action &&= action.to_sym
-      
+      action = args.first._?.to_sym
       options, params = params.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
       
-      if options[:method].to_s == 'post' && obj.try.new_record?
-        obj = obj.class
-      end
-      
-      action ||= case options[:method].to_s
-                 when 'put';    :update
-                 when 'post';   :create
-                 when 'delete'; :destroy
-                 else; obj.is_a?(Class) ? :index : :show
-                 end
+      if obj.respond_to?(:origin)
+        # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
+        if action == :new
+          action_path = "#{obj.origin_attribute}/new"
+          action = "new_#{obj.origin_attribute.to_s.singularize}"
+        elsif action.nil?
+          action = obj.origin_attribute
+        end
+        obj = obj.origin
+        
+      else
+        action ||= case options[:method].to_s
+                   when 'put';    :update
+                   when 'post';   :create
+                   when 'delete'; :destroy
+                   else; obj.is_a?(Class) ? :index : :show
+                   end
 
-      if linkable?((obj.is_a?(Class) ? obj : obj.class), action, options)
+        if action == :create && obj.try.new_record?
+          # Asking for url to post new record to
+          obj = obj.class
+        end
+      end
+    
+      klass = obj.is_a?(Class) ? obj : obj.class
+      if Hobo::ModelRouter.linkable?(klass, action, options)
 
         path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
         url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
 
-        url += "/#{action}" unless action.in?(IMPLICIT_ACTIONS)
+        url += "/#{action_path || action}" unless action.in?(IMPLICIT_ACTIONS)
 
         params = make_params(params)
         params.blank? ? url : "#{url}?#{params}"
@@ -255,9 +267,7 @@ module Hobo
      
     def new_for_current_user(model_or_assoc=nil)
       model_or_assoc ||= this
-      record = model_or_assoc.new
-      record.set_creator(current_user)
-      record
+      model_or_assoc.user_new(current_user)
     end
     
     
@@ -319,7 +329,14 @@ module Hobo
       target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
       action = args.first
 
-      if target.is_a?(Class)
+      if (origin = target.try.origin)
+        klass = origin.class
+        action = if action == :new
+                   "new_#{target.origin_attribute.to_s.singularize}" 
+                 elsif action.nil?
+                   target.origin_attribute
+                 end
+      elsif target.is_a?(Class)
         klass = target
         action ||= :index
       else
