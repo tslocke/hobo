@@ -117,7 +117,7 @@
 
 
 <def tag="show-page" attrs="primary-collection">
-  <set primary-collection-name="&primary_collection || self.primary_collection_name"/>
+  <set primary-collection-name="&(primary_collection || self.primary_collection_name).to_s"/>
   <page merge title="#{name :no_wrapper => true}">
     <body: class="show-page #{type_name :dasherize => true}" param/>
     <content-header: param>
@@ -142,7 +142,7 @@
                   skip-associations="has_many" param/>
 
       <section class="primary-collection" field="&primary_collection_name" if="&primary_collection_name">
-        <h2 param="primary-collection-title"><%= primary_collection_name.to_s.titleize %></h2>
+        <h2 param="primary-collection-title"><%= primary_collection_name.titleize %></h2>
 
         <do param="primary-collection">
           <collection part="primary-collection"/>
@@ -150,11 +150,11 @@
 
         <do with="&new_for_current_user">
           <section class="create-new" if="&!linkable?(:new) && can_create?">
-            <h2>Add <A-or-An word="&primary_collection_name.to_s.singularize.titleize"/></h2>
-            <form update="primary-collection, primary-collection-count" message="Adding #{primary_collection_name.to_s.singularize.titleize}..." reset-form>
+            <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
+            <form update="primary-collection, primary-collection-count" message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
               <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
                           skip-associations="has_many" param="primary-collection-field-list"/>
-              <submit label="Create #{primary_collection_name.to_s.singularize.titleize}"/>
+              <submit label="Create #{primary_collection_name.singularize.titleize}"/>
             </form>
           </section>
         </do>
