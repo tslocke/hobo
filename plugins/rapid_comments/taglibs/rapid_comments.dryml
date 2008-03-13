@@ -1,8 +1,0 @@
-<def tag="new-comment-form">
-  <form with="&this.comments.new" class="new-comment" param="form">
-    <h2 param="heading">Add A Comment</h2>
-    <div param="author" class="author"><input:author/><label>Your Name</label></div>
-    <div param="body" class="body"><input:body/></div>
-    <submit param="submit" label="Submit Comment"/>
-  </form>
-</def>
