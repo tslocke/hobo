@@ -23,8 +23,8 @@ module Hobo::RapidHelper
     js_options['resultUpdate']  = js_result_updates(options[:result_update]) if options[:result_update]
     js_options['resetForm']     = options[:reset_form] if options.has_key?(:reset_form)
     js_options['refocusForm']   = options[:refocus_form] if options.has_key?(:refocus_form)
-    js_options['spinnerNextTo'] = options[:spinner_next_to] if options.has_key?(:spinner_next_to)
-    js_options['message']       = options[:message] if options[:message]
+    js_options['spinnerNextTo'] = js_str(options[:spinner_next_to]) if options.has_key?(:spinner_next_to)
+    js_options['message']       = js_str(options[:message]) if options[:message]
     
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
