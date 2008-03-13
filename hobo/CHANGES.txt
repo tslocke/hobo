@@ -104,6 +104,10 @@ Hobo Routing
   Hobo::ModelRouter.linkable? can now be used with all the routes
   created by Hobo.
 
+  Hobo routes are no longer automatically updated on every request in
+  dev mode. This was making dev very slow. We'll hopefully re-enable
+  this feature without the performance problem at some point.
+
 
 Hobo helpers
 
@@ -489,7 +493,7 @@ Rapid tags: pages
   be changed with an attribute.
 
   <app-name> is gone -- this is now automatically generated in your
-  application.dryml (you may need to manually add this to existing
+  application.dryml (you will need to manually add this to existing
   apps)
 
 

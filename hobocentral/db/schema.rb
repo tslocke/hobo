@@ -55,8 +55,8 @@ ActiveRecord::Schema.define(:version => 7) do
   create_table "forum_topic_viewings", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "user_id"
-    t.integer  "forum_topic_id"
+    t.integer  "viewer_id"
+    t.integer  "target_id"
   end
 
   create_table "forum_topics", :force => true do |t|

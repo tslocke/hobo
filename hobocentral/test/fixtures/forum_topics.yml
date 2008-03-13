@@ -193,7 +193,6 @@ forum_topic_9:
     
     Code:
     
-    <%= javascript_include_tag "tiny_mce/tiny_mce" %> 
       <script type="text/javascript"> 
       tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce", 
        plugins: 'save', 

@@ -3,8 +3,8 @@ class AddViewTrackingToForumTopics < ActiveRecord::Migration
     create_table :forum_topic_viewings do |t|
       t.datetime :created_at
       t.datetime :updated_at
-      t.integer  :user_id
-      t.integer  :forum_topic_id
+      t.integer  :viewer_id
+      t.integer  :target_id
     end
     
     add_column :forum_topics, :view_counter, :integer, :default => 0
