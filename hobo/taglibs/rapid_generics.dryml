@@ -1,0 +1,74 @@
+<def tag="creation-details">
+  <span class="creation-details">
+    <view field="&this.class.creator_attribute" class="creator" if="&this.class.creator_attribute" />
+    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
+  </span>
+</def>
+
+<def tag="primary-content">
+  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute" merge/>
+</def>
+
+<def tag="association-count">
+  <a class="association-count #{this_field.to_s.underscore}" href="##{this_field.to_s.underscore}" merge>
+    <count/>
+  </a>
+</def>
+
+<def tag="base-card">
+  <if test="&can_view?">
+    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
+      <h3 param="title"><a if="&linkable?"/></h3>
+      <div class="content" param="content" if="&!linkable?">
+        <primary-content/>
+      </div>
+      <creation-details param/>
+      <do param="counter">
+        <set primary-collection="&primary_collection_name"/>
+        <if test="&primary_collection">
+          <span class="dependents"><count field="&primary_collection"/></span>
+        </if>
+      </do>
+      <delete-button label="X" unless="&linkable?(this, :edit)" param/>
+    </div>
+  </if>
+</def>
+
+<def tag="card">
+  <if test="&can_view?">
+    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
+    <base-card unless="&poly" merge/>
+  </if>
+</def>
+
+<def tag="search-card">
+  <%= poly = call_polymorphic_tag('search-card', attributes, parameters) %>
+  <card unless="&poly"/>
+</def>
+
+<def tag="collection">
+  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
+  <ul class="collection" merge-attrs unless="&poly">
+    <li:><card param/></li:>
+  </ul>
+  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
+    <% label = if (refl = this.try.proxy_reflection)
+                 refl.association_name.to_s.humanize.downcase
+               elsif (klass = this.try.member_class)
+                 klass.name.humanize.downcase.pluralize
+               else
+                 type_name(:plural => true).pluralize.humanize.downcase.to_s 
+               end %>
+    There are no <%= label.pluralize %>
+  </p>
+</def>
+
+<def tag="collection-preview" attrs="limit">
+  <% limit ||= 6 %>
+  <div class="collection-preview" merge-attrs>
+    <h2><do param="heading"><this-field.titleize/></do> <span param="show-all-link" if="&linkable?">(<a>show all</a>)</span></h2>
+    <collection with="&this.limit(limit)" merge-params>
+      <card: class="small"/>
+    </collection>
+  </div>
+</def>

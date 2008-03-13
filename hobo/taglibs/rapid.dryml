@@ -7,6 +7,8 @@
 <include src="rapid_forms"/>
 <include src="rapid_navigation"/>
 <include src="rapid_plus"/>
+<include src="rapid_generics"/>
+
 
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "view" %>
@@ -73,7 +75,7 @@
                 <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
-                <a param="edit-link">Edit</a>
+                <a param="edit-link" action="edit">Edit</a>
                 <delete-button param/>
               </td>
             </if>
@@ -97,39 +99,9 @@
 </def>
 
 
-<def tag="theme-image" attrs="src">
-  <img src="#{theme_asset('images/' + src)}" merge-attrs/>
-</def>
-
-
-<def tag="card">
-  <if test="&can_view?">
-    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
-    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" unless="&poly">
-      <a if="&linkable?"/>
-      <div class="content" param="content">
-        <primary-content if="&!linkable?"/>
-      </div>
-      <creation-details/>
-      <span class="dependents"><count-dependents /></span>
-    </div>
-  </if>
-</def>
-  
-
-<def tag="collection">
-  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
-  <ul class="collection" merge-attrs unless="&poly">
-    <li:><card param/></li:>
-  </ul>
-  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
-    There are no <type-name plural/>
-  </p>
-</def>
-
-
 <def tag="hobo-rapid-javascripts" attrs="tiny-mce"><%=
    res = '<script type="text/javascript">var hoboParts = {};'
+   # FIXME: This should interrogate the model-router - not the models
    unless Hobo.all_models.empty?
      # Tell JS code how to pluralize names, unless they follow the simple rule
      names = Hobo.all_models.map do |m|
@@ -147,7 +119,7 @@
    if tiny_mce
      res += javascript_include_tag("tiny_mce/tiny_mce_src") + %{
                <script type="text/javascript">
-                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny_mce",
+                 tinyMCE.init({ mode: "textareas", editor_selector: "tiny-mce",
                        plugins: 'save',
                        theme_advanced_buttons1 : "bold, italic, separator, " +
                                                  "bullist, outdent, indent, separator, " +
@@ -183,13 +155,8 @@
 %></def>
 
 <def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
-  type ||= if this.is_a?(Class)
-             this
-           elsif this.respond_to? :proxy_reflection
-             this.proxy_reflection.klass
-           else
-             this.class
-           end
+  type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
+
   name = dasherize ? type.name.underscore.dasherize : type.name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
@@ -216,15 +183,15 @@
       # Link to a new object form
       new_record = target.new
       new_record.set_creator(current_user)
-      if can_create?(new_record)
-        
+      href = object_url(target, "new", params._?.merge(:subsite => subsite))
+      
+      if href && can_create?(new_record)
         new_class_name = if target.respond_to?(:proxy_reflection)
                            target.proxy_reflection.klass.name
                          else
                            target.name
                          end
 
-        href = object_url(target, "new", params._?.merge(:subsite => subsite))
         add_classes!(attributes, "new-#{new_class_name.underscore}-link")
         content = "New #{new_class_name.titleize}" if content.blank?
         element(:a, attributes.update(:href => href), content)
@@ -235,17 +202,9 @@
     else
       # Link to an existing object
 
-      if target.is_a?(Array) && !target.respond_to?(:proxy_reflection) && target.respond_to?(:member_class)
-        # Not much to go on here - last guess is that this is an index page
-        target = target.member_class
-      end
-      
       content = name if content.blank?
       
-      # Do we want automatic disabling of links to thinks that are not
-      # linkable?
-      only_if_linkable = format.blank?
-      href = object_url(target, action, (params || {}).merge(:subsite => subsite, :if_available => only_if_linkable))
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
       if href.nil?
         # This target is registered with ModelRouter as not linkable
         content
@@ -268,21 +227,23 @@
    
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
-        elsif this_type.respond_to?(:macro)
-          if this_type.macro == :belongs_to
+        elsif refl = this_field_reflection
+          if refl.macro == :belongs_to
             belongs_to_view(attributes)
-          elsif this_type.macro == :has_many
+          elsif refl.macro == :has_many
             has_many_view(attributes)
           end
         else
-          attrs = add_classes(attributes, "view", type_id, type_and_field)
-          attrs['hobo-model-id'] = this_field_dom_id if this_parent && this_parent.respond_to?(:typed_id)
          
           view_tag = find_polymorphic_tag("view")
           
           if view_tag == "view" # i.e. it didn't find a type specific tag
             raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
           else
+            attrs = add_classes(attributes, "view", type_and_field)
+            id = dom_id
+            attrs['hobo-model-id'] = id unless id == "nil"
+
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)
             
@@ -325,32 +286,29 @@
 
 <def tag="view" for="html"><%= this %></def>
 
-<def tag="view" for="Hobo::MarkdownString"><%= this.to_html %></def>
+<def tag="view" for="markdown"><%= this.to_html %></def>
 
-<def tag="view" for="Hobo::TextileString"><%= this.to_html %></def>
+<def tag="view" for="textile"><%= this.to_html %></def>
 
-<def tag="view" for="Hobo::PasswordString">[password withheld]</def>
+<def tag="view" for="password">[password withheld]</def>
 
-<def tag="view" for="String"><%= h(this).gsub("\n", "<br/>") %></def>
+<def tag="view" for="string"><%= h(this).gsub("\n", "<br/>") %></def>
 
-<def tag="view" for="TrueClass"><%= this ? 'Yes' : 'No' %></def>
+<def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="count" attrs="label, prefix, if-any"><%=
+
+<def tag="count" attrs="label, prefix, if-any, lowercase"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
-  if this.is_a?(Class) and this < ActiveRecord::Base
-    c = this.count
-    label ||= this.name.titleize
-  else
-    label ||= this.respond_to?(:proxy_reflection) && this.proxy_reflection.name.to_s.singularize.titleize
-    c = if this.is_a?(Fixnum)
-          this
-        elsif this.respond_to?(:count)
-          this.count
-        else
-          this.length
-        end
-  end
+  c = this.try.to_int || this.try.total_entries || this.try.count || this.try.length
+
+  label ||= if this.is_a?(Class)
+              this.name
+            else
+              (this.try.association_name || this.try.member_class._?.name)
+            end.to_s.singularize.titleize
+
+  label = label.downcase if lowercase
    
   Hobo::Dryml.last_if = c > 0 if if_any
   if if_any && c == 0
@@ -360,7 +318,7 @@
    
     if prefix.in? %w(are is)
       p = c == 1 ? "is" : "are"
-      p + ' ' + main
+      p + ' ' + main.to_s
     else
       main
     end
@@ -370,12 +328,9 @@
 
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= 'application' -%>
-  <link href="<%= base_url %>/hobothemes/<%= Hobo.current_theme %>/stylesheets/<%= name %>.css"
+  <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
-
-
-<def tag="clearer"><div class='clearer'>&nbsp;</div></def>
 
 
 <!-- The Tags defined below here are a bit rough and will be improved
@@ -386,12 +341,12 @@ in the future - use at your own risk. -->
 
     <do param="default"/>
 
-    <if test="&delete_buttons != false and can_delete?(this)">
+    <if test="&delete_buttons != false && can_delete?(this)">
       <td><delete-button/></td>
     </if>
   </table-for>
   <else>
-    <p>There are no <%= this_type.klass.name.titleize.pluralize.downcase %></p>
+    <p>There are no <%= this.member_class.name.titleize.pluralize.downcase %></p>
   </else>
   <div>
     <create-button update="&id || part_id"/>
@@ -423,16 +378,9 @@ in the future - use at your own risk. -->
 </def>
 
 
-<def tag="you" attrs="have, are">
-  <if test="&this == current_user">you <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
-</def>
+<def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou #{'have' if have}#{'are' if are}#{'do' if do_}" %></if><else><do param="default"><name/> <%= "#{'has' if have}#{'is' if are}#{'does' if do_}" %></do></else></def>
 
-
-<def tag="You" attrs="have, are">
-  <if test="&this == current_user">You <%= if have then 'have' elsif are then 'are' end %></if>
-  <else><do param="default"><name/> <%= if have then 'has' elsif are then 'is' end %></do></else>
-</def>
+<def tag="You"><you merge titleize/></def>
 
 <def tag="your">
   <if test="&this == current_user">your</if>
@@ -446,17 +394,6 @@ in the future - use at your own risk. -->
 </def>
 
 
-<def tag="creation-details">
-  <span class="creation-details">
-    <view with="&this.send(this.class.creator_attribute)" class="creator" if="&this.class.creator_attribute" />
-    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
-  </span>
-</def>
-
-<def tag="primary-content">
-  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute"/>
-</def>
-
 <def tag="live-search">
   <div class="search">
     <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
@@ -468,11 +405,6 @@ in the future - use at your own risk. -->
   </section>
 </def>
 
-<def tag="count-dependents">
-  <% assoc = this.class.dependent_collections.first if this.class.dependent_collections.length == 1 %>
-  <count field="&assoc" if="&assoc"/>
-</def>
-
 
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiouh]/i ? "an " : "a ") + word
@@ -482,3 +414,14 @@ in the future - use at your own risk. -->
 <def tag="A-or-An" attrs="word"><%=
   (word =~ /^[aeiouh]/i ? "An " : "A ") + word
 %></def>
+
+
+<def tag="filter-menu" attrs="param-name, options, no-filter">
+  <form action="&request.request_uri" method="get" class="filter-menu">
+    <hidden-field name="filter-parameter" value="&param_name"/>
+    <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
+  </form>
+</def>
+
+
+<def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>

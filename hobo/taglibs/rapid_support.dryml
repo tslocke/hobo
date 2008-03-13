@@ -4,7 +4,7 @@
                                                                                                                 
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
-                  columns = klass.content_columns.every(:name)
+                  columns = klass.content_columns.*.name
                   columns -= %w{created_at updated_at created_on updated_on} unless
                     include_timestamps
 
@@ -27,8 +27,8 @@
 
 <def tag="with-field-names" attrs="fields, skip, skip-associations, include-timestamps"><%=
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
-                  klass = fields.is_a?(Class) ? fields : this.proxy_reflectin.class
-                  columns = klass.content_columns.every(:name)
+                  klass = fields.is_a?(Class) ? fields : this.member_class
+                  columns = klass.content_columns.*.name
                   columns -= %w{created_at updated_at created_on updated_on} unless include_timestamps
 
                   if skip_associations == "has_many"

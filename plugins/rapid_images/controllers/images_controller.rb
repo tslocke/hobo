@@ -1,7 +1,9 @@
-bundle_model_controller :Images do
+bundle_model_controller :Image do
   
-  include_taglib "image_pages", :from_plugin => "hobo_images"
+  include_taglib "image_pages", :bundle => _bundle_
   
+  auto_actions :create
+
   def update
     hobo_update do
       redirect_to(:action => :index) if valid?
@@ -9,7 +11,7 @@ bundle_model_controller :Images do
   end
 
   def index
-    hobo_index model.fullsize_images
+    hobo_index model.fullsize
   end
 
   index_action :select_image do

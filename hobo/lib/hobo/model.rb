@@ -2,33 +2,34 @@ module Hobo
 
   module Model
     
+    class PermissionDeniedError < RuntimeError; end
+    class NoNameError < RuntimeError; end
+    
     NAME_FIELD_GUESS      = %w(name title)
     PRIMARY_CONTENT_GUESS = %w(description body content profile)
     SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
     
-    PLAIN_TYPES = { :boolean       => TrueClass,
-                    :date          => Date,
-                    :datetime      => Time,
-                    :integer       => Fixnum,
-                    :big_integer   => BigDecimal,
-                    :float         => Float,
-                    :string        => String
-                  }
-    
-    Hobo.field_types.update(PLAIN_TYPES)
     
     def self.included(base)
-      Hobo.register_model(base)
       base.extend(ClassMethods)
+      
+      included_in_class_callbacks(base)
+
+      Hobo.register_model(base)
+      
+      patch_will_paginate
+
       base.class_eval do
+        inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
-        default_scopes
       end
+      
       class << base
-        alias_method_chain :has_many, :defined_scopes
-        alias_method_chain :belongs_to, :foreign_key_declaration
-        alias_method_chain :belongs_to, :hobo_metadata
-        alias_method_chain :acts_as_list, :fields if defined?(ActiveRecord::Acts::List)
+        alias_method_chain :has_many,   :defined_scopes
+        alias_method_chain :belongs_to, :creator_metadata
+        
+        alias_method_chain :has_one, :new_method
+        
         def inherited(klass)
           fields do
             Hobo.register_model(klass)
@@ -36,126 +37,136 @@ module Hobo
           end
         end
       end
+      
+    end
+    
+    def self.patch_will_paginate
+      if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
+        
+        WillPaginate::Collection.class_eval do
+          attr_accessor :member_class, :origin, :origin_attribute
+        end
+        
+        WillPaginate::Finder::ClassMethods.class_eval do
+          def paginate_with_hobo_metadata(*args, &block)
+            returning paginate_without_hobo_metadata(*args, &block) do |collection|
+              collection.member_class     = self
+              collection.origin           = try.proxy_owner
+              collection.origin_attribute = try.proxy_reflection._?.name
+            end
+          end
+          alias_method_chain :paginate, :hobo_metadata
+          
+        end
+        
+      end
     end
 
+    
     module ClassMethods
       
       # include methods also shared by CompositeModel
-      include ModelSupport::ClassMethods
+      #include ModelSupport::ClassMethods
       
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
       
-      def default_scopes
-        def_scope :recent do |*args|
-          count = args.first || 3
-          { :limit => count, :order => "#{table_name}.created_at DESC" }
-        end
+      def named(*args)
+        raise NoNameError, "Model #{name} has no name attribute" unless name_attribute
+        send("find_by_#{name_attribute}", *args)
       end
+      
+      alias_method :[], :named
+      
+      
+      def field_added(name, type, args, options)
+        self.name_attribute            = name.to_sym if options.delete(:name)
+        self.primary_content_attribute = name.to_sym if options.delete(:primary_content)
+        self.creator_attribute         = name.to_sym if options.delete(:creator)
+        validate = options.delete(:validate) {true}
+        
+        #FIXME - this should be in Hobo::User
+        send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
+      end
+      
+      
+      def user_find(user, *args)
+        record = find(*args)
+        raise PermissionDeniedError unless Hobo.can_view?(user, self)
+        record
+      end
+      
+      
+      def user_new(user, attributes={})
+        record = new(attributes)
+        record.user_changes(user) and record
+      end
+      
+      
+      def user_new!(user, attributes={})
+        user_new(user, attributes) or raise PermissionDeniedError
+      end
+      
+      
+      def user_create(user, attributes={})
+        record = new(attributes)
+        record.user_save_changes(user)
+        record
+      end
+      
+      
+      def user_can_create?(user, attributes={})
+        record = new(attributes)
+        record.user_changes(user)
+      end
+      
       
       def name_attribute
         @name_attribute ||= begin
-                              cols = columns.every :name
-                              NAME_FIELD_GUESS.detect {|f| f.in? columns.every(:name) }
+                              cols = columns.*.name
+                              NAME_FIELD_GUESS.detect {|f| f.in? columns.*.name }
                             end
       end
       
 
       def primary_content_attribute
-        @description_attribute ||= begin
-                                     cols = columns.every :name
-                                     PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.every(:name) }
-                                   end
+        @primary_content_attribute ||= begin
+                                         cols = columns.*.name
+                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.*.name }
+                                       end
       end
       
       def dependent_collections
         reflections.values.select do |refl| 
           refl.macro == :has_many && refl.options[:dependent]
-        end.every(:name)
+        end.*.name
       end
       
       
       def dependent_on
         reflections.values.select do |refl| 
           refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
-        end.every(:name)
+        end.*.name
       end
+      
+      
+      def default_dependent_on
+        dependent_on.first
+      end
+      
       
       private
       
-      def return_type(type)
-        @next_method_type = type
-      end
-      
-      def method_added(name)
-        if @next_method_type
-          set_field_type(name => @next_method_type)
-          @next_method_type = nil
-        end
-      end
-      
-      
-      def fields(&b)
-        dsl = FieldDeclarationsDsl.new(self)
-        if b.arity == 1
-          yield dsl
-        else
-          dsl.instance_eval(&b)
-        end
-      end
-      
-      
-      def belongs_to_with_foreign_key_declaration(name, *args, &block)
-        options = args.extract_options!
-        res = belongs_to_without_foreign_key_declaration(name, *args + [options], &block)
-        refl = reflections[name]
-        fkey = refl.primary_key_name
-        column_options = {}
-        column_options[:null] = options[:null] if options.has_key?(:null)
-        field_specs[fkey] ||= FieldSpec.new(self, fkey, :integer, column_options)
-        if refl.options[:polymorphic]
-          type_col = "#{name}_type"
-          field_specs[type_col] ||= FieldSpec.new(self, type_col, :string, column_options)
-        end
-        res
-      end
-      
-      
-      def belongs_to_with_hobo_metadata(name, *args, &block)
-        options = args.extract_options!
+            
+      def belongs_to_with_creator_metadata(name, options={}, &block)
         self.creator_attribute = name.to_sym if options.delete(:creator)
-        belongs_to_without_hobo_metadata(name, *args + [options], &block)
-      end
-
-
-      def acts_as_list_with_fields(options = {})
-        fields { |f| f.send(options._?[:column] || "position", :integer) }
-        acts_as_list_without_fields(options)
-      end
-
-
-      def field_specs
-        @field_specs ||= HashWithIndifferentAccess.new
-      end
-      public :field_specs
-      
-      def set_field_type(types)
-        types.each_pair do |field, type|
-          type_class = Hobo.field_types[type] || type
-          field_types[field] = type_class
-          
-          if type_class && "validate".in?(type_class.instance_methods)
-            self.validate do |record|
-              v = record.send(field)._?.validate
-              record.errors.add(field, v) if v.is_a?(String)
-            end
-          end
-        end
+        belongs_to_without_creator_metadata(name, options, &block)
       end
       
-      
-      def field_types
-        @hobo_field_types ||= superclass.respond_to?(:field_types) ? superclass.field_types : {}
+            
+      def has_one_with_new_method(name, options={}, &block)
+        has_one_without_new_method(name, options)
+        class_eval "def new_#{name}(attributes={}); build_#{name}(attributes, false); end"
       end
       
       
@@ -163,178 +174,62 @@ module Hobo
         @default_order = order
       end
       
-      inheriting_attr_accessor :default_order, :id_name_options
-
 
       def never_show(*fields)
         @hobo_never_show ||= []
-        @hobo_never_show.concat(fields.every(:to_sym))
+        @hobo_never_show.concat(fields.*.to_sym)
       end
 
-      def never_show?(field)
-        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
-      end
-      public :never_show?
-
+      
       def set_search_columns(*columns)
         class_eval %{
           def self.search_columns
-            %w{#{columns.every(:to_s) * ' '}}
+            %w{#{columns.*.to_s * ' '}}
           end
         }
       end
       
-
-      def id_name(*args)
-        @id_name_options = [] + args
-        
-        underscore = args.delete(:underscore)
-        insenstive = args.delete(:case_insensitive)
-        id_name_field = args.first || :name
-        @id_name_column = id_name_field.to_s
-
-        if underscore
-          class_eval %{
-            def id_name(underscore=false)
-              underscore ? #{id_name_field}.gsub(' ', '_') : #{id_name_field}
-            end
-          }
-        else
-          class_eval %{
-            def id_name(underscore=false)
-              #{id_name_field}
-            end
-          }
-        end
-        
-        key = "id_name#{if underscore; ".gsub('_', ' ')"; end}"
-        finder = if insenstive
-          "find(:first, options.merge(:conditions => ['lower(#{id_name_field}) = ?', #{key}.downcase]))"
-        else
-          "find_by_#{id_name_field}(#{key}, options)"
-        end
-
-        class_eval %{
-          def self.find_by_id_name(id_name, options={})
-            #{finder}
-          end
-        }
-        
-        model = self
-        validate do
-          erros.add id_name_field, "is taken" if model.find_by_id_name(name)
-        end
-        validates_format_of id_name_field, :with => /^[^_]+$/, :message => "cannot contain underscores" if
-          underscore
-      end
-
+      
       public
-      
-      def id_name?
-        respond_to?(:find_by_id_name)
-      end
-
-      attr_reader :id_name_column
 
       
-      def field_type(name)
-        name = name.to_sym
-        field_types[name] or
-          reflections[name] or begin
-                                 col = column(name)
-                                 return nil if col.nil?
-                                 case col.type
-                                 when :boolean
-                                   TrueClass
-                                 when :text
-                                   Hobo::Text
-                                 else
-                                   col.klass
-                                 end
-                               end
-      end
-      
-      
-      def column(name)
-        columns.find {|c| c.name == name.to_s} rescue nil
-      end
-      
-      
-      def conditions(*args, &b)
-        if args.empty?
-          ModelQueries.new(self).instance_eval(&b)._?.to_sql
-        else
-          ModelQueries.new(self).instance_exec(*args, &b)._?.to_sql
-        end
+      def never_show?(field)
+        (@hobo_never_show && field.to_sym.in?(@hobo_never_show)) || (superclass < Hobo::Model && superclass.never_show?(field))
       end
       
 
       def find(*args, &b)
         options = args.extract_options!
-        if args.first.in?([:all, :first]) && options[:order] == :default
+        if options[:order] == :default
           options = if default_order.blank?
-                      options - [:order]
+                      options.except :order
                     else
                       options.merge(:order => "#{table_name}.#{default_order}")
                     end
         end
-          
-        res = if b && !(block_conditions = conditions(&b)).blank?
-                c = if !options[:conditions].blank?
-                      "(#{sanitize_sql options[:conditions]}) AND (#{sanitize_sql block_conditions})"
-                    else
-                      block_conditions
-                    end
-                super(args.first, options.merge(:conditions => c))
-              else
-                super(*args + [options])
-              end
-        if args.first == :all
-          def res.member_class
-            @member_class
-          end
-          res.instance_variable_set("@member_class", self)
-        end
-        res
+        result = super(*args + [options])
+        result.member_class = self if result.is_a?(Array)
+        result
       end
-      
+
       
       def all(options={})
         find(:all, options.reverse_merge(:order => :default))
       end
       
       
-      def count(*args, &b)
-        if b
-          sql = ModelQueries.new(self).instance_eval(&b).to_sql
-          options = extract_options_from_args!(args)
-          super(*args + [options.merge(:conditions => sql)])
-        else
-          super(*args)
-        end
-      end
-
-
-      def subclass_associations(association, *subclass_associations)
-        refl = reflections[association]
-        for assoc in subclass_associations
-          class_name = assoc.to_s.classify
-          options = { :class_name => class_name, :conditions => "type = '#{class_name}'" }
-          options[:source] = refl.source_reflection.name if refl.source_reflection
-          has_many(assoc, refl.options.merge(options))
-        end
-      end
-
       def creator_type
         reflections[creator_attribute]._?.klass
       end
 
+      
       def search_columns
-        cols = columns.every(:name)
+        cols = columns.*.name
         SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
       end
       
-      # This should really be a method on AssociationReflection
+      
+      # FIXME: This should really be a method on AssociationReflection
       def reverse_reflection(association_name)
         refl = reflections[association_name]
         return nil if refl.options[:conditions]
@@ -353,153 +248,94 @@ module Hobo
       end
       
       
-      class ScopedProxy
-        
-        def initialize(klass, scope)
-          @klass = klass
-          
-          # If there's no :find, or :create specified, assume it's a find scope
-          @scope = if scope.has_key?(:find) || scope.has_key?(:create)
-                     scope
-                   else
-                     { :find => scope }
-                   end
-        end
-        
-        
-        def method_missing(name, *args, &block)
-          if name.to_sym.in?(@klass.defined_scopes.keys)
-            proxy = @klass.send(name, *args)
-            proxy.instance_variable_set("@parent_scope", self)
-            proxy
-          else
-            _apply_scope { @klass.send(name, *args, &block) }
-          end
-        end
-        
-        def all
-          self.find(:all)
-        end
-        
-        def first
-          self.find(:first)
-        end
-        
-        def member_class
-          @klass
-        end
-        
-        private
-        def _apply_scope
-          if @parent_scope
-            @parent_scope.send(:_apply_scope) do
-              @scope ? @klass.send(:with_scope, @scope) { yield } : yield
-            end
-          else
-            @scope ? @klass.send(:with_scope, @scope) { yield } : yield
-          end
-        end
-        
-      end
-      (Object.instance_methods + 
-       Object.private_instance_methods +
-       Object.protected_instance_methods).each do |m|
-        ScopedProxy.send(:undef_method, m) unless
-          m.in?(%w{initialize method_missing send instance_variable_set instance_variable_get puts}) || m.starts_with?('_')
+      def has_inheritance_column?
+        columns_hash.include?(inheritance_column)
       end
       
-      attr_accessor :defined_scopes
 
-      
-      def def_scope(name, scope=nil, &block)
-        @defined_scopes ||= {}
-        @defined_scopes[name.to_sym] = block || scope
-        
-        meta_def(name) do |*args|
-          ScopedProxy.new(self, block ? block.call(*args) : scope)
-        end
-      end
-      
-      
-      module DefinedScopeProxyExtender
-        
-        attr_accessor :reflections
-        
-        def method_missing(name, *args, &block)
-          scope = (proxy_reflection.klass.respond_to?(:defined_scopes) and
-                   scopes = proxy_reflection.klass.defined_scopes and 
-                   scopes[name.to_sym])
-          
-          scope = scope.call(*args) if scope.is_a?(Proc)
-          
-          # If there's no :find, or :create specified, assume it's a find scope
-          find_scope = if scope && (scope.has_key?(:find) || scope.has_key?(:create))
-                         scope[:find]
-                       else
-                         scope
-                       end
-          
-          if find_scope
-            scope_name = "@#{name.to_s.gsub('?','')}_scope"
-
-            # Calling instance_variable_get directly causes self to
-            # get loaded, hence this trick
-            assoc = Kernel.instance_method(:instance_variable_get).bind(self).call(scope_name)
-            
-            unless assoc
-              options = proxy_reflection.options
-              has_many_conditions = options[:conditions]
-              has_many_conditions = nil if has_many_conditions.blank?
-              source = proxy_reflection.source_reflection
-              scope_conditions = find_scope[:conditions]
-              scope_conditions = nil if scope_conditions.blank?
-              conditions = if has_many_conditions && scope_conditions
-                             "(#{sanitize_sql scope_conditions}) AND (#{sanitize_sql has_many_conditions})"
-                           else
-                             scope_conditions || has_many_conditions
-                           end
-              
-              options = options.merge(find_scope).update(:class_name => proxy_reflection.klass.name,
-                                                         :foreign_key => proxy_reflection.primary_key_name)
-              options[:conditions] = conditions unless conditions.blank?
-              options[:source] = source.name if source
-
-              r = ActiveRecord::Reflection::AssociationReflection.new(:has_many,
-                                                                      name,
-                                                                      options,
-                                                                      proxy_owner.class)
-              
-              @reflections ||= {}
-              @reflections[name] = r
-              
-              assoc = if source
-                        ActiveRecord::Associations::HasManyThroughAssociation
-                      else
-                        ActiveRecord::Associations::HasManyAssociation
-                      end.new(self.proxy_owner, r)
-
-              # Calling directly causes self to get loaded
-              Kernel.instance_method(:instance_variable_set).bind(self).call(scope_name, assoc)
-            end
-            assoc
-          else
-            super
-          end
-        end
-        
-      end
-      
-      
-      def has_many_with_defined_scopes(name, *args, &block)
-        options = args.extract_options!
-        if options.has_key?(:extend) || block
-          # Normal has_many
-          has_many_without_defined_scopes(name, *args + [options], &block)
+      def method_missing(name, *args, &block)
+        name = name.to_s
+        if name =~ /\./
+          # FIXME: Do we need this now?
+          call_method_chain(name, args, &block)
+        elsif create_automatic_scope(name)
+          send(name, *args, &block)
         else
-          options[:extend] = DefinedScopeProxyExtender
-          has_many_without_defined_scopes(name, *args + [options], &block)
+          super(name.to_sym, *args, &block)
         end
       end
+
+      
+      def call_method_chain(chain, args, &block)
+        parts = chain.split(".")
+        s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
+        s.send(parts.last, *args)
+      end
+      
+      
+      def to_url_path
+        "#{name.underscore.pluralize}"
+      end
+      
+      def typed_id
+        HoboFields.to_name(self) || name.underscore.gsub("/", "__")
+      end
+
+    end # --- of ClassMethods --- #
+    
+    
+    include Scopes
+    
+    
+    def to_url_path
+      "#{self.class.to_url_path}/#{to_param}" unless new_record?
+    end
+    
+    
+    def user_changes(user, changes={})
+      if new_record?
+        self.attributes = changes
+        set_creator(user) 
+        Hobo.can_create?(user, self)
+      else
+        original = duplicate
+        # 'duplicate' can cause these to be set, but they can conflict
+        # with the changes so we clear them
+        clear_aggregation_cache
+        clear_association_cache
+        
+        self.attributes = changes
+        
+        Hobo.can_update?(user, original, self)
+      end        
+    end
+    
+    
+    def user_changes!(user, changes={})
+      user_changes(user, changes) or raise PermissionDeniedError
+    end
+    
+    
+    def user_can_create?(user, attributes={})
+      raise ArgumentError, "Called #user_can_create? on existing record" unless new_record?
+      user_changes(user, attributes)
+    end
+      
+
+    def user_save_changes(user, changes={})
+      user_changes!(user, changes)
+      save
+    end
+    
+
+    def user_view(user, field=nil)
+      raise PermissionDeniedError unless Hobo.can_view?(user, self, field)
+    end
+    
+    
+    def user_destroy(user)
+      raise PermissionDeniedError unless Hobo.can_delete?(user, self)
+      destroy
     end
     
     
@@ -509,13 +345,18 @@ module Hobo
     
     
     def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
-      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.field_type(k), v) }
+      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.attr_type(k), v) }
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
       
 
     
     def set_creator(user)
+      set_creator!(user) unless get_creator
+    end
+    
+    
+    def set_creator!(user)
       attr = self.class.creator_attribute
       return unless attr
       
@@ -528,22 +369,30 @@ module Hobo
         self.send("#{attr}=", user.to_s) unless user.guest?
       end
     end
+    
+    
+    # We deliberately give this method an unconventional name to avoid
+    # polluting the application namespace too badly
+    def get_creator
+      self.class.creator_attribute && send(self.class.creator_attribute)
+    end
 
 
     def duplicate
-      res = self.class.new
-      res.instance_variable_set("@attributes", @attributes.dup)
-      res.instance_variable_set("@new_record", nil) unless new_record?
+      copy = self.class.new
+      copy.copy_instance_variables_from(self, ["@attributes_cache"])
+      copy.instance_variable_set("@attributes", @attributes.dup)
+      copy.instance_variable_set("@new_record", nil) unless new_record?
       
       # Shallow copy of belongs_to associations
       for refl in self.class.reflections.values
         if refl.macro == :belongs_to and (target = self.send(refl.name))
-          bta = ActiveRecord::Associations::BelongsToAssociation.new(res, refl)
+          bta = ActiveRecord::Associations::BelongsToAssociation.new(copy, refl)
           bta.replace(target)
-          res.instance_variable_set("@#{refl.name}", bta)
+          copy.instance_variable_set("@#{refl.name}", bta)
         end
       end
-      res
+      copy
     end
 
 
@@ -554,29 +403,25 @@ module Hobo
       fields.all?{|f| self.send(f) == other.send(f)}
     end
     
+    
     def only_changed_fields?(other, *changed_fields)
       return true if other.nil?
       
-      changed_fields = changed_fields.flatten.every(:to_s)
-      all_cols = self.class.columns.every(:name) - []
+      changed_fields = changed_fields.flatten.*.to_s
+      all_cols = self.class.columns.*.name - []
       all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
     end
+    
     
     def compose_with(object, use=nil)
       CompositeModel.new_for([self, object])
     end
     
-    def created_date
-      created_at.to_date
-    end
-    
-    def modified_date
-      modified_at.to_date
-    end
 
     def typed_id
-      id ? "#{self.class.name.underscore}_#{self.id}" : nil
+      "#{self.class.name.underscore}_#{self.id}" if id 
     end
+
     
     def to_s
       if self.class.name_attribute
@@ -586,15 +431,20 @@ module Hobo
       end
     end
     
+    
     private
+    
     
     def parse_datetime(s)
       defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
     end
 
+    
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) and field_type.macro.in?([:belongs_to, :has_one])
+      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) &&
+          field_type.macro.in?([:belongs_to, :has_one])
         if value.is_a?(String) && value.starts_with?('@')
+          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
           Hobo.object_from_dom_id(value[1..-1])
         else
           value
@@ -618,61 +468,18 @@ module Hobo
         else
           value
         end
-      elsif field_type <= TrueClass
+      elsif field_type <= Hobo::Boolean
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
       else
         # primitive field
         value
       end
     end
-    
-  end
-end
-
-
-# Hack AR to get Hobo type wrappers in
-
-module ActiveRecord::AttributeMethods::ClassMethods
-
-  # Define an attribute reader method.  Cope with nil column.
-  def define_read_method(symbol, attr_name, column)
-    cast_code = column.type_cast_code('v') if column
-    access_code = cast_code ? "(v=@attributes['#{attr_name}']) && #{cast_code}" : "@attributes['#{attr_name}']"
-
-    unless attr_name.to_s == self.primary_key.to_s
-      access_code = access_code.insert(0, "missing_attribute('#{attr_name}', caller) " +
-                                       "unless @attributes.has_key?('#{attr_name}'); ")
-    end
-
-    # This is the Hobo hook - add a type wrapper around the field
-    # value if we have a special type defined
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(symbol)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
-            "val = begin; #{access_code}; end; " +
-              "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; self.class.field_type(:#{attr_name}).new(val); end"
-          else
-            access_code
-          end
-    
-    evaluate_attribute_method(attr_name, 
-                              "def #{symbol}; @attributes_cache['#{attr_name}'] ||= begin; #{src}; end; end")
+        
   end
   
-  def define_write_method(attr_name)
-    src = if connected? && respond_to?(:field_type) && (type_wrapper = field_type(attr_name)) &&
-              type_wrapper.is_a?(Class) && type_wrapper.not_in?(Hobo::Model::PLAIN_TYPES.values)
-            "if val.nil? || (val.respond_to?(:hobo_undefined?) && val.hobo_undefined?); val; " + 
-              "else; self.class.field_type(:#{attr_name}).new(val); end"
-          else
-            "val"
-          end
-    evaluate_attribute_method(attr_name, "def #{attr_name}=(val); " + 
-                              "write_attribute('#{attr_name}', #{src});end", "#{attr_name}=")
-    
-  end
-
 end
+
 
 class ActiveRecord::Base
   alias_method :has_hobo_method?, :respond_to_without_attributes?

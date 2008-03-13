@@ -1,0 +1,21 @@
+<def tag="view" for="Time"><%= this.strftime("%b %d, %Y %H:%M") %></def>
+<def tag="show-page" extend-with="forum-topic">
+  <show-page-without-forum-topic merge>
+    <field-list: replace/>
+    <creation-details: replace/>
+    <primary-collection-title: replace/>
+    <primary-collection-count: replace/>
+    <primary-content: replace>
+      <div class="main-post">
+        <creation-details/>
+        <primary-content/>
+      </div>
+    </primary-content:>
+  </show-page-without-forum-topic>
+</def>
+
+<def tag="new-page" extend-with="forum-topic">
+  <new-page-without-forum-topic>
+    <field-list: fields="title,sticky,body"/>
+  </new-page-without-forum-topic>
+</def>

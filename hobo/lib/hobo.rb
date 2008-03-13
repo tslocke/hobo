@@ -5,20 +5,12 @@ module Hobo
   class RawJs < String; end
 
   @models = []
-  @field_types = HashWithIndifferentAccess.new
   
   class << self
 
-    attr_accessor :current_theme, :field_types
+    attr_accessor :current_theme
     attr_writer :developer_features
     
-    def symbolic_type_name(type)
-      field_types.index(type)
-    end
-    
-    def type_id(type)
-      symbolic_type_name(type) || type.name.underscore.gsub("/", "__")
-    end
 
     def developer_features?
       @developer_features
@@ -41,7 +33,7 @@ module Hobo
 
     
     def models=(models)
-      @models = models.every(:name)
+      @models = models.*.name
     end
 
     
@@ -52,7 +44,7 @@ module Hobo
         end
         @models_loaded = true
       end
-      @models.every(:constantize)
+      @models.*.constantize
     end
 
     
@@ -87,64 +79,38 @@ module Hobo
     end
 
     def dom_id(obj, attr=nil)
-      if obj.nil?
-        raise ArgumentError, "Tried to get dom id of nil.#{attr}" if attr
-        return 'nil'
-      end
-
-      if obj.is_a?(Array) and obj.respond_to?(:proxy_owner)
-        attr = obj.proxy_reflection.name
-        obj = obj.proxy_owner
-      elsif obj.is_a?(Class)
-        return type_id(obj)
-      elsif !obj.respond_to?(:typed_id)
-        return (if attr
-                  dom_id(get_field(obj, attr))
-                elsif obj.respond_to?(:id)
-                  "#{obj.class.name.underscore}_#{obj.id}"
-                else
-                  raise ArgumentError, "Can't create dom id for #{obj.inspect}"
-                end)
-      end
       attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
     end
 
-    def find_by_search(query)
-      sql = Hobo.models.map do |model|
-        if model.superclass == ActiveRecord::Base && # filter out STI subclasses
-            ModelRouter.linkable?(nil, model, :show) # filter out non-linkables
-          cols = model.search_columns
-          if cols.blank?
-            nil
-          else
-            where = cols.map {|c| "(#{c} like ?)"}.join(' or ')
-            type = model.column_names.include?("type") ? "type" : "'#{model.name}'"
-            ActiveRecord::Base.send(:sanitize_sql,
-                                    ["select #{type} as type, id " +
-                                     "from #{model.table_name} " +
-                                     "where #{where}"] +
-                                    ["%#{query}%"] * cols.length)
+    def find_by_search(query, search_targets=nil)
+      search_targets ||= 
+        begin
+          # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
+          # By default, search all models, but filter out...
+          Hobo.models.select do |m| 
+          ModelRouter.linkable?(m, :show) && # ...non-linkables
+            m.search_columns.any?             # and models with no search-columns
           end
         end
-      end.compact.join(" union ")
-
-      rows = ActiveRecord::Base.connection.select_all(sql)
-      records = Hash.new {|h,k| h[k] = []}
-      for row in rows
-        records[row['type']] << row['id']
-      end
-      results = []
-      for type, ids in records
-        results.concat(type.constantize.find(:all, :conditions => "id in (#{ids * ','})"))
-      end
       
-      results
+      query_words = ActiveRecord::Base.connection.quote_string(query).split
+                    
+      search_targets.build_hash do |search_target|
+        conditions = query_words.map do |word| 
+          "(" + search_target.search_columns.map { |column| %(#{column} like "%#{word}%") }.join(" or ") + ")"
+        end.join(" and ")
+        
+        results = search_target.find(:all, :conditions => conditions)
+        [search_target.name, results] unless results.empty?
+      end
     end
 
     def add_routes(m)
       Hobo::ModelRouter.add_routes(m)
     end
 
+    
+    # FIXME: This method won't be needed
     def all_models
       Hobo.models.map { |m| m.name.underscore }
     end
@@ -213,10 +179,12 @@ module Hobo
       return false if !can_view?(person, object, field)
       
       if field.nil?
-        if respond_to?(:editable_by?)
+        if object.has_hobo_method?(:editable_by?)
           object.editable_by?(person) 
-        else
+        elsif object.has_hobo_method?(:updatable_by?)
           object.updatable_by?(person, nil)
+        else
+          false
         end
         
       else
@@ -333,7 +301,7 @@ module Hobo
                                 else
                                     File.join(File.dirname(__FILE__), "hobo/static_tags")
                                 end
-                         File.readlines(path).every(:chop)
+                         File.readlines(path).*.chop
                        end
     end
     

@@ -1,16 +1,21 @@
+# gem dependencies
+require 'hobosupport'
+
+# Force load:
+HoboFields
+
 # Monkey patches, ooh ooh
-require 'extensions'
 require 'rexml'
 require 'active_record/has_many_association'
 require 'active_record/has_many_through_association'
-require 'active_record/table_definition'
+require 'active_record/association_proxy'
+require 'active_record/association_reflection'
 require 'action_view_extensions/base'
 
 require 'hobo'
 require 'hobo/dryml'
 
 require 'hobo/model'
-require 'hobo/field_declaration_dsl'
 
 require 'hobo/dryml/template'
 require 'hobo/dryml/taglib'
@@ -18,16 +23,6 @@ require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
 require 'extensions/test_case' if RAILS_ENV == "test"
-
-# Rich data types
-require "hobo/html_string"
-require "hobo/markdown_string"
-require "hobo/textile_string"
-require "hobo/password_string"
-require "hobo/text"
-require "hobo/email_address"
-require "hobo/enum_string"
-require "hobo/percentage"
 
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
@@ -54,6 +49,7 @@ end
 class ActiveRecord::Base
   def self.hobo_model
     include Hobo::Model
+    fields # force hobofields to load
   end
   def self.hobo_user_model
     include Hobo::Model
@@ -64,3 +60,39 @@ end
 # Default settings
 
 Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
+
+
+module ::Hobo
+  # Empty class to represent the boolean type.
+  class Boolean; end
+end
+
+
+if defined? HoboFields
+  HoboFields.never_wrap(Hobo::Undefined)
+end
+
+
+# Add support for type metadata to arrays
+class ::Array
+  
+  attr_accessor :member_class, :origin, :origin_attribute
+  
+  def to_url_path
+    base_path = origin_object.try.to_url_path
+    "#{base_path}/#{origin_attribute}" unless base_path.blank?
+  end
+  
+  def typed_id
+    origin_id = origin.try.typed_id
+    "#{origin_id}_#{origin_attribute}" if origin_id
+  end
+  
+end
+
+
+class NilClass
+  def typed_id
+    "nil"
+  end
+end

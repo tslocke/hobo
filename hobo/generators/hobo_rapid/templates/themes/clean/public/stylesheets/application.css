@@ -1,37 +1,38 @@
 html {background: #666;}
 body {
-	width: 760px; margin: 0 auto; background: white; color: #222;
-	font: 12px "Lucida Grande", Arial, sans-serif;
-	line-height: 18px; margin-bottom: 20px;
+	width: 760px;  
+	margin: 0 auto 20px;
+	color: #222; background: white;
+	font: 12px "Lucida Grande", "Trebuchet MS", Arial, sans-serif; line-height: 18px;
 }
-h1, h2, h3 {font-family: "Lucida Grande", "Trebuchet MS", "Arial", sans-serif; font-weight: normal;}
-h1 {font-size: 22px; line-height: 22px; margin: 20px 0 10px;}
-h2 {font-size: 18px; line-height: 18px; margin: 15px 0 10px;}
-h3 {font-size: 16px; line-height: 16px; margin: 10px 0 5px;}
-h4 {font-size: 14px; line-height: 14px; margin: 10px 0 5px;}
-h5 {font-size: 12px; line-height: 12px; margin: 10px 0 5px;}
-h6 {font-size: 10px; line-height: 10px; margin: 10px 0 5px;}
+h1, h2, h3 {font-weight: normal;}
+h1 {margin: 20px 0 10px; font-size: 22px; line-height: 22px;}
+h2 {margin: 15px 0 10px; font-size: 18px; line-height: 18px;}
+h3 {margin: 10px 0 5px;  font-size: 16px; line-height: 16px;}
+h4 {margin: 10px 0 5px;  font-size: 14px; line-height: 14px;}
+h5 {margin: 10px 0 5px;  font-size: 12px; line-height: 12px;}
+h6 {margin: 10px 0 5px;  font-size: 10px; line-height: 10px;}
 
 li {margin-left: 20px;}
 
 a {
-	text-decoration: none; color: #222;
 	border-bottom: 1px dotted #ccc;
-	background: #fafafa;
+	color: #222; background: #fafafa;
+	text-decoration: none; 
 }
 a:hover {
-	border-bottom: 1px dotted #aaa; background: #f2f2f2; color: black;
+	border-bottom: 1px dotted #aaa;
+	color: black; background: #f2f2f2; 
 }
-h1 a, h2 a, h3 a {background: none; border: none;}
+h1 a, h2 a, h3 a {border: none; background: none;}
 
-input.text, input.string, input.email_address, input.password, input.search, input.integer, input.float, textarea {
-	font-size:1.1em;
-	line-height:1.3em;
+input.text, input.string, input.email-address, input.password, input.search, input.integer, input.float, textarea {
 	border-top:1px solid #7c7c7c;
 	border-left:1px solid #c3c3c3;
 	border-right:1px solid #c3c3c3;
 	border-bottom:1px solid #ddd;
 	background: #fff url(../images/fieldbg.gif) repeat-x top;
+	font-size: 1.1em; line-height: 1.3em;
 }
 
 input.file_upload {
@@ -40,179 +41,235 @@ input.file_upload {
 
 .button {
 	padding: 6px 10px;
-	font: bold 11px "Lucida Grande", Arial, sans-serif;
 	border-top:1px solid #ddd;
 	border-left:1px solid #c3c3c3;
 	border-right:1px solid #c3c3c3;
 	border-bottom:1px solid #8c8c8c;
 	background: #eee; 
+	font-size: 11px; font-weight: bold;
 }
 .button:hover {cursor: pointer;}
-.button:active {border-top:1px solid #8c8c8c; border-bottom:1px solid #ddd;}
-.actions {font-size: 11px;}
-
-
-#ajax-progress {
-	background: black url(../images/spinner.gif) no-repeat 10px 8px;
-	border: 1px solid #444;
-	padding: 8px 20px 8px 40px;
-	color: #cfc; font-weight: bold; font-size: 13px; text-shadow: black 2px 2px 2px;
-}
-#search-results-panel {
-	position: absolute; top: 35px; right: 25px; width: 350px; height: 500px; overflow: auto; z-index: 50;
-	padding: 0 20px 20px; background: #f2f2f2; border: 1px solid #ddd; color: black;
-}
-#search-results-panel .card.linkable a {
-	color: black;
-}
-
-.content-header, .content-body, .content-footer {margin: 10px 45px 15px; padding: 0;}
+.button:active {border-top: 1px solid #8c8c8c; border-bottom: 1px solid #ddd;}
+.actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
-	margin: 20px 40px; padding: 10px 30px;
-	border-width: 2px 0;
+	margin: 0px 40px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
-.flash.notice {background: #92ab6e; border: 1px solid #829862; text-shadow: #728852 2px 2px 0;}
-.flash.error {background: #BC1C3D; border: 1px solid #900024; text-shadow: #900024 2px 2px 0;}
-.article { margin: 20px 0; border-top: 1px dotted #ccc;}
+.flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
+.flash.error {border: 1px solid #900024; background: #BC1C3D; text-shadow: #900024 1px 1px 0;}
 
+/* rails error message */
+.error-messages {
+	background: #BC1C3D;
+	border: 1px solid #900024;
+	padding: 15px 30px;
+	color: white;
+	margin-bottom: 20px;
+	text-shadow: #900024 1px 1px 0;
+}
+.error-messages h2 {
+	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px; text-shadow: #900024 2px 2px 0;
+}
+.error-messages li {margin-left: 20px; list-style: square;}
+
+.field-with-errors input, .field-with-errors textarea, .field-with-errors select {border: 2px solid #BC1C3D;}
+
+#ajax-progress {
+	padding: 8px 20px 8px 40px;
+	border: 1px solid #444;
+	color: #cfc; background: black url(../images/spinner.gif) no-repeat 10px 8px;
+	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
+}
+
+.article {margin: 20px 0; border-top: 1px dotted #ccc;}
+
+.field-list th {width: 120px;}
+.field-list td {width: auto;}
+
+.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
-
 /* aside layout */
 body.aside-layout {width: 960px;}
-.aside-layout .page-content {overflow: hidden; height: 100%;}
+.aside-layout .page-content {height: 100%; overflow: hidden;}
 .main-content {float: left; width: 670px;}
 .aside {float: right; width: 220px; padding: 20px 30px; background: #E5E5E5;}
 .aside-content {
-	font-size: 11px; color: #444;
+	color: #222; font-size: 11px;
 }
+.aside-content h2 {padding-bottom: 10px; border-bottom: 1px dotted #666;}
+.aside-content h3 {padding-bottom: 5px; border-bottom: 1px dotted #666;}
+.aside-content a {background: none;}
 /* trick to produce equal height columns */
 .aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
 
 
-/***********/
-
-.page-header {color: white; background: black; margin-top: 20px; padding: 20px 0 0; position: relative;}
-.page-header h1 {margin: 0; padding: 0 30px 30px; font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;}
-.page-header .nav {margin: 0 20px; overflow: hidden; height: 100%;}
-.page-header .nav li {float: left; list-style: none; margin-left: 0;}
-.page-header a, .page-header a:hover {color: white; border: none; background: none;}
+.page-header {position: relative; margin: 20px 0; padding: 20px 0 0; color: white; background: black;}
+.page-header h1 {
+	margin: 0; padding: 0 30px 30px; 
+	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
+}
+.page-header .nav {height: 100%; overflow: hidden; margin: 0 20px;}
+.page-header .nav li {float: left; margin-left: 0; list-style: none;}
+.page-header a, .page-header a:hover {border: none; color: white; background: none;}
 
 .page-header div.search {
-	position: absolute; top: 10px; right: 5px; padding: 6px 30px 8px 15px; 
+	position: absolute; top: 10px; right: 5px;
+	padding: 6px 30px 8px 15px; 
 }
 .page-header div.search label {
 	padding-right: 10px; 
-	text-transform: uppercase; font: bold 9px Arial, sans-serif; letter-spacing: 1.0pt;
+	font: bold 9px Arial, sans-serif; text-transform: uppercase; letter-spacing: 1.0pt;
 }
 .page-header div.search input {
 	font-size: 10px;
 }
+#search-results-panel {
+	position: absolute; top: 35px; right: 25px; z-index: 50;
+	width: 350px; height: 500px; overflow: auto; 
+	padding: 0 20px 20px; border: 1px solid #ddd;
+	color: black; background: #f2f2f2;
+}
+#search-results-panel .card.linkable a {color: black;}
 #search-spinner {position: absolute; top: 6px; right: 7px;}
 
-.account-nav {
-	position: absolute; top: -20px; right: 35px; font-size: 11px; 
-}
 
 ul.main-nav {float: left; margin: 0 10px;}
-.main-nav li {background: black; margin-right: 10px;}
+.main-nav li {margin-right: 10px;}
 .main-nav a {
+	display: block;
+	padding: 5px 15px 7px; border: 1px solid #313131; border-width: 1px 1px 0;
 	background: #282828;
-	display: block; padding: 5px 15px 7px; border: 1px solid #313131; border-width: 1px 1px 0;
-	font: bold 13px "Lucida Grande", Arial, sans-serif; text-shadow: black 2px 2px 2px;
+	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
 }
-.main-nav a:hover {background: #444; border: 1px solid #555; border-width: 1px 1px 0;}
+.main-nav a:hover {border: 1px solid #555; border-width: 1px 1px 0; background: #444;}
+
+.account-nav {
+	position: absolute; top: -20px; right: 35px;
+	font-size: 11px;
+}
 .account-nav li {
-	padding-left: 20px; float: left; list-style: none; margin-left: 0; color: #ddd; text-shadow: #444 2px 2px 0;}
+	float: left; 
+	margin-left: 0; padding-left: 20px; 
+	color: #ddd;
+	text-shadow: #444 1px 1px 0;
+	list-style: none;
+}
 .account-nav a {font-weight: bold;}
 .account-nav a:hover {border-bottom: 1px dotted #ddd;}
 
+.user-account-page .change-password {width: 350px;}
+.user-account-page .change-password th {width: 150px;}
 
 /* pagination nav, needs a more specific class on the wrapper */
-.content-body .nav {font-size: 11px; margin-bottom: 10px;}
+.content-body .nav {margin-bottom: 10px; font-size: 11px;}
 .content-body .nav a {margin-right: 5px;}
-
-.field-list th {width: 120px;}
-.field-list td {width: auto;}
 
 .login-page, .signup-page {width: 50%; margin-top: 40px;}
 .login-page .content-header, .signup-page .content-header {padding-bottom: 0;}
 .login-page .field-list, .signup-page .field-list {width: 300px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 120px;}
-.login-page .actions, .signup-page .actions {text-align: left; margin-left: 128px; margin-top: 20px;}
+.login-page .actions, .signup-page .actions {margin-left: 128px; margin-top: 20px; text-align: left;}
 /*.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}*/
 
-.edit-page .delete-button {margin-top: 25px;}
+.edit-page .content-header {overflow: hidden; height: 100%;}
+.edit-page .content-header h1 {float: left;}
+.edit-page .content-header .delete-button {float: right; margin-top: 25px;}
+form .actions {margin: 30px 0; width: 100%; text-align: center;}
 
 .show-page .content-header {position: relative; border-bottom: 1px dotted black;}
 .show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 2px; margin-right: 70px;}
 .show-page .content-header a.edit {position: absolute; top: 0; right: 0;}
-.content-header .creation-details, .content-header .dependent-collection-count {font-size: 11px; line-height: 11px;}
+.aside-content .collection {padding-bottom: 10px;}
+
+.content-header .creation-details, .content-header .primary-collection-count {font-size: 11px; line-height: 11px;}
 .content-header .creator {margin-right: 5px;}
 .content-header .created-at {color: #444;}
-.content-header .dependent-collection-count {font-weight: bold; margin-left: 15px;}
+.content-header .primary-collection-count {margin-left: 15px; font-weight: bold;}
 
-.new-in-collection-page .content-header h2 {margin-top: 6px; font: bold 16px "Lucida Grande", Arial, sans-serif;}
+.new-in-collection-page .content-header h2 {margin-top: 6px; font-size: 14px;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
 
-.show-page .create-new {
-	padding: 0 30px;
-	border-top: 1px dotted #ddd; margin-top: 20px; background: #f5f5f5;
+.create-new {
+	margin-top: 20px; padding: 0 30px; border-top: 1px dotted #ddd;
+	background: #f5f5f5;
 }
-.show-page .create-new form .submit-button {margin: 20px 130px;}
-.show-page .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
+.create-new form .submit-button {margin: 20px 130px;}
+.primary-collection .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
 
 /* styling of generic elements */
 .creator {font-weight: bold;}
 .card {
+	clear: both;
+	height: 100%; overflow: hidden;
+	margin-bottom: 5px;	padding:10px 20px; border: 1px solid #e8e8e8;
 	background: #f5f5f5;
-	border: 1px solid #e8e8e8;
-	padding:10px 20px;
-	margin-bottom: 5px;
-	height: 100%; overflow: hidden; clear: both;
 }
 .card a {background: #f5f5f5;}
 .card .creation-details {
-	font-size: 11px; color: #333; display: block;
+	display: block; color: #333; font-size: 11px; 
 }
 .card .datetime {color: #666;}
 
 .card.content {
+	padding: 0; margin: 10px 0 30px; border: none;
+	background: none; 
 	font-size: 11px;
-	border: none; background: none; padding: 0; margin: 10px 0 30px;
 }
 .card.content .creation-details {
-	float: left; width: 155px; line-height: 14px;
+	float: left; width: 28%;
+	line-height: 14px;
 }
 .card.content .creation-details .created-at {display: block;}
 .card.content .content {
-	float: right; width: 420px;
+	float: right; width: 72%;
 }
-ul.collection li {list-style: none; margin-left: 0;}
+ul.collection li {clear: both; margin-left: 0; list-style: none;}
+.empty-collection-message {margin-top: 20px;}
 
-.new-links {margin-top: 20px;}
-.new-links ul li {list-style: none; margin-left: 0;}
+.new-link {margin-top: 20px;}
 
-.dependent-collection ul li {
-	list-style: none; margin-left: 0;
+.primary-collection ul li {
+	margin-left: 0; list-style: none; 
 }
-.dependent-collection h2 {
-	padding: 15px 0; margin-bottom: 20px;
-	border-bottom: 1px dotted black;
+.primary-collection h2 {
+	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted black;
 }
+
+.table-plus .header {height: 100%; overflow: hidden;}
+.table-plus .header a {float: left; margin-right: 20px;}
+.table-plus div.search {float: right;}
+.table-plus div.search span {color: #444;}
+.table-plus div.search input.search {margin: 0 5px;}
+.table-plus div.search .button {padding: 2px 4px;}
+
+.table-plus table {width: 100%; margin: 20px 0;}
+.table-plus table th {
+	padding: 2px 10px;
+	color: white; background: #444;
+	font-weight: bold; font-size: 10px;
+}
+.table-plus table th a {color: white;}
+.table-plus table td {
+	padding: 6px 10px; border-bottom: 1px solid #e2e2e2; color: #666;
+}
+.table-plus table td input.button {padding: 1px; margin-left: 10px; }
+.table-plus table td.controls {width: 100px;}
+.table-plus .even {background: #f8f8f8;}
+.table-plus a {background: none;}
 
 /*******************************************************/
 /* these styles are for the generated front index page */
 /* you can delete them if you over-ride it             */
 
 .front-page .welcome-message {
-	background: #eee; color: #222; border: 1px solid #e8e8e8; padding: 10px 20px 20px;
+	padding: 10px 20px 20px; border: 1px solid #e8e8e8; 
+	color: #222; background: #eee;
 }
 .front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
 }
-.front-page .content-body li {list-style: none; margin-left: 0;}
+.front-page .content-body li {margin-left: 0; list-style: none;}

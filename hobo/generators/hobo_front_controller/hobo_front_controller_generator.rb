@@ -1,6 +1,6 @@
 class HoboFrontControllerGenerator < Rails::Generator::NamedBase
 
-  default_options :no_user => false, :delete_index => false, :add_routes => false
+  default_options :delete_index => false, :add_routes => false
 
   def full_class_path
     class_path.blank? ? file_name : File.join(class_path, file_name)
@@ -34,8 +34,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
                  File.join('app/helpers', class_path, "#{file_name}_helper.rb"))
 
 
-      pages = options[:no_user] ? %w{index search} : %w{index search}
-      for page in pages
+      for page in %w{index search}
         m.template("#{page}.dryml", File.join('app/views', class_path, file_name, "#{page}.dryml"))
       end
     end
@@ -49,7 +48,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     routes_path = File.join(RAILS_ROOT, "config/routes.rb")
     name = full_class_path
 
-    route = ("  map.search  'search', :controller => '#{name}', :action => 'search'\n" +
+    route = ("  map.site_search  'search', :controller => '#{name}', :action => 'search'\n" +
              "  map.homepage '', :controller => '#{name}', :action => 'index'")
 
     route_src = File.read(routes_path)
@@ -68,7 +67,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
 
   protected
     def banner
-      "Usage: #{$0} #{spec.name} <controller-name> [--add-routes] [--no-user] [--delete-index]"
+      "Usage: #{$0} #{spec.name} <controller-name> [--add-routes] [--delete-index]"
     end
 
     def add_options!(opt)

@@ -38,7 +38,7 @@ module Hobo
     #   skip_before_filter :login_required
     #
     def login_required(user_model=nil)
-      auth_model = user_model || UserController.user_models.first
+      auth_model = user_model || User.default_user_model
       if current_user.guest? 
         username, passwd = get_auth_data
         self.current_user = auth_model.authenticate(username, passwd) || nil if username && passwd && auth_model

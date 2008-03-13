@@ -1,0 +1,74 @@
+body {
+    margin: 20px;
+		width: 780px;
+    font-family: "Trebuchet MS","Lucida Grande", "Lucida Sans Unicode", helvetica, arial, sans-serif;
+}
+
+h1, h2, h3, h4 {color: black; font-weight: bold; font-family: Helvetica, Arial, sans-serif;}
+h1 {margin: 0 0 20px; font-size: 32px; line-height: 32px;}
+h2 {margin: 0 0 15px; font-size: 24px; line-height: 24px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;}
+h3 {margin: 0 0 5px;  font-size: 20px; line-height: 20px;}
+h3 {margin: 0 0 5px;  font-size: 16px; line-height: 16px;}
+
+a {color: #09c; text-decoration: none;}
+
+pre {
+    background: #181818; 
+    font-size: 13px; line-height: 11pt;
+		margin: 0 0 10px; padding: 15px;
+    overflow: auto;
+}
+pre code {
+    color: white;
+}
+
+/* == Code Highlighting == */
+
+/** RUBY / JAVASCRIPT **/
+code span.comment {
+	color: #BD48B3;
+}
+
+code span.string {
+	color: #99FF00;
+}
+
+code span.brackets {
+	
+}
+
+code span.symbol {
+	color: #6BCFF7;
+}
+
+code span.keywords {
+	color: #FF8400;
+}
+
+code span.erb {
+	background: #333;
+}
+
+code span.symbol {
+	color: #07DFFC;
+}
+
+/** DRYML **/
+code span.tag {
+	color: #FF8400;
+}
+
+code span.parameter {
+	color: #bb4400;
+}
+
+code span.attribute {
+	color: #6BCFF7;
+}
+
+code span.doctype {
+	color: #D7FF80;
+}
+pre.dryml code span.string {
+	color: #cfa;
+}

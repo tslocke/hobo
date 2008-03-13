@@ -37,7 +37,7 @@ var Hobo = {
 
         var opts = Object.merge(options || {}, { params: params})
         Hobo.ajaxRequest(Hobo.putUrl(el),
-                         el.getAttribute("hobo-ajax-message") || "Changing...",
+                         el.getAttribute("hobo-ajax-message") || "Saving...",
                          updates,
                          opts)
     },
@@ -73,11 +73,12 @@ var Hobo = {
         return params.join('&')
     },
 
-    ajaxRequest: function(url_or_form, message, updates, options) {
+    ajaxRequest: function(url_or_form, updates, options) {
         options = Object.merge({ asynchronous:true,
                                  evalScripts:true,
                                  resetForm: false,
-                                 refocusForm: false
+                                 refocusForm: false,
+                                 message: "Saving..."
                                }, options)
         if (typeof url_or_form == "string") {
             var url = url_or_form
@@ -104,7 +105,7 @@ var Hobo = {
             params.push(Form.serialize(form))
         }
 
-        Hobo.showSpinner(message, options.spinnerNextTo)
+        Hobo.showSpinner(options.message, options.spinnerNextTo)
         var complete = function() {
             if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
@@ -385,7 +386,7 @@ var Hobo = {
         if(t = $('ajax-progress-text')) Element.update(t, message);
         if(e = $('ajax-progress')) {
             if (nextTo) {
-                var pos = nextTo.cumulativeOffset()
+                var pos = $(nextTo).cumulativeOffset()
                 e.style.top = pos.top + "px"
                 e.style.left = (pos.left + nextTo.offsetWidth) + "px"
             }
@@ -431,8 +432,14 @@ var Hobo = {
         return pluralisations[s] || s + "s"
     },
 
-    addUrlParams: function(params) {
+    addUrlParams: function(params, options) {
         params = $H(window.location.search.toQueryParams()).merge(params)
+
+        if (options.remove) {
+            var remove = (options.remove instanceof Array) ? options.remove : [options.remove]
+            remove.each(function(k) { params.unset(k) })
+        }
+
         return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
     }
 
@@ -496,7 +503,7 @@ HasManyThroughInput = Behavior.create({
         var select = this.element.down('select')
         var selected = select.options[select.selectedIndex]
         if (selected.style.display != "none" & selected.value != "") {
-            var newItem = strToDom(this.element.down('.item-proto').innerHTML)
+            var newItem = DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip())
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             newItem.down('input[type=hidden]').value = selected.innerHTML
@@ -524,8 +531,20 @@ HasManyThroughInput = Behavior.create({
 
 Event.addBehavior({
     'div.has-many-through.input' : HasManyThroughInput(),
-		'.dependent-collection-count:click' : function(e) {
-			new Effect.ScrollTo('dependent-collection', {duration: 1.0, offset: -10, transition: Effect.Transitions.sinoidal});
-			Event.stop(e);
-		}
+    '.association-count:click' : function(e) {
+	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
+	Event.stop(e);
+    },
+    'form.filter-menu select:change': function(event) {
+        var paramName = this.up('form').down('input[type=hidden]').value.gsub("-", "_")
+        var params = {}
+        remove = [ 'page' ]
+	if (this.value == '') { 
+            remove.push(paramName)
+        } else {
+            params[paramName] = this.value
+	}
+	location.href = Hobo.addUrlParams(params, {remove: remove})
+    }
+
 });

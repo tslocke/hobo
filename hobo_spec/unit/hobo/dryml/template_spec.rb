@@ -58,13 +58,15 @@ describe Template do
   end
   
   it "should allow close tags to ommit the :field_name part" do 
-    compile_dryml("<foo:name></foo>").should == '<% _output(foo({:field => "name"}, {})) %>'
+    compile_dryml("<foo:name></foo>").should == 
+      '<% _output(foo({:field => "name"}, { :default => proc { |_foo__default_content| new_context { %><% } }, })) %>'
   end
 
   it "should compile tag calls with merge-attrs" do
     compile_dryml("<foo merge-attrs/>").should == "<% _output(foo(merge_attrs({},(attributes) || {}), {})) %>"
     compile_dryml("<foo a='1' merge-attrs/>").should == '<% _output(foo(merge_attrs({:a => "1"},(attributes) || {}), {})) %>'
   end
+  
 
   # --- Compilation: Defining Tags --- #
   
@@ -197,6 +199,40 @@ describe Template do
       '<% } }, })) %>'
   end
   
+  
+  # --- Compilation: Syntax sugar for before, after, append, prepend --- #
+  
+  it "should compile 'before' parameters" do
+    compile_dryml("<page><before-head:>abc</before-head></page>").should == 
+      
+      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc' +
+      '<% _output(_head_restore.call({}, {})) %>' +
+      '<% } }, })) %>'
+  end
+  
+  it "should compile 'after' parameters" do
+    compile_dryml("<page><after-head:>abc</after-head></page>").should == 
+      
+      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>' +
+      '<% _output(_head_restore.call({}, {})) %>' +
+      'abc<% } }, })) %>'
+  end
+  
+  it "should compile 'apppend' parameters" do
+    compile_dryml("<page><append-head:>:o)</append-head></page>").should == 
+      
+      '<% _output(page({}, {:head => proc { [{}, { :default => proc { |_head__default_content| new_context { %>' + 
+      '<%= _head__default_content && _head__default_content.call %>:o)' +
+      '<% } } } ] }, })) %>'
+  end
+
+  it "should compile 'prepend' parameters" do
+    compile_dryml("<page><prepend-head:>:o)</prepend-head></page>").should == 
+      
+      '<% _output(page({}, {:head => proc { [{}, { :default => proc { |_head__default_content| new_context { %>' + 
+      ':o)<%= _head__default_content && _head__default_content.call %>' +
+      '<% } } } ] }, })) %>'
+  end
 
   # --- Tag Evalutation Examples --- #
   
@@ -412,6 +448,25 @@ describe Template do
     
   end
   
+  
+  # --- Append, Prepend, Before & After --- #
+
+  it "should allow content to be inserted before template parameters" do 
+    eval_with_templates('<static-merge><before-b:>:o)</before-b></static-merge>').should ==
+      '<p>a :o)<b name="big">bold</b> word</p>'
+  end
+  
+  it "should allow content to be inserted after template parameters" do 
+    eval_with_templates('<static-merge><after-b:>:o)</after-b></static-merge>').should ==
+      '<p>a <b name="big">bold</b>:o) word</p>'
+  end
+  
+  it "should allow content to be prepended to the content of template parameters" do 
+    eval_with_templates('<static-merge><prepend-b:>:o)</prepend-b></static-merge>').should ==
+      '<p>a <b name="big">:o)bold</b> word</p>'
+  end
+
+  
   # --- Merge Params --- #
   
   
@@ -427,8 +482,8 @@ describe Template do
   
   it "should allow tags to be selected based on types" do
     tags = %(<def tag="do"><%= parameters.default %></def>
-             <def tag="t" for="String">A string</def>
-             <def tag="t" for="TrueClass">A boolean</def>)
+             <def tag="t" for="string">A string</def>
+             <def tag="t" for="boolean">A boolean</def>)
 
     eval_dryml(tags + '<do with="&\'foo\'"><%= call_polymorphic_tag(:t) %></do>').should == "A string"
     eval_dryml(tags + '<do with="&false"><%= call_polymorphic_tag(:t) %></do>').should == "A boolean"
@@ -546,6 +601,19 @@ describe Template do
   it "should allow <else> to be used with the if attribute" do
     eval_dryml("<p if='&false'/><%= Hobo::Dryml.last_if %>").should == "false"
   end
+  
+  
+  # --- Whitespace Suppression --- #
+  
+#  it "should remove allow newlines to be removed by adding a ' -' at the end of a line" do 
+#    src = <<-END
+#<def tag="t"> -
+#  My Tag -
+#</def>
+#<p><t/></p>
+#END
+#    eval_dryml(src).should == "<p>My Tag</p>"
+#  end
   
   
   # --- Testing for parameters --- #

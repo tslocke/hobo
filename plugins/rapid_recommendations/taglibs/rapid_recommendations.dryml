@@ -1,0 +1,18 @@
+<def tag="recommendations">
+  <section part="recommendations" id="#{dom_id}-recommendations">
+    <collection-preview/>
+    <new-recommendation-form update="self"/>
+  </section>
+</def>
+
+
+<def tag="new-recommendation-form">
+  <form:new merge>
+    <p class="recommend-this"><a href="#">Recommend this</a></p>
+    <div style="display:none;">
+      <label for="comment">Optional Comment</label>
+      <input:comment/>
+      <submit label="Recommend"/>
+    </div>
+  </form>
+</def>

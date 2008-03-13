@@ -20,58 +20,73 @@
 %></def>
 
 
-<def tag="form" attrs="message, update, hidden-fields, action, method, web-method"><%= 
+<def tag="form" attrs="update, hidden-fields, action, method, web-method"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
-  html_attrs[:action] = action || object_url(this, web_method)
+  new_record = this.try.new_record?
 
-  new_record = this.respond_to?(:new_record?) && this.new_record?
-   
   method = if method.nil?
              (action || web_method || new_record) ? "post" : "put"
            else
              method.downcase
            end
-  if method == "put"
-    http_method_hidden = hidden_field_tag("_method", "PUT") 
-    html_attrs[:method] = "post"
+
+  html_attrs[:action] = action || object_url(this, web_method, :method => method)
+   
+  if html_attrs[:action].nil? || (new_record && !this.user_can_create?(current_user))
+    Hobo::Dryml.last_if = false
+    ""
   else
-    html_attrs[:method] = method
+    if method == "put"
+      # browsers don't support put -- use post and add the Rails _method hack
+      http_method_hidden = hidden_field_tag("_method", "PUT") 
+      html_attrs[:method] = "post" 
+    else
+      html_attrs[:method] = method
+    end
+     
+    if update || !ajax_attrs.empty?
+      # add an onsubmit to convert to an ajax form if `update` is given
+      function = ajax_updater(:post_form, update, ajax_attrs)
+      html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+    end
+     
+    body, field_names = scope.new_scope do
+      scope[:in_form] = true
+      with_form_context { parameters.default }
+    end
+     
+    hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
+     
+    auth_token = if request_forgery_protection_token.nil?
+                   ''
+                 else
+                   element(:input, :type => "hidden", 
+                           :name => request_forgery_protection_token.to_s,
+                           :value => form_authenticity_token)
+                 end
+     
+    page_path = if request.post? || request.put? && params[:page_path]
+                  params[:page_path]
+                else
+                  view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
+                end
+    page_path_hidden = hidden_field_tag("page_path", page_path) unless method == "get"
+     
+    body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
+     
+    
+    if action.nil? # don't add automatic css classes if the action was specified
+      if web_method
+        add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
+      else
+        add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
+      end
+    end
+     
+    Hobo::Dryml.last_if = true
+    element("form", html_attrs, body)
   end
-   
-  if update || !ajax_attrs.empty?
-    message ||= "Creating #{this.class.name.titleize}" if new_record
-    # add an onsubmit to convert to an ajax form if `update` is given
-    function = ajax_updater(:post_form, message, update, ajax_attrs)
-    html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
-  end
-
-  body, field_names = scope.new_scope do
-    scope[:in_form] = true
-    with_form_context { parameters.default }
-  end
-
-  hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
-  
-  auth_token = if request_forgery_protection_token.nil?
-                 ''
-               else
-                 element(:input, :type => "hidden", 
-                         :name => request_forgery_protection_token.to_s,
-                         :value => form_authenticity_token)
-               end
-
-  page_path_hidden = hidden_field_tag("page_path", view_name) 
-   
-  body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
-   
-  if web_method
-    add_classes!(html_attrs, "#{type_id}_#{web_method}_form")
-  else
-    add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
-  end
-   
-  element("form", html_attrs, body)
 %></def>
 
 
@@ -89,19 +104,18 @@
   elsif !can_edit?
     view
   else
-    attrs = add_classes(attributes, type_and_field)
-    the_input = if this_type.respond_to?(:macro)
-                  if this_type.macro == :belongs_to
+    attrs = add_classes(attributes, type_id, type_and_field)
+    the_input = if (refl = this_field_reflection)
+                  if refl.macro == :belongs_to
                     belongs_to_input(attrs)
-                  elsif this_type.macro == :has_many
-                    if this_type.options[:through]
+                  elsif refl.macro == :has_many
+                    if refl.options[:through]
                       has_many_through_input(attrs)
                     else
                       has_many_input(attrs)
                     end
                   end
                 else
-                  add_classes!(attrs, type_id)
                   attrs[:name] ||= param_name_for_this
                   the_input = call_polymorphic_tag('input', attrs) or
                     raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
@@ -132,12 +146,12 @@
 </def>
 
 <def tag="input" for="date" attrs="order">
-  <% order = order.nil? ? [:year, :month, :day] : comma_split(order).every(:to_sym) -%>
+  <% order = order.nil? ? [:year, :month, :day] : comma_split(order).*.to_sym -%>
   <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
 </def>
 
 <def tag="input" for="datetime" attrs="order">
-  <% order = order.nil? ? [:year, :month, :day, :hour, :minute] : comma_split(order).every(:to_sym) -%>
+  <% order = order.nil? ? [:year, :month, :day, :hour, :minute] : comma_split(order).*.to_sym -%>
   <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
 </def>
 
@@ -157,7 +171,7 @@
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
-<def tag="input" for="Hobo::EnumString" attrs="labels,titleize">
+<def tag="input" for="HoboFields::EnumString" attrs="labels,titleize">
   <% labels ||= {} %>
   <% titleize = true if titleize.nil? %>
   <select name="#{param_name_for_this}" merge-attrs>
@@ -176,15 +190,15 @@
 
 <!--- Buttons --->
 
-<def tag="remote-method-button" attrs="method, update, result-update, params, label, message"><%= 
+<def tag="remote-method-button" attrs="method, update, label"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
   url = object_url(this, method)
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
-  if update || result_update
-    message ||= method.titleize
-    func = ajax_updater(url, message, update,
-                        ajax_attributes.merge(:params => params, :result_update => result_update))
+  if update || result_update || !ajax_attrs.empty?
+    label ||= method.titleize
+    ajax_attributes[:message] ||= label
+    func = ajax_updater(url, update, ajax_attributes)
     html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
     element(:input, html_attributes)
   else
@@ -193,10 +207,10 @@
 %></def>
   
 
-<def tag="update-button" attrs="label, message, update, fields, params"><%=
+<def tag="update-button" attrs="label, update, fields, params"><%=
   raise HoboError.new("no update specified") unless update
-  message ||= label
-  func = ajax_updater(object_url(this), message, update,
+  ajax_attributes[:message] ||= label
+  func = ajax_updater(object_url(this), update,
                       :params => { this.class.name.underscore => fields }.merge(params || {}),
                       :method => :put)
   element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
@@ -204,8 +218,10 @@
 </def>
 
 
-<def tag="delete-button" attrs="label, message, update, in-place, image, confirm, fade, subsite"><%=
-  if (Hobo::Dryml.last_if = can_delete?)
+<def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
+  in_place = false if in_place.nil? && this == @this
+  url = object_url(this, :method => :delete, :subsite => subsite)
+  if (Hobo::Dryml.last_if = url && can_delete?)
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
                                   else
@@ -217,15 +233,17 @@
     add_classes!(attributes,
                  image ? "image-button" : "button",
                  "delete-button delete-#{this.class.name.underscore.dasherize}-button")
-    url = object_url(this, "destroy", :subsite => subsite)
-    if in_place == false
-      attributes[:confirm] = confirm if confirm
-      button_to(label, url, attributes)
-    else
-      fade = true if fade.nil?
-      attributes[:value] = label
-      attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
-      element(:input, attributes)
+    if url
+      if in_place == false
+        attributes[:confirm] = confirm if confirm
+        attributes[:method] = :delete
+        button_to(label, url, attributes)
+      else
+        fade = true if fade.nil?
+        attributes[:value] = label
+        attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
+        element(:input, attributes)
+      end
     end
   else
     ""
@@ -233,14 +251,14 @@
 %></def>
 
 
-<def tag="create-button" attrs="model, update, label, message, fields"><%=
+<def tag="create-button" attrs="model, update, label, fields, message"><%=
   raise HoboError.new("no update specified") unless update
 
   fields ||= {}
   class_or_assoc = if model
                      model.is_a?(String) ? model.constantize : model
                    elsif Hobo.simple_has_many_association?(this)
-                     fields[this.proxy_reflection.primary_key_name] = this.proxy_owner.id
+                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.id
                      this
                    else
                      raise HoboError.new("invalid context for <create-button>")
@@ -249,12 +267,12 @@
   new.set_creator(current_user)
   if can_create?(new)
     label ||= "New #{new.class.name.titleize}"
-    message ||= label
+    ajax_attributes = { :message => message }
+    ajax_attributes[:params] = { class_name => fields } unless fields.empty?
     class_name = new.class.name.underscore
-    func = ajax_updater(object_url(new.class), message, update,
-                        ({:params => { class_name => fields }} unless fields.empty?))
+    func = ajax_updater(object_url(new.class), message, update, ajax_attributes)
     element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                            "button create-button create-#{class_name}-button")
+                                "button create-button create-#{class_name}-button")
   end
 %></def>
 
@@ -263,8 +281,9 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  options ||= this_type.klass.find(:all, :conditions => this_type.options[:conditions]).select {|x| can_view?(x)}
-  #Todo: switch to autocompleter for id_name when too many records, and id_name supported
+  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this, this_field_reflection).conditions
+  options ||= this_field_reflection.klass.find(:all, :conditions => conditions).select {|x| can_view?(x)}
+    #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }.sort
@@ -281,7 +300,7 @@
 <% refl = this_type
    completer_model ||= refl.klass
    completer_attr ||= refl.klass.id_name_column
-   id ||= this_field_dom_id + "_completer"
+   id ||= dom_id + "_completer"
    where_attributes = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
    url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_attributes))
   %>
@@ -345,6 +364,19 @@
 </def>
 
 
-<def tag="after-submit" attrs="uri">
-  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit"/>
+<def tag="after-submit" attrs="uri, stay-here, go-back">
+  <% uri = request.request_uri if stay_here %>
+  <% uri = session[:previous_uri] if go_back %>
+  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
+</def>
+
+
+<def tag="hidden-field" attrs="name, value"><input type="hidden" name="&name" value="&value" merge-attrs/></def>
+
+
+<def tag="select-menu" attrs="options, selected, first-option, first-value">
+  <select merge-attrs param="default">
+    <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
+    <do param="options"><%= options_for_select(options, selected) %></do>
+  </select>
 </def>

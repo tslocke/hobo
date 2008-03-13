@@ -2,13 +2,17 @@ module Hobo::Dryml
   
   class DRYMLBuilder
 
-    def initialize(template_path)
-      @template_path = template_path
+    def initialize(template)
+      @template = template
       @build_instructions = Array.new
       @part_names = []
     end
     
-    attr_reader :template_path
+    attr_reader :template
+    
+    def template_path
+      template.template_path
+    end
 
 
     def set_environment(environment)
@@ -34,7 +38,7 @@ module Hobo::Dryml
     
     def add_part(name, src, line_num)
       raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
-      add_build_instruction(:part, :src => src, :line_num => line_num)
+      add_build_instruction(:def, :src => src, :line_num => line_num)
       @part_names << name
     end
 
@@ -73,9 +77,6 @@ module Hobo::Dryml
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
           
-        when :part
-          @environment.class_eval(erb_process(instruction[:src]), template_path, instruction[:line_num])
-          
         when :render_page
           method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
@@ -107,7 +108,12 @@ module Hobo::Dryml
         import_module(options[:module].constantize, options[:as])
       else
         template_dir = File.dirname(template_path)
-        taglib = Taglib.get(options.merge(:template_dir => template_dir))
+        options = options.merge(:template_dir => template_dir)
+        
+        # Pass on the current bundle, if there is one, to the sub-taglib
+        options[:bundle] = template.bundle.name unless template.bundle.nil? || options[:bundle] || options[:plugin]
+        
+        taglib = Taglib.get(options)
         taglib.import_into(@environment, options[:as])
       end
     end

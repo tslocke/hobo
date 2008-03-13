@@ -1,10 +1,9 @@
 <def tag="blog-post-summary">
   <article class="blog-post-summary">
-    <delete-button label="Delete #{@model.name.titleize}"/>
-    <heading param="title"><a><view:title/></a></heading>
+    <h2 param="title"><a><view:title/></a></h2>
     <do if="features_comments?">
       <p class="date-comment-summary">
-        <span class="created-at"><view:created_at/></span>
+        <span class="created-at"><view:published_at/></span>
         <count:comments if-any/>
         <else><span param="no-comments">No comments</span></else>
       </p>
@@ -13,36 +12,6 @@
     <div param="continue"><a>Continue Reading &raquo;</a></div>
   </article>
 </def>
-
-
-<def tag="blog-post-show">
-  <article class="blog-post">
-    <heading param="title"><a><editor:title/></a></heading>
-    <div class="created-at" param="created-at"><view:created_at/></div>
-    <div class="body" param="body"><editor:body/></div>
-    <do if="features_comments?">
-      <div>
-        <a name="comments"></a>
-        <set count="&1"/>
-        <repeat:comments>
-          <div class="comment">
-            <div class="comment-header">
-              <delete-button label="Remove Comment" in-place="&false"/>
-              <div class="comment-count"><%= count %></div>
-              <div class="comment-author">Written By <view:author/></div>
-              <div class="comment-datetime">Posted on: <view:created_at/></div>
-            </div>
-            <div class="comment-body"><view:body/></div>
-          </div>
-          <set count="&count + 1"/>
-        </repeat>
-        <a name="bottom"></a>
-        <new-comment-form/>
-      </div>
-    </do>
-  </article>
-</def>
-
 
 <def tag="blog-posts-list-by-month">
   <% this.each do |month, posts| -%>

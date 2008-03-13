@@ -1,0 +1,19 @@
+<def tag="icon" attrs="size">
+  <% size ||= "medium" %>
+  <do with="&this.icon || this.default_icon">
+    <img src="#{this.public_filename(size)}" alt="#{this.label}" class="icon"/>
+  </do>
+</def>
+
+
+<def tag="choose-icon">
+  <h2 param="heading"><type-name/> Icon</h2>
+
+  <icon param/><else><p param="no-icon-message">You have not uploaded an icon yet</p></else>
+
+  <section class="icon-upload">
+    <upload-image-form:new_icon param>
+      <after-submit: stay-here/>
+    </upload-image-form>
+  </section>
+</def>

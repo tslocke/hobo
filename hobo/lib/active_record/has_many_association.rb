@@ -18,7 +18,7 @@ module ActiveRecord::Associations
       record = @reflection.klass.new(attributes)
       if hobo_has_many?
         set_belongs_to_association_for(record)
-        set_reverse_association(record)
+        set_reverse_association(record) unless proxy_reflection.options[:as]
       end
       record
     end
@@ -28,17 +28,13 @@ module ActiveRecord::Associations
       proxy_reflection.klass
     end
     
-    
-    def find_with_block(*args, &b)
-      if b
-        options = args.extract_options!
-        args << options.merge(:conditions => member_class.conditions(&b))
-        find_without_block(*args)
-      else
-        find_without_block(*args)
-      end
+    def origin
+      proxy_owner
     end
-    alias_method_chain :find, :block
+
+    def origin_attribute
+      proxy_reflection.association_name
+    end
     
     private
     

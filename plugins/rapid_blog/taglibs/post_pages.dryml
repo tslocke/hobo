@@ -2,28 +2,41 @@
 
 <def tag="page" extend-with="rapid-blog">
   <page-without-rapid-blog merge>
+
     <stylesheets: param>
       <param-content/>
       <stylesheet name="rapid-blog"/>
     </stylesheets>
+
+    <head:>
+      <param-content/>
+      <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="#{@rss_alternative_url}" />
+    </head:>
+
   </page-without-rapid-blog>
 </def>
 
+
 <def tag="index-page" extend-with="rapid-blog">
   <index-page-without-rapid-blog merge>
+    <content-header: replace/>
     <content-body:>
-      <blog-posts-list-by-month with="&@posts_by_month" param />
+      <blog-post-summary repeat param/>
     </content-body>
   </index-page-without-rapid-blog>
 </def>
 
-<def tag="show-pagem" extend-withm="rapid-blog">
-  <show-page-without-rapid-blog layout="aside">
-    <main-content:>
-      <blog-post-show/>
-    </main-content>
-    <aside:>
-      <list-blog-post-categories:categories/>
-    </aside:>
-  </show-page>
+<def tag="show-page" extend-with="rapid-blog">
+  <show-page-without-rapid-blog merge>
+    <field-list: replace/>
+  </show-page-without-rapid-blog>
+</def>
+
+
+<def tag="archive-page">
+  <page merge title="Blog Post Archive">
+    <content-body:>
+      <blog-posts-list-by-month param />
+    </content-body>
+  </page>
 </def>

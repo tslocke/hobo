@@ -4,8 +4,9 @@ module HoboCsv
   
   def render_csv(*args)
     options = args.extract_options!
+    fields = args.empty? ? @member_class.content_columns.*.name : args
     
-    filename = (options[:filename] || @member_class.name.pluralize.underscore) +".csv"    
+    filename = (options[:filename] || params[:action]) +".csv"    
     
     # We have to jump through hoops to get IE to work? How surprising
     if request.env['HTTP_USER_AGENT'] =~ /msie/i
@@ -25,7 +26,6 @@ module HoboCsv
         if block_given?
           yield(csv)
         else
-          fields = args.blank? ? @member_class.content_columns.every(:name) : args
           # Generate and write out titles
           titles = fields.map do |field|
             if field.is_a?(String)

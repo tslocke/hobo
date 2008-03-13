@@ -1,0 +1,41 @@
+<def tag="forum-post-summary">
+  <a>
+    <if><%= time_ago_in_words(this.last_post_at) %> ago<br/> by <name:last_post_by/></if>
+    <else>None</else>
+  </a>
+</def>
+
+<def tag="card" for="_Forum_">
+  <div class="card forum">
+    <div class="summary">
+      <a/>
+      <span class="count"><count:topics_count label="topic"/>, <count:posts_count label="post"/></span>
+      <view:description truncate="100"/>
+    </div>
+    <div class="latest-post">
+        Latest Post
+        <forum-post-summary:last_update/>
+    </div>
+  </div>
+</def>
+
+<def tag="collection" for="_ForumTopic_">
+  <table class="collection forum-topic">
+    <thead:>
+      <tr>
+        <th></th>
+        <th class="topic">Topic</th>
+        <th class="last-post">Last Post</th>
+        <th class="replies">Replies</th>
+        <th class="views">Views</th>
+      </tr>
+    </thead:>
+    <tr:>
+      <td class="icon"><img src="/images/clearbits/comment.gif" class="forum-icon#{this.unread_posts?(current_user) ? ' unread' : ''}"/></td>
+      <td class="topic"><if:sticky>Sticky: </if><a/></td>
+      <td class="last-post"><forum-post-summary/></td>
+      <td class="replies"><view:replies.count/></td>
+      <td class="views"><view:view_counter/></td>
+    </tr:>
+  </table>
+</def>

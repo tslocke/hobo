@@ -5,7 +5,15 @@ Signal.trap("INT") { puts; exit }
 
 hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
 
-USAGE = "USAGE: hobo [ --user-model <model-name-or-false> ] [ --svn ] [--db] [--hobo-src <path to hobo src>] <app-path>"
+USAGE = "USAGE: hobo <options> <app-path>
+
+Options:
+  --user-model <model-name-or-false>
+  --svn                               # Use 'svn co' to checkout Hobo
+  --create-dbs                        # Run rake db:create:all
+  --hobo-src <path to hobo src>
+  -d | --database <database>         # e.g. mysql, sqlite
+"
 
 HOBO_REPO = "svn://hobocentral.net/hobo/trunk/hobo"
 
@@ -34,8 +42,8 @@ end
 
 app_path = ARGV.pop
 
-user_model = "user"
-hobo_svn = create_db = false
+user_model    = "user"
+hobo_svn      = create_db = false
 
 until ARGV.empty?
   case ARGV.shift
@@ -44,10 +52,12 @@ until ARGV.empty?
     user_model = arg == "false" ? nil : arg
   when "--svn"
     hobo_svn = true
-  when "--db"
+  when "--create-dbs"
     create_db = true
   when "--hobo-src"
     hobo_src = "../" + ARGV.shift
+  when "-d", "--database"
+    database_type = ARGV.shift
   else
     puts USAGE
     exit 1
@@ -55,7 +65,9 @@ until ARGV.empty?
 end
 
 puts "\nGenerating Rails app...\n"
-system("rails #{app_path}")
+opts = []
+opts << "-d #{database_type}" if database_type
+system("rails #{opts * ' '} #{app_path}")
 
 
 Dir.chdir(app_path) do
@@ -64,9 +76,12 @@ Dir.chdir(app_path) do
 
   FileUtils.touch("public/stylesheets/application.css")
 
-  puts "\nInstalling classic_pagination\n"
-  command(plugin, "install svn://errtheblog.com/svn/plugins/classic_pagination")
+  puts "\nInstalling will_paginate\n"
+  command(plugin, "install svn://errtheblog.com/svn/plugins/will_paginate")
   
+  puts "\nInstalling hobofields\n"
+  command(plugin, "install svn://hobocentral.net/hobofields/trunk")
+
   if hobo_svn
     puts "\nInstalling Hobo plugin via svn checkout...\n"
     command("svn co #{HOBO_REPO} vendor/plugins/hobo")

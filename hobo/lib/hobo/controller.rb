@@ -87,12 +87,10 @@ module Hobo
         page << renderer.part_contexts_storage if renderer
       end
     end
-
-
-    def render_tag(tag, options={}, render_options={})
-      add_variables_to_assigns
-      text = Hobo::Dryml.render_tag(@template, tag, options)
-      text && render({:text => text, :layout => false }.merge(render_options))
+    
+    
+    def dryml_context
+      @this
     end
 
 
@@ -111,11 +109,12 @@ module Hobo
 
 
     def site_search(query)
-      results = Hobo.find_by_search(query).select {|r| Hobo.can_view?(current_user, r, nil)}
+      results = Hobo.find_by_search(query).select{|r| Hobo.can_view?(current_user, r, nil)}
       if results.empty?
         render :text => "<p>Your search returned no matches.</p>"
       else
-        render_tags(results, :card, :for_type => true)
+        # TODO: call one tag that renders all the search results with headings for each model
+        render_tags(results.map {|r|r.last}.flatten, :search_card, :for_type => true)
       end
     end
 

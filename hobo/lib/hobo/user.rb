@@ -4,6 +4,12 @@ module Hobo
 
   module User
     
+    @user_models = []
+    
+    def self.default_user_model
+      @user_models.first._?.constantize
+    end
+    
     AUTHENTICATION_FIELDS = [:salt, :crypted_password, :remember_token, :remember_token_expires_at]
 
     # Extend the base class with AuthenticatedUser functionality
@@ -12,9 +18,12 @@ module Hobo
     # - plaintext password validation
     # - login token for rembering a login during multiple browser sessions
     def self.included(base)
+      @user_models << base.name
+      
       base.extend(ClassMethods)
 
       base.class_eval do
+        
         fields do
           crypted_password          :string, :limit => 40
           salt                      :string, :limit => 40
@@ -22,20 +31,19 @@ module Hobo
           remember_token_expires_at :datetime
         end
         
-        # Virtual attribute for the unencrypted password
-        attr_accessor :password
+        validates_confirmation_of :password, :if => :password_required?
 
-        validates_presence_of     :password,                   :if => :password_required?
-        validates_presence_of     :password_confirmation,      :if => :password_required?
-        validates_confirmation_of :password,                   :if => :password_required?
-      
+        # Virtual attributes for setting and changing the password
+        attr_accessor :current_password, :password, :password_confirmation, :type => :password
+
+
+        validate :validate_current_password_when_changing_password
+        
         before_save :encrypt_password
         
         never_show *AUTHENTICATION_FIELDS
         
         attr_protected *AUTHENTICATION_FIELDS
-        
-        set_field_type :password => :password, :password_confirmation => :password
         
         password_validations
       end
@@ -50,23 +58,22 @@ module Hobo
       end
       
       def login_attribute=(attr, validate=true)
-        @login_attr = attr = attr.to_sym
+        @login_attribute = attr = attr.to_sym
         unless attr == :login
           alias_attribute(:login, attr)
-          set_field_type :login => field_type(attr)
+          declare_attr_type(:login, attr_type(attr)) if table_exists? # this breaks if the table doesn't exist
         end
         
         if validate
-          validates_presence_of   attr
           validates_length_of     attr, :within => 3..100
           validates_uniqueness_of attr, :case_sensitive => false
         end
       end
-      attr_reader :login_attr
+      attr_reader :login_attribute
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
-        u = find(:first, :conditions => ["#{@login_attr} = ?", login]) # need to get the salt
+        u = find(:first, :conditions => ["#{@login_attribute} = ?", login]) # need to get the salt
         
         if u && u.authenticated?(password)
           if u.respond_to?(:last_login_at) || u.respond_to?(:login_count)
@@ -125,6 +132,10 @@ module Hobo
       false
     end
     
+    def changing_password?
+      crypted_password? && (password || password_confirmation)
+    end
+
     protected
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
@@ -133,9 +144,15 @@ module Hobo
       self.crypted_password = encrypt(password)
     end
 
+    
     # Is a password required for login? (or do we have an empty password?)
     def password_required?
-      (crypted_password.blank? && password != nil) || !password.blank?
+      (crypted_password.blank? && password != nil) || !password.blank? || changing_password?
+    end
+
+    
+    def validate_current_password_when_changing_password
+      changing_password? && !authenticated?(current_password) and errors.add :current_password, "is not correct" 
     end
     
   end

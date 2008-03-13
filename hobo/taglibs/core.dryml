@@ -3,9 +3,9 @@
 </def>
 
 
-<def tag="wrap" attrs="tag, when">
-  <% body = parameters.default %>
-  <%= when_ ? call_tag(tag, attributes, &proc { body }) : body %>
+<def tag="wrap" attrs="tag, when, parameter">
+  <% parameter ||= :default %>
+  <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameter.default %>
 </def>
 
     
@@ -15,8 +15,8 @@
 %></def>
 
 
-<def tag="repeat" attrs="even-odd, join"><%= 
-  if !this.blank? 
+<def tag="repeat" attrs="even-odd, join">
+  <if><%= 
     if even_odd
       map_this do
         klass = [attributes[:class], cycle("even", "odd")].compact.join(' ')
@@ -31,15 +31,13 @@
           res
         end.join(join)
       end
-    end
-  else
-    ""
-  end
-%></def>
+    end %>
+  </if>
+</def>
 
 
 <def tag="do"><%= parameters.default %></def>
-<def tag="with"><%= parameters.default %></def>
+<def tag="with" alias-of="do"/>
 
 
 <def tag="if" attrs="test"><%= 
