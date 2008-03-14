@@ -1,1 +1,3 @@
 hobo_spec/build_app/new_hobo_app
+hobo_spec/rails_root/log
+hobo_spec/rails_root/vendor/plugins/hobofields
