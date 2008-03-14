@@ -65,7 +65,7 @@
 <def tag="index-page">
   <set model="&this.try.member_class || self.model"/>
   <set model-name="&model.name.titleize"/>
-  <page title="All #{type_name :with => model, :pluralize => true}" merge>
+  <page title="All #{type_name :with => model, :plural => true}" merge>
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
       <heading param><type-name with="&model"/></heading>
