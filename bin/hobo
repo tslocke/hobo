@@ -11,7 +11,7 @@ USAGE = "USAGE: hobo <options> <app-path>
 
 Options:
   --user-model <model-name-or-false>
-  --svn                               # Use 'svn co' to checkout Hobo
+  --svn                               # Use 'svn co' to checkout Hobo trunk
   --create-dbs                        # Run rake db:create:all
   --hobo-src <path to hobo src>
   -d | --database <database>         # e.g. mysql, sqlite
@@ -82,7 +82,7 @@ Dir.chdir(app_path) do
   command(plugin, "install svn://errtheblog.com/svn/plugins/will_paginate")
   
   puts "\nInstalling hobofields\n"
-  command(plugin, "install svn://hobocentral.net/hobofields/tags/rel_#{HOBO_VERSION}")
+  command("svn export svn://hobocentral.net/hobofields/tags/rel_#{HOBO_VERSION} vendor/plugins/hobofields")
 
   if hobo_svn
     puts "\nInstalling Hobo plugin via svn checkout...\n"
