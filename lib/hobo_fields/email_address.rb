@@ -5,7 +5,7 @@ module HoboFields
     COLUMN_TYPE = :string
     
     def validate
-      "is not a valid email address" unless valid? || blank?
+      "is not valid" unless valid? || blank?
     end
     
     def valid?
