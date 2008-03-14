@@ -167,7 +167,7 @@
     </content-body:>
     <aside: param>
       <section class="preview-collections">
-        <with-fields fields="&non_through_collections - [primary_collection_name._?.to_sym]">
+        <with-fields fields="&non_through_collections - [(primary_collection_name.to_sym unless primary_collection_name.blank?)]">
           <collection-preview class="#{this_field.dasherize}"/>
         </with-fields>
       </section>
