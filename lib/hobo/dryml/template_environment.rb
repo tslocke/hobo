@@ -182,12 +182,14 @@ module Hobo::Dryml
       call_type ||= (this.is_a?(Array) && this.respond_to?(:member_class) && this.member_class) || this_type
 
       while true
-        if call_type == ActiveRecord::Base || call_type == Object
-          return name
-        elsif respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
+        if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
           return poly_name
         else
-          call_type = call_type.superclass
+          if call_type == ActiveRecord::Base || call_type == Object
+            return name
+          else
+            call_type = call_type.superclass
+          end
         end
       end
     end
