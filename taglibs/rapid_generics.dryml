@@ -66,7 +66,7 @@
 <def tag="collection-preview" attrs="limit">
   <% limit ||= 6 %>
   <div class="collection-preview" merge-attrs>
-    <h2><do param="heading"><this-field.titleize/></do> <span param="show-all-link" if="&linkable?">(<a>show all</a>)</span></h2>
+    <h2><do param="heading"><this-field.titleize/></do> <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span></h2>
     <collection with="&this.limit(limit)" merge-params>
       <card: class="small"/>
     </collection>
