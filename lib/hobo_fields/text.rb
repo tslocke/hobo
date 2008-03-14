@@ -10,8 +10,8 @@ module HoboFields
       s.to_s.gsub(/[&"><]/) { |special| HTML_ESCAPE[special] }
     end
     
-  end
+    HoboFields.register_type(:text, self)
   
-  HoboFields.register_type(:text, self)
+  end
   
 end
