@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby 
 
+HOBO_VERSION = "0.7.3"
+
 require 'fileutils'
 Signal.trap("INT") { puts; exit }
 
@@ -80,7 +82,7 @@ Dir.chdir(app_path) do
   command(plugin, "install svn://errtheblog.com/svn/plugins/will_paginate")
   
   puts "\nInstalling hobofields\n"
-  command(plugin, "install svn://hobocentral.net/hobofields/trunk")
+  command(plugin, "install svn://hobocentral.net/hobofields/tags/rel_#{HOBO_VERSION}")
 
   if hobo_svn
     puts "\nInstalling Hobo plugin via svn checkout...\n"
