@@ -296,6 +296,8 @@
 
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
+<def tag="view" for="ActiveRecord::Base"><a/></def>
+
 
 <def tag="count" attrs="label, prefix, if-any, lowercase"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
