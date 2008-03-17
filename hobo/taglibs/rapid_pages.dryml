@@ -97,7 +97,7 @@
 
 <def tag="new-page">
   <page title="New #{type_name}" merge>
-    <body: class="new-page #{type_name.underscore}" param/>
+    <body: class="new-page #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param>New <type-name title/></heading>
     </content-header>
