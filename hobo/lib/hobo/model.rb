@@ -277,8 +277,28 @@ module Hobo
         "#{name.underscore.pluralize}"
       end
       
+      
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
+      end
+      
+      
+      def manage_join_records(association)
+        through = reflections[association].through_reflection
+        source  = reflections[association].source_reflection
+        
+        method = "manage_join_records_for_#{association}"
+        after_save method
+        class_eval %{
+          def #{method}
+            current = #{through.name}.*.#{source.name}
+            to_delete = current - #{association}
+            to_add    = #{association} - current
+            #{through.klass.name}.delete_all(["#{through.primary_key_name} = ? and #{source.primary_key_name} in (?)", 
+                                             self.id, to_delete.*.id]) if to_delete.any?
+            to_add.each { |record| #{association} << record }
+          end
+        }
       end
 
     end # --- of ClassMethods --- #
@@ -441,16 +461,12 @@ module Hobo
 
     
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection) &&
-          field_type.macro.in?([:belongs_to, :has_one])
-        if value.is_a?(String) && value.starts_with?('@')
-          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
-          Hobo.object_from_dom_id(value[1..-1])
-        else
-          value
-        end
+      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
+        convert_associated_records_for_mass_assignment(field_type, value)
+        
       elsif !field_type.is_a?(Class)
         value
+        
       elsif field_type <= Date
         if value.is_a? Hash
           Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
@@ -460,6 +476,7 @@ module Hobo
         else
           value
         end
+        
       elsif field_type <= Time
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
@@ -468,10 +485,39 @@ module Hobo
         else
           value
         end
+        
       elsif field_type <= Hobo::Boolean
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
+        
       else
         # primitive field
+        value
+      end
+    end
+    
+    def convert_associated_records_for_mass_assignment(reflection, value)
+      if reflection.macro.in?([:belongs_to, :has_one])
+        if value.is_a?(String) && value.starts_with?('@')
+          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
+          Hobo.object_from_dom_id(value[1..-1])
+        else
+          value
+        end
+      elsif reflection.macro == :has_many
+        if reflection.klass.try.name_attribute
+          value.map do |x| 
+            if x.is_a?(String) 
+              reflection.klass[x] unless x.blank?
+            else
+              x
+            end
+          end.compact
+        else
+          value
+        end
+        
+      else
+        # unknown kind of accociation - no conversion
         value
       end
     end

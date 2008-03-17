@@ -167,7 +167,7 @@ module ::Hobo
     def create_controllers
       bundle = self
       self.class.controller_declarations.each do |model_name, block|
-        klass = make_class("#{new_name_for(model_name).to_s.pluralize}Controller", ApplicationController) do 
+        klass = make_class("#{new_name_for(model_name).to_s.pluralize}Controller", ::ApplicationController) do 
           hobo_model_controller
         end
         klass.class_eval(&block)

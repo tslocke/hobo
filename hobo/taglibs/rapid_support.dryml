@@ -22,7 +22,13 @@
                 end
   field_names -= comma_split(skip) if skip
   field_names = field_names.select {|f| can_view?(this, f)} unless force_all
-  field_names.each do |field| %><with field="&field"><do param="default"/></with><% end
+  field_names.each do |field| 
+    if field == "this"
+      %><do param="default"/><%
+    else
+      %><with field="&field"><do param="default"/></with><%
+    end
+  end
 %></def>
 
 <def tag="with-field-names" attrs="fields, skip, skip-associations, include-timestamps"><%=
@@ -47,7 +53,7 @@
   field_names -= comma_split(skip) if skip
   scope.new_scope do
     field_names.map do |n|
-      scope.field_name = n.to_s.gsub("." , "_")
+      scope.field_name = n == "this" ? this.member_class.name : n.to_s.gsub("." , "_") 
       scope.field_path = n
       parameters.default
     end

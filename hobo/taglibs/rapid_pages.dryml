@@ -65,7 +65,7 @@
 <def tag="index-page">
   <set model="&this.try.member_class || self.model"/>
   <set model-name="&model.name.titleize"/>
-  <page title="All #{type_name :with => model, :pluralize => true}" merge>
+  <page title="All #{type_name :with => model, :plural => true}" merge>
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
       <heading param><type-name with="&model"/></heading>
@@ -97,7 +97,7 @@
 
 <def tag="new-page">
   <page title="New #{type_name}" merge>
-    <body: class="new-page #{type_name.underscore}" param/>
+    <body: class="new-page #{type_name :dasherize => true}" param/>
     <content-header: param>
       <heading param>New <type-name title/></heading>
     </content-header>
@@ -167,7 +167,7 @@
     </content-body:>
     <aside: param>
       <section class="preview-collections">
-        <with-fields fields="&non_through_collections - [primary_collection_name._?.to_sym]">
+        <with-fields fields="&non_through_collections - [(primary_collection_name.to_sym unless primary_collection_name.blank?)]">
           <collection-preview class="#{this_field.dasherize}"/>
         </with-fields>
       </section>
