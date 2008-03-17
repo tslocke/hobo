@@ -10,8 +10,10 @@ class ActionController::Routing::RouteSet
   
   # temporay hack -- reload assemble.rb whenever routes need reloading
   def reload_with_hobo_assemble
-    load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
-    reload_without_hobo_assemble
+    if defined? ::ApplicationController
+      load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
+      reload_without_hobo_assemble
+    end
   end
   alias_method_chain :reload, :hobo_assemble
   
