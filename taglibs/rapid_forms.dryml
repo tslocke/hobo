@@ -335,12 +335,13 @@
 </def>
 
 
-<def tag="name-array-input" attrs="targets, remove-label">
+<def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
-  all ||= this.member_class.find(:all)
+  prompt ||= "Add a #{this_field.titleize.singularize}"
+  options ||= this.member_class.all
   values = this
   %>
-  <div class="input has-many-through" merge-attrs>
+  <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
       <div class="item">
         <span></span>
@@ -356,8 +357,8 @@
       </div>
     </div>
     <select>
-      <option value="">Add a <%= this_field.titleize.singularize %></option>
-      <option repeat="&all.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
+      <option value=""><prompt/></option>
+      <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
               merge-attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
     </select>
   </div>
