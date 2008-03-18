@@ -31,9 +31,9 @@
 
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
-<def tag="ul">
+<def tag="ul" attrs="empty">
   <% if all_parameters.li? # don't use dryml if, because it will mess up <ul/><else> %>
-    <unless test="&this.empty?">
+    <if test="&empty || !this.empty?">
       <% element "ul", attributes do %>
       <repeat>
         <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize}"
@@ -42,7 +42,7 @@
         </li>
       </repeat>
       <% end %>
-    </unless>
+    </if>
   <% else %>
     <%= element("ul", attributes, all_parameters.default) %>
   <% end %>      
