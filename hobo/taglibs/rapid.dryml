@@ -33,14 +33,16 @@
 
 <def tag="ul" attrs="empty">
   <% if all_parameters.li? # don't use dryml if, because it will mess up <ul/><else> %>
-    <if test="&empty || !this.empty?">
+    <if test="&empty || all_parameters[:head] || all_parameters[:foot] || !this.empty?">
       <% element "ul", attributes do %>
+      <do param="head"/>
       <repeat>
         <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize}"
             merge-attrs="&{'hobo-model-id' => dom_id(this)} if this.respond_to?(:typed_id)">
           <do param="default"><a/></do>
         </li>
       </repeat>
+      <do param="foot"/>
       <% end %>
     </if>
   <% else %>
