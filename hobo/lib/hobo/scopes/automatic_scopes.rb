@@ -152,14 +152,14 @@ module Hobo
           end
           
         # published
-        elsif (col = column($1)) && (col.type == :boolean)
+        elsif (col = column(name)) && (col.type == :boolean)
 
           def_scope do 
             { :conditions => "#{column_sql(col)} = 1" }
           end
         
         # not_published
-        elsif (col = column($1)) && (col.type == :boolean)
+        elsif name =~ /^not_(.*)$/ && (col = column($1)) && (col.type == :boolean)
 
           def_scope do 
             { :conditions => "#{column_sql(col)} <> 1" }

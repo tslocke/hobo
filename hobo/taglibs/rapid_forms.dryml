@@ -343,18 +343,20 @@
   %>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
-      <div class="item">
+      <div class="item" param="proto-item">
         <span></span>
-        <input type="hidden" name="#{param_name_for_this}[]" />
+        <input type="hidden" name="#{param_name_for_this}[]" param="proto-hidden"/>
         <input type="button" class="remove-item" value="#{remove_label || 'Remove'}"/>
       </div>
     </div>
     <div class="items">
-      <div class="item" repeat>
-        <span><%= this %></span>
-        <input type="hidden" name="#{param_name_for_this}[]" value="#{this}"/>
-        <input type="button" class="remove-item" value="#{remove_label || 'Remove'}"/>
-      </div>
+      <repeat>
+        <div class="item" param="item">
+          <span><%= this %></span>
+          <input type="hidden" name="#{param_name_for_this}[]" value="#{this}" param="hidden"/>
+          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}"/>
+        </div>
+      </repeat>
     </div>
     <select>
       <option value=""><prompt/></option>
