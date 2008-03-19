@@ -1,7 +1,7 @@
 <def tag="creation-details">
   <span class="creation-details">
-    <view field="&this.class.creator_attribute" class="creator" if="&this.class.creator_attribute" />
-    <view:created_at class="created-at" if="&this.respond_to?(:created_at)"/>
+    <view field="&this.class.creator_attribute" class="creator" if="&this.class.creator_attribute" param="by"/>
+    <view:created_at class="created-at" if="&this.respond_to?(:created_at)" param="at"/>
   </span>
 </def>
 
