@@ -229,12 +229,8 @@
    
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
-        elsif refl = this_field_reflection
-          if refl.macro == :belongs_to
-            belongs_to_view(attributes)
-          elsif refl.macro == :has_many
-            has_many_view(attributes)
-          end
+        elsif (refl = this_field_reflection) && refl.macro == :has_many
+          has_many_view(attributes)
         else
          
           view_tag = find_polymorphic_tag("view")
