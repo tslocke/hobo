@@ -65,10 +65,13 @@
 
 <def tag="collection-preview" attrs="limit">
   <% limit ||= 6 %>
-  <div class="collection-preview" merge-attrs>
-    <h2><do param="heading"><this-field.titleize/></do> <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span></h2>
-    <collection with="&this.limit(limit)" merge-params>
-      <card: class="small"/>
-    </collection>
-  </div>
+  <do with="&this.is_a?(Class) ? this.limit(limit).all : this.limit(limit)">
+    <set collection-name="&this.try.origin_attribute || this.member_class.name"/>
+    <div class="collection-preview" merge-attrs>
+      <h2><do param="heading"><collection-name.titleize/></do> <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span></h2>
+      <collection merge-params>
+        <card: class="small"/>
+      </collection>
+    </div>
+  </do>
 </def>
