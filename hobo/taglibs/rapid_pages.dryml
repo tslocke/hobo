@@ -145,7 +145,9 @@
         <h2 param="primary-collection-title"><%= primary_collection_name.titleize %></h2>
 
         <do param="primary-collection">
-          <collection part="primary-collection"/>
+          <collection part="primary-collection">
+            <card:><delete-button: update="primary-collection-count"></delete-button:></card:>
+          </collection>
         </do>
 
         <if test="&can_create?">
