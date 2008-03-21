@@ -21,6 +21,9 @@
 </def>
 
 
+<def tag="main-nav"><magic-nav class="main-nav"/></def>
+
+
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account-nav">
