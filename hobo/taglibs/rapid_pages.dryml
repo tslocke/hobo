@@ -1,9 +1,9 @@
-<def tag="base-page" attrs="title, doctype">
-  <% title ||= default_page_title %>
+<def tag="base-page" attrs="title, full-title, doctype">
+  <% full_title ||= "#{title} : #{app_name}" %>
   <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
     <head param>
-      <title param><%= title.gsub(/<.*?>/, '') %></title>
+      <title param><%= full_title.gsub(/<.*?>/, '') %></title>
       <do param="stylesheets">
         <stylesheet name="reset"/>
         <stylesheet name="hobo-rapid"/>
