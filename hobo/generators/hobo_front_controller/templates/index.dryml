@@ -15,15 +15,8 @@
   <content-body:>
     <ul with="&front_models">
       <li:>
-        <header><h2><a/></h2></header>
-        <section>
-          <p if="&this.count == 0">There are no <type-name plural/></p>
-          <else>
-            <card repeat="&select_viewable(this.recent.all)"/>
-            <p><a>More</a> (<count/>)</p>
-          </else>
-          <p if="&can_create? && linkable?(:new)">Create a <a to="&this" action="new"/>.</p>
-        </section>
+        <collection-preview/>
+        <p if="&can_create? && linkable?(:new)">Create a <a to="&this" action="new"/>.</p>
       </li:>
     </ul>  
   </content-body>
