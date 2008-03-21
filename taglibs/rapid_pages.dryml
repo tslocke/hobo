@@ -30,7 +30,7 @@
         <live-search param if="&defined_route? :site_search"/>
         <nav param>
           <account-nav if="&Hobo::User.default_user_model" param/>
-          <do param="main-nav"><magic-nav class="main-nav"/></do>
+          <main-nav param/>
         </nav>
       </header>
       <section class="page-content" param="content">
