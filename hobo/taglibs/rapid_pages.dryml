@@ -132,7 +132,7 @@
         <association-count class="primary-collection-count" part="primary-collection-count"/>
       </do>
                          
-      <a action="edit" class="edit" if="&can_edit?" param="edit-link">Edit <type-name/></a>
+      <a action="edit" class="edit" if="&linkable?(:edit) && can_edit?" param="edit-link">Edit <type-name/></a>
     </content-header>
     
     <content-body: param>
