@@ -148,7 +148,7 @@
           <collection part="primary-collection"/>
         </do>
 
-        <if test="can_create?">
+        <if test="&can_create?">
           <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
           <else>
             <section class="create-new" with="&new_for_current_user">
