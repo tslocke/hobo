@@ -159,7 +159,7 @@
                     message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
                 <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
                             skip-associations="has_many" param="primary-collection-field-list"/>
-                <submit label="Create #{primary_collection_name.singularize.titleize}"/>
+                <submit label="Add"/>
               </form>
             </section>
           </else>
