@@ -180,13 +180,13 @@ describe Template do
     # block == 1 (for a normal parameter it would be 0). See
     # TemplateEnvironment#call_tag_parameter
     compile_dryml("<page><head: replace>abc</head></page>").should == 
-      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc<% } }, })) %>'
+      '<% _output(page({}, {:head_replacement => proc { |_head_restore| new_context { %>abc<% } }, })) %>'
   end
     
-  it "should compile 'replace' parameters with a default parameter call" do
+  it "should compile 'replace' parameters where the restore contains a default parameter call" do
     compile_dryml("<page><head: replace>abc <head restore>blah</head></head></page>").should == 
       
-      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc ' +
+      '<% _output(page({}, {:head_replacement => proc { |_head_restore| new_context { %>abc ' +
       '<% _output(_head_restore.call({}, { :default => proc { |_head__default_content| new_context { %>blah<% } }, })) %>' +
       '<% } }, })) %>'
   end
@@ -194,7 +194,7 @@ describe Template do
   it "should compile 'replace' tag parameters with a default parameter call" do
     compile_dryml("<page><head: replace>abc <head restore/></head></page>").should == 
       
-      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc ' +
+      '<% _output(page({}, {:head_replacement => proc { |_head_restore| new_context { %>abc ' +
       '<% _output(_head_restore.call({}, {})) %>' +
       '<% } }, })) %>'
   end
@@ -205,7 +205,7 @@ describe Template do
   it "should compile 'before' parameters" do
     compile_dryml("<page><before-head:>abc</before-head></page>").should == 
       
-      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>abc' +
+      '<% _output(page({}, {:head_replacement => proc { |_head_restore| new_context { %>abc' +
       '<% _output(_head_restore.call({}, {})) %>' +
       '<% } }, })) %>'
   end
@@ -213,7 +213,7 @@ describe Template do
   it "should compile 'after' parameters" do
     compile_dryml("<page><after-head:>abc</after-head></page>").should == 
       
-      '<% _output(page({}, {:head => proc { |_head_restore| new_context { %>' +
+      '<% _output(page({}, {:head_replacement => proc { |_head_restore| new_context { %>' +
       '<% _output(_head_restore.call({}, {})) %>' +
       'abc<% } }, })) %>'
   end
@@ -445,9 +445,24 @@ describe Template do
     eval_with_templates('<def tag="restore-param"><static-merge><b: replace>short <b restore param>big</b></b></static-merge></def>' +
                         '<restore-param><b:>very big</b:></restore-param>').
       should == '<p>a short <b name="big">very big</b> word</p>'
-    
+  end
+
+  it "should restore overridden parameters" do 
+    eval_dryml(%(
+      <def tag='foo'><parameters.default/></def>
+      <def tag='one'><foo param>a heading</foo></def>
+      <def tag='two'><one merge><foo: param>new heading</foo:></one></def>
+      <two><foo: replace><foo restore/></foo:></two>
+    )).should == "new heading"
   end
   
+  it "should restore overridden parameters on static tags" do 
+    eval_dryml(%(
+      <def tag='one'><h1 param>a heading</h1></def>
+      <def tag='two'><one merge><h1: param>new heading</h1:></one></def>
+      <two><h1: replace><h1 restore/></h1:></two>
+    )).should == "<h1>new heading</h1>"
+  end
   
   # --- Append, Prepend, Before & After --- #
 
@@ -466,6 +481,10 @@ describe Template do
       '<p>a <b name="big">:o)bold</b> word</p>'
   end
 
+  it "should allow content to be appended to the content of template parameters" do 
+    eval_with_templates('<static-merge><append-b:>:o)</append-b></static-merge>').should ==
+      '<p>a <b name="big">bold:o)</b> word</p>'
+  end
   
   # --- Merge Params --- #
   

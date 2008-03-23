@@ -317,13 +317,14 @@ module Hobo::Dryml
     
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
       overriding_proc = caller_parameters[param_name]
+      replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
       
       if param_name == :default && overriding_proc
         # :default content is handled specially
         
         call_tag_parameter_with_default_content(the_tag, attributes, parameters[:default], overriding_proc)
-        
-      elsif overriding_proc && overriding_proc.arity == 1
+
+      elsif replacing_proc
         # The caller is replacing this parameter. Don't call the tag
         # at all, just the overriding proc, but pass the restorable
         # tag as a parameter to the overriding proc
@@ -332,9 +333,17 @@ module Hobo::Dryml
           # Call the replaced tag with the attributes and parameters
           # as given in the original tag definition, and with the
           # specialisation given on the 'restore' call
+          
+          if overriding_proc
+            overriding_attributes, overriding_parameters = overriding_proc.call
+            restore_attrs  = overriding_attributes.merge(restore_attrs)
+            restore_params = overriding_parameters.merge(restore_params)
+          end
+          
           override_and_call_tag(the_tag, attributes, parameters, restore_attrs, restore_params)
         end
-        overriding_proc.call(tag_restore)
+        replacing_proc.call(tag_restore)
+        
         
       else
         overriding_attributes, overriding_parameters = overriding_proc._?.call
