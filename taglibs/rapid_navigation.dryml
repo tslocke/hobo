@@ -45,7 +45,7 @@
 <!--- Pagination Navigation -->
 
 <def tag="page-nav" attrs="params">
-  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :prev_label => '« Prev') %>
+  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :prev_label => "&laquo; Prev") %>
 </def>
 
 
