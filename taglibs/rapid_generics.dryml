@@ -29,6 +29,7 @@
           <span class="dependents"><count field="&primary_collection"/></span>
         </if>
       </do>
+      <a action="edit" class="edit" if="&!linkable?(:show) && linkable?(:edit)">Edit</a>
       <delete-button label="X" unless="&linkable?(this, :edit)" param/>
     </div>
   </if>
