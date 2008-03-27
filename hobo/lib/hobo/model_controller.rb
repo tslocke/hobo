@@ -404,7 +404,7 @@ module Hobo
     
     
     def update_response(in_place_edit_field=nil, &b)
-      flash[:notice] = "Changes to the #{@this.class.name.humanize.downcase} were saved" if !request.xhr? && valid?
+      flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
       
       response_block(&b) or 
         if valid?
