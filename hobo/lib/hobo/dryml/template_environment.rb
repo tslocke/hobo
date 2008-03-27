@@ -49,12 +49,15 @@ module Hobo::Dryml
       end
     end
 
-    attr_accessor 
 
     for attr in [:erb_binding, :part_contexts, :view_name,
-                 :this, :this_parent, :this_field,
+                 :this, :this_parent, :this_field, :this_key,
                  :form_field_path, :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
+    end
+    
+    def this_key=(key)
+      @_this_key = key
     end
     
     
