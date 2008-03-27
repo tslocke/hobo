@@ -20,7 +20,7 @@ module HoboFields
   }
   
   @field_types   = HashWithIndifferentAccess.new(PLAIN_TYPES)
-  @never_wrap_types = Set.new([NilClass])
+  @never_wrap_types = Set.new([NilClass, Hobo::Boolean, TrueClass, FalseClass])
 
   attr_reader :field_types
   
