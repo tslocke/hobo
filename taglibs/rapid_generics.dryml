@@ -48,18 +48,16 @@
 </def>
 
 <def tag="collection">
-  <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
-  <base-collection if="&poly.nil?" merge/>
-  <p class="empty-collection-message" if="&this.empty?" param="empty-message">
-    <% label = if (refl = this.try.proxy_reflection)
-                 refl.association_name.to_s.titleize.downcase
-               elsif (klass = this.try.member_class)
-                 klass.name.titleize.downcase.pluralize
-               else
-                 type_name(:plural => true).pluralize.titleize.downcase.to_s 
-               end %>
-    There are no <%= label %>
-  </p>
+  <set-scoped collection-contains-delete-button="&false">
+    <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
+    <base-collection if="&poly.nil?" merge/>
+    <p class="empty-collection-message" 
+       if="&this.empty? || scope.collection_contains_delete_button" 
+       style="#{'display:none' if !this.empty?}"
+       param="empty-message">
+      There are no <name-for-collection lowercase/>
+    </p>
+  </set-scoped>
 </def>
 
 
