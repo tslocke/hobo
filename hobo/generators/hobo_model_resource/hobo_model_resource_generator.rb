@@ -50,8 +50,6 @@ class HoboModelResourceGenerator < Rails::Generator::NamedBase
 
       m.template('functional_test.rb', File.join('test/functional', controller_class_path, "#{controller_file_name}_controller_test.rb"))
       m.template('helper.rb',          File.join('app/helpers',     controller_class_path, "#{controller_file_name}_helper.rb"))
-
-      m.route_resources controller_file_name
     end
   end
 
