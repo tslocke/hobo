@@ -145,6 +145,14 @@
   <%= text_area_tag(name, this, add_classes(attributes, :tiny_mce)) %>
 </def>
 
+<def tag="input" for="markdown" attrs="name">
+  <%= text_area_tag(name, this, attributes) %>
+</def>
+
+<def tag="input" for="textile" attrs="name">
+  <%= text_area_tag(name, this, attributes) %>
+</def>
+
 <def tag="input" for="date" attrs="order">
   <% order = order.nil? ? [:year, :month, :day] : comma_split(order).*.to_sym -%>
   <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
