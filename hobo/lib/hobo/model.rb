@@ -26,6 +26,7 @@ module Hobo
       
       class << base
         alias_method_chain :has_many,   :defined_scopes
+        alias_method_chain :has_many,   :join_record_management
         alias_method_chain :belongs_to, :creator_metadata
         
         alias_method_chain :has_one, :new_method
@@ -304,6 +305,13 @@ module Hobo
             to_add.each { |record| #{association} << record }
           end
         }
+      end
+      
+      def has_many_with_join_record_management(name, options={}, &b)
+        manage = options.delete(:managed)
+        returning (has_many_without_join_record_management(name, options, &b)) do 
+          manage_join_records(name) if manage
+        end
       end
 
     end # --- of ClassMethods --- #
