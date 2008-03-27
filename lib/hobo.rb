@@ -337,7 +337,7 @@ module Hobo
                    when :edit;   :editable_by?
                    when :view;   :viewable_by?
                    end
-      p = if object.has_hobo_method?(obj_method)
+      p = if (obj_method.respond_to?(:has_hobo_method) ? object.has_hobo_method?(obj_method) : object.respond_to?(obj_method))
             begin
               object.send(obj_method, person, *args)
             rescue Hobo::UndefinedAccessError
