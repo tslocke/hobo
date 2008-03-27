@@ -68,8 +68,8 @@
   <page title="All #{type_name :with => model, :plural => true}" merge>
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
-      <heading param><type-name with="&model"/></heading>
-      <p class="note" if param>There <count part="item-count" prefix="are"/></p>
+      <heading param><type-name with="&model" plural/></heading>
+      <p class="note" if param>There <count prefix="are"/></p>
     </content-header:>
 
     <content-body: param>
