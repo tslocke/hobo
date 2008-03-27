@@ -49,30 +49,65 @@
 
 <def tag="collection">
   <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
-  <ul class="collection" merge-attrs unless="&poly">
-    <li:><card param/></li:>
-  </ul>
+  <base-collection if="&poly.nil?" merge/>
   <p class="empty-collection-message" if="&this.empty?" param="empty-message">
     <% label = if (refl = this.try.proxy_reflection)
-                 refl.association_name.to_s.humanize.downcase
+                 refl.association_name.to_s.titleize.downcase
                elsif (klass = this.try.member_class)
-                 klass.name.humanize.downcase.pluralize
+                 klass.name.titleize.downcase.pluralize
                else
-                 type_name(:plural => true).pluralize.humanize.downcase.to_s 
+                 type_name(:plural => true).pluralize.titleize.downcase.to_s 
                end %>
-    There are no <%= label.pluralize %>
+    There are no <%= label %>
   </p>
 </def>
+
+
+<def tag="base-collection" attrs="sortable, sortable-options"><% 
+  sortable = (sortable != false and
+              first = this.first and
+              first.respond_to?(:position_column) and
+              reorder_url = object_url(this.member_class, :reorder, :method => :post) and
+              can_edit?(first, first.position_column))
+  if sortable
+    singular_name = first.class.name.underscore
+    attributes[:id] ||= "#{singular_name}_ordering"
+  end
+  %>
+  <ul class="collection #{this.origin_attribute.to_s.gsub('_', '-')}" merge-attrs>
+    <li: id="&%(#{singular_name}_#{this.id}) if sortable" param>
+      <div class="ordering-handle" param="handle" if="&sortable">&uarr;<br/>&darr;</div>
+      <card param/>
+    </li:>
+  </ul>
+  <%= if sortable && Hobo::Dryml.last_if
+        opts = { :url => reorder_url,
+                 :constraint => :vertical,
+                 :overlap => :vertical,
+                 :scroll => :window,
+                 :handle => 'ordering-handle',
+                 :complete => [visual_effect(:highlight, attributes[:id])]
+                } 
+        opts.reverse_merge!(sortable_options) if sortable_options
+        sortable_element attributes[:id], opts
+      end
+   %>
+</def>
+
 
 <def tag="collection-preview" attrs="limit">
   <% limit ||= 6 %>
   <do with="&this.is_a?(Class) ? this.limit(limit).all : this.limit(limit)">
-    <set collection-name="&this.try.origin_attribute || this.member_class.name"/>
+    <set collection-name="&(this.try.origin_attribute || this.member_class.name.pluralize).to_s"/>
     <div class="collection-preview" merge-attrs>
-      <h2><do param="heading"><collection-name.titleize/></do> <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span></h2>
+      <h2>
+        <do param="heading"><collection-name.titleize/></do> 
+        <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span>
+      </h2>
       <collection merge-params>
         <card: class="small"/>
       </collection>
     </div>
   </do>
 </def>
+
