@@ -133,6 +133,7 @@ module Hobo
         collection_routes
         web_method_routes
         show_action_routes
+        reorder_route
         user_routes if controller < Hobo::UserController
       end
     end
@@ -192,6 +193,11 @@ module Hobo
       controller.show_actions.each do |view|
         linkable_route("#{plural.singularize}_#{view}", "#{plural}/:id/#{view}", view.to_s, :conditions => { :method => :get })
       end
+    end
+    
+    
+    def reorder_route
+      linkable_route("reorder_#{plural}", "#{plural}/reorder", 'reorder', :conditions => { :method => :post })
     end
     
         
