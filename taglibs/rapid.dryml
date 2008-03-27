@@ -282,7 +282,7 @@
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
-<def tag="view" for="Hobo::Text"><%= h(this).gsub("\n", "<br/>") %></def>
+<def tag="view" for="text"><%= h(this).gsub("\n", "<br/>") %></def>
 
 <def tag="view" for="html"><%= this %></def>
 
