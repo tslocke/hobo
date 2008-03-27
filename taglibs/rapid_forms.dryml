@@ -383,8 +383,9 @@
 
 
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
+  
   <select merge-attrs param="default">
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
-    <do param="options"><%= options_for_select(options, selected) %></do>
+    <do param="options"><% options_for_select(options.*.to_s, selected) %></do>
   </select>
 </def>
