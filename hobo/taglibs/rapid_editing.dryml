@@ -85,8 +85,8 @@
                           } })
     %>
     <select onchange="#{f}">
-      <%= options_for_select(select_options.sort, this ? this.id : "") %>
-    </select>&nbsp;<a if="&this">View</a>
+      <%= options_for_select(select_options, this ? this.id : "") %>
+    </select>&nbsp;<a if="&this && linkable?">View</a>
   </span>
 </def>
 
