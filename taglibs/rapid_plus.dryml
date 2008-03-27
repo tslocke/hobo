@@ -1,5 +1,6 @@
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
+  <% sort_columns['this'] ||= this.member_class.name_attribute %>
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
@@ -12,7 +13,7 @@
       </div>
     </div>
 
-    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" merge-params>
+    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" empty merge-params>
       <field-heading-row:>
         <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path
@@ -32,11 +33,9 @@
         <th if="&all_parameters[:controls]" class="controls"/>
       </field-heading-row>
     </table>    
-    <else>
-      <do param="empty-message"/>
-    </else>
+    <do param="empty-message" if="empty?"/>
    
-    <nav class="page">
+    <nav class="page" if="&this.respond_to? :page_count">
       <page-nav param/>
     </nav>
   </div>
