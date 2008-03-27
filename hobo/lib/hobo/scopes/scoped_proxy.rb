@@ -22,10 +22,6 @@ module Hobo
         end
       end
       
-      def all
-        self.find(:all)
-      end
-      
       def first
         self.find(:first)
       end
