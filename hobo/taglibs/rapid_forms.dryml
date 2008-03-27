@@ -107,10 +107,10 @@
     attrs = add_classes(attributes, type_id, type_and_field)
     the_input = if (refl = this_field_reflection)
                   if refl.macro == :belongs_to
-                    belongs_to_input(attrs)
+                    select_one(attrs)
                   elsif refl.macro == :has_many
                     if refl.options[:through]
-                      has_many_through_input(attrs)
+                      select_many(attrs)
                     else
                       has_many_input(attrs)
                     end
@@ -191,10 +191,6 @@
   <%= text_field_tag(name, this, attributes.merge(:size => '3', :maxlength => '3')) %>%
 </def>
 
-
-<def tag="belongs-to-input">
-  <%= belongs_to_menu_input(attributes) %>
-</def>
 
 <!--- Buttons --->
 
@@ -285,16 +281,17 @@
 %></def>
 
 
-<def tag="belongs-to-menu-input" attrs="include-none, blank-message, options"><%
+<def tag="select-one" attrs="include-none, blank-message, options, sort"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
   conditions = ActiveRecord::Associations::BelongsToAssociation.new(this, this_field_reflection).conditions
-  options ||= this_field_reflection.klass.find(:all, :conditions => conditions).select {|x| can_view?(x)}
+  options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
             [ name(:with => x, :no_wrapper => true), x.id ]
-          }.sort
+          }
+  select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
   %>
