@@ -86,7 +86,7 @@
         <if with="&model.user_new current_user">
           <section class="create-new">
             <h2>New <type-name/></h2>
-            <form><field-list/><submit label="Create #{type_name}"/></form>
+            <form><field-list param="new-field-list"/><submit label="Create"/></form>
           </section>
         </if>
       </else>
