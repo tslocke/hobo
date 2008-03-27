@@ -581,50 +581,51 @@ module Hobo::Dryml
     
 
     def parameter_tag_hash_item(el, metadata_name)
-      if el.name =~ /^before-/
-        before_parameter_tag_hash_item(el, metadata_name)
-      elsif el.name =~ /^after-/
-        after_parameter_tag_hash_item(el, metadata_name)
-      elsif el.name =~ /^prepend-/
-        prepend_parameter_tag_hash_item(el, metadata_name)
-      elsif el.name =~ /^append-/
-        append_parameter_tag_hash_item(el, metadata_name)
-      elsif (param_name = get_param_name(el))
-        ":#{ruby_name el.name} => merge_tag_parameter(#{param_proc(el, metadata_name)}, all_parameters[:#{param_name}])"
+      name = el.name.dup
+      if name.sub!(/^before-/, "")
+        before_parameter_tag_hash_item(name, el, metadata_name)
+      elsif name.sub!(/^after-/, "")
+        after_parameter_tag_hash_item(name, el, metadata_name)
+      elsif name.sub!(/^prepend-/, "")
+        prepend_parameter_tag_hash_item(name, el, metadata_name)
+      elsif name.sub!(/^append-/, "")
+        append_parameter_tag_hash_item(name, el, metadata_name)
       else
-        ":#{ruby_name el.name} => #{param_proc(el, metadata_name)}"
+        hash_key = ruby_name name
+        hash_key += "_replacement" if el.attribute("replace")
+        if (param_name = get_param_name(el))
+          ":#{hash_key} => merge_tag_parameter(#{param_proc(el, metadata_name)}, all_parameters[:#{param_name}])"
+        else
+          ":#{hash_key} => #{param_proc(el, metadata_name)}"
+        end
       end
     end
     
     
-    def before_parameter_tag_hash_item(el, metadata_name)
+    def before_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'before' parameters", el) if param_name
-      name = el.name.sub(/^before-/, "")
       content = children_to_erb(el) + "<% _output(#{param_restore_local_name(name)}.call({}, {})) %>"
-      ":#{ruby_name name} => #{replace_parameter_proc(el, metadata_name, content)}"
+      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
 
     
-    def after_parameter_tag_hash_item(el, metadata_name)
+    def after_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'after' parameters", el) if param_name
-      name = el.name.sub(/^after-/, "")
       content = "<% _output(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el) 
-      ":#{ruby_name name} => #{replace_parameter_proc(el, metadata_name, content)}"
+      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
     
     
-    def append_parameter_tag_hash_item(el, metadata_name)
-      name = el.name.sub(/^append-/, "")
+    def append_parameter_tag_hash_item(name, el, metadata_name)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" + 
         param_content_element(name) + children_to_erb(el) +
         "<% } } } ] }"
     end
     
     
-    def prepend_parameter_tag_hash_item(el, metadata_name)
-      name = el.name.sub(/^prepend-/, "")
+    def prepend_parameter_tag_hash_item(name, el, metadata_name)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" + 
         children_to_erb(el) + param_content_element(name) +
         "<% } } } ] }"
