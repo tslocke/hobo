@@ -263,7 +263,7 @@ module Hobo
           
           "EXISTS (SELECT * FROM #{related.table_name} " + 
             "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key} AND " +
-            "#{related.table_name}.#{related.primary_key} = ?"
+            "#{related.table_name}.#{related.primary_key} = ?)"
         end
       end
               
