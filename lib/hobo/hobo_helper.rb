@@ -130,6 +130,8 @@ module Hobo
       empty = true
       if this.respond_to?(:each_index)
         this.each_index {|i| empty = false; new_field_context(i) { res << yield } }
+      elsif this.is_a?(Hash)
+        this.map {|key, value| empty = false; self.this_key = key; new_object_context(value) { res << yield } }
       else
         this.map {|e| empty = false; new_object_context(e) { res << yield } }
       end
@@ -346,7 +348,7 @@ module Hobo
       
       Hobo::ModelRouter.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
-   
+    
     
     # Convenience helper for the default app
     
