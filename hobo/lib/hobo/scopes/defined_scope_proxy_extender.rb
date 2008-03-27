@@ -69,7 +69,7 @@ module Hobo
         options[:order]   = scope[:order]   if scope[:order]
         options[:include] = scope[:include] if scope[:include]
 
-        r = ScopeReflection.new(:has_many, name, options, proxy_owner.class, proxy_reflection.name)
+        r = ScopeReflection.new(:has_many, name, options, proxy_owner.class, proxy_reflection.association_name)
         
         @reflections ||= {}
         @reflections[name] = r
