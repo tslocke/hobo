@@ -19,6 +19,8 @@ module Hobo::Dryml
                             if unless repeat 
                             part part-locals
                             restore)
+    
+    VALID_PARAMETER_TAG_ATTRIBUTES = %w(param replace)
 
     @build_cache = {}
     
@@ -661,8 +663,14 @@ module Hobo::Dryml
         
         replace_parameter_proc(el, metadata_name)
       else
-        attributes = el.attributes.map do 
-          |name, value| ":#{ruby_name name} => #{attribute_to_ruby(value, el)}" unless name.in?(SPECIAL_ATTRIBUTES)
+        attributes = el.attributes.map do |name, value| 
+          if name.in?(VALID_PARAMETER_TAG_ATTRIBUTES)
+            # just ignore
+          elsif name.in?(SPECIAL_ATTRIBUTES)
+            dryml_exception("attribute '#{name}' is not allowed on parameter tags (<#{el.name}:>)", el)
+          else
+            ":#{ruby_name name} => #{attribute_to_ruby(value, el)}"
+          end
         end.compact
         
         nested_parameters_hash = parameter_tags_hash(el, metadata_name)
