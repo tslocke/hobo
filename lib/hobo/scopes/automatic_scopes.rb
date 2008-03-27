@@ -200,11 +200,38 @@ module Hobo
             def_scope do |count|
               { :limit => count }
             end
-            
+
           when "order_by"
+            klass = @klass
             def_scope do |*args|
               field, asc = args
-              { :order => "#{field} #{asc._?.upcase}" }
+              type = klass.attr_type(field)
+              if type.respond_to?(:table_name) && (name = type.name_attribute)
+                include = field
+                colspec = "#{type.table_name}.#{name}"
+              else
+                colspec = "#{klass.table_name}.#{field}"
+              end
+              { :order => "#{colspec} #{asc._?.upcase}", :include => include }
+            end
+            
+
+          when "include"
+            def_scope do |inclusions|
+              { :include => inclusions }
+            end
+            
+          when "search"
+            def_scope do |query, *fields|
+              words = query.split
+              args = []              
+              word_queries = words.map do |word|
+                field_query = '(' + fields.map { |field| "(#{@klass.table_name}.#{field} like ?)" }.join(" OR ") + ')'
+                args += ["%#{word}%"] * fields.length
+                field_query
+              end
+              
+              { :conditions => [word_queries.join(" OR ")] + args }              
             end
             
           else
