@@ -67,13 +67,14 @@
 </def>
 
 
-<def tag="belongs-to-menu-editor"><%
+<def tag="belongs-to-menu-editor" attrs="sort"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   link_id = "#{dom_id}_editor" %>
-  <span id="#{link_id}" part="rapid-belongs-to-edit">
+  <span id="#{link_id}" part="rapid-belongs-to-edit" part-locals="sort">
     <% select_options = this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
+       select_options = select_options.sort if sort
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
        link_id = "#{dom_id}_editor"
        f = ajax_updater(object_url(this_parent),
