@@ -138,9 +138,11 @@ module Hobo
           def destroy; hobo_destroy end if include_action?(:destroy) 
           
           def completions; hobo_completions end if include_action?(:completions)
+          
+          def reorder; hobo_reorder end if include_action?(:reorder) 
         end
 
-        collections.each { |c| def_collection_actions(c.to_sym) } 
+        collections.each { |c| def_collection_actions(c.to_sym) }
       end
       
       
@@ -495,6 +497,14 @@ module Hobo
     def hobo_completions(finder)
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
+    end
+    
+    
+    def hobo_reorder
+      params["#{model.name.underscore}_ordering"].each_with_index do |id, position|
+        model.user_update(current_user, id, :position => position+1)
+      end
+      hobo_ajax_response || render(:nothing => true)
     end
     
     
