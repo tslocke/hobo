@@ -164,6 +164,16 @@
   name = name.downcase if lowercase
   name
 %></def>
+     
+
+<def tag="name-for-collection" attrs="singular, lowercase"><%=
+  name = (attr = colection.try.origin_attribute and attr.to_s) || type_name(:plural => true)
+  name = name.titleize
+  name = name.singularize if singular
+  name = name.downcase if lowercase
+  name
+%></def>
+
 
 
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
