@@ -143,4 +143,5 @@ module Hobo::RapidHelper
     
     names - through_collection_names
   end
+  
 end
