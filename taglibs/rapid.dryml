@@ -212,7 +212,8 @@
         # This target is registered with ModelRouter as not linkable
         content
       else
-        add_classes!(attributes, "#{target.class.name.underscore}-link")
+        css_class = target.try.origin_attribute || target.class.name.underscore
+        add_classes!(attributes, "#{css_class}-link")
       
         href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
       
