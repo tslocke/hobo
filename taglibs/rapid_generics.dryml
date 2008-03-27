@@ -18,7 +18,7 @@
 <def tag="base-card">
   <if test="&can_view?">
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
-      <h3 param="title"><a if="&linkable?"/></h3>
+      <h3 param="heading" if="&this.class.name_attribute || all_parameters[:heading]"><a><name/></a></h3>
       <div class="content" param="content" if="&!linkable?">
         <primary-content/>
       </div>
