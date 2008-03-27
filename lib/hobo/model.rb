@@ -92,7 +92,7 @@ module Hobo
       
       def user_find(user, *args)
         record = find(*args)
-        raise PermissionDeniedError unless Hobo.can_view?(user, self)
+        raise PermissionDeniedError unless Hobo.can_view?(user, record)
         record
       end
       
