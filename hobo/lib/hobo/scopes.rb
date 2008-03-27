@@ -29,6 +29,19 @@ module Hobo
       end
       
       
+      def apply_scopes(scopes)
+        result = self
+        scopes.each_pair do |scope, arg|
+          if arg.is_a?(Array)
+            result = result.send(scope, *arg) unless arg.first.blank?
+          else
+            result = result.send(scope, arg) unless arg.blank?
+          end
+        end
+        result
+      end
+            
+      
       def alias_scope(new_name, old_name)
         metaclass.send(:alias_method, new_name, old_name)
         defined_scopes[new_name] = defined_scopes[old_name]
