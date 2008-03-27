@@ -171,9 +171,13 @@ module Hobo
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
         object.set_creator(person)
-      elsif Hobo.simple_has_many_association?(object)
-        object = object.new
-        object.set_creator(person)
+      elsif (refl = object.try.proxy_reflection) && refl.macro == :has_many
+        if Hobo.simple_has_many_association?(object)
+          object = object.new
+          object.set_creator(person)
+        else
+          return false
+        end
       end
       check_permission(:create, person, object)
     end
