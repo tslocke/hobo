@@ -702,6 +702,11 @@ module Hobo::Dryml
     end
     
     
+    def field_shorthand_element?(el)
+      el.expanded_name =~ /:./
+    end
+    
+    
     def tag_attributes(el)
       attributes = el.attributes
       items = attributes.map do |n,v|
@@ -713,7 +718,7 @@ module Hobo::Dryml
       end.compact
       
       # if there's a ':' el.name is just the part after the ':'
-      items << ":field => \"#{ruby_name el.name}\"" if el.expanded_name =~ /:./
+      items << ":field => \"#{ruby_name el.name}\"" if field_shorthand_element?(el)
       
       items = items.join(", ")
       
@@ -774,7 +779,7 @@ module Hobo::Dryml
     
     
     def static_element_to_erb(el)
-      if %w(part merge-attrs if unless repeat).any? {|x| el.attributes[x]}
+      if promote_static_tag_to_method_call?(el)
         static_tag_to_method_call(el)
       else
         start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
@@ -790,6 +795,11 @@ module Hobo::Dryml
           start_tag_src
         end
       end
+    end
+    
+    
+    def promote_static_tag_to_method_call?(el)
+      %w(part merge-attrs if unless repeat).any? {|x| el.attributes[x]}
     end
     
     
