@@ -18,9 +18,11 @@ module Hobo
                              target_class.send(scope_name).scope(:find)[:conditions]
                            end
         if scope_conditions && conditions_without_hobo_scopes
-          "#{conditions_without_hobo_scopes} AND #{scope_conditions}"
+          "(#{sanitize_sql conditions_without_hobo_scopes}) AND (#{sanitize_sql scope_conditions})"
+        elsif scope_conditions
+          sanitize_sql scope_conditions
         else
-          scope_conditions || conditions_without_hobo_scopes
+          conditions_without_hobo_scopes
         end
       end
       
