@@ -217,7 +217,11 @@ module Hobo
       
       
       def available_auto_write_actions
-        WRITE_ONLY_ACTIONS
+        if "position_column".in?(model.instance_methods)
+          WRITE_ONLY_ACTIONS + [:reorder]
+        else
+          WRITE_ONLY_ACTIONS
+        end
       end
       
       
