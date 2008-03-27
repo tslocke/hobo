@@ -235,38 +235,17 @@ module Hobo
     protected
     
     
-    def filter_by(*args)
-      filters = args.extract_options!
-      finder = args.first || self.model
-      
-      filters.each_pair do |scope, arg|
-        dont_filter = arg.is_a?(Array) ? arg.compact.empty? : arg.nil?
-        finder = finder.send(scope, arg) unless dont_filter
-      end
-      finder
-    end
-    
-    
-    def sort_fields(*args)
-      finder = args.first.is_a?(Class) ? args.shift : model
-      
+    def parse_sort_param(*sort_fields)
       _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
 
       if field
-        fields = args.*.to_s
-        if field.in?(fields)
+        if field.in?(sort_fields.*.to_s)
           @sort_field = field
           @sort_direction = desc ? "desc" : "asc"
         
-          table, column = if field =~ /^(.*)\.(.*)$/
-                            [$1.camelize.constantize.table_name, $2]
-                          else
-                            [finder.table_name, field]
-                          end
-          finder = finder.order("#{table}.#{column}", @sort_direction)
+          [@sort_field, @sort_direction]
         end
       end
-      finder
     end
     
     
