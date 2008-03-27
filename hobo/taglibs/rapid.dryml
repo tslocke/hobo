@@ -196,6 +196,7 @@
 
         add_classes!(attributes, "new-#{new_class_name.underscore}-link")
         content = "New #{new_class_name.titleize}" if content.blank?
+        Hobo::Dryml.last_if = true
         element(:a, attributes.update(:href => href), content)
       else
         Hobo::Dryml.last_if = false
