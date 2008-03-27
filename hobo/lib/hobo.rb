@@ -214,13 +214,13 @@ module Hobo
           object.send("#{field}_editable_by?", person)
         elsif object.has_hobo_method?(:editable_by?)
           check_permission(:edit, person, object)
+        elsif refl._?.macro == :has_many
+          # The below technique to figure out edit permission based on
+          # update permission doesn't work for has_many associations
+          false
         else
           # Fake an edit test by setting the field in question to
           # Hobo::Undefined and then testing for update permission
-          
-          # This technique is not suitable for has_many associations
-          return false if refl._?.macro == :has_many
-          
           current = object.send(field)
           new = object.duplicate
 
