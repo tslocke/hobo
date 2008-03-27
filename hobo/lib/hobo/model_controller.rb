@@ -449,7 +449,7 @@ module Hobo
       response_block(&b) or
         respond_to do |wants|
           wants.html { redirect_to(:action => "index") }
-          wants.js   { hobo_ajax_response || render(:text => "") }
+          wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
  
@@ -498,10 +498,19 @@ module Hobo
     def permission_denied(error)
       if respond_to? :permission_denied_response
         permission_denied_response
-      elsif render_tag("permission-denied-page", { }, :status => 403)
-        # job done
       else
-        render :text => "Permission Denied", :status => 403
+        respond_to do |wants|
+          wants.html do
+            if render_tag("permission-denied-page", { }, :status => 403)
+              # job done
+            else
+              render :text => "Permission Denied", :status => 403
+            end
+          end
+          wants.js do 
+            render :text => "Permission Denied", :status => 403
+          end
+        end
       end
     end
     
