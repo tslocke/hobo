@@ -244,6 +244,7 @@
         button_to(label, url, attributes)
       else
         fade = true if fade.nil?
+        scope.collection_contains_delete_button = true if fade
         attributes[:value] = label
         attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
         element(:input, attributes)
