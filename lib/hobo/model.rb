@@ -121,6 +121,11 @@ module Hobo
       end
       
       
+      def user_update(user, id, attributes={})
+        find(id).user_save_changes(user, attributes)
+      end
+      
+      
       def name_attribute
         @name_attribute ||= begin
                               cols = columns.*.name
