@@ -1,8 +1,8 @@
 LowPro = {};
 LowPro.Version = '0.5';
-LowPro.CompatibleWithPrototype = '1.6.0';
+LowPro.CompatibleWithPrototype = '1.6';
 
-if (Prototype.Version != LowPro.CompatibleWithPrototype && console && console.warn)
+if (Prototype.Version.indexOf(LowPro.CompatibleWithPrototype) != 0 && window.console && window.console.warn)
   console.warn("This version of Low Pro is tested with Prototype " + LowPro.CompatibleWithPrototype + 
                   " it may not work as expected with this version (" + Prototype.Version + ")");
 
@@ -15,19 +15,19 @@ DOM = {};
 // DOMBuilder for prototype
 DOM.Builder = {
 	tagFunc : function(tag) {
-	  return function() {
-	    var attrs, children; 
-	    if (arguments.length>0) { 
-	      if (arguments[0].nodeName || 
-	        typeof arguments[0] == "string") 
-	        children = arguments; 
-	      else { 
-	        attrs = arguments[0]; 
-	        children = Array.prototype.slice.call(arguments, 1); 
-	      };
-	    }
-	    return DOM.Builder.create(tag, attrs, children);
-	  };
+    return function() {
+     var attrs, children;
+     if (arguments.length>0) {
+       if (arguments[0].constructor == Object) {
+         attrs = arguments[0];
+         children = Array.prototype.slice.call(arguments, 1);
+       } else {
+         children = arguments;
+       };
+       children = $A(children).flatten()
+     }
+     return DOM.Builder.create(tag, attrs, children);
+    };
   },
 	create : function(tag, attrs, children) {
 		attrs = attrs || {}; children = children || []; tag = tag.toLowerCase();
@@ -71,7 +71,8 @@ DOM.Builder.fromHTML = function(html) {
 // Event.onReady(callbackFunction);
 Object.extend(Event, {
   onReady : function(f) {
-    document.observe('dom:loaded', f);
+    if (document.body) f();
+    else document.observe('dom:loaded', f);
   }
 });
 
@@ -96,7 +97,7 @@ Event.addBehavior = function(rules) {
     Ajax.Responders.register({
       onComplete : function() { 
         if (Event.addBehavior.reassignAfterAjax) 
-          setTimeout(function() { ab.unload(); ab.load(ab.rules) }, 10);
+          setTimeout(function() { ab.reload() }, 10);
       }
     });
     ab.responderApplied = true;
@@ -143,6 +144,12 @@ Object.extend(Event.addBehavior, {
       Event.stopObserving.apply(Event, c);
     });
     this.cache = [];
+  },
+  
+  reload: function() {
+    var ab = Event.addBehavior;
+    ab.unload(); 
+    ab.load(ab.rules);
   },
   
   _wrapObserver: function(observer) {
@@ -277,7 +284,7 @@ Remote.Form = Behavior.create(Remote.Base, {
   onclick : function(e) {
     var sourceElement = e.element();
     
-    if (sourceElement.nodeName.toLowerCase() == 'input' && 
+    if (['input', 'button'].include(sourceElement.nodeName.toLowerCase()) && 
         sourceElement.type == 'submit')
       this._submitButton = sourceElement;
   },
