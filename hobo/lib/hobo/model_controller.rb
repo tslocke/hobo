@@ -207,7 +207,10 @@ module Hobo
       
       
       def available_auto_actions
-        READ_ONLY_ACTIONS + WRITE_ONLY_ACTIONS + FORM_ACTIONS + available_auto_collection_actions
+        (available_auto_read_actions +
+         available_auto_write_actions + 
+         FORM_ACTIONS + 
+         available_auto_collection_actions).uniq
       end
       
       
