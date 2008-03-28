@@ -128,7 +128,7 @@
 
     <content-header: param>
       <if with="&this.dependent_on.reject{|x| x.is_a?(Hobo::User)}.first">
-        <div class="container"><a/></div>
+        <div class="container"><a>&laquo; <name/></a></div>
       </if>
 
       <heading param><this/></heading>
