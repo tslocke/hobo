@@ -343,11 +343,13 @@ var Hobo = {
                 Hobo.hideSpinner()
             }
             if (updates && updates.length > 0) {
-                new Hobo.ajaxRequest(url, "Removing", updates, { method:'delete',
-                                                                 onComplete: complete});
+                new Hobo.ajaxRequest(url, updates, { method:'delete', message: "Removing...", onComplete: complete});
             } else {
-                new Ajax.Request(url, {asynchronous:true, evalScripts:true, method:'delete',
-                                       onComplete: complete});
+                ajaxOptions = {asynchronous:true, evalScripts:true, method:'delete', onComplete: complete}
+                if (typeof(formAuthToken) != "undefined") {
+                    ajaxOptions.parameters = formAuthToken.name + "=" + formAuthToken.value
+                }
+                new Ajax.Request(url, ajaxOptions);
             }
         }
     },
@@ -492,7 +494,7 @@ Element.Methods.$$ = function(e, css) {
 
 // --- has_many_through_input --- //
 
-HasManyThroughInput = Behavior.create({
+SelectManyInput = Behavior.create({
 
     initialize : function() {
         // onchange doesn't bubble in IE6 so...
@@ -506,9 +508,10 @@ HasManyThroughInput = Behavior.create({
             var newItem = DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip())
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
-            newItem.down('input[type=hidden]').value = selected.innerHTML
+            this.itemAdded(newItem, selected)
             selected.style.display = 'none'
             select.value = ""
+            Event.addBehavior.reload()
         }
     },
 
@@ -525,12 +528,22 @@ HasManyThroughInput = Behavior.create({
         var label = el.down('span').innerHTML
         var option = $A(this.element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
         option.style.display = 'block'
+    },
+
+    itemAdded: function(item, option) {
+        this.hiddenField(item).value = option.innerHTML
+    },
+
+    hiddenField: function(item) {
+        return item.down('input[type=hidden]')
     }
+
 
 })
 
 Event.addBehavior({
-    'div.has-many-through.input' : HasManyThroughInput(),
+    'div.select-many.input' : SelectManyInput(),
+
     '.association-count:click' : function(e) {
 	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
 	Event.stop(e);
