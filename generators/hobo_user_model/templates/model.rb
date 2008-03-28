@@ -17,7 +17,7 @@ class <%= class_name %> < ActiveRecord::Base
   # def super_user?; true; end
 
   def creatable_by?(creator)
-    true
+    !administrator
   end
 
   def updatable_by?(updater, new)
