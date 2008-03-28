@@ -4,7 +4,7 @@ module Hobo
     
     class ScopedProxy
       
-      #include AutomaticScopes
+      include ApplyScopes
       
       def initialize(klass, scope)
         @klass = klass

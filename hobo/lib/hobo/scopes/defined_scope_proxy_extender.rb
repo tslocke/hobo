@@ -8,6 +8,8 @@ module Hobo
       
       include AutomaticScopes
       
+      include ApplyScopes
+      
       def method_missing(name, *args, &block)
         if (scope = named_scope(name))
           association_proxy_for_scope(name, scope, args)
