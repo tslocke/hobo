@@ -53,7 +53,7 @@ input.file_upload {
 .actions {height: 100%; overflow:hidden; font-size: 11px;}
 
 .flash {
-	margin: 0px 40px; padding: 10px 30px; border-width: 2px 0;
+	margin: 0 40px 10px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
 .flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
@@ -91,9 +91,12 @@ input.file_upload {
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
+.page-content { margin-top: 20px; }
+
 /* aside layout */
 body.aside-layout {width: 960px;}
-.aside-layout .page-content {height: 100%; overflow: hidden;}
+.aside-layout .page-content {height: 100%; overflow: hidden; margin-top: 0px;}
+.aside-layout .main-content {margin-top: 20px;}
 .main-content {float: left; width: 670px;}
 .aside {float: right; width: 220px; padding: 20px 30px; background: #E5E5E5;}
 .aside-content {
@@ -106,7 +109,7 @@ body.aside-layout {width: 960px;}
 .aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
 
 
-.page-header {position: relative; margin: 20px 0; padding: 20px 0 0; color: white; background: black;}
+.page-header {position: relative; margin-top: 20px; padding: 20px 0 0; color: white; background: black;}
 .page-header h1 {
 	margin: 0; padding: 0 30px 30px; 
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
@@ -203,7 +206,6 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 /* styling of generic elements */
 .creator {font-weight: bold;}
 .card {
-	clear: both;
 	height: 100%; overflow: hidden;
 	margin-bottom: 5px;	padding:10px 20px; border: 1px solid #e8e8e8;
 	background: #f5f5f5;
@@ -213,6 +215,8 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 	display: block; color: #333; font-size: 11px; 
 }
 .card .datetime {color: #666;}
+.card .delete-button { float: right;}
+div.ordering-handle { float: left; background: #ccc; color: white; margin-right: 5px; cursor: move; padding: 0 2px;}
 
 .card.content {
 	padding: 0; margin: 10px 0 30px; border: none;
@@ -261,6 +265,13 @@ ul.collection li {clear: both; margin-left: 0; list-style: none;}
 .table-plus .even {background: #f8f8f8;}
 .table-plus a {background: none;}
 
+/* <select-many> */
+
+div.select-many .item { overflow:hidden; height: 100%; width: 100%; background: #eee; padding: 5px; margin: 5px 25px 5px 0;}
+div.select-many .item span { float: left; }
+div.select-many .item .remove-item { float: right; }
+
+
 /*******************************************************/
 /* these styles are for the generated front index page */
 /* you can delete them if you over-ride it             */
@@ -273,3 +284,4 @@ ul.collection li {clear: both; margin-left: 0; list-style: none;}
 	font-size: 18px; line-height: 27px;
 }
 .front-page .content-body li {margin-left: 0; list-style: none;}
+
