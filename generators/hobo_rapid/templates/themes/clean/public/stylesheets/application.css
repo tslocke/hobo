@@ -216,6 +216,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 }
 .card .datetime {color: #666;}
 .card .delete-button { float: right;}
+.card a.edit { float: right;}
 div.ordering-handle { float: left; background: #ccc; color: white; margin-right: 5px; cursor: move; padding: 0 2px;}
 
 .card.content {
