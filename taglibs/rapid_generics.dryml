@@ -21,7 +21,7 @@
     <set has-link="&has_heading && linkable?"/>
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
       <a action="edit" class="edit" if="&!has_link && linkable?(:edit)">Edit</a>
-      <delete-button label="X" unless="&linkable?(this, :edit)" param/>
+      <delete-button label="X" unless="&linkable?(:edit)" param/>
 
       <h3 param="heading" if="&has_heading"><a><name/></a></h3>
       <div class="content" param="content" unless="&has_link">
