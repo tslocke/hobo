@@ -13,6 +13,8 @@ module Hobo
     module ClassMethods
       
       include AutomaticScopes
+      
+      include ApplyScopes
     
       def defined_scopes
         @defined_scopes
