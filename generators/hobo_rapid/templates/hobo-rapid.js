@@ -113,6 +113,7 @@ var Hobo = {
             if (options.onComplete)
                 options.onComplete.apply(this, arguments)
             if (form && options.refocusForm) Form.focusFirstElement(form)
+            Event.addBehavior.reload()
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method
@@ -325,11 +326,15 @@ var Hobo = {
         return res
     },
 
+
     fadeObjectElement: function(el) {
-        new Effect.Fade(Hobo.objectElementFor(el),
-                        { duration: 0.5,
-                          afterFinish: function (ef) { ef.element.remove() } });
+        var fadeEl = Hobo.objectElementFor(el)
+        new Effect.Fade(fadeEl, { duration: 0.5, afterFinish: function (ef) { 
+            ef.element.remove() 
+        } });
+        Hobo.showEmptyMessageAfterLastRemove(fadeEl)
     },
+
 
     removeButton: function(el, url, updates, options) {
         if (options.fade == null) { options.fade = true; }
@@ -355,12 +360,23 @@ var Hobo = {
     },
 
 
+    showEmptyMessageAfterLastRemove: function(el) {
+        var empty
+        var container = el.parentNode
+        if (container.getElementsByTagName(el.nodeName).length == 1 &&
+            (empty = container.next('.empty-collection-message'))) {
+            new Effect.Appear(empty, {delay:0.3})
+        }
+    },
+
+
     parseFieldId: function(el) {
         id = el.getAttribute("hobo-model-id")
         if (!id) return
         m = id.match(/^([a-z_]+)_([0-9]+)_([a-z_]+)$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
     },
+
 
     appendRow: function(el, rowSrc) {
         // IE friendly method to add a <tr> (from html source) to a table
@@ -369,6 +385,7 @@ var Hobo = {
         el.innerHTML = el.innerHTML.replace("</table>", "") + rowSrc + "</table>";
         Hobo.applyEvents(el)
     },
+
 
     objectElementFor: function(el) {
         var m
