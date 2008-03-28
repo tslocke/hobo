@@ -17,9 +17,14 @@
 
 <def tag="base-card">
   <if test="&can_view?">
+    <set has-heading="&this.class.name_attribute || all_parameters[:heading]"/>
+    <set has-link="&has_heading && linkable?"/>
     <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
-      <h3 param="heading" if="&this.class.name_attribute || all_parameters[:heading]"><a><name/></a></h3>
-      <div class="content" param="content" if="&!linkable?">
+      <a action="edit" class="edit" if="&!has_link && linkable?(:edit)">Edit</a>
+      <delete-button label="X" unless="&linkable?(this, :edit)" param/>
+
+      <h3 param="heading" if="&has_heading"><a><name/></a></h3>
+      <div class="content" param="content" unless="&has_link">
         <primary-content/>
       </div>
       <creation-details param/>
@@ -29,8 +34,6 @@
           <span class="dependents"><count field="&primary_collection"/></span>
         </if>
       </do>
-      <a action="edit" class="edit" if="&!linkable?(:show) && linkable?(:edit)">Edit</a>
-      <delete-button label="X" unless="&linkable?(this, :edit)" param/>
     </div>
   </if>
 </def>
