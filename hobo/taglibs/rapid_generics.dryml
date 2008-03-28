@@ -19,7 +19,8 @@
   <if test="&can_view?">
     <set has-heading="&this.class.name_attribute || all_parameters[:heading]"/>
     <set has-link="&has_heading && linkable?"/>
-    <div class="card #{linkable? ? 'linkable' : 'content'} #{type_name :dasherize => true}" merge-attrs>
+    <div class="card #{has_link ? 'linkable' : 'content'} #{'with-owner' if this.class.creator_attribute} #{type_name :dasherize => true}" 
+         merge-attrs>
       <a action="edit" class="edit" if="&!has_link && linkable?(:edit)">Edit</a>
       <delete-button label="X" unless="&linkable?(:edit)" param/>
 
