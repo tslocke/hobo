@@ -157,7 +157,6 @@ ul.main-nav {float: left; margin: 0 10px;}
 	float: left; 
 	margin-left: 0; padding-left: 20px; 
 	color: #ddd;
-	text-shadow: #444 1px 1px 0;
 	list-style: none;
 }
 .account-nav a {font-weight: bold;}
@@ -189,9 +188,9 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 .aside-content .collection {padding-bottom: 10px;}
 
 .content-header .creation-details, .content-header .primary-collection-count {font-size: 11px; line-height: 11px;}
-.content-header .creator {margin-right: 5px;}
+.content-header .creator {margin-right: 15px;}
 .content-header .created-at {color: #444;}
-.content-header .primary-collection-count {margin-left: 15px; font-weight: bold;}
+.content-header .primary-collection-count {font-weight: bold;}
 
 .new-in-collection-page .content-header h2 {margin-top: 6px; font-size: 14px;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
@@ -207,16 +206,16 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 .creator {font-weight: bold;}
 .card {
 	height: 100%; overflow: hidden;
-	margin-bottom: 5px;	padding:10px 20px; border: 1px solid #e8e8e8;
+	margin: 10px 0;	padding: 12px 20px; border: 1px solid #e8e8e8;
 	background: #f5f5f5;
 }
+.card h3 {margin-top: 0;}
 .card a {background: #f5f5f5;}
 .card .creation-details {
 	display: block; color: #333; font-size: 11px; 
 }
 .card .datetime {color: #666;}
 .card .delete-button { float: right;}
-.card a.edit { float: right;}
 div.ordering-handle { float: left; background: #ccc; color: white; margin-right: 5px; cursor: move; padding: 0 2px;}
 
 .card.content.with-owner {
@@ -261,14 +260,19 @@ ul.collection li {clear: both; margin-left: 0; list-style: none;}
 .table-plus table td {
 	padding: 6px 10px; border-bottom: 1px solid #e2e2e2; color: #666;
 }
-.table-plus table td input.button {padding: 1px; margin-left: 10px; }
+.table-plus table td input.button, .collection .button {padding: 1px 3px; margin-left: 10px; margin-top: 0;}
 .table-plus table td.controls {width: 100px;}
 .table-plus .even {background: #f8f8f8;}
 .table-plus a {background: none;}
 
 /* <select-many> */
 
-div.select-many .item { overflow:hidden; height: 100%; width: 100%; background: #eee; padding: 5px; margin: 5px 25px 5px 0;}
+div.select-many {border-top: 1px dotted #999;}
+div.select-many .items {margin-bottom: 10px;}
+div.select-many .item {
+	overflow:hidden; height: 100%; font-weight: bold;
+	border-bottom: 1px dotted #999; padding: 5px 10px; /*margin: 5px 25px 5px 0;*/
+}
 div.select-many .item span { float: left; }
 div.select-many .item .remove-item { float: right; }
 
