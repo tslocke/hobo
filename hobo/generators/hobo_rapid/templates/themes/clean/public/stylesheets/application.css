@@ -219,7 +219,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 .card a.edit { float: right;}
 div.ordering-handle { float: left; background: #ccc; color: white; margin-right: 5px; cursor: move; padding: 0 2px;}
 
-.card.content {
+.card.content.with-owner {
 	padding: 0; margin: 10px 0 30px; border: none;
 	background: none; 
 	font-size: 11px;
@@ -229,7 +229,7 @@ div.ordering-handle { float: left; background: #ccc; color: white; margin-right:
 	line-height: 14px;
 }
 .card.content .creation-details .created-at {display: block;}
-.card.content .content {
+.card.content.with-owner .content {
 	float: right; width: 72%;
 }
 ul.collection li {clear: both; margin-left: 0; list-style: none;}
