@@ -316,9 +316,11 @@
 
   label ||= if this.is_a?(Class)
               this.name
+            elsif (attr = this.try.origin_attribute)
+              attr.to_s.singularize
             else
-              (this.try.origin_attribute || this.try.member_class._?.name)
-            end.to_s.singularize.titleize
+              this.member_class.name
+            end.titleize
 
   label = label.downcase if lowercase
    
