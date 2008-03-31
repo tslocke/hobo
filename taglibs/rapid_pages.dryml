@@ -158,20 +158,22 @@
             </collection>
           </do>
 
-          <if test="&can_create?" param="primary-collection-add">
-            <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
-            <else>
-              <section class="create-new" with="&new_for_current_user">
-                <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
-                <form update="primary-collection, primary-collection-count"
-                      message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
-                  <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
-                              skip-associations="has_many" param="primary-collection-field-list"/>
-                  <submit label="Add"/>
-                </form>
-              </section>
-            </else>
-          </if>
+          <do with="&@this.send(primary_collection_name)">
+            <if test="&can_create?" param="primary-collection-add">
+              <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
+              <else>
+                <section class="create-new" with="&new_for_current_user">
+                  <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
+                  <form update="primary-collection, primary-collection-count"
+                        message="Adding #{primary_collection_name.singularize.titleize}..." reset-form>
+                    <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
+                                skip-associations="has_many" param="primary-collection-field-list"/>
+                    <submit label="Add"/>
+                  </form>
+                </section>
+              </else>
+            </if>
+          </do>
         </section>
       </with-primary-collection>
     </content-body:>
