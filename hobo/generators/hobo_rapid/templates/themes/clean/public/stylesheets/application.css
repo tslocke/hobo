@@ -215,6 +215,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 	display: block; color: #333; font-size: 11px; 
 }
 .card .datetime {color: #666;}
+.card a.edit { float: right;}
 .card .delete-button { float: right;}
 div.ordering-handle { float: left; background: #ccc; color: white; margin-right: 5px; cursor: move; padding: 0 2px;}
 
