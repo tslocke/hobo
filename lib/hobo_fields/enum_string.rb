@@ -25,8 +25,7 @@ module HoboFields
         values = values.*.to_s
         c = Class.new(EnumString) do
           values.each do |v|
-            define_method("#{v.underscore}?") { self == v }
-            meta_def("#{v.underscore}") { v }
+            define_method("is_#{v.underscore}?") { self == v }
           end
         end
         c.with_values(*values)
