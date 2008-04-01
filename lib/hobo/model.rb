@@ -32,6 +32,7 @@ module Hobo
         alias_method_chain :has_one, :new_method
         
         def inherited(klass)
+          super
           fields do
             Hobo.register_model(klass)
             field(klass.inheritance_column, :string)
