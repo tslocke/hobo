@@ -1,6 +1,6 @@
 class <%= class_name %> < ActiveRecord::Base
 
-  hobo_model
+  hobo_model # Don't put anything above this
 
   fields do
 <% for attribute in attributes -%>
