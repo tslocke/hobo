@@ -1,0 +1,93 @@
+/**** Default styling for Rapid ****/
+
+#ajax_progress {
+    color: grey;
+    float: right;
+    margin: 20px;
+    position: fixed;
+    background: white;
+    font-family: Tahoma "sans serif";
+    display: none;
+    z-index: 10;
+}
+
+#ajax_progress div {
+    margin: 10px;
+    padding: 3px;
+/*    padding-top: -15px;*/
+}
+
+#ajax_progress img {
+    padding-left: 6px;
+    vertical-align: middle;
+}
+
+
+/* Scriptaculous Autocompleter ---*/
+
+div.completions_popup {
+    position:absolute;
+    width:250px;
+    background-color:white;
+    border:1px solid #888;
+    margin:0px;
+    padding:0px;
+}
+div.completions_popup ul {
+    list-style-type:none;
+    margin:0px;
+    padding:0px;
+}
+div.completions_popup ul li.selected { background-color: #ffb;}
+div.completions_popup ul li {
+    list-style-type:none;
+    display:block;
+    margin:0;
+    padding:2px;
+    cursor:pointer;
+}
+
+
+.field_list   { width:95%; }
+.field_list td { padding: 5px; vertical-align: middle; }
+.field_list td.field_label {
+    text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
+    padding-top: 10px; padding-bottom: 10px;
+}
+.field_list input[type=text] { width: 100%; }
+.field_list input, .field_list textarea { margin: -2px 0 0 0; }
+.field_list textarea { width: 100%; margin: 0; }
+/*
+td span.in_place_textfield_bhv, td span.in_place_textarea_bhv, td span.in_place_html_textarea_bhv {
+    display: block; border: 1px solid #ddd;
+    padding: 4px; background: #fafafa;
+}
+*/
+table.login-table, table.login-table td {border: none;}
+.login_table td.field_label { vertical-align: middle; }
+/*table.login-table input {font-size: 16px; color: black;}*/
+
+input[type=text].wide { width: 100%; }
+textarea { height: 200px; }
+textarea.wide { width: 100%; }
+textarea.tall { height: 350px; }
+
+.field_list input.percentage {width: 25px; display: inline; margin-right: 5px; padding: 1px 3px;}
+
+/* rails error message */
+.error_messages {
+	font-family: "Lucida Grande", arial, sans-serif;
+	background: #9d0018;
+	border: 1px solid #7a0013;
+	padding: 20px;
+	color: white;
+	margin-bottom: 20px;
+}
+.error_messages h2 {
+	text-transform: none;
+	letter-spacing: normal;
+	color: white;
+}
+.error_messages li {
+	margin-left: 20px;
+}

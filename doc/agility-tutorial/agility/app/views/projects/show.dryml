@@ -1,0 +1,15 @@
+<show-page>
+
+  <primary-collection:>
+    <table-plus fields="this, status">
+      <prepend-header:>
+        <div class="filter">
+          Display by status: <filter-menu param-name="status" options="&StoryStatus.all"/>
+        </div>
+      </prepend-header:>
+      <empty-message:>No stoires match your criteria</empty-message:>
+
+    </table-plus>
+  </primary-collection:>
+
+</show-page>

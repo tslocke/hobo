@@ -1,0 +1,25 @@
+<!-- Define your application-wide tags here -->
+
+<include src="rapid" plugin="hobo"/>
+
+<set-theme name="clean"/>
+
+<def tag="app-name">Agility</def>
+
+
+<def tag="card" for="Task">
+  <base-card>
+    <creation-details: replace>
+      <div class="users">
+        Assigned users: <repeat:users join=", "><a/></repeat:users><else>None</else>
+      </div>
+    </creation-details:>
+  </base-card>
+</def>
+
+<def tag="card" for="StoryStatus">
+  <base-card>
+    <creation-details: replace/>
+  </base-card>
+</def>
+
