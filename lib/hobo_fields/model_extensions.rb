@@ -32,7 +32,7 @@ module HoboFields
     # by attr_accessor :foo, :type => :email_address) should be subject
     # to validation (note that the rich types know how to validate themselves)
     def self.validate_virtual_field(*args)
-      validates_each(*args) {|record, field, value| msg = value.validate and errors.add(field, msg) if value.respond_to?(:validate) }
+      validates_each(*args) {|record, field, value| msg = value.validate and record.errors.add(field, msg) if value.respond_to?(:validate) }
     end
     
     
