@@ -14,6 +14,7 @@ module HoboFields
     # and speeds things up a little.
     inheriting_cattr_reader :field_specs => HashWithIndifferentAccess.new
     
+    
     def self.inherited(klass)
       fields do
         field(inheritance_column, :string)

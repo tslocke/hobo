@@ -62,8 +62,8 @@ module HoboFields
     end
     
     
-    # return a hash of table renames and modifies the passed arrays to
-    # that renames tables are no longer listed as to_create or to_drop
+    # return a hash of table renames and modifies the passed arrays so
+    # that renamed tables are no longer listed as to_create or to_drop
     def extract_table_renames!(to_create, to_drop)
       if renames
         # A hash of table renames has been provided
