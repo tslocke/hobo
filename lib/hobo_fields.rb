@@ -70,7 +70,6 @@ require "hobo_fields/password_string"
 require "hobo_fields/text"
 require "hobo_fields/email_address"
 require "hobo_fields/enum_string"
-require "hobo_fields/percentage"
 
 
 
