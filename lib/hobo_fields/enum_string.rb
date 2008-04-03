@@ -25,7 +25,11 @@ module HoboFields
         values = values.*.to_s
         c = Class.new(EnumString) do
           values.each do |v|
-            define_method("is_#{v.underscore}?") { self == v }
+            const_name = v.upcase
+            const_set(const_name, self.new(v)) unless const_defined?(const_name)
+
+            method_name = "is_#{v.underscore}?"
+            define_method(method_name) { self == v } unless self.respond_to?(method_name)
           end
         end
         c.with_values(*values)
