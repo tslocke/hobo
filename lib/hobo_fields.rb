@@ -19,16 +19,27 @@ module HoboFields
     :string        => String
   }
   
+  # Provide a lookup for these rather than loading them all preemptively
+  STANDARD_TYPES = {
+    :html          => "HtmlString",
+    :markdown      => "MarkdownString",
+    :textile       => "TextileString",
+    :password      => "PasswordString",
+    :text          => "Text",
+    :email_address => "EmailAddress"
+  }
+  
   @field_types   = HashWithIndifferentAccess.new(PLAIN_TYPES)
   @never_wrap_types = Set.new([NilClass, Hobo::Boolean, TrueClass, FalseClass])
 
   attr_reader :field_types
   
   def to_class(type)
-    case type
-    when Symbol; field_types[type] 
-    when String; field_types[type.to_sym] 
-    else type # assume it's already a class
+    if type.is_a?(Symbol, String)
+      type = type.to_sym
+      field_types[type] || standard_class(type)
+    else
+      type # assume it's already a class
     end
   end
   
@@ -59,19 +70,15 @@ module HoboFields
     type_name.in?(PLAIN_TYPES)
   end
   
+  
+  def standard_class(name)
+    class_name = STANDARD_TYPES[name]
+    "HoboFields::#{class_name}".constantize if class_name
+  end
+  
 end
 
-
-# Rich data types
-require "hobo_fields/html_string"
-require "hobo_fields/markdown_string"
-require "hobo_fields/textile_string"
-require "hobo_fields/password_string"
-require "hobo_fields/text"
-require "hobo_fields/email_address"
 require "hobo_fields/enum_string"
-
-
 
 # Add the fields do declaration to ActiveRecord::Base
 ActiveRecord::Base.send(:include, HoboFields::FieldsDeclaration)
