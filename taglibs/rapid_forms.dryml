@@ -364,7 +364,6 @@
     <select>
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              value="#{name :no_wrapper => true}"
               merge-attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
     </select>
   </div>
@@ -382,7 +381,6 @@
 
 
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
-  
   <select merge-attrs param="default">
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
     <do param="options"><% options_for_select(options.*.to_s, selected) %></do>
