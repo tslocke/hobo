@@ -50,7 +50,7 @@ module HoboFields
           declare_attr_type attr, type
           define_method "#{attr}=" do |val|
             if !val.is_a?(type) && HoboFields.can_wrap?(val)
-              val = type.new(val)
+              val = type.new(val.to_s)
             end
             instance_variable_set("@#{attr}", val)
           end
