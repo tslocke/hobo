@@ -17,7 +17,7 @@
     </head>
 
     <body onload="Hobo.applyEvents();" param/>
-</html>
+  </html>
 </def>
 
 
@@ -41,6 +41,7 @@
         <footer class="content-footer" param="content-footer"/>
       </section>
       <footer class="page-footer" param/>
+      <part-contexts-javascripts/>
     </body:>
   </base-page>
 </def>
