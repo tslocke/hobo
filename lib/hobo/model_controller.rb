@@ -310,8 +310,18 @@ module Hobo
       end
     end
     
+    
+    def request_requires_pagination?
+      # Internet explorer has a penchant for saying it would mostly
+      # like an image, if you clicked on an image link
+      request.format.in?(PAGINATE_FORMATS) || request.format.to_s =~ %r(image/)
+    end
+    
+    
     def find_or_paginate(finder, options)
-      do_pagination = options.delete(:paginate) != false && request.format.in?(PAGINATE_FORMATS)
+      options = options.reverse_merge(:paginate => request_requires_pagination?)
+      do_pagination = options.delete(:paginate)
+      
       if do_pagination && !finder.respond_to?(:paginate)
         do_pagination = false
         logger.warn "Hobo::ModelController: Pagination is not available. To enable, please install will_paginate or a duck-type compatible paginator"
