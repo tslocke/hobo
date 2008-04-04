@@ -255,7 +255,9 @@ module Hobo::Dryml
       if (for_type = el.attributes['for'])
         type_name = if defined?(HoboFields) && for_type =~ /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
-                      HoboFields.to_class(for_type).name
+                      klass = HoboFields.to_class(for_type)
+                      dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el) unless klass
+                      klass.name
                     elsif for_type =~ /^_.*_$/
                       rename_class(for_type)
                     else
