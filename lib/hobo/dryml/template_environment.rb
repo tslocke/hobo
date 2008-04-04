@@ -438,7 +438,7 @@ module Hobo::Dryml
     end
     
 
-    def part_contexts_storage_tag
+    def part_contexts_javascripts
       storage = part_contexts_storage
       storage.blank? ? "" : "<script>\n#{storage}</script>\n"
     end
@@ -452,7 +452,7 @@ module Hobo::Dryml
     def render_tag(tag_name, attributes)
       method_name = tag_name.gsub('-', '_')
       if respond_to?(method_name)
-        res = (send(method_name, attributes) + part_contexts_storage_tag).strip
+        res = (send(method_name, attributes) + part_contexts_javascripts).strip
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
         if RAILS_ENV == "development"
