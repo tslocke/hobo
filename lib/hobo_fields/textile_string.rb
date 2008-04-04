@@ -1,3 +1,5 @@
+require 'redcloth'
+
 module HoboFields
   
   class TextileString < String
@@ -15,10 +17,10 @@ module HoboFields
     end  
 
     HoboFields.register_type(:textile, self)
-
   end
 
 end
+
 class RedCloth
   # Patch for RedCloth.  Fixed in RedCloth r128 but _why hasn't released it yet.
   # http://code.whytheluckystiff.net/redcloth/changeset/128
