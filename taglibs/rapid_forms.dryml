@@ -348,7 +348,7 @@
       <div class="item" param="proto-item">
         <span></span>
         <input type="hidden" name="#{param_name_for_this}[]" param="proto-hidden"/>
-        <input type="button" class="remove-item" value="#{remove_label || 'Remove'}"/>
+        <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="proto-remove-button"/>
       </div>
     </div>
     <div class="items">
@@ -357,13 +357,14 @@
         <div class="item" param="item">
           <span><%= this %></span>
           <input type="hidden" name="#{param_name}[]" value="#{this}" param="hidden"/>
-          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}"/>
+          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="remove-button"/>
         </div>
       </repeat>
     </div>
     <select>
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
+              value="#{name :no_wrapper => true}"
               merge-attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
     </select>
   </div>
