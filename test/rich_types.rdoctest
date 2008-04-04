@@ -157,6 +157,7 @@ Note that every enum you create is a subclass of HoboFields::EnumString:
 	>> a.is_a?(HoboFields::EnumString)
 	=> true
 	
+	
 ### Using EnumString in your models
 	
 `HoboFields::EnumString` extends the field declaration DSL with a shorthand for creating enum types:

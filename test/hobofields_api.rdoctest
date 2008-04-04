@@ -84,22 +84,21 @@ If you provide a class it must define the `COLUMN_TYPE` constant. This instructs
 	>> HoboFields::Text::COLUMN_TYPE
 	=> :text
 	
-The full set of available symbolic names is here:
-
-	>> HoboFields::field_types
-	=> {"html"=>HoboFields::HtmlString, 
-	    "boolean"=>Hobo::Boolean,
-	    "integer"=>Fixnum,
-	    "text"=>HoboFields::Text,
-	    "textile"=>HoboFields::TextileString,
-	    "date"=>Date,
-	    "markdown"=>HoboFields::MarkdownString,
-	    "password"=>HoboFields::PasswordString,
-	    "datetime"=>Time,
-	    "big_integer"=>BigDecimal,
-	    "email_address"=>HoboFields::EmailAddress,
-	    "string"=>String,
-	    "float"=>Float}
+The full set of available symbolic names is
+  
+ * `:integer`
+ * `:big_integer`
+ * `:float`
+ * `:string`
+ * `:text`
+ * `:boolean`
+ * `:date`
+ * `:datetime`
+ * `:html`
+ * `:textile`
+ * `:markdown`
+ * `:password`
+ * `:email_addresss`
 
 You can add your own types too. More on that later.
 
