@@ -23,12 +23,12 @@ Let's define some example models that we can use to demonstrate the API. With Ho
 	>>
 	class Advert < ActiveRecord::Base
 	  fields do
-	    title           :string
+		title           :string
 		body            :text
 		contact_address :email_address
 	  end
 	end
-	
+
 (Note: `:email_address` is an example of a "Rich Type" provided by HoboFields -- more on those later)
 
 The migration generator uses this information to create a migration. The following creates and runs the migration so we're ready to go.

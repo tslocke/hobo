@@ -22,7 +22,7 @@ If you ever decide to change from, say, plain text to markdown formatted, your v
 
 Defining a rich type is very simple. We'll show an example here before we go through the bundled types so that you start with the idea that there's really nothing sophisticated going on here.
 
-This class defines the methods `to_html` to customize the way the type is rendered, and `validate` to provide a custom validation. It also defined the COLUMN_TYPE constant to tell the migration generator what underlying type should represent these values in the database.
+This class defines the methods `to_html` to customize the way the type is rendered, and `validate` to provide a custom validation. It also defined the `COLUMN_TYPE` constant to tell the migration generator what underlying type should represent these values in the database.
 
 	# Loud text always renderd in caps. 
 	# It's rude to shout too much so it's not allowed to be 
@@ -106,12 +106,17 @@ Provides validation of correct email address format.
 
 	>> text = HoboFields::Text.new %(Tom & Jerry
 	
-	Cat 
-	)
+	Cat & Mouse)
+	>> text.to_html
+	=>""
+	Tom &amp; Jerry<br />
+	<br />
+	Cat &amp; Mouse
+	>>
 
 ### `HoboFields::PasswordString`
 
-`HoboFields::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "[password hidden]". The type is also used to indicate the need for an `<input type='password'>`
+`HoboFields::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "`[password hidden]`". The type is also used to indicate the need for an `<input type='password'>`
 
 
 ## Enum Strings
