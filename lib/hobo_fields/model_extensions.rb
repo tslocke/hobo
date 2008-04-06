@@ -16,8 +16,8 @@ module HoboFields
     
     
     def self.inherited(klass)
-      fields do
-        field(inheritance_column, :string)
+      fields do |f|
+        f.field(inheritance_column, :string)
       end
     end
     
