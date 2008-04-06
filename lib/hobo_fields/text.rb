@@ -7,7 +7,7 @@ module HoboFields
     COLUMN_TYPE = :text
     
     def to_html
-      s.to_s.gsub(/[&"><]/) { |special| HTML_ESCAPE[special] }
+      gsub(/[&"><]/) { |special| HTML_ESCAPE[special] }.gsub("\n", "<br />\n")
     end
     
     HoboFields.register_type(:text, self)
