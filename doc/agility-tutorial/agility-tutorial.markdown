@@ -1,8 +1,10 @@
 # Hobo Tutorial -- Agility
 
+**NOTE: This is the tutorial that was recently delivered at the Ruby Fools conference in Copenhagen. It hasn't been properly chapterised for the web yet.**
+
 In this tutorial we'll be creating a simple "Agile Development" application -- _Agillity_. The application tracks projects which consist of a number of user stories. Stories have a status (e.g. accepted, under development...) as well as a number of associated tasks. Tasks can be assigned to users, and each user can see a heads-up of all the tasks they've been assigned to on their home page.
 
-This is a bit of an in-at-the-deep-end tutorial -- we build the app the way you would assuming you had already got the hang of the way Hobo works. In the later stages new concepts start coming thick and fast. The goal here is to show you what's possible, and give you a flavour of Hobo-style application development, rather that to provide detailed background on how everything workds. Don't worry about it, it's fun!
+This is a bit of an in-at-the-deep-end tutorial -- we build the app the way you would assuming you had already got the hang of the way Hobo works. In the later stages new concepts start coming thick and fast. The goal here is to show you what's possible, and give you a flavour of Hobo-style application development, rather that to provide detailed background on how everything workds. Don't worry about it, it's fun! If you'd rather take things a bit slower, you might prefer the [POD tutorial](http://hobocentral.net/pod-tutorial).
 
 
 # Part 1 -- Getting Started
@@ -18,19 +20,11 @@ For more info on Hobo please see [hobocentral.net](http://hobocentral.net)
 
 ## Before you start
 
-You'll need the following installed on your computer:
+You'll need a working Ruby on Rails setup. We're assuming you know at least the basics of Rails. If not, you should probably work through a Rails tutorial before attempting this one.
 
- * A working Ruby on Rails setup
+And you'll need Hobo! Although Hobo is in fact a group of Rails plugins, it is also available as a gem which gives you the useful `hobo` command:
 
-We're assuming you know at least the basics of Rails. If not, you should probably work through a Rails tutorial before attempting this one.
-
-Also:
-
- * The HoboSupport gem (`gem install hobosupport`)
-
-And finally, although Hobo is in fact a group of Rails plugins, it is also available as a gem which gives you the useful `hobo` command:
-
- * Hobo! (`gem install hobo`)
+    $ gem install hobo
 
 Let's get started!
 
@@ -362,7 +356,7 @@ Now for the controller side. Add a `show` method to `app/controllers/projects_co
 	                                  :order_by  => parse_sort_param(:title, :status))
 	end
 	
-[To do -- explain how that works!]
+(To do -- explain how that works!)
 	
 # Part 5 -- odds and ends
 
@@ -449,7 +443,7 @@ Needs support in the controller. Add this option to `apply_scopes`:
 	
 Status filtering should now be working.
 
-[To do: explain the scope being used there]
+(To do: explain the scope being used there)
 
 
 # Task re-ordering
