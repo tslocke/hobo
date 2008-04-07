@@ -1,3 +1,305 @@
+== Hobo 0.7.4 ===
+
+Switching to a new style for the changelog. Now that we're using git
+the commit logs are a lot better, so this file is just going to
+contain edited highlights of the commit log.
+
+    Rapid: making <view> make more use of the to_html API from
+    HoboFields
+
+    Reworked REXML extensions. Now compatible with REXML 3.7.1.1
+    through 3.7.1.3
+
+    ModelController -- fix to chosing whether or not to paginate
+
+    Various IE Javascript fixes
+
+    Rapid, <select-many>: Additional params, and IE fix
+
+    Moving the part-contexts javascripts from the very end of the
+    output, to the end of <body>
+    
+      The script tag must now be output by the <page>, instead of
+      being appended automatically by DRYML. This is done in
+      <simple-layout/>
+
+    Rapid -- removing <view for='percentage'>
+
+    DRYML -- improved error reporting
+
+    Hobo::Model: fix -- we were breaking inheritence of validations
+
+    Model generators -- adding some helpful comments
+
+    Rapid: Fix to permission check for adding to primary collection on
+    <show-page>
+
+    Rapid: removing empty message from <index-page>
+
+    Rapid: Fix to enum-string editor
+
+    Rapid: Fix to auto-label in <count>
+
+    User model generator -- change create permission to allow admin to
+    create another admin
+
+    New lowpro version
+
+    New automatic css class 'with-owner' on default <card/>
+
+    Hobo::ModelController -- fix to automatic inclusion of reorder
+    action for models that act as list
+
+    Improvements to default <card>
+
+    Rapid javascript: try to automatically bring back the
+    empty-message on removing the last item from a collection
+
+    Scopes: fix to apply_scopes
+
+    Fix to <name-for-collection>
+
+    Rapid tags: Support for the empty-message on a collection
+    re-appearing automatically if all the items are removed by the
+    user
+
+    DRYML: scoped variables -- assigning to a variable now modifies
+    it's value in a parent scope if it's present in one
+
+    <delete-button> fix -- was incorrectly guessing 'in-place' during
+    ajax update
+
+    New tag <name-for-collection>
+
+    Fix to <view for='text'/>
+
+    Improvements to <table-plus>
+    
+      Ability to sort by name of 'this' when 'this' is one of the
+      fields
+    
+      Keep table headings in when the table is empty
+    
+      Don't include page nav if the collection doesn't support it
+
+    Improvements to rapid pages
+    
+      Allowing has_many associations in forms
+    
+      Allowing the primary collection on a show page to be provided by
+      an instance variable (so that filtering/searching/pagination are
+      supported)
+    
+      Tidy of <show-page>
+    
+      <index-page> -- improved wording
+
+      Fixes to <index-page>
+
+    <account-nav> make 'logged in as bob' a link to current_user
+    
+    Factored out default <collection> into <base-collection>, and
+    fixes to <collection-preview>
+    
+    <base-card> -- add 'edit' link
+
+    <base-card> change 'title' param to 'heading' and make it easier
+    to provide your own
+    
+    <creation-details> use a div rather than a span
+    
+    Fix to <select-many>
+
+    Fix to <select-menu>
+    
+    Fix to <input for='datetime'>
+    
+    Rapid forms: switching to <select-one> and <select-many> naming
+    
+    <form> -- don't include auth token on GET forms
+    
+    Rapid: <belongs-to-menu-editor> -- don't show 'View' link if the
+    thing is not linkable
+    
+    Rapid: adding sort attribute to <belongs-to-menu-editor>
+
+    Rapid: default 'no-filter' option for filter-menu
+    
+    Rapid: Fix to extraneous whitespace in <you>
+    
+    Rapid: better guess of label on <count>
+    
+    Rapid: Use association name rather than class name in css classes
+    on <a> tags (when available)
+
+    Rapid: Fix to use of <else> with <a>
+    
+    Removed 'all' method from ScopedProxy - delegates to the model
+    class instead
+    
+    Fix to origin_attribute on scoped associations
+
+    Fix to with_abc automatic scopes
+
+    New automatic scopes 'include' and 'search', and improvements to
+    order_by scope
+    
+    Scopes: fix to parameterised scopes on associations
+
+    Scopes: new apply_scopes method for models and has_many
+    associations
+    
+        Pass a hash of scope-name => scope-arguments (single valur or
+        array), the result will be scoped accordingly, but only if the
+        first argument to the scope is not blank. It's designed to be
+        used from controllers: if a param (e.g. a search or filter) is
+        not included in the request, the scope is not applied
+
+    Hobo::ModelController -- fix to permission denied response for
+    ajax actions
+
+    Hobo::ModelController -- Fix to flash message after update
+    
+    Hobo::ModelController -- fix to redirection after submitting a
+    form
+
+    Hobo::ModelController -- cleaning up sorting and filtering
+    
+    Hobo::ModelController -- make reorder one of the automatic
+    :write_only actions if the model has the position_column method
+
+    <with-fields> better error reporting
+
+    Hobo::ModelController -- adding automatic reorder action
+    
+      Works with acts_as_list and scriptaculous drag and drop
+      re-ordering
+    
+    Hobo::Model adding :managed => true option to has_many
+    
+      Only valid with the :through option. Records of the joining
+      model will be created and destroyed as required when this record
+      is saved, in order to honour the contents of the association at
+      save time.
+    
+    Hobo::Model -- adding .user_update
+
+    Hobo::Model -- fix to user_find
+    
+    Hobo::HoboHelper -- #map_this (used by repeat) will set this_key
+    when iterating over a hash
+    
+    DRYML: made this_field_reflection do a better job of figuring out
+    the current reflection
+    
+    DRYML: adding this_key -- gives you the current key when
+    <repeat>ing on a hash
+    
+    DRYML: Error message for invalid attributes on parameter tags,
+    e.g. <foo: if-'...'>
+    
+    Hobo module - fix to permission checks on unexpected objects
+
+    Hobo module -- always return false for can_create? on has_many
+    associations that are not 'simple'
+    
+      (i.e. they have conditions)
+    
+    DRYML: Fix for replacing an overridden tag parameter
+    
+    Rapid pages: new submit label on show page (add to collection)
+    
+    Rapid pages: Add param to <show-page>
+    
+    Rapid pages: by default, append app-name to every title, override
+    with full-title attribute (<base-page>)
+    
+    Rapid pages: <show-page> -- update primary collection count when
+    an item is deleted
+    
+    Rapid pages: fix on <show-page>
+    
+    Rapid pages: make edit link on show-page check if the edit action
+    is linkable
+    
+    Rapid forms: adding inputs (just textareas) for textile and
+    markdown
+    
+    front_controller generator -- use <collection-preview> in
+    index.dryml
+    
+    Rapid generics: adding support for <collection with='&MyModel'/>
+
+    Rapid tags: switching to <main-nav> tag, called from simple-layout
+    
+    hobo_model_resource generator -- removing creating of (rails
+    style) resource route
+
+    Improvements to rapid pages
+    
+      Allowing has_many associations in forms
+    
+      Allowing the primary collection on a show page to be provided by
+      an instance variable (so that filtering/searching/pagination are
+      supported)
+    
+    Rapid: Fix to use of <else> with <a>
+
+    Removed 'all' method from ScopedProxy - delegates to the model
+    class instead
+
+    Fix to origin_attribute on scoped associations
+
+    Rapid tags: disabled <belongs-to-view>, new <view
+    for='ActiveRecord::Base'> is used now
+
+    Hobo::Model -- fix to reverse_refelction
+
+    Rapid tags: Adding <head:> and <foot:> params to <ul>
+
+    Rapid tags: Adding params to <select-many>
+
+    Rapid tags: adding support for <ul empty> (force the <ul> to
+    appear even if empty)
+
+    Fix: automatic scopes not_ and "association name" were not being
+    created
+
+    Rapid forms: Renaming <name-array-input> to <select-many> (and
+    improvements)
+
+    Hobo::Model -- adding assigment by arrays of names to has_many
+    associations
+
+    Hobo::Model -- adding Model.manage_join_records
+
+    Routing: fix -- don't try to load assemble.rb if
+    ApplicationController not defined
+
+    Rapid pages: Fix to body class on <new-page>
+
+    Rapid pages: fix to show page
+
+    Rapid pages -- fixing pluralisation of <index-page> title
+
+    Adding support for 'this' psuedo-field to <with-fields> and
+    <with-fields-names>
+    
+      In particular, this makes it possible to include the object
+      itself in a table plus column
+  
+    Adding a general <view> for ActiveRecord objects (just <a/>)
+
+    Allowing lookup of polymorphic tags to include ActiveRecord::Base
+    or Object as a catch-all
+
+    Rapid generics: make collection preview hide the show-all link if
+    there are none
+
+    <page-nav> now uses will_paginate's helper to provide much better
+    page navigation than before.
+
+
 === Release 0.7.3 ===
 
 hobo command -- options are now:
