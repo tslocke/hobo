@@ -5,7 +5,6 @@ require 'hobosupport'
 HoboFields
 
 # Monkey patches, ooh ooh
-require 'rexml'
 require 'active_record/has_many_association'
 require 'active_record/has_many_through_association'
 require 'active_record/association_proxy'

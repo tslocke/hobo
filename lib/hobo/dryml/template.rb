@@ -101,7 +101,7 @@ module Hobo::Dryml
 
       @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
       begin
-        @doc = REXML::Document.new(RexSource.new(@xmlsrc), :dryml_mode => true)
+        @doc = Hobo::Dryml::Parser::Document.new(Hobo::Dryml::Parser::Source.new(@xmlsrc))
       rescue REXML::ParseException => e
         raise DrymlSyntaxError, "File: #{@template_path}\n#{e}"
       end

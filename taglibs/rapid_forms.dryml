@@ -188,7 +188,7 @@
 </def>
 
 
-<!--- Buttons --->
+<!-- Buttons -->
 
 <def tag="remote-method-button" attrs="method, update, label"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
