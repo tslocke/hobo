@@ -248,7 +248,11 @@
           view_tag = find_polymorphic_tag("view")
           
           if view_tag == "view" # i.e. it didn't find a type specific tag
-            raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+            if this.respond_to?(:to_html)
+              this.to_html
+            else
+              raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+            end
           else
             attrs = add_classes(attributes, "view", type_and_field)
             id = dom_id
@@ -291,16 +295,6 @@
 <def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
-
-<def tag="view" for="text"><%= h(this).gsub("\n", "<br/>") %></def>
-
-<def tag="view" for="html"><%= this %></def>
-
-<def tag="view" for="markdown"><%= this.to_html %></def>
-
-<def tag="view" for="textile"><%= this.to_html %></def>
-
-<def tag="view" for="password">[password withheld]</def>
 
 <def tag="view" for="string"><%= h(this).gsub("\n", "<br/>") %></def>
 
