@@ -6,3 +6,5 @@ doc/agility-tutorial/agility/db/*.sqlite3
 doc/agility-tutorial/agility/log/*
 doc/agility-tutorial/agility/vendor/plugins/hobo
 doc/agility-tutorial/agility/vendor/plugins/hobofields
+doc/agility-tutorial/agility/db/*
+
