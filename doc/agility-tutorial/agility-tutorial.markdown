@@ -333,7 +333,7 @@ As an experiment, try this:
 	  </primary-collection:>
 	</show-page>
 	
-You should now see that in place of the story cards, we now get a simple comma-separated list of links to the stories. Not what we want of course, but it illustrates the concept of overriding the primary-collection. We didn't even have to set the context because it's already set to the collection by `<how-page>`
+You should now see that in place of the story cards, we now get a simple comma-separated list of links to the stories. Not what we want of course, but it illustrates the concept of overriding the primary-collection. We didn't even have to set the context because it's already set to the collection by `<show-page>`
 
 Here's how we get the table-plus:
 
