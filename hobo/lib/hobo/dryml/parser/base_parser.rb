@@ -2,18 +2,18 @@ module Hobo::Dryml::Parser
   
   class BaseParser < REXML::Parsers::BaseParser
     
-    REX_3_1_7_1 = REXML::VERSION == "3.1.7.1"
+    NEW_REX = REXML::VERSION =~ /3\.1\.(\d)(?:\.(\d))?/ && $1.to_i*1000 + $2.to_i >= 7002
     
     DRYML_NAME_STR          = "#{NCNAME_STR}(?::(?:#{NCNAME_STR})?)?"
-    DRYML_ATTRIBUTE_PATTERN = if REX_3_1_7_1
-                                /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
-                              else
+    DRYML_ATTRIBUTE_PATTERN = if NEW_REX
                                 /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\4)?/um
-                              end
-    DRYML_TAG_MATCH         = if REX_3_1_7_1
-                                /^<((?>#{DRYML_NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
                               else
+                                /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\2)?/um
+                              end
+    DRYML_TAG_MATCH         = if NEW_REX
                                 /^<((?>#{DRYML_NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\5)?)*)\s*(\/)?>/um
+                              else
+                                /^<((?>#{DRYML_NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
                               end
     DRYML_CLOSE_MATCH       = /^\s*<\/(#{DRYML_NAME_STR})\s*>/um
     
@@ -200,7 +200,8 @@ module Hobo::Dryml::Parser
             md = @source.match(DRYML_TAG_MATCH, true)
             unless md
               # Check for missing attribute quotes
-              raise REXML::ParseException.new("missing attribute quote", @source) if @source.match(MISSING_ATTRIBUTE_QUOTES )
+              raise REXML::ParseException.new("missing attribute quote", @source) if
+                defined?(MISSING_ATTRIBUTE_QUOTES) && @source.match(MISSING_ATTRIBUTE_QUOTES)
               raise REXML::ParseException.new("malformed XML: missing tag start", @source) 
               
             end
@@ -210,7 +211,7 @@ module Hobo::Dryml::Parser
               attrs = md[2].scan(DRYML_ATTRIBUTE_PATTERN)
               raise REXML::ParseException.new( "error parsing attributes: [#{attrs.join ', '}], excess = \"#$'\"", @source) if $' and $'.strip.size > 0
               attrs.each { |a,b,c,d,e| 
-                val = REX_3_1_7_1 ? c : e
+                val = NEW_REX ? e : c
                 if attributes.has_key? a
                   msg = "Duplicate attribute #{a.inspect}"
                   raise REXML::ParseException.new( msg, @source, self)
@@ -219,7 +220,7 @@ module Hobo::Dryml::Parser
               }
             end
             
-            if md[REX_3_1_7_1 ? 4 : 6]
+            if md[NEW_REX ? 6 : 4]
               @closed = md[1]
               #@nsstack.shift
             else
