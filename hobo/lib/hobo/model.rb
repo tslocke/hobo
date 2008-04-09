@@ -291,17 +291,20 @@ module Hobo
       
       
       def manage_join_records(association)
-        through = reflections[association].through_reflection
-        source  = reflections[association].source_reflection
         
         method = "manage_join_records_for_#{association}"
         after_save method
         class_eval %{
           def #{method}
-            current = #{through.name}.*.#{source.name}
-            to_delete = current - #{association}
-            to_add    = #{association} - current
-            #{through.klass.name}.delete_all(["#{through.primary_key_name} = ? and #{source.primary_key_name} in (?)", 
+            assigned = #{association}.dup
+            current = #{association}.reload
+              
+            through = #{association}.proxy_reflection.through_reflection
+            source  = #{association}.proxy_reflection.source_reflection
+
+            to_delete = current - assigned
+            to_add    = assigned - current
+            through.klass.delete_all(["\#{through.primary_key_name} = ? and \#{source.primary_key_name} in (?)", 
                                              self.id, to_delete.*.id]) if to_delete.any?
             to_add.each { |record| #{association} << record }
           end
