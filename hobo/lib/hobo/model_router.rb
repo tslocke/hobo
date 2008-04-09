@@ -67,6 +67,8 @@ module Hobo
         subsites.each { |subsite| add_routes_for(map, subsite) }
         
         add_developer_routes(map) if Hobo.developer_features?
+      rescue ActiveRecord::StatementInvalid
+        # Database problem? Just continue without routes
       end
       
       
