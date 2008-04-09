@@ -8,6 +8,12 @@ Doctests are a great way to get both documentation and tests from the same sourc
 
 ## Introduction 
 
+HoboFields lives on GitHub: [http://github.com/tablatom/hobofields](http://github.com/tablatom/hobofields)
+
+For now it's easier to install using subversion:
+
+	./script/plugin install svn://hobocentral.net/hobofields/tags/rel_0.7.4
+	
 HoboFields provides two main features:
 
  * An extension to ActiveRecord that provides rich field types such as "markdown text" or "email address"

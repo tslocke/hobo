@@ -72,7 +72,7 @@ Provides validation of correct email address format.
 
 ### `HoboFields::MarkdownString`
 
-`HoboFields::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
+`HoboFields::TextileString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
 
 	>> require 'bluecloth'
 	>> markdown = HoboFields::MarkdownString.new %(
@@ -89,7 +89,7 @@ Provides validation of correct email address format.
 
 ### `HoboFields::TextileString`
 
-`HoboFields::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
+`HoboFields::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the redcloth gem.
 
 	>> require 'redcloth'
 	>> textile = HoboFields::TextileString.new %(
