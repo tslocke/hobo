@@ -1,9 +1,7 @@
 module HoboFields
   
-  class MarkdownString < String
+  class MarkdownString < HoboFields::Text
   
-    COLUMN_TYPE = :text
-
     HoboFields.register_type(:markdown, self)
 
     def to_html

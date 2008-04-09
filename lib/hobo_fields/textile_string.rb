@@ -2,9 +2,7 @@ require 'redcloth'
 
 module HoboFields
   
-  class TextileString < String
-
-    COLUMN_TYPE = :text
+  class TextileString < HoboFields::Text
 
     def to_html
       if blank?
