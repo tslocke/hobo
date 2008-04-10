@@ -6,6 +6,9 @@ module Hobo
       
       def create_automatic_scope(name)
         ScopeBuilder.new(self, name).create_scope
+      rescue ActiveRecord::StatementInvalid
+        # Problem with the database? Don't try to create automatic scopes
+        false
       end
       
     end
