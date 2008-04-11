@@ -255,10 +255,8 @@ module Hobo
     # --- Action implementation helpers --- #
     
 
-    def find_instance(*args)
-      options = args.extract_options!
-      id = args.first || params[:id]
-      model.user_find(current_user, id, options)
+    def find_instance(options={})
+      model.user_find(current_user, params[:id], options)
     end
     
     
