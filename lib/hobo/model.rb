@@ -23,6 +23,8 @@ module Hobo
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
         attr_accessor :acting_user
+        
+        include Hobo::Lifecycles::ModelExtensions
       end
       
       class << base
@@ -62,6 +64,18 @@ module Hobo
           
         end
         
+      end
+    end
+    
+    
+    def self.enable
+      ActiveRecord::Base.class_eval do
+        def self.hobo_model
+          include Hobo::Model
+          fields # force hobofields to load
+        end
+        
+        alias_method :has_hobo_method?, :respond_to_without_attributes?
       end
     end
 
@@ -561,6 +575,4 @@ module Hobo
 end
 
 
-class ActiveRecord::Base
-  alias_method :has_hobo_method?, :respond_to_without_attributes?
-end
+Hobo::Model.enable if defined? ActiveRecord

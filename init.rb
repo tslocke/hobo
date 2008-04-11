@@ -50,11 +50,10 @@ class ActionController::Base
 
 end
 
+
+
+
 class ActiveRecord::Base
-  def self.hobo_model
-    include Hobo::Model
-    fields # force hobofields to load
-  end
   def self.hobo_user_model
     include Hobo::Model
     include Hobo::User
