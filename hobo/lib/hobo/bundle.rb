@@ -73,7 +73,7 @@ module ::Hobo
       end
       
       
-      # Declatations
+      # Declarations
       
       def models(*models)
         @models = models
