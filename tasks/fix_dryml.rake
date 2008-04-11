@@ -100,7 +100,7 @@ def fix_file(filename)
   # happy
   @src = "<root>" + src + "</root>"
   begin
-    doc = REXML::Document.new(Hobo::Dryml::RexSource.new(@src), :dryml_mode => true)
+    doc = Hobo::Dryml::Parser::Document.new(Hobo::Dryml::Parser::Source.new(@src))
   rescue REXML::ParseException => e
     raise Exception, "File: #{@template_path}\n#{e}"
   end
