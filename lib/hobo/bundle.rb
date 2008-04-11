@@ -225,6 +225,16 @@ module ::Hobo
     
     
     def new_name_for(name)
+      name = name.to_s
+      underscore = name =~ /^[a-z]/
+      name = name.camelize if underscore
+      
+      plural = !renames.has_key?(name) && (p = name.singularize) && renames.has_key?(p)
+      name = p if plural
+      
+      # Keep a track of names we've seen to avoid cycles
+      seen = [ name ]
+      
       while true
         if renames.has_key?(name)
           name = renames[name]
@@ -233,9 +243,16 @@ module ::Hobo
           # Make sure symbols stay symbols
           name = name.is_a?(Symbol) ? name2.to_sym : name2
         else
-          return name
+          break
         end
+        break if name.in?(seen)
+        seen << name
       end
+      
+      name = name.underscore if underscore
+      name = name.pluralize  if plural
+      name = name.to_sym if underscore || plural
+      name
     end
     
     
@@ -244,8 +261,6 @@ module ::Hobo
       options.each do |k, v| 
         if k.to_s =~ /^[A-Z]/
           renames[k] = v.to_s
-          renames[k.to_s.underscore] = v.to_s.underscore.to_sym
-          renames[k.to_s.underscore.pluralize] = v.to_s.underscore.pluralize.to_sym
         else
           simple_options[k] = v
         end
@@ -302,7 +317,7 @@ module ::Hobo
       external_options = self.options[option_name]
       external_options = {} if external_options.nil? || external_options == true
       name = "#{self.name}_#{option_name}"
-
+      
       sub_bundle_options = external_options.merge(local_options).merge(renames)
       sub_bundle = class_name.to_s.constantize.new(name, sub_bundle_options)
       
