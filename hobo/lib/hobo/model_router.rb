@@ -47,6 +47,9 @@ module Hobo
       end
       
       def add_routes(map)
+        # Don't create routes if it's a generator that's running
+        return if caller[-1] =~ /script[\/\\]generate:\d+$/
+        
         reset_linkables
         
         begin 
