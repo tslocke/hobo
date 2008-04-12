@@ -235,18 +235,12 @@ module ::Hobo
       # Keep a track of names we've seen to avoid cycles
       seen = [ name ]
       
-      while true
-        if renames.has_key?(name)
-          name = renames[name]
-        elsif name.to_s =~ /_.*?_/
-          name2 = name.to_s.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
-          # Make sure symbols stay symbols
-          name = name.is_a?(Symbol) ? name2.to_sym : name2
-        else
-          break
-        end
+      while (newname = renames[name])
+        name = newname
+        name = name.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) } if newname =~ /_.*?_/
+
         break if name.in?(seen)
-        seen << name
+        seen << name        
       end
       
       name = name.underscore if underscore
