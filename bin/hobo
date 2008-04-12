@@ -78,12 +78,6 @@ Dir.chdir(app_path) do
 
   FileUtils.touch("public/stylesheets/application.css")
 
-  puts "\nInstalling will_paginate\n"
-  command(plugin, "install svn://errtheblog.com/svn/plugins/will_paginate")
-  
-  puts "\nInstalling hobofields\n"
-  command("svn export svn://hobocentral.net/hobofields/tags/rel_#{HOBO_VERSION} vendor/plugins/hobofields")
-
   if hobo_svn
     puts "\nInstalling Hobo plugin via svn checkout...\n"
     command("svn co #{HOBO_REPO} vendor/plugins/hobo")

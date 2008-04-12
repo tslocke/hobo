@@ -1,8 +1,11 @@
 # gem dependencies
 require 'hobosupport'
-
-# Force load:
-HoboFields
+require 'hobofields'
+begin
+  require 'will_paginate'
+rescue MissingSourceFile
+  # OK, Hobo won't do pagination then
+end
 
 # Monkey patches, ooh ooh
 require 'active_record/has_many_association'
@@ -22,6 +25,7 @@ require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
 
 require 'extensions/test_case' if RAILS_ENV == "test"
+
 
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
