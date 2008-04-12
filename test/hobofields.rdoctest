@@ -10,9 +10,13 @@ Doctests are a great way to get both documentation and tests from the same sourc
 
 HoboFields lives on GitHub: [http://github.com/tablatom/hobofields](http://github.com/tablatom/hobofields)
 
-For now it's easier to install using subversion:
+You can install it with git:
 
-	./script/plugin install svn://hobocentral.net/hobofields/tags/rel_0.7.4
+	git clone git://github.com/tablatom/hobofields.git vendor/plugins/hobofields
+
+Or subversion:
+
+	svn export svn://hobocentral.net/hobofields/tags/rel_0.7.4 vendor/plugins/hobofields
 	
 HoboFields provides two main features:
 
@@ -29,6 +33,12 @@ This is all done using a declaration of your fields that you put in your models,
     end
 {: .ruby}
 
+**NOTE:** If you're going to use the migration generator outside of Hobo, do remember the `--skip-migration` option when generating your models:
+
+	./script/generate model post --skip-migration
+
+
+## [Migration Generator](/hobofields/migration_generator)
 
 Once you have declared your fields like this, you can run the following, at any time during the development of your project:
 
@@ -36,9 +46,7 @@ Once you have declared your fields like this, you can run the following, at any 
 	
 The migration generator will create a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. Note that the migration generator is interactive -- it can't tell the difference between renaming something vs. adding one thing and removing another, so it has to ask you.
 
-## [Migration Generator](/hobofields/migration_generator)
-
-The [migration generator doctests](/hobofields/migration_generator) provide a lot more detail, but they're not great as documentation because doctests run in a single irb session, which doesn't fit well with the concept of a generator. Skip these unless you're really keen to see how the details of the migration generator in action
+The [migration generator doctests](/hobofields/migration_generator) provide a lot more detail. They're not really that great as documentation because doctests run in a single irb session, and that doesn't fit well with the concept of a generator. Skip these unless you're really keen to see the details of the migration generator in action
 
 ## [HoboFields API](/hobofields/hobofields_api)
 
