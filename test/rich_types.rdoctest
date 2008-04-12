@@ -149,13 +149,19 @@ There are also instance methods to check for each of the values:
 	>> a.is_approved?
 	=> true
 	
-Equality of these enum types is just string equality, and they can be constructed from strings:
+They can be constructed from strings:
 
 	>> a = ArticleStatus.new("approved")
 	>> a.is_approved?
 	=> true
+	
+Equality is string equality, with symbols first converted to strings:
+
 	>> a == "approved"
 	=> true
+	>> a == :approved
+	=> true
+	
 	
 Note that every enum you create is a subclass of HoboFields::EnumString:
 

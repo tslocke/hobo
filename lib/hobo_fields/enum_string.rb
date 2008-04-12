@@ -1,3 +1,5 @@
+require 'hobo_fields/field_declaration_dsl'
+
 module HoboFields
   
   class EnumString < String
@@ -47,6 +49,14 @@ module HoboFields
     
     def validate
       "must be one of #{self.class.values * ', '}" unless self.in?(self.class.values)
+    end
+    
+    def ==(other)
+      if other.is_a?(Symbol)
+        super(other.to_s)
+      else
+        super
+      end
     end
     
   end
