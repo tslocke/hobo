@@ -29,7 +29,7 @@
 <def tag="account-nav">
   <ul with="&current_user" class="account-nav" param>
     <if test="&logged_in?">
-      <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <view:login/></a></li>
+      <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
       <li class='nav-item' param="account"><a action="account">Account</a></li>
       <li class='nav-item' param="log-out"><a href="&logout_url">Log out</a></li>
     </if>
