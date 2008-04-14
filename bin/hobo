@@ -1,0 +1,109 @@
+#!/usr/bin/env ruby 
+
+HOBO_VERSION = "0.7.4"
+
+require 'fileutils'
+Signal.trap("INT") { puts; exit }
+
+hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
+
+USAGE = "USAGE: hobo <options> <app-path>
+
+Options:
+  --user-model <model-name-or-false>
+  --svn                               # Use 'svn co' to checkout Hobo trunk
+  --create-dbs                        # Run rake db:create:all
+  --hobo-src <path to hobo src>
+  -d | --database <database>         # e.g. mysql, sqlite
+"
+
+HOBO_REPO = "svn://hobocentral.net/hobo/trunk/hobo"
+
+
+### Nasty stuff needed for Windows :-( ###
+require 'rbconfig'
+
+if Config::CONFIG["arch"] =~ /win32/
+  require "win32/registry"
+  def system(command)
+    win = Win32API.new("crtdll", "system", ['P'], 'L').Call(command)
+  end
+end 
+### end nasty stuff ###
+
+
+def command(*s)
+  ok = system(s.join(' '))
+  exit(1) unless ok
+end
+
+if ARGV.length == 0 || ARGV.include?("--help")
+  puts USAGE
+  exit 1
+end
+
+app_path = ARGV.pop
+
+user_model    = "user"
+hobo_svn      = create_db = false
+
+until ARGV.empty?
+  case ARGV.shift
+  when "--user-model"
+    arg = ARGV.shift
+    user_model = arg == "false" ? nil : arg
+  when "--svn"
+    hobo_svn = true
+  when "--create-dbs"
+    create_db = true
+  when "--hobo-src"
+    hobo_src = "../" + ARGV.shift
+  when "-d", "--database"
+    database_type = ARGV.shift
+  else
+    puts USAGE
+    exit 1
+  end 
+end
+
+puts "\nGenerating Rails app...\n"
+opts = []
+opts << "-d #{database_type}" if database_type
+system("rails #{opts * ' '} #{app_path}")
+
+
+Dir.chdir(app_path) do
+  gen = "ruby #{File.join('script', 'generate')}"
+  plugin = "ruby #{File.join('script', 'plugin')}"
+
+  FileUtils.touch("public/stylesheets/application.css")
+
+  if hobo_svn
+    puts "\nInstalling Hobo plugin via svn checkout...\n"
+    command("svn co #{HOBO_REPO} vendor/plugins/hobo")
+  else
+    puts "\nInstalling Hobo plugin...\n"
+    FileUtils.cp_r hobo_src, "vendor/plugins/hobo"
+  end
+
+  puts "\nInitialising Hobo...\n"  
+  command(gen, "hobo --add-routes")
+
+  puts "\nInstalling Hobo Rapid and default theme...\n"
+  command("#{gen} hobo_rapid --import-tags")
+
+  if user_model
+    puts "\nCreating #{user_model} model and controller...\n"
+    command("#{gen} hobo_user_model #{user_model}")
+    command("#{gen} hobo_user_controller #{user_model}")
+  end
+  
+  puts "\nCreating standard pages...\n"
+  command("#{gen} hobo_front_controller front --delete-index --add-routes")
+  
+  if create_db
+    puts "\nCreating databases"
+    command("rake db:create:all")
+  end
+end
+
