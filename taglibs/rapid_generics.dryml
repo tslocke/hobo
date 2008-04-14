@@ -1,6 +1,6 @@
 <def tag="creation-details">
   <div class="creation-details">
-    <view field="&this.class.creator_attribute" class="creator" if="&this.class.creator_attribute" param="by"/>
+    <if:get_creator><view class="creator" param="by"/></if:>
     <view:created_at class="created-at" if="&this.respond_to?(:created_at)" param="at"/>
   </div>
 </def>
@@ -97,19 +97,21 @@
 </def>
 
 
-<def tag="collection-preview" attrs="limit">
+<def tag="collection-preview" attrs="limit, if-any">
   <% limit ||= 6 %>
   <do with="&this.is_a?(Class) ? this.limit(limit).all : this.limit(limit)">
-    <set collection-name="&(this.try.origin_attribute || this.member_class.name.pluralize).to_s"/>
-    <div class="collection-preview" merge-attrs>
-      <h2>
-        <do param="heading"><collection-name.titleize/></do> 
-        <span param="show-all-link" if="&this.any? && linkable?">(<a>show all</a>)</span>
-      </h2>
-      <collection merge-params>
-        <card: class="small"/>
-      </collection>
-    </div>
+    <unless test="&if_any && this.empty?">
+      <set collection-name="&(this.try.origin_attribute || this.member_class.name.pluralize).to_s"/>
+      <div class="collection-preview" merge-attrs>
+        <h2>
+          <do param="heading"><collection-name.titleize/></do> 
+          <span param="show-all-link" if="&linkable? && this.count > limit">(<a>show all</a>)</span>
+        </h2>
+        <collection merge-params>
+          <card: class="small"/>
+        </collection>
+      </div>
+    </unless>
   </do>
 </def>
 
