@@ -514,9 +514,13 @@ module Hobo
     
     def convert_associated_records_for_mass_assignment(reflection, value)
       if reflection.macro.in?([:belongs_to, :has_one])
-        if value.is_a?(String) && value.starts_with?('@')
-          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
-          Hobo.object_from_dom_id(value[1..-1])
+        if value.is_a?(String)
+          if value.starts_with?('@')
+            # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
+            Hobo.object_from_dom_id(value[1..-1])
+          else
+            reflection.klass[value]
+          end
         else
           value
         end
