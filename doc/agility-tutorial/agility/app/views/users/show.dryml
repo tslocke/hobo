@@ -1,9 +1,0 @@
-<show-page>
-  <content-body:>
-    <h2><Your/> Assigned Tasks</h2>
-    <repeat with="&this.tasks.group_by(&:story)">
-      <h3><a with="&this_key"/></h3>
-      <collection class="tasks"/>
-    </repeat>
-  </content-body:>
-</show-page>
