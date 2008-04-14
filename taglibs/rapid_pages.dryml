@@ -70,7 +70,10 @@
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
       <heading param><type-name with="&model" plural/></heading>
-      <p class="note" if param>There <count prefix="are"/></p>
+      <p class="note" param="count">
+        <if>There <count prefix="are"/></if>
+        <else>There aren't any <type-name lowercase plural/> yet.</else>
+      </p>
     </content-header:>
 
     <content-body: param>
