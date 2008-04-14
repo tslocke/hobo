@@ -30,7 +30,6 @@ module Hobo
           alias_method_chain :render, :hobo_model
 
         end
-        base.template_path_cache = {}        
 
         Hobo::Controller.included_in_class(base)
       end
