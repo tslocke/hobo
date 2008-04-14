@@ -290,17 +290,11 @@
 </def>
 
 
-<def tag="belongs-to-autocompleting-input">
-<% refl = this_type
-   completer_model ||= refl.klass
-   completer_attr ||= refl.klass.id_name_column
-   id ||= dom_id + "_completer"
-   where_attributes = attributes.select_hash {|k,v| k.to_s.starts_with? "where_"}
-   url = object_url(completer_model, :completions, { :for => completer_attr }.update(where_attributes))
-  %>
-
-  <input type="text" id="#{id}" class="autocomplete-bhv" autocomplete-url="#{url}"
-         name="#{param_name_for_this}" merge-attrs/>
+<def tag="name-one">
+ <% id = "completer-#{uid}" %>
+  <input type="text" id="#{id}" 
+         class="autocompleter #{type_and_field} complete-on:#{this_type}:#{this_type.name_attribute" 
+         autocomplete-url="#{url}" name="#{param_name_for_this}" merge-attrs/>
   <div id="#{id}-completions" class="completions-popup" style="display:none"></div>
 </def>
 
