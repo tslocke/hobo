@@ -8,6 +8,13 @@ module Hobo
     end
      
     protected
+    
+    
+    def uid
+      @hobo_uid ||= 0
+      @hobo_uid += 1
+    end
+    
      
     def current_user
       # simple one-hit-per-request cache
