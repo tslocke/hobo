@@ -20,7 +20,7 @@
 %></def>
 
 
-<def tag="form" attrs="to, update, hidden-fields, action, method, web-method"><%= 
+<def tag="form" attrs="to, update, hidden-fields, action, method, web-method, lifecycle"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
   new_record = this.try.new_record?
@@ -31,9 +31,9 @@
              method.downcase
            end
 
-  html_attrs[:action] = action || object_url(to || this, web_method, :method => method)
+  html_attrs[:action] = action || object_url(to || this, web_method || lifecycle, :method => method)
    
-  if html_attrs[:action].nil? || (new_record && !this.user_can_create?(current_user))
+  if html_attrs[:action].nil? || (lifecycle.nil? && new_record && !this.user_can_create?(current_user))
     Hobo::Dryml.last_if = false
     ""
   else

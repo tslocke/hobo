@@ -188,6 +188,13 @@ module Hobo
           def_scope do |time1, time2|
             { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} =< ?", time1, time2] }
           end
+          
+         # active (a lifecycle state)
+        elsif @klass.has_lifecycle? && name.in?(@klass::Lifecycle.state_names)
+
+          def_scope do 
+            { :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name] }
+          end
 
         else
         

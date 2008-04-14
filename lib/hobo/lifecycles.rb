@@ -22,13 +22,22 @@ module Hobo
         dsl = DeclarationDSL.new(lifecycle)
         dsl.instance_eval(&block)
           
-        declare_field(options[:state_field], :string, :default => lifecycle.initial_state.name)
+        default = lifecycle.initial_state ? { :default => lifecycle.initial_state.name } : {}
+        declare_field(options[:state_field], :string, default)
+        
         declare_field(options[:last_transition_at_field], :datetime)
       end
+      
+      
+      def self.has_lifecycle?
+        defined?(self::Lifecycle)
+      end
     
+      
       def lifecycle
         @lifecycle ||= self.class::Lifecycle.new(self)
       end
+      
       
       def become(state)
         self.lifecycle.state = state
@@ -60,6 +69,14 @@ module Hobo
         @lifecycle.def_transition(name, who,
                                   Array(change.keys.first), change.values.first,
                                   block, options)
+      end
+      
+      def invariant(&block)
+        @lifecycle.invariants << block
+      end
+
+      def precondition(&block)
+        @lifecycle.preconditions << block
       end
       
     end
