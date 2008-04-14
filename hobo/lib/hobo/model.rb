@@ -366,7 +366,7 @@ module Hobo
     
 
     def user_view(user, field=nil)
-      raise PermissionDeniedError unless Hobo.can_view?(user, self, field)
+      raise PermissionDeniedError, self.inspect unless Hobo.can_view?(user, self, field)
     end
     
     
