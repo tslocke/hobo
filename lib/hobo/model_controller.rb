@@ -497,9 +497,9 @@ module Hobo
     
     
     # --- Response helpers --- #
-
     
     def permission_denied(error)
+      self.this = nil # Otherwise this gets sent user_view
       if respond_to? :permission_denied_response
         permission_denied_response
       else
