@@ -17,8 +17,11 @@ module Hobo
       def included(base)
         base.class_eval do 
           @auto_actions ||= {}
+
+          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [], :completer_actions => []
           
           extend ClassMethods
+          
           
           helper_method :model, :current_user
           before_filter :set_no_cache_headers
@@ -41,25 +44,12 @@ module Hobo
 
       attr_writer :model
       
-      attr_accessor :template_path_cache      
-
-      def web_methods
-        @web_methods ||= superclass.respond_to?(:web_methods) ? superclass.web_methods : []
-      end
-      
-      
-      def show_actions
-        @show_actions ||= superclass.respond_to?(:show_actions) ? superclass.show_actions : []
-      end
-      
-      
-      def index_actions
-        @index_actions ||= superclass.respond_to?(:index_actions) ? superclass.index_actions : []
-      end
-      
-      
       def collections
-        # By default, all has_many associations are published
+        # FIXME The behaviour here is weird if the superclass does
+        # define collections *and* this class adds some more. The
+        # added ones won't be published
+        
+        # by default By default, all has_many associations are published
         @collections ||= if superclass.respond_to?(:collections)
                            superclass.collections
                          else
@@ -73,10 +63,14 @@ module Hobo
       end
       
       
-      def autocomplete_for(field, options={})
-        options = options.reverse_merge(:limit => 15)
-        index_action "complete_#{field}" do
-          hobo_completions(model.limit(options[:limit]).send("#{field}_contains", params[:query]))
+      def autocomplete(*args)
+        options = args.extract_options!
+        options = options.reverse_merge(:limit => 15, :param => :query)
+        args.each do |attr|
+          completer_actions << attr
+          index_action "complete_#{attr}" do
+            hobo_completions(attr, model.limit(options[:limit]).send("#{attr}_contains", params[options[:param]]))
+          end
         end
       end
 
@@ -487,9 +481,9 @@ module Hobo
     end
     
 
-    def hobo_completions(finder)
+    def hobo_completions(attribute, finder)
       items = finder.find(:all)
-      render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attr)}</li>\n"}.join + "</ul>"
+      render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
     
     
