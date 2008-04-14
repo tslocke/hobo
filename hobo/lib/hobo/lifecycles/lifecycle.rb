@@ -13,21 +13,21 @@ module Hobo
       end
       
       def self.reset
-        @states      = {}
-        @creators    = {}
-        @transitions = []
+        @states        = {}
+        @creators      = {}
+        @transitions   = []
+        @preconditions = []
+        @invariants    = []
       end
       
       class << self
-        attr_accessor :model, :options, :states, :initial_state, :creators, :transitions
+        attr_accessor :model, :options, :states, :initial_state, :creators, :transitions, :invariants, :preconditions
       end
       
       def self.def_state(name, on_enter)
         name = name.to_s
         returning(State.new(name, on_enter)) do |s|
           states[name] = s
-          self.initial_state ||= s
-          
           class_eval "def #{name}?; record.state == '#{name}'; end"
         end
       end
@@ -35,8 +35,7 @@ module Hobo
       
       def self.def_creator(name, who, on_create, options)
         name = name.to_s
-        returning(Creator.new(name, who, on_create, options)) do |creator|
-          creators[name] = creator
+        returning(Creator.new(self, name, who, on_create, options)) do |creator|
           
           class_eval %{
                        def self.#{name}(user, attributes=nil)
@@ -64,17 +63,35 @@ module Hobo
           
         end
       end
-      
+                 
+      def self.state_names
+        states.keys
+      end
+                 
       
       def self.can_create?(name, user, attributes=nil)
-        creators[name.to_s].allowed?(model, user, attributes)
+        creators[name.to_s].allowed?(user, attributes)
       end
       
       
       def self.create(name, user, attributes=nil)
-        creators[name.to_s].run!(model, user, attributes)
+        creators[name.to_s].run!(user, attributes)
       end
       
+      
+      def self.creator_names
+        creators.keys
+      end
+      
+      
+      def self.transition_names
+        transitions.*.name.uniq
+      end
+      
+      
+      def self.state_field
+        options[:state_field]
+      end
       
       attr_reader :record
       
@@ -97,7 +114,7 @@ module Hobo
       
       
       def state_name
-        record.read_attribute self.class.options[:state_field]
+        record.read_attribute self.class.state_field
       end
       
       
@@ -126,7 +143,7 @@ module Hobo
       def state=(state_name)
         state_name = state_name.to_s
         if self.state != state_name
-          record.write_attribute self.class.options[:state_field], state_name
+          record.write_attribute self.class.state_field, state_name
           
           if state_name == "destroy"
             record.destroy
@@ -134,19 +151,24 @@ module Hobo
             s = self.class.states[state_name]
             raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
             s.activate! record
-            record.save
+            record.save!
           end
         end
       end
       
       
       def key
-        "#{record.id}:#{key_digest}"
-      end
-      
-      def key_digest
         require 'digest/sha1'
         Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{last_transition_at}")
+      end
+      
+      
+      def invariants_satisfied?
+        self.class.invariants.all? { |i| record.instance_eval(&i) }
+      end
+      
+      def preconditions_satisfied?
+        self.class.preconditions.all? { |i| record.instance_eval(&i) }
       end
       
     end      

@@ -38,13 +38,22 @@ module Hobo
         !options[:if] || run_hook(record, options[:if], user)
       end
       
+      def check_invariants(record)
+        record.lifecycle.invariants_satisfied?
+      end
       
-      def prepare_and_check!(record, user, attributes=nil)
+      
+      def prepare(record, user, attributes=nil)
         if attributes
           attributes = extract_attributes(attributes)
           record.attributes = attributes
         end
-        set_or_check_who!(record, user) && check_guard(record, user)
+        set_or_check_who!(record, user) && record
+      end
+      
+      
+      def prepare_and_check!(record, user, attributes=nil)
+        prepare(record, user, attributes) if check_guard(record, user) && check_invariants(record)
       end
       
     end

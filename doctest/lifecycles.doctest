@@ -192,7 +192,7 @@ Here is the entire lifecycle
           $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
         end
 
-		transition [ :requester, :requestee ], :retract, { :active => :destroy }
+		transition [ :requester, :requestee ], :cancel, { :active => :destroy }
 		# TODO: send the email - for this we need the acting user to be passed to the block
 
       end

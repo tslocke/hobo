@@ -81,7 +81,7 @@ module Hobo
                    else; obj.is_a?(Class) ? :index : :show
                    end
 
-        if action == :create && obj.try.new_record?
+        if options[:method].to_s == 'post' && obj.try.new_record?
           # Asking for url to post new record to
           obj = obj.class
         end

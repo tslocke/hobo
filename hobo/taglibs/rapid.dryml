@@ -8,6 +8,7 @@
 <include src="rapid_navigation"/>
 <include src="rapid_plus"/>
 <include src="rapid_generics"/>
+<include src="rapid_lifecycles"/>
 
 
 <def tag="field-list" attrs="tag">

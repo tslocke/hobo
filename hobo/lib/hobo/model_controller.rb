@@ -101,8 +101,9 @@ module Hobo
         
         @auto_actions = case args.first
                           when :all        then available_auto_actions
-                          when :write_only then available_auto_write_actions + args.rest
-                          when :read_only  then available_auto_read_actions  + args.rest
+                          when :write_only then available_auto_write_actions     + args.rest
+                          when :read_only  then available_auto_read_actions      + args.rest
+                          when :lifecycle  then available_auto_lifecycle_actions + args.rest
                           else args
                         end
 
@@ -137,6 +138,12 @@ module Hobo
         end
 
         collections.each { |c| def_collection_actions(c.to_sym) }
+        def_lifecycle_actions
+      end
+      
+      
+      def def_auto_action(name, &block)        
+        define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
       end
       
       
@@ -161,6 +168,23 @@ module Hobo
           end
         end
       end
+      
+      
+      def def_lifecycle_actions
+        if model.has_lifecycle?
+          model::Lifecycle.creator_names.each do |creator|
+            def_auto_action creator do 
+              creator_action creator
+            end
+          end
+          
+          model::Lifecycle.transition_names.each do |transition|
+            def_auto_action transition do
+              transition_action transition
+            end
+          end
+        end
+      end
 
 
       def show_action(*names, &block)
@@ -174,6 +198,7 @@ module Hobo
           end
         end
       end
+      
       
       def index_action(*names, &block)
         options = names.extract_options!
@@ -191,6 +216,7 @@ module Hobo
         end
       end
       
+      
       def publish_collection(*names)
         collections.concat(names)
         names.each {|n| def_collection_actions(n)}
@@ -206,7 +232,8 @@ module Hobo
         (available_auto_read_actions +
          available_auto_write_actions + 
          FORM_ACTIONS + 
-         available_auto_collection_actions).uniq
+         available_auto_collection_actions +
+         available_auto_lifecycle_actions).uniq
       end
       
       
@@ -229,8 +256,17 @@ module Hobo
           [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
         end.flatten
       end
+      
+      
+      def available_auto_lifecycle_actions
+        if model.has_lifecycle?
+          (model::Lifecycle.creator_names + model::Lifecycle.transition_names).*.to_sym
+        else
+          []
+        end
+      end
 
-    end
+    end # of ClassMethods
     
 
     protected
@@ -359,7 +395,7 @@ module Hobo
     
     
     def attribute_parameters
-      params[this.class.name.underscore]
+      params[(this ? this.class : model).name.underscore]
     end
     
 
@@ -456,7 +492,9 @@ module Hobo
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
- 
+    
+    
+    # --- Collection Actions --- #
     
     def hobo_show_collection(association, *args, &b)
       options = args.extract_options!
@@ -481,14 +519,37 @@ module Hobo
     end
     
     
+<<<<<<< HEAD:hobo/lib/hobo/model_controller.rb
     def hobo_create_in_collection(association, *args, &b)
       options = args.extract_options!
       @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
       self.this = args.first || @association.new
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response("new_#{association}", &b)
+=======
+    # --- Lifecycle Actions --- #
+    
+    def creator_action(name)
+      if request.post?
+        self.this = model::Lifecycle.create(name, current_user, attribute_parameters)
+        redirect_to :back
+      end
+>>>>>>> More work on lifecycles:hobo/lib/hobo/model_controller.rb
     end
     
+<<<<<<< HEAD:hobo/lib/hobo/model_controller.rb
+=======
+    
+    def transition_action(name)
+      if request.request_method == :put
+        find_instance.lifecycle.transition(name, current_user, attribute_parameters)
+        redirect_to :back
+      end
+    end
+    
+    
+    # --- Miscelaneous Actions --- #
+>>>>>>> More work on lifecycles:hobo/lib/hobo/model_controller.rb
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)

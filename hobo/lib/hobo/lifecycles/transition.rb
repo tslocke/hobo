@@ -16,7 +16,7 @@ module Hobo
         end
         unless end_state.to_s == "destroy"
           state = lifecycle.states[end_state.to_s]
-          raise ArgumentError, "No such state '#{end_state}' in #{'name'} transition (#{lifecycle.model.name})" unless state
+          raise ArgumentError, "No such state '#{end_state}' in '#{name}' transition (#{lifecycle.model.name})" unless state
           state.transitions_in << self
         end
         lifecycle.transitions << self
@@ -39,6 +39,8 @@ module Hobo
           fire_event(record, on_transition)
           record.write_attribute lifecycle.options[:last_transition_at_field], Time.now
           record.become end_state
+        else
+          raise Hobo::Model::PermissionDeniedError
         end        
       end
       
@@ -49,7 +51,10 @@ module Hobo
         end
       end
       
-      #alias_method_chain :set_or_check_who!, :key
+
+      def parameters
+        options[:update] || []
+      end
 
 
     end
