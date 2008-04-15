@@ -139,7 +139,9 @@ module Hobo
         web_method_routes
         show_action_routes
         reorder_route
-        user_routes if controller < Hobo::UserController
+
+        lifecycle_routes if defined? model::Lifecycle
+        user_routes      if controller < Hobo::UserController
       end
     end
     
@@ -205,6 +207,18 @@ module Hobo
       linkable_route("reorder_#{plural}", "#{plural}/reorder", 'reorder', :conditions => { :method => :post })
     end
     
+<<<<<<< HEAD:hobo/lib/hobo/model_router.rb
+=======
+    
+    def lifecycle_routes
+      model::Lifecycle.creator_names.each do |creator|
+        linkable_route("#{singular}_#{creator}", "#{plural}/#{creator}", creator, :conditions => { :method => :post })
+      end
+      model::Lifecycle.transition_names do |transition|
+        linkable_route("#{singular}_#{transition}", "#{plural}/:id/#{transition}", transition, :conditions => { :method => :put })
+      end
+    end
+>>>>>>> d7a9e38... Work on auto-completers:hobo/lib/hobo/model_router.rb
         
     def user_routes
       prefix = plural == "users" ? "" : "#{singular}_"

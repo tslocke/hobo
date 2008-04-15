@@ -18,7 +18,7 @@ module Hobo
         base.class_eval do 
           @auto_actions ||= {}
 
-          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [], :completer_actions => []
+          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => []
           
           extend ClassMethods
           
@@ -63,13 +63,14 @@ module Hobo
       end
       
       
-      def autocomplete(*args)
-        options = args.extract_options!
-        options = options.reverse_merge(:limit => 15, :param => :query)
-        args.each do |attr|
-          completer_actions << attr
-          index_action "complete_#{attr}" do
-            hobo_completions(attr, model.limit(options[:limit]).send("#{attr}_contains", params[options[:param]]))
+      def autocomplete(name, options={}, &block)
+        options = options.dup
+        field = options.delete(:field) || name
+        if block
+          index_action name, &block
+        else
+          index_action name do
+            hobo_completetions name, model, options
           end
         end
       end
@@ -481,7 +482,10 @@ module Hobo
     end
     
 
-    def hobo_completions(attribute, finder)
+    def hobo_completions(attribute, finder, options={})
+      options = options.reverse_merge(:limit => 10, :param => :query)
+      finder = finder.limit(options[:limit]) unless finder.scope(:find, :limit)
+      finder = finder.send("#{attr}_contains", params[options[:param]])
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
