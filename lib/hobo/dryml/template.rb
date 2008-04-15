@@ -89,30 +89,14 @@ module Hobo::Dryml
 
     
     def process_src
-      # Replace <%...%> scriptlets with xml-safe references into a hash of scriptlets
-      @scriptlets = {}
-      src = @src.gsub(/<%(.*?)%>/m) do
-        _, scriptlet = *Regexp.last_match
-        id = @scriptlets.size + 1
-        @scriptlets[id] = scriptlet
-        newlines = "\n" * scriptlet.count("\n")
-        "[![HOBO-ERB#{id}#{newlines}]!]"
-      end
-
-      @xmlsrc = "<dryml_page>" + src + "</dryml_page>"
-      begin
-        @doc = Hobo::Dryml::Parser::Document.new(Hobo::Dryml::Parser::Source.new(@xmlsrc))
-      rescue REXML::ParseException => e
-        raise DrymlSyntaxError, "File: #{@template_path}\n#{e}"
-      end
-      @doc.default_attribute_value = "&true"
-      
-      restore_erb_scriptlets(children_to_erb(@doc.root))
+      @doc = Hobo::Dryml::Parser::Document.new(@src, @template_path)
+      result = children_to_erb(@doc.root)
+      restore_erb_scriptlets(result)
     end
 
 
     def restore_erb_scriptlets(src)
-      src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
+      @doc.restore_erb_scriptlets(src)
     end
 
     
@@ -896,8 +880,7 @@ module Hobo::Dryml
     end
 
     def element_line_num(el)
-      offset = el.source_offset
-      @xmlsrc[0..offset].count("\n") + 1
+      @doc.element_line_num(el)
     end
 
     def tag_newlines(el)

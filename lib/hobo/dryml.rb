@@ -27,7 +27,11 @@ module Hobo
     APPLICATION_TAGLIB = { :src => "taglibs/application" }
     CORE_TAGLIB        = { :src => "core", :plugin => "hobo" }
     
-    DEFAULT_IMPORTS = [Hobo::HoboHelper, ApplicationHelper]
+    DEFAULT_IMPORTS = (if defined?(ApplicationHelper) 
+                         [Hobo::HoboHelper, ApplicationHelper]
+                       else
+                         [Hobo::HoboHelper]
+                       end)
 
     @renderer_classes = {}
     @tag_page_renderer_classes = {}
