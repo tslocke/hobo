@@ -291,11 +291,10 @@
 
 
 <def tag="name-one">
- <% id = "completer-#{uid}" %>
-  <input type="text" id="#{id}" 
-         class="autocompleter #{type_and_field} complete-on:#{this_type}:#{this_type.name_attribute}" 
-         autocomplete-url="#{url}" name="#{param_name_for_this}" merge-attrs/>
-  <div id="#{id}-completions" class="completions-popup" style="display:none"></div>
+  <input type="text" name="#{param_name_for_this}" 
+         class="autocompleter #{type_and_field} complete-on:#{this_type.to_s.underscore}:#{this_type.name_attribute}"
+         merge-attrs/>
+  <div class="completions-popup" style="display:none"></div>
 </def>
 
 
