@@ -217,14 +217,6 @@ module Hobo
     end
     
     
-    def completer_routes
-      controller.completer_actions.each do |attr|
-        action = "complete_#{attr}"
-        linkable_route(action, "#{plural}/#{action}", action, :conditions => { :method => :get })
-      end
-    end
-    
-    
     def lifecycle_routes
       model::Lifecycle.creator_names.each do |creator|
         linkable_route("#{singular}_#{creator}", "#{plural}/#{creator}", creator, :conditions => { :method => :post })
