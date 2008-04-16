@@ -263,15 +263,6 @@ var Hobo = {
             }
         })
                                                 
-        select(".autocomplete-bhv").each(function (el) {
-            var options = {paramName: "query", minChars: 3, method: 'get' }
-            if (el.hasClassName("autosubmit")) {
-                options.afterUpdateElement = function(el, item) { el.form.onsubmit(); }
-            }
-            new Ajax.Autocompleter(el, el.id + "-completions", el.getAttribute("autocomplete-url"),
-                                   options);
-        });
-
         select(".search-bhv").each(function(el) {
             new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
         });
@@ -313,6 +304,14 @@ var Hobo = {
     putUrl: function(el) {
         spec = Hobo.parseFieldId(el)
         return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
+    },
+
+    
+    urlForId: function(id) {
+        var spec = Hobo.parseId(id)
+        var url = urlBase + "/" + Hobo.pluralise(spec.name)
+        if (spec.id) { url += "/" + spec.id }
+        return url
     },
 
         
@@ -371,8 +370,12 @@ var Hobo = {
 
     parseFieldId: function(el) {
         id = el.getAttribute("hobo-model-id")
-        if (!id) return
-        m = id.match(/^([a-z_]+)_([0-9]+)_([a-z_]+)$/)
+        return id && parseId(id)
+    },
+
+
+    parseId: function(id) {
+        m = id.match(/^([a-z_]+)_([0-9]+)(?:_([a-z_]+))?$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
     },
 
@@ -565,6 +568,7 @@ Event.addBehavior({
 	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
 	Event.stop(e);
     },
+
     'form.filter-menu select:change': function(event) {
         var paramName = this.up('form').down('input[type=hidden]').value.gsub("-", "_")
         var params = {}
@@ -575,6 +579,18 @@ Event.addBehavior({
             params[paramName] = $F(this)
 	}
 	location.href = Hobo.addUrlParams(params, {remove: remove})
+    },
+
+    '.autocompleter' : function(event) {
+        var target    = this.className.match(/complete-on:([\S]+)/)[1].split(':')
+        var model     = target[0]
+        var completer = target[1]
+
+        var spec = Hobo.parseId(model)
+        var url = urlBase + "/" + Hobo.pluralise(spec.name) +  "/complete_" + completer
+        var parameters = spec.id ? "id=" + spec.id : ""
+        new Ajax.Autocompleter(this, this.next('.completions-popup'), url, {paramName:'query', method:'get', parameters: parameters});
     }
+
 
 });
