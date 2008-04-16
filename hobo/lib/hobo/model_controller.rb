@@ -274,8 +274,10 @@ module Hobo
     def destination_after_submit(record=nil)
       record ||= this
       
+      after_submit = params[:after_submit]
+      
       # The after_submit post parameter takes priority
-      params[:after_submit] || 
+      (after_submit == "stay-here" ? :back : after_submit) || 
         
         # Then try the record's show page
         object_url(@this) || 
