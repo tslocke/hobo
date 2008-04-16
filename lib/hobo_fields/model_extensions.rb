@@ -43,7 +43,10 @@ module HoboFields
     # type.
     def self.attr_accessor_with_rich_types(*attrs)
       options = attrs.extract_options!
-      type = options[:type]
+      type = options.delete(:type)
+      attrs << options unless options.empty?
+      attr_accessor_without_rich_types(*attrs)
+      
       if type
         type = HoboFields.to_class(type)
         attrs.each do |attr|
@@ -55,10 +58,6 @@ module HoboFields
             instance_variable_set("@#{attr}", val)
           end
         end
-        
-        attr_reader *attrs
-      else
-        attr_accessor_without_rich_types(*attrs)
       end
     end
     
