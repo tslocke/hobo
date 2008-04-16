@@ -115,7 +115,7 @@ module Hobo
           end
         end
         
-        @auto_actions -= except_actions
+        @auto_actions -= except_actions.flatten
         
         def_auto_actions
       end
