@@ -39,16 +39,24 @@ module ActionController
       @dryml_fallback_tag = tag_name
     end
     
-    def render_tag(tag, options={}, render_options={})
+    
+    def call_dryml_tag(tag, options={})
       add_variables_to_assigns
       
+      # TODO: Figure out what this bit is all about :-)
       if options[:with]
         @this = options[:with] unless options[:field]
       else
         options[:with] = dryml_context
       end
       
-      text = Hobo::Dryml.render_tag(@template, tag, options)
+      Hobo::Dryml.render_tag(@template, tag, options)
+    end
+    
+    
+    # TODO: This is namespace polution, should be called render_dryml_tag
+    def render_tag(tag, options={}, render_options={})
+      text = call_dryml_tag(tag, options)
       text && render({:text => text, :layout => false }.merge(render_options))
     end
 
