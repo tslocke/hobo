@@ -455,7 +455,7 @@ module Hobo::Dryml
         res = (send(method_name, attributes) + part_contexts_javascripts).strip
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
-        if RAILS_ENV == "development"
+        if false && RAILS_ENV == "development"
           res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
         else
           res
