@@ -235,9 +235,10 @@ module ::Hobo
       # Keep a track of names we've seen to avoid cycles
       seen = [ name ]
       
+      name = name.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
       while (newname = renames[name])
         name = newname
-        name = name.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) } if newname =~ /_.*?_/
+        name = name.gsub(/_.*?_/) { |s| new_name_for(s[1..-2]) }
 
         break if name.in?(seen)
         seen << name        
