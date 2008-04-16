@@ -422,7 +422,7 @@ module Hobo
             wants.js do
               if in_place_edit_field
                 # Decreasingly hacky support for the scriptaculous in-place-editor
-                new_val = Hobo::Dryml.render_tag(@template, "view", :field => in_place_edit_field, :no_wrapper => true)
+                new_val = call_dryml_tag("view", :field => in_place_edit_field, :no_wrapper => true)
                 hobo_ajax_response(this, :new_field_value => new_val)
               else
                 hobo_ajax_response(this)
