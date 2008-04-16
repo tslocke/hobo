@@ -30,7 +30,10 @@ def doc_for_tag(tagdef)
   
   parameters = params_to_list(get_parameters(tagdef))
 <<-END
-## <a name="#{name}" />`<#{name}>`
+---
+
+<a name="#{name}">&nbsp;</a>
+##  `<#{name}>`
 
 ### Attributes #{attrs_merged_with}
 
@@ -60,11 +63,11 @@ def params_to_list(params, indent=" ")
   items = params.map do |elem, sub_params|
     p_attr = elem.attributes['param']
     entry = if p_attr == "&true"
-              "#{elem.name}"
+              "&lt;#{elem.name}:&gt;"
             elsif p_attr =~ /#\{/
-                "(dynamic parameter) (#{elem.name})"
+                "(dynamic parameter) (&lt;#{elem.name}&gt;)"
             else
-              "#{p_attr} (#{elem.name})"
+              "&lt;#{p_attr}:&gt; (&lt;#{elem.name}&gt;)"
             end
     sub_list = params_to_list(sub_params, indent + ' ') unless sub_params.empty?
     "<li>#{entry}\n#{sub_list}</li>\n"
@@ -108,11 +111,11 @@ namespace :hobo do
       doc = Hobo::Dryml::Parser::Document.new(File.read(f), f)
     
       markdown = doc_for_taglib(title, doc)
-      html = Maruku.new(markdown).to_html
+      #html = Maruku.new(markdown).to_html
       
-      output_file = "#{output_dir}/#{basename}.html"
+      output_file = "#{output_dir}/#{basename}.markdown"
       puts output_file
-      File.open(output_file, 'w') { |f| f.write(html) }
+      File.open(output_file, 'w') { |f| f.write(markdown) }
     end
   end
   
