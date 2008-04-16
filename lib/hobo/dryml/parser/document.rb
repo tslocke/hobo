@@ -39,7 +39,7 @@ module Hobo::Dryml::Parser
     
     
     def restore_erb_scriptlets(src)
-      src.gsub(/\[!\[HOBO-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
+      src.gsub(/\[!\[DRYML-ERB(\d+)\s*\]!\]/m) {|s| "<%#{@scriptlets[$1.to_i]}%>" }
     end
 
     
