@@ -185,7 +185,7 @@
 <def tag="remote-method-button" attrs="method, update, label"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  url = object_url(this, method)
+  url = object_url(this, method, :method => :post)
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
   if update || result_update || !ajax_attrs.empty?
     label ||= method.titleize
