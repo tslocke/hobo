@@ -290,9 +290,9 @@
 </def>
 
 
-<def tag="name-one">
+<def tag="name-one" attrs="complete-target, completer">
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field} complete-on:#{this_type.to_s.underscore}:#{this_type.name_attribute}"
+         class="autocompleter #{type_and_field} complete-on:#{dom_id complete_target}:#{completer}"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
 </def>
