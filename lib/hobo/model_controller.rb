@@ -67,9 +67,9 @@ module Hobo
         options = options.dup
         field = options.delete(:field) || name
         if block
-          index_action name, &block
+          index_action "complete_#{name}", &block
         else
-          index_action name do
+          index_action "complete_#{name}" do
             hobo_completetions name, model, options
           end
         end
@@ -487,7 +487,7 @@ module Hobo
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
       finder = finder.limit(options[:limit]) unless finder.scope(:find, :limit)
-      finder = finder.send("#{attr}_contains", params[options[:param]])
+      finder = finder.send("#{attribute}_contains", params[options[:param]])
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
