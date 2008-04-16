@@ -360,7 +360,7 @@ var Hobo = {
 
     showEmptyMessageAfterLastRemove: function(el) {
         var empty
-        var container = el.parentNode
+        var container = $(el.parentNode)
         if (container.getElementsByTagName(el.nodeName).length == 1 &&
             (empty = container.next('.empty-collection-message'))) {
             new Effect.Appear(empty, {delay:0.3})
