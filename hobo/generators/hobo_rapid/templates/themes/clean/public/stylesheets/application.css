@@ -1,8 +1,8 @@
-html {background: #666;}
+html, body {background: #666;}
 body {
 	width: 760px;  
 	margin: 0 auto 20px;
-	color: #222; background: white;
+	color: #222;
 	font: 12px "Lucida Grande", "Trebuchet MS", Arial, sans-serif; line-height: 18px;
 }
 h1, h2, h3 {font-weight: normal;}
@@ -46,6 +46,7 @@ input.file_upload {
 	border-right:1px solid #c3c3c3;
 	border-bottom:1px solid #8c8c8c;
 	background: #eee; 
+	overflow: visible; width: auto;
 	font-size: 11px; font-weight: bold;
 }
 .button:hover {cursor: pointer;}
@@ -91,12 +92,12 @@ input.file_upload {
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
-.page-content { margin-top: 20px; }
+.page-content {padding-top: 20px; background: white;}
 
 /* aside layout */
 body.aside-layout {width: 960px;}
-.aside-layout .page-content {height: 100%; overflow: hidden; margin-top: 0px;}
-.aside-layout .main-content {margin-top: 20px;}
+.aside-layout .page-content {height: 100%; overflow: hidden; padding-top: 0;}
+.aside-layout .main-content {padding-top: 20px;}
 .main-content {float: left; width: 670px;}
 .aside {float: right; width: 220px; padding: 20px 30px; background: #E5E5E5;}
 .aside-content {
@@ -165,17 +166,17 @@ ul.main-nav {float: left; margin: 0 10px;}
 .user-account-page .change-password {width: 350px;}
 .user-account-page .change-password th {width: 150px;}
 
+.page-footer {text-align: right; color: #ccc; padding: 5px; font-size: 11px;}
+
 /* pagination nav, needs a more specific class on the wrapper */
 .content-body .nav {margin-bottom: 10px; font-size: 11px;}
 .content-body .nav a {margin-right: 5px;}
 
-.login-page, .signup-page {width: 50%; margin-top: 40px;}
+.login-page, .signup-page {width: 470px; margin-top: 40px;}
 .login-page .content-header, .signup-page .content-header {padding-bottom: 0;}
 .login-page .field-list, .signup-page .field-list {width: 300px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
-.login-page .field-list th, .signup-page .field-list th {width: 120px;}
-.login-page .actions, .signup-page .actions {margin-left: 128px; margin-top: 20px; text-align: left;}
-/*.login-page .submit-button, .signup-page .submit-button {margin: 10px 130px;}*/
+.login-page .field-list th, .signup-page .field-list th {width: 120px !important; width: 110px;}
 
 .edit-page .content-header {overflow: hidden; height: 100%;}
 .edit-page .content-header h1 {float: left;}
