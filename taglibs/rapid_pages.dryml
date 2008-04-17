@@ -12,6 +12,7 @@
 
       <do param="scripts">
         <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <do param="fix-ie6"><%= "<!--[if lt IE 7]>" %><javascript name="IE7"/><%= "<![endif]-->" %></do>
         <hobo-rapid-javascripts param/>
       </do>
     </head>
