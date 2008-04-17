@@ -6,7 +6,7 @@ module Hobo
 
     VIEWLIB_DIR = "taglibs"
     
-    PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
+    DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
     
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :destroy]
@@ -67,9 +67,9 @@ module Hobo
         options = options.dup
         field = options.delete(:field) || name
         if block
-          index_action name, &block
+          index_action "complete_#{name}", &block
         else
-          index_action name do
+          index_action "complete_#{name}" do
             hobo_completetions name, model, options
           end
         end
@@ -271,7 +271,7 @@ module Hobo
     end
     
     
-    def destination_after_submit(record=nil)
+    def destination_after_submit(record=nil, destroyed=false)
       record ||= this
       
       after_submit = params[:after_submit]
@@ -279,11 +279,12 @@ module Hobo
       # The after_submit post parameter takes priority
       (after_submit == "stay-here" ? :back : after_submit) || 
         
+        
         # Then try the record's show page
-        object_url(@this) || 
+        (!destroyed && object_url(@this)) || 
         
         # Then the show page of the 'owning' object if there is one
-        (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on))) ||
+        (!destroyed && (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on)))) ||
         
         # Last try - the index page for this model
         object_url(@this.class) ||
@@ -306,21 +307,14 @@ module Hobo
     
     
     def request_requires_pagination?
-      # Internet explorer has a penchant for saying it would mostly
-      # like an image, if you clicked on an image link
-      request.format.in?(PAGINATE_FORMATS) || request.format.to_s =~ %r(image/)
+      request.format.not_in?(DONT_PAGINATE_FORMATS)
     end
     
     
     def find_or_paginate(finder, options)
       options = options.reverse_merge(:paginate => request_requires_pagination?)
-      do_pagination = options.delete(:paginate)
+      do_pagination = options.delete(:paginate) && finder.respond_to?(:paginate)
       
-      if do_pagination && !finder.respond_to?(:paginate)
-        do_pagination = false
-        logger.warn "Hobo::ModelController: Pagination is not available. To enable, please install will_paginate or a duck-type compatible paginator"
-      end
-
       if do_pagination
         finder.paginate(options.reverse_merge(:page => params[:page] || 1))
       else
@@ -382,7 +376,7 @@ module Hobo
         if valid?
           respond_to do |wants|
             wants.html { redirect_to destination_after_submit }
-            wants.js   { hobo_ajax_response || render(:text => "") }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
           end
         else
           respond_to do |wants|
@@ -398,7 +392,7 @@ module Hobo
     def hobo_update(*args, &b)
       options = args.extract_options!
       
-      self.this ||= args.first || find_instance
+      self.this = args.first || find_instance
       changes = options[:attributes] || attribute_parameters
       this.user_save_changes(current_user, changes)
 
@@ -445,7 +439,7 @@ module Hobo
     
     def hobo_destroy(*args, &b)
       options = args.extract_options!
-      self.this ||= args.first || find_instance
+      self.this = args.first || find_instance
       this.user_destroy(current_user)
       flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
       destroy_response(&b)
@@ -455,7 +449,7 @@ module Hobo
     def destroy_response(&b)
       response_block(&b) or
         respond_to do |wants|
-          wants.html { redirect_to(:action => "index") }
+          wants.html { redirect_to destination_after_submit(this, true) }
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
@@ -487,7 +481,7 @@ module Hobo
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
       finder = finder.limit(options[:limit]) unless finder.scope(:find, :limit)
-      finder = finder.send("#{attr}_contains", params[options[:param]])
+      finder = finder.send("#{attribute}_contains", params[options[:param]])
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
@@ -506,8 +500,8 @@ module Hobo
     
     def permission_denied(error)
       self.this = nil # Otherwise this gets sent user_view
-      if respond_to? :permission_denied_response
-        permission_denied_response
+      if :permission_denied.in?(superclass.instance_methods)
+        super
       else
         respond_to do |wants|
           wants.html do
@@ -526,8 +520,8 @@ module Hobo
     
     
     def not_found(error)
-      if respond_to? :not_found_response
-        not_found_response
+      if :not_found_response.in?(superclass.instance_methods)
+        super
       elsif render_tag("not-found-page", {}, :status => 404)
         # cool
       else
