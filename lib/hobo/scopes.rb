@@ -17,13 +17,12 @@ module Hobo
       include ApplyScopes
     
       def defined_scopes
-        @defined_scopes
+        @defined_scopes ||= {}
       end
       
       
       def def_scope(name, scope=nil, &block)
-        @defined_scopes ||= {}
-        @defined_scopes[name.to_sym] = block || scope
+        defined_scopes[name.to_sym] = block || scope
         
         meta_def(name) do |*args|
           ScopedProxy.new(self, block ? block.call(*args) : scope)
@@ -42,7 +41,7 @@ module Hobo
         end
         result
       end
-            
+
       
       def alias_scope(new_name, old_name)
         metaclass.send(:alias_method, new_name, old_name)

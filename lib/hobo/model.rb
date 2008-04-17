@@ -78,8 +78,6 @@ module Hobo
         send("find_by_#{name_attribute}", *args)
       end
       
-      alias_method :[], :named
-      
       
       def field_added(name, type, args, options)
         self.name_attribute            = name.to_sym if options.delete(:name)
@@ -519,7 +517,7 @@ module Hobo
             # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
             Hobo.object_from_dom_id(value[1..-1])
           else
-            reflection.klass[value]
+            reflection.klass.named(value)
           end
         else
           value
@@ -528,7 +526,7 @@ module Hobo
         if reflection.klass.try.name_attribute
           value.map do |x| 
             if x.is_a?(String) 
-              reflection.klass[x] unless x.blank?
+              reflection.klass.named(x) unless x.blank?
             else
               x
             end
