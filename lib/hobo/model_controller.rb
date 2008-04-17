@@ -391,7 +391,7 @@ module Hobo
     def hobo_update(*args, &b)
       options = args.extract_options!
       
-      self.this ||= args.first || find_instance
+      self.this = args.first || find_instance
       changes = options[:attributes] || attribute_parameters
       this.user_save_changes(current_user, changes)
 
@@ -438,7 +438,7 @@ module Hobo
     
     def hobo_destroy(*args, &b)
       options = args.extract_options!
-      self.this ||= args.first || find_instance
+      self.this = args.first || find_instance
       this.user_destroy(current_user)
       flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
       destroy_response(&b)
