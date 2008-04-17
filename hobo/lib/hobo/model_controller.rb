@@ -6,7 +6,7 @@ module Hobo
 
     VIEWLIB_DIR = "taglibs"
     
-    PAGINATE_FORMATS = [ Mime::HTML, Mime::ALL ]
+    DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
     
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :destroy]
@@ -306,9 +306,7 @@ module Hobo
     
     
     def request_requires_pagination?
-      # Internet explorer has a penchant for saying it would mostly
-      # like an image, if you clicked on an image link
-      request.format.in?(PAGINATE_FORMATS) || request.format.to_s =~ %r(image/)
+      request.format.not_in?(DONT_PAGINATE_FORMATS)
     end
     
     
