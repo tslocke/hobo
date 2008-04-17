@@ -314,13 +314,8 @@ module Hobo
     
     def find_or_paginate(finder, options)
       options = options.reverse_merge(:paginate => request_requires_pagination?)
-      do_pagination = options.delete(:paginate)
+      do_pagination = options.delete(:paginate) && finder.respond_to?(:paginate)
       
-      if do_pagination && !finder.respond_to?(:paginate)
-        do_pagination = false
-        logger.warn "Hobo::ModelController: Pagination is not available. To enable, please install will_paginate or a duck-type compatible paginator"
-      end
-
       if do_pagination
         finder.paginate(options.reverse_merge(:page => params[:page] || 1))
       else
