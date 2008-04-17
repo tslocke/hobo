@@ -78,8 +78,6 @@ module Hobo
         send("find_by_#{name_attribute}", *args)
       end
       
-      alias_method :[], :named
-      
       
       def field_added(name, type, args, options)
         self.name_attribute            = name.to_sym if options.delete(:name)
