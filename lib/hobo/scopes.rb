@@ -42,7 +42,7 @@ module Hobo
         end
         result
       end
-            
+
       
       def alias_scope(new_name, old_name)
         metaclass.send(:alias_method, new_name, old_name)
