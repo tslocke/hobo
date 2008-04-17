@@ -375,7 +375,7 @@ module Hobo
         if valid?
           respond_to do |wants|
             wants.html { redirect_to destination_after_submit }
-            wants.js   { hobo_ajax_response || render(:text => "") }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
           end
         else
           respond_to do |wants|
