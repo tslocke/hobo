@@ -271,7 +271,7 @@ module Hobo
     end
     
     
-    def destination_after_submit(record=nil)
+    def destination_after_submit(record=nil, destroyed=false)
       record ||= this
       
       after_submit = params[:after_submit]
@@ -279,11 +279,12 @@ module Hobo
       # The after_submit post parameter takes priority
       (after_submit == "stay-here" ? :back : after_submit) || 
         
+        
         # Then try the record's show page
-        object_url(@this) || 
+        (!destroyed && object_url(@this)) || 
         
         # Then the show page of the 'owning' object if there is one
-        (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on))) ||
+        (!destroyed && (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on)))) ||
         
         # Last try - the index page for this model
         object_url(@this.class) ||
@@ -448,7 +449,7 @@ module Hobo
     def destroy_response(&b)
       response_block(&b) or
         respond_to do |wants|
-          wants.html { redirect_to(:action => "index") }
+          wants.html { redirect_to destination_after_submit(this, true) }
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
