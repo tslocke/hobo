@@ -500,8 +500,8 @@ module Hobo
     
     def permission_denied(error)
       self.this = nil # Otherwise this gets sent user_view
-      if respond_to? :permission_denied_response
-        permission_denied_response
+      if :permission_denied.in?(superclass.instance_methods)
+        super
       else
         respond_to do |wants|
           wants.html do
@@ -520,8 +520,8 @@ module Hobo
     
     
     def not_found(error)
-      if respond_to? :not_found_response
-        not_found_response
+      if :not_found_response.in?(superclass.instance_methods)
+        super
       elsif render_tag("not-found-page", {}, :status => 404)
         # cool
       else
