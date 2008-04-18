@@ -8,9 +8,18 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
     >> HoboSupport::VERSION
     => "0.1"
 
+## Contents
+
+ * [Enumerable](/hobosupport/hobosupport/enumerable/)
+ * [Hash](/hobosupport/hobosupport/hash/)
+ * [Implies](/hobosupport/hobosupport/implies/)
+ * [Metaid](/hobosupport/hobosupport/metaid/)
+ * [Methodphitamine](/hobosupport/hobosupport/methodphitamine)
+ * [Module](/hobosupport/hobosupport/module)
+
 ## Object extensions
 
-### Object#is_a?
+### `Object#is_a?`
 
 Extended to allow multiple types to be checked in one go
 
@@ -31,7 +40,7 @@ Still works the old way
     
 ## Method call extensions
 
-### Object#_?
+### `Object#_?`
 
 We have the "." operator to call methods on objects. These extensions introduce two "special dots". "`._?.`" only calls the method if the receiver is not `nil`.
 
@@ -41,7 +50,7 @@ We have the "." operator to call methods on objects. These extensions introduce 
     => nil
     
 
-### Object#try
+### `Object#try`
 
 "`.try`" only calls the method if the receiver responds to that method.
 

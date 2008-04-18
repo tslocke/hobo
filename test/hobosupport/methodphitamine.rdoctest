@@ -4,7 +4,7 @@
     >> HoboSupport::VERSION
     => "0.1"
 
-## Kernel#it and Kernel#its
+## `Kernel#it` and `Kernel#its`
 
 A nice hack from Jay Phillips, christened "Methodphitamine". The low-down is in the [original blog post][1].
 

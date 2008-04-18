@@ -4,7 +4,7 @@
     >> HoboSupport::VERSION
     => "0.1"
 
-## Module#included_in_class_callbacks
+## `Module#included_in_class_callbacks`
 
 Bit involved, this one :-)
 
@@ -42,7 +42,7 @@ When a module is included in a class, it gets a callback on the `included` metho
     => "MY NAME IS C"
     
     
-## Module#interiting_cattr_reader
+## `Module#interiting_cattr_reader`
 
 Declares a reader for an instance variable on the class. The attribute is looked up on the superclass if not defined on the receiving class. In other words, the superclass defines a default that subclasses can override. The declaration can also give a default, as shown here.
 
@@ -69,7 +69,7 @@ Now we change the nickname of `B`. `A` retains it's existing nickname.
     => "Andy"
     
     
-## Kernel#classy_module
+## `Kernel#classy_module`
 
 In Ruby we use modules to factor out features that are shared by more than one class. By including the module, a class gets the module's features, just as if they were defined inside the class. This mechanism is very simple if the shared features are all instance methods, but starts to get complicated when we want to share class-level features. For example, to create a module that adds class-methods to the including class, Ruby programmers often use the ClassMethods sub-module idiom:
 

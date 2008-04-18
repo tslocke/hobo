@@ -6,7 +6,7 @@
 
 The implies operator comes from Eiffel. Often comes in handy in Hobo's model-permission methods.
 
-## TrueClass#implies and FalseClass#implies
+## `TrueClass#implies` and `FalseClass#implies`
 
     >> false.implies true
     => true

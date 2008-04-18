@@ -6,7 +6,7 @@
 
 Why the Luck Stiff's essential meta-programming additions to Object. These are probably distributed elsewhere, but they're small enough to throw them in to HoboSupport and remove an external dependency.
 
-## Object#metaclass
+## `Object#metaclass`
 
 Returns the "metaclass" (bad name) or "singleton class" of a given ruby Object
 
@@ -17,7 +17,7 @@ Returns the "metaclass" (bad name) or "singleton class" of a given ruby Object
     >> o.metaclass.instance_methods.grep "foo"
     => ["foo"]
 
-## Object#meta_eval
+## `Object#meta_eval`
 
 * `object.meta_eval(string)`
 * `object.meta_eval { block }`
@@ -34,12 +34,12 @@ And with a block
     >> File.b2 "a/b"
     => "b"
 
-## Object#metaclass_eval
+## `Object#metaclass_eval`
 
 * `object.metaclass_eval(string)`
 * `object.metaclass_eval { block }`
 
-Like #meta_eval, but does a `class_eval` instead of an `instance_eval`
+Like `#meta_eval`, but does a `class_eval` instead of an `instance_eval`
 
     >> File.metaclass_eval "def b3(path); basename(path); end"
     >> File.b3 "a/b"
@@ -52,7 +52,7 @@ And with a block
     => "b"
     
     
-## Object#meta_def
+## `Object#meta_def`
 
     >> String.meta_def(:backwards_new) { |s| s.reverse }
     >> String.backwards_new "strange"

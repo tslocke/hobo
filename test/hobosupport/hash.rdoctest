@@ -4,7 +4,7 @@
     >> HoboSupport::VERSION
     => "0.1"
     
-## Hash#select_hash
+## `Hash#select_hash`
 
 * `hash.select_hash { |key, value| block } => hash`
 * `hash.select_hash { |value| block } => hash`
@@ -20,7 +20,7 @@ You can also give a block that takes one argument, in which case the block is gi
     => {3=>4, 6=>5}
     
 
-## Hash#map_hash
+## `Hash#map_hash`
 
 * `hash.map_hash { |key, value| block } => hash`
 * `hash.map_hash { |value| block } => hash`
@@ -36,7 +36,7 @@ You can also give a block which takes one argument, in which case only the value
     => {1=>200, 3=>400, 6=>500 }
 
     
-## Hash#partition_hash
+## `Hash#partition_hash`
 
 * `hash.partition_hash(keys) => [hash1, hash2]`
 * `hash.partition_hash { |key, value| block } => hash`
@@ -51,7 +51,7 @@ When passed a block, each pair is passed to the block in turn. The result is two
     >> {1=>2, 3=>4, 6=>5}.partition_hash { |key, value| key < value }
     => [{1=>2, 3=>4}, {6=>5}]
     
-## Hash.recursive_update
+## `Hash.recursive_update`
 
 * `hash.recursive_update(hash2)`
 
@@ -63,7 +63,7 @@ Like `#update` but where a sub-hash would overwrite another sub-hash, they are i
     => { :a => 1, :b => { :x => 10, :y => 20}, :c => 3 }
 
 
-## Hash#-
+## `Hash#-`
 
 * `hash - array => hash`
 
@@ -72,7 +72,7 @@ Returns a new hash, the left-hand-side hash with all pairs removed where the key
     >> {1=>2, 3=>4, 6=>5} - [1, 3]
     => {6 => 5}
     
-## Hash#&
+## `Hash#&`
 
 * `hash & array => array`
 
@@ -81,7 +81,7 @@ Returns a new array, the left hand side hash restricted to pairs where the key i
     >> {1=>2, 3=>4, 6=>5} & [1, 3]
     => {1=>2, 3=>4}
     
-## Hash#|
+## `Hash#|`
 
 * `hash | hash => hash`
 
@@ -91,7 +91,7 @@ An alias for merge
     => {1 => 3, 2 => 4}
     
     
-## Hash#get
+## `Hash#get`
 
 * `hash.get(*args) => hash`
 
@@ -100,7 +100,7 @@ Returns an array of values for the given keys. Useful for extracting a few optio
     >> {1=>2, 3=>4, 6=>5}.get(1, 3)
     => [2, 4]
     
-## Hash#compact
+## `Hash#compact`
 
 * `hash.compact => hash`
 
@@ -109,7 +109,7 @@ Returns a hash with the same items as the receiver except those where the value 
     >> {1=>'a', 2=>nil, 3=>'b'}.compact
     => {1=>'a', 3=>'b'}
     
-## Hash#compact
+## `Hash#compact`
 
 * `hash.compact!`
 
