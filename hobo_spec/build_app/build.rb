@@ -23,10 +23,8 @@ def edit(filename)
 end
 
 FileUtils.rm_rf(APP_NAME)
-system "mysqladmin -f drop new_hobo_app_development"
 
-
-sh '../../bin/hobo --hobo-src ../../hobo', APP_NAME
+sh '../../hobo/bin/hobo --hobo-src ../../hobo', APP_NAME
 
 puts "\nCreating POD app"
 
@@ -123,7 +121,6 @@ END
   edit "app/controllers/categories_controller.rb" do |controller|
     controller.sub("auto_actions :all", "auto_actions :all, :except => :new")
   end
-  sh "mysqladmin create new_hobo_app_development"
   
   gen "hobo_migration"
 
