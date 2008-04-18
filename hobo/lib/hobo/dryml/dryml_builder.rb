@@ -128,7 +128,7 @@ module Hobo::Dryml
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name
         Hobo.current_theme = name
-        import_taglib(:src => "taglibs/themes/#{name}/application")
+        import_taglib(:src => "taglibs/themes/#{name}/#{name}")
       end
     end
   end
