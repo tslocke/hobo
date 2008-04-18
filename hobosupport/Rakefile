@@ -1,17 +1,12 @@
-require 'rubygems'
-require 'hoe'
+require 'echoe'
 
-$: << "./lib" 
-
-require 'hobosupport'
-
-Hoe.new('hobosupport', HoboSupport::VERSION) do |p|
-  p.rubyforge_name = 'hobo'
-  p.author = 'Tom Locke'
-  p.email = 'tom@tomlocke.com'
-  p.url = "http://hobocentral.net/hobosupport"
-  p.summary = 'Core Ruby extensions from the Hobo project'
-  p.description = p.paragraphs_of('README.txt', 2..5).join("\n\n")
-  p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
+Echoe.new('hobosupport') do |p|
+  p.author  = "Tom Locke"
+  p.email   = "tom@tomlocke.com"
+  p.summary = "Core Ruby extensions from the Hobo project"
+  p.url     = "http://hobocentral.net/hobosupport"
+  p.project = "hobo"
+  
+  p.changelog = "CHANGES.txt"
+  p.version   = "0.7.5"
 end
-

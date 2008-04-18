@@ -1,12 +1,7 @@
 CHANGES.txt
-LICENSE.txt
-Manifest.txt
-README.txt
-Rakefile
 generators/hobo_migration/hobo_migration_generator.rb
 generators/hobo_migration/templates/migration.rb
 init.rb
-lib/hobo_fields.rb
 lib/hobo_fields/email_address.rb
 lib/hobo_fields/enum_string.rb
 lib/hobo_fields/field_declaration_dsl.rb
@@ -19,8 +14,12 @@ lib/hobo_fields/model_extensions.rb
 lib/hobo_fields/password_string.rb
 lib/hobo_fields/text.rb
 lib/hobo_fields/textile_string.rb
+lib/hobo_fields.rb
 lib/hobofields.rb
+LICENSE.txt
+README.txt
 test/hobofields.rdoctest
 test/hobofields_api.rdoctest
 test/migration_generator.rdoctest
 test/rich_types.rdoctest
+Manifest
