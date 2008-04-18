@@ -1,3 +1,103 @@
+== Hobo 0.7.5 ===
+
+   Restructuring the git repo -- all the different gems/plugins live
+   in the same repo now (github.com/tablatom/hobo)
+
+   New rake task generate_tag_reference. Creates simple HTML reference
+   docs, including any inline documentation comments (found
+   immediately above the <def>)
+   
+    ModelController
+
+      Made it possible to have a custom #permission_denined and
+      #not_found in ApplicationController
+
+      Improved logic for figuring out redirect after destroy
+
+      Fix to bug where we would turn pagination off when we shouldn't
+    
+        We now have a list of mime-types that we *don't* paginate for
+        (can be extended)
+
+      hobo_index now silently skips pagination when the passed finder doesn't support it
+
+      Fix to auto_actions :except => :collections
+
+      Fix to rendering permission denied errors
+
+
+    Fixes for IE6
+
+      The rapid-pages now include the fabulous IE7.js when the client
+      is IE6.
+
+        http://dean.edwards.name/IE7/
+
+      The clean theme now works much better in IE6.
+
+      hobo-rapid.js -- fix displaying the empty-message after a removeButton
+
+
+    Hobo models
+
+      No longer defines Model[...] (in Hobo use Model.named(foo) instead)
+
+      Fix to MyHoboModel.defined_scopes sometimes returning nil
+
+      Allowing belongs_to and has_one associations to be set by name
+      during mass-assignment
+     
+        e.g. person.attributes = { :department => 'Sales' }
+
+      Automatic scopes -- give up silently if there's a problem with the DB
+
+      Fix to :managed => true option on has_many. No longer requires
+      the through association to be declared first.
+
+    Auto-completers are now working again. The tag to use is
+    <name-one>. Should be a how-to for this availabe soon.
+
+    In-place-edits are working again 
+
+    New controller method call_dryml_tag (added by DRYML template
+    handler). Calls a tag and returns the result as a string.
+
+    Fix to <after-submit stay-here> following a part update
+
+    Bundles -- fixes to class renaming
+
+    <remote-method-button> is working again
+
+    Refactored the DRYML parser to make it easier to parse DRYML in other contexts
+
+    Rapid:
+    
+      Improvements to wording on index-page
+
+      Display the users name, not login in the account-nav
+
+      Small tweaks to generic tags
+
+      Fix: The <view> for various types was reverting to a plain String view
+
+
+    Switching to dependency on hobofields and will_paginate as gems rather than plugins
+
+    Fix: DRYML parser works again with REXML versions back to 3.1.4
+
+    Fix: Hobo No longer depends on redcloth unless you're using markdown
+
+    Routing
+
+      Recover from ActiveRecord::StatementInvalid (routes may not be
+      declared). Without this you sometimes can't even run rake if
+      something is invalid
+
+      Don't do routing (and hence load models) during
+      script/generate. This *finally* fixes the dreaded 'User is
+      reserved by Rails' error
+
+
 == Hobo 0.7.4 ===
 
 Switching to a new style for the changelog. Now that we're using git
