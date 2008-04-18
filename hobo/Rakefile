@@ -2,6 +2,8 @@ require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
+load "tasks/generate_tag_reference.rb"
+
 desc 'Default: run specs.'
 task :default => :spec
 
