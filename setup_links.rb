@@ -11,7 +11,7 @@ def give_help
   print "    -F  Will delete old directories recursively first\n"
 end
 
-hobo_root_dir = File.dirname(__FILE__).gsub(/^\./, `pwd`).chomp
+hobo_root_dir = File.dirname(__FILE__).gsub(/^\./, `pwd`.chomp).chomp
 
 force=false; directories = []
 ARGV.each do |l|
@@ -39,7 +39,6 @@ directories.each do |l|
     root.sub!(/\/+[^\/]+\/\.\./,"")
     root.sub!(/\/+[^\/]+\/\.\./,"")
     #p "TESTING #{root} #{l} #{p}"
-    #load "#{root}/config/boot.rb" if File.exists? "#{root}/config/boot.rb" rescue p "no"
     if File.exists?("#{root}/config/boot.rb") and File.read("#{root}/config/boot.rb").match(/RAILS_ROOT/)
       print "Found a Rails root directory at #{root}\n"
       %w(hobo hobosupport hobofields).each do |link_name|
