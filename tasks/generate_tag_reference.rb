@@ -48,10 +48,9 @@ end
 def comment_for_tag(element)
   space = element.previous_sibling and 
     space.to_s.blank? && space.to_s.count("\n") == 1 and
-    comment = space.previous_sibling and
-    comment.is_a?(REXML::Comment)
-   
-  comment.to_s.strip if comment
+    comment = space.previous_sibling
+  
+  comment.to_s.strip if comment.is_a?(REXML::Comment)
 end
 
 
