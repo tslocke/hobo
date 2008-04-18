@@ -3,7 +3,8 @@
   -->
 
 <!--- General Navigation -->
-  
+
+<!-- General purpose navigation bar. Renders a `<ul class="navigation">` -->
 <def tag="navigation" attrs="current">
   <ul class="navigation" merge-attrs>
     <set-scoped current-navigation="&current">
@@ -86,8 +87,8 @@
 </def>
 
 
-<!-- magic nav, just to get you started -->
-<!-- write your own navigation using the <navigation> tag -->
+<!-- magic nav, just to get you started. Don't try to customise this
+but rather write your own navigation using the `<navigation>` tag -->
 <def tag="magic-nav">
   <navigation merge-attrs>
     <nav-item href="#{base_url}/">Home</nav-item>
