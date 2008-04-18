@@ -9,3 +9,6 @@ doc/agility-tutorial/agility/vendor/plugins/hobofields
 doc/agility-tutorial/agility/db/*
 
 hobo/taglib-docs
+
+
+hobosupport/pkg

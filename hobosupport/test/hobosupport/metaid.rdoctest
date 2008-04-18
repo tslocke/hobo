@@ -1,0 +1,60 @@
+# HoboSupport - Metaid
+
+    >> require 'hobosupport'
+    >> HoboSupport::VERSION
+    => "0.1"
+
+Why the Luck Stiff's essential meta-programming additions to Object. These are probably distributed elsewhere, but they're small enough to throw them in to HoboSupport and remove an external dependency.
+
+## `Object#metaclass`
+
+Returns the "metaclass" (bad name) or "singleton class" of a given ruby Object
+
+    >> o = Object.new
+    >> def o.foo; ;123; end
+    >> o.foo
+    => 123
+    >> o.metaclass.instance_methods.grep "foo"
+    => ["foo"]
+
+## `Object#meta_eval`
+
+* `object.meta_eval(string)`
+* `object.meta_eval { block }`
+
+Evaluates ruby source or a block in the context of the metaclass.
+
+    >> File.meta_eval "alias_method :b, :basename"
+    >> File.b "a/b"
+    => "b"
+
+And with a block
+
+    >> File.meta_eval { alias_method :b2, :basename }
+    >> File.b2 "a/b"
+    => "b"
+
+## `Object#metaclass_eval`
+
+* `object.metaclass_eval(string)`
+* `object.metaclass_eval { block }`
+
+Like `#meta_eval`, but does a `class_eval` instead of an `instance_eval`
+
+    >> File.metaclass_eval "def b3(path); basename(path); end"
+    >> File.b3 "a/b"
+    => "b"
+
+And with a block
+
+    >> File.metaclass_eval { def b4(path); basename(path); end }
+    >> File.b4 "a/b"
+    => "b"
+    
+    
+## `Object#meta_def`
+
+    >> String.meta_def(:backwards_new) { |s| s.reverse }
+    >> String.backwards_new "strange"
+    => "egnarts"
+   
