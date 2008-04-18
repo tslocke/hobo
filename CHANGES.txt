@@ -3,6 +3,9 @@
    Restructuring the git repo -- all the different gems/plugins live
    in the same repo now (github.com/tablatom/hobo)
 
+   Change to themes - the stylesheet and tablib are now called
+   (e.g. for the 'clean' theme) clean.css and clean.dryml
+
    New rake task generate_tag_reference. Creates simple HTML reference
    docs, including any inline documentation comments (found
    immediately above the <def>)
