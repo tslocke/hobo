@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+require 'fileutils'
+
+def give_help
+  print "setup_links.rb [<rails_root> ...]\n"
+  print "Sets up plugin links to the hobo repo that this script is run from.\n"
+  print "Can take no arguments (link within the current rails application) or\n"
+  print "the location of one or more rails application directories. It will\n"
+  print "make relative links in the former case and absolute links otherwise\n"
+  print "    -f  Will delete old links or files first\n"
+  print "    -F  Will delete old directories recursively first\n"
+end
+
+hobo_root_dir = File.dirname(__FILE__).gsub(/^\./, `pwd`).chomp
+
+force=false; directories = []
+ARGV.each do |l|
+  case l
+  when '-h'
+    give_help; exit 0
+  when '-f'
+    force=1
+  when '-F'
+    force=2
+  end
+  directories.push l if File.directory?(l)
+end
+directories.push hobo_root_dir if directories.empty?
+
+
+# Lets go digging for roots
+directories.each do |l|
+  #p "DIGGING IN #{l}"
+  ["", "/..", "/../..", "/../../..", "/../../../.."].each do |p|
+    root="#{l}#{p}"
+    root.gsub!(/\/\//,'/')
+    root.sub!(/\/+[^\/]+\/\.\./,"")
+    root.sub!(/\/+[^\/]+\/\.\./,"")
+    root.sub!(/\/+[^\/]+\/\.\./,"")
+    root.sub!(/\/+[^\/]+\/\.\./,"")
+    #p "TESTING #{root} #{l} #{p}"
+    #load "#{root}/config/boot.rb" if File.exists? "#{root}/config/boot.rb" rescue p "no"
+    if File.exists?("#{root}/config/boot.rb") and File.read("#{root}/config/boot.rb").match(/RAILS_ROOT/)
+      print "Found a Rails root directory at #{root}\n"
+      %w(hobo hobosupport hobofields).each do |link_name|
+        link="#{root}/vendor/plugins/#{link_name}"
+        target="#{hobo_root_dir}/#{link_name}"
+        target.gsub!(/^#{root}/, "../../")
+        target.gsub!(/\/\//,"/")
+        if File.directory?(link)
+          if force == 2
+            FileUtils.rm_r(link)
+          else
+            next
+          end
+        elsif File.directory?(link)
+          if force == 1
+            FileUtils.rm(link)
+          else
+            next
+          end
+        end
+        FileUtils.ln_s(target, link, {:verbose => true})
+      end
+      next
+
+    end
+  end
+end
