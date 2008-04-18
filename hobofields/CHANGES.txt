@@ -1,0 +1,38 @@
+== HoboFields 0.7.4 ==
+
+    Fix to using the migration generator with STI
+
+    HoboFields::Text - fix to to_html
+
+    Ensure that the bundled rich types are only loaded on demand
+
+    HoboFields::TextileString -- adding require 'redcloth'
+
+    Fix for HoboFields::EnumString -- couldn't set values using
+    symbols
+
+    Adding to_html to PasswordString (returns '[password-hidden]')
+
+    EnumString -- now defines constants on the class for each value in
+    the enum
+    
+      Also, won't define an is_foo? method if that already exists
+
+    Removing HoboFields::Percentage -- this is better handled as an
+    application specific type
+    
+      For example, is a percentage an fixnum or a float? Is 101% valid
+      or invalid?
+
+    Fix to validates_virtual_field
+
+    *Breaking Change* EnumString: Change to automatically defined
+     class methods on EnumString classes
+    
+        It used to be that if you did EnumString.for(:foo, :baa), your
+        class had methods foo, baa and the instance got methods foo?
+        and baa?. There was a big problem with name clashes with other
+        class methods. You now get no class methods, and the instance
+        methods are called is_foo? and is_baa?.
+
+    Rich field type fix: don't attempt to wrap booleans

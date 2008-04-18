@@ -1,0 +1,215 @@
+# HoboFields -- Rich Types
+
+This doctest describes the rich types bundles with HoboFields, and the process by which you can create and register your own types.
+	
+	>> require 'rubygems'
+	>> require 'activesupport'
+	>> Dependencies.load_paths << '.'
+	>> Dependencies.mechanism = :require
+	>> require 'activerecord'
+	>> require 'hobofields'
+	
+
+## `to_html` method
+
+The rich types provide a `to_html` method. If you are using the full Hobo stack you don't need to be aware of this unless you're defining your own rich types -- the `<view>` tag uses `to_html` to render a rich type. If you are not using DRYML and Rapid, you can simply call `to_html` in your views, e.g.
+	
+	<div class="post-body"><%= @post.body.to_html %></div>
+	
+If you ever decide to change from, say, plain text to markdown formatted, your view won't need to change.
+
+## Defining your own Rich Type
+
+Defining a rich type is very simple. We'll show an example here before we go through the bundled types so that you start with the idea that there's really nothing sophisticated going on here.
+
+This class defines the methods `to_html` to customize the way the type is rendered, and `validate` to provide a custom validation. It also defined the `COLUMN_TYPE` constant to tell the migration generator what underlying type should represent these values in the database.
+
+	# Loud text always renderd in caps. 
+	# It's rude to shout too much so it's not allowed to be 
+	# longer than 100 characters
+	class LoudText < String
+	
+      COLUMN_TYPE = :string
+
+	  HoboFields.register_type(:loud, self)
+	
+	  def validate
+	    "is too long (you shouldn't shout that much)" if length > 100
+	  end
+	
+	  def to_html
+	    upcase
+	  end
+	
+	end
+	
+That's all there is to it. Defining `to_html` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
+
+
+## Bundled types
+
+Here we'll give a quick overview of the bundles types. Remember that, along with the specific features the type provides (e.g. validation), the simple fact that the type exists is also useful in the other layers of Hobo. For example `HoboFields::PasswordString` doesn't add any features to `String`, but the fact that a specific type exists for passwords means that the view layer can automatically render an `<input type="password">`.
+
+
+### `HoboFields::EmailAddress`
+
+Provides validation of correct email address format.
+
+	>> good = HoboFields::EmailAddress.new("foo@baa.com")
+	>> bad  = HoboFields::EmailAddress.new("foo.baa.com")
+	>> !!good.valid?
+	=> true
+	>> good.validate
+	=> nil
+	>> !!bad.valid?
+	=> false
+	>> bad.validate
+	=> "is not valid"
+
+### `HoboFields::HtmlString`
+
+`HtmlString` provides no special behavior. The main reason for using this type is that the `to_html` method does not do any html-escaping. Use this for columns that store raw HTML in the database.
+
+### `HoboFields::MarkdownString`
+
+`HoboFields::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
+
+	>> require 'bluecloth'
+	>> markdown = HoboFields::MarkdownString.new %(
+	# This is a heading
+	
+	And text can be *emphasised*
+	)
+	>> markdown.to_html
+	=>""
+	<h1>This is a heading</h1>
+	
+	<p>And text can be <em>emphasised</em></p>
+	>>
+
+### `HoboFields::TextileString`
+
+`HoboFields::TextileString` provides a `to_html` that renders markdown syntax into html. It requires the redcloth gem.
+
+	>> require 'redcloth'
+	>> textile = HoboFields::TextileString.new %(
+	Text can be _emphasised_
+	)
+	>> textile.to_html
+	=>""
+	<p>Text can be <em>emphasised</em></p>
+	>>
+
+### `HoboFields::Text`
+
+`HoboFields::Text` provides a `to_html` method with HTML escaping and conversion of newlines to `<br />` tags.
+
+	>> text = HoboFields::Text.new %(Tom & Jerry
+	
+	Cat & Mouse)
+	>> text.to_html
+	=>""
+	Tom &amp; Jerry<br />
+	<br />
+	Cat &amp; Mouse
+	>>
+
+### `HoboFields::PasswordString`
+
+`HoboFields::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "`[password hidden]`". The type is also used to indicate the need for an `<input type='password'>`
+
+
+## Enum Strings
+
+`HoboFields::EnumString` is not a rich type that you use directly. It's a "type generator", rather like Ruby's `Struct`. It's used for the common situation in database driven apps that you want an enumerated type, but it's not worth going to the extra bother of a separate table enumerating the values. For example you could create a type to represent the status of an article:
+
+	>> ArticleStatus = HoboFields::EnumString.for(:draft, :approved, :published)
+	=> ArticleStatus
+	
+Note that, like all dynamically created classes in Ruby, the class is anonymous until assigned to a constant:
+
+	>> klass = HoboFields::EnumString.for(:draft, :approved, :published)
+	=> #<EnumString draft approved published>
+	>> AritcleStatus = klass
+	>> ArticleStatus
+	=> ArticleStatus
+	
+The values in the enum are available as class constants:
+
+	>> ArticleStatus::DRAFT
+	=> "draft"
+	>> ArticleStatus::DRAFT.class
+	=> ArticleStatus
+	
+There are also instance methods to check for each of the values:
+
+	>> a = ArticleStatus::APPROVED
+	>> a.is_draft?
+	=> false
+	>> a.is_approved?
+	=> true
+	
+They can be constructed from strings:
+
+	>> a = ArticleStatus.new("approved")
+	>> a.is_approved?
+	=> true
+	
+Equality is string equality, with symbols first converted to strings:
+
+	>> a == "approved"
+	=> true
+	>> a == :approved
+	=> true
+	
+	
+Note that every enum you create is a subclass of HoboFields::EnumString:
+
+	>> a.is_a?(HoboFields::EnumString)
+	=> true
+	
+	
+### Using EnumString in your models
+	
+`HoboFields::EnumString` extends the field declaration DSL with a shorthand for creating enum types:
+
+	>>
+	class Article < ActiveRecord::Base
+	  fields do
+	    status enum_string(:draft, :approved, :published)
+	  end
+	end
+	>> Article.attr_type :status
+	#<EnumString draft approved published>
+
+Sometimes it's nice to have a proper type name. Here's one way you might go about it:
+
+	>>
+	class Article < ActiveRecord::Base
+      Status = HoboFields::EnumString.for(:draft, :approved, :published)
+	  fields do
+	    status Status
+	  end
+	end
+	>> Article.attr_type :status
+	=> Article::Status
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

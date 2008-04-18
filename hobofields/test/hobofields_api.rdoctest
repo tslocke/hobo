@@ -1,0 +1,247 @@
+# HoboFields API
+
+## Connect to the Database
+
+In order for the API examples to run we need a connection to a database. You can ignore this if you're just looking for documentation.
+
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> Dependencies.load_paths << '.'
+    >> Dependencies.mechanism = :require
+    >> require 'activerecord'
+    >> require 'hobofields'
+    >> mysql_database = "hobofields_doctest"
+    >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
+    >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+                                               :database => mysql_database,
+                                               :host => "localhost")
+
+## Example Models
+
+Let's define some example models that we can use to demonstrate the API. With HoboFields we define the model's fields, with their name and type, directly in the model like so:
+
+	>>
+	class Advert < ActiveRecord::Base
+	  fields do
+		title           :string
+		body            :text
+		contact_address :email_address
+	  end
+	end
+
+(Note: `:email_address` is an example of a "Rich Type" provided by HoboFields -- more on those later)
+
+The migration generator uses this information to create a migration. The following creates and runs the migration so we're ready to go.
+
+	>> up, down = HoboFields::MigrationGenerator.run
+	>> ActiveRecord::Migration.class_eval up
+	
+We're now ready to start demonstrating the API
+
+## The Basics
+
+The main feature of HoboFields, aside from the migration generator, is the ability to declare rich types for your fields. For example, you can declare that a field is an email address, and the field will be automatically validated for correct email address syntax.
+
+### Field Types
+
+Field values are returned as the type you specify.
+
+	>> a = Advert.new :body => "This is the body"
+	>> a.body.class
+	=> HoboFields::Text
+	
+This also works after a round-trip to the database
+
+	>> a.save
+	>> b = Advert.find(a.id)
+	>> b.body.class
+	=> HoboFields::Text
+
+HoboFields::Text is a simple subclass of string. It's a "wrapper type", by which we mean you pass the underlying value to the constructor. 
+
+	>> t = HoboFields::Text.new("hello")
+	=> "hello"
+	>> t.class
+	=> HoboFields::Text
+	
+If you define your own rich types, they need to support a one argument constructor in the same way.
+
+Although the body of our advert is really just a string, it's very useful that it has a different type. For example, the view layer in Hobo Rapid would use this information to render a `<textarea>` rather than an `<input type='text'>` in an Advert form.
+	
+
+## Names vs. Classes
+
+In the `fields do ... end` block you can give the field-type either as a name (symbol) or a class. For example, we could have said
+
+	body HoboFields::Text
+	
+Obviously the symbol form is a nicer:
+
+	body :text
+
+If you provide a class it must define the `COLUMN_TYPE` constant. This instructs the migration generator to create the appropriate underlying database column type. It should be a symbol that is a valid column type in a Rails migration. 
+
+	>> HoboFields::Text::COLUMN_TYPE
+	=> :text
+	
+The full set of available symbolic names is
+  
+ * `:integer`
+ * `:big_integer`
+ * `:float`
+ * `:string`
+ * `:text`
+ * `:boolean`
+ * `:date`
+ * `:datetime`
+ * `:html`
+ * `:textile`
+ * `:markdown`
+ * `:password`
+ * `:email_addresss`
+
+You can add your own types too. More on that later.
+
+
+## Model extensions
+	
+HoboFields adds a few features to your models.
+	
+### `Model.attr_type`
+
+Returns the type (i.e. class) declared for a given field or attribute
+
+	>> Advert.attr_type :title
+	=> String
+	>> Advert.attr_type :body
+	=> HoboFields::Text
+	
+### `Model.column`
+
+A shorthand for accessing column metadata
+
+	>> col = Advert.column :title
+	>> col.name
+	"title"
+	>> col.klass
+	>> String
+
+### `Model.attr_accessor` with types
+
+In your HoboFields models you can also give type information to "virtual fields" (i.e. regular Ruby attributes)
+
+	>>
+	class Advert
+	  attr_accessor :my_attr, :type => :text
+	end
+	>> a = Advert.new
+	>> a.my_attr = "hello"
+	>> a.my_attr.class 
+	=> HoboFields::Text
+	
+
+## Field validations
+
+HoboFields gives you some shorthands for declaring some common validations right in the field declaration
+
+### Required fields
+
+The `:required` argument to a field gives a `validates_presence_of`:
+
+	>> 
+	class Advert
+	  fields do
+	    title :string, :required
+	  end
+	end
+	>> a = Advert.new
+	>> a.valid?
+	=> false
+	>> a.errors.full_messages
+	=> ["Title can't be blank"]
+	>> a.title = "Jimbo"
+	>> a.save
+	=> true
+	
+
+### Unique fields
+
+The `:unique` argument in a field declaration gives `validates_uniqueness_of`:
+    
+	>> 
+	class Advert < ActiveRecord::Base
+	  fields do
+	    title :string, :unique
+	  end
+	end
+	>> a = Advert.new :title => "Jimbo"
+	>> a.valid?
+	=> false
+	>> a.errors.full_messages
+	=> ["Title has already been taken"]
+	>> a.title = "Sambo"
+	>> a.save
+	=> true
+	
+Let's get back to the basic Advert class with no validations before we continue:
+   
+	>> Dependencies.remove_constant "Advert"
+	>>
+	class Advert < ActiveRecord::Base
+	  fields do
+	    title           :string
+	    body            :text
+		contact_address :email_address
+	  end
+	end
+
+	
+### Type specific validations
+
+Rich types can define there own validations by a `#validate` method. It should return an error message if the value is invalid, otherwise nil. We can call that method directly to show how it works:
+
+	>> a = Advert.new :contact_address => "not really an email address"
+	>> a.contact_address.class
+	=> HoboFields::EmailAddress
+	>> a.contact_address.validate
+	=> "is not valid"
+	
+But normally that method would be called for us during validation:
+	
+	>> a.valid?
+	=> false
+	>> a.errors.full_messages
+	=> ["Contact address is not valid"]
+	>> a.contact_address = "me@me.com"
+	>> a.valid?
+	=> true
+	
+You can add this capability to your own rich types just by defining `#validate`
+	
+### Validating virtual fields
+
+You can set the type of a virtual field to a rich type, e.g.
+
+	>>
+	class Advert
+	  attr_accessor :alternative_email, :type => :email_address
+	end
+	
+By default, virtual fields are not subject to validation.
+
+	>> a = Advert.new :alternative_email => "woot!"
+	>> a.valid?
+	=> true
+
+To have them validated use `validate_virtual_field`:
+
+	>>
+	class Advert
+	  validate_virtual_field :alternative_email
+	end
+	>> a.valid?
+	=> false
+	
+## Cleanup
+
+    >> system  "mysqladmin --force drop #{mysql_database}"
