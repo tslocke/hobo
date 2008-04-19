@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby 
 
-HOBO_VERSION = "0.7.4"
+HOBO_VERSION = "0.7.5"
 
 require 'fileutils'
 Signal.trap("INT") { puts; exit }
