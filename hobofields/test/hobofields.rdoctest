@@ -8,15 +8,17 @@ Doctests are a great way to get both documentation and tests from the same sourc
 
 ## Introduction 
 
-HoboFields lives on GitHub: [http://github.com/tablatom/hobofields](http://github.com/tablatom/hobofields)
+The simplest and recommended way to install HoboFeilds is as a gem:
 
-You can install it with git:
+	$ gem install hobofields
 
-	git clone git://github.com/tablatom/hobofields.git vendor/plugins/hobofields
+The source lives on GitHub as part of the main Hobo repo:
 
-Or subversion:
+ - [http://github.com/tablatom/hobo](http://github.com/tablatom/hobo)
 
-	svn export svn://hobocentral.net/hobofields/tags/rel_0.7.4 vendor/plugins/hobofields
+The simplest way to install HoboFields as a plugin is to use the subversion mirror:
+
+	svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
 	
 HoboFields provides two main features:
 
