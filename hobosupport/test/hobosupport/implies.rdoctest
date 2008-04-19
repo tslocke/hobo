@@ -1,8 +1,6 @@
 # HoboSupport - implies
 
     >> require 'hobosupport'
-    >> HoboSupport::VERSION
-    => "0.1"
 
 The implies operator comes from Eiffel. Often comes in handy in Hobo's model-permission methods.
 

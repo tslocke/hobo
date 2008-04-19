@@ -1,8 +1,6 @@
 # HoboSupport - Eumerable extensions
 
     >> require 'hobosupport'
-    >> HoboSupport::VERSION
-    => "0.1"
 
 ## `Enumerable#search`
 

@@ -1,8 +1,6 @@
 # HoboSupport - Hash extensions
 
     >> require 'hobosupport'
-    >> HoboSupport::VERSION
-    => "0.1"
     
 ## `Hash#select_hash`
 

@@ -6,7 +6,7 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
     >> require 'hobosupport'
     >> HoboSupport::VERSION
-    => "0.1"
+    => "0.7.5"
 
 ## Contents
 

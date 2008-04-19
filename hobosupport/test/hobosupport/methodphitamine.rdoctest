@@ -1,8 +1,6 @@
 # HoboSupport - Methodphitamine
 
     >> require 'hobosupport'
-    >> HoboSupport::VERSION
-    => "0.1"
 
 ## `Kernel#it` and `Kernel#its`
 

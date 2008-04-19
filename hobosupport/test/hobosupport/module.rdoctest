@@ -1,8 +1,6 @@
 # HoboSupport - Module extensions
 
     >> require 'hobosupport'
-    >> HoboSupport::VERSION
-    => "0.1"
 
 ## `Module#included_in_class_callbacks`
 
