@@ -6,42 +6,36 @@ module Hobo
     
     AssociationProxyExtensions = classy_module do
       
+      def scope_conditions(reflection)
+        scope_name = reflection.options[:scope] and
+          target_class = reflection.klass and
+          target_class.send(scope_name).scope(:find)[:conditions]
+      end
+      
+      
+      def combine_conditions(*conditions)
+        parts = conditions.compact.map { |c| "(#{sanitize_sql c})" }
+        parts.empty? ? nil : parts.join(" AND ")
+      end
+      
+      
       def conditions_with_hobo_scopes
-        scope_conditions = if (scope_name = @reflection.options[:scope])
-                             target_class = @reflection.klass
-                             target_class.send(scope_name).scope(:find)[:conditions]
-                           end
+        scope_conditions = self.scope_conditions(@reflection)
         unscoped_conditions = conditions_without_hobo_scopes
-        if scope_conditions && unscoped_conditions
-          "(#{sanitize_sql conditions_without_hobo_scopes}) AND (#{sanitize_sql scope_conditions})"
-        elsif scope_conditions
-          sanitize_sql scope_conditions
-        else
-          unscoped_conditions
-        end
+        combine_conditions(scope_conditions, unscoped_conditions)
       end
 
       alias_method_chain :conditions, :hobo_scopes
       
     end
 
-    # Horrible repitition, but you know what, sometimes you just do.
-    
     HasManyThroughAssociationExtensions = classy_module do
       
       def sql_conditions_with_hobo_scopes
-        scope_conditions = if (scope_name = @reflection.options[:scope])
-                             target_class = @reflection.klass
-                             target_class.send(scope_name).scope(:find)[:conditions]
-                           end
+        scope_conditions         = self.scope_conditions(@reflection)
+        through_scope_conditions = self.scope_conditions(@reflection.through_reflection)
         unscoped_conditions = sql_conditions_without_hobo_scopes
-        if scope_conditions && unscoped_conditions
-          "(#{sanitize_sql conditions_without_hobo_scopes}) AND (#{sanitize_sql scope_conditions})"
-        elsif scope_conditions
-          sanitize_sql scope_conditions
-        else
-          unscoped_conditions
-        end
+        combine_conditions(scope_conditions, through_scope_conditions, unscoped_conditions)
       end
 
       alias_method_chain :sql_conditions, :hobo_scopes
