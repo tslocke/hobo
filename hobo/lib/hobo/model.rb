@@ -476,8 +476,11 @@ module Hobo
 
     
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
-        convert_associated_records_for_mass_assignment(field_type, value)
+      if field_type < ActiveRecord::Base
+        convert_record_reference_for_mass_assignment(field_type, value)
+        
+      elsif field_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
+        convert_collection_for_mass_assignment(field_type, value)
         
       elsif !field_type.is_a?(Class)
         value
@@ -505,41 +508,39 @@ module Hobo
         (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
         
       else
-        # primitive field
+        # no conversion
         value
       end
     end
     
-    def convert_associated_records_for_mass_assignment(reflection, value)
-      if reflection.macro.in?([:belongs_to, :has_one])
-        if value.is_a?(String)
-          if value.starts_with?('@')
-            # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
-            Hobo.object_from_dom_id(value[1..-1])
-          else
-            reflection.klass.named(value)
-          end
+    
+    def convert_record_reference_for_mass_assignment(klass, value)
+      if value.is_a?(String)
+        if value.starts_with?('@')
+          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
+          Hobo.object_from_dom_id(value[1..-1])
         else
-          value
+          klass.named(value)
         end
-      elsif reflection.macro == :has_many
-        if reflection.klass.try.name_attribute
-          value.map do |x| 
-            if x.is_a?(String) 
-              reflection.klass.named(x) unless x.blank?
-            else
-              x
-            end
-          end.compact
-        else
-          value
-        end
-        
       else
-        # unknown kind of accociation - no conversion
         value
       end
     end
+    
+    
+    def convert_collection_for_mass_assignment(reflection, value)
+      if reflection.klass.try.name_attribute
+        value.map do |x| 
+          if x.is_a?(String) 
+            reflection.klass.named(x) unless x.blank?
+          else
+            x
+          end
+        end.compact
+      else
+        value
+      end
+    end  
         
   end
   
