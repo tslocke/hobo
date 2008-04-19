@@ -158,14 +158,14 @@ module Hobo
         elsif (col = column(name)) && (col.type == :boolean)
 
           def_scope do 
-            { :conditions => "#{column_sql(col)}" }
+            { :conditions => ["#{column_sql(col)} = ?", true] }
           end
         
         # not_published
         elsif name =~ /^not_(.*)$/ && (col = column($1)) && (col.type == :boolean)
 
           def_scope do 
-            { :conditions => "NOT #{column_sql(col)}" }
+            { :conditions => ["#{column_sql(col)} <> ?", true] }
           end
           
         # published_before(time)
