@@ -25,8 +25,9 @@ ARGV.each do |l|
   end
   directories.push l if File.directory?(l)
 end
-directories.push hobo_root_dir if directories.empty?
-
+# this is counter intuitive I think... rather it tried the PWD than the script srouce
+# directories.push hobo_root_dir if directories.empty?
+directories.push `pwd`.chomp if directories.empty?
 
 # Lets go digging for roots
 directories.each do |l|
