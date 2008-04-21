@@ -2,7 +2,7 @@ module Hobo::Dryml::Parser
   
   class BaseParser < REXML::Parsers::BaseParser
     
-    NEW_REX = REXML::VERSION =~ /3\.1\.(\d)(?:\.(\d))?/ && $1.to_i*1000 + $2.to_i >= 7002
+    NEW_REX = defined?(REXML::VERSION) && REXML::VERSION =~ /3\.1\.(\d)(?:\.(\d))?/ && $1.to_i*1000 + $2.to_i >= 7002
     
     DRYML_NAME_STR          = "#{NCNAME_STR}(?::(?:#{NCNAME_STR})?)?"
     DRYML_ATTRIBUTE_PATTERN = if NEW_REX
