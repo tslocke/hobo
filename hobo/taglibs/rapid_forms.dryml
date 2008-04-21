@@ -200,13 +200,15 @@
   
 
 <def tag="update-button" attrs="label, update, fields, params"><%=
-  raise HoboError.new("no update specified") unless update
-  ajax_attributes[:message] ||= label
-  func = ajax_updater(object_url(this), update,
-                      :params => { this.class.name.underscore => fields }.merge(params || {}),
-                      :method => :put)
-  element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                          "button update-button update-#{this.class.name.underscore}-button") %>
+   raise HoboError.new("no update specified") unless update
+
+   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+   params = (params || {}).merge(this.class.name.underscore => fields)
+   ajax_attributes.reverse_merge!(:message => label, :params => params, :method => :put)
+   func = ajax_updater(object_url(this), update, ajax_attributes)
+   html_attributes.reverse_merge!(:type =>'button', :onclick => func, :value => label)
+   
+   element :input, add_classes(html_attributes, "button update-button update-#{this.class.name.underscore}-button") %>
 </def>
 
 
