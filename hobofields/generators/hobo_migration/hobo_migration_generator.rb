@@ -30,7 +30,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
       migration_name = input("Filename [#@migration_name]:").strip.gsub(' ', '_')
       migration_name = @migration_name if migration_name.blank?
       
-      at_exit { system "rake db:migrate" } if action == 'm'
+      at_exit { rake_migrate } if action == 'm'
       
       up.gsub!("\n", "\n    ")
       down.gsub!("\n", "\n    ")
@@ -88,6 +88,14 @@ class HoboMigrationGenerator < Rails::Generator::Base
       response
     else
       STDIN.readline
+    end
+  end
+  
+  def rake_migrate
+    if RUBY_PLATFORM =~ /mswin32/
+      system "rake.bat db:migrate"
+    else
+      system "rake db:migrate"
     end
   end
   
