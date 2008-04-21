@@ -27,9 +27,7 @@ module HoboFields
     
     def load_rails_models
       if defined? RAILS_ROOT
-        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
-          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
-        end
+        Dir["#{RAILS_ROOT}/app/models/**/[a-z]*.rb"].each { |f| load f }
       end
     end
     
