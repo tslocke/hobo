@@ -350,7 +350,7 @@ module Hobo
     def hobo_create(*args, &b)
       options = args.extract_options!
       self.this = args.first || new_for_create
-      this.user_save_changes(current_user, options[:attributes] || attribute_parameters)
+      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(&b)
     end
     
@@ -393,7 +393,7 @@ module Hobo
       options = args.extract_options!
       
       self.this = args.first || find_instance
-      changes = options[:attributes] || attribute_parameters
+      changes = options[:attributes] || attribute_parameters or raise RuntimeError, "No update specified in params"
       this.user_save_changes(current_user, changes)
 
       # Ensure current_user isn't out of date
