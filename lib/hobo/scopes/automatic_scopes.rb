@@ -234,7 +234,7 @@ module Hobo
                 field_query
               end
               
-              { :conditions => [word_queries.join(" OR ")] + args }              
+              { :conditions => [word_queries.join(" AND ")] + args }
             end
             
           else
