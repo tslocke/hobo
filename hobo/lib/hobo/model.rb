@@ -476,7 +476,7 @@ module Hobo
 
     
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type < ActiveRecord::Base
+      if field_type.is_a?(Class) && field_type < ActiveRecord::Base
         convert_record_reference_for_mass_assignment(field_type, value)
         
       elsif field_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
