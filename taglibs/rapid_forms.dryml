@@ -364,7 +364,7 @@
 </def>
 
 
-<def tag="hidden-field" attrs="name, value"><input type="hidden" name="&name" value="&value" merge-attrs/></def>
+<def tag="hidden-form-field" attrs="name, value"><input type="hidden" name="&name" value="&value" merge-attrs/></def>
 
 
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
