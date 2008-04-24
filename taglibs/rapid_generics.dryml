@@ -25,16 +25,18 @@
       <delete-button label="X" unless="&linkable?(:edit)" param/>
 
       <h3 param="heading" if="&has_heading"><a><name/></a></h3>
-      <div class="content" param="content" unless="&has_link">
-        <primary-content/>
+      <div class="body" param="body">
+        <div class="content" param="content" unless="&has_link">
+          <primary-content/>
+        </div>
+        <creation-details param/>
+        <do param="counter">
+          <set primary-collection="&primary_collection_name"/>
+          <if test="&primary_collection">
+            <span class="dependents"><count field="&primary_collection"/></span>
+          </if>
+        </do>
       </div>
-      <creation-details param/>
-      <do param="counter">
-        <set primary-collection="&primary_collection_name"/>
-        <if test="&primary_collection">
-          <span class="dependents"><count field="&primary_collection"/></span>
-        </if>
-      </do>
     </div>
   </if>
 </def>
