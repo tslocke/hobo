@@ -155,7 +155,7 @@
 
       <with-primary-collection name="&primary_collection_name" if="&primary_collection_name">
         <section class="primary-collection">
-          <h2 param="primary-collection-title"><primary-collection-name.titleize/></h2>
+          <h2 param="primary-collection-heading"><primary-collection-name.titleize/></h2>
 
           <do param="primary-collection">
             <collection part="primary-collection" sortable>
