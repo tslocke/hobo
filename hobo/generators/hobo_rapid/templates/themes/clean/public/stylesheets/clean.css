@@ -207,7 +207,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 .creator {font-weight: bold;}
 .card {
 	height: 100%; overflow: hidden;
-	margin: 10px 0;	padding: 12px 20px; border: 1px solid #e8e8e8;
+	margin: 10px 0;	padding: 12px; border: 1px solid #e8e8e8;
 	background: #f5f5f5;
 }
 .card h3 {margin-top: 0;}
