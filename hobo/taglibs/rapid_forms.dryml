@@ -352,7 +352,7 @@
     <select>
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              merge-attrs="&{:style => 'display:none'} if this.in?(values)"><name/></option>
+              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><name/></option>
     </select>
   </div>
 </def>
