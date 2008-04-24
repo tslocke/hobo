@@ -528,7 +528,7 @@ SelectManyInput = Behavior.create({
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             this.itemAdded(newItem, selected)
-			selected.disabled = true
+	    selected.disabled = true
             select.value = ""
             Event.addBehavior.reload()
         }
@@ -546,7 +546,7 @@ SelectManyInput = Behavior.create({
                              afterFinish: function (ef) { ef.element.remove() } } ) 
         var label = el.down('span').innerHTML
         var option = $A(this.element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
-		option.disabled = false
+	option.disabled = false
     },
 
     itemAdded: function(item, option) {
