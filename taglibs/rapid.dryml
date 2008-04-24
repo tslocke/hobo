@@ -251,7 +251,7 @@
             if this.respond_to?(:to_html)
               this.to_html
             else
-              raise HoboError, "Cannot view: #{this.inspect} (field is #{this_field}, type is #{this.class})"
+              this.to_s
             end
           else
             attrs = add_classes(attributes, "view", type_and_field)
