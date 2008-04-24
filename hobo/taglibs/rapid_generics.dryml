@@ -30,7 +30,7 @@
           <primary-content/>
         </div>
         <creation-details param/>
-        <do param="counter">
+        <do param="count">
           <set primary-collection="&primary_collection_name"/>
           <if test="&primary_collection">
             <span class="dependents"><count field="&primary_collection"/></span>
