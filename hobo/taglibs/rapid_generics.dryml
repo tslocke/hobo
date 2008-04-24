@@ -91,7 +91,7 @@
                  :handle => 'ordering-handle',
                  :complete => [visual_effect(:highlight, attributes[:id])]
                 } 
-        opts.reverse_merge!(sortable_options) if sortable_options
+        opts.update(sortable_options) if sortable_options
         sortable_element attributes[:id], opts
       end
    %>
