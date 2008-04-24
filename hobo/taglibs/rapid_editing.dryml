@@ -77,7 +77,7 @@
        select_options = select_options.sort if sort
        select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
        link_id = "#{dom_id}_editor"
-       f = ajax_updater(object_url(this_parent),
+       f = ajax_updater(object_url(this_parent, :method => :put),
                         [link_id],
                         :method => "put",
                         :params => { this_parent.class.name.underscore => {
