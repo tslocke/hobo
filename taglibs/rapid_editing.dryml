@@ -1,17 +1,19 @@
 <def tag="editor" ><%= 
   if !can_edit?
     view(attributes)
-  elsif (refl = this_field_reflection)
-    if refl.macro == :belongs_to
-      belongs_to_editor(attributes)
-    else
-      has_many_editor(attributes)
-    end
   else
     attrs = add_classes(attributes, type_id, type_and_field, "editor")
-    call_polymorphic_tag("editor", attrs) or
-      raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
-                          "(#{this.inspect}:#{this_type})")
+    if (refl = this_field_reflection)
+      if refl.macro == :belongs_to
+        belongs_to_editor(attrs)
+      else
+        has_many_editor(attrs)
+      end
+    else
+      call_polymorphic_tag("editor", attrs) or
+        raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
+                            "(#{this.inspect}:#{this_type})")
+    end
   end
 %></def>
 
