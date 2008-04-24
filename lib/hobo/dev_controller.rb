@@ -6,7 +6,7 @@ class Hobo::DevController < ActionController::Base
   
   def set_current_user
     model = params[:model] || Hobo::User.default_user_model
-    self.current_user = params[:name] ? model[params[:name]] : model.find(params[:id])
+    self.current_user = params[:name] ? model.named(params[:name]) : model.find(params[:id])
     redirect_to(request.env["HTTP_REFERER"] ? :back : home_page)
   end
   
