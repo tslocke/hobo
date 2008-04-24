@@ -174,12 +174,13 @@
 </def>
 
       
-<def tag="integer-select-editor" attrs="min, max, update, nil-option, message">
+<def tag="integer-select-editor" attrs="options, min, max, update, nil-option, message">
+ <% options ||= (min.to_i..max.to_i).to_a %>
  <select class="number-editor-bhv" hobo-update="#{update}"
           hobo-model-id="#{dom_id}"
           merge-attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
    <if test="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
-   <%= options_for_select((min.to_i..max.to_i).to_a, this) %>
+   <%= options_for_select(options, this) %>
  </select>
 </def>
 
