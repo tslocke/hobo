@@ -158,7 +158,7 @@
           <h2 param="primary-collection-title"><primary-collection-name.titleize/></h2>
 
           <do param="primary-collection">
-            <collection part="primary-collection">
+            <collection part="primary-collection" sortable>
               <card:><delete-button: update="primary-collection-count"></delete-button:></card:>
             </collection>
           </do>

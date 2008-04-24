@@ -68,11 +68,10 @@
 
 
 <def tag="base-collection" attrs="sortable, sortable-options"><% 
-  sortable = (sortable != false and
-              first = this.first and
-              first.respond_to?(:position_column) and
-              reorder_url = object_url(this.member_class, :reorder, :method => :post) and
-              can_edit?(first, first.position_column))
+  sortable &&= (first = this.first and
+                first.respond_to?(:position_column) and
+                reorder_url = object_url(this.member_class, :reorder, :method => :post) and
+                can_edit?(first, first.position_column))
   if sortable
     singular_name = first.class.name.underscore
     attributes[:id] ||= "#{singular_name}_ordering"
