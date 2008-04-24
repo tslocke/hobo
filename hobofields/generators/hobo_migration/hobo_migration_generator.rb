@@ -42,7 +42,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
       end
     end
   rescue HoboFields::FieldSpec::UnknownSqlTypeError => e
-    puts "Invalid field type '#{e.message[2]}' for #{e.message[0]}.#{e.message[1]}"
+    puts "Invalid field type: #{e}"
     record {|m| }
   end
   

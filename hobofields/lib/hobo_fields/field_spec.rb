@@ -21,7 +21,7 @@ module HoboFields
                                 type
                               else
                                 field_class = HoboFields.to_class(type)
-                                field_class && field_class::COLUMN_TYPE or raise UnknownSqlTypeError, "#{model}.#{name}::#{type}"
+                                field_class && field_class::COLUMN_TYPE or raise UnknownSqlTypeError, "#{type.inspect} for #{model}.#{name}"
                               end
                             end
     end
