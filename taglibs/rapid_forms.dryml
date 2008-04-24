@@ -309,9 +309,7 @@
 
       
 <def tag="select-input">
-  <select name="#{param_name_for_this}">
-    <do param="default"/>
-  </select>
+  <select-menu name="#{param_name_for_this}" selected="&this" merge/>
 </def>
 
       
