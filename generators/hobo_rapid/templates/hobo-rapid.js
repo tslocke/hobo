@@ -35,11 +35,8 @@ var Hobo = {
         var p = el.getAttribute("hobo-ajax-params")
         if (p) params = params + "&" + p
 
-        var opts = Object.merge(options || {}, { params: params})
-        Hobo.ajaxRequest(Hobo.putUrl(el),
-                         el.getAttribute("hobo-ajax-message") || "Saving...",
-                         updates,
-                         opts)
+        var opts = Object.merge(options || {}, { params: params, message: el.getAttribute("hobo-ajax-message")})
+        Hobo.ajaxRequest(Hobo.putUrl(el), updates, opts)
     },
 
     ajaxUpdateParams: function(updates, resultUpdates) {
@@ -302,7 +299,7 @@ var Hobo = {
 
 
     putUrl: function(el) {
-        spec = Hobo.parseFieldId(el)
+        var spec = Hobo.parseFieldId(el)
         return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
     },
 
@@ -316,8 +313,8 @@ var Hobo = {
 
         
     fieldSetParam: function(el, val) {
-        spec = Hobo.parseFieldId(el)
-        res = spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
+        var spec = Hobo.parseFieldId(el)
+        var res = spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
         if (typeof(formAuthToken) != "undefined") {
             res = res + "&" + formAuthToken.name + "=" + formAuthToken.value
         }
@@ -358,6 +355,15 @@ var Hobo = {
     },
 
 
+    ajaxUpdateField: function(element, field, value, updates) {
+        var objectElement = Hobo.objectElementFor(element)
+        var url = Hobo.putUrl(objectElement)
+        var spec = Hobo.parseFieldId(objectElement)
+        var params = spec.name + '[' + field + ']=' + encodeURIComponent(value)
+        new Hobo.ajaxRequest(url, updates, { method:'put', message: "Saving...", params: params });
+    },
+
+
     showEmptyMessageAfterLastRemove: function(el) {
         var empty
         var container = $(el.parentNode)
@@ -370,7 +376,7 @@ var Hobo = {
 
     parseFieldId: function(el) {
         id = el.getAttribute("hobo-model-id")
-        return id && parseId(id)
+        return id && Hobo.parseId(id)
     },
 
 
@@ -398,6 +404,11 @@ var Hobo = {
             el = el.parentNode;
         }
         if (m) return el;
+    },
+
+    modelIdFor: function(el) {
+        var e = Hobo.objectElementFor(el)
+        return e && e.getAttribute("hobo-model-id");
     },
 
 
@@ -528,7 +539,7 @@ SelectManyInput = Behavior.create({
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             this.itemAdded(newItem, selected)
-	    selected.disabled = true
+            selected.disabled = true
             select.value = ""
             Event.addBehavior.reload()
         }
