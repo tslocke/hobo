@@ -23,7 +23,7 @@
   <a merge-attrs/>
 </def>
   
-<def tag="belongs-to-editor"><%= belongs_to_menu_editor(attributes) %></def>
+<def tag="belongs-to-editor"><%= select_one_editor(attributes) %></def>
 
 <def tag="editor" for="string"><%= in_place_editor "in_place_textfield_bhv", attributes %></def>
 
@@ -69,27 +69,24 @@
 </def>
 
 
-<def tag="belongs-to-menu-editor" attrs="sort"><%
+<def tag="select-one-editor" attrs="include-none, blank-message, sort, update"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
-  link_id = "#{dom_id}_editor" %>
-  <span id="#{link_id}" part="rapid-belongs-to-edit" part-locals="sort">
-    <% select_options = this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
+  blank_message ||= "(No #{this_type.name.to_s.titleize})"
+  select_options = this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
-       select_options = select_options.sort if sort
-       select_options.insert(0, ["(No #{this_type.name.to_s.titleize})", ""]) if this.nil?
-       link_id = "#{dom_id}_editor"
-       f = ajax_updater(object_url(this_parent, :method => :put),
-                        [link_id],
-                        :method => "put",
-                        :params => { this_parent.class.name.underscore => {
-                            this_field_reflection.primary_key_name => Hobo.raw_js('this.value')
-                          } })
+   select_options = select_options.sort if sort
+   select_options.insert(0, [blank_message, ""]) if this.nil? || include_none
+   f = ajax_updater(object_url(this_parent, :method => :put),
+                    update,
+                    :method => "put",
+                    :params => { this_parent.class.name.underscore => {
+                        this_field_reflection.primary_key_name => Hobo.raw_js('this.value')
+                      } })
     %>
-    <select onchange="#{f}">
-      <%= options_for_select(select_options, this ? this.id : "") %>
-    </select>
-  </span>
+  <select onchange="#{f}" merge-attrs>
+     <%= options_for_select(select_options, this ? this.id : "") %>
+  </select>
 </def>
 
 
