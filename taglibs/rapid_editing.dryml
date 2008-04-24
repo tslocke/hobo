@@ -96,7 +96,7 @@
   return object_link unless can_edit?
 
   id ||= dom_id + "_completer"
-  f = ajax_updater(object_url(this_parent),
+  f = ajax_updater(object_url(this_parent, :method => :put),
                    update,
                    :method => "put",
                    :params => { this_parent.class.name.underscore => {
@@ -125,7 +125,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
 
   values = comma_split(values)
-  f = ajax_updater(object_url(this_parent),
+  f = ajax_updater(object_url(this_parent, :method => :put),
                    update,
                    :method => "put",
                    :params => { this_parent.class.name.underscore => {
@@ -141,7 +141,7 @@
 
 <def tag="boolean-checkbox-editor" attrs="update, message"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
-  f = ajax_updater(object_url(this_parent),
+  f = ajax_updater(object_url(this_parent, :method => :put),
                    update,
                    :method => "put",
                    :message => message,
@@ -202,7 +202,7 @@
       class_name = new.class.name.underscore
       ajax_options = { :message => message }
       ajax_options[:params] = { class_name => fields } unless fields.empty?
-      checkbox_attrs[:onclick] = ajax_updater(object_url(new.class), update, ajax_options)
+      checkbox_attrs[:onclick] = ajax_updater(object_url(new.class, :method => :post), update, ajax_options)
     end
   else
     permission = if can_delete?(obj)
