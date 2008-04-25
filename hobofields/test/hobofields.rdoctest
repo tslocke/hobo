@@ -1,12 +1,58 @@
 # HoboFields
 
-## About Doctests
-
-HoboFields is documented and tested using *doctests*. This is an idea that comes from Python that we've been experimenting with for Hobo. Whenever you see code-blocks that start "`>>`", read them as IRB sessions. The `rdoctest` tool extracts these and runs them to verify they behave as advertised. 
-
-Doctests are a great way to get both documentation and tests from the same source. We're still experimenting with exactly how this all works though, so if the docs seem strange in places, please bear with us!
-
 ## Introduction 
+
+Welcome to HoboFields -- a spin-off from the Hobo project (Hobo not required!).
+
+**HoboFields writes your Rails migrations for you! Your migration writing days are over!**
+
+All we ask is that you declare your fields in the model. It's still perfectly DRY because you're not having to repeat that in the migration -- HoboFields does that for you. In fact, you'll come to love having them there.
+
+It still has all the benefits of writing your own migrations, for example if you want to add some special code to migrate your old data, you can just edit the generated migration.
+
+## Example
+
+First off, if you're using the migration generator outside of Hobo, do remember the `--skip-migration` option when generating your models:
+
+	$ ./script/generate model blog_post --skip-migration
+
+Now edit your model as follows:
+
+    class BlogPost < ActiveRecord::Base
+      fields do
+        title :string
+        body  :text
+        timestamps
+      end
+    end
+{: .ruby}
+
+	
+Then, simply run
+
+	$ ./script/genearte hobo_migration
+	
+And voila 
+
+	---------- Up Migration ----------
+	create_table :blog_posts do |t|
+	  t.string   :title
+	  t.text     :body
+	  t.datetime :created_at
+	  t.datetime :updated_at
+	end
+	----------------------------------
+
+	---------- Down Migration --------
+	drop_table :blog_posts
+	----------------------------------
+{: .ruby}
+
+The migration generator has created a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. You are now free to simply hack away on your app and run the migration generator every time the database needs to play catch-up. 
+
+Note that the migration generator is interactive -- it can't tell the difference between renaming something vs. adding one thing and removing another, so sometimes it will ask you to clarify. It's a bit picky about what it makes you type in response, because we really don't want you to lose data when someone's amazing twitter distracts you at the wrong moment.
+
+## Installing
 
 The simplest and recommended way to install HoboFeilds is as a gem:
 
@@ -20,40 +66,29 @@ The simplest way to install HoboFields as a plugin is to use the subversion mirr
 
 	svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
 	
-HoboFields provides two main features:
+## Rich Types
 
- * An extension to ActiveRecord that provides rich field types such as "markdown text" or "email address"
- * A generator that writes your migrations for you. Your migration writing days are over.
- 
-This is all done using a declaration of your fields that you put in your models, for example
+In addition to the migration generator, HoboFields provides a Rich-Type mechanism that allows you to declare your fields using higher level concepts like "email-address" or "markdown text". This can give you both automatic validations, and automatic rendering of those values in the UI (this works particularly well if you use the rest of Hobo).
 
-    class BlogPost < ActiveRecord::Base
-      fields do
-        title :string
-        body  :text
-      end
-    end
-{: .ruby}
+Read more:
 
-**NOTE:** If you're going to use the migration generator outside of Hobo, do remember the `--skip-migration` option when generating your models:
+ - [HoboFields Rich Types](/hobofields/rich_types)
 
-	./script/generate model post --skip-migration
+## API
 
+HoboFields provides various API methods. Read more:
 
-## [Migration Generator](/hobofields/migration_generator)
+ - [HoboFields API](/hobofields/hobofields_api)
 
-Once you have declared your fields like this, you can run the following, at any time during the development of your project:
+## Migration Generator Details
 
-	$ ./script/generate hobo_migration
-	
-The migration generator will create a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. Note that the migration generator is interactive -- it can't tell the difference between renaming something vs. adding one thing and removing another, so it has to ask you.
+The migration generator doctests provide a lot more detail. They're not really that great as documentation because doctests run in a single irb session, and that doesn't fit well with the concept of a generator. Skip these unless you're really keen to see the details of the migration generator in action
 
-The [migration generator doctests](/hobofields/migration_generator) provide a lot more detail. They're not really that great as documentation because doctests run in a single irb session, and that doesn't fit well with the concept of a generator. Skip these unless you're really keen to see the details of the migration generator in action
+ - [Migration Generator Details](/hobofields/migration_generator)
 
-## [HoboFields API](/hobofields/hobofields_api)
+## About Doctests
 
-As well as the migration generator, HoboFields provides a bunch of small extensions to ActiveRecord. The [HoboFields API doctests](/hobofields/hobofields_api) provide a useful reference to these.
+HoboFields is documented and tested using *doctests*. This is an idea that comes from Python that we've been experimenting with for Hobo. Whenever you see code-blocks that start "`>>`", read them as IRB sessions. The `rdoctest` tool extracts these and runs them to verify they behave as advertised. 
 
-## [Rich Types](/hobofields/rich_types)
+Doctests are a great way to get both documentation and tests from the same source. We're still experimenting with exactly how this all works though, so if the docs seem strange in places, please bear with us!
 
-Documentation for the full set of rich types bundled with HoboFields, and how to create your own, is [here](/hobofields/rich_types).
