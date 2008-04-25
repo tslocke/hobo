@@ -27,8 +27,21 @@ class TestHobofieldModelGenerator < Test::Unit::TestCase
   #   bare_setup - place this in setup method to create the APP_ROOT folder for each test
   #   bare_teardown - place this in teardown method to destroy the TMP_ROOT or APP_ROOT folder after each test
 
-  def test_generator_without_options
+  def test_generator_underscore_name
     name = "my_model"
+    run_generator('hobofield_model', [name], sources)
+    assert_generated_file("app/models/my_model.rb")
+    assert_generated_class("app/models/my_model") do |body|
+    end
+
+    assert_generated_file("test/unit/my_model_test.rb")
+    assert_generated_class("test/unit/my_model_test") do |body|
+      assert_has_method "test_truth"
+    end
+  end
+
+  def test_generator_camelcase
+    name = "MyModel"
     run_generator('hobofield_model', [name], sources)
     assert_generated_file("app/models/my_model.rb")
     assert_generated_class("app/models/my_model") do |body|
