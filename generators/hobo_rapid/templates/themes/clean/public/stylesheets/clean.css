@@ -233,14 +233,11 @@ div.ordering-handle { float: left; background: #ccc; color: white; margin-right:
 .card.content.with-owner .content {
 	float: right; width: 72%;
 }
-ul.collection li {clear: both; margin-left: 0; list-style: none;}
+ul.collection > li {clear: both; margin-left: 0; list-style: none;}
 .empty-collection-message {margin-top: 20px;}
 
 .new-link {margin-top: 20px;}
 
-.primary-collection ul li {
-	margin-left: 0; list-style: none; 
-}
 .primary-collection h2 {
 	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted black;
 }
