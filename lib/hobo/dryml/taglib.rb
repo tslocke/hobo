@@ -9,7 +9,8 @@ module Hobo
       class << self
      
         def get(options)
-          taglib = @cache[options]
+          cache_key = options.inspect
+          taglib = @cache[cache_key]
           if taglib
             taglib.reload
           else
@@ -17,7 +18,7 @@ module Hobo
             bundle = options[:bundle] && Bundle.bundles[options[:bundle]]
      
             taglib = Taglib.new(src_file, bundle)
-            @cache[options] = taglib
+            @cache[cache_key] = taglib
           end
           taglib
         end
