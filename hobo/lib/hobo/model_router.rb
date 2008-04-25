@@ -177,6 +177,11 @@ module Hobo
                          "#{plural}/:id/#{collection}/new",
                          "new_#{collection.to_s.singularize}",
                          :conditions => { :method => :get }) 
+          linkable_route("create_#{singular}_#{collection.to_s.singularize}",
+                         "#{plural}/:id/#{collection}",
+                         "create_#{collection.to_s.singularize}",
+                         :conditions => { :method => :post })
+          
         end
       end
     end

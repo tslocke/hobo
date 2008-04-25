@@ -63,7 +63,12 @@ module Hobo
           action_path = "#{obj.origin_attribute}/new"
           action = "new_#{obj.origin_attribute.to_s.singularize}"
         elsif action.nil?
-          action = obj.origin_attribute
+          if method.to_s == 'post'
+            action_path = obj.origin_attribute
+            action = "create_#{obj.origin_attribute.to_s.singularize}"
+          else
+            action = obj.origin_attribute
+          end
         end
         obj = obj.origin
         
