@@ -1,6 +1,4 @@
 CHANGES.txt
-generators/hobo_migration/hobo_migration_generator.rb
-generators/hobo_migration/templates/migration.rb
 init.rb
 lib/hobo_fields/email_address.rb
 lib/hobo_fields/enum_string.rb
@@ -18,6 +16,8 @@ lib/hobo_fields.rb
 lib/hobofields.rb
 LICENSE.txt
 Manifest
+rails_generators/hobo_migration/hobo_migration_generator.rb
+rails_generators/hobo_migration/templates/migration.rb
 rails_generators/hobofield_model/hobofield_model_generator.rb
 rails_generators/hobofield_model/templates/fixtures.yml.erb
 rails_generators/hobofield_model/templates/model.rb.erb
