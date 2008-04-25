@@ -120,7 +120,7 @@ module HoboFields
       model_table_names = models.*.table_name
 
       to_create = model_table_names - db_tables
-      to_drop = db_tables - model_table_names - ['schema_info']
+      to_drop = db_tables - model_table_names - ['schema_info', 'schema_migrations']
       to_change = model_table_names
       
       to_rename = extract_table_renames!(to_create, to_drop)
