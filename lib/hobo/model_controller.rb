@@ -488,10 +488,15 @@ module Hobo
     
     
     def hobo_reorder
-      params["#{model.name.underscore}_ordering"].each_with_index do |id, position|
-        model.user_update(current_user, id, :position => position+1)
+      ordering = params["#{model.name.underscore}_ordering"] 
+      if ordering
+        ordering.each_with_index do |id, position|
+          model.user_update(current_user, id, :position => position+1)
+        end
+        hobo_ajax_response || render(:nothing => true)
+      else
+        render :nothing => true
       end
-      hobo_ajax_response || render(:nothing => true)
     end
     
     
