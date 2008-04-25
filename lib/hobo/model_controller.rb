@@ -140,27 +140,29 @@ module Hobo
       end
       
       
+      
+      def def_auto_action(name, &block)        
+        define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
+      end
+      
+      
       def def_collection_actions(name)
-        defined_methods = instance_methods
-        
-        show_collection_method = name
-        if show_collection_method.not_in?(defined_methods) && include_action?(show_collection_method)
-          define_method show_collection_method do
-            hobo_show_collection(name)
-          end
+        def_auto_action name do
+          hobo_show_collection(name)
         end
           
         if Hobo.simple_has_many_association?(model.reflections[name])
-          new_method = "new_#{name.to_s.singularize}"
-          if new_method.not_in?(defined_methods) && include_action?(new_method)
-            define_method new_method do
-              hobo_new_in_collection(name)
-            end
+          def_auto_action "new_#{name.to_s.singularize}" do
+            hobo_new_in_collection(name)
+          end
+          
+          def_auto_action "create_#{name.to_s.singularize}" do
+            hobo_create_in_collection(name)
           end
         end
       end
-            
-      
+
+
       def show_action(*names, &block)
         options = names.extract_options!
         show_actions.concat(names)
@@ -223,7 +225,9 @@ module Hobo
       
       
       def available_auto_collection_actions
-        collections + collections.map {|c| "new_#{c.to_s.singularize}".to_sym}
+        collections.map do |c| 
+          [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
+        end.flatten
       end
 
     end
@@ -264,7 +268,7 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        render :action => view, :controller => controller
+        render :template => "#{controller}/#{view}"
       else
         render :action => default_action
       end
@@ -278,8 +282,7 @@ module Hobo
       
       # The after_submit post parameter takes priority
       (after_submit == "stay-here" ? :back : after_submit) || 
-        
-        
+                
         # Then try the record's show page
         (!destroyed && object_url(@this)) || 
         
@@ -351,7 +354,7 @@ module Hobo
       options = args.extract_options!
       self.this = args.first || new_for_create
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(&b)
+      create_response(:new, &b)
     end
     
     
@@ -369,7 +372,7 @@ module Hobo
     end
     
     
-    def create_response(&b)
+    def create_response(new_action, &b)
       flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid? 
       
       response_block(&b) or
@@ -380,7 +383,7 @@ module Hobo
           end
         else
           respond_to do |wants|
-            wants.html { re_render_form(:new) }
+            wants.html { re_render_form(new_action) }
             wants.js   { render(:status => 500,
                                 :text => ("Couldn't create the #{this.class.name.titleize.downcase}.\n" +
                                           this.errors.full_messages.join("\n"))) }
@@ -475,6 +478,15 @@ module Hobo
       this.user_changes(current_user) # set_creator and permission check
       dryml_fallback_tag("new_in_collection_page")
       response_block(&b)
+    end
+    
+    
+    def hobo_create_in_collection(association, *args, &b)
+      options = args.extract_options!
+      @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
+      self.this = args.first || @association.new
+      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
+      create_response("new_#{association}", &b)
     end
     
 
