@@ -168,7 +168,7 @@ module Hobo
           if block
             define_method(name, &block)
           else
-            define_method(name) { hobo_show options }
+            define_method(name) { hobo_show options.dup }
           end
         end
       end
@@ -181,9 +181,9 @@ module Hobo
             define_method(name, &block)
           else
             if scope = options.delete(:scope)
-              define_method(name) { hobo_index scope, options }
+              define_method(name) { hobo_index scope, options.dup }
             else
-              define_method(name) { hobo_index options }
+              define_method(name) { hobo_index options.dup }
             end
           end
         end
