@@ -19,6 +19,7 @@ module HoboFields
     :datetime      => Time,
     :integer       => Fixnum,
     :big_integer   => BigDecimal,
+    :decimal       => BigDecimal,
     :float         => Float,
     :string        => String
   }
