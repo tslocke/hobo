@@ -84,6 +84,7 @@ module Hobo
       klass = obj.is_a?(Class) ? obj : obj.class
       if Hobo::ModelRouter.linkable?(klass, action, options)
 
+        subsite = options[:subsite]
         path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
         url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
 
