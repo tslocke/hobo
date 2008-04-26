@@ -56,16 +56,17 @@ module Hobo
       action = args.first._?.to_sym
       options, params = params.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
+      subsite, method = options.get :subsite, :method
       
       if obj.respond_to?(:origin)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
-          action = "new_#{obj.origin_attribute.to_s.singularize}"
+          action = :"new_#{obj.origin_attribute.to_s.singularize}"
         elsif action.nil?
           if method.to_s == 'post'
             action_path = obj.origin_attribute
-            action = "create_#{obj.origin_attribute.to_s.singularize}"
+            action = :"create_#{obj.origin_attribute.to_s.singularize}"
           else
             action = obj.origin_attribute
           end
@@ -89,7 +90,6 @@ module Hobo
       klass = obj.is_a?(Class) ? obj : obj.class
       if Hobo::ModelRouter.linkable?(klass, action, options)
 
-        subsite = options[:subsite]
         path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
         url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
 
