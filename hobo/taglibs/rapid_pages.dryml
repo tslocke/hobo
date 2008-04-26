@@ -169,7 +169,8 @@
               <else>
                 <section class="create-new" with="&new_for_current_user">
                   <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
-                  <form update="primary-collection, primary-collection-count"
+                  <form to="&@this.send(primary_collection_name)" method="post" 
+                        update="primary-collection, primary-collection-count"
                         message="Adding #{primary_collection_name.singularize.titleize}..." reset-form param="add-new-form">
                     <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
                                 skip-associations="has_many" param="primary-collection-field-list"/>
@@ -229,7 +230,7 @@
     <content-body: param>
       <error-messages/>
 
-      <form param>
+      <form to="&@association" method="post" param>
         <field-list skip="#{@association.origin.class.reverse_reflection(association_name.to_sym).name}" param/>
         <div class="actions" param="actions">
           <submit label="Create #{association_name.singularize.titleize}" param/>
