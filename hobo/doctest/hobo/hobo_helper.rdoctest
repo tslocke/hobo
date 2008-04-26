@@ -1,0 +1,91 @@
+# Hobo::HoboHelper
+
+Various view helpers
+
+	>> require 'rubygems'
+    >> require 'hobosupport'
+    >> Dependencies.load_paths << '.'
+    >> Dependencies.mechanism = :require
+
+	>> require 'mocha'
+	>> self.class.send(:include, Mocha::AutoVerify)
+
+Create a mock view layer:
+
+	>> class View
+	     extend Hobo::HoboHelper
+	     class << self 
+	       protected_instance_methods.each {|m| public m }
+	       
+           def params; {} ;end
+           def subsite; "" ;end
+           def base_url; "" ;end
+	     end
+       end
+	>> RAILS_ROOT = "test-app"
+	
+Useful stuff
+
+	>> def init_mocha; $stubba = Mocha::Central.new; end
+	>> class Thing
+		 class Mocks; extend Mocha::AutoVerify; end
+	     def self.mock(hash)
+	       Mocks.mock(hash.update(:class => self))
+	     end
+	   end
+	
+
+## `object_url`
+
+Returns a canonical restful URL for a given object. THe Hobo routing is checked and URLs are only returned for routes that exist.
+
+Note that `object_url` doesn't perform "reverse routing". It knows nothing about attractive URLs you may have declared in your routes file.
+
+Something to link to:
+
+	>> init_mocha
+	>> thing = Thing.mock(:to_url_path => "things/1")
+
+### Simple 'show' URLs
+
+	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(true)
+	>> View.object_url(thing)
+	=> "/things/1"
+	
+Returns nil if ModelRouter says it's not linkable
+
+	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(false)
+	>> View.object_url(thing)
+	=> nil
+	
+A URL to the 'edit' page:
+
+	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
+	>> View.object_url(thing, :edit)
+	=> "/things/1/edit"
+
+
+### POST URLs for creating new items in collections:
+	
+	>> collection = mock(:origin => thing, :origin_attribute => "parts")
+	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
+	>> View.object_url(collection, :method => :post)
+	=> "/things/1/parts"
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
