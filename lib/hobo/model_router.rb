@@ -1,22 +1,26 @@
-class ActionController::Routing::RouteSet
-  # Monkey patch this method so routes are reloaded on *every*
-  # request. Without this Rails checks the mtime of config/routes.rb
-  # which doesn't take into account Hobo's auto routing
-  #def reload
-  #  # TODO: This can get slow - quicker to stat routes.rb and the
-  #  # controllers and only do a load if there's been a change
-  #  load!
-  #end
-  
-  # temporay hack -- reload assemble.rb whenever routes need reloading
-  def reload_with_hobo_assemble
-    if defined? ::ApplicationController
-      load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
-      reload_without_hobo_assemble
+if defined? ActionController::Routing::RouteSet
+
+  class ActionController::Routing::RouteSet
+    # Monkey patch this method so routes are reloaded on *every*
+    # request. Without this Rails checks the mtime of config/routes.rb
+    # which doesn't take into account Hobo's auto routing
+    #def reload
+    #  # TODO: This can get slow - quicker to stat routes.rb and the
+    #  # controllers and only do a load if there's been a change
+    #  load!
+    #end
+    
+    # temporay hack -- reload assemble.rb whenever routes need reloading
+    def reload_with_hobo_assemble
+      if defined? ::ApplicationController
+        load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
+        reload_without_hobo_assemble
+      end
     end
+    alias_method_chain :reload, :hobo_assemble
+    
   end
-  alias_method_chain :reload, :hobo_assemble
-  
+
 end
 
 module Hobo
