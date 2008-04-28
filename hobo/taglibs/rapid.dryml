@@ -183,7 +183,7 @@
   
   if href || attributes[:name]
     # Regular link
-    href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if params
+    href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if !params.blank?
     element(:a, attributes.update(:href => href), content)
   else
     target = to || this
