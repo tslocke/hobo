@@ -156,6 +156,7 @@
   end
 %></def>
 
+
 <def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
 
@@ -173,7 +174,6 @@
   name = name.downcase if lowercase
   name
 %></def>
-
 
 
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
