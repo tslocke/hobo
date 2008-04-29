@@ -51,9 +51,6 @@ module Hobo
       end
       
       def add_routes(map)
-        # Don't create routes if it's a generator that's running
-        return if caller[-1] =~ /script[\/\\]generate:\d+$/
-        
         reset_linkables
         
         begin 
@@ -63,8 +60,12 @@ module Hobo
           return
         end
 
-        require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
         load "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
+
+        # Don't create routes if it's a generator that's running
+        return if caller[-1] =~ /script[\/\\]generate:\d+$/
+        
+        require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
 
         # Add non-subsite routes
         add_routes_for(map, nil)
