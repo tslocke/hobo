@@ -6,8 +6,10 @@ Echoe.new('hobofields') do |p|
   p.summary = "Rich field types and migration generator for Rails"
   p.url     = "http://hobocentral.net/hobofields"
   p.project = "hobo"
-  
+
   p.changelog = "CHANGES.txt"
   p.version   = "0.7.5"
+
+  p.dependencies = ['hobosupport >=0.7.5']
 end
 

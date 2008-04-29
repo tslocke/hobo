@@ -1,3 +1,4 @@
+require File.dirname(__FILE__) + '/../../lib/hobofields'
 class HoboMigrationGenerator < Rails::Generator::Base
 
   def initialize(runtime_args, runtime_options = {})

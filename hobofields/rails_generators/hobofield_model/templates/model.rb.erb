@@ -1,0 +1,10 @@
+class <%= class_name %> < ActiveRecord::Base
+  fields do
+<% for attribute in attributes -%>
+    <%= attribute.name %> :<%= attribute.type %>
+<% end -%>
+<% unless options[:skip_timestamps] %>
+    timestamps
+<% end -%>
+  end
+end
