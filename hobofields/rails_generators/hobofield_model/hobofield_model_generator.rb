@@ -15,8 +15,8 @@ class HobofieldModelGenerator < Rails::Generator::NamedBase
       m.template "model.rb.erb",  "app/models/#{file_name}.rb"
       m.template "test.rb.erb",   "test/unit/#{file_name}_test.rb"
 
-      unless options[:skip_fixture] 
-       	m.template 'fixtures.yml.erb',  File.join('test/fixtures', "#{file_name}.yml")
+      unless options[:skip_fixture]
+       	m.template 'fixtures.yml.erb',  File.join('test/fixtures', "#{file_name.pluralize}.yml")
       end
 
     end
