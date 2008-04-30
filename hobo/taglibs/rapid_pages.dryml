@@ -138,7 +138,7 @@
 
       <heading param><this/></heading>
 
-      <div class="flags"><flags/></div>
+      <div class="flags" param="flags"><flags/></div>
       
       <creation-details param/>
       <do field="&primary_collection_name" if="&primary_collection_name" param="primary-collection-count">
@@ -245,20 +245,19 @@
 <def tag="show-collection-page">
   <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin)}" %>
   <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.origin)} #{type_name(:pluralize => true) rescue debugger}"
-          param/>
+    <body: class="show-collection-page #{type_name(:with => this.origin)} #{type_name(:pluralize => true)}" param/>
     <content-header: param>
-      <nav>Back to <a:origin/></nav>
-      <heading><%= title %></heading>
-      <sub-heading><count/></sub-heading>
+      <nav param="back-to">Back to <a:origin/></nav>
+      <heading param><%= title %></heading>
+      <sub-heading param><count/></sub-heading>
     </content-header>
 
     <content-body: param>
       <nav param="top-pagination-nav"><page-nav/></nav>
 
-      <card repeat/>
+      <collection param/>
       
-      <nav param="bottom-pagination-nav"><page-nav param/></nav>
+      <nav param="bottom-pagination-nav"><page-nav/></nav>
       
       <nav if="&Hobo.simple_has_many_association?(this)" param="new-link">
         <a action="new"/>
