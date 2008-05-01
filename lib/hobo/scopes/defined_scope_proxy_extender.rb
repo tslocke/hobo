@@ -13,7 +13,7 @@ module Hobo
       def method_missing(name, *args, &block)
         if (scope = named_scope(name))
           association_proxy_for_scope(name, scope, args)
-        elsif member_class.create_automatic_scope(name)
+        elsif member_class.try.create_automatic_scope(name)
           # create_automatic_scope returned true -- the method now exists
           send(name, *args, &block)
         else
