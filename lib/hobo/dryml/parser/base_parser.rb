@@ -166,7 +166,7 @@ module Hobo::Dryml::Parser
             #md = @source.match_to_consume( '>', CLOSE_MATCH)
             md = @source.match(DRYML_CLOSE_MATCH, true)
             
-            valid_end_tag = last_tag =~ /^#{Regexp.escape(md[1])}(:.*)?/
+            valid_end_tag = last_tag =~ /^#{Regexp.escape(md[1])}(:.*)?$/
             raise REXML::ParseException.new( "Missing end tag for "+
                                              "'#{last_tag}' (line #{line_no}) (got \"#{md[1]}\")", 
                                              @source) unless valid_end_tag
