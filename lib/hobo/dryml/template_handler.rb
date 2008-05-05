@@ -61,7 +61,7 @@ module ActionController
     end
 
     def render_for_file_with_dryml(template_path, *args)
-      if template_path !~ /^\// &&                             # not an absolute path (e.g. an exception ERB template)
+      if template_path !~ /^([a-z]:)?\// &&                    # not an absolute path (e.g. an exception ERB template)
           !template_exists?(template_path) &&                  # no template available in app/views
           tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
 
