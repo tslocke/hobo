@@ -31,17 +31,17 @@ module Hobo
         
         def taglib_filename(options)
           base = if (plugin = options[:plugin])
-                   "vendor/plugins/#{plugin}/taglibs"
+                   "#{HOBO_ROOT}/taglibs"
                  elsif (bundle_name = options[:bundle])
                    bundle = Bundle.bundles[bundle_name]
-                   "vendor/plugins/#{bundle.plugin}/taglibs"
+                   "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
                  elsif options[:src] =~ /\//
-                   "app/views"
+                   "#{RAILS_ROOT}/app/views"
                  else
                    options[:template_dir].gsub(/^\//, "") # remove leading / if there is one
                  end
           
-          filename = "#{RAILS_ROOT}/#{base}/#{options[:src]}.dryml"
+          filename = "#{base}/#{options[:src]}.dryml"
           raise DrymlException, "No such taglib: #{options.inspect} #{filename}" unless File.exists?(filename)
           filename
         end

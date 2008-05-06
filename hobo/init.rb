@@ -26,7 +26,8 @@ require 'hobo/dryml/template_handler'
 
 require 'extensions/test_case' if RAILS_ENV == "test"
 
-
+# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
+::HOBO_ROOT = self.directory
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
 
