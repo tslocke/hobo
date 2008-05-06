@@ -73,7 +73,7 @@
        
     <body: class="account-disabled-page" param/>
 
-    <content-header: param><heading param>Account is not available</heading></content>
+    <content-header: param><heading param>Account is not available</heading></content-header>
 
     <content-body: param>
       <p>Your account is not available at this time.</p>
