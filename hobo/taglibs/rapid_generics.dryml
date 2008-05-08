@@ -1,6 +1,5 @@
 <def tag="creation-details">
   <div class="creation-details">
-<<<<<<< HEAD:hobo/taglibs/rapid_generics.dryml
     <if:get_creator><view class="creator" param="by"/></if>
     <view:created_at class="created-at" if="&this.respond_to?(:created_at)" param="at"/>
   </div>
