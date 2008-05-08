@@ -90,16 +90,20 @@ module Hobo
       klass = obj.is_a?(Class) ? obj : obj.class
       if Hobo::ModelRouter.linkable?(klass, action, options)
 
-        path = obj.to_url_path or HoboError.new("cannot create url for #{obj.inspect} (#{obj.class})")
-        url = "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
-
+        url = base_url_for(obj, subsite, action)
         url += "/#{action_path || action}" unless action.in?(IMPLICIT_ACTIONS)
 
         params = make_params(params)
         params.blank? ? url : "#{url}?#{params}"
       end
     end
-     
+      
+      
+    def base_url_for(object, subsite, action)
+      path = object.to_url_path or HoboError.new("cannot create url for #{object.inspect} (#{object.class})")
+      "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
+    end
+
      
     def _as_params(name, obj)
       if obj.is_a? Array
