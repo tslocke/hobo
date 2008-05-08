@@ -30,8 +30,11 @@ module Hobo
         private
         
         def taglib_filename(options)
-          base = if (plugin = options[:plugin])
+          plugin = options[:plugin]
+          base = if plugin == "hobo"
                    "#{HOBO_ROOT}/taglibs"
+                 elsif plugin
+                   "vendor/plugins/#{plugin}/taglibs"
                  elsif (bundle_name = options[:bundle])
                    bundle = Bundle.bundles[bundle_name]
                    "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
