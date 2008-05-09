@@ -102,6 +102,7 @@ lib/hobo/dryml/parser/elements.rb
 lib/hobo/dryml/parser/source.rb
 lib/hobo/dryml/parser/text.rb
 lib/hobo/dryml/parser/tree_parser.rb
+lib/hobo/dryml/parser.rb
 lib/hobo/dryml/part_context.rb
 lib/hobo/dryml/scoped_variables.rb
 lib/hobo/dryml/tag_parameters.rb
@@ -132,6 +133,7 @@ lib/hobo/user.rb
 lib/hobo/user_controller.rb
 lib/hobo.rb
 LICENSE.txt
+Manifest
 README
 taglibs/core.dryml
 taglibs/rapid.dryml
@@ -150,4 +152,3 @@ tasks/fix_dryml.rake
 tasks/generate_tag_reference.rb
 tasks/hobo_tasks.rake
 uninstall.rb
-Manifest
