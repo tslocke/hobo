@@ -47,7 +47,7 @@ until ARGV.empty?
   when "--user-model"
     arg = ARGV.shift
     user_model = arg == "false" ? nil : arg
-  when "--create-dbs"
+  when "--db-create"
     create_db = true
   when "--hobo-src"
     hobo_src = "../" + ARGV.shift
