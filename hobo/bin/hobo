@@ -9,7 +9,6 @@ USAGE = "USAGE: hobo <options> <app-path>
 
 Options:
   --user-model <model-name-or-false>
-  --svn                               # Use 'svn co' to checkout Hobo trunk
   --create-dbs                        # Run rake db:create:all
   --hobo-src <path to hobo src>
   -d | --database <database>         # e.g. mysql, sqlite
@@ -40,16 +39,14 @@ end
 
 app_path = ARGV.pop
 
-user_model    = "user"
-hobo_svn      = create_db = false
+user_model  = "user"
+create_db   = false
 
 until ARGV.empty?
   case ARGV.shift
   when "--user-model"
     arg = ARGV.shift
     user_model = arg == "false" ? nil : arg
-  when "--svn"
-    hobo_svn = true
   when "--create-dbs"
     create_db = true
   when "--hobo-src"
