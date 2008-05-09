@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 
 require 'fileutils'
 Signal.trap("INT") { puts; exit }
@@ -15,7 +15,7 @@ Options:
   -d | --database <database>         # e.g. mysql, sqlite
 "
 
-HOBO_REPO = "svn://hobocentral.net/hobo/trunk/hobo"
+HOBO_REPO_SVN = "svn://hobocentral.net/hobo/trunk/hobo"
 
 
 ### Nasty stuff needed for Windows :-( ###
@@ -26,7 +26,7 @@ if Config::CONFIG["arch"] =~ /win32/
   def system(command)
     win = Win32API.new("crtdll", "system", ['P'], 'L').Call(command)
   end
-end 
+end
 ### end nasty stuff ###
 
 
@@ -61,7 +61,7 @@ until ARGV.empty?
   else
     puts USAGE
     exit 1
-  end 
+  end
 end
 
 puts "\nGenerating Rails app...\n"
@@ -78,13 +78,13 @@ Dir.chdir(app_path) do
 
   if hobo_svn
     puts "\nInstalling Hobo plugin via svn checkout...\n"
-    command("svn co #{HOBO_REPO} vendor/plugins/hobo")
+    command("svn co #{HOBO_REPO_SVN} vendor/plugins/hobo")
   else
     puts "\nInstalling Hobo plugin...\n"
     FileUtils.cp_r hobo_src, "vendor/plugins/hobo"
   end
 
-  puts "\nInitialising Hobo...\n"  
+  puts "\nInitialising Hobo...\n"
   command(gen, "hobo --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
@@ -95,10 +95,10 @@ Dir.chdir(app_path) do
     command("#{gen} hobo_user_model #{user_model}")
     command("#{gen} hobo_user_controller #{user_model}")
   end
-  
+
   puts "\nCreating standard pages...\n"
   command("#{gen} hobo_front_controller front --delete-index --add-routes")
-  
+
   if create_db
     puts "\nCreating databases"
     command("rake db:create:all")
