@@ -519,14 +519,15 @@ module Hobo
     end
     
     
-<<<<<<< HEAD:hobo/lib/hobo/model_controller.rb
     def hobo_create_in_collection(association, *args, &b)
       options = args.extract_options!
       @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
       self.this = args.first || @association.new
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response("new_#{association}", &b)
-=======
+    end
+    
+
     # --- Lifecycle Actions --- #
     
     def creator_action(name)
@@ -534,11 +535,8 @@ module Hobo
         self.this = model::Lifecycle.create(name, current_user, attribute_parameters)
         redirect_to :back
       end
->>>>>>> More work on lifecycles:hobo/lib/hobo/model_controller.rb
     end
     
-<<<<<<< HEAD:hobo/lib/hobo/model_controller.rb
-=======
     
     def transition_action(name)
       if request.request_method == :put
@@ -549,7 +547,6 @@ module Hobo
     
     
     # --- Miscelaneous Actions --- #
->>>>>>> More work on lifecycles:hobo/lib/hobo/model_controller.rb
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
