@@ -9,7 +9,7 @@ USAGE = "USAGE: hobo <options> <app-path>
 
 Options:
   --user-model <model-name-or-false>
-  --create-dbs                        # Run rake db:create:all
+  --db-create                        # Run rake db:create:all
   --hobo-src <path to hobo src>
   -d | --database <database>         # e.g. mysql, sqlite
 "
