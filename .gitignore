@@ -10,6 +10,6 @@ doc/agility-tutorial/agility/db/*
 
 hobo/taglib-docs
 
+hobo/pkg
 hobosupport/pkg
-
 hobofields/pkg
