@@ -1,5 +1,5 @@
 module Hobo::Dryml
-  
+
   class DRYMLBuilder
 
     def initialize(template)
@@ -7,9 +7,9 @@ module Hobo::Dryml
       @build_instructions = Array.new
       @part_names = []
     end
-    
+
     attr_reader :template
-    
+
     def template_path
       template.template_path
     end
@@ -34,8 +34,8 @@ module Hobo::Dryml
     def add_build_instruction(type, params)
       @build_instructions << params.merge(:type => type)
     end
-    
-    
+
+
     def add_part(name, src, line_num)
       raise DrymlException.new("duplicate part: #{name}", template_path, line_num) if name.in?(@part_names)
       add_build_instruction(:def, :src => src, :line_num => line_num)
@@ -56,8 +56,8 @@ module Hobo::Dryml
             src +
            "; _erbout; end; end")
     end
-    
-    
+
+
     def erb_process(erb_src)
       # Strip off "_erbout = ''" from the beginning and "; _erbout"
       # from the end, because we do things differently around
@@ -69,39 +69,39 @@ module Hobo::Dryml
     def build(local_names, auto_taglibs, src_mtime)
 
       auto_taglibs.each { |t| import_taglib(t) }
-    
+
       @build_instructions.each do |instruction|
         name = instruction[:name]
         case instruction[:type]
         when :def
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
-          
+
         when :render_page
           method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
           @environment.class_eval(method_src, template_path, instruction[:line_num])
-          
+
         when :include
           import_taglib(instruction)
-          
+
         when :module
           import_module(name.constantize, instruction[:as])
-          
+
         when :set_theme
           set_theme(name)
-          
+
         when :alias_method
           @environment.send(:alias_method, instruction[:new], instruction[:old])
-          
+
         else
-          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, " + 
+          raise RuntimeError.new("DRYML: Unknown build instruction :#{instruction[:type]}, " +
                                  "building #{template_path}")
         end
       end
       @last_build_mtime = src_mtime
     end
-    
+
 
     def import_taglib(options)
       if options[:module]
@@ -109,10 +109,10 @@ module Hobo::Dryml
       else
         template_dir = File.dirname(template_path)
         options = options.merge(:template_dir => template_dir)
-        
+
         # Pass on the current bundle, if there is one, to the sub-taglib
         options[:bundle] = template.bundle.name unless template.bundle.nil? || options[:bundle] || options[:plugin]
-        
+
         taglib = Taglib.get(options)
         taglib.import_into(@environment, options[:as])
       end
@@ -123,7 +123,7 @@ module Hobo::Dryml
       raise NotImplementedError if as
       @environment.send(:include, mod)
     end
-  
+
 
     def set_theme(name)
       if Hobo.current_theme.nil? or Hobo.current_theme == name

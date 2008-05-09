@@ -72,6 +72,9 @@ Dir.chdir(app_path) do
   FileUtils.touch("public/stylesheets/application.css")
 
   puts "\nInitialising Hobo...\n"
+  File.open("config/initializers/hobo.rb",'w') do |f|
+    f << "gem 'hobo'\nrequire 'hobo'"
+  end
   command(gen, "hobo --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
