@@ -15,8 +15,6 @@ Options:
   -d | --database <database>         # e.g. mysql, sqlite
 "
 
-HOBO_REPO_SVN = "svn://hobocentral.net/hobo/trunk/hobo"
-
 
 ### Nasty stuff needed for Windows :-( ###
 require 'rbconfig'
@@ -75,14 +73,6 @@ Dir.chdir(app_path) do
   plugin = "ruby #{File.join('script', 'plugin')}"
 
   FileUtils.touch("public/stylesheets/application.css")
-
-  if hobo_svn
-    puts "\nInstalling Hobo plugin via svn checkout...\n"
-    command("svn co #{HOBO_REPO_SVN} vendor/plugins/hobo")
-  else
-    puts "\nInstalling Hobo plugin...\n"
-    FileUtils.cp_r hobo_src, "vendor/plugins/hobo"
-  end
 
   puts "\nInitialising Hobo...\n"
   command(gen, "hobo --add-routes")
