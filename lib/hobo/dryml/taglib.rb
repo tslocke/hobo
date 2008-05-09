@@ -45,7 +45,7 @@ module Hobo
                  end
 
           filename = "#{base}/#{options[:src]}.dryml"
-          raise DrymlException, "No such taglib: #{options.inspect} #{filename}" unless File.exists?(filename)
+          raise DrymlException, "No such taglib: #{base} #{options.inspect} #{filename}" unless File.exists?(filename)
           filename
         end
 
