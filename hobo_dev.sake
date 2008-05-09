@@ -1,0 +1,83 @@
+# A set of sake tasks to manage Hobo gems
+desc 'Clone a copy of the Hobo repository; set GITHUB_USER=tablatom for Tom\'s repository'
+task 'hobo:clone' => [ 'hobo:env' ] do
+  hobo = ENV["HOBO_GEM_ROOT"]
+  if File.exists?(hobo) then
+    puts("#{ENV["HOBO_GEM_ROOT"]} already exists!")
+    exit
+  end
+  require("fileutils")
+  FileUtils.mkdir_p(hobo)
+  sh("git clone git://github.com/#{ENV["GITHUB_USER"]}/hobo.git .")
+end
+
+desc 'Update your local Hobo repositories.  Run from anywhere.'
+task 'hobo:update' => [ 'hobo:env' ] do
+  cd(ENV["HOBO_GEM_ROOT"])
+  sh("git fetch")
+  sh("git rebase origin/master")
+end
+
+desc 'Uninstall all RubyGems related to Hobo'
+task 'hobo:gems:wipe' do
+  windows = PLATFORM =~ /win32|cygwin/ rescue nil
+  sudo = windows ? ("") : ("sudo")
+  gems = `gem list hobo`
+  gems.split("\n").each do |line|
+    next unless line =~ /^(hobo[^ ]+)/
+    sh("#{sudo} gem uninstall -a -i -x #{$1}")
+  end
+end
+
+desc 'Pull fresh copies of Hobo and refresh all the gems'
+task 'hobo:gems:refresh' => [ 'hobo:update', 'hobo:install' ] do
+  # do nothing
+end
+
+desc "Install gem hobosupport"
+task "hobo:install:support" => [ 'hobo:env' ] do
+  cd(ENV["HOBO_GEM_ROOT"])
+  cd("hobosupport")
+  sh("rake install")
+  cd("..")
+end
+
+desc "Install gem hobofields"
+task "hobo:install:fields" => [ 'hobo:env' ] do
+  cd(ENV["HOBO_GEM_ROOT"])
+  cd("hobofields")
+  sh("rake install")
+  cd("..")
+end
+
+desc "Install gem hobo"
+task "hobo:install:hobo" => [ 'hobo:env' ] do
+  cd(ENV["HOBO_GEM_ROOT"])
+  cd("hobo")
+  sh("rake install")
+  cd("..")
+end
+
+desc 'Install hobo gems'
+task 'hobo:install' => [ 'hobo:install:support', 'hobo:install:fields', 'hobo:install:hobo' ] do
+  # do nothing
+end
+
+desc 'Remove and reinstall Hobo sake recipes'
+task 'hobo:sake:refresh' do
+  ["clone", "update", "gems:wipe", "gems:refresh", "install", "install:core", "install:more", "sake:refresh"].each do |t|
+    sh("sake -u hobo:#{t}")
+  end
+  sh("sake -i http://hobocentral.com/hobo_dev.sake")
+end
+
+desc 'Uninstall all hobo:xxx tasks'
+task 'hobo:sake:uninstall' do
+  `sake -T | grep hobo | sed -e \"s/sake //\" | sed -e \"s/ .*//\" | xargs sake -u`
+end
+
+task 'hobo:env' do
+  ENV["GEM_SRC_ROOT"] ||= File.expand_path(File.join("~", "gems"))
+  ENV["HOBO_GEM_ROOT"] ||= File.join(ENV["GEM_SRC_ROOT"], "hobo")
+  ENV["GITHUB_USER"] ||= "tablatom"
+end
