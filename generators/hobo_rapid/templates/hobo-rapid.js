@@ -236,16 +236,16 @@ var Hobo = {
             var ipe = Hobo._makeInPlaceEditor(el, options) 
             if (typeof(tinyMCE) != "undefined") {
                 ipe.afterEnterEditMode = function() {
-                    var id = this.form.id = Hobo.uid()
+                    var id = this._form.id = Hobo.uid()
 
                     // 'orrible 'ack
                     // What is the correct way to individually configure a tinyMCE instace?
                     var old = tinyMCE.settings.theme_advanced_buttons1
                     tinyMCE.settings.theme_advanced_buttons1 += ", separator, save"
-                    tinyMCE.addMCEControl(this.editField, id);
+                    tinyMCE.addMCEControl(this._controls.editor, id);
                     tinyMCE.settings.theme_advanced_buttons1 = old
 
-                    this.form.onsubmit = function() {
+                    this._form.onsubmit = function() {
                         tinyMCE.removeMCEControl(ipe.form.id)
                         setTimeout(ipe.onSubmit.bind(ipe), 10)
                         return false
