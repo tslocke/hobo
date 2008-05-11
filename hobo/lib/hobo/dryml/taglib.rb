@@ -34,14 +34,14 @@ module Hobo
           base = if plugin == "hobo"
                    "#{HOBO_ROOT}/taglibs"
                  elsif plugin
-                   "vendor/plugins/#{plugin}/taglibs"
+                   "#{RAILS_ROOT}/vendor/plugins/#{plugin}/taglibs"
                  elsif (bundle_name = options[:bundle])
                    bundle = Bundle.bundles[bundle_name]
                    "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{RAILS_ROOT}/app/views"
                  else
-                   options[:template_dir].gsub(/^\//, "") # remove leading / if there is one
+                   "#{RAILS_ROOT}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
                  end
           
           filename = "#{base}/#{options[:src]}.dryml"
