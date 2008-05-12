@@ -410,6 +410,8 @@ require 'extensions/test_case' if RAILS_ENV == "test"
 ::HOBO_ROOT = File.dirname(__FILE__) + "/.."
 
 ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+# TODO - Rails 2.1 requires ActionView::Template
+# ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
 
 class ActionController::Base
 
