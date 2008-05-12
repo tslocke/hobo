@@ -41,23 +41,6 @@ class TestHoboModelControllerGenerator < Test::Unit::TestCase
     assert_generated_file 'test/functional/my_models_controller_test.rb'
   end
 
-  def test_generator_with_views
-    name = "MyModel"
-    run_generator('hobo_model_controller', [name, 'index', 'show'], sources)
-    assert_directory_exists 'app/controllers'
-    assert_directory_exists 'app/helpers'
-    assert_directory_exists 'app/views'
-    assert_directory_exists 'test/functional'
-
-    assert_generated_file 'app/controllers/my_models_controller.rb'
-    assert_generated_class 'app/controllers/my_models_controller'
-    assert_generated_file 'app/helpers/my_models_helper.rb'
-    assert_generated_file 'test/functional/my_models_controller_test.rb'
-
-    assert_generated_file 'app/views/my_models/index.html.erb'
-    assert_generated_file 'app/views/my_models/show.html.erb'
-  end
-
   private
   def sources
     [RubiGen::PathSource.new(:test, File.join(File.dirname(__FILE__),"..", generator_path))
