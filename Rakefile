@@ -31,7 +31,7 @@ Echoe.new('hobo') do |p|
   p.dependencies = [
     'hobosupport >=0.7.5',
     'hobofields >=0.7.5',
-    'rails >= 2.0.2',
+    'rails =2.0.2',
     'will_paginate >= 2.2.1']
 end
 
