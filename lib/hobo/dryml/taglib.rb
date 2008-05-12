@@ -40,6 +40,8 @@ module Hobo
                    "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{RAILS_ROOT}/app/views"
+                 elsif options[:template_dir] =~ /^#{HOBO_ROOT}/
+                   options[:template_dir]
                  else
                    "#{RAILS_ROOT}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
                  end
