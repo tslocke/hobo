@@ -12,7 +12,7 @@ namespace :hobo do
       
       Dir.chdir("hobothemes/clean/stylesheets") do       
         puts "clean.css"
-        `rm -f cean.css`
+        `rm -f clean.css`
         `ln -s ../../../../vendor/plugins/hobo/generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css`
       end
     end
