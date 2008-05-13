@@ -22,6 +22,7 @@ module Hobo
       base.class_eval do
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
+        attr_accessor :acting_user
       end
       
       class << base
@@ -95,7 +96,7 @@ module Hobo
         raise PermissionDeniedError unless Hobo.can_view?(user, record)
         record
       end
-      
+
       
       def user_new(user, attributes={})
         record = new(attributes)
@@ -321,28 +322,38 @@ module Hobo
     
     include Scopes
     
-    
     def to_url_path
       "#{self.class.to_url_path}/#{to_param}" unless new_record?
     end
     
     
+    def with_acting_user(user)
+      old = acting_user
+      self.acting_user = user
+      result = yield
+      self.acting_user = old
+      result
+    end
+    
+    
     def user_changes(user, changes={})
-      if new_record?
-        self.attributes = changes
-        set_creator(user) 
-        Hobo.can_create?(user, self)
-      else
-        original = duplicate
-        # 'duplicate' can cause these to be set, but they can conflict
-        # with the changes so we clear them
-        clear_aggregation_cache
-        clear_association_cache
-        
-        self.attributes = changes
-        
-        Hobo.can_update?(user, original, self)
-      end        
+      with_acting_user user do
+        if new_record?
+          self.attributes = changes
+          set_creator(user) 
+          Hobo.can_create?(user, self)
+        else
+          original = duplicate
+          # 'duplicate' can cause these to be set, but they can conflict
+          # with the changes so we clear them
+          clear_aggregation_cache
+          clear_association_cache
+          
+          self.attributes = changes
+          
+          Hobo.can_update?(user, original, self)
+        end
+      end
     end
     
     
@@ -358,8 +369,10 @@ module Hobo
       
 
     def user_save_changes(user, changes={})
-      user_changes!(user, changes)
-      save
+      with_acting_user user do
+        user_changes!(user, changes)
+        save
+      end
     end
     
 
@@ -369,8 +382,10 @@ module Hobo
     
     
     def user_destroy(user)
-      raise PermissionDeniedError unless Hobo.can_delete?(user, self)
-      destroy
+      with_acting_user user do
+        raise PermissionDeniedError unless Hobo.can_delete?(user, self)
+        destroy
+      end
     end
     
     
@@ -385,7 +400,6 @@ module Hobo
     end
       
 
-    
     def set_creator(user)
       set_creator!(user) unless get_creator
     end
