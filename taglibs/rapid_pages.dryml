@@ -36,7 +36,7 @@
       </header>
       <section class="page-content" param="content">
         <flash-message param/>
-        <flash-message type="error" param/>
+        <flash-message type="error" param="flash-error-message"/>
         <header class="content-header" param="content-header"/>
         <section class="content-body" param="content-body"/>
         <footer class="content-footer" param="content-footer"/>
