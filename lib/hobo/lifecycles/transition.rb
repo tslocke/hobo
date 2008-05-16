@@ -37,7 +37,6 @@ module Hobo
       def run!(record, user, attributes)
         if prepare_and_check!(record, user, attributes)
           fire_event(record, on_transition)
-          record.write_attribute lifecycle.options[:last_transition_at_field], Time.now
           record.become end_state
         else
           raise Hobo::Model::PermissionDeniedError
@@ -45,11 +44,14 @@ module Hobo
       end
       
       
-      def set_or_check_who_with_key!(record, user, attributes)
+      def set_or_check_who_with_key!(record, user)
         if who == :with_key
-          
+          record.lifecycle.valid_key? or raise LifecycleKeyError
+        else
+          set_or_check_who_without_key!(record, user)
         end
       end
+      alias_method_chain :set_or_check_who!, :key
       
 
       def parameters

@@ -404,6 +404,11 @@ module Hobo
       end
     end
     
+    
+    def user_save(user)
+      user_save_changes(user)
+    end
+    
 
     def user_view(user, field=nil)
       raise PermissionDeniedError, self.inspect unless Hobo.can_view?(user, self, field)

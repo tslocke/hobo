@@ -14,6 +14,9 @@ namespace :hobo do
         puts "clean.css"
         `rm -f clean.css`
         `ln -s ../../../../vendor/plugins/hobo/generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css`
+        puts "rapid-ui.css"
+        `rm -f rapid-ui.css`
+        `ln -s ../../../../vendor/plugins/hobo/generators/hobo_rapid/templates/themes/clean/public/stylesheets/rapid-ui.css`
       end
     end
     

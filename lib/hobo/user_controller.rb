@@ -23,6 +23,10 @@ module Hobo
     
     def logout; hobo_logout; end
     
+    def forgot_password; hobo_forgot_password; end
+    
+    def reset_password; hobo_reset_password; end
+    
     private
     
     def hobo_login(options={})
@@ -60,17 +64,12 @@ module Hobo
 
     
     def hobo_signup(&b)
-      if request.post?
-        self.this = model.user_create(current_user, params[model.name.underscore])
-        self.current_user = this if valid?
-        response_block(&b) or
-          if valid?
-            flash[:notice] ||= "Thanks for signing up!"
-            redirect_back_or_default(home_page)
-          end
-      else
-        self.this = model.new
-        yield if block_given?
+      creator_action(:signup) do
+        response_block(&b) or if valid?
+                                self.current_user = this
+                                flash[:notice] = "Thanks for signing up!"
+                                redirect_back_or_default(home_page)
+                              end
       end
     end
 
@@ -83,6 +82,29 @@ module Hobo
       yield if block_given?
       flash[:notice] ||= options[:notice]
       redirect_back_or_default(options[:redirect_to]) unless performed?
+    end
+    
+    
+    def hobo_forgot_password
+      if request.post?
+        user = model.find_by_email_address(params[:email_address])
+        if user && (!block_given? || yield(user))
+          Hobo::Controller.request_host = request.host_with_port
+          user.lifecycle.request_password_reset(:nobody)
+        end
+        render_tag :forgot_password_email_sent_page
+      end
+    end
+    
+    
+    def hobo_reset_password(&b)
+      transition_action :reset_password do
+        response_block(&b) or if valid?
+                                self.current_user = this
+                                flash[:notice] = "Your password has been reset"
+                                redirect_to home_page 
+                              end
+      end
     end
     
     

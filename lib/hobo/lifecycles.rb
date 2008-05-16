@@ -2,6 +2,10 @@ module Hobo
   
   module Lifecycles
     
+    class LifecycleError < RuntimeError; end
+
+    class LifecycleKeyError < LifecycleError; end
+    
     ModelExtensions = classy_module do
       
       attr_writer :lifecycle
@@ -9,7 +13,7 @@ module Hobo
       def self.lifecycle(*args, &block)
         options = args.extract_options!
         options = options.reverse_merge(:state_field => :state,
-                                        :last_transition_at_field => :last_transition_at)
+                                        :key_timestamp_field => :key_timestamp)
         
         if defined? self::Lifecycle
           lifecycle = self::Lifecycle
@@ -25,7 +29,10 @@ module Hobo
         default = lifecycle.initial_state ? { :default => lifecycle.initial_state.name } : {}
         declare_field(options[:state_field], :string, default)
         
-        declare_field(options[:last_transition_at_field], :datetime)
+        declare_field(options[:key_timestamp_field], :datetime)
+        
+        never_show      options[:state_field], options[:key_timestamp_field]
+        attr_protected  options[:state_field], options[:key_timestamp_field]
       end
       
       
