@@ -2,8 +2,6 @@ module Hobo
   
   module Lifecycles
     
-    class LifecycleError < RuntimeError; end
-    
     class Lifecycle
       
       def self.init(model, options)
@@ -21,7 +19,8 @@ module Hobo
       end
       
       class << self
-        attr_accessor :model, :options, :states, :initial_state, :creators, :transitions, :invariants, :preconditions
+        attr_accessor :model, :options, :states, :initial_state,
+                      :creators, :transitions, :invariants, :preconditions
       end
       
       def self.def_state(name, on_enter)
@@ -93,7 +92,12 @@ module Hobo
         options[:state_field]
       end
       
+      
+      # --- Instance Features --- #
+      
       attr_reader :record
+      
+      attr_accessor :provided_key, :current_key
       
       
       def initialize(record)
@@ -107,19 +111,19 @@ module Hobo
       
       
       def transition(name, user, attributes=nil)
-        transition = available_transitions_for(user, name, attributes).first
-        raise LifecycleError, "No #{name} transition available to #{user} on this #{record.class.name}" unless transition
+        transition = find_transition(name, user, attributes)
         transition.run!(record, user, attributes)
+      end
+
+      
+      def find_transition(name, user, attributes=nil)
+        available_transitions_for(user, name, attributes).first or 
+          raise LifecycleError, "No #{name} transition available to #{user} on this #{record.class.name}" 
       end
       
       
       def state_name
         record.read_attribute self.class.state_field
-      end
-      
-      
-      def last_transition_at
-        record.read_attribute self.class.options[:last_transition_at_field]
       end
       
       
@@ -150,16 +154,33 @@ module Hobo
           else
             s = self.class.states[state_name]
             raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
-            s.activate! record
-            record.save!
+            if record.save
+              s.activate! record
+            end
           end
         end
       end
       
       
-      def key
+      def key_timestamp_field
+        record.class::Lifecycle.options[:key_timestamp_field]
+      end
+      
+      
+      def generate_key
+        key_timestamp = Time.now
+        record.write_attribute key_timestamp_field, key_timestamp
+        current_key
+      end
+      
+      
+      def current_key
         require 'digest/sha1'
-        Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{last_transition_at}")
+        Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{record.read_attribute key_timestamp_field}")
+      end
+      
+      def valid_key?
+        provided_key == current_key
       end
       
       

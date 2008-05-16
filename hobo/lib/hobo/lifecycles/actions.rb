@@ -5,17 +5,24 @@ module Hobo
     module Actions
       
       def set_or_check_who!(record, user)
-        if who == :anyone
+        case who
+        when :nobody
+          user == :nobody
+        when :anybody
           true
-        elsif who.is_a?(Array)
+        when :self
+          record == user
+        when Array
           who.detect {|attribute| record.send(attribute) == user }
-        elsif (current = record.send(who)) # it's already set, check it's the same user
-          user == current
-        elsif user.is_a?(record.class.attr_type(who))
-          record.send("#{who}=", user)
-          true
         else
-          false
+          if (current = record.send(who)) # it's already set, check it's the same user
+            user == current
+          elsif user.is_a?(record.class.attr_type(who))
+            record.send("#{who}=", user)
+            true
+          else
+            false
+          end
         end
       end
       
@@ -53,7 +60,7 @@ module Hobo
       
       
       def prepare_and_check!(record, user, attributes=nil)
-        prepare(record, user, attributes) if check_guard(record, user) && check_invariants(record)
+        prepare(record, user, attributes) && check_guard(record, user) && check_invariants(record)
       end
       
     end

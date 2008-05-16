@@ -1,0 +1,47 @@
+<def tag="lifecycle-start-page">
+  <set creator-name="&@creator.name"/>
+  <set creator-title="&creator_name.titleize"/>
+
+  <page title="&creator_title" merge>
+    <body: class="lifecycle-start-page #{creator_name.gsub('_', '-')}-page" param/>
+    <content-header: param>
+      <heading param><creator-title/></heading>
+    </content-header>
+
+    <content-body: param>
+      <error-messages param/>
+
+      <form lifecycle="&creator_name" param>
+        <field-list fields="&@creator.parameters" param/>
+        <div class="actions" param="actions">
+          <submit label="&creator_title" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
+      </form>
+    </content-body>
+  </page>
+</def>
+
+
+<def tag="lifecycle-transition-page">
+  <set transition-name="&@transition.name"/>
+  <set transition-title="&transition_name.titleize"/>
+
+  <page title="&transition_title" merge>
+    <body: class="lifecycle-start-page #{transition_name.gsub('_', '-')}-page" param/>
+    <content-header: param>
+      <heading param><transition-title/></heading>
+    </content-header>
+
+    <content-body: param>
+      <error-messages param/>
+
+      <form lifecycle="&transition_name" param>
+        <hidden-form-field name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
+        <field-list fields="&@transition.parameters" param/>
+        <div class="actions" param="actions">
+          <submit label="&transition_title" param/><do param="back-link"> or <a>Cancel</a></do>
+        </div>
+      </form>
+    </content-body>
+  </page>
+</def>

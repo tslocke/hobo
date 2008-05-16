@@ -28,7 +28,8 @@ module Hobo
           
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
               
-          rescue_from Hobo::Model::PermissionDeniedError, :with => :permission_denied
+          rescue_from Hobo::Model::PermissionDeniedError,  :with => :permission_denied
+          rescue_from Hobo::Lifecycles::LifecycleKeyError, :with => :permission_denied
           
           alias_method_chain :render, :hobo_model
 
@@ -109,10 +110,10 @@ module Hobo
 
         except = Array(options[:except])
         except_actions = except.map do |arg|
-          if arg == :collections
-            available_auto_collection_actions
-          else
-            arg
+          case arg
+            when :collections then available_auto_collection_actions
+            when :lifecycle   then available_auto_lifecycle_actions
+            else arg
           end
         end
         
@@ -173,12 +174,18 @@ module Hobo
       def def_lifecycle_actions
         if model.has_lifecycle?
           model::Lifecycle.creator_names.each do |creator|
+            def_auto_action "#{creator}_page" do 
+              creator_page_action creator
+            end
             def_auto_action creator do 
               creator_action creator
             end
           end
           
           model::Lifecycle.transition_names.each do |transition|
+            def_auto_action "#{transition}_page" do
+              transition_page_action transition
+            end
             def_auto_action transition do
               transition_action transition
             end
@@ -259,8 +266,13 @@ module Hobo
       
       
       def available_auto_lifecycle_actions
+        # For each creator/transition there are two possible
+        # actions. e.g. for signup, 'signup_page' would be routed to
+        # GET users/signup, and would show the form, while 'signup'
+        # would be routed to POST /users/signup)
         if model.has_lifecycle?
-          (model::Lifecycle.creator_names + model::Lifecycle.transition_names).*.to_sym
+          (model::Lifecycle.creator_names.map { |c| [c, "#{c}_page"] } +
+           model::Lifecycle.transition_names.map { |t| [t, "#{t}_page"] }).flatten.*.to_sym
         else
           []
         end
@@ -530,21 +542,52 @@ module Hobo
 
     # --- Lifecycle Actions --- #
     
-    def creator_action(name)
-      if request.post?
-        self.this = model::Lifecycle.create(name, current_user, attribute_parameters)
-        redirect_to :back
-      end
+    def creator_action(name, &b)
+      @creator = model::Lifecycle.creators[name.to_s]
+      self.this = @creator.run!(current_user, attribute_parameters)
+      response_block(&b) or
+        if valid?
+          redirect_to destination_after_submit
+        else
+          dryml_fallback_tag "lifecycle_start_page"
+          re_render_form(name)
+        end
     end
     
     
-    def transition_action(name)
-      if request.request_method == :put
-        find_instance.lifecycle.transition(name, current_user, attribute_parameters)
-        redirect_to :back
-      end
+    def creator_page_action(name)
+      self.this = model.new
+      @creator = model::Lifecycle.creators[name]
+      dryml_fallback_tag "lifecycle_start_page"
     end
     
+    
+    def prepare_for_transition(name, options={})
+      self.this = find_instance
+      this.exempt_from_edit_checks = true
+      this.lifecycle.provided_key = params[:key]
+      @transition = this.lifecycle.find_transition(name, current_user)      
+    end
+
+    
+    def transition_action(name, *args, &b)
+      prepare_for_transition(name)
+      @transition.run!(this, current_user, attribute_parameters)
+      response_block(&b) or 
+        if valid?
+          redirect_to destination_after_submit
+        else
+          dryml_fallback_tag "lifecycle_transition_page"
+          re_render_form(name)          
+        end
+    end
+    
+
+    def transition_page_action(name, *args)
+      options = args.extract_options!
+      prepare_for_transition(name, options)
+      dryml_fallback_tag "lifecycle_transition_page"
+    end
     
     # --- Miscelaneous Actions --- #
 

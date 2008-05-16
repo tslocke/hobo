@@ -135,16 +135,16 @@ module Hobo
         map.connect "#{plural}/:id", :controller => plural, :action => 'show'
 
       elsif controller < Hobo::ModelController
-        # index routes need to be first so the index names don't get
-        # taken as IDs
+        # index and lifecycle routes need to be first so the names
+        # names don't get taken as IDs
         index_action_routes 
+        lifecycle_routes if defined? model::Lifecycle
         resource_routes
         collection_routes
         web_method_routes
         show_action_routes
         
         reorder_route
-        lifecycle_routes if defined? model::Lifecycle
         user_routes      if controller < Hobo::UserController
       end
     end
@@ -219,10 +219,14 @@ module Hobo
     
     def lifecycle_routes
       model::Lifecycle.creator_names.each do |creator|
-        linkable_route("#{singular}_#{creator}", "#{plural}/#{creator}", creator, :conditions => { :method => :post })
+        linkable_route("#{singular}_#{creator}",      "#{plural}/#{creator}", creator,           :conditions => { :method => :post }, :format => false)
+        linkable_route("#{singular}_#{creator}_page", "#{plural}/#{creator}", "#{creator}_page", :conditions => { :method => :get },  :format => false)
       end
-      model::Lifecycle.transition_names do |transition|
-        linkable_route("#{singular}_#{transition}", "#{plural}/:id/#{transition}", transition, :conditions => { :method => :put })
+      model::Lifecycle.transition_names.each do |transition|
+        linkable_route("#{singular}_#{transition}",      "#{plural}/:id/#{transition}", transition, 
+                       :conditions => { :method => :put }, :format => false)
+        linkable_route("#{singular}_#{transition}_page", "#{plural}/:id/#{transition}", "#{transition}_page", 
+                       :conditions => { :method => :get }, :format => false)
       end
     end
         
@@ -230,7 +234,7 @@ module Hobo
       prefix = plural == "users" ? "" : "#{singular}_"
       linkable_route("#{singular}_login",  "#{prefix}login",  'login')
       linkable_route("#{singular}_logout", "#{prefix}logout", 'logout')
-      linkable_route("#{singular}_signup", "#{prefix}signup", 'signup')
+      linkable_route("#{singular}_forgot_password", "#{prefix}forgot_password", 'forgot_password')
     end
     
     

@@ -296,12 +296,23 @@ module Hobo
      
      
     # Login url for a given user record or user class
-    def login_url(user_or_class)
-      c = user_or_class.is_a?(Class) ? user_or_class : user_or_class.class
-      send("#{c.name.underscore}_login_url") rescue nil
+    def forgot_password_url(user_class=Hobo::User.default_user_model)
+      send("#{user_class.name.underscore}_forgot_password_url") rescue nil
+    end
+
+    
+    # Login url for a given user record or user class
+    def login_url(user_class=Hobo::User.default_user_model)
+      send("#{user_class.name.underscore}_login_url") rescue nil
     end
     
 
+    # Sign-up url for a given user record or user class
+    def signup_url(user_class=Hobo::User.default_user_model)
+      send("#{user_class.name.underscore}_signup_url") rescue nil
+    end
+
+    
     # Login url for a given user record or user class
     def logout_url(user_or_class=nil)
       c = if user_or_class.nil?
@@ -315,15 +326,6 @@ module Hobo
     end
     
 
-    # Sign-up url for a given user record or user class
-    def signup_url(user_or_class=nil)
-      c = case user_or_class
-          when Class; user_or_class
-          when nil;   Hobo::User.default_user_model
-          else user_or_class
-          end
-      send("#{c.name.underscore}_signup_url") rescue nil
-    end
     
     def current_page_url
       request.request_uri.match(/^([^?]*)/)._?[1]
