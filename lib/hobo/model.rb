@@ -282,6 +282,14 @@ module Hobo
         "#{name.underscore.pluralize}"
       end
 
+      def with_acting_user(user)
+        old = acting_user
+        self.acting_user = user
+        result = yield
+        self.acting_user = old
+        result
+      end
+
 
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
@@ -328,20 +336,22 @@ module Hobo
 
 
     def user_changes(user, changes={})
-      if new_record?
-        self.attributes = changes
-        set_creator(user)
-        Hobo.can_create?(user, self)
-      else
-        original = duplicate
-        # 'duplicate' can cause these to be set, but they can conflict
-        # with the changes so we clear them
-        clear_aggregation_cache
-        clear_association_cache
+      with_acting_user user do
+        if new_record?
+          self.attributes = changes
+          set_creator(user)
+          Hobo.can_create?(user, self)
+        else
+          original = duplicate
+          # 'duplicate' can cause these to be set, but they can conflict
+          # with the changes so we clear them
+          clear_aggregation_cache
+          clear_association_cache
 
-        self.attributes = changes
+          self.attributes = changes
 
-        Hobo.can_update?(user, original, self)
+          Hobo.can_update?(user, original, self)
+        end
       end
     end
 
