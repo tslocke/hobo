@@ -31,13 +31,6 @@ class HoboModelControllerGenerator < Rails::Generator::NamedBase
                   File.join('app/helpers',
                             class_path,
                             "#{file_name}_helper.rb")
-
-      # View template for each action.
-      actions.each do |action|
-        path = File.join('app/views', class_path, file_name, "#{action}.rhtml")
-        m.template 'view.rhtml', path,
-          :assigns => { :action => action, :path => path }
-      end
     end
   end
 end
