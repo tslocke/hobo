@@ -97,6 +97,7 @@ module Hobo
         record
       end
 
+
       def user_new(user, attributes={})
         record = new(attributes)
         record.user_changes(user) and record
@@ -282,14 +283,6 @@ module Hobo
         "#{name.underscore.pluralize}"
       end
 
-      def with_acting_user(user)
-        old = acting_user
-        self.acting_user = user
-        result = yield
-        self.acting_user = old
-        result
-      end
-
 
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
@@ -329,9 +322,17 @@ module Hobo
 
     include Scopes
 
-
     def to_url_path
       "#{self.class.to_url_path}/#{to_param}" unless new_record?
+    end
+
+
+    def with_acting_user(user)
+      old = acting_user
+      self.acting_user = user
+      result = yield
+      self.acting_user = old
+      result
     end
 
 
@@ -397,7 +398,6 @@ module Hobo
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.attr_type(k), v) }
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
-
 
 
     def set_creator(user)
