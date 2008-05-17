@@ -129,16 +129,16 @@ module Hobo
 
       def name_attribute
         @name_attribute ||= begin
-                              cols = columns.*.name
-                              NAME_FIELD_GUESS.detect {|f| f.in? columns.*.name }
+                              column_names = columns.*.name
+                              NAME_FIELD_GUESS.detect {|f| f.in? column_names }
                             end
       end
 
 
       def primary_content_attribute
         @primary_content_attribute ||= begin
-                                         cols = columns.*.name
-                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? columns.*.name }
+                                         column_names = columns.*.name
+                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? column_names }
                                        end
       end
 
@@ -230,8 +230,8 @@ module Hobo
 
 
       def search_columns
-        cols = columns.*.name
-        SEARCH_COLUMNS_GUESS.select{|c| c.in?(cols) }
+        column_names = columns.*.name
+        SEARCH_COLUMNS_GUESS.select{|c| c.in?(column_names) }
       end
 
 
