@@ -5,6 +5,7 @@ Dependencies.load_paths << File.dirname(__FILE__) + "/../lib"
 require 'rexml/xpath'
 XPath = REXML::XPath
 
+gem 'maruku'
 require 'maruku'
 
 

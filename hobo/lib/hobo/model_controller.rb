@@ -5,50 +5,50 @@ module Hobo
     include Hobo::Controller
 
     VIEWLIB_DIR = "taglibs"
-    
+
     DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
-    
+
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :destroy]
     FORM_ACTIONS       = [:new, :edit]
-    
+
     class << self
 
       def included(base)
-        base.class_eval do 
+        base.class_eval do
           @auto_actions ||= {}
 
           inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => []
-          
+
           extend ClassMethods
-          
-          
+
+
           helper_method :model, :current_user
           before_filter :set_no_cache_headers
-          
+
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
-              
+
           rescue_from Hobo::Model::PermissionDeniedError, :with => :permission_denied
-          
+
           alias_method_chain :render, :hobo_model
 
         end
 
         Hobo::Controller.included_in_class(base)
       end
-      
+
     end
-    
+
 
     module ClassMethods
 
       attr_writer :model
-      
+
       def collections
         # FIXME The behaviour here is weird if the superclass does
         # define collections *and* this class adds some more. The
         # added ones won't be published
-        
+
         # by default By default, all has_many associations are published
         @collections ||= if superclass.respond_to?(:collections)
                            superclass.collections
@@ -57,12 +57,12 @@ module Hobo
                          end
       end
 
-      
+
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
       end
-      
-      
+
+
       def autocomplete(name, options={}, &block)
         options = options.dup
         field = options.delete(:field) || name
@@ -90,15 +90,15 @@ module Hobo
           else
             @this.send(method)
           end
-          
+
           hobo_ajax_response || render(:nothing => true) unless performed?
         end
       end
-      
-      
+
+
       def auto_actions(*args)
         options = args.extract_options!
-        
+
         @auto_actions = case args.first
                           when :all        then available_auto_actions
                           when :write_only then available_auto_write_actions + args.rest
@@ -114,48 +114,48 @@ module Hobo
             arg
           end
         end
-        
+
         @auto_actions -= except_actions.flatten
-        
+
         def_auto_actions
       end
-      
-      
+
+
       def def_auto_actions
         self.class_eval do
-          def index;   hobo_index   end if include_action?(:index) 
-          def show;    hobo_show    end if include_action?(:show) 
-          def new;     hobo_new     end if include_action?(:new) 
-          def create;  hobo_create  end if include_action?(:create) 
-          def edit;    hobo_show    end if include_action?(:edit) 
-          def update;  hobo_update  end if include_action?(:update) 
-          def destroy; hobo_destroy end if include_action?(:destroy) 
-          
+          def index;   hobo_index   end if include_action?(:index)
+          def show;    hobo_show    end if include_action?(:show)
+          def new;     hobo_new     end if include_action?(:new)
+          def create;  hobo_create  end if include_action?(:create)
+          def edit;    hobo_show    end if include_action?(:edit)
+          def update;  hobo_update  end if include_action?(:update)
+          def destroy; hobo_destroy end if include_action?(:destroy)
+
           def completions; hobo_completions end if include_action?(:completions)
-          
-          def reorder; hobo_reorder end if include_action?(:reorder) 
+
+          def reorder; hobo_reorder end if include_action?(:reorder)
         end
 
         collections.each { |c| def_collection_actions(c.to_sym) }
       end
-      
-      
-      
-      def def_auto_action(name, &block)        
+
+
+
+      def def_auto_action(name, &block)
         define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
       end
-      
-      
+
+
       def def_collection_actions(name)
         def_auto_action name do
           hobo_show_collection(name)
         end
-          
+
         if Hobo.simple_has_many_association?(model.reflections[name])
           def_auto_action "new_#{name.to_s.singularize}" do
             hobo_new_in_collection(name)
           end
-          
+
           def_auto_action "create_#{name.to_s.singularize}" do
             hobo_create_in_collection(name)
           end
@@ -174,7 +174,7 @@ module Hobo
           end
         end
       end
-      
+
       def index_action(*names, &block)
         options = names.extract_options!
         index_actions.concat(names)
@@ -190,31 +190,31 @@ module Hobo
           end
         end
       end
-      
+
       def publish_collection(*names)
         collections.concat(names)
         names.each {|n| def_collection_actions(n)}
       end
-      
-      
+
+
       def include_action?(name)
         name.to_sym.in?(@auto_actions)
       end
-      
-      
+
+
       def available_auto_actions
         (available_auto_read_actions +
-         available_auto_write_actions + 
-         FORM_ACTIONS + 
+         available_auto_write_actions +
+         FORM_ACTIONS +
          available_auto_collection_actions).uniq
       end
-      
-      
+
+
       def available_auto_read_actions
         READ_ONLY_ACTIONS + collections
       end
-      
-      
+
+
       def available_auto_write_actions
         if "position_column".in?(model.instance_methods)
           WRITE_ONLY_ACTIONS + [:reorder]
@@ -222,20 +222,20 @@ module Hobo
           WRITE_ONLY_ACTIONS
         end
       end
-      
-      
+
+
       def available_auto_collection_actions
-        collections.map do |c| 
+        collections.map do |c|
           [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
         end.flatten
       end
 
     end
-    
+
 
     protected
-    
-    
+
+
     def parse_sort_param(*sort_fields)
       _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
 
@@ -243,27 +243,27 @@ module Hobo
         if field.in?(sort_fields.*.to_s)
           @sort_field = field
           @sort_direction = desc ? "desc" : "asc"
-        
+
           [@sort_field, @sort_direction]
         end
       end
     end
-    
-    
+
+
     # --- Action implementation helpers --- #
-    
+
 
     def find_instance(options={})
       model.user_find(current_user, params[:id], options)
     end
-    
-    
+
+
     def invalid?; !valid?; end
-    
-    
+
+
     def valid?; this.errors.empty?; end
 
-    
+
     def re_render_form(default_action)
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
@@ -273,30 +273,30 @@ module Hobo
         render :action => default_action
       end
     end
-    
-    
+
+
     def destination_after_submit(record=nil, destroyed=false)
       record ||= this
-      
+
       after_submit = params[:after_submit]
-      
+
       # The after_submit post parameter takes priority
-      (after_submit == "stay-here" ? :back : after_submit) || 
-                
+      (after_submit == "stay-here" ? :back : after_submit) ||
+
         # Then try the record's show page
-        (!destroyed && object_url(@this)) || 
-        
+        (!destroyed && object_url(@this)) ||
+
         # Then the show page of the 'owning' object if there is one
         (!destroyed && (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on)))) ||
-        
+
         # Last try - the index page for this model
         object_url(@this.class) ||
-        
+
         # Give up
         home_page
     end
-    
-    
+
+
     def response_block(&b)
       if b
         if b.arity == 1
@@ -307,25 +307,25 @@ module Hobo
         performed?
       end
     end
-    
-    
+
+
     def request_requires_pagination?
       request.format.not_in?(DONT_PAGINATE_FORMATS)
     end
-    
-    
+
+
     def find_or_paginate(finder, options)
       options = options.reverse_merge(:paginate => request_requires_pagination?)
       do_pagination = options.delete(:paginate) && finder.respond_to?(:paginate)
-      
+
       if do_pagination
         finder.paginate(options.reverse_merge(:page => params[:page] || 1))
       else
         finder.all(options)
       end
     end
-    
-    
+
+
     # --- Action implementations --- #
 
     def hobo_index(*args, &b)
@@ -334,34 +334,34 @@ module Hobo
       self.this = find_or_paginate(finder, options)
       response_block(&b)
     end
-    
+
 
     def hobo_show(*args, &b)
       options = args.extract_options!
       self.this = find_instance(options)
       response_block(&b)
     end
-    
-    
+
+
     def hobo_new(new_record=nil, &b)
       self.this = new_record || model.new
       this.user_changes!(current_user) # set_creator and permission check
       response_block(&b)
     end
-    
-    
+
+
     def hobo_create(*args, &b)
       options = args.extract_options!
       self.this = args.first || new_for_create
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:new, &b)
     end
-    
-    
+
+
     def attribute_parameters
       params[this.class.name.underscore]
     end
-    
+
 
     def new_for_create
       if model.has_inheritance_column? && (type_attr = params['type']) && type_attr.in?(model.send(:subclasses).*.name)
@@ -370,11 +370,11 @@ module Hobo
         model
       end.new
     end
-    
-    
+
+
     def create_response(new_action, &b)
-      flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid? 
-      
+      flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid?
+
       response_block(&b) or
         if valid?
           respond_to do |wants|
@@ -390,27 +390,27 @@ module Hobo
           end
         end
     end
-    
+
 
     def hobo_update(*args, &b)
       options = args.extract_options!
-      
+
       self.this = args.first || find_instance
       changes = options[:attributes] || attribute_parameters or raise RuntimeError, "No update specified in params"
       this.user_save_changes(current_user, changes)
 
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
-      
+
       in_place_edit_field = changes.keys.first if changes.size == 1 && params[:render]
       update_response(in_place_edit_field, &b)
     end
-    
-    
+
+
     def update_response(in_place_edit_field=nil, &b)
       flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
-      
-      response_block(&b) or 
+
+      response_block(&b) or
         if valid?
           respond_to do |wants|
             wants.html do
@@ -424,7 +424,7 @@ module Hobo
               else
                 hobo_ajax_response(this)
               end
-               
+
               # Maybe no ajax requests were made
               render :nothing => true unless performed?
             end
@@ -433,13 +433,13 @@ module Hobo
           respond_to do |wants|
             wants.html { re_render_form(:edit) }
             wants.js { render(:status => 500,
-                              :text => ("There was a problem with that change.\n" + 
+                              :text => ("There was a problem with that change.\n" +
                                         @this.errors.full_messages.join("\n"))) }
           end
         end
     end
-    
-    
+
+
     def hobo_destroy(*args, &b)
       options = args.extract_options!
       self.this = args.first || find_instance
@@ -447,8 +447,8 @@ module Hobo
       flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
       destroy_response(&b)
     end
-    
-    
+
+
     def destroy_response(&b)
       response_block(&b) or
         respond_to do |wants|
@@ -456,8 +456,8 @@ module Hobo
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
- 
-    
+
+
     def hobo_show_collection(association, *args, &b)
       options = args.extract_options!
       association = find_instance.send(association) if association.is_a?(String, Symbol)
@@ -466,11 +466,11 @@ module Hobo
       end
       self.this = find_or_paginate(association, options)
       dryml_fallback_tag("show_collection_page")
-      response_block(&b) 
+      response_block(&b)
     end
-    
-    
-    # TODO: This action needs some more tidying up    
+
+
+    # TODO: This action needs some more tidying up
     def hobo_new_in_collection(association, *args, &b)
       options = args.extract_options!
       @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
@@ -479,8 +479,8 @@ module Hobo
       dryml_fallback_tag("new_in_collection_page")
       response_block(&b)
     end
-    
-    
+
+
     def hobo_create_in_collection(association, *args, &b)
       options = args.extract_options!
       @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
@@ -488,7 +488,7 @@ module Hobo
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response("new_#{association}", &b)
     end
-    
+
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
@@ -497,10 +497,10 @@ module Hobo
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
-    
-    
+
+
     def hobo_reorder
-      ordering = params["#{model.name.underscore}_ordering"] 
+      ordering = params["#{model.name.underscore}_ordering"]
       if ordering
         ordering.each_with_index do |id, position|
           model.user_update(current_user, id, :position => position+1)
@@ -510,11 +510,11 @@ module Hobo
         render :nothing => true
       end
     end
-    
-    
-    
+
+
+
     # --- Response helpers --- #
-    
+
     def permission_denied(error)
       self.this = nil # Otherwise this gets sent user_view
       if :permission_denied.in?(self.class.superclass.instance_methods)
@@ -528,14 +528,14 @@ module Hobo
               render :text => "Permission Denied", :status => 403
             end
           end
-          wants.js do 
+          wants.js do
             render :text => "Permission Denied", :status => 403
           end
         end
       end
     end
-    
-    
+
+
     def not_found(error)
       if :not_found_response.in?(self.class.superclass.instance_methods)
         super
@@ -545,14 +545,14 @@ module Hobo
         render(:text => "The page you requested cannot be found.", :status => 404)
       end
     end
-    
-    
+
+
     def this
-      @this ||= (instance_variable_get("@#{model.name.underscore}") || 
+      @this ||= (instance_variable_get("@#{model.name.underscore}") ||
                  instance_variable_get("@#{model.name.underscore.pluralize}"))
     end
 
-    
+
     def this=(object)
       ivar = if object.is_a?(Array)
                (object.try.member_class || model).name.underscore.pluralize
@@ -561,22 +561,22 @@ module Hobo
              end
       @this = instance_variable_set("@#{ivar}", object)
     end
-    
-    
+
+
     def dryml_context
       this
     end
 
-    
+
     def render_with_hobo_model(*args, &block)
       options = args.extract_options!
       self.this = options[:object] if options[:object]
       this.user_view(current_user) if this && this.respond_to?(:user_view)
       render_without_hobo_model(*args + [options], &block)
     end
-    
+
     # --- filters --- #
-    
+
     def set_no_cache_headers
       headers["Pragma"] = "no-cache"
       #headers["Cache-Control"] = ["must-revalidate", "no-cache", "no-store"]
@@ -586,13 +586,13 @@ module Hobo
     end
 
     # --- end filters --- #
-    
+
     public
 
     def model
       self.class.model
     end
-    
+
   end
 
 end
