@@ -320,40 +320,6 @@ module Hobo
 
 
     include Scopes
-<<<<<<< HEAD:hobo/lib/hobo/model.rb
-    
-    def to_url_path
-      "#{self.class.to_url_path}/#{to_param}" unless new_record?
-    end
-    
-    
-    def with_acting_user(user)
-      old = acting_user
-      self.acting_user = user
-      result = yield
-      self.acting_user = old
-      result
-    end
-    
-    
-    def user_changes(user, changes={})
-      with_acting_user user do
-        if new_record?
-          self.attributes = changes
-          set_creator(user) 
-          Hobo.can_create?(user, self)
-        else
-          original = duplicate
-          # 'duplicate' can cause these to be set, but they can conflict
-          # with the changes so we clear them
-          clear_aggregation_cache
-          clear_association_cache
-          
-          self.attributes = changes
-          
-          Hobo.can_update?(user, original, self)
-        end
-=======
 
 
     def to_url_path
@@ -376,7 +342,6 @@ module Hobo
         self.attributes = changes
 
         Hobo.can_update?(user, original, self)
->>>>>>> me/hobo_the_gem:hobo/lib/hobo/model.rb
       end
     end
 
@@ -423,11 +388,8 @@ module Hobo
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
 
-<<<<<<< HEAD:hobo/lib/hobo/model.rb
-=======
 
 
->>>>>>> me/hobo_the_gem:hobo/lib/hobo/model.rb
     def set_creator(user)
       set_creator!(user) unless get_creator
     end
