@@ -165,7 +165,7 @@ module Hobo
       when Symbol
         x.to_s
       when String
-        x.split(/\s*[, ]\s*/)
+        x.strip.split(/\s*,\s*/)
       else
         x.compact.map{|e| comma_split(e)}.flatten
       end
