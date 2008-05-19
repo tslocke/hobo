@@ -272,7 +272,7 @@
             else
               wrapper = if inline
                           :span
-                        elsif block || (this.class.const_defined?(:COLUMN_TYPE) && this.class::COLUMN_TYPE == :text)
+                        elsif block || this.is_a?(HoboFields::Text)
                           :div
                         else
                           :span
