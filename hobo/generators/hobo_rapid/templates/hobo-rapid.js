@@ -210,6 +210,21 @@ var Hobo = {
         return new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
     },
 
+    nicEditorOptions: { buttonList : ['bold','italic',
+                                      'left','center','right',
+                                      'ul',
+                                      'fontFormat',
+                                      'indent','outdent',
+                                      'link','unlink',
+                                      'image', 'removeLink']},
+
+    makeNicEditor: function(element) {
+        if (!Hobo.nicEditorOptions.iconsPath) { Hobo.nicEditorOptions.iconsPath = urlBase + '/images/nicEditorIcons.gif' }
+        var nic = new nicEditor(Hobo.nicEditorOptions)
+        nic.panelInstance(element.id, {hasPanel : true})
+        return nic.instanceById(element)
+    },
+
     applyEvents: function(root) {
         root = $(root)
         function select(p) {
@@ -231,25 +246,22 @@ var Hobo = {
         })
 
         select(".in-place-html-textarea-bhv").each(function (el) {
-            var options = {rows: 2, handleLineBreaks: false}
-            if (typeof(tinyMCE) != "undefined") options["submitOnBlur"] = false
+            var nicEditPresent = typeof(nicEditor) != "undefined"
+            var options = { rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save" }
+            if (nicEditPresent) options["submitOnBlur"] = false
             var ipe = Hobo._makeInPlaceEditor(el, options) 
-            if (typeof(tinyMCE) != "undefined") {
+            if (nicEditPresent) {
                 ipe.afterEnterEditMode = function() {
-                    var id = this._form.id = Hobo.uid()
-
-                    // 'orrible 'ack
-                    // What is the correct way to individually configure a tinyMCE instace?
-                    var old = tinyMCE.settings.theme_advanced_buttons1
-                    tinyMCE.settings.theme_advanced_buttons1 += ", separator, save"
-                    tinyMCE.addMCEControl(this._controls.editor, id);
-                    tinyMCE.settings.theme_advanced_buttons1 = old
-
-                    this._form.onsubmit = function() {
-                        tinyMCE.removeMCEControl(ipe.form.id)
-                        setTimeout(ipe.onSubmit.bind(ipe), 10)
-                        return false
-                    }
+                    var editor = this._controls.editor
+                    var id = editor.id = Hobo.uid()
+                    var nicInstance = Hobo.makeNicEditor(editor)
+                    var panel = this._form.down(".nicEdit-panel")
+                    panel.appendChild(this._controls.cancel)
+                    panel.appendChild(this._controls.ok)
+                    bkLib.addEvent(this._controls.ok,'click', function () {
+                        nicInstance.saveContent()
+                        setTimeout(function() {nicInstance.remove()}, 1)
+                    })
                 }
             }
         })
@@ -573,6 +585,13 @@ SelectManyInput = Behavior.create({
 })
 
 Event.addBehavior({
+
+    'textarea.html' : function(e) {
+        if (typeof(nicEditors) != "undefined") {
+            Hobo.makeNicEditor(this)
+        }
+    },
+
     'div.select-many.input' : SelectManyInput(),
 
     '.association-count:click' : function(e) {

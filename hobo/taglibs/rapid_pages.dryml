@@ -1,4 +1,4 @@
-<def tag="base-page" attrs="title, full-title, doctype">
+<def tag="base-page" attrs="title, full-title, doctype, nicedit">
   <% full_title ||= "#{title} : #{app_name}" %>
   <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
   <html>
@@ -11,7 +11,7 @@
       </do>
 
       <do param="scripts">
-        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <javascript param name="#{'nicedit, ' if nicedit} prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
         <do param="fix-ie6"><%= "<!--[if lt IE 7]>" %><javascript name="IE7"/><%= "<![endif]-->" %></do>
         <hobo-rapid-javascripts param/>
       </do>

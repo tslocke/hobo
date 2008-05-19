@@ -10,11 +10,13 @@ class HoboRapidGenerator < Hobo::Generator
     end
     
     record do |m|
-      m.file "hobo-rapid.js", "public/javascripts/hobo-rapid.js"
-      m.file "lowpro.js", "public/javascripts/lowpro.js"
-      m.file "IE7.js", "public/javascripts/IE7.js"
-      m.file "reset.css", "public/stylesheets/reset.css"
-      m.file "hobo-rapid.css", "public/stylesheets/hobo-rapid.css"
+      m.file "hobo-rapid.js",      "public/javascripts/hobo-rapid.js"
+      m.file "lowpro.js",          "public/javascripts/lowpro.js"
+      m.file "IE7.js",             "public/javascripts/IE7.js"
+      m.file "nicEdit.js",         "public/javascripts/nicEdit.js"
+      m.file "nicEditorIcons.gif", "public/images/nicEditorIcons.gif"
+      m.file "reset.css",          "public/stylesheets/reset.css"
+      m.file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
       create_all(m, "themes/clean/public", "public/hobothemes/clean")
       create_all(m, "themes/clean/views", "app/views/taglibs/themes/clean")
     end
