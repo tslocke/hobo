@@ -31,7 +31,9 @@ end
 
 
 def command(*s)
-  ok = system(s.join(' '))
+  com = s.join(' ')
+  puts "--> #{com}"
+  ok = system(com)
   exit(1) unless ok
 end
 
