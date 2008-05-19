@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-file=File.read(File.dirname(__FILE__)+"/hobo/CHANGES.txt").to_a
+file=File.read(File.dirname(__FILE__)+"/../hobo/CHANGES.txt").to_a
 
 out=[]; oline=''; voline=''; @oindent=0; @inlist=0
 file.each_index do |line|
@@ -37,8 +37,9 @@ file.each_index do |line|
   #file[line] =~ /mmit/ && file[line] = "FOO"
 end
 
-f=File.open(File.dirname(__FILE__)+"/CHANGES.html","w")
+f=File.open(File.dirname(__FILE__)+"/../hobo/CHANGES.html","w")
 f.write '<html><head><style type="text/css">'+"\n"
+f.write '.class0_7_5 {background-color: #fdc}'+"\n"
 f.write '.class0_7_4 {background-color: #dff}'+"\n"
 f.write '.class0_7_3 {background-color: #fdf}'+"\n"
 f.write '.class0_7_2 {background-color: #ffd}'+"\n"
