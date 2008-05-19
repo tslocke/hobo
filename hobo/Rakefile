@@ -16,6 +16,26 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
+require 'echoe'
+
+Echoe.new('hobo') do |p|
+  p.author  = "Tom Locke"
+  p.email   = "tom@tomlocke.com"
+  p.summary = "The web app builder for Rails"
+  p.url     = "http://hobocentral.net/"
+  p.project = "hobo"
+
+  p.changelog = "CHANGES.txt"
+  p.version   = "0.7.5"
+
+  p.dependencies = [
+    'hobosupport >=0.7.5',
+    'hobofields >=0.7.5',
+    'rails =2.0.2',
+    'will_paginate >= 2.2.1']
+end
+
+
 
 
 # --- RSpec --- #

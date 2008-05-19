@@ -1,4 +1,5 @@
-require 'find' 
+require 'find'
+require "rails_generator"
 
 class Hobo::Generator < Rails::Generator::Base
 
