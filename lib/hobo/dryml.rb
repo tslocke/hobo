@@ -1,7 +1,18 @@
+require 'hobo/dryml/dryml_builder'
+require 'hobo/dryml/dryml_support_controller'
+require 'hobo/dryml/part_context'
+require 'hobo/dryml/scoped_variables'
+require 'hobo/dryml/dryml_builder'
+require 'hobo/dryml/parser'
+require 'hobo/dryml/template'
+require 'hobo/dryml/taglib'
+require 'hobo/dryml/tag_parameters'
+require 'hobo/dryml/template_environment'
+require 'hobo/dryml/template_handler'
 module Hobo
-  
+
   module Dryml
-    
+
     class DrymlSyntaxError < RuntimeError; end
 
     class DrymlException < Exception
@@ -13,7 +24,7 @@ module Hobo
         end
       end
     end
-    
+
     class AttributeExtensionString < String;
       def drop_prefix; self[2..-1]; end
     end
@@ -26,8 +37,8 @@ module Hobo
 
     APPLICATION_TAGLIB = { :src => "taglibs/application" }
     CORE_TAGLIB        = { :src => "core", :plugin => "hobo" }
-    
-    DEFAULT_IMPORTS = (if defined?(ApplicationHelper) 
+
+    DEFAULT_IMPORTS = (if defined?(ApplicationHelper)
                          [Hobo::HoboHelper, ApplicationHelper]
                        else
                          [Hobo::HoboHelper]
@@ -39,7 +50,7 @@ module Hobo
     class << self
 
       attr_accessor :last_if
-      
+
       def clear_cache
         @renderer_classes = {}
         @tag_page_renderer_classes = {}
@@ -70,7 +81,7 @@ module Hobo
         if page.ends_with?(EMPTY_PAGE)
           # DELETE ME: controller_class = controller_class_for(page)
           controller_class = view.controller.class
-          @tag_page_renderer_classes[controller_class.name] ||= 
+          @tag_page_renderer_classes[controller_class.name] ||=
             make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
           @tag_page_renderer_classes[controller_class.name].new(page, view)
         else
@@ -91,20 +102,20 @@ module Hobo
           renderer_class.new(page, view)
         end
       end
-      
-      
+
+
       # TODO: Delete this - not needed (use view.controller.class)
       def controller_class_for(page)
         controller, view = Controller.controller_and_view_for(page)
         "#{controller.camelize}Controller".constantize
       end
-      
-      
+
+
       def controller_taglibs(controller_class)
         (controller_class.respond_to?(:included_taglibs) && controller_class.included_taglibs) || []
       end
-      
-      
+
+
       def subsite_taglib(page)
         parts = page.split("/")
         if parts.length == 3
@@ -128,14 +139,14 @@ module Hobo
         end
       end
 
-      
+
       def make_renderer_class(template_src, template_path, locals, imports, included_taglibs=[])
         renderer_class = Class.new(TemplateEnvironment)
         compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs)
         renderer_class
       end
 
-      
+
       def compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs=[])
         template = Template.new(template_src, renderer_class, template_path)
         imports.each {|m| template.import_module(m)}
@@ -148,7 +159,7 @@ module Hobo
         template.compile(all_local_names, taglibs)
       end
 
-      
+
       def unreserve(word)
         word = word.to_s
         if RESERVED_WORDS.include?(word)
@@ -157,7 +168,7 @@ module Hobo
           word
         end
       end
-      
+
     end
 
   end
