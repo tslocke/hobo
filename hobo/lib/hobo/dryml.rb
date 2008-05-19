@@ -9,6 +9,7 @@ require 'hobo/dryml/taglib'
 require 'hobo/dryml/tag_parameters'
 require 'hobo/dryml/template_environment'
 require 'hobo/dryml/template_handler'
+require 'hobo/dryml/tag_extractor'
 module Hobo
 
   module Dryml
