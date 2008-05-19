@@ -260,9 +260,9 @@
   if can_create?(new)
     label ||= "New #{new.class.name.titleize}"
     ajax_attributes = { :message => message }
-    ajax_attributes[:params] = { class_name => fields } unless fields.empty?
     class_name = new.class.name.underscore
-    func = ajax_updater(object_url(new.class), message, update, ajax_attributes)
+    ajax_attributes[:params] = { class_name => fields } unless fields.empty?
+    func = ajax_updater(object_url(new.class), update, ajax_attributes)
     element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
                                 "button create-button create-#{class_name}-button")
   end
