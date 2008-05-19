@@ -14,8 +14,8 @@ if defined? ActionController::Routing::RouteSet
     def reload_with_hobo_assemble
       if defined? ::ApplicationController
         load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
-        reload_without_hobo_assemble
       end
+      reload_without_hobo_assemble
     end
     alias_method_chain :reload, :hobo_assemble
 
