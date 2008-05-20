@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+file=File.read(File.dirname(__FILE__)+"/../hobo/CHANGES.txt").to_a
+
+out=[]; oline=''; voline=''; @oindent=0; @inlist=0
+file.each_index do |line|
+  file[line].gsub!(/\</,"&lt;")
+  file[line].gsub!(/\>/,"&gt;")
+  eof=(line+1)==file.length
+  blank=file[line].chomp.match(/^ *$/)
+  indent=blank ? @oindent : file[line].gsub(/^( *).*$/,'\1').chomp.length
+  nindent=eof ? 0 : file[line+1].gsub(/^( *).*$/,'\1').chomp.length
+
+	if (file[line] =~ /==.*==/)
+    version=file[line].gsub(/^ *===* *[^0-9]*(.*[^= ]) *===*.*$/,'\1').gsub(/\./,"_").chomp
+    file[line] = "<div class=class#{version}><h1>"+file[line]+"</h1>"
+    defined?(@oversion) && file[line] = "</div>"+file[line]
+    @oversion=version
+
+  elsif blank
+    if indent < nindent
+      file[line] = "<ul> <li>"+file[line]
+    elsif indent > nindent
+      if nindent > 0
+        file[line] = "</li><li>\n"+file[line]
+      else
+        file[line] = "</li>\n"+file[line]
+      end
+      file[line] = "</li> </ul>"+file[line]
+    else
+      file[line] = "</li><li>\n"
+    end
+  end
+
+  p "FOO #{eof} #{@oindent} #{indent} #{nindent} #{file[line]}"
+  @oindent=indent unless blank
+  #file[line] =~ /mmit/ && file[line] = "FOO"
+end
+
+f=File.open(File.dirname(__FILE__)+"/../hobo/CHANGES.html","w")
+f.write '<html><head><style type="text/css">'+"\n"
+f.write '.class0_7_5 {background-color: #fdc}'+"\n"
+f.write '.class0_7_4 {background-color: #dff}'+"\n"
+f.write '.class0_7_3 {background-color: #fdf}'+"\n"
+f.write '.class0_7_2 {background-color: #ffd}'+"\n"
+f.write '.class0_7_1 {background-color: #ddf}'+"\n"
+f.write '.class0_7 {background-color: #ddd}'+"\n"
+f.write '.class0_6_4 {background-color: #fdd}'+"\n"
+f.write '.class0_6_3 {background-color: #dfd}'+"\n"
+f.write '.class0_6_2 {background-color: #acc}'+"\n"
+f.write '.class0_6_1 {background-color: #cac}'+"\n"
+f.write '.class0_6 {background-color: #cca}'+"\n"
+f.write '.class0_6-pre1 {background-color: #caa}'+"\n"
+f.write '.class0_5_3 {background-color: #99c}'+"\n"
+f.write '.class0_5_2 {background-color: #9c9}'+"\n"
+f.write '.class0_5_1 {background-color: #c99}'+"\n"
+f.write '.class0_5 {background-color: #88c}'+"\n"
+f.write '</style></head><body>'+"\n"
+f.write(file)
+f.write '</body></html>'+"\n"
+f.close
