@@ -7,13 +7,16 @@ namespace :hobo do
       Dir.chdir("javascripts") do 
         puts "hobo-rapid.js"
         `rm -f hobo-rapid.js`
-        `ln -s ../../vendor/plugins/hobo/generators/hobo_rapid/templates/hobo-rapid.js`
+        `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js`
       end
       
       Dir.chdir("hobothemes/clean/stylesheets") do       
         puts "clean.css"
         `rm -f clean.css`
-        `ln -s ../../../../vendor/plugins/hobo/generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css`
+        `ln -s ../../../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css`
+        puts "rapud-ui.css"
+        `rm -f rapid-ui.css`
+        `ln -s ../../../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/rapid-ui.css`
       end
     end
     
