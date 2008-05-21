@@ -388,8 +388,6 @@ require 'hobo/undefined'
 require 'hobo/undefined_access_error'
 require 'hobo/authentication_support'
 
-require 'hobo/generator'
-
 require 'hobo/model'
 require 'hobo/controller'
 
