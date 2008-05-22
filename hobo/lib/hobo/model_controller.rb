@@ -319,7 +319,7 @@ module Hobo
       do_pagination = options.delete(:paginate) && finder.respond_to?(:paginate)
 
       if do_pagination
-        finder.paginate(options.reverse_merge(:page => params[:page] || 1))
+        finder.paginate(options.reverse_merge(:page => params[:page] || 1, :order => :default))
       else
         finder.all(options)
       end
