@@ -230,8 +230,8 @@ module ::Hobo
       underscore = name =~ /^[a-z]/
       name = name.camelize if underscore
       
-      plural = !renames.has_key?(name) && (p = name.singularize) && renames.has_key?(p)
-      name = p if plural
+      plural = !renames.has_key?(name) && (sing = name.singularize) && renames.has_key?(sing)
+      name = sing if plural
       
       # Keep a track of names we've seen to avoid cycles
       seen = [ name ]
