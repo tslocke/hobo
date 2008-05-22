@@ -86,15 +86,7 @@
     </content-body>
     
     <content-footer: param>
-      <a to="&model" action="new" param="new-link"/>
-      <else>
-        <if with="&model.user_new current_user">
-          <section class="create-new">
-            <h2>New <type-name/></h2>
-            <form><field-list param="new-field-list"/><submit label="Create"/></form>
-          </section>
-        </if>
-      </else>
+      <new-link-or-form model="&model" merge-params/>
     </content-footer:>
   </page>
 </def>
