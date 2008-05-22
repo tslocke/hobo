@@ -61,7 +61,7 @@
        if="&this.empty? || scope.collection_contains_delete_button" 
        style="#{'display:none' if !this.empty?}"
        param="empty-message">
-      There are no <name-for-collection lowercase/>
+      No <name-for-collection lowercase/> to display
     </p>
   </set-scoped>
 </def>
