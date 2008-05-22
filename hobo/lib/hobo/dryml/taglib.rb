@@ -36,7 +36,7 @@ module Hobo
                  elsif plugin
                    "#{RAILS_ROOT}/vendor/plugins/#{plugin}/taglibs"
                  elsif (bundle_name = options[:bundle])
-                   bundle = Bundle.bundles[bundle_name]
+                   bundle = Bundle.bundles[bundle_name] or raise ArgumentError, "No such bundle: #{options[:bundle]}"
                    "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{RAILS_ROOT}/app/views"
