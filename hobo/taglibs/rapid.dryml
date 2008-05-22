@@ -340,7 +340,7 @@ in the future - use at your own risk. -->
     </if>
   </table-for>
   <else>
-    <p>There are no <%= this.member_class.name.titleize.pluralize.downcase %></p>
+    <p>No <%= this.member_class.name.titleize.pluralize.downcase %> to display</p>
   </else>
   <div>
     <create-button update="&id || part_id"/>
