@@ -128,7 +128,7 @@
         <div class="container"><a>&laquo; <name/></a></div>
       </if>
 
-      <heading param><this/></heading>
+      <heading param><name/></heading>
 
       <div class="flags" param="flags"><flags/></div>
       
