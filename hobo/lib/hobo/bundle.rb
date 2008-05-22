@@ -89,12 +89,14 @@ module ::Hobo
     end
     
     def initialize(*args)
+      caller_options = args.extract_options!
+      
       self.class.load_models_and_controllers      
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
       Bundle.bundles[name] = self
 
       options = defaults.with_indifferent_access
-      options.recursive_update(args.extract_options!)
+      options.recursive_update(caller_options)
       
       @renames, @options = separate_renames(options)
       
