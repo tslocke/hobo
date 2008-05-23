@@ -172,11 +172,15 @@ ul.main-nav {float: left; margin: 0 10px;}
 .content-body .nav {margin-bottom: 10px; font-size: 11px;}
 .content-body .nav a {margin-right: 5px;}
 
-.login-page, .signup-page {width: 470px; margin-top: 40px;}
-.login-page .content-header, .signup-page .content-header {padding-bottom: 0;}
-.login-page .field-list, .signup-page .field-list {width: 300px;}
+.login-page, .forgot-password-page {width: 470px; margin-top: 40px;}
+.login-page .content-header {padding-bottom: 0;}
+.login-page .field-list {width: 370px;}
+.signup-page .field-list {width: 370px;}
+.signup-page .content-body, .signup-page .content-header { margin-left: 120px; margin-right: 120px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
-.login-page .field-list th, .signup-page .field-list th {width: 120px !important; width: 110px;}
+.login-page .field-list th, .signup-page .field-list th {width: 150px !important; width: 150px;}
+.login-page .content-header { position: relative; }
+.login-page .forgot-password { position: absolute; top: 0; right: 0; }
 
 .edit-page .content-header {overflow: hidden; height: 100%;}
 .edit-page .content-header h1 {float: left;}

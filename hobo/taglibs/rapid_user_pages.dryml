@@ -1,42 +1,19 @@
-<def tag="signup-page">
-  <page layout="simple" title="Sign up to #{app_name}" merge>
-    <body: class="signup-page" param/>
-
+<def tag="simple-page">
+  <page layout="simple" merge>
     <live-search: replace/>
     <nav: replace/>
-    
-    <content-header: param>
-      <heading param>Sign Up</heading>
-    </content-header>
-    
-    <content-body: param>
-      <error-messages/>
-      <form action="&request.request_uri" param>
-        <field-list fields="login, password, password_confirmation" param>
-          <login-label:><%= model.login_attribute.to_s.titleize %></login-label>
-          <password-confirmation-label:>Confirm Password</password-confirmation-label>
-        </field-list>
-
-        <div class="actions" param="actions">
-          <submit label='Sign Up'/>
-        </div>
-      </form>
-    </content-body>
-
   </page>
-</def>
+</def>    
 
 
 <def tag="login-page" attrs="remember-me">
-  <page layout="simple" title="Log in to #{app_name}" merge>
+  <simple-page title="Log in to #{app_name}" merge>
    
     <body: class="login-page" param/>
- 
-    <live-search: replace/>
-    <nav: replace/>
     
     <content-header: param>
       <heading param>Log In</heading>
+      <a class="forgot-password" href="&forgot_password_url">Forgot your password?</a>
     </content-header>
 
     <content-body: param>
@@ -57,19 +34,88 @@
             <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
           </labelled-item>
         </labelled-item-list>
-        <set user="&Hobo::User.default_user_model"/>
         <div class="actions" param="actions">
-          <submit label='Log in' param/><if test="&signup_url(user)" class='nav-item'> or <a href="&signup_url(user)">Sign up</a></if>
+          <submit label='Log in' param/><if test="&signup_url" class='nav-item'> or <a href="&signup_url">Sign up</a></if>
         </div>
       </form>
     </content-body>
-  </page>
+  </simple-page>
+</def>
+
+
+<def tag="forgot-password-page" attrs="remember-me">
+  <simple-page title="Forgotten Password" merge>
+   
+    <body: class="forgot-password-page" param/>
+    
+    <content-header: param>
+      <heading param>Forgotten Password</heading>
+      <p>Enter the email address you signed up with. If we have it in
+      our records we'll send you an email allowing you to chose a new
+      password.</p>
+    </content-header>
+
+    <content-body: param>
+      <form action="" class="forgot-password" param>
+        <labelled-item-list param>
+          <labelled-item>
+            <item-label param="email-address-label">Email Address</item-label>
+            <item-value><input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" /></item-value>
+          </labelled-item>
+        </labelled-item-list>
+        <div class="actions" param="actions">
+          <submit label="Send" param/>
+        </div>
+      </form>
+    </content-body>
+  </simple-page>
+</def>
+
+
+<def tag="forgot-password-page" attrs="remember-me">
+  <simple-page title="Forgotten Password" merge>
+   
+    <body: class="forgot-password-page" param/>
+    
+    <content-header: param>
+      <heading param>Forgotten Password</heading>
+      <p>Enter the email address you signed up with. If we have it in
+      our records we'll send you an email allowing you to chose a new
+      password.</p>
+    </content-header>
+
+    <content-body: param>
+      <form action="" class="forgot-password" param>
+        <labelled-item-list param>
+          <labelled-item>
+            <item-label param="email-address-label">Email Address</item-label>
+            <item-value><input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" /></item-value>
+          </labelled-item>
+        </labelled-item-list>
+        <div class="actions" param="actions">
+          <submit label="Send" param/>
+        </div>
+      </form>
+    </content-body>
+  </simple-page>
+</def>
+
+
+<def tag="forgot-password-email-sent-page">
+  <simple-page>
+    <body: class="forgot-password-page" param/>
+    
+    <content-header: param>
+      <heading param>Forgotten Password - Sent</heading>
+      <p>Please check your email and follow the instructions given. Don't forget to check your spam folder.</p>
+    </content-header>
+  </simple-page>
 </def>
 
 
 <def tag="account-disabled-page">
 
-  <page layout="simple" title="#{app_name} - account not available" merge>
+  <simple-page title="#{app_name} - account not available" merge>
        
     <body: class="account-disabled-page" param/>
 
@@ -78,7 +124,7 @@
     <content-body: param>
       <p>Your account is not available at this time.</p>
     </content-body>
-  </page>
+  </simple-page>
 
 </def>
 

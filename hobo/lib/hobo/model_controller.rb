@@ -27,9 +27,10 @@ module Hobo
           before_filter :set_no_cache_headers
 
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
-
-          rescue_from Hobo::Model::PermissionDeniedError, :with => :permission_denied
-
+              
+          rescue_from Hobo::Model::PermissionDeniedError,  :with => :permission_denied
+          rescue_from Hobo::Lifecycles::LifecycleKeyError, :with => :permission_denied
+          
           alias_method_chain :render, :hobo_model
 
         end
@@ -101,17 +102,18 @@ module Hobo
 
         @auto_actions = case args.first
                           when :all        then available_auto_actions
-                          when :write_only then available_auto_write_actions + args.rest
-                          when :read_only  then available_auto_read_actions  + args.rest
+                          when :write_only then available_auto_write_actions     + args.rest
+                          when :read_only  then available_auto_read_actions      + args.rest
+                          when :lifecycle  then available_auto_lifecycle_actions + args.rest
                           else args
                         end
 
         except = Array(options[:except])
         except_actions = except.map do |arg|
-          if arg == :collections
-            available_auto_collection_actions
-          else
-            arg
+          case arg
+            when :collections then available_auto_collection_actions
+            when :lifecycle   then available_auto_lifecycle_actions
+            else arg
           end
         end
 
@@ -137,6 +139,12 @@ module Hobo
         end
 
         collections.each { |c| def_collection_actions(c.to_sym) }
+        def_lifecycle_actions
+      end
+      
+      
+      def def_auto_action(name, &block)        
+        define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
       end
 
 
@@ -161,6 +169,29 @@ module Hobo
           end
         end
       end
+      
+      
+      def def_lifecycle_actions
+        if model.has_lifecycle?
+          model::Lifecycle.creator_names.each do |creator|
+            def_auto_action "#{creator}_page" do 
+              creator_page_action creator
+            end
+            def_auto_action creator do 
+              creator_action creator
+            end
+          end
+          
+          model::Lifecycle.transition_names.each do |transition|
+            def_auto_action "#{transition}_page" do
+              transition_page_action transition
+            end
+            def_auto_action transition do
+              transition_action transition
+            end
+          end
+        end
+      end
 
 
       def show_action(*names, &block)
@@ -175,6 +206,7 @@ module Hobo
         end
       end
 
+      
       def index_action(*names, &block)
         options = names.extract_options!
         index_actions.concat(names)
@@ -191,6 +223,7 @@ module Hobo
         end
       end
 
+      
       def publish_collection(*names)
         collections.concat(names)
         names.each {|n| def_collection_actions(n)}
@@ -204,9 +237,10 @@ module Hobo
 
       def available_auto_actions
         (available_auto_read_actions +
-         available_auto_write_actions +
-         FORM_ACTIONS +
-         available_auto_collection_actions).uniq
+         available_auto_write_actions + 
+         FORM_ACTIONS + 
+         available_auto_collection_actions +
+         available_auto_lifecycle_actions).uniq
       end
 
 
@@ -229,9 +263,23 @@ module Hobo
           [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
         end.flatten
       end
+      
+      
+      def available_auto_lifecycle_actions
+        # For each creator/transition there are two possible
+        # actions. e.g. for signup, 'signup_page' would be routed to
+        # GET users/signup, and would show the form, while 'signup'
+        # would be routed to POST /users/signup)
+        if model.has_lifecycle?
+          (model::Lifecycle.creator_names.map { |c| [c, "#{c}_page"] } +
+           model::Lifecycle.transition_names.map { |t| [t, "#{t}_page"] }).flatten.*.to_sym
+        else
+          []
+        end
+      end
 
-    end
-
+    end # of ClassMethods
+    
 
     protected
 
@@ -359,7 +407,7 @@ module Hobo
 
 
     def attribute_parameters
-      params[this.class.name.underscore]
+      params[(this ? this.class : model).name.underscore]
     end
 
 
@@ -457,7 +505,9 @@ module Hobo
         end
     end
 
-
+    
+    # --- Collection Actions --- #
+    
     def hobo_show_collection(association, *args, &b)
       options = args.extract_options!
       association = find_instance.send(association) if association.is_a?(String, Symbol)
@@ -489,6 +539,57 @@ module Hobo
       create_response("new_#{association}", &b)
     end
 
+
+    # --- Lifecycle Actions --- #
+    
+    def creator_action(name, &b)
+      @creator = model::Lifecycle.creators[name.to_s]
+      self.this = @creator.run!(current_user, attribute_parameters)
+      response_block(&b) or
+        if valid?
+          redirect_to destination_after_submit
+        else
+          dryml_fallback_tag "lifecycle_start_page"
+          re_render_form(name)
+        end
+    end
+    
+    
+    def creator_page_action(name)
+      self.this = model.new
+      @creator = model::Lifecycle.creators[name]
+      dryml_fallback_tag "lifecycle_start_page"
+    end
+    
+    
+    def prepare_for_transition(name, options={})
+      self.this = find_instance
+      this.exempt_from_edit_checks = true
+      this.lifecycle.provided_key = params[:key]
+      @transition = this.lifecycle.find_transition(name, current_user)      
+    end
+
+    
+    def transition_action(name, *args, &b)
+      prepare_for_transition(name)
+      @transition.run!(this, current_user, attribute_parameters)
+      response_block(&b) or 
+        if valid?
+          redirect_to destination_after_submit
+        else
+          dryml_fallback_tag "lifecycle_transition_page"
+          re_render_form(name)          
+        end
+    end
+    
+
+    def transition_page_action(name, *args)
+      options = args.extract_options!
+      prepare_for_transition(name, options)
+      dryml_fallback_tag "lifecycle_transition_page"
+    end
+    
+    # --- Miscelaneous Actions --- #
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
