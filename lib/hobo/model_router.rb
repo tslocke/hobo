@@ -36,8 +36,10 @@ module Hobo
       end
 
       def linkable_key(klass, action, options)
+        subsite = options[:subsite] || options['subsite']
+        method  = options[:method]  || options['method']
         opts = options.map { |k, v| "#{k}=#{v}" unless v.blank? }.compact.join(',')
-        "#{klass.name}/#{action}/#{opts}"
+        "#{subsite}/#{klass.name}/#{action}/#{method}"
       end
 
       def linkable!(klass, action, options={})
