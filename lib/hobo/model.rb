@@ -23,13 +23,18 @@ module Hobo
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
         attr_accessor :acting_user
+
+        bool_attr_accessor :exempt_from_edit_checks
+        
+        include Hobo::Lifecycles::ModelExtensions
       end
 
       class << base
-        alias_method_chain :has_many,   :defined_scopes
-        alias_method_chain :has_many,   :join_record_management
-        alias_method_chain :belongs_to, :creator_metadata
-
+        alias_method_chain :has_many,      :defined_scopes
+        alias_method_chain :has_many,      :join_record_management
+        alias_method_chain :belongs_to,    :creator_metadata
+        alias_method_chain :attr_accessor, :creator_metadata
+        
         alias_method_chain :has_one, :new_method
 
         def inherited(klass)
@@ -62,6 +67,18 @@ module Hobo
 
         end
 
+      end
+    end
+    
+    
+    def self.enable
+      ActiveRecord::Base.class_eval do
+        def self.hobo_model
+          include Hobo::Model
+          fields # force hobofields to load
+        end
+        
+        alias_method :has_hobo_method?, :respond_to_without_attributes?
       end
     end
 
@@ -169,6 +186,20 @@ module Hobo
         belongs_to_without_creator_metadata(name, options, &block)
       end
 
+      
+      def attr_accessor_with_creator_metadata(*args)
+        options = args.extract_options!
+        if options.delete(:creator)
+          if args.length == 1
+            self.creator_attribute = args.first.to_sym
+          else
+            raise ArgumentError, "trying to set :creator => true on multiple attributes"
+          end
+        end
+        args << options unless options.empty?
+        attr_accessor_without_creator_metadata(*args)
+      end
+            
 
       def has_one_with_new_method(name, options={}, &block)
         has_one_without_new_method(name, options)
@@ -225,7 +256,7 @@ module Hobo
 
 
       def creator_type
-        reflections[creator_attribute]._?.klass
+        attr_type(creator_attribute)
       end
 
 
@@ -374,8 +405,13 @@ module Hobo
         save
       end
     end
-
-
+    
+    
+    def user_save(user)
+      user_save_changes(user)
+    end
+    
+    
     def user_view(user, field=nil)
       raise PermissionDeniedError, self.inspect unless Hobo.can_view?(user, self, field)
     end
@@ -410,12 +446,13 @@ module Hobo
       return unless attr
 
       # Is creator a string field or an association?
-      if self.class.reflections[attr]
-        # It's an association
-        self.send("#{attr}=", user) if (t = self.class.creator_type) && user.is_a?(t)
-      else
-        # Assume it's a string field -- set it to the name of the current user
+      if self.class.attr_type(attr)._? <= String
+        # Set it to the name of the current user
         self.send("#{attr}=", user.to_s) unless user.guest?
+      else  
+        # Assume user is a user object, but don't set if we've got a type mismatch
+        t = self.class.creator_type
+        self.send("#{attr}=", user) if t.nil? || user.is_a?(t)
       end
     end
 
@@ -561,6 +598,4 @@ module Hobo
 end
 
 
-class ActiveRecord::Base
-  alias_method :has_hobo_method?, :respond_to_without_attributes?
-end
+Hobo::Model.enable if defined? ActiveRecord

@@ -21,6 +21,8 @@ module Hobo
         Hobo::HoboHelper.add_to_controller(klass)
       end
       
+      attr_accessor :request_host
+
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
       end
@@ -30,7 +32,7 @@ module Hobo
     module ClassMethods
 
       attr_reader :included_taglibs
-
+      
       def include_taglib(src, options={})
         @included_taglibs << options.merge(:src => src)
       end

@@ -46,6 +46,7 @@ module Hobo
         attr_protected *AUTHENTICATION_FIELDS
         
         password_validations
+        
       end
     end
 
@@ -68,8 +69,29 @@ module Hobo
           validates_length_of     attr, :within => 3..100
           validates_uniqueness_of attr, :case_sensitive => false
         end
+        
+        signup_lifecycle_for(attr)
       end
       attr_reader :login_attribute
+      
+      
+      def signup_lifecycle_for(login_attribute)
+        lifecycle do 
+          
+          state :active
+          
+          create :anybody, :signup, :params => [login_attribute, :email_address, :password, :password_confirmation], 
+                 :become => :active, :if => proc {|_, u| u.guest?}
+          
+          transition :nobody, :request_password_reset, { :active => :active } do
+            UserMailer.deliver_forgot_password(self, lifecycle.generate_key)
+          end
+          
+          transition :with_key, :reset_password, { :active => :active }, :update => [ :password, :password_confirmation ]
+          
+        end
+      end
+      
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
@@ -133,7 +155,7 @@ module Hobo
     end
     
     def changing_password?
-      crypted_password? && (password || password_confirmation)
+      crypted_password? && (password || password_confirmation) && !lifecycle.valid_key?
     end
 
     protected
