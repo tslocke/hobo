@@ -225,14 +225,14 @@ module HoboFields
         spec = model.field_specs[c]
         if spec.different_to?(col)
           change_spec = {}
-          change_spec[:limit]     = spec.limit     unless spec.limit.nil?
+          change_spec[:limit]     = spec.limit     unless spec.limit.nil? && col.limit.nil?
           change_spec[:precision] = spec.precision unless spec.precision.nil?
           change_spec[:scale]     = spec.scale     unless spec.scale.nil?
           change_spec[:null]      = false          unless spec.null
           change_spec[:default]   = spec.default   unless spec.default.nil? && col.default.nil?
           
           changes << "change_column :#{new_table_name}, :#{c}, " + 
-            ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type)).join(", ")
+            ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type, true)).join(", ")
           back = change_column_back(current_table_name, col_name)
           undo_changes << back unless back.blank?
         else
@@ -245,10 +245,12 @@ module HoboFields
     end
     
     
-    def format_options(options, type)
+    def format_options(options, type, changing=false)
       options.map do |k, v|
-        next if k == :limit && (type == :decimal || v == native_types[type][:limit])
-        next if k == :null && v == true
+        unless changing
+          next if k == :limit && (type == :decimal || v == native_types[type][:limit])
+          next if k == :null && v == true
+        end
         "#{k.inspect} => #{v.inspect}" 
       end.compact
     end
