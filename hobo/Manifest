@@ -34,6 +34,12 @@ lib/hobo/dryml.rb
 lib/hobo/generator.rb
 lib/hobo/guest.rb
 lib/hobo/hobo_helper.rb
+lib/hobo/lifecycles/actions.rb
+lib/hobo/lifecycles/creator.rb
+lib/hobo/lifecycles/lifecycle.rb
+lib/hobo/lifecycles/state.rb
+lib/hobo/lifecycles/transition.rb
+lib/hobo/lifecycles.rb
 lib/hobo/model.rb
 lib/hobo/model_controller.rb
 lib/hobo/model_router.rb
@@ -74,7 +80,6 @@ rails_generators/hobo_model_controller/hobo_model_controller_generator.rb
 rails_generators/hobo_model_controller/templates/controller.rb
 rails_generators/hobo_model_controller/templates/functional_test.rb
 rails_generators/hobo_model_controller/templates/helper.rb
-rails_generators/hobo_model_controller/templates/view.html.erb
 rails_generators/hobo_model_controller/USAGE
 rails_generators/hobo_model_resource/hobo_model_resource_generator.rb
 rails_generators/hobo_model_resource/templates/controller.rb
@@ -85,6 +90,8 @@ rails_generators/hobo_rapid/templates/hobo-rapid.css
 rails_generators/hobo_rapid/templates/hobo-rapid.js
 rails_generators/hobo_rapid/templates/IE7.js
 rails_generators/hobo_rapid/templates/lowpro.js
+rails_generators/hobo_rapid/templates/nicedit.js
+rails_generators/hobo_rapid/templates/nicEditorIcons.gif
 rails_generators/hobo_rapid/templates/reset.css
 rails_generators/hobo_rapid/templates/themes/clean/public/images/fieldbg.gif
 rails_generators/hobo_rapid/templates/themes/clean/public/images/pencil.png
@@ -132,6 +139,8 @@ rails_generators/hobo_user_controller/templates/helper.rb
 rails_generators/hobo_user_controller/USAGE
 rails_generators/hobo_user_model/hobo_user_model_generator.rb
 rails_generators/hobo_user_model/templates/fixtures.yml
+rails_generators/hobo_user_model/templates/forgot_password.erb
+rails_generators/hobo_user_model/templates/mailer.erb
 rails_generators/hobo_user_model/templates/model.rb
 rails_generators/hobo_user_model/templates/unit_test.rb
 rails_generators/hobo_user_model/USAGE
@@ -144,6 +153,8 @@ taglibs/rapid_document_tags.dryml
 taglibs/rapid_editing.dryml
 taglibs/rapid_forms.dryml
 taglibs/rapid_generics.dryml
+taglibs/rapid_lifecycle_pages.dryml
+taglibs/rapid_lifecycles.dryml
 taglibs/rapid_navigation.dryml
 taglibs/rapid_pages.dryml
 taglibs/rapid_plus.dryml
