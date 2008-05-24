@@ -27,10 +27,10 @@ module Hobo
           before_filter :set_no_cache_headers
 
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
-              
+
           rescue_from Hobo::Model::PermissionDeniedError,  :with => :permission_denied
           rescue_from Hobo::Lifecycles::LifecycleKeyError, :with => :permission_denied
-          
+
           alias_method_chain :render, :hobo_model
 
         end
@@ -141,9 +141,9 @@ module Hobo
         collections.each { |c| def_collection_actions(c.to_sym) }
         def_lifecycle_actions
       end
-      
-      
-      def def_auto_action(name, &block)        
+
+
+      def def_auto_action(name, &block)
         define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
       end
 
@@ -169,19 +169,19 @@ module Hobo
           end
         end
       end
-      
-      
+
+
       def def_lifecycle_actions
         if model.has_lifecycle?
           model::Lifecycle.creator_names.each do |creator|
-            def_auto_action "#{creator}_page" do 
+            def_auto_action "#{creator}_page" do
               creator_page_action creator
             end
-            def_auto_action creator do 
+            def_auto_action creator do
               creator_action creator
             end
           end
-          
+
           model::Lifecycle.transition_names.each do |transition|
             def_auto_action "#{transition}_page" do
               transition_page_action transition
@@ -206,7 +206,7 @@ module Hobo
         end
       end
 
-      
+
       def index_action(*names, &block)
         options = names.extract_options!
         index_actions.concat(names)
@@ -223,7 +223,7 @@ module Hobo
         end
       end
 
-      
+
       def publish_collection(*names)
         collections.concat(names)
         names.each {|n| def_collection_actions(n)}
@@ -237,8 +237,8 @@ module Hobo
 
       def available_auto_actions
         (available_auto_read_actions +
-         available_auto_write_actions + 
-         FORM_ACTIONS + 
+         available_auto_write_actions +
+         FORM_ACTIONS +
          available_auto_collection_actions +
          available_auto_lifecycle_actions).uniq
       end
@@ -263,8 +263,8 @@ module Hobo
           [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
         end.flatten
       end
-      
-      
+
+
       def available_auto_lifecycle_actions
         # For each creator/transition there are two possible
         # actions. e.g. for signup, 'signup_page' would be routed to
@@ -279,7 +279,7 @@ module Hobo
       end
 
     end # of ClassMethods
-    
+
 
     protected
 
@@ -505,9 +505,9 @@ module Hobo
         end
     end
 
-    
+
     # --- Collection Actions --- #
-    
+
     def hobo_show_collection(association, *args, &b)
       options = args.extract_options!
       association = find_instance.send(association) if association.is_a?(String, Symbol)
@@ -541,7 +541,7 @@ module Hobo
 
 
     # --- Lifecycle Actions --- #
-    
+
     def creator_action(name, &b)
       @creator = model::Lifecycle.creators[name.to_s]
       self.this = @creator.run!(current_user, attribute_parameters)
@@ -553,42 +553,42 @@ module Hobo
           re_render_form(name)
         end
     end
-    
-    
+
+
     def creator_page_action(name)
       self.this = model.new
       @creator = model::Lifecycle.creators[name]
       dryml_fallback_tag "lifecycle_start_page"
     end
-    
-    
+
+
     def prepare_for_transition(name, options={})
       self.this = find_instance
       this.exempt_from_edit_checks = true
       this.lifecycle.provided_key = params[:key]
-      @transition = this.lifecycle.find_transition(name, current_user)      
+      @transition = this.lifecycle.find_transition(name, current_user)
     end
 
-    
+
     def transition_action(name, *args, &b)
       prepare_for_transition(name)
       @transition.run!(this, current_user, attribute_parameters)
-      response_block(&b) or 
+      response_block(&b) or
         if valid?
           redirect_to destination_after_submit
         else
           dryml_fallback_tag "lifecycle_transition_page"
-          re_render_form(name)          
+          re_render_form(name)
         end
     end
-    
+
 
     def transition_page_action(name, *args)
       options = args.extract_options!
       prepare_for_transition(name, options)
       dryml_fallback_tag "lifecycle_transition_page"
     end
-    
+
     # --- Miscelaneous Actions --- #
 
     def hobo_completions(attribute, finder, options={})

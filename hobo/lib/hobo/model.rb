@@ -1,3 +1,5 @@
+require 'hobo/lifecycles'
+
 module Hobo
 
   module Model

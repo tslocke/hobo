@@ -9,6 +9,8 @@ begin
 rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
+require "active_record"
+require "action_view"
 
 # Monkey patches, ooh ooh
 require 'active_record/has_many_association'
