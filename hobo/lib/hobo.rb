@@ -10,6 +10,7 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 require "active_record"
+require "action_controller"
 require "action_view"
 
 # Monkey patches, ooh ooh
