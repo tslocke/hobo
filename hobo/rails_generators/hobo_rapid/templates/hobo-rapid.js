@@ -221,7 +221,7 @@ var Hobo = {
     makeNicEditor: function(element) {
         if (!Hobo.nicEditorOptions.iconsPath) { Hobo.nicEditorOptions.iconsPath = urlBase + '/images/nicEditorIcons.gif' }
         var nic = new nicEditor(Hobo.nicEditorOptions)
-        nic.panelInstance(element.id, {hasPanel : true})
+        nic.panelInstance(element, {hasPanel : true})
         return nic.instanceById(element)
     },
 
