@@ -335,7 +335,7 @@ module Hobo
         (!destroyed && object_url(@this)) ||
 
         # Then the show page of the 'owning' object if there is one
-        (!destroyed && (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on)))) ||
+        (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on))) ||
 
         # Last try - the index page for this model
         object_url(@this.class) ||
