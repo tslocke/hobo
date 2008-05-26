@@ -208,7 +208,7 @@
       checkbox_attrs[:checked] = 'checked'
       message ||= "Unsetting #{obj.class.name.titleize}"
       class_name = obj.class.name.underscore
-      checkbox_attrs[:onclick] = ajax_updater(object_url(obj, "destroy"), update, {:message => message, :method => 'delete'})                          
+      checkbox_attrs[:onclick] = ajax_updater(object_url(obj, :method => :delete), update, {:message => message, :method => 'delete'})                          
     end
   end
   element(:input, add_classes(attributes.merge(checkbox_attrs),
