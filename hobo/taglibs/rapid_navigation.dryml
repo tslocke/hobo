@@ -28,6 +28,7 @@
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account-nav">
+  <dev-user-changer/>
   <ul with="&current_user" class="account-nav" param>
     <if test="&logged_in?">
       <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
@@ -94,4 +95,13 @@ but rather write your own navigation using the `<navigation>` tag -->
     <nav-item href="#{base_url}/">Home</nav-item>
     <nav-item repeat="&front_models[0..5]"><name/></nav-item>
   </navigation>
+</def>
+
+
+<def tag="dev-user-changer">
+ <select-menu if="&RAILS_ENV == 'development'"
+              first-option="Guest" options="&Hobo::User.default_user_model.all(:limit => 10).*.login"
+              onchange="location.href = '/dev/set_current_user?name=' + this.options[this.selectedIndex].value"
+              selected="#{current_user}"
+              class="dev-user-changer"/>
 </def>
