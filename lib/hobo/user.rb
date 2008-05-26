@@ -80,7 +80,7 @@ module Hobo
           
           state :active
           
-          create :anybody, :signup, :params => [login_attribute, :email_address, :password, :password_confirmation], 
+          create :anybody, :signup, :params => [login_attribute, :email_address, :password, :password_confirmation].uniq, 
                  :become => :active, :if => proc {|_, u| u.guest?}
           
           transition :nobody, :request_password_reset, { :active => :active } do
