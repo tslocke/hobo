@@ -154,6 +154,10 @@ module Hobo
       false
     end
     
+    def signed_up?
+      true
+    end
+    
     def changing_password?
       crypted_password? && (password || password_confirmation) && !lifecycle.valid_key?
     end

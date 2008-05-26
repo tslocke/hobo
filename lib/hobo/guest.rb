@@ -12,6 +12,10 @@ module Hobo
       true
     end
 
+    def signed_up?
+      false
+    end
+    
     def super_user?
       false
     end
