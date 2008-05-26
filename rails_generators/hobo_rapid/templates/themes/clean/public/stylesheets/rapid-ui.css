@@ -90,3 +90,4 @@ textarea.tall { height: 350px; }
 .field-list input.percentage {width: 25px; display: inline; margin-right: 5px; padding: 1px 3px;}
 
 select.dev-user-changer { opacity: 0.3; position: absolute; top: -15px; left: 0; height: 10px;}
+select.dev-user-changer:hover { opacity: 1; }
