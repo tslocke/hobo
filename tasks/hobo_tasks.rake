@@ -10,13 +10,10 @@ namespace :hobo do
         `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js`
       end
       
-      Dir.chdir("hobothemes/clean/stylesheets") do       
-        puts "clean.css"
-        `rm -f clean.css`
-        `ln -s ../../../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css`
-        puts "rapud-ui.css"
-        `rm -f rapid-ui.css`
-        `ln -s ../../../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/rapid-ui.css`
+      Dir.chdir("hobothemes") do       
+        puts "hobothemes/clean"
+        `rm -f clean`
+        `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public clean`
       end
     end
     
