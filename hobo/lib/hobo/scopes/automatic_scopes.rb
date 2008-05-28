@@ -195,7 +195,20 @@ module Hobo
           def_scope do 
             { :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name] }
           end
+                    
+        # self is / is not
+        elsif name == "is"
+          
+          def_scope do |record|
+            { :conditions => ["#{@klass.table_name}.#{@klass.primary_key} = ?", record] }
+          end          
 
+        elsif name == "is_not"
+          
+          def_scope do |record|
+            { :conditions => ["#{@klass.table_name}.#{@klass.primary_key} <> ?", record] }
+          end          
+          
         else
         
           case name
