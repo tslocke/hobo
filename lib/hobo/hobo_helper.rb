@@ -383,7 +383,7 @@ module Hobo
 
     # FIXME: this should interrogate the routes to find index methods, not the models
     def front_models
-      Hobo.models.select {|m| linkable?(m) && !(m < Hobo::User)}
+      Hobo.models.select {|m| linkable?(m) }
     end
 
 
