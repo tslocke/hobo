@@ -584,6 +584,41 @@ SelectManyInput = Behavior.create({
 
 })
 
+NameManyInput = Object.extend(SelectManyInput, {
+    addOne : function() {
+        var select = this.element.down('select') 
+        var selected = select.options[select.selectedIndex]
+        if (selected.value != "") {
+            var newItem = $(DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip()))
+            this.element.down('.items').appendChild(newItem);
+            newItem.down('span').innerHTML = selected.innerHTML
+            this.itemAdded(newItem, selected)
+            selected.disabled = true
+            select.value = ""
+            Event.addBehavior.reload()
+        }
+    }
+})
+
+                              
+AutocompleteBehavior = Behavior.create({
+    initialize : function() {
+        var target    = this.element.className.match(/complete-on:([\S]+)/)[1].split(':')
+        var model     = target[0]
+        var completer = target[1]
+
+        var spec = Hobo.parseId(model)
+        var url = urlBase + "/" + Hobo.pluralise(spec.name) +  "/complete_" + completer
+        var parameters = spec.id ? "id=" + spec.id : ""
+        new Ajax.Autocompleter(this.element, 
+                               this.element.next('.completions-popup'), 
+                               url, 
+                               {paramName:'query', method:'get', parameters: parameters});
+    }
+})
+
+
+
 Event.addBehavior({
 
     'textarea.html' : function(e) {
@@ -611,16 +646,7 @@ Event.addBehavior({
 	location.href = Hobo.addUrlParams(params, {remove: remove})
     },
 
-    '.autocompleter' : function(event) {
-        var target    = this.className.match(/complete-on:([\S]+)/)[1].split(':')
-        var model     = target[0]
-        var completer = target[1]
-
-        var spec = Hobo.parseId(model)
-        var url = urlBase + "/" + Hobo.pluralise(spec.name) +  "/complete_" + completer
-        var parameters = spec.id ? "id=" + spec.id : ""
-        new Ajax.Autocompleter(this, this.next('.completions-popup'), url, {paramName:'query', method:'get', parameters: parameters});
-    }
+    '.autocompleter' : AutocompleteBehavior()
 
 
 });
