@@ -66,7 +66,7 @@ module Hobo
         load "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
 
         # Don't create routes if it's a generator that's running
-        return if caller[-1] =~ /script[\/\\]generate:\d+$/
+        return if caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
 
         # Add non-subsite routes
         add_routes_for(map, nil)
