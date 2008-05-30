@@ -27,7 +27,7 @@
     <body: param>
       <ajax-progress/>
       <header class="page-header" param>
-        <heading param="app-name"><a href="#{base_url}/"><app-name/></a></heading>
+        <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
         <live-search param if="&defined_route? :site_search"/>
         <nav param>
           <account-nav if="&Hobo::User.default_user_model" param/>
@@ -70,7 +70,7 @@
   <page title="All #{type_name :with => model, :plural => true}" merge>
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
-      <heading param><type-name with="&model" plural/></heading>
+      <h2 param><type-name with="&model" plural/></h2>
       <p class="note" param="count">
         <if>There <count prefix="are"/></if>
         <else>There aren't any <type-name lowercase plural/> yet.</else>
@@ -96,7 +96,7 @@
   <page title="New #{type_name}" merge>
     <body: class="new-page #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <heading param>New <type-name title/></heading>
+      <h2 param>New <type-name title/></h2>
     </content-header>
 
     <content-body: param>
@@ -128,7 +128,7 @@
         <div class="container"><a>&laquo; <name/></a></div>
       </if>
 
-      <heading param><name/></heading>
+      <h2 param><name/></h2>
 
       <div class="flags" param="flags"><flags/></div>
       
@@ -192,7 +192,7 @@
   <page merge>    
     <body: class="edit-page #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <heading param><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></heading>
+      <h2 param><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></h2>
       <delete-button label="Remove This #{type_name}" param/>
     </content-header>
 
@@ -215,8 +215,8 @@
   <page title="New #{type_name}" merge>
     <body: class="new-in-collection-page #{association_name.underscore.dasherize} #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <heading param>New <association-name.singularize.titleize/></heading>
-      <sub-heading param>For: <a with="&@association.origin"/></sub-heading>
+      <h2 param>New <association-name.singularize.titleize/></h2>
+      <h3 class="subheading" param>For: <a with="&@association.origin"/></h3>
     </content-header>
 
     <content-body: param>
@@ -240,8 +240,8 @@
     <body: class="show-collection-page #{type_name(:with => this.origin)} #{type_name(:pluralize => true)}" param/>
     <content-header: param>
       <nav param="back-to">Back to <a:origin/></nav>
-      <heading param><%= title %></heading>
-      <sub-heading param><count/></sub-heading>
+      <h2 param><%= title %></h2>
+      <h3 class="subheading" param><count/></h3>
     </content-header>
 
     <content-body: param>
@@ -264,7 +264,7 @@
   <page merge>
     <body: class="permission-denied"/>
     <content-header: param>
-      <heading param><message/></heading>
+      <h2 param><message/></h2>
     </content-header>
   </page>
 </def>
@@ -275,7 +275,7 @@
   <page merge>
     <body: class="not-found"/>
     <content-header: param>
-      <heading param><message/></heading>
+      <h2 param><message/></h2>
     </content-header>
   </page>
 </def>

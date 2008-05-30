@@ -6,17 +6,6 @@
 
 <def tag="item-value"><td merge-attrs><do param="default"/></td></def>
 
-
-<def tag="heading">
-   <%= element("h#{scope.heading_level || '1'}", attributes, parameters.default) %>
-</def>
-
-<def tag="sub-heading"><%= 
-  element("h#{scope.heading_level ? scope.heading_level.to_i + 1 : '2'}",
-          attributes.merge(:class => "subheading"),
-          parameters.default)
-%></def>
-
 <def tag="nav">
   <div class="nav" merge-attrs><do param="default"/></div>
 </def>  

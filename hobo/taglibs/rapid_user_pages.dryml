@@ -12,7 +12,7 @@
     <body: class="login-page" param/>
     
     <content-header: param>
-      <heading param>Log In</heading>
+      <h2 param>Log In</h2>
       <a class="forgot-password" href="&forgot_password_url">Forgot your password?</a>
     </content-header>
 
@@ -49,7 +49,7 @@
     <body: class="forgot-password-page" param/>
     
     <content-header: param>
-      <heading param>Forgotten Password</heading>
+      <h2 param>Forgotten Password</h2>
       <p>Enter the email address you signed up with. If we have it in
       our records we'll send you an email allowing you to chose a new
       password.</p>
@@ -78,7 +78,7 @@
     <body: class="forgot-password-page" param/>
     
     <content-header: param>
-      <heading param>Forgotten Password</heading>
+      <h2 param>Forgotten Password</h2>
       <p>Enter the email address you signed up with. If we have it in
       our records we'll send you an email allowing you to chose a new
       password.</p>
@@ -106,7 +106,7 @@
     <body: class="forgot-password-page" param/>
     
     <content-header: param>
-      <heading param>Forgotten Password - Sent</heading>
+      <h2 param>Forgotten Password - Sent</h2>
       <p>Please check your email and follow the instructions given. Don't forget to check your spam folder.</p>
     </content-header>
   </simple-page>
@@ -119,7 +119,7 @@
        
     <body: class="account-disabled-page" param/>
 
-    <content-header: param><heading param>Account is not available</heading></content-header>
+    <content-header: param><h2 param>Account is not available</h2></content-header>
 
     <content-body: param>
       <p>Your account is not available at this time.</p>
@@ -136,7 +136,7 @@
     <body: class="user-account-page #{type_name}" param/>
 
     <content-header: param>
-      <heading><name/></heading>
+      <h2><name/></h2>
     </content-header:>
 
     <content-body: param>
