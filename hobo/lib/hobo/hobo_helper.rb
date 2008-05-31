@@ -184,7 +184,9 @@ module Hobo
 
     def can_edit?(*args)
       if args.empty?
-        if this_parent && this_field
+        if this.respond_to?(:updatable_by?)
+          can_edit?(this, nil)
+        elsif this_parent && this_field
           can_edit?(this_parent, this_field)
         else
           can_edit?(this, nil)
