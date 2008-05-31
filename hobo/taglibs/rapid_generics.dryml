@@ -22,7 +22,7 @@
     <div class="card #{has_link ? 'linkable' : 'content'} #{'with-owner' if this.class.creator_attribute} #{type_name :dasherize => true}" 
          merge-attrs>
       <div class="controls" param="controls">
-        <a action="edit" class="edit" if="&!has_link && linkable?(:edit)" param="edit-link">Edit</a>
+        <a action="edit" class="edit" if="&!has_link && linkable?(:edit) && can_edit?" param="edit-link">Edit</a>
         <delete-button label="X" unless="&linkable?(:edit)" param/>
       </div>
 
