@@ -50,7 +50,7 @@
 
 <def tag="aside-layout">
   <simple-layout merge>
-  <body: class="aside-layout" param/>
+    <body: class="aside-layout" param/>
     <content: param>
       <section class="main-content" param="main-content">
         <param-content for="content"/>
@@ -59,7 +59,7 @@
     </content:>
   </simple-layout>
 </def>
-      
+
 
 <def tag="page" attrs="layout"><call-tag tag="#{layout || 'simple'}-layout" merge/></def>
 
