@@ -74,7 +74,6 @@ rails_generators/hobo_model_controller/hobo_model_controller_generator.rb
 rails_generators/hobo_model_controller/templates/controller.rb
 rails_generators/hobo_model_controller/templates/functional_test.rb
 rails_generators/hobo_model_controller/templates/helper.rb
-rails_generators/hobo_model_controller/templates/view.html.erb
 rails_generators/hobo_model_controller/USAGE
 rails_generators/hobo_model_resource/hobo_model_resource_generator.rb
 rails_generators/hobo_model_resource/templates/controller.rb
