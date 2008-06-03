@@ -1,6 +1,3 @@
-$:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
-
 # gem dependencies
 require 'hobosupport'
 require 'hobofields'
@@ -10,12 +7,13 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
-# Monkey patches, ooh ooh
-require 'active_record/has_many_association'
-require 'active_record/has_many_through_association'
-require 'active_record/association_proxy'
-require 'active_record/association_reflection'
-require 'action_view_extensions/base'
+Dependencies.load_paths |= [ File.dirname(__FILE__) ]
+
+# Modules that must *not* be auto-reloaded by activesupport
+# (explicitly requiring them means they're never unloaded)
+require 'hobo/model_router'
+require 'hobo/undefined'
+
 
 class HoboError < RuntimeError; end
 
@@ -28,6 +26,7 @@ module Hobo
   @models = []
 
   class << self
+    
 
     attr_accessor :current_theme
     attr_writer :developer_features
@@ -377,85 +376,73 @@ module Hobo
             end
           end
     end
+    
+    public 
+    
+    def enable
+      # Rails monkey patches
+      require 'active_record/has_many_association'
+      require 'active_record/has_many_through_association'
+      require 'active_record/association_proxy'
+      require 'active_record/association_reflection'
+      require 'action_view_extensions/base'
+
+      ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+      # TODO - Rails 2.1 requires ActionView::Template
+      # ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+
+      
+      Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
+
+      require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
+      
+      ActionController::Base.send(:include, Hobo::ControllerExtensions)
+      ActiveRecord::Base.send(:include, Hobo::ModelExtensions)
+      
+    end
+    
+  end
+  
+  ControllerExtensions = classy_module do
+    def self.hobo_user_controller(model=nil)
+      @model = model
+      include Hobo::ModelController
+      include Hobo::UserController
+    end
+
+    def self.hobo_model_controller(model=nil)
+      @model = model
+      include Hobo::ModelController
+    end
+
+    def self.hobo_controller
+      include Hobo::Controller
+    end
 
   end
 
 
+  ModelExtensions = classy_module do
+    def self.hobo_model
+      include Hobo::Model
+      fields # force hobofields to load
+    end
+    def self.hobo_user_model
+      include Hobo::Model
+      include Hobo::User
+    end
+  end
+
+
+  # Empty class to represent the boolean type.
+  class Boolean; end
+  
+
 end
 
-require 'hobo/hobo_helper'
-require 'hobo/scopes'
-require 'hobo/undefined'
-require 'hobo/undefined_access_error'
-require 'hobo/authentication_support'
-
-require 'hobo/model'
-require 'hobo/controller'
-
-require 'hobo/model_controller'
-require 'hobo/model_router'
-require 'hobo/model_support'
-require 'hobo/composite_model'
-
-require 'hobo/user'
-require 'hobo/guest'
-
-require 'hobo/dryml'
-require 'hobo/rapid_helper'
-
-require 'extensions/test_case' if RAILS_ENV == "test"
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.dirname(__FILE__) + "/.."
-
-ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-# TODO - Rails 2.1 requires ActionView::Template
-# ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-
-class ActionController::Base
-
-  def self.hobo_user_controller(model=nil)
-    @model = model
-    include Hobo::ModelController
-    include Hobo::UserController
-  end
-
-  def self.hobo_model_controller(model=nil)
-    @model = model
-    include Hobo::ModelController
-  end
-
-  def self.hobo_controller
-    include Hobo::Controller
-  end
-
-end
-
-require 'hobo/dev_controller'
-require 'hobo/user_controller'
-
-
-class ActiveRecord::Base
-  def self.hobo_model
-    include Hobo::Model
-    fields # force hobofields to load
-  end
-  def self.hobo_user_model
-    include Hobo::Model
-    include Hobo::User
-  end
-end
-
-
-# Default settings
-
-Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
-
-
-module ::Hobo
-  # Empty class to represent the boolean type.
-  class Boolean; end
-end
 
 
 if defined? HoboFields
@@ -486,3 +473,5 @@ class NilClass
     "nil"
   end
 end
+
+Hobo.enable if defined?(Rails)

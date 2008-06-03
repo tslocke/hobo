@@ -1,7 +1,3 @@
-%w[apply_scopes association_proxy_extensions automatic_scopes defined_scope_proxy_extender scope_reflection scoped_proxy].each do |lib|
-  require "hobo/scopes/#{lib}"
-end
-
 module Hobo
 
   module Scopes
