@@ -209,7 +209,7 @@ module Hobo
 
 
     def can_edit?(person, object, field)
-      return true if object.exempt_from_edit_checks?
+      return true if object.try.exempt_from_edit_checks?
       # Can't view implies can't edit
       return false if !can_view?(person, object, field)
 
