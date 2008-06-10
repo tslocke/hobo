@@ -13,6 +13,7 @@ Dependencies.load_paths |= [ File.dirname(__FILE__) ]
 # (explicitly requiring them means they're never unloaded)
 require 'hobo/model_router'
 require 'hobo/undefined'
+require 'hobo/user'
 
 
 class HoboError < RuntimeError; end
@@ -398,7 +399,6 @@ module Hobo
       
       ActionController::Base.send(:include, Hobo::ControllerExtensions)
       ActiveRecord::Base.send(:include, Hobo::ModelExtensions)
-      
     end
     
   end
