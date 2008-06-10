@@ -294,7 +294,7 @@
 <def tag="count" attrs="label, prefix, if-any, lowercase"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
-  c = this.try.to_int || this.try.total_entries || this.try.count || this.try.length
+  c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
 
   label ||= if this.is_a?(Class)
               this.name
