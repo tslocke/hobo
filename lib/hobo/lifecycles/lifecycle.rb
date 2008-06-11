@@ -133,7 +133,7 @@ module Hobo
       
       
       def available_transitions
-        state.transitions_out
+        state ? state.transitions_out : []
       end
       
       
