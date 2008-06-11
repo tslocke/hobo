@@ -64,14 +64,15 @@ module HoboFields
     
     # Extend belongs_to so that it creates a FieldSpec for the foreign key
     def self.belongs_to_with_field_declarations(name, options={}, &block)
-      res = belongs_to_without_field_declarations(name, options, &block)
-      refl = reflections[name.to_sym]
-      fkey = refl.primary_key_name
       column_options = {}
-      column_options[:null] = options[:null] if options.has_key?(:null)
-      declare_field(fkey, :integer, column_options)
-      declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
-      res
+      column_options[:null] = options.delete(:null) if options.has_key?(:null)
+
+      returning belongs_to_without_field_declarations(name, options, &block) do
+        refl = reflections[name.to_sym]
+        fkey = refl.primary_key_name
+        declare_field(fkey, :integer, column_options)
+        declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
+      end
     end
     class << self
       alias_method_chain :belongs_to, :field_declarations
