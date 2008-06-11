@@ -237,7 +237,7 @@
 <def tag="show-collection-page">
   <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin)}" %>
   <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.origin)} #{type_name(:pluralize => true)}" param/>
+    <body: class="show-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name(:plural => true, :dasherize => true)}" param/>
     <content-header: param>
       <nav param="back-to">Back to <a:origin/></nav>
       <h2 param><%= title %></h2>
