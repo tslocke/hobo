@@ -23,6 +23,10 @@ module Hobo
     def administrator?
       false
     end
+    
+    def login
+      "Guest"
+    end
 
   end
 
