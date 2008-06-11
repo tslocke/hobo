@@ -103,6 +103,6 @@ but rather write your own navigation using the `<navigation>` tag -->
   <select-menu if="&user && RAILS_ENV == 'development'"
                first-option="Guest" options="&user.all(:limit => 10).*.login"
                onchange="location.href = '/dev/set_current_user?name=' + this.options[this.selectedIndex].value"
-               selected="#{current_user}"
+               selected="#{current_user.login}"
                class="dev-user-changer"/>
 </def>
