@@ -124,6 +124,7 @@
 
 
 <def tag="name"><%= 
+     debugger if this.is_a?(User)
   if this.nil?
     nil_view
   else
