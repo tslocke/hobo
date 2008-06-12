@@ -145,18 +145,12 @@ module Hobo
 
 
       def name_attribute
-        @name_attribute ||= begin
-                              column_names = columns.*.name
-                              NAME_FIELD_GUESS.detect {|f| f.in? column_names }
-                            end
+        @name_attribute ||= NAME_FIELD_GUESS.detect {|f| f.in? public_instance_methods }
       end
 
 
       def primary_content_attribute
-        @primary_content_attribute ||= begin
-                                         column_names = columns.*.name
-                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? column_names }
-                                       end
+        @primary_content_attribute ||= PRIMARY_CONTENT_GUESS.detect {|f| f.in? public_instance_methods }
       end
 
       def dependent_collections
