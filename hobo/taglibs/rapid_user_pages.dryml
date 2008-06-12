@@ -107,8 +107,16 @@
     
     <content-header: param>
       <h2 param>Forgotten Password - Sent</h2>
-      <p>Please check your email and follow the instructions given. Don't forget to check your spam folder.</p>
-    </content-header>
+    </content-header:>
+
+    <content-body: param>
+      <p param="message">If the e-mail address you entered, <%= h params[:email_address] %>,
+        is in our records, you will
+      receive an e-mail from us with instructions for resetting your
+      password. If you don't receive this e-mail, please check your
+      junk mail folder.</p>
+      <p><a href="#{base_url}/">Back to <app-name/></a></p>
+    </content-body:>
   </simple-page>
 </def>
 
