@@ -26,7 +26,7 @@
         <delete-button label="X" unless="&linkable?(:edit)" param/>
       </div>
 
-      <h3 param="heading" if="&has_heading"><a><name/></a></h3>
+      <h4 param="heading" if="&has_heading"><a><name/></a></h4>
       <div class="body" param="body">
         <div class="content" param="content" unless="&has_link">
           <primary-content/>

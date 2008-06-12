@@ -70,7 +70,7 @@
   <page title="All #{type_name :with => model, :plural => true}" merge>
     <body: class="index-page #{type_id model}" param/>
     <content-header: param>
-      <h2 param><type-name with="&model" plural/></h2>
+      <h2 param="heading"><type-name with="&model" plural/></h2>
       <p class="note" param="count">
         <if>There <count prefix="are"/></if>
         <else>There aren't any <type-name lowercase plural/> yet.</else>
@@ -96,7 +96,7 @@
   <page title="New #{type_name}" merge>
     <body: class="new-page #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <h2 param>New <type-name title/></h2>
+      <h2 param="heading">New <type-name title/></h2>
     </content-header>
 
     <content-body: param>
@@ -128,7 +128,7 @@
         <div class="container"><a>&laquo; <name/></a></div>
       </if>
 
-      <h2 param><name/></h2>
+      <h2 param="heading"><name/></h2>
 
       <div class="flags" param="flags"><flags/></div>
       
@@ -147,7 +147,7 @@
 
       <with-primary-collection name="&primary_collection_name" if="&primary_collection_name">
         <section class="primary-collection">
-          <h2 param="primary-collection-heading"><primary-collection-name.titleize/></h2>
+          <h3 param="primary-collection-heading"><primary-collection-name.titleize/></h3>
 
           <do param="primary-collection">
             <collection part="primary-collection" sortable>
@@ -160,7 +160,7 @@
               <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
               <else>
                 <section class="create-new" with="&new_for_current_user">
-                  <h2>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h2>
+                  <h3>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h3>
                   <form to="&@this.send(primary_collection_name)" method="post" 
                         update="primary-collection, primary-collection-count"
                         message="Adding #{primary_collection_name.singularize.titleize}..." reset-form param="add-new-form">
@@ -192,7 +192,7 @@
   <page merge>    
     <body: class="edit-page #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <h2 param><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></h2>
+      <h2 param="heading"><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></h2>
       <delete-button label="Remove This #{type_name}" param/>
     </content-header>
 
@@ -215,7 +215,7 @@
   <page title="New #{type_name}" merge>
     <body: class="new-in-collection-page #{association_name.underscore.dasherize} #{type_name :dasherize => true}" param/>
     <content-header: param>
-      <h2 param>New <association-name.singularize.titleize/></h2>
+      <h2 param="heading">New <association-name.singularize.titleize/></h2>
       <h3 class="subheading" param>For: <a with="&@association.origin"/></h3>
     </content-header>
 
@@ -240,7 +240,7 @@
     <body: class="show-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name(:plural => true, :dasherize => true)}" param/>
     <content-header: param>
       <nav param="back-to">Back to <a:origin/></nav>
-      <h2 param><%= title %></h2>
+      <h2 param="heading"><%= title %></h2>
       <h3 class="subheading" param><count/></h3>
     </content-header>
 
@@ -264,7 +264,7 @@
   <page merge>
     <body: class="permission-denied"/>
     <content-header: param>
-      <h2 param><message/></h2>
+      <h2 param="heading"><message/></h2>
     </content-header>
   </page>
 </def>
@@ -275,7 +275,7 @@
   <page merge>
     <body: class="not-found"/>
     <content-header: param>
-      <h2 param><message/></h2>
+      <h2 param="heading"><message/></h2>
     </content-header>
   </page>
 </def>
