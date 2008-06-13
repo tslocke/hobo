@@ -100,7 +100,7 @@ We can test which transitions are available:
 	>> f.lifecycle.available_transitions_for(tom).*.name
 	=> []
 	>> f.lifecycle.available_transitions_for(bob).*.name
-	["accept", "reject"]
+	=> ["accept", "reject"]
 	>> f.lifecycle.can_accept?(tom)
 	=> false
 	>> f.lifecycle.can_reject?(tom)
