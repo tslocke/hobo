@@ -1,6 +1,6 @@
 <def tag="creation-details">
   <div class="creation-details">
-    <if:get_creator><view class="creator" param="by"/></if>
+    <span class="creator" param="by"><if:get_creator><view/></if:get_creator></span>
     <view:created_at class="created-at" if="&this.respond_to?(:created_at)" param="at"/>
   </div>
 </def>
