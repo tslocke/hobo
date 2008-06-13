@@ -1,5 +1,5 @@
 module Spec
-  module DSL      
+  module DSL
     module Pending
       def pending(message = "TODO")
         if block_given?

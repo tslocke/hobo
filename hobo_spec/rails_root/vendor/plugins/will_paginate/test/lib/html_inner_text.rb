@@ -6,7 +6,7 @@ module HTML
       children.map(&:inner_text).join('')
     end
   end
-  
+
   class Text
     def inner_text
       self.to_s

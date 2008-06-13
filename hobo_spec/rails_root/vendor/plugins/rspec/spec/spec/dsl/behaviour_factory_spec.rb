@@ -57,7 +57,7 @@ module Spec
       it "when passed unregistered value; returns nil" do
         BehaviourFactory.get(:does_not_exist).should be_nil
       end
-    end    
+    end
 
     describe BehaviourFactory, "#get!" do
       before do
@@ -86,6 +86,6 @@ module Spec
           BehaviourFactory.get!(:does_not_exist)
         end.should raise_error
       end
-    end    
+    end
   end
 end

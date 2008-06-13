@@ -1,21 +1,21 @@
 # HoboFields -- Rich Types
 
 This doctest describes the rich types bundles with HoboFields, and the process by which you can create and register your own types.
-	
+
 	>> require 'rubygems'
 	>> require 'activesupport'
 	>> Dependencies.load_paths << '.'
 	>> Dependencies.mechanism = :require
 	>> require 'activerecord'
 	>> require 'hobofields'
-	
+
 
 ## `to_html` method
 
 The rich types provide a `to_html` method. If you are using the full Hobo stack you don't need to be aware of this unless you're defining your own rich types -- the `<view>` tag uses `to_html` to render a rich type. If you are not using DRYML and Rapid, you can simply call `to_html` in your views, e.g.
-	
+
 	<div class="post-body"><%= @post.body.to_html %></div>
-	
+
 If you ever decide to change from, say, plain text to markdown formatted, your view won't need to change.
 
 ## Defining your own Rich Type
@@ -24,25 +24,25 @@ Defining a rich type is very simple. We'll show an example here before we go thr
 
 This class defines the methods `to_html` to customize the way the type is rendered, and `validate` to provide a custom validation. It also defined the `COLUMN_TYPE` constant to tell the migration generator what underlying type should represent these values in the database.
 
-	# Loud text always renderd in caps. 
-	# It's rude to shout too much so it's not allowed to be 
+	# Loud text always renderd in caps.
+	# It's rude to shout too much so it's not allowed to be
 	# longer than 100 characters
 	class LoudText < String
-	
+
       COLUMN_TYPE = :string
 
 	  HoboFields.register_type(:loud, self)
-	
+
 	  def validate
 	    "is too long (you shouldn't shout that much)" if length > 100
 	  end
-	
+
 	  def to_html
 	    upcase
 	  end
-	
+
 	end
-	
+
 That's all there is to it. Defining `to_html` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
 
 
@@ -77,13 +77,13 @@ Provides validation of correct email address format.
 	>> require 'bluecloth'
 	>> markdown = HoboFields::MarkdownString.new %(
 	# This is a heading
-	
+
 	And text can be *emphasised*
 	)
 	>> markdown.to_html
 	=>""
 	<h1>This is a heading</h1>
-	
+
 	<p>And text can be <em>emphasised</em></p>
 	>>
 
@@ -105,7 +105,7 @@ Provides validation of correct email address format.
 `HoboFields::Text` provides a `to_html` method with HTML escaping and conversion of newlines to `<br />` tags.
 
 	>> text = HoboFields::Text.new %(Tom & Jerry
-	
+
 	Cat & Mouse)
 	>> text.to_html
 	=>""
@@ -125,7 +125,7 @@ Provides validation of correct email address format.
 
 	>> ArticleStatus = HoboFields::EnumString.for(:draft, :approved, :published)
 	=> ArticleStatus
-	
+
 Note that, like all dynamically created classes in Ruby, the class is anonymous until assigned to a constant:
 
 	>> klass = HoboFields::EnumString.for(:draft, :approved, :published)
@@ -133,14 +133,14 @@ Note that, like all dynamically created classes in Ruby, the class is anonymous 
 	>> AritcleStatus = klass
 	>> ArticleStatus
 	=> ArticleStatus
-	
+
 The values in the enum are available as class constants:
 
 	>> ArticleStatus::DRAFT
 	=> "draft"
 	>> ArticleStatus::DRAFT.class
 	=> ArticleStatus
-	
+
 There are also instance methods to check for each of the values:
 
 	>> a = ArticleStatus::APPROVED
@@ -148,29 +148,29 @@ There are also instance methods to check for each of the values:
 	=> false
 	>> a.is_approved?
 	=> true
-	
+
 They can be constructed from strings:
 
 	>> a = ArticleStatus.new("approved")
 	>> a.is_approved?
 	=> true
-	
+
 Equality is string equality, with symbols first converted to strings:
 
 	>> a == "approved"
 	=> true
 	>> a == :approved
 	=> true
-	
-	
+
+
 Note that every enum you create is a subclass of HoboFields::EnumString:
 
 	>> a.is_a?(HoboFields::EnumString)
 	=> true
-	
-	
+
+
 ### Using EnumString in your models
-	
+
 `HoboFields::EnumString` extends the field declaration DSL with a shorthand for creating enum types:
 
 	>>
@@ -193,7 +193,7 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
 	end
 	>> Article.attr_type :status
 	=> Article::Status
-	
+
 
 
 

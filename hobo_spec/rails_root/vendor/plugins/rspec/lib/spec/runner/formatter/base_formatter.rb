@@ -1,13 +1,13 @@
 module Spec
   module Runner
     module Formatter
-      # Baseclass for formatters that implements all required methods as no-ops. 
+      # Baseclass for formatters that implements all required methods as no-ops.
       class BaseFormatter
         def initialize(options, where)
           @options = options
           @where = where
         end
-        
+
         # This method is invoked before any examples are run, right after
         # they have all been collected. This can be useful for special
         # formatters that need to provide progress on feedback (graphical ones)
@@ -34,12 +34,12 @@ module Spec
         end
 
         # This method is invoked when an +example+ fails, i.e. an exception occurred
-        # inside it (such as a failed should or other exception). +counter+ is the 
-        # sequence number of the failure (starting at 1) and +failure+ is the associated 
+        # inside it (such as a failed should or other exception). +counter+ is the
+        # sequence number of the failure (starting at 1) and +failure+ is the associated
         # Failure object.
         def example_failed(example, counter, failure)
         end
-        
+
         # This method is invoked when an example is not yet implemented (i.e. has not
         # been provided a block), or when an ExamplePendingError is raised.
         # +name+ is the name of the example.
@@ -59,11 +59,11 @@ module Spec
         # information about the failure.
         def dump_failure(counter, failure)
         end
-      
+
         # This method is invoked after the dumping of examples and failures.
         def dump_summary(duration, example_count, failure_count, pending_count)
         end
-        
+
         # This gets invoked after the summary if option is set to do so.
         def dump_pending
         end

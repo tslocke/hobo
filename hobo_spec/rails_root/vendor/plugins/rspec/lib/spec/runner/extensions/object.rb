@@ -2,7 +2,7 @@
 # which we borrowed from active_support.
 #
 # Copyright (c) 2004 David Heinemeier Hansson
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,7 +25,7 @@ class Object
   # From active_support
   def copy_instance_variables_from(object, exclude = []) # :nodoc:
     exclude += object.protected_instance_variables if object.respond_to? :protected_instance_variables
-    
+
     instance_variables = object.instance_variables - exclude.map { |name| name.to_s }
     instance_variables.each { |name| instance_variable_set(name, object.instance_variable_get(name)) }
   end

@@ -35,7 +35,7 @@ A user model for our example:
 	    name :string
 	  end
 	end
-	
+
 Now the friendship. For now we'll just declare the *invite* part of the lifecycle. We first declare the *states* -- there's only one for now. We then declare the *invite* action. This is the action that first creates the friendship, so we declare it with `create`:
 
 	>>
@@ -49,7 +49,7 @@ Now the friendship. For now we'll just declare the *invite* part of the lifecycl
         create :requester, :request, :params => [ :requestee ], :become => :requested
       end
     end
-  
+
 Now let's get the DB ready:
 
 	>> require 'hobo_fields/migration_generator'
@@ -57,17 +57,17 @@ Now let's get the DB ready:
 	>> ActiveRecord::Migration.class_eval up
 	>> User.delete_all
 	>> Friendship.delete_all
-	
+
 We need some users to be friends:
 
 	>> tom = User.create(:name => "Tom")
 	>> bob = User.create(:name => "Bob")
-	
+
 Tom is allowed to request friendship:
-	
+
 	>> Friendship::Lifecycle.can_request?(tom)
 	=> true
-	
+
 Tom does so:
 
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
@@ -77,7 +77,7 @@ Tom does so:
 	=> "Bob"
 	>> f.state
 	=> "requested"
-	
+
 To continue modeling the friendship lifecycle, we add some *transitions*:
 
 	>>
@@ -126,7 +126,7 @@ And now there's nowhere to go:
 Cleanup
 
 	>> Friendship.delete_all
-	
+
 Let's try a rejected friendship:
 
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
@@ -139,7 +139,7 @@ Let's try a rejected friendship:
 	>> f.lifecycle.reject(bob)
 	>> Friendship.count
 	=> 0
-	
+
 Cleanup
 
 	>> User.delete_all
@@ -181,13 +181,13 @@ Here is the entire lifecycle
 		transition :requestee, :accept, { :requested => :active } do
           $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
         end
-		
+
 		transition :requestee, :reject, { :requested => :destroy } do
           $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
         end
 
 		transition :requestee, :ignore, { :requested => :ignored }
-		
+
 		transition :requester, :retract, { :requested => :destroy } do
           $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
         end
@@ -198,7 +198,7 @@ Here is the entire lifecycle
       end
 
     end
-	
+
 Check the simple accept still works, and sends emails
 
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
@@ -211,14 +211,14 @@ Check the simple accept still works, and sends emails
 	=> true
 
 Rejection:
-	
+
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
 	>> f.lifecycle.reject(bob)
 	>> $emails.last
 	=> "Dear Tom, Bob blew you out :-("
 	>> f.state
 	=> "destroy"
-	
+
 Retraction:
 
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
@@ -228,9 +228,9 @@ Retraction:
 	>> $emails.last
 	=> "Dear Bob, Tom reconsidered"
 	>> f.lifecycle.active?
-	
-Ignoring	
-	
+
+Ignoring
+
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
 	>> $emails = []
 	>> f.lifecycle.ignore(bob)
@@ -238,8 +238,8 @@ Ignoring
 	=> []
 	>> f.state
 	=> "ignored"
-	
-Requester cancels	
+
+Requester cancels
 
 	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
 	>> f.lifecycle.can_cancel?(tom)
@@ -248,7 +248,7 @@ Requester cancels
 	>> f.lifecycle.cancel(tom)
 	>> f.state
 	=> "destroy"
-	
+
 
 
 

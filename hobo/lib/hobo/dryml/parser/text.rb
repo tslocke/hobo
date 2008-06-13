@@ -1,7 +1,7 @@
 module Hobo::Dryml::Parser
-  
+
   class Text < REXML::Text
-    
+
     def parent=(parent)
       # Bypass immediate super
       REXML::Child.instance_method(:parent=).bind(self).call(parent)
@@ -9,5 +9,5 @@ module Hobo::Dryml::Parser
     end
 
   end
-  
+
 end

@@ -1,7 +1,7 @@
 module HoboFields
-  
+
   class HtmlString < HoboFields::Text
-  
+
     def to_html
       self
     end

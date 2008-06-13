@@ -17,7 +17,7 @@ module Spec
         end
         example = @behaviour.new(example_definition)
         proxy = ::Spec::DSL::ExampleRunner.new(@options, example)
-        
+
         @reporter.should_receive(:example_finished) do |spec, error|
           error.backtrace.detect {|line| line =~ /\/path\/to\/blah.ext:37/}.should_not be_nil
         end

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
 module Spec
   module Runner
-    
+
     module ReporterSpecHelper
       def setup
         @io = StringIO.new
@@ -17,16 +17,16 @@ module Spec
       def failure
         Mocks::DuckTypeArgConstraint.new(:header, :exception)
       end
-      
+
       def description(s)
         Spec::DSL::BehaviourDescription.new(s)
       end
     end
-    
+
     describe Reporter do
       include ReporterSpecHelper
       before(:each) {setup}
-      
+
       it "should tell formatter when behaviour is added" do
         @formatter.should_receive(:add_behaviour).with(description("behaviour"))
         @reporter.add_behaviour(description("behaviour"))
@@ -80,7 +80,7 @@ module Spec
         @formatter.should_receive(:close).with(no_args)
         @reporter.dump
       end
-      
+
       it "should push time to formatter" do
         @formatter.should_receive(:start).with(5)
         @formatter.should_receive(:start_dump)
@@ -94,7 +94,7 @@ module Spec
         @reporter.dump
       end
     end
-    
+
     describe Reporter, "reporting one passing example" do
       include ReporterSpecHelper
       before(:each) {setup}
@@ -103,7 +103,7 @@ module Spec
         @formatter.should_receive(:example_passed)
         @reporter.example_finished("example")
       end
-      
+
       it "should not delegate to backtrace tweaker" do
         @formatter.should_receive(:example_passed)
         @backtrace_tweaker.should_not_receive(:tweak_backtrace)
@@ -129,7 +129,7 @@ module Spec
         @formatter.should_receive(:example_failed)
         @reporter.example_finished("example", RuntimeError.new)
       end
-      
+
       it "should delegate to backtrace tweaker" do
         @formatter.should_receive(:example_failed)
         @backtrace_tweaker.should_receive(:tweak_backtrace)
@@ -148,9 +148,9 @@ module Spec
         @reporter.example_finished("example", RuntimeError.new)
         @reporter.dump
       end
-      
+
     end
-    
+
     describe Reporter, "reporting one pending example (Not Yet Implemented)" do
       include ReporterSpecHelper
       before(:each) {setup}

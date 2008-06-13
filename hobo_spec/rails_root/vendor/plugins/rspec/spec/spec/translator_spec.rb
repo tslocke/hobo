@@ -4,7 +4,7 @@ describe "Translator" do
   before do
     @t = Spec::Translator.new
   end
-  
+
   it "should translate files" do
     from = File.dirname(__FILE__) + '/..'
     to = "#{Dir.tmpdir}/translated_specs"
@@ -26,7 +26,7 @@ describe "Translator" do
       "before(:all)  {foo}\n"
     )
   end
-  
+
   it "should translate context ' to describe '" do
     @t.translate_line(
       "context 'Translator' do\n"
@@ -50,7 +50,7 @@ describe "Translator" do
       '  describe "Translator"'
     )
   end
-  
+
   it "should not translate context=foo" do
     @t.translate_line('  context=foo').should eql('  context=foo')
   end
@@ -62,7 +62,7 @@ describe "Translator" do
   it "should not translate context  =  foo" do
     @t.translate_line('  context  =  foo').should eql('  context  =  foo')
   end
-  
+
   it "should translate should_be_close" do
     @t.translate_line('5.0.should_be_close(5.0, 0.5)').should eql('5.0.should be_close(5.0, 0.5)')
   end
@@ -86,7 +86,7 @@ describe "Translator" do
   it "should leave should_receive" do
     @t.translate_line('@mock.should_receive(:not_expected).with("unexpected text")').should eql('@mock.should_receive(:not_expected).with("unexpected text")')
   end
-  
+
   it "should translate multi word predicates" do
     @t.translate_line('foo.should_multi_word_predicate').should eql('foo.should be_multi_word_predicate')
   end
@@ -122,7 +122,7 @@ describe "Translator" do
   it "should translate should_be_happy" do
     @t.translate_line("4.should_be_happy").should eql("4.should be_happy")
   end
-    
+
   it "should translate custom method taking regexp with parenthesis" do
     @t.translate_line("@browser.should_contain_text(/Sn.rrunger og annet rusk/)").should eql("@browser.should be_contain_text(/Sn.rrunger og annet rusk/)")
   end
@@ -130,16 +130,16 @@ describe "Translator" do
   it "should translate custom method taking regexp without parenthesis" do
     @t.translate_line("@browser.should_contain_text /Sn.rrunger og annet rusk/\n").should eql("@browser.should be_contain_text(/Sn.rrunger og annet rusk/)\n")
   end
-   
+
   it "should translate should_not_be_nil" do
     @t.translate_line("foo.should_not_be_nil\n").should eql("foo.should_not be_nil\n")
   end
-    
+
   it "should translate kind of" do
     @t.translate_line('@object.should_be_kind_of(MessageExpectation)').should(
     eql('@object.should be_kind_of(MessageExpectation)'))
   end
-  
+
   it "should translate should_be_true" do
     @t.translate_line("foo.should_be_true\n").should eql("foo.should be_true\n")
   end
@@ -150,7 +150,7 @@ describe "Translator" do
     @t.translate_line("collection.each { |c| c.should_match a_regexp_in_a_var }\n").should eql("collection.each { |c| c.should match(a_regexp_in_a_var) }\n")
     @t.translate_line("collection.each{|c| c.should_match a_regexp_in_a_var}\n").should eql("collection.each{|c| c.should match(a_regexp_in_a_var) }\n")
   end
-  
+
   # From Rubinius specs
   it "should translate close_to without parens" do
     @t.translate_line("end.should_be_close 3.14159_26535_89793_23846, TOLERANCE\n").should eql("end.should be_close(3.14159_26535_89793_23846, TOLERANCE)\n")
@@ -185,7 +185,7 @@ describe "Translator" do
       "@parslet.should_not eql(lambda { nil }.to_parseable)"
     )
   end
-  
+
   # [#9882] 0.9 Beta 1 - translator bugs
   # http://rubyforge.org/tracker/index.php?func=detail&aid=9882&group_id=797&atid=3149
   it "should support fully qualified names" do
@@ -195,7 +195,7 @@ describe "Translator" do
       "results.should be_kind_of(SimpleASTLanguage::Identifier)"
     )
   end
-    
+
   # [#9882] 0.9 Beta 1 - translator bugs
   # http://rubyforge.org/tracker/index.php?func=detail&aid=9882&group_id=797&atid=3149
   # it "should leave whitespace between expression and comments" do

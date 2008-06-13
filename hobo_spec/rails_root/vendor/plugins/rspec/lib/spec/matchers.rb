@@ -31,7 +31,7 @@ module Spec
   #
   # In addition to those Expression Matchers that are defined explicitly, RSpec will
   # create custom Matchers on the fly for any arbitrary predicate, giving your specs
-  # a much more natural language feel. 
+  # a much more natural language feel.
   #
   # A Ruby predicate is a method that ends with a "?" and returns true or false.
   # Common examples are +empty?+, +nil?+, and +instance_of?+.
@@ -148,6 +148,6 @@ module Spec
 
     class MatcherError < StandardError
     end
-    
+
   end
 end

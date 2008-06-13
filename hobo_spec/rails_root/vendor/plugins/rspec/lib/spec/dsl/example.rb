@@ -32,11 +32,11 @@ module Spec
           end
           suite
         end
-        
+
         def is_test?(method_name)
           method_name =~ /^test./
         end
-        
+
         def is_spec?(method_name)
           !(method_name =~ /^should(_not)?$/) && method_name =~ /^should/
         end
@@ -173,6 +173,6 @@ module Spec
       end
     end
   end
-  
+
   ExampleGroup = Spec::DSL::Example
 end

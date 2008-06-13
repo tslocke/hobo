@@ -10,10 +10,10 @@ end
 class Autotest
   describe Rspec, "discovery" do
     include DiscoveryHelper
-    
+
     it "should add the rspec autotest plugin" do
       Autotest.should_receive(:add_discovery).and_yield
       load_discovery
     end
-  end  
+  end
 end

@@ -1,6 +1,6 @@
 class RspecScaffoldGenerator < Rails::Generator::NamedBase
   default_options :skip_migration => false
-  
+
   attr_reader   :controller_name,
                 :controller_class_path,
                 :controller_file_path,
@@ -27,7 +27,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
     else
       @controller_class_name = "#{@controller_class_nesting}::#{@controller_class_name_without_nesting}"
     end
-    
+
     if ActionView::Base.const_defined?('DEFAULT_TEMPLATE_HANDLER_PREFERENCE') &&
        ActionView::Base::DEFAULT_TEMPLATE_HANDLER_PREFERENCE.include?(:erb) then
       @resource_generator = "scaffold"
@@ -36,7 +36,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
       @resource_generator = "scaffold_resource"
       @default_file_extension = "rhtml"
     end
-    
+
     if ActionController::Base.respond_to?(:resource_action_separator)
       @resource_edit_path = "/edit"
     else
@@ -46,7 +46,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
 
   def manifest
     record do |m|
-      
+
       # Check for class naming collisions.
       m.class_collisions(controller_class_path, "#{controller_class_name}Controller", "#{controller_class_name}Helper")
       m.class_collisions(class_path, "#{class_name}")
@@ -61,7 +61,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
       m.directory(File.join('spec/helpers', class_path))
       m.directory File.join('spec/fixtures', class_path)
       m.directory File.join('spec/views', controller_class_path, controller_file_name)
-      
+
       # Controller spec, class, and helper.
       m.template 'rspec_scaffold:controller_spec.rb',
         File.join('spec/controllers', controller_class_path, "#{controller_file_name}_controller_spec.rb")
@@ -81,7 +81,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
           File.join('app/views', controller_class_path, controller_file_name, "#{action}.#{default_file_extension}")
         )
       end
-      
+
       # Model class, unit test, and fixtures.
       m.template 'model:model.rb',      File.join('app/models', class_path, "#{file_name}.rb")
       m.template 'model:fixtures.yml',  File.join('spec/fixtures', class_path, "#{table_name}.yml")
@@ -99,11 +99,11 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
 
       unless options[:skip_migration]
         m.migration_template(
-          'model:migration.rb', 'db/migrate', 
+          'model:migration.rb', 'db/migrate',
           :assigns => {
             :migration_name => "Create#{class_name.pluralize.gsub(/::/, '')}",
             :attributes     => attributes
-          }, 
+          },
           :migration_file_name => "create_#{file_path.gsub(/\//, '_').pluralize}"
         )
       end
@@ -122,7 +122,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
     def add_options!(opt)
       opt.separator ''
       opt.separator 'Options:'
-      opt.on("--skip-migration", 
+      opt.on("--skip-migration",
              "Don't generate a migration file for this model") { |v| options[:skip_migration] = v }
     end
 
@@ -130,7 +130,7 @@ class RspecScaffoldGenerator < Rails::Generator::NamedBase
       %w[ index show new edit ]
     end
 
-    def model_name 
+    def model_name
       class_name.demodulize
     end
 end
@@ -150,7 +150,7 @@ module Rails
           when :boolean                     then "false"
           else
             ""
-        end      
+        end
       end
 
       def input_type
@@ -158,7 +158,7 @@ module Rails
           when :text                        then "textarea"
           else
             "input"
-        end      
+        end
       end
     end
   end

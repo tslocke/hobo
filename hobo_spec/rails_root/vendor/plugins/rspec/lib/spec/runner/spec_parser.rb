@@ -37,7 +37,7 @@ module Spec
         lines = source.split("\n")
         lines[0...line_number].reverse
       end
-      
+
       def parse_description(str)
         return str[1..-2] if str =~ /^['"].*['"]$/
         if matches = /^['"](.*)['"](,.*)?$/.match(str)

@@ -135,11 +135,11 @@ module Spec
         shared_behaviour = describe "all things", :shared => true do
           it "should do stuff" do end
         end
-        
+
         behaviour = describe "one thing" do
           include shared_behaviour
         end
-        
+
         behaviour.number_of_examples.should == 1
       end
 
@@ -147,11 +147,11 @@ module Spec
         AllThings = describe "all things", :shared => true do
           it "should do stuff" do end
         end
-        
+
         behaviour = describe "one thing" do
           it_should_behave_like AllThings
         end
-        
+
         behaviour.number_of_examples.should == 1
       end
 

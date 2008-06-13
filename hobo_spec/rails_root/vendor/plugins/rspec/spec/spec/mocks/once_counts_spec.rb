@@ -23,7 +23,7 @@ module Spec
           @mock.rspec_verify
         end.should raise_error(MockExpectationError)
       end
-      
+
       it "once should fail when not called" do
         @mock.should_receive(:random_call).once
         lambda do

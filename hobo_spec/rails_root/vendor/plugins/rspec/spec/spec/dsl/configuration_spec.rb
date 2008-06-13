@@ -9,7 +9,7 @@ module Spec
           @behaviour = mock("behaviour")
         end
       end
-    
+
     describe Configuration, "#mock_with" do
       include ConfigurationSpec
       it "should default mock framework to rspec" do
@@ -118,7 +118,7 @@ module Spec
         end
         @behaviour.it "calls prepend_before" do
         end
-        
+
         @behaviour.suite.run
         order.should == [
           :prepend__before_all,

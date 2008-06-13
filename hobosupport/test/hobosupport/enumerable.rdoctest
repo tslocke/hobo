@@ -12,7 +12,7 @@ E.g. The length of the first word that starts with a capital letter
 
     >> %w(my name is Fred).search { |s| s.length if s =~ /^[A-Z]/ }
     => 4
-    
+
 ## `Enumerable#map_with_index`
 
 * `enum.map_with_index { |element, index| block }`
@@ -21,7 +21,7 @@ Just like #map but the block gets the element and the index.
 
     >> %w(some short words).map_with_index { |s, i| s * i }
     => ["", "short", "wordswords"]
-    
+
 ## `Enumerable#build_hash`
 
 * `enum.build_hash { |element| block }`
@@ -30,7 +30,7 @@ The block is passed each element in turn and should return a key/value pair. If 
 
     >> %w(some short words).build_hash { |s| [s, s.length] unless s == "short" }
     => {"some"=>4, "words"=>5}
-    
+
 
 ## `Enumerable#map_hash`
 
@@ -47,29 +47,29 @@ Shorthand for `enum[1..-1]`
 
     >> %w(some short words).rest
     => ["short", "words"]
-    
-    
+
+
 ## `Enumerable#*`
 
 Shorthand for `map` when you need to map a single method call on the elements.
 
     >> %w(some short words).*.length
     => [4, 5, 5]
-    
+
 ## `Enumerable#where`
 
 Shorthand for `select` when you need to select on a single method call.
 
     >> %w(some short words).where.include?("r")
     => ["short", "words"]
-    
+
 ## `Enumerable#where_not`
 
 Shorthand for `reject` when you need to reject on a single method call.
 
     >> %w(some short words).where_not.include?("r")
     => ["some"]
-    
+
 ## `Enumerable#drop_while`
 
 * `enum.drop_while { |element| block }`
@@ -78,14 +78,14 @@ Passes each element in turn to the block until the block returns false. Returns 
 
     >> %w(this is a nice example).drop_while { |s| s.length > 1 }
     => ["a", "nice", "example"]
-    
+
 There is also a destructive version for arrays
 
     >> a = %w(this is a nice example)
     >> a.drop_while! { |s| s.length > 1 }
     >> a
     => ["a", "nice", "example"]
-    
+
 
 ## `Enumerable#take_while`
 

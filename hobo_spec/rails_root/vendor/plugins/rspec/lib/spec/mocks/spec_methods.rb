@@ -24,7 +24,7 @@ module Spec
         stubs.each { |key, value| object_stub.stub!(key).and_return(value) }
         object_stub
       end
-      
+
       # Shortcut for creating a mock object that will return itself in response
       # to any message it receives that it hasn't been explicitly instructed
       # to respond to.

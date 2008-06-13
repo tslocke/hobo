@@ -8,15 +8,15 @@ module Spec
       def should_not_receive(sym, &block)
         __mock_proxy.add_negative_message_expectation(caller(1)[0], sym.to_sym, &block)
       end
-      
+
       def stub!(sym, opts={})
         __mock_proxy.add_stub(caller(1)[0], sym.to_sym, opts)
       end
-      
+
       def received_message?(sym, *args, &block) #:nodoc:
         __mock_proxy.received_message?(sym.to_sym, *args, &block)
       end
-      
+
       def rspec_verify #:nodoc:
         __mock_proxy.verify
       end

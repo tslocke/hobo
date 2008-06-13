@@ -12,9 +12,9 @@ require 'hobosupport/hash'
 require 'hobosupport/module'
 
 module HoboSupport
-  
+
   VERSION = "0.7.5"
-  
+
 end
 
 
@@ -27,5 +27,5 @@ class Object
   def is_a?(*args)
     args.any? {|a| is_a_without_multiple_args?(a) }
   end
-  
+
 end

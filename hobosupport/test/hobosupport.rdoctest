@@ -29,15 +29,15 @@ Extended to allow multiple types to be checked in one go
     => true
     >> 1.is_a?(String, Symbol)
     => false
-    
+
 Still works the old way
 
     >> "foo".is_a?(String)
     => true
     >> :foo.is_a?(String)
     => false
-    
-    
+
+
 ## Method call extensions
 
 ### `Object#_?`
@@ -48,7 +48,7 @@ We have the "." operator to call methods on objects. These extensions introduce 
     => 3
     >> nil._?.length
     => nil
-    
+
 
 ### `Object#try`
 

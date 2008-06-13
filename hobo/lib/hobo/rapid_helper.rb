@@ -14,7 +14,7 @@ module Hobo::RapidHelper
 
   def options_for_hobo_ajax(options)
     js_options = rapid_build_callbacks(options)
-    
+
     js_options['asynchronous']  = false if options[:type] == :synchronous
     js_options['method']        = method_option_to_s(options[:method]) if options[:method]
     js_options['evalScripts']   = false if options[:script] == false
@@ -25,11 +25,11 @@ module Hobo::RapidHelper
     js_options['refocusForm']   = options[:refocus_form] if options.has_key?(:refocus_form)
     js_options['spinnerNextTo'] = js_str(options[:spinner_next_to]) if options.has_key?(:spinner_next_to)
     js_options['message']       = js_str(options[:message]) if options[:message]
-    
+
     js_options.empty? ? nil : options_for_javascript(js_options)
   end
 
-  
+
   def js_updates(updates)
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
@@ -42,8 +42,8 @@ module Hobo::RapidHelper
     end
     "[#{updates * ', '}]"
   end
-  
-  
+
+
   def js_result_updates(updates)
     return '[]' unless updates
     updates = [updates] unless updates.is_a? Array
@@ -55,7 +55,7 @@ module Hobo::RapidHelper
   def ajax_updater(url_or_form, update, options={})
     options ||= {}
     options.symbolize_keys!
-    
+
     target = if url_or_form == :post_form
                target = "this"
              else
@@ -63,9 +63,9 @@ module Hobo::RapidHelper
              end
     js_options = options_for_hobo_ajax(options)
     args = [target, js_updates(update), js_options].compact
-    
+
     confirm = options.delete(:confirm)
-    
+
     func = "Hobo.ajaxRequest(#{args * ', '})"
     if confirm
       "if (confirm(#{js_str(confirm)})) { #{func} }"
@@ -91,7 +91,7 @@ module Hobo::RapidHelper
 
 
 
-  
+
   def in_place_editor(behaviour_class, attributes)
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
@@ -102,15 +102,15 @@ module Hobo::RapidHelper
                       :no_wrapper => false)
 
     update = attributes.delete(:update)
-    attributes[:hobo_update] = update if update 
-    
+    attributes[:hobo_update] = update if update
+
     view(attributes)
   end
-    
-  
+
+
 
   AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
-  
+
   AJAX_ATTRS = AJAX_CALLBACKS + [ :type, :method,
                                   :script, :form, :params, :confirm, :message,
                                   :reset_form, :refocus_form, :result_update, :spinner_next_to ]
@@ -121,27 +121,27 @@ module Hobo::RapidHelper
 
 
   def through_collection_names(object=this)
-    object.class.reflections.values.select do |refl| 
+    object.class.reflections.values.select do |refl|
       refl.macro == :has_many && refl.options[:through]
     end.map {|x| x.options[:through]}
   end
 
 
   def primary_collection_name(object=this)
-    dependent_collection_names = object.class.reflections.values.select do |refl| 
+    dependent_collection_names = object.class.reflections.values.select do |refl|
       refl.macro == :has_many && refl.options[:dependent]
     end.*.name
-    
+
     (dependent_collection_names - through_collection_names(object)).first
   end
 
 
   def non_through_collections(object=this)
-    names = object.class.reflections.values.select do |refl| 
+    names = object.class.reflections.values.select do |refl|
       refl.macro == :has_many
     end.*.name
-    
+
     names - through_collection_names
   end
-  
+
 end

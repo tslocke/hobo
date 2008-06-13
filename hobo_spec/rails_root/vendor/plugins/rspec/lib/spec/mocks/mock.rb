@@ -10,7 +10,7 @@ module Spec
         @name = name
         @options = options
       end
-      
+
       # This allows for comparing the mock to other objects that proxy
       #  such as ActiveRecords belongs_to proxy objects
       #  By making the other object run the comparison, we're sure the call gets delegated to the proxy target
@@ -28,7 +28,7 @@ module Spec
           __mock_proxy.raise_unexpected_message_error sym, *args
         end
       end
-      
+
       def inspect
         "#<#{self.class}:#{sprintf '0x%x', self.object_id} @name=#{@name.inspect}>"
       end

@@ -1,7 +1,7 @@
 module Spec
   module Rails
     module Matchers
-    
+
       class HaveText  #:nodoc:
 
         def initialize(expected)
@@ -13,19 +13,19 @@ module Spec
           return actual =~ expected if Regexp === expected
           return actual == expected unless Regexp === expected
         end
-      
+
         def failure_message
           "expected #{expected.inspect}, got #{actual.inspect}"
         end
-        
+
         def negative_failure_message
           "expected not to have text #{expected.inspect}"
         end
-        
+
         def to_s
           "have text #{expected.inspect}"
         end
-      
+
         private
           attr_reader :expected
           attr_reader :actual
@@ -49,7 +49,7 @@ module Spec
       def have_text(text)
         HaveText.new(text)
       end
-    
+
     end
   end
 end

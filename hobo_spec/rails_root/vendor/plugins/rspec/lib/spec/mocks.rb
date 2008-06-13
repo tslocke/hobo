@@ -23,12 +23,12 @@ module Spec
   # which can help clarify the role it is playing within a given spec.
   #
   # == Mock Objects
-  # 
+  #
   # Mocks are objects that allow you to set and verify expectations that they will
   # receive specific messages during run time. They are very useful for specifying how the subject of
   # the spec interacts with its collaborators. This approach is widely known as "interaction
   # testing".
-  # 
+  #
   # Mocks are also very powerful as a design tool. As you are
   # driving the implementation of a given class, Mocks provide an anonymous
   # collaborator that can change in behaviour as quickly as you can write an expectation in your
@@ -36,12 +36,12 @@ module Spec
   # does not yet exist. As the shape of the class being specified becomes more clear, so do the
   # requirements for its collaborators - often leading to the discovery of new types that are
   # needed in your system.
-  # 
+  #
   # Read Endo-Testing[http://www.mockobjects.com/files/endotesting.pdf] for a much
   # more in depth description of this process.
-  # 
+  #
   # == Stubs
-  # 
+  #
   # Stubs are objects that allow you to set "stub" responses to
   # messages. As Martin Fowler points out on his site,
   # mocks_arent_stubs[http://www.martinfowler.com/articles/mocksArentStubs.html].
@@ -49,25 +49,25 @@ module Spec
   # of Gerard Meszaros: Stubs provide canned responses to messages they might receive in a test, while
   # mocks allow you to specify and, subsquently, verify that certain messages should be received during
   # the execution of a test.
-  # 
+  #
   # == Partial Mocks/Stubs
-  # 
+  #
   # RSpec also supports partial mocking/stubbing, allowing you to add stub/mock behaviour
   # to instances of your existing classes. This is generally
   # something to be avoided, because changes to the class can have ripple effects on
   # seemingly unrelated specs. When specs fail due to these ripple effects, the fact
   # that some methods are being mocked can make it difficult to understand why a
   # failure is occurring.
-  # 
+  #
   # That said, partials do allow you to expect and
   # verify interactions with class methods such as +#find+ and +#create+
   # on Ruby on Rails model classes.
-  # 
+  #
   # == Further Reading
-  # 
+  #
   # There are many different viewpoints about the meaning of mocks and stubs. If you are interested
   # in learning more, here is some recommended reading:
-  # 
+  #
   # * Mock Objects: http://www.mockobjects.com/
   # * Endo-Testing: http://www.mockobjects.com/files/endotesting.pdf
   # * Mock Roles, Not Objects: http://www.mockobjects.com/files/mockrolesnotobjects.pdf
@@ -110,7 +110,7 @@ module Spec
   #
   #   my_mock.should_receive(:sym)
   #   my_mock.should_not_receive(:sym)
-  #   
+  #
   # == Expecting Arguments
   #
   #   my_mock.should_receive(:sym).with(*args)
@@ -137,7 +137,7 @@ module Spec
   #   my_mock.should_receive(:sym).with(1, anything(), "b") #2nd argument can be anything at all
   #   my_mock.should_receive(:sym).with(1, ducktype(:abs, :div), "b")
   #                            #2nd argument can be object that responds to #abs and #div
-  #                                                                       
+  #
   # == Receive Counts
   #
   #   my_mock.should_receive(:sym).once

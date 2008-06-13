@@ -71,11 +71,11 @@ class Autotest::RailsRspec < Autotest::Rspec
       %r%^lib/(.*)\.rb$% => proc { |_, m|
         ["spec/lib/#{m[1]}_spec.rb"]
       },
-    }    
+    }
   end
-  
+
   def spec_command
     "script/spec"
   end
-    
+
 end

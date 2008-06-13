@@ -14,7 +14,7 @@ module Spec
       #     before do
       #       render 'login/login'
       #     end
-      # 
+      #
       #     it "should display login form" do
       #       response.should have_tag("form[action=/login]") do
       #         with_tag("input[type=text][name=email]")

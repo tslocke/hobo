@@ -1,6 +1,6 @@
 # HoboFields
 
-## Introduction 
+## Introduction
 
 Welcome to HoboFields -- a spin-off from the Hobo project (Hobo not required!).
 
@@ -27,12 +27,12 @@ Now edit your model as follows:
     end
 {: .ruby}
 
-	
+
 Then, simply run
 
 	$ ./script/genearte hobo_migration
-	
-And voila 
+
+And voila
 
 	---------- Up Migration ----------
 	create_table :blog_posts do |t|
@@ -48,7 +48,7 @@ And voila
 	----------------------------------
 {: .ruby}
 
-The migration generator has created a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. You are now free to simply hack away on your app and run the migration generator every time the database needs to play catch-up. 
+The migration generator has created a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. You are now free to simply hack away on your app and run the migration generator every time the database needs to play catch-up.
 
 Note that the migration generator is interactive -- it can't tell the difference between renaming something vs. adding one thing and removing another, so sometimes it will ask you to clarify. It's a bit picky about what it makes you type in response, because we really don't want you to lose data when someone's amazing twitter distracts you at the wrong moment.
 
@@ -65,7 +65,7 @@ The source lives on GitHub as part of the main Hobo repo:
 The simplest way to install HoboFields as a plugin is to use the subversion mirror:
 
 	svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
-	
+
 ## Rich Types
 
 In addition to the migration generator, HoboFields provides a Rich-Type mechanism that allows you to declare your fields using higher level concepts like "email-address" or "markdown text". This can give you both automatic validations, and automatic rendering of those values in the UI (this works particularly well if you use the rest of Hobo).
@@ -88,7 +88,7 @@ The migration generator doctests provide a lot more detail. They're not really t
 
 ## About Doctests
 
-HoboFields is documented and tested using *doctests*. This is an idea that comes from Python that we've been experimenting with for Hobo. Whenever you see code-blocks that start "`>>`", read them as IRB sessions. The `rdoctest` tool extracts these and runs them to verify they behave as advertised. 
+HoboFields is documented and tested using *doctests*. This is an idea that comes from Python that we've been experimenting with for Hobo. Whenever you see code-blocks that start "`>>`", read them as IRB sessions. The `rdoctest` tool extracts these and runs them to verify they behave as advertised.
 
 Doctests are a great way to get both documentation and tests from the same source. We're still experimenting with exactly how this all works though, so if the docs seem strange in places, please bear with us!
 

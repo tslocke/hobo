@@ -5,7 +5,7 @@ module Spec
         def Story(title, narrative, params = {}, &body)
           ::Spec::Story::Runner.story_runner.Story(title, narrative, params, &body)
         end
-      
+
         # Calling this deprecated is silly, since it hasn't been released yet. But, for
         # those who are reading this - this will be deleted before the 1.1 release.
         def run_story(*args, &block)
@@ -13,7 +13,7 @@ module Spec
           runner.instance_eval(&block) if block
           runner.run
         end
-      
+
         # Creates (or appends to an existing) a namespaced group of steps for use in Stories
         #
         # == Examples
@@ -28,7 +28,7 @@ module Spec
           steps.instance_eval(&block) if block
           steps
         end
-      
+
         # Creates a context for running a Plain Text Story with specific groups of Steps
         # Steps. Also supports adding arbitrary steps that will only be accessible to
         # the Story being run.
@@ -73,11 +73,11 @@ module Spec
             runner.run
           end
         end
-        
+
         def rspec_story_steps  # :nodoc:
           $rspec_story_steps ||= Spec::Story::StepGroupHash.new
         end
-                
+
       end
     end
   end

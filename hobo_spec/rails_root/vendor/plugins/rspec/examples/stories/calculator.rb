@@ -10,7 +10,7 @@ class AdditionMatchers < Spec::Story::StepGroup
   end
 end
 
-steps = AdditionMatchers.new do |add|  
+steps = AdditionMatchers.new do |add|
   add.then("the sum should be $sum") do |sum|
     @sum.should == sum.to_i
   end
@@ -42,13 +42,13 @@ class Adder
   def << addend
     addends << addend
   end
-  
+
   def sum
     @addends.inject(0) do |result, addend|
       result + addend.to_i
     end
   end
-  
+
   def addends
     @addends ||= []
   end

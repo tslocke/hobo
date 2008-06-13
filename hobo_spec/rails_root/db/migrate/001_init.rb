@@ -7,18 +7,18 @@ class Init < ActiveRecord::Migration
       t.datetime :remember_token_expires_at
       t.string   :name
     end
-    
+
     create_table :categorisations do |t|
       t.integer :post_id
       t.integer :category_id
     end
-    
+
     create_table :categories do |t|
       t.string   :name
       t.datetime :created_at
       t.datetime :updated_at
     end
-    
+
     create_table :comments do |t|
       t.text     :body
       t.string   :author
@@ -26,7 +26,7 @@ class Init < ActiveRecord::Migration
       t.datetime :updated_at
       t.integer  :post_id
     end
-    
+
     create_table :posts do |t|
       t.string   :title
       t.text     :body
@@ -34,7 +34,7 @@ class Init < ActiveRecord::Migration
       t.datetime :updated_at
       t.integer  :user_id
     end
-    
+
     create_table :users do |t|
       t.string   :crypted_password, :limit => 40
       t.string   :salt, :limit => 40

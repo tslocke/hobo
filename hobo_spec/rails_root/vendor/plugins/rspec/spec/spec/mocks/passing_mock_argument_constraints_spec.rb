@@ -7,12 +7,12 @@ module Spec
         @mock = Mock.new("test mock")
         Kernel.stub!(:warn)
       end
-      
+
       after(:each) do
         @mock.rspec_verify
       end
     end
-    
+
     describe Methods, "handling argument constraints with DEPRECATED symbols" do
       it_should_behave_like "mock argument constraints"
 
@@ -20,7 +20,7 @@ module Spec
         @mock.should_receive(:random_call).with(:boolean)
         @mock.random_call(true)
       end
-      
+
       it "should accept false as boolean" do
         @mock.should_receive(:random_call).with(:boolean)
         @mock.random_call(false)
@@ -45,12 +45,12 @@ module Spec
         @mock.should_receive(:random_call).with(:string)
         @mock.random_call("a string")
       end
-      
+
       it "should match no args against any_args" do
         @mock.should_receive(:random_call).with(:any_args)
         @mock.random_call("a string")
       end
-      
+
       it "should match no args against no_args" do
         @mock.should_receive(:random_call).with(:no_args)
         @mock.random_call
@@ -94,23 +94,23 @@ module Spec
         @mock.should_receive(:random_call).with(duck_type(:abs, :div))
         @mock.random_call(1)
       end
-      
+
       it "should match no args against any_args()" do
         @mock.should_receive(:random_call).with(any_args)
         @mock.random_call()
       end
-      
+
       it "should match one arg against any_args()" do
         @mock.should_receive(:random_call).with(any_args)
         @mock.random_call("a string")
       end
-      
+
       it "should match no args against no_args()" do
         @mock.should_receive(:random_call).with(no_args)
         @mock.random_call()
       end
     end
-    
+
     describe Methods, "handling non-constraint arguments" do
 
       it "should match non special symbol (can be removed when deprecated symbols are removed)" do
@@ -127,24 +127,24 @@ module Spec
         @mock.should_receive(:random_call).with(/bcd/)
         @mock.random_call(/bcd/)
       end
-      
+
       it "should match against a hash submitted and received by value" do
         @mock.should_receive(:random_call).with(:a => "a", :b => "b")
         @mock.random_call(:a => "a", :b => "b")
       end
-      
+
       it "should match against a hash submitted by reference and received by value" do
         opts = {:a => "a", :b => "b"}
         @mock.should_receive(:random_call).with(opts)
         @mock.random_call(:a => "a", :b => "b")
       end
-      
+
       it "should match against a hash submitted by value and received by reference" do
         opts = {:a => "a", :b => "b"}
         @mock.should_receive(:random_call).with(:a => "a", :b => "b")
         @mock.random_call(opts)
       end
-      
+
       it "should match against a Matcher" do
         @mock.should_receive(:msg).with(equal(37))
         @mock.msg(37)

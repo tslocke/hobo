@@ -51,7 +51,7 @@ module Spec
           Spec::Story::Runner::PlainTextStoryRunner.should_receive(:new).and_return(runner)
           runner.should_receive(:run)
           @main.run_story
-        end  
+        end
       end
 
       describe Main, "#steps_for" do
@@ -114,7 +114,7 @@ module Spec
 
       describe Main, "#with_steps_for running a story" do
         it_should_behave_like "the main object extended with Main"
-        
+
         before(:each) do
           @runner = mock("runner")
           @runner_step_group = StepGroup.new
@@ -122,21 +122,21 @@ module Spec
           @runner.stub!(:run)
           Spec::Story::Runner::PlainTextStoryRunner.stub!(:new).and_return(@runner)
         end
-        
+
         it "should create a PlainTextStoryRunner with a path" do
           Spec::Story::Runner::PlainTextStoryRunner.should_receive(:new).with('path/to/file',{}).and_return(@runner)
           @main.with_steps_for(:foo) do
             run 'path/to/file'
           end
         end
-        
+
         it "should create a PlainTextStoryRunner with a path and options" do
           Spec::Story::Runner::PlainTextStoryRunner.should_receive(:new).with(anything,{:bar => :baz}).and_return(@runner)
           @main.with_steps_for(:foo) do
             run 'path/to/file', :bar => :baz
           end
         end
-        
+
         it "should pass the group it creates to the runner's steps" do
           steps = @main.steps_for(:ice_cream) do
             Given("vanilla") {}
@@ -146,7 +146,7 @@ module Spec
           end
           @runner_step_group.should have_step(:given, "vanilla")
         end
-        
+
         it "should run a story" do
           @runner.should_receive(:run)
           Spec::Story::Runner::PlainTextStoryRunner.should_receive(:new).and_return(@runner)

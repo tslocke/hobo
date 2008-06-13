@@ -79,7 +79,7 @@ module Spec
           end
         end
       end
-      
+
       # TODO: BT - Helper Examples should proxy method_missing to a Rails View instance.
       # When that is done, remove this method
       describe HelperExample, "#protect_against_forgery?", :behaviour_type => :helper do

@@ -39,7 +39,7 @@ module Spec
 
         it "should push out not pending example" do
           @formatter.example_pending("behaviour", "example", "reason")
-          @io.string.should eql("# * behaviour example [PENDING: reason]\n")      
+          @io.string.should eql("# * behaviour example [PENDING: reason]\n")
         end
 
       end

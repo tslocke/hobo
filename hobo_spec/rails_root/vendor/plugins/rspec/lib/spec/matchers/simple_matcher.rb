@@ -14,12 +14,12 @@ module Spec
       def failure_message()
         return %[expected #{@description.inspect} but got #{@actual.inspect}]
       end
-        
+
       def negative_failure_message()
         return %[expected not to get #{@description.inspect}, but got #{@actual.inspect}]
       end
     end
-    
+
     def simple_matcher(message, &match_block)
       SimpleMatcher.new(message, &match_block)
     end

@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 
 # This script generates the POD demo from scratch. We can then run
 # some Selenium tests on it to ensure everything is in order
@@ -31,10 +31,10 @@ puts "\nCreating POD app"
 Dir.chdir(APP_NAME) do
   gen "hobo_model advert title:string body:text"
   gen "hobo_model_controller advert"
-  
+
   gen "hobo_model category name:string"
   gen "hobo_model_controller category"
-  
+
   edit "app/models/user.rb" do |user|
     user.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
   has_many :adverts, :dependent => :destroy
@@ -44,7 +44,7 @@ Dir.chdir(APP_NAME) do
   def super_user?
     login == 'admin'
   end
-  
+
   def creatable_by?(user)
     user.guest?
   end
@@ -64,7 +64,7 @@ Dir.chdir(APP_NAME) do
 end
 END
   end
-  
+
   edit "app/models/advert.rb" do |advert|
     advert.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
   belongs_to :user, :creator => true
@@ -91,7 +91,7 @@ END
 end
 END
   end
-  
+
   edit "app/models/category.rb" do |category|
     category.sub(/  # --- Hobo Permissions --- #.*end\s*end/m, <<-END)
   has_many :adverts, :dependent => :destroy
@@ -121,7 +121,7 @@ END
   edit "app/controllers/categories_controller.rb" do |controller|
     controller.sub("auto_actions :all", "auto_actions :all, :except => :new")
   end
-  
+
   gen "hobo_migration"
 
 end

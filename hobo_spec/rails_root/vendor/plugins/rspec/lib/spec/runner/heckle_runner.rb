@@ -12,7 +12,7 @@ module Spec
         @filter = filter
         @heckle_class = heckle_class
       end
-      
+
       # Runs all the behaviours held by +rspec_options+ once for each of the
       # methods in the matched classes.
       def heckle_with
@@ -22,13 +22,13 @@ module Spec
           heckle_class_or_module(@filter)
         end
       end
-      
+
       def heckle_method(class_name, method_name)
         verify_constant(class_name)
         heckle = @heckle_class.new(class_name, method_name, rspec_options)
         heckle.validate
       end
-      
+
       def heckle_class_or_module(class_or_module_name)
         verify_constant(class_or_module_name)
         pattern = /^#{class_or_module_name}/
@@ -36,7 +36,7 @@ module Spec
         ObjectSpace.each_object(Class) do |klass|
           classes << klass if klass.name =~ pattern
         end
-        
+
         classes.each do |klass|
           klass.instance_methods(false).each do |method_name|
             heckle = @heckle_class.new(klass.name, method_name, rspec_options)
@@ -44,7 +44,7 @@ module Spec
           end
         end
       end
-      
+
       def verify_constant(name)
         begin
           # This is defined in Heckle
@@ -54,7 +54,7 @@ module Spec
         end
       end
     end
-    
+
     #Supports Heckle 1.2 and prior (earlier versions used Heckle::Base)
     class Heckler < (Heckle.const_defined?(:Base) ? Heckle::Base : Heckle)
       def initialize(klass_name, method_name, rspec_options)

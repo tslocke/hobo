@@ -4,10 +4,10 @@ module Spec
       # Creates and registers an instance of a Spec::DSL::Example (or a subclass).
       # The instantiated behaviour class depends on the directory of the file
       # calling this method. For example, Spec::Rails will use different
-      # classes for specs living in <tt>spec/models</tt>, <tt>spec/helpers</tt>, 
+      # classes for specs living in <tt>spec/models</tt>, <tt>spec/helpers</tt>,
       # <tt>spec/views</tt> and <tt>spec/controllers</tt>.
       #
-      # It is also possible to override autodiscovery of the behaviour class 
+      # It is also possible to override autodiscovery of the behaviour class
       # with an options Hash as the last argument:
       #
       #   describe "name", :behaviour_type => :something_special do ...
@@ -31,7 +31,7 @@ module Spec
       alias :context :describe
 
     private
-    
+
       def rspec_options
         $rspec_options ||= begin; \
           parser = ::Spec::Runner::OptionParser.new(STDERR, STDOUT); \
@@ -40,7 +40,7 @@ module Spec
         end
         $rspec_options
       end
-      
+
       def init_rspec_options(options)
         $rspec_options = options if $rspec_options.nil?
       end

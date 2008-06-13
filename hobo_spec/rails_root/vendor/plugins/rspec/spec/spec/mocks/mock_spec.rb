@@ -7,11 +7,11 @@ module Spec
       before(:each) do
         @mock = mock("test mock")
       end
-      
+
       after(:each) do
         @mock.rspec_reset
       end
-      
+
       it "should report line number of expectation of unreceived message" do
         expected_error_line = __LINE__; @mock.should_receive(:wont_happen).with("x", 3)
         begin
@@ -22,19 +22,19 @@ module Spec
           e.backtrace[0].should match(/#{File.basename(__FILE__)}:#{expected_error_line}/)
         end
       end
-      
+
       it "should pass when not receiving message specified as not to be received" do
         @mock.should_not_receive(:not_expected)
         @mock.rspec_verify
       end
-      
+
       it "should pass when receiving message specified as not to be received with different args" do
         @mock.should_not_receive(:message).with("unwanted text")
         @mock.should_receive(:message).with("other text")
         @mock.message "other text"
         @mock.rspec_verify
       end
-      
+
       it "should fail when receiving message specified as not to be received" do
         @mock.should_not_receive(:not_expected)
         @mock.not_expected
@@ -43,7 +43,7 @@ module Spec
           violated
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :not_expected with (any args) 0 times, but received it once")
       end
-      
+
       it "should fail when receiving message specified as not to be received with args" do
         @mock.should_not_receive(:not_expected).with("unexpected text")
         @mock.not_expected("unexpected text")
@@ -52,31 +52,31 @@ module Spec
           violated
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :not_expected with (\"unexpected text\") 0 times, but received it once")
       end
-      
+
       it "should pass when receiving message specified as not to be received with wrong args" do
         @mock.should_not_receive(:not_expected).with("unexpected text")
         @mock.not_expected "really unexpected text"
         @mock.rspec_verify
       end
-      
+
       it "should allow block to calculate return values" do
         @mock.should_receive(:something).with("a","b","c").and_return { |a,b,c| c+b+a }
         @mock.something("a","b","c").should == "cba"
         @mock.rspec_verify
       end
-      
+
       it "should allow parameter as return value" do
         @mock.should_receive(:something).with("a","b","c").and_return("booh")
         @mock.something("a","b","c").should == "booh"
         @mock.rspec_verify
       end
-      
+
       it "should return nil if no return value set" do
         @mock.should_receive(:something).with("a","b","c")
         @mock.something("a","b","c").should be_nil
         @mock.rspec_verify
       end
-      
+
       it "should raise exception if args dont match when method called" do
         @mock.should_receive(:something).with("a","b","c").and_return("booh")
         lambda {
@@ -84,14 +84,14 @@ module Spec
           violated
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :something with (\"a\", \"b\", \"c\") but received it with (\"a\", \"d\", \"c\")")
       end
-           
+
       it "should fail if unexpected method called" do
         lambda {
           @mock.something("a","b","c")
           violated
         }.should raise_error(MockExpectationError, "Mock 'test mock' received unexpected message :something with (\"a\", \"b\", \"c\")")
       end
-        
+
       it "should use block for expectation if provided" do
         @mock.should_receive(:something) do | a, b |
           a.should == "a"
@@ -101,14 +101,14 @@ module Spec
         @mock.something("a", "b").should == "booh"
         @mock.rspec_verify
       end
-        
+
       it "should fail if expectation block fails" do
         @mock.should_receive(:something) {| bool | bool.should be_true}
         lambda {
           @mock.something false
         }.should raise_error(MockExpectationError, /Mock 'test mock' received :something but passed block failed with: expected true, got false/)
       end
-        
+
       it "should fail right away when method defined as never is received" do
         pending "Used to pass (false positive). Which one is wrong, the spec or the actual behavior?"
 
@@ -117,11 +117,11 @@ module Spec
           @mock.not_expected
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :not_expected 0 times, but received it 1 times")
       end
-      
+
       it "should eventually fail when method defined as never is received" do
         @mock.should_receive(:not_expected).never
         @mock.not_expected
-          
+
         lambda {
           @mock.rspec_verify
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :not_expected with (any args) 0 times, but received it once")
@@ -133,7 +133,7 @@ module Spec
           @mock.something
         end.should raise_error(RuntimeError)
       end
-       
+
       it "should raise passed an Exception instance" do
         error = RuntimeError.new("error message")
         @mock.should_receive(:something).and_raise(error)
@@ -141,28 +141,28 @@ module Spec
           @mock.something
         }.should raise_error(RuntimeError, "error message")
       end
-      
+
       it "should raise RuntimeError with passed message" do
         @mock.should_receive(:something).and_raise("error message")
         lambda {
           @mock.something
         }.should raise_error(RuntimeError, "error message")
       end
-       
+
       it "should not raise when told to if args dont match" do
         @mock.should_receive(:something).with(2).and_raise(RuntimeError)
         lambda {
           @mock.something 1
         }.should raise_error(MockExpectationError)
       end
-       
+
       it "should throw when told to" do
         @mock.should_receive(:something).and_throw(:blech)
         lambda {
           @mock.something
         }.should throw_symbol(:blech)
       end
-      
+
       it "should raise when explicit return and block constrained" do
         lambda {
           @mock.should_receive(:fruit) do |colour|
@@ -170,7 +170,7 @@ module Spec
           end.and_return :apple
         }.should raise_error(AmbiguousReturnError)
       end
-      
+
       it "should ignore args on any args" do
         @mock.should_receive(:something).at_least(:once).with(any_args)
         @mock.something
@@ -179,7 +179,7 @@ module Spec
         @mock.something [], {}, "joe", 7
         @mock.rspec_verify
       end
-      
+
       it "should fail on no args if any args received" do
         @mock.should_receive(:something).with(no_args())
         lambda {
@@ -193,7 +193,7 @@ module Spec
           @mock.something
         }.should raise_error(MockExpectationError, "Mock 'test mock' expected :something with (1) but received it with (no args)")
       end
-      
+
       it "should yield 0 args to blocks that take a variable number of arguments" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield
         a = nil
@@ -201,7 +201,7 @@ module Spec
         a.should == []
         @mock.rspec_verify
       end
-      
+
       it "should yield 0 args multiple times to blocks that take a variable number of arguments" do
         @mock.should_receive(:yield_back).once.with(no_args()).once.and_yield.
                                                                     and_yield
@@ -211,7 +211,7 @@ module Spec
         b.should == [ [], [] ]
         @mock.rspec_verify
       end
-      
+
       it "should yield one arg to blocks that take a variable number of arguments" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield(99)
         a = nil
@@ -219,7 +219,7 @@ module Spec
         a.should == [99]
         @mock.rspec_verify
       end
-      
+
       it "should yield one arg 3 times consecutively to blocks that take a variable number of arguments" do
         @mock.should_receive(:yield_back).once.with(no_args()).once.and_yield(99).
                                                                     and_yield(43).
@@ -230,7 +230,7 @@ module Spec
         b.should == [[99], [43], ["something fruity"]]
         @mock.rspec_verify
       end
-      
+
       it "should yield many args to blocks that take a variable number of arguments" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield(99, 27, "go")
         a = nil
@@ -249,7 +249,7 @@ module Spec
         b.should == [[99, :green, "go"], ["wait", :amber], ["stop", 12, :red]]
         @mock.rspec_verify
       end
-      
+
       it "should yield single value" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield(99)
         a = nil
@@ -257,7 +257,7 @@ module Spec
         a.should == 99
         @mock.rspec_verify
       end
-      
+
       it "should yield single value 3 times consecutively" do
         @mock.should_receive(:yield_back).once.with(no_args()).once.and_yield(99).
                                                                     and_yield(43).
@@ -268,7 +268,7 @@ module Spec
         b.should == [99, 43, "something fruity"]
         @mock.rspec_verify
       end
-      
+
       it "should yield two values" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield('wha', 'zup')
         a, b = nil
@@ -277,7 +277,7 @@ module Spec
         b.should == 'zup'
         @mock.rspec_verify
       end
-      
+
       it "should yield two values 3 times consecutively" do
         @mock.should_receive(:yield_back).once.with(no_args()).once.and_yield('wha', 'zup').
                                                                     and_yield('not', 'down').
@@ -288,14 +288,14 @@ module Spec
         c.should == [['wha', 'zup'], ['not', 'down'], [14, 65]]
         @mock.rspec_verify
       end
-      
+
       it "should fail when calling yielding method with wrong arity" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield('wha', 'zup')
         lambda {
           @mock.yield_back {|a|}
         }.should raise_error(MockExpectationError, "Mock 'test mock' yielded |\"wha\", \"zup\"| to block with arity of 1")
       end
-      
+
       it "should fail when calling yielding method consecutively with wrong arity" do
         @mock.should_receive(:yield_back).once.with(no_args()).once.and_yield('wha', 'zup').
                                                                     and_yield('down').
@@ -306,32 +306,32 @@ module Spec
           @mock.yield_back {|a,b| c << [a, b]}
         }.should raise_error(MockExpectationError, "Mock 'test mock' yielded |\"down\"| to block with arity of 2")
       end
-      
+
       it "should fail when calling yielding method without block" do
         @mock.should_receive(:yield_back).with(no_args()).once.and_yield('wha', 'zup')
         lambda {
           @mock.yield_back
         }.should raise_error(MockExpectationError, "Mock 'test mock' asked to yield |[\"wha\", \"zup\"]| but no block was passed")
       end
-      
+
       it "should be able to mock send" do
         @mock.should_receive(:send).with(any_args)
         @mock.send 'hi'
         @mock.rspec_verify
       end
-      
+
       it "should be able to raise from method calling yielding mock" do
         @mock.should_receive(:yield_me).and_yield 44
-        
+
         lambda {
           @mock.yield_me do |x|
             raise "Bang"
           end
         }.should raise_error(StandardError, "Bang")
-      
+
         @mock.rspec_verify
       end
-      
+
       it "should clear expectations after verify" do
         @mock.should_receive(:foobar)
         @mock.foobar
@@ -340,7 +340,7 @@ module Spec
           @mock.foobar
         }.should raise_error(MockExpectationError, "Mock 'test mock' received unexpected message :foobar with (no args)")
       end
-      
+
       it "should restore objects to their original state on rspec_reset" do
         mock = mock("this is a mock")
         mock.should_receive(:blah)
@@ -351,28 +351,28 @@ module Spec
       it "should work even after method_missing starts raising NameErrors instead of NoMethodErrors" do
         # Object#method_missing throws either NameErrors or NoMethodErrors.
         #
-        # On a fresh ruby program Object#method_missing: 
+        # On a fresh ruby program Object#method_missing:
         #  * raises a NoMethodError when called directly
         #  * raises a NameError when called indirectly
         #
         # Once Object#method_missing has been called at least once (on any object)
-        # it starts behaving differently: 
+        # it starts behaving differently:
         #  * raises a NameError when called directly
         #  * raises a NameError when called indirectly
         #
         # There was a bug in Mock#method_missing that relied on the fact
         # that calling Object#method_missing directly raises a NoMethodError.
         # This example tests that the bug doesn't exist anymore.
-        
-        
+
+
         # Ensures that method_missing always raises NameErrors.
         a_method_that_doesnt_exist rescue
-        
-        
+
+
         @mock.should_receive(:foobar)
         @mock.foobar
         @mock.rspec_verify
-                
+
         lambda { @mock.foobar }.should_not raise_error(NameError)
         lambda { @mock.foobar }.should raise_error(MockExpectationError)
       end
@@ -383,11 +383,11 @@ module Spec
         @mock = mock("mock")
         @calls = 0
       end
-      
+
       def add_call
         @calls = @calls + 1
       end
-      
+
       it "should call the block after #should_receive" do
         @mock.should_receive(:foo) { add_call }
 
@@ -415,7 +415,7 @@ module Spec
 
       it "should call the block after #times" do
         @mock.should_receive(:foo).exactly(10).times { add_call }
-        
+
         (1..10).each { @mock.foo }
 
         @calls.should == 10
@@ -423,7 +423,7 @@ module Spec
 
       it "should call the block after #any_number_of_times" do
         @mock.should_receive(:foo).any_number_of_times { add_call }
-        
+
         (1..7).each { @mock.foo }
 
         @calls.should == 7
@@ -431,7 +431,7 @@ module Spec
 
       it "should call the block after #with" do
         @mock.should_receive(:foo).with(:arg) { add_call }
-        
+
         @mock.foo(:arg)
 
         @calls.should == 1
@@ -440,7 +440,7 @@ module Spec
       it "should call the block after #ordered" do
         @mock.should_receive(:foo).ordered { add_call }
         @mock.should_receive(:bar).ordered { add_call }
-        
+
         @mock.foo
         @mock.bar
 

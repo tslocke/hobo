@@ -10,7 +10,7 @@ describe "State created in before(:all)" do
   before :each do
     @isolated = 1
   end
-  
+
   it "should be accessible from example" do
     @sideeffect.should == 1
     $global.should == 1
@@ -32,7 +32,7 @@ describe "State created in before(:all)" do
   after :each do
     $global += 1
   end
-  
+
   after :all do
     $global.should == 3
     $global = 0

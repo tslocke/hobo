@@ -12,7 +12,7 @@ module Spec
           err.rewind
           err.read.should =~ /No server is running/
         end
-      end    
+      end
     end
 
     class DrbCommandLineSpec < ::Spec::DSL::Example
@@ -23,7 +23,7 @@ module Spec
           exit Spec::Runner::CommandLine.run(OptionParser.parse(argv, stderr, stdout))
         end
       end
-      
+
       unless Config::CONFIG['ruby_install_name'] == 'jruby'
         before(:all) do
           DRb.start_service("druby://localhost:8989", CommandLineForSpec)

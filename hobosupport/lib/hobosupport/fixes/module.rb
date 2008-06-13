@@ -1,5 +1,5 @@
 class Module
-  
+
   # Custom alias_method_chain that won't cause inifinite recursion if
   # called twice.
   # Calling alias_method_chain on alias_method_chain
@@ -16,7 +16,7 @@ class Module
     end
   end
 
-  
+
   # Fix delegate so it doesn't go bang if 'to' is nil
   def delegate(*methods)
     options = methods.pop
@@ -33,5 +33,5 @@ class Module
       EOS
     end
   end
-    
+
 end

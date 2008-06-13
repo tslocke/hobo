@@ -8,7 +8,7 @@ module Spec
         @return_values = ["1",2,Object.new]
         @mock.should_receive(:message).and_return(@return_values[0],@return_values[1],@return_values[2])
       end
-      
+
       it "should return values in order to consecutive calls" do
         @mock.message.should == @return_values[0]
         @mock.message.should == @return_values[1]
@@ -69,7 +69,7 @@ module Spec
         @mock = Mock.new("mock")
         @mock.should_receive(:message).at_least(:twice).with(no_args).and_return(11, 22)
       end
-      
+
       it "should use last return value for subsequent calls" do
         @mock.message.should equal(11)
         @mock.message.should equal(22)
@@ -87,7 +87,7 @@ module Spec
         @mock = Mock.new("mock")
         @mock.should_receive(:message).exactly(3).times.and_return(11, 22)
       end
-      
+
       it "should use last return value for subsequent calls" do
         @mock.message.should equal(11)
         @mock.message.should equal(22)

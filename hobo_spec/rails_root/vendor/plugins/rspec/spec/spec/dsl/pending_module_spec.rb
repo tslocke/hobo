@@ -1,14 +1,14 @@
 module Spec
   module DSL
     describe Pending do
-      
+
       it 'should raise an ExamplePendingError if no block is supplied' do
         lambda {
           include Pending
           pending "TODO"
         }.should raise_error(ExamplePendingError, /TODO/)
       end
-      
+
       it 'should raise an ExamplePendingError if a supplied block fails as expected' do
         lambda {
           include Pending
@@ -17,7 +17,7 @@ module Spec
           end
         }.should raise_error(ExamplePendingError, /TODO/)
       end
-      
+
       it 'should raise a PendingFixedError if a supplied block starts working' do
         lambda {
           include Pending

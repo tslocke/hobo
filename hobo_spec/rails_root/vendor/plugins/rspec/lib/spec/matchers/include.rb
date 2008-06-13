@@ -2,11 +2,11 @@ module Spec
   module Matchers
 
     class Include #:nodoc:
-      
+
       def initialize(*expecteds)
         @expecteds = expecteds
       end
-      
+
       def matches?(actual)
         @actual = actual
         @expecteds.each do |expected|
@@ -14,24 +14,24 @@ module Spec
         end
         true
       end
-      
+
       def failure_message
         _message
       end
-      
+
       def negative_failure_message
         _message("not ")
       end
-      
+
       def description
         "include #{_pretty_print(@expecteds)}"
       end
-      
+
       private
         def _message(maybe_not="")
           "expected #{@actual.inspect} #{maybe_not}to include #{_pretty_print(@expecteds)}"
         end
-        
+
         def _pretty_print(array)
           result = ""
           array.each_with_index do |item, index|

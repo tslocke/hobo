@@ -12,11 +12,11 @@ require 'will_paginate'
 WillPaginate.enable_actionpack
 
 class PaginationTest < Test::Unit::TestCase
-  
+
   class DevelopersController < ActionController::Base
     def list_developers
       @options = session[:wp] || {}
-      
+
       @developers = (1..11).to_a.paginate(
         :page => params[@options[:param_name] || :page] || 1,
         :per_page => params[:per_page] || 4
@@ -35,7 +35,7 @@ class PaginationTest < Test::Unit::TestCase
       def rescue_errors(e) raise e end
       def rescue_action(e) raise e end
   end
-  
+
   def setup
     @controller = DevelopersController.new
     @request    = ActionController::TestRequest.new
@@ -67,7 +67,7 @@ class PaginationTest < Test::Unit::TestCase
       :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next'
     }
     assert_response :success
-    
+
     entries = assigns :developers
     assert entries
     assert_equal 4, entries.size
@@ -102,36 +102,36 @@ class PaginationTest < Test::Unit::TestCase
       validate_page_numbers [1,3], elements
     end
   end
-  
+
   def test_will_paginate_preserves_parameters_on_get
     get :list_developers, :foo => { :bar => 'baz' }
     assert_links_match /foo%5Bbar%5D=baz/
   end
-  
+
   def test_will_paginate_doesnt_preserve_parameters_on_post
     post :list_developers, :foo => 'bar'
     assert_no_links_match /foo=bar/
   end
-  
+
   def test_adding_additional_parameters
     get :list_developers, {}, :wp => { :params => { :foo => 'bar' } }
     assert_links_match /foo=bar/
   end
-  
+
   def test_removing_arbitrary_parameters
     get :list_developers, { :foo => 'bar' }, :wp => { :params => { :foo => nil } }
     assert_no_links_match /foo=bar/
   end
-    
+
   def test_adding_additional_route_parameters
     get :list_developers, {}, :wp => { :params => { :controller => 'baz' } }
     assert_links_match %r{\Wbaz/list_developers\W}
   end
-  
+
   def test_will_paginate_with_custom_page_param
     get :list_developers, { :developers_page => 2 }, :wp => { :param_name => :developers_page }
     assert_response :success
-    
+
     entries = assigns :developers
     assert entries
     assert_equal 4, entries.size
@@ -141,13 +141,13 @@ class PaginationTest < Test::Unit::TestCase
         validate_page_numbers [1,1,3,3], elements, :developers_page
       end
       assert_select 'span.current', entries.current_page.to_s
-    end    
+    end
   end
 
   def test_will_paginate_windows
     get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 1 }
     assert_response :success
-    
+
     entries = assigns :developers
     assert entries
     assert_equal 1, entries.size
@@ -166,7 +166,7 @@ class PaginationTest < Test::Unit::TestCase
   def test_will_paginate_eliminates_small_gaps
     get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 2 }
     assert_response :success
-    
+
     assert_select 'div.pagination', 1, 'no main DIV' do
       assert_select 'a[href]', 12 do |elements|
         validate_page_numbers [5,1,2,3,4,5,7,8,9,10,11,7], elements
@@ -182,7 +182,7 @@ class PaginationTest < Test::Unit::TestCase
 
     assert_equal '', @response.body
   end
-  
+
   def test_faulty_input_raises_error
     assert_raise WillPaginate::InvalidPage do
       get :list_developers, :page => 'foo'
@@ -196,7 +196,7 @@ class PaginationTest < Test::Unit::TestCase
       get :guess_collection_name, {}, :wp => collection
     end
   end
-  
+
   def test_inferred_collection_name_raises_error_when_nil
     ex = assert_raise ArgumentError do
       get :guess_collection_name, {}, :wp => nil
@@ -227,12 +227,12 @@ class PaginationTest < Test::Unit::TestCase
         DevelopersController.rescue_responses['WillPaginate::InvalidPage']
     end
   end
-  
+
 protected
 
   def validate_page_numbers expected, links, param_name = :page
     param_pattern = /\W#{param_name}=([^&]*)/
-    
+
     assert_equal(expected, links.map { |e|
       e['href'] =~ param_pattern
       $1 ? $1.to_i : $1
@@ -264,7 +264,7 @@ class ViewHelpersTest < Test::Unit::TestCase
     collection = arr.paginate :page => 2, :per_page => 5
     assert_equal %{Displaying entries <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
       page_entries_info(collection)
-    
+
     collection = arr.paginate :page => 7, :per_page => 4
     assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
       page_entries_info(collection)

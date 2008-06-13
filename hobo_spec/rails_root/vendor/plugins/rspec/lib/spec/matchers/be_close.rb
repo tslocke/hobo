@@ -6,21 +6,21 @@ module Spec
         @expected = expected
         @delta = delta
       end
-      
+
       def matches?(actual)
         @actual = actual
         (@actual - @expected).abs < @delta
       end
-      
+
       def failure_message
         "expected #{@expected} +/- (< #{@delta}), got #{@actual}"
       end
-      
+
       def description
         "be close to #{@expected} (within +- #{@delta})"
       end
     end
-    
+
     # :call-seq:
     #   should be_close(expected, delta)
     #   should_not be_close(expected, delta)

@@ -13,7 +13,7 @@ class IntegratingRSpecExpectationsIntoTestCaseTest < Test::Unit::TestCase
   def test_should_support_rspecs_comparison_expectations
     5.should be > 4
   end
-  
+
   class Band
     def players
       ["John", "Paul", "George", "Ringo"]

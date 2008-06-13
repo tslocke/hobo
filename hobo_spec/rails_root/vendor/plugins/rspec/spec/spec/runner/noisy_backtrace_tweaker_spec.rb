@@ -7,7 +7,7 @@ module Spec
         @error = RuntimeError.new
         @tweaker = NoisyBacktraceTweaker.new
       end
-        
+
       it "should leave anything in lib spec dir" do
         ["expectations", "mocks", "runner", "stubs"].each do |child|
           @error.set_backtrace(["/lib/spec/#{child}/anything.rb"])
@@ -33,13 +33,13 @@ module Spec
           @tweaker.tweak_backtrace(@error, "spec name")
         end.should_not raise_error
       end
-      
+
       it "should clean up double slashes" do
         @error.set_backtrace(["/a//b/c//d.rb"])
         @tweaker.tweak_backtrace(@error, "spec name")
         @error.backtrace.should include("/a/b/c/d.rb")
       end
-      
+
     end
   end
 end

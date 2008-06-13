@@ -39,7 +39,7 @@ describe "mock_model with null_object", :behaviour_type => :view do
   before(:each) do
     @model = mock_model(MockableModel, :null_object => true, :mocked_method => "mocked")
   end
-  
+
   it "should be able to mock methods" do
     @model.mocked_method.should == "mocked"
   end
@@ -54,7 +54,7 @@ describe "mock_model as association", :behaviour_type => :view do
     @mock_model = mock_model(MockableModel)
     @real.mockable_model = @mock_model
   end
-  
+
   it "should pass associated_model == mock" do
       @mock_model.should == @real.mockable_model
   end

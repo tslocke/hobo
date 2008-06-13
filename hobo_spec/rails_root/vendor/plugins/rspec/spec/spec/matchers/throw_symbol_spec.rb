@@ -20,10 +20,10 @@ module Spec
         @matcher.negative_failure_message.should == "expected no Symbol, got :sym"
       end
     end
-    
+
     describe ThrowSymbol, "(constructed with a Symbol)" do
       before(:each) { @matcher = ThrowSymbol.new(:sym) }
-      
+
       it "should match if correct Symbol is thrown" do
         @matcher.matches?(lambda{ throw :sym }).should be_true
       end

@@ -1,9 +1,9 @@
 module Hobo::Dryml::Parser
-  
+
   class BaseParser < REXML::Parsers::BaseParser
-    
+
     NEW_REX = defined?(REXML::VERSION) && REXML::VERSION =~ /3\.1\.(\d)(?:\.(\d))?/ && $1.to_i*1000 + $2.to_i >= 7002
-    
+
     DRYML_NAME_STR          = "#{NCNAME_STR}(?::(?:#{NCNAME_STR})?)?"
     DRYML_ATTRIBUTE_PATTERN = if NEW_REX
                                 /\s*(#{NAME_STR})(?:\s*=\s*(["'])(.*?)\4)?/um
@@ -16,10 +16,10 @@ module Hobo::Dryml::Parser
                                 /^<((?>#{DRYML_NAME_STR}))\s*((?>\s+#{NAME_STR}(?:\s*=\s*(["']).*?\3)?)*)\s*(\/)?>/um
                               end
     DRYML_CLOSE_MATCH       = /^\s*<\/(#{DRYML_NAME_STR})\s*>/um
-    
+
     # For compatibility with REXML 3.1.7.3
-    IDENTITY = /^([!\*\w\-]+)(\s+#{NCNAME_STR})?(\s+["'](.*?)['"])?(\s+['"](.*?)["'])?/u 
-    
+    IDENTITY = /^([!\*\w\-]+)(\s+#{NCNAME_STR})?(\s+["'](.*?)['"])?(\s+['"](.*?)["'])?/u
+
     def pull
       if @closed
         x, @closed = @closed, nil
@@ -87,7 +87,7 @@ module Hobo::Dryml::Parser
       if @document_status == :in_doctype
         md = @source.match(/\s*(.*?>)/um)
         case md[1]
-        when SYSTEMENTITY 
+        when SYSTEMENTITY
           match = @source.match( SYSTEMENTITY, true )[1]
           return [ :externalentity, match ]
 
@@ -165,10 +165,10 @@ module Hobo::Dryml::Parser
             last_tag, line_no = @tags.pop
             #md = @source.match_to_consume( '>', CLOSE_MATCH)
             md = @source.match(DRYML_CLOSE_MATCH, true)
-            
+
             valid_end_tag = last_tag =~ /^#{Regexp.escape(md[1])}(:.*)?$/
             raise REXML::ParseException.new( "Missing end tag for "+
-                                             "'#{last_tag}' (line #{line_no}) (got \"#{md[1]}\")", 
+                                             "'#{last_tag}' (line #{line_no}) (got \"#{md[1]}\")",
                                              @source) unless valid_end_tag
             return [ :end_element, last_tag, true ]
           elsif @source.buffer[1] == ?!
@@ -202,15 +202,15 @@ module Hobo::Dryml::Parser
               # Check for missing attribute quotes
               raise REXML::ParseException.new("missing attribute quote", @source) if
                 defined?(MISSING_ATTRIBUTE_QUOTES) && @source.match(MISSING_ATTRIBUTE_QUOTES)
-              raise REXML::ParseException.new("malformed XML: missing tag start", @source) 
-              
+              raise REXML::ParseException.new("malformed XML: missing tag start", @source)
+
             end
             attributes = {}
             #@nsstack.unshift(curr_ns=Set.new)
             if md[2].size > 0
               attrs = md[2].scan(DRYML_ATTRIBUTE_PATTERN)
               raise REXML::ParseException.new( "error parsing attributes: [#{attrs.join ', '}], excess = \"#$'\"", @source) if $' and $'.strip.size > 0
-              attrs.each { |a,b,c,d,e| 
+              attrs.each { |a,b,c,d,e|
                 val = NEW_REX ? e : c
                 if attributes.has_key? a
                   msg = "Duplicate attribute #{a.inspect}"
@@ -219,7 +219,7 @@ module Hobo::Dryml::Parser
                 attributes[a] = val || true
               }
             end
-            
+
             if md[NEW_REX ? 6 : 4]
               @closed = md[1]
               #@nsstack.shift
@@ -250,5 +250,5 @@ module Hobo::Dryml::Parser
       return [ :dummy ]
     end
   end
-  
+
 end

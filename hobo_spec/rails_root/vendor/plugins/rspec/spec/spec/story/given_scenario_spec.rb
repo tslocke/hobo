@@ -13,12 +13,12 @@ module Spec
           @scenario_ran = true
         end
         Runner::StoryRunner.should_receive(:scenario_from_current_story).with('scenario name').and_return(scenario)
-        
+
         step = GivenScenario.new 'scenario name'
-        
+
         # when
         step.perform(instance, nil)
-        
+
         # then
         ensure_that instance.scenario_ran, is(true)
       end

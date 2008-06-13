@@ -1,6 +1,6 @@
 module Spec
   module Matchers
-    
+
     class RaiseError #:nodoc:
       def initialize(error_or_message=Exception, message=nil)
         if String === error_or_message
@@ -11,7 +11,7 @@ module Spec
           @expected_message = message
         end
       end
-      
+
       def matches?(proc)
         @raised_expected_error = false
         @raised_other = false
@@ -42,7 +42,7 @@ module Spec
           return @raised_expected_error
         end
       end
-      
+
       def failure_message
         return "expected #{expected_error}#{actual_error}" if @raised_other || !@raised_expected_error
       end
@@ -50,11 +50,11 @@ module Spec
       def negative_failure_message
         "expected no #{expected_error}#{actual_error}"
       end
-      
+
       def description
         "raise #{expected_error}"
       end
-      
+
       private
         def expected_error
           case @expected_message
@@ -71,7 +71,7 @@ module Spec
           @actual_error.nil? ? " but nothing was raised" : ", got #{@actual_error.inspect}"
         end
     end
-    
+
     # :call-seq:
     #   should raise_error()
     #   should raise_error(NamedError)

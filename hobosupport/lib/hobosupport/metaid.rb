@@ -3,7 +3,7 @@
 class Object
 
   def metaclass; class << self; self; end; end
-  
+
   def meta_eval(src=nil, &blk)
     if src
       metaclass.instance_eval(src)

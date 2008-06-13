@@ -4,7 +4,7 @@ require 'spec/expectations/extensions'
 require 'spec/expectations/handler'
 
 module Spec
-  
+
   # Spec::Expectations lets you set expectations on your objects.
   #
   #   result.should == 37

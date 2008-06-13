@@ -26,9 +26,9 @@ module Spec
       def matches?(name)
         !(matches = name.match(@expression)).nil?
       end
-            
+
       private
-      
+
         def parse_args(name)
           name.match(@expression)[1..-1]
         end

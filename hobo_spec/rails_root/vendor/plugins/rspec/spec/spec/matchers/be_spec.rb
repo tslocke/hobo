@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
-describe "should be_predicate" do  
+describe "should be_predicate" do
   it "should pass when actual returns true for :predicate?" do
     actual = stub("actual", :happy? => true)
     actual.should be_happy
@@ -17,7 +17,7 @@ describe "should be_predicate" do
       actual.should be_happy
     }.should fail_with("expected happy? to return true, got false")
   end
-  
+
   it "should fail when actual does not respond to :predicate?" do
     lambda {
       Object.new.should be_happy
@@ -30,7 +30,7 @@ describe "should_not be_predicate" do
     actual = stub("actual", :happy? => false)
     actual.should_not be_happy
   end
-  
+
   it "should fail when actual returns true for :sym?" do
     actual = stub("actual", :happy? => true)
     lambda {
@@ -59,7 +59,7 @@ describe "should be_predicate(*args)" do
       actual.should be_older_than(3)
     }.should fail_with("expected older_than?(3) to return true, got false")
   end
-  
+
   it "should fail when actual does not respond to :predicate?" do
     lambda {
       Object.new.should be_older_than(3)
@@ -73,7 +73,7 @@ describe "should_not be_predicate(*args)" do
     actual.should_receive(:older_than?).with(3).and_return(false)
     actual.should_not be_older_than(3)
   end
-  
+
   it "should fail when actual returns true for :predicate?(*args)" do
     actual = mock("actual")
     actual.should_receive(:older_than?).with(3).and_return(true)

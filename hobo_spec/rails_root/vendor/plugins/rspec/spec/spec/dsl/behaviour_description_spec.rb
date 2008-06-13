@@ -4,7 +4,7 @@ module Spec
   module DSL
     describe BehaviourDescription, " constructed with a single String" do
       before(:each) {@description = BehaviourDescription.new("abc")}
-      
+
       it "should provide that string as its name" do
         @description.description.should == "abc"
       end
@@ -25,7 +25,7 @@ module Spec
         @description.should == BehaviourDescription.new("abc")
       end
     end
-    
+
     describe BehaviourDescription, " constructed with a Type" do
       before(:each) {@description = BehaviourDescription.new(Example)}
 
@@ -36,10 +36,10 @@ module Spec
         @description.described_type.should == Spec::DSL::Example
       end
     end
-    
+
     describe BehaviourDescription, " constructed with a Type and a String" do
       before(:each) {@description = BehaviourDescription.new(Example, " behaving")}
-      
+
       it "should include the type and second String in its name" do
         @description.description.should == "Spec::DSL::Example behaving"
       end
@@ -79,7 +79,7 @@ module Spec
         @description.description.should == "A Hash with one entry"
       end
     end
-    
+
     describe BehaviourDescription, " constructed with options" do
       before(:each) do
         @description = BehaviourDescription.new(Example, :a => "b", :spec_path => "blah")
@@ -88,7 +88,7 @@ module Spec
       it "should provide its options" do
         @description[:a].should == "b"
       end
-      
+
       it "should wrap spec path using File.expand_path" do
         @description[:spec_path].should == File.expand_path("blah")
       end

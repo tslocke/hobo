@@ -20,7 +20,7 @@ end
 describe "a controller spec running in integration mode", :behaviour_type => :controller do
   controller_name :controller_spec
   integrate_views
-  
+
   before(:each) do
     controller.class.send(:define_method, :rescue_action) { |e| raise e }
   end

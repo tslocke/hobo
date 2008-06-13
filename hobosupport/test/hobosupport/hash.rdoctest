@@ -1,7 +1,7 @@
 # HoboSupport - Hash extensions
 
     >> require 'hobosupport'
-    
+
 ## `Hash#select_hash`
 
 * `hash.select_hash { |key, value| block } => hash`
@@ -11,12 +11,12 @@ This is the Hash version of `Enumerable#select`. i.e. a way to create a new hash
 
     >> {1=>2, 3=>4, 6=>5}.select_hash { |key, value| key < value }
     => {1=>2, 3=>4}
-    
+
 You can also give a block that takes one argument, in which case the block is given the value only
 
     >> {1=>2, 3=>4, 6=>5}.select_hash { |value| value != 2 }
     => {3=>4, 6=>5}
-    
+
 
 ## `Hash#map_hash`
 
@@ -27,13 +27,13 @@ Applies a function to each *value* in a Hash, resulting in a new hash with the s
 
     >> {1=>2, 3=>4, 6=>5}.map_hash { |key, value| key < value }
     => {1=>true, 3=>true, 6=>false}
-    
+
 You can also give a block which takes one argument, in which case only the value is passed in
 
     >> {1=>2, 3=>4, 6=>5}.map_hash { |value| value * 100 }
     => {1=>200, 3=>400, 6=>500 }
 
-    
+
 ## `Hash#partition_hash`
 
 * `hash.partition_hash(keys) => [hash1, hash2]`
@@ -43,12 +43,12 @@ Returns an array of two hashes, the first with all the key/value pairs where the
 
     >> {1=>2, 3=>4, 6=>5}.partition_hash([1, 3])
     => [{1=>2, 3=>4}, {6=>5}]
-    
+
 When passed a block, each pair is passed to the block in turn. The result is two hashes, the first containing those pairs for which the block returned true, the second with the remaining pairs
 
     >> {1=>2, 3=>4, 6=>5}.partition_hash { |key, value| key < value }
     => [{1=>2, 3=>4}, {6=>5}]
-    
+
 ## `Hash.recursive_update`
 
 * `hash.recursive_update(hash2)`
@@ -69,7 +69,7 @@ Returns a new hash, the left-hand-side hash with all pairs removed where the key
 
     >> {1=>2, 3=>4, 6=>5} - [1, 3]
     => {6 => 5}
-    
+
 ## `Hash#&`
 
 * `hash & array => array`
@@ -78,7 +78,7 @@ Returns a new array, the left hand side hash restricted to pairs where the key i
 
     >> {1=>2, 3=>4, 6=>5} & [1, 3]
     => {1=>2, 3=>4}
-    
+
 ## `Hash#|`
 
 * `hash | hash => hash`
@@ -87,8 +87,8 @@ An alias for merge
 
     >> {1 => 2} | {1 => 3, 2 => 4}
     => {1 => 3, 2 => 4}
-    
-    
+
+
 ## `Hash#get`
 
 * `hash.get(*args) => hash`
@@ -97,7 +97,7 @@ Returns an array of values for the given keys. Useful for extracting a few optio
 
     >> {1=>2, 3=>4, 6=>5}.get(1, 3)
     => [2, 4]
-    
+
 ## `Hash#compact`
 
 * `hash.compact => hash`
@@ -106,7 +106,7 @@ Returns a hash with the same items as the receiver except those where the value 
 
     >> {1=>'a', 2=>nil, 3=>'b'}.compact
     => {1=>'a', 3=>'b'}
-    
+
 ## `Hash#compact`
 
 * `hash.compact!`
@@ -117,6 +117,6 @@ Removes every pair from the hash where the value is nil
     >> h.compact!
     >> h
     => {1=>'a', 3=>'b'}
-    
+
 
 

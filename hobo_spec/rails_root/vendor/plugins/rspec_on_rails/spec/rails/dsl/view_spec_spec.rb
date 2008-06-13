@@ -81,13 +81,13 @@ describe "A template that includes a partial", :behaviour_type => :view do
     render!
     response.should have_tag('div', "This is text from a method in the ApplicationHelper")
   end
-  
+
   it "should pass expect_render with the right partial" do
     template.expect_render(:partial => 'partial')
     render!
     template.verify_rendered
   end
-  
+
   it "should fail expect_render with the wrong partial" do
     template.expect_render(:partial => 'non_existent')
     render!
@@ -98,13 +98,13 @@ describe "A template that includes a partial", :behaviour_type => :view do
       e.backtrace.find{|line| line =~ /view_spec_spec\.rb\:92/}.should_not be_nil
     end
   end
-  
+
   it "should pass expect_render when a partial is expected twice and happens twice" do
     template.expect_render(:partial => 'partial_used_twice').twice
     render!
     template.verify_rendered
   end
-  
+
   it "should pass expect_render when a partial is expected once and happens twice" do
     template.expect_render(:partial => 'partial_used_twice')
     render!
@@ -115,7 +115,7 @@ describe "A template that includes a partial", :behaviour_type => :view do
       e.backtrace.find{|line| line =~ /view_spec_spec\.rb\:109/}.should_not be_nil
     end
   end
-  
+
   it "should fail expect_render with the right partial but wrong options" do
     template.expect_render(:partial => 'partial', :locals => {:thing => Object.new})
     render!
@@ -177,7 +177,7 @@ describe "A view that includes a partial using an array as partial_path", :behav
   end
 
   it "should render have the array passed through to render_partial without modification" do
-    render "view_spec/template_with_partial_with_array" 
+    render "view_spec/template_with_partial_with_array"
     response.body.should match(/^Array Partial$/)
   end
 end
@@ -221,11 +221,11 @@ describe "An instantiated ViewExampleController", :behaviour_type => :view do
   before do
     render "view_spec/foo/show"
   end
-  
+
   it "should return the name of the real controller that it replaces" do
     @controller.controller_name.should == 'foo'
   end
-  
+
   it "should return the path of the real controller that it replaces" do
     @controller.controller_path.should == 'view_spec/foo'
   end

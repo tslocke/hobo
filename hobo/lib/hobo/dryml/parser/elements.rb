@@ -1,31 +1,31 @@
 module Hobo::Dryml::Parser
 
   class Element < REXML::Element
-    
+
     def initialize(*args)
       super
       @elements = Hobo::Dryml::Parser::Elements.new(self)
     end
-    
+
     def dryml_name
       expanded_name.sub(/:.*/, "")
     end
-    
+
     attr_accessor :start_tag_source, :source_offset
-    
+
     attr_writer :has_end_tag
     def has_end_tag?
       @has_end_tag
     end
-    
+
     def parameter_tag?
       expanded_name =~ /:$/
     end
-    
+
   end
-  
+
   class Elements < REXML::Elements
-    
+
     # Override to ensure DRYML elements are created
     def add(element=nil)
       rv = nil
@@ -39,7 +39,7 @@ module Hobo::Dryml::Parser
         element
       end
     end
-    
+
   end
 
 end

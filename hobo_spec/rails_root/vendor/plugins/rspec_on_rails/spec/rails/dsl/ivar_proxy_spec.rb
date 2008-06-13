@@ -4,12 +4,12 @@ describe "IvarProxy setup", :shared => true do
   before do
     @object = Object.new
     @proxy = Spec::Rails::DSL::IvarProxy.new(@object)
-  end  
+  end
 end
 
 describe "IvarProxy" do
   it_should_behave_like "IvarProxy setup"
-  
+
   it "has [] accessor" do
     @proxy['foo'] = 'bar'
     @object.instance_variable_get(:@foo).should == 'bar'
@@ -41,7 +41,7 @@ end
 
 describe "IvarProxy", "#delete" do
   it_should_behave_like "IvarProxy setup"
-  
+
   it "deletes the element with key" do
     @proxy['foo'] = 'bar'
     @proxy.delete('foo').should == 'bar'

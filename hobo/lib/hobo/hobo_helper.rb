@@ -302,7 +302,7 @@ module Hobo
       send("#{user_class.name.underscore}_forgot_password_url") rescue nil
     end
 
-    
+
     # Login url for a given user record or user class
     def login_url(user_class=Hobo::User.default_user_model)
       send("#{user_class.name.underscore}_login_url") rescue nil
@@ -314,7 +314,7 @@ module Hobo
       send("#{user_class.name.underscore}_signup_url") rescue nil
     end
 
-    
+
     # Login url for a given user record or user class
     def logout_url(user_or_class=nil)
       c = if user_or_class.nil?

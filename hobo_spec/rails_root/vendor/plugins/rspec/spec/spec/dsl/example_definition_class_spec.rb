@@ -9,7 +9,7 @@ module Spec
         @example_definition_class = ExampleDefinition.dup
         @behaviour = Class.new(Example).describe("My Behaviour")
       end
-      
+
       it "should report errors in example" do
         error = Exception.new
         example_definition = @example_definition_class.new("example") {raise(error)}

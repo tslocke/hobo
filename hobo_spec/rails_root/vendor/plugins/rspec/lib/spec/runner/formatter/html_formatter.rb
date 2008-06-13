@@ -5,7 +5,7 @@ module Spec
     module Formatter
       class HtmlFormatter < BaseTextFormatter
         include ERB::Util # for the #h method
-        
+
         def initialize(options, output)
           super
           @current_behaviour_number = 0
@@ -16,12 +16,12 @@ module Spec
         def current_behaviour_number
           @current_behaviour_number
         end
-        
+
         # The number of the currently running example (a global counter)
         def current_example_number
           @current_example_number
         end
-        
+
         def start(example_count)
           @example_count = example_count
 
@@ -93,7 +93,7 @@ module Spec
         def extra_failure_content(failure)
           "    <pre class=\"ruby\"><code>#{@snippet_extractor.snippet(failure.exception)}</code></pre>"
         end
-        
+
         def move_progress
           percent_done = @example_count == 0 ? 100.0 : ((current_example_number + 1).to_f / @example_count.to_f * 1000).to_i / 10.0
           @output.puts "    <script type=\"text/javascript\">moveProgressBar('#{percent_done}');</script>"
@@ -108,7 +108,7 @@ module Spec
             totals = "This was a dry-run"
           else
             totals = "#{example_count} example#{'s' unless example_count == 1}, #{failure_count} failure#{'s' unless failure_count == 1}"
-            totals << ", #{pending_count} pending" if pending_count > 0  
+            totals << ", #{pending_count} pending" if pending_count > 0
           end
           @output.puts "<script type=\"text/javascript\">document.getElementById('duration').innerHTML = \"Finished in <strong>#{duration} seconds</strong>\";</script>"
           @output.puts "<script type=\"text/javascript\">document.getElementById('totals').innerHTML = \"#{totals}\";</script>"
@@ -119,10 +119,10 @@ module Spec
           @output.flush
         end
 
-        def html_header 
+        def html_header
           <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html 
+<!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -193,7 +193,7 @@ function makeYellow(element_id) {
 }
 EOF
         end
-        
+
         def global_styles
           <<-EOF
 #rspec-header {

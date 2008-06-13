@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
 module Spec
   module Mocks
-    
+
     describe "AnyNumberOfTimes" do
       before(:each) do
         @mock = Mock.new("test mock")
@@ -19,7 +19,7 @@ module Spec
         @mock.should_receive(:random_call).any_number_of_times
         @mock.random_call
       end
-      
+
       it "should pass if any number of times method is not called" do
         @mock.should_receive(:random_call).any_number_of_times
       end

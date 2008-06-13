@@ -115,7 +115,7 @@ module Spec
         @options.current_argv = @argv
         return if parse_generate_options
         return if parse_drb
-        
+
         super(@argv) do |file|
           @options.files << file
           blk.call(file) if blk
@@ -147,7 +147,7 @@ module Spec
             options_file = @argv.delete_at(index)
           end
         end
-        
+
         if options_file
           write_generated_options(options_file)
           return true
@@ -155,7 +155,7 @@ module Spec
           return false
         end
       end
-      
+
       def write_generated_options(options_file)
         File.open(options_file, 'w') do |io|
           io.puts @argv.join("\n")
@@ -185,7 +185,7 @@ module Spec
       def parse_help
         @out_stream.puts self
         exit if stdout?
-      end      
+      end
 
       def set_spec_from_line_number
         if @options.examples.empty?

@@ -1,11 +1,11 @@
 module Spec
   module Matchers
-  
+
     class Equal #:nodoc:
       def initialize(expected)
         @expected = expected
       end
-  
+
       def matches?(actual)
         @actual = actual
         @actual.equal?(@expected)
@@ -18,12 +18,12 @@ module Spec
       def negative_failure_message
         return "expected #{@actual.inspect} not to equal #{@expected.inspect} (using .equal?)", @expected, @actual
       end
-      
+
       def description
         "equal #{@expected.inspect}"
       end
     end
-    
+
     # :call-seq:
     #   should equal(expected)
     #   should_not equal(expected)

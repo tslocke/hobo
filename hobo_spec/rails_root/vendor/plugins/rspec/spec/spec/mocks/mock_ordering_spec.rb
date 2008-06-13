@@ -8,7 +8,7 @@ module Spec
       before do
         @mock = mock("test mock")
       end
-      
+
       after do
         @mock.rspec_reset
       end
@@ -48,7 +48,7 @@ module Spec
           @mock.three
         end.should raise_error(MockExpectationError, "Mock 'test mock' received :three out of order")
       end
-      
+
       it "should fail if third call comes second" do
         @mock.should_receive(:one).ordered
         @mock.should_receive(:two).ordered
@@ -78,7 +78,7 @@ module Spec
         @mock.ignored_1
         @mock.rspec_verify
       end
-            
+
     end
   end
 end

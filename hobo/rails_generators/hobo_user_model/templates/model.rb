@@ -10,7 +10,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   set_admin_on_first_user
-  
+
   # --- Hobo Permissions --- #
 
   # It is possible to override the permission system entirely by

@@ -12,7 +12,7 @@ module Spec
         def run_options
           @run_options ||= ::Spec::Runner::OptionParser.parse(ARGV, $stderr, $stdout)
         end
-        
+
         def story_runner
           unless @story_runner
             scenario_runner = ScenarioRunner.new
@@ -33,7 +33,7 @@ module Spec
           end
           @story_runner
         end
-        
+
         def register_exit_hook
           # TODO - when story runner uses test/unit runners like example runner does we can kill
           # this and also the assorted Kernel.stub!(:at_exit) in examples
@@ -42,7 +42,7 @@ module Spec
           end
           # TODO exit with non-zero status if run fails
         end
-        
+
         def dry_run
           run_options.dry_run
         end

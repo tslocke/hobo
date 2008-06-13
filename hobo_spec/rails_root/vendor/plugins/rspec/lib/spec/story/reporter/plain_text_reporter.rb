@@ -8,27 +8,27 @@ module Spec
           @failed = []
           @pending = []
         end
-        
+
         def scenario_succeeded(story_title, scenario_name)
           @out << '.'
           @succeeded += 1
         end
-        
+
         def scenario_failed(story_title, scenario_name, err)
           @out << "FAILED\n"
           @failed << [story_title, scenario_name, err]
         end
-        
+
         def scenario_pending(story_title, scenario_name, msg)
           @pending << [story_title, scenario_name, msg]
           @out << "PENDING\n"
         end
-        
+
         def run_started(count)
           @count = count
           @out << "Running #@count scenarios:\n"
         end
-        
+
         def run_ended
           @out << "\n\n#@count scenarios: #@succeeded succeeded, #{@failed.size} failed, #{@pending.size} pending\n"
           unless @pending.empty?
@@ -50,7 +50,7 @@ module Spec
             end
           end
         end
-        
+
         def method_missing(meth, *args, &block)
           # ignore unexpected callbacks
         end

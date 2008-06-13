@@ -26,7 +26,7 @@ module Spec
         @example_definition = @behaviour.create_example_definition("example") {}
         @proxy = create_proxy(@example_definition)
       end
-      
+
       it "should send reporter example_started" do
         @reporter.should_receive(:example_started).with(equal(@example_definition))
         @proxy.run
@@ -97,7 +97,7 @@ module Spec
           error.message.should eql("in body")
         end
         @proxy.run
-      end      
+      end
     end
 
     describe ExampleRunner, "#run where before_each fails" do
@@ -171,7 +171,7 @@ module Spec
 
         @reporter.should_receive(:example_finished).with(equal(@example_definition), nil, nil, false)
         @proxy.run
-        
+
         scope_object.should == @example
         scope_object.should be_instance_of(@behaviour)
       end
@@ -237,7 +237,7 @@ module Spec
           5.should == 5
         }
         proxy = create_proxy(example_definition)
-        
+
         @reporter.should_receive(:example_finished) do |example_definition, error, location|
           example_definition.description.should == "should == 5"
         end

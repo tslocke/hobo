@@ -7,7 +7,7 @@ module Spec
         @expected_error_class = determine_error_class
         @expected_error_message = determine_error_message
       end
-  
+
       def determine_error_class
         if @should_raise.is_a?(Class)
           return @should_raise
@@ -17,14 +17,14 @@ module Spec
           return Exception
         end
       end
-  
+
       def determine_error_message
         if @should_raise.is_a?(Array)
           return @should_raise[1]
         end
         return nil
       end
-  
+
       def build_message(exception=nil)
         if @expected_error_message
           message = "example block expected #{@expected_error_class.new(@expected_error_message.to_s).inspect}"
@@ -36,7 +36,7 @@ module Spec
         message << "\n"
         message << @file_and_line_number
       end
-  
+
       def error_matches?(error)
         return false unless error.kind_of?(@expected_error_class)
         if @expected_error_message

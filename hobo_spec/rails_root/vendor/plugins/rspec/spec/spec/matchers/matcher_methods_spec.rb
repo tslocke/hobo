@@ -62,7 +62,7 @@ This module should provide the following methods, each of which returns a Matche
         respond_to(:sym).should be_an_instance_of(RespondTo)
       end
     end
-    
+
     describe "Spec::Matchers#method_missing" do
       it "should convert be_xyz to Be(:be_xyz)" do
         Be.should_receive(:new).with(:be_whatever)

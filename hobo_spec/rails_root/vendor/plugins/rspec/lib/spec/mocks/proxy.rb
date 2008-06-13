@@ -79,14 +79,14 @@ module Spec
       def raise_unexpected_message_error(sym, *args)
         @error_generator.raise_unexpected_message_error sym, *args
       end
-      
+
     private
 
       def __add(sym)
         $rspec_mocks.add(@target) unless $rspec_mocks.nil?
         define_expected_method(sym)
       end
-      
+
       def define_expected_method(sym)
         if target_responds_to?(sym) && !metaclass.method_defined?(munge(sym))
           munged_sym = munge(sym)
@@ -95,7 +95,7 @@ module Spec
           end
           @proxied_methods << sym
         end
-        
+
         metaclass_eval(<<-EOF, __FILE__, __LINE__)
           def #{sym}(*args, &block)
             __mock_proxy.message_received :#{sym}, *args, &block
@@ -128,7 +128,7 @@ module Spec
       def metaclass_eval(str, filename, lineno)
         metaclass.class_eval(str, filename, lineno)
       end
-      
+
       def metaclass
         (class << @target; self; end)
       end

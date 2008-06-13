@@ -8,12 +8,12 @@ The implies operator comes from Eiffel. Often comes in handy in Hobo's model-per
 
     >> false.implies true
     => true
-    
+
     >> false.implies false
     => true
-    
+
     >> true.implies true
     => true
-    
+
     >> true.implies false
     => false

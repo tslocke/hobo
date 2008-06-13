@@ -14,8 +14,8 @@
       FULL_VERSION = "#{[MAJOR, MINOR, TINY, RELEASE_CANDIDATE].compact.join('.')} (r#{REV})"
 
       NAME   = "RSpec"
-      URL    = "http://rspec.rubyforge.org/"  
-    
+      URL    = "http://rspec.rubyforge.org/"
+
       DESCRIPTION = "#{NAME}-#{FULL_VERSION} - BDD for Ruby\n#{URL}"
     end
   end

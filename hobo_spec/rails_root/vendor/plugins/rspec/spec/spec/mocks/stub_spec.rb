@@ -41,7 +41,7 @@ module Spec
           @obj.rspec_verify
         end.should_not raise_error
       end
-      
+
       it "should clear itself on rspec_verify" do
         @obj.stub!(:this_should_go).and_return(:blah)
         @obj.this_should_go.should == :blah
@@ -68,7 +68,7 @@ module Spec
         @obj.msg.should equal(:return_value)
         @obj.rspec_verify
       end
-      
+
       it "should return values in order to consecutive calls" do
         return_values = ["1",2,Object.new]
         @obj.stub!(:msg).and_return(return_values[0],return_values[1],return_values[2])
@@ -94,7 +94,7 @@ module Spec
         @obj.rspec_verify
         @obj.existing_instance_method.should equal(:original_value)
       end
-      
+
       it "should revert to original class method if existed" do
         @class.existing_class_method.should equal(:original_value)
         @class.stub!(:existing_class_method).and_return(:mock_value)
@@ -111,7 +111,7 @@ module Spec
           @obj.this_should_go
         end.should raise_error
       end
-      
+
       it "should support yielding" do
         @obj.stub!(:method_that_yields).and_yield(:yielded_value)
         current_value = :value_before
@@ -135,12 +135,12 @@ module Spec
           @mock.something
         end.should throw_symbol(:blech)
       end
-      
+
       it "should support overriding w/ a new stub" do
         @stub.stub!(:existing_instance_method).and_return(:updated_stub_value)
         @stub.existing_instance_method.should == :updated_stub_value
       end
-      
+
       it "should support stub with" do
         @stub.stub!(:foo).with("bar")
         @stub.should_receive(:foo).with("baz")
@@ -148,7 +148,7 @@ module Spec
         @stub.foo("baz")
       end
     end
-    
+
     describe "A method stub with args" do
       before(:each) do
         @stub = Object.new
@@ -188,7 +188,7 @@ module Spec
           @stub.foo("other")
         end.should raise_error
       end
-      
+
       it "should support options" do
         @stub.stub!(:foo, :expected_from => "bar")
       end

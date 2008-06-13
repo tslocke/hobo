@@ -7,7 +7,7 @@ module Spec #:nodoc:
         return "expected #{relativities[@relativity]}#{@expected} error on :#{@args[0]}, got #{@actual}" if @collection_name == :error_on
         return __original_failure_message
       end
-      
+
       alias_method :__original_description, :description
       def description
         return "should have #{relativities[@relativity]}#{@expected} errors on :#{@args[0]}" if @collection_name == :errors_on

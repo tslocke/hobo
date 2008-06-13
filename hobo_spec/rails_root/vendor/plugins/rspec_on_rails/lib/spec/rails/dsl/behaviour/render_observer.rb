@@ -55,11 +55,11 @@ module Spec
           register_verify_after_each
           expect_render_mock_proxy.stub!(:render, :expected_from => caller(1)[0]).with(opts)
         end
-  
+
         def verify_rendered # :nodoc:
           expect_render_mock_proxy.rspec_verify
         end
-  
+
         def unregister_verify_after_each #:nodoc:
           proc = verify_rendered_proc
           Spec::DSL::Example.remove_after(:each, &proc)
@@ -79,11 +79,11 @@ module Spec
           proc = verify_rendered_proc
           Spec::DSL::Example.after(:each, &proc)
         end
-  
+
         def expect_render_mock_proxy #:nodoc:
           @expect_render_mock_proxy ||= Spec::Mocks::Mock.new("expect_render_mock_proxy")
         end
-  
+
       end
     end
   end

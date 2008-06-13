@@ -63,9 +63,9 @@ module Spec
       def it(description=:__generate_description, opts={}, &block)
         example_definitions << create_example_definition(description, opts, &block)
       end
-      
+
       alias_method :specify, :it
-      
+
       # Use this to temporarily disable an example.
       def xit(description=:__generate_description, opts={}, &block)
         Kernel.warn("Example disabled: #{description}")
@@ -152,7 +152,7 @@ module Spec
         @before_each_parts = nil
         @after_each_parts = nil
       end
-      
+
       protected
 
       def before_parts_from_scope(scope)
@@ -167,7 +167,7 @@ module Spec
         when :each; after_each_parts
         when :all; after_all_parts
         end
-      end      
+      end
 
       def before_eval
       end

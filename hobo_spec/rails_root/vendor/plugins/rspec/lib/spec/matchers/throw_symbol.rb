@@ -1,11 +1,11 @@
 module Spec
   module Matchers
-    
+
     class ThrowSymbol #:nodoc:
       def initialize(expected=nil)
         @expected = expected
       end
-      
+
       def matches?(proc)
         begin
           proc.call
@@ -28,7 +28,7 @@ module Spec
           "expected #{expected} but nothing was thrown"
         end
       end
-      
+
       def negative_failure_message
         if @expected
           "expected #{expected} not to be thrown"
@@ -36,19 +36,19 @@ module Spec
           "expected no Symbol, got :#{@actual}"
         end
       end
-      
+
       def description
         "throw #{expected}"
       end
-      
+
       private
-      
+
         def expected
           @expected.nil? ? "a Symbol" : @expected.inspect
         end
-      
+
     end
- 
+
     # :call-seq:
     #   should throw_symbol()
     #   should throw_symbol(:sym)

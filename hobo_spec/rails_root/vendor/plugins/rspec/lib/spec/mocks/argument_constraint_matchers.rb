@@ -10,15 +10,15 @@ module Spec
       def any_args
         AnyArgsConstraint.new
       end
-      
+
       def anything
         AnyArgConstraint.new(nil)
       end
-      
+
       def boolean
         BooleanArgConstraint.new(nil)
       end
-      
+
       def no_args
         NoArgsConstraint.new
       end

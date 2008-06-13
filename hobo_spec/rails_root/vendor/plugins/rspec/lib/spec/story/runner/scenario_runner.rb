@@ -5,11 +5,11 @@ module Spec
         def initialize
           @listeners = []
         end
-        
+
         def run(scenario, world)
           @listeners.each { |l| l.scenario_started(scenario.story.title, scenario.name) }
           run_story_ignoring_scenarios(scenario.story, world)
-          
+
           world.start_collecting_errors
           world.instance_eval(&scenario.body)
           if world.errors.empty?
@@ -25,13 +25,13 @@ module Spec
             end
           end
         end
-        
+
         def add_listener(listener)
           @listeners << listener
         end
-        
+
         private
-        
+
         def run_story_ignoring_scenarios(story, world)
           class << world
             def Scenario(name, &block)

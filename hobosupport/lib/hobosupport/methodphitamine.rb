@@ -6,7 +6,7 @@ module Kernel
 
   def it() It.new end
   alias its it
-  
+
 end
 
 class It < BlankSlate

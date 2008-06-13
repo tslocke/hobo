@@ -9,13 +9,13 @@ module Spec
         matcher.matches?("foo")
         actual.should == "foo"
       end
-      
+
       it "should provide a stock failure message" do
         matcher = simple_matcher("thing") do end
         matcher.matches?("other")
         matcher.failure_message.should =~ /expected \"thing\" but got \"other\"/
       end
-      
+
       it "should provide a stock negative failure message" do
         matcher = simple_matcher("thing") do end
         matcher.matches?("other")

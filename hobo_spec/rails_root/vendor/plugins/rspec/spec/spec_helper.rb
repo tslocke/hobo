@@ -41,20 +41,20 @@ module Spec
     def pass
       Pass.new
     end
-    
+
     class CorrectlyOrderedMockExpectation
       def initialize(&event)
         @event = event
       end
-      
+
       def expect(&expectations)
         expectations.call
         @event.call
       end
     end
-    
+
     def during(&block)
-      CorrectlyOrderedMockExpectation.new(&block) 
+      CorrectlyOrderedMockExpectation.new(&block)
     end
   end
 end
@@ -67,5 +67,5 @@ module Custom
     def initialize(options, arg)
       @options, @arg = options, arg
     end
-  end  
+  end
 end

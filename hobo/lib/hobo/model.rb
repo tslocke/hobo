@@ -25,7 +25,7 @@ module Hobo
         attr_accessor :acting_user
 
         bool_attr_accessor :exempt_from_edit_checks
-        
+
         include Hobo::Lifecycles::ModelExtensions
       end
 
@@ -34,7 +34,7 @@ module Hobo
         alias_method_chain :has_many,      :join_record_management
         alias_method_chain :belongs_to,    :creator_metadata
         alias_method_chain :attr_accessor, :creator_metadata
-        
+
         alias_method_chain :has_one, :new_method
 
         def inherited(klass)
@@ -69,15 +69,15 @@ module Hobo
 
       end
     end
-    
-    
+
+
     def self.enable
       ActiveRecord::Base.class_eval do
         def self.hobo_model
           include Hobo::Model
           fields # force hobofields to load
         end
-        
+
         alias_method :has_hobo_method?, :respond_to_without_attributes?
       end
     end
@@ -186,7 +186,7 @@ module Hobo
         belongs_to_without_creator_metadata(name, options, &block)
       end
 
-      
+
       def attr_accessor_with_creator_metadata(*args)
         options = args.extract_options!
         if options.delete(:creator)
@@ -199,7 +199,7 @@ module Hobo
         args << options unless options.empty?
         attr_accessor_without_creator_metadata(*args)
       end
-            
+
 
       def has_one_with_new_method(name, options={}, &block)
         has_one_without_new_method(name, options)
@@ -405,13 +405,13 @@ module Hobo
         save
       end
     end
-    
-    
+
+
     def user_save(user)
       user_save_changes(user)
     end
-    
-    
+
+
     def user_view(user, field=nil)
       raise PermissionDeniedError, self.inspect unless Hobo.can_view?(user, self, field)
     end
@@ -449,7 +449,7 @@ module Hobo
       if self.class.attr_type(attr)._? <= String
         # Set it to the name of the current user
         self.send("#{attr}=", user.to_s) unless user.guest?
-      else  
+      else
         # Assume user is a user object, but don't set if we've got a type mismatch
         t = self.class.creator_type
         self.send("#{attr}=", user) if t.nil? || user.is_a?(t)

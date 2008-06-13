@@ -34,7 +34,7 @@ class Substance
     @description
   end
 end
-  
+
 class SubstanceTester
   include Spec::Matchers
   def initialize substance
@@ -50,11 +50,11 @@ describe "should exist" do
     @real = Substance.new true, 'something real'
     @imaginary = Substance.new false, 'something imaginary'
   end
-  
+
   it "should pass if target exists" do
     @real.should exist
   end
-  
+
   it "should fail if target does not exist" do
     lambda { @imaginary.should exist }.
       should fail

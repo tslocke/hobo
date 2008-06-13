@@ -11,7 +11,7 @@ module Spec
         translate_file(from, to)
       end
     end
-    
+
     def translate_dir(from, to)
       FileUtils.mkdir_p(to) unless File.directory?(to)
       Dir["#{from}/*"].each do |sub_from|
@@ -43,35 +43,35 @@ module Spec
       line.gsub!(/:string/, 'an_instance_of(String)')
 
       return line if line =~ /(should_not|should)_receive/
-      
+
       line.gsub!(/(^\s*)context([\s*|\(]['|"|A-Z])/, '\1describe\2')
       line.gsub!(/(^\s*)specify([\s*|\(]['|"|A-Z])/, '\1it\2')
       line.gsub!(/(^\s*)context_setup(\s*[do|\{])/, '\1before(:all)\2')
       line.gsub!(/(^\s*)context_teardown(\s*[do|\{])/, '\1after(:all)\2')
       line.gsub!(/(^\s*)setup(\s*[do|\{])/, '\1before(:each)\2')
       line.gsub!(/(^\s*)teardown(\s*[do|\{])/, '\1after(:each)\2')
-      
+
       if line =~ /(.*\.)(should_not|should)(?:_be)(?!_)(.*)/m
         pre = $1
         should = $2
         post = $3
         be_or_equal = post =~ /(<|>)/ ? "be" : "equal"
-        
+
         return "#{pre}#{should} #{be_or_equal}#{post}"
       end
-      
+
       if line =~ /(.*\.)(should_not|should)_(?!not)\s*(.*)/m
         pre = $1
         should = $2
         post = $3
-        
+
         post.gsub!(/^raise/, 'raise_error')
         post.gsub!(/^throw/, 'throw_symbol')
-        
+
         unless standard_matcher?(post)
           post = "be_#{post}"
         end
-        
+
         # Add parenthesis
         post.gsub!(/^(\w+)\s+([\w|\.|\,|\(.*\)|\'|\"|\:|@| ]+)(\})/, '\1(\2)\3') # inside a block
         post.gsub!(/^(redirect_to)\s+(.*)/, '\1(\2)') # redirect_to, which often has http:
@@ -84,22 +84,22 @@ module Spec
 
       line
     end
-    
+
     def standard_matcher?(matcher)
       patterns = [
-        /^be/, 
+        /^be/,
         /^be_close/,
-        /^eql/, 
-        /^equal/, 
-        /^has/, 
-        /^have/, 
-        /^change/, 
+        /^eql/,
+        /^equal/,
+        /^has/,
+        /^have/,
+        /^change/,
         /^include/,
-        /^match/, 
-        /^raise_error/, 
-        /^respond_to/, 
-        /^redirect_to/, 
-        /^satisfy/, 
+        /^match/,
+        /^raise_error/,
+        /^respond_to/,
+        /^redirect_to/,
+        /^satisfy/,
         /^throw_symbol/,
         # Extra ones that we use in spec_helper
         /^pass/,
@@ -109,6 +109,6 @@ module Spec
       matched = patterns.detect{ |p| matcher =~ p }
       !matched.nil?
     end
-    
+
   end
 end

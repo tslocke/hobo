@@ -27,7 +27,7 @@ module Hobo
   @models = []
 
   class << self
-    
+
 
     attr_accessor :current_theme
     attr_writer :developer_features
@@ -377,9 +377,9 @@ module Hobo
             end
           end
     end
-    
-    public 
-    
+
+    public
+
     def enable
       # Rails monkey patches
       require 'active_record/has_many_association'
@@ -392,17 +392,17 @@ module Hobo
       # TODO - Rails 2.1 requires ActionView::Template
       # ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
 
-      
+
       Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
 
       require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
-      
+
       ActionController::Base.send(:include, Hobo::ControllerExtensions)
       ActiveRecord::Base.send(:include, Hobo::ModelExtensions)
     end
-    
+
   end
-  
+
   ControllerExtensions = classy_module do
     def self.hobo_user_controller(model=nil)
       @model = model
@@ -436,7 +436,7 @@ module Hobo
 
   # Empty class to represent the boolean type.
   class Boolean; end
-  
+
 
 end
 

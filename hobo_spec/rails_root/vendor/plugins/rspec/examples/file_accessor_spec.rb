@@ -27,11 +27,11 @@ describe "A FileAccessor" do
     # These are the primary actor's neighbours, which we mock.
     file = mock "Pathname"
     io_processor = mock "IoProcessor"
-    
+
     io = StringIO.new "whatever"
     file.should_receive(:open).and_yield io
     io_processor.should_receive(:process).with(io)
-    
+
     accessor.open_and_handle_with(file, io_processor)
   end
 

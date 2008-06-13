@@ -21,7 +21,7 @@ describe "OptionParser" do
     options = parse(["--format", "Custom::Formatter"])
     options.formatters[0].class.should be(Custom::Formatter)
   end
-  
+
   it "should support formatters with relative and absolute paths, even on windows" do
     options = parse([
       "--format", "Custom::Formatter:C:\\foo\\bar",
@@ -69,7 +69,7 @@ describe "OptionParser" do
     @out.rewind
     @out.read.should match(/RSpec-\d+\.\d+\.\d+.*\(r\d+\) - BDD for Ruby\nhttp:\/\/rspec.rubyforge.org\/\n/n)
   end
-  
+
   it "should require file when require specified" do
     lambda do
       parse(["--require", "whatever"])
@@ -109,10 +109,10 @@ describe "OptionParser" do
   it "should read several example names from file if --example is given an existing file name" do
     options = parse(["--example", File.dirname(__FILE__) + '/examples.txt'])
     options.examples.should eql([
-      "Sir, if you were my husband, I would poison your drink.", 
+      "Sir, if you were my husband, I would poison your drink.",
       "Madam, if you were my wife, I would drink it."])
   end
-  
+
   it "should read no examples if given an empty file" do
     options = parse(["--example", File.dirname(__FILE__) + '/empty_file.txt'])
     options.examples.should eql([])
@@ -297,7 +297,7 @@ describe "OptionParser" do
     options.colour.should be_true
     options.formatters.first.should be_instance_of(::Spec::Runner::Formatter::SpecdocFormatter)
   end
-   
+
   it "should save config to file when --generate-options is specified" do
     FileUtils.rm 'test.spec.opts' if File.exist?('test.spec.opts')
     options = parse(["--colour", "--generate-options", "test.spec.opts", "--diff"])
@@ -321,7 +321,7 @@ describe "OptionParser" do
     end
     parse(["some/spec.rb", "--diff", "--drb", "--colour"])
   end
-  
+
   it "should reverse spec order when --reverse is specified" do
     options = parse(["some/spec.rb", "--reverse"])
   end
@@ -360,5 +360,5 @@ describe "OptionParser" do
   it "should return the correct default behaviour runner" do
    options = Spec::Runner::OptionParser.parse(["--runner", "Custom::BehaviourRunner"], @err, @out)
     options.custom_runner.class.should equal(Custom::BehaviourRunner)
-  end  
+  end
 end

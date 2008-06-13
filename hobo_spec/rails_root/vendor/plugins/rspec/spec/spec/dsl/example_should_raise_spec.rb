@@ -10,7 +10,7 @@ module Spec
         @options.reporter = @reporter
         @behaviour = Class.new(Example).describe("My Behaviour")
       end
-  
+
       def verify_error(error, message=nil)
         error.should be_an_instance_of(Spec::Expectations::ExpectationNotMetError)
         unless message.nil?

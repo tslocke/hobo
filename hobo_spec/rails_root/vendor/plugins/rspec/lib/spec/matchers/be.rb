@@ -1,13 +1,13 @@
 module Spec
   module Matchers
-    
+
     class Be #:nodoc:
       def initialize(*args)
         @expected = parse_expected(args.shift)
         @args = args
         @comparison = ""
       end
-      
+
       def matches?(actual)
         @actual = actual
         return true if match_or_compare unless handling_predicate?
@@ -31,24 +31,24 @@ module Spec
         end
         return false
       end
-      
+
       def failure_message
         return "expected #{@comparison}#{expected}, got #{@actual.inspect}" unless handling_predicate?
         return "expected #{predicate}#{args_to_s} to return true, got #{@result.inspect}"
       end
-      
+
       def negative_failure_message
         return "expected not #{expected}, got #{@actual.inspect}" unless handling_predicate?
         return "expected #{predicate}#{args_to_s} to return false, got #{@result.inspect}"
       end
-      
+
       def expected
         return true if @expected == :true
         return false if @expected == :false
         return "nil" if @expected == :nil
         return @expected.inspect
       end
-      
+
       def match_or_compare
         return @actual == true if @expected == :true
         return @actual == false if @expected == :false
@@ -61,7 +61,7 @@ module Spec
         return @actual === @expected if @triple_equal
         return @actual.equal?(@expected)
       end
-      
+
       def ==(expected)
         @double_equal = true
         @comparison = "== "
@@ -103,7 +103,7 @@ module Spec
         @expected = expected
         self
       end
-      
+
       def description
         "#{prefix_to_sentence}#{comparison}#{expected_to_sentence}#{args_to_sentence}"
       end
@@ -119,7 +119,7 @@ module Spec
           @prefix = "be "
           return expected
         end
-        
+
         def handling_predicate?
           return false if [:true, :false, :nil].include?(@expected)
           return @handling_predicate
@@ -128,25 +128,25 @@ module Spec
         def predicate
           "#{@expected.to_s}?".to_sym
         end
-        
+
         def present_tense_predicate
           "#{@expected.to_s}s?".to_sym
         end
-        
+
         def args_to_s
           return "" if @args.empty?
           inspected_args = @args.collect{|a| a.inspect}
           return "(#{inspected_args.join(', ')})"
         end
-        
+
         def comparison
           @comparison
         end
-        
+
         def expected_to_sentence
           split_words(@expected)
         end
-        
+
         def prefix_to_sentence
           split_words(@prefix)
         end
@@ -165,9 +165,9 @@ module Spec
               " #{@args[0...-1].join(', ')} and #{@args[-1]}"
           end
         end
-        
+
     end
- 
+
     # :call-seq:
     #   should be_true
     #   should be_false
@@ -187,7 +187,7 @@ module Spec
     # prefixed with "be_an_" (e.g. be_an_instance_of), "be_a_" (e.g. be_a_kind_of)
     # or "be_" (e.g. be_empty), letting you choose the prefix that best suits the predicate.
     #
-    # == Examples 
+    # == Examples
     #
     #   target.should be_true
     #   target.should be_false

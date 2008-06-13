@@ -48,11 +48,11 @@ And with a block
     >> File.metaclass_eval { def b4(path); basename(path); end }
     >> File.b4 "a/b"
     => "b"
-    
-    
+
+
 ## `Object#meta_def`
 
     >> String.meta_def(:backwards_new) { |s| s.reverse }
     >> String.backwards_new "strange"
     => "egnarts"
-   
+

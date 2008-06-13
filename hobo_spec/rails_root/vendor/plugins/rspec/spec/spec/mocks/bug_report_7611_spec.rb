@@ -14,6 +14,6 @@ module Bug7611
 
     it "should" do
       Bar.new.class.should == Bar
-    end 
+    end
   end
 end

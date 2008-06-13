@@ -10,13 +10,13 @@ module Spec
           :use_instantiated_fixtures,
           :global_fixtures
         )
-        
+
         class << self
           def before_eval #:nodoc:
             super
             configure
           end
-          
+
           def configure
             self.fixture_table_names = []
             self.fixture_class_names = {}

@@ -24,33 +24,33 @@ class SpecParserSubject
 end
 
 describe SpecParserSubject do
-  
+
   it "5" do
   end
-  
+
 end
 
 describe SpecParserSubject, "described" do
-  
+
   it "6" do
   end
-  
+
 end
 
 describe SpecParserSubject, "described", :something => :something_else do
-   
+
    it "7" do
    end
 
 end
 
 describe "described", :something => :something_else do
-  
+
   it "8" do
   end
-  
+
 end
-   
+
 
 describe "SpecParser" do
   before(:each) do
@@ -88,11 +88,11 @@ describe "SpecParser" do
   it "should find nothing outside a context" do
     @p.spec_name_for(File.open(__FILE__), 2).should be_nil
   end
-  
+
   it "should find context name for type" do
     @p.spec_name_for(File.open(__FILE__), 26).should == "SpecParserSubject"
   end
-  
+
   it "should find context and spec name for type" do
     @p.spec_name_for(File.open(__FILE__), 28).should == "SpecParserSubject 5"
   end
@@ -100,7 +100,7 @@ describe "SpecParser" do
   it "should find context and description for type" do
     @p.spec_name_for(File.open(__FILE__), 33).should == "SpecParserSubject described"
   end
-  
+
   it "should find context and description and example for type" do
     @p.spec_name_for(File.open(__FILE__), 36).should == "SpecParserSubject described 6"
   end
@@ -108,17 +108,17 @@ describe "SpecParser" do
   it "should find context and description for type with modifications" do
     @p.spec_name_for(File.open(__FILE__), 40).should == "SpecParserSubject described"
   end
-  
+
   it "should find context and described and example for type with modifications" do
     @p.spec_name_for(File.open(__FILE__), 43).should == "SpecParserSubject described 7"
   end
-  
+
   it "should find context and described for type with modifications" do
     @p.spec_name_for(File.open(__FILE__), 47).should == "described"
   end
-  
+
   it "should find context and described for type with modifications" do
     @p.spec_name_for(File.open(__FILE__), 50).should == "described 8"
   end
-  
+
 end

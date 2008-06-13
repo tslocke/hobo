@@ -7,7 +7,7 @@ require File.dirname(__FILE__) + '/../../spec_helper'
     if mode == 'integration'
       integrate_views
     end
-    
+
     it "should match a simple path" do
       post 'some_action'
       response.should render_template('some_action')
@@ -17,12 +17,12 @@ require File.dirname(__FILE__) + '/../../spec_helper'
       post 'some_action'
       response.should render_template('render_spec/some_action')
     end
-  
+
     it "should match a less simple path to another controller" do
       post 'action_which_renders_template_from_other_controller'
       response.should render_template('controller_spec/action_with_template')
     end
-  
+
     it "should match a symbol" do
       post 'some_action'
       response.should render_template(:some_action)

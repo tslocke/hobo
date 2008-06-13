@@ -4,7 +4,7 @@ module Spec
   module DSL
     describe Configuration do
       before(:each) { @config = Configuration.new }
-      
+
       it "should default use_transactional_fixtures to true" do
         @config.use_transactional_fixtures.should be(true)
       end

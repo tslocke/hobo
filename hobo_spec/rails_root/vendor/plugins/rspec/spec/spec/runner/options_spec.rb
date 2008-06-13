@@ -8,7 +8,7 @@ module Spec
         @out = StringIO.new('')
         @options = Options.new(@err, @out)
       end
-      
+
       after(:each) do
         Spec::Expectations.differ = nil
       end
@@ -50,7 +50,7 @@ module Spec
 
       it "should use custom diff format option when format is a custom format" do
         Spec::Expectations.differ.should_not be_instance_of(Custom::Differ)
-        
+
         @options.parse_diff "Custom::Differ"
         @options.diff_format.should == :custom
         @options.differ_class.should == Custom::Differ
@@ -60,13 +60,13 @@ module Spec
       it "should print instructions about how to fix missing differ" do
         lambda { @options.parse_diff "Custom::MissingDiffer" }.should raise_error(NameError)
         @err.string.should match(/Couldn't find differ class Custom::MissingDiffer/n)
-      end      
+      end
 
       it "should print instructions about how to fix bad formatter" do
         lambda do
           @options.parse_format "Custom::BadFormatter"
         end.should raise_error(NameError, /undefined local variable or method `bad_method'/)
-      end      
+      end
 
       it "parse_example sets single example when argument not a file" do
         example = "something or other"
@@ -80,7 +80,7 @@ module Spec
         File.should_receive(:file?).with(example).and_return(true)
         file = StringIO.new("Sir, if you were my husband, I would poison your drink.\nMadam, if you were my wife, I would drink it.")
         File.should_receive(:open).with(example).and_return(file)
-        
+
         @options.parse_example example
         @options.examples.should eql([
           "Sir, if you were my husband, I would poison your drink.",
@@ -102,7 +102,7 @@ module Spec
         @options.run_examples
         @out.string.should include("0 examples, 0 failures")
       end
-      
+
       it "sets #examples_run? to true" do
         @options.examples_run?.should be_false
         @options.run_examples
@@ -123,7 +123,7 @@ module Spec
         @out.string.should_not include("examples")
         @out.string.should_not include("failures")
       end
-      
+
       it "sets #examples_run? to false" do
         @options.examples_run?.should be_false
         @options.run_examples
@@ -137,7 +137,7 @@ module Spec
         @out = StringIO.new('')
         @options = Options.new(@err, @out)
       end
-      
+
       it "returns true when there is a runner_arg" do
         @options.runner_arg = "Custom::BehaviourRunner"
         @options.custom_runner?.should be_true
@@ -155,7 +155,7 @@ module Spec
         @out = StringIO.new('')
         @options = Options.new(@err, @out)
       end
-      
+
       it "should split class names with args" do
         @options.split_at_colon('Foo').should == ['Foo', nil]
         @options.split_at_colon('Foo:arg').should == ['Foo', 'arg']
@@ -275,6 +275,6 @@ module Spec
         @options.number_of_examples.should == 1
         @options.behaviours.length.should == 1
       end
-    end    
+    end
   end
 end

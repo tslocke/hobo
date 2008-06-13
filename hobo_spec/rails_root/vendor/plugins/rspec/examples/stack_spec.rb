@@ -4,7 +4,7 @@ require File.dirname(__FILE__) + "/stack"
 describe "non-empty Stack", :shared => true do
   # NOTE that this one auto-generates the description "should not be empty"
   it { @stack.should_not be_empty }
-  
+
   it "should return the top item when sent #peek" do
     @stack.peek.should == @last_item_added
   end
@@ -13,11 +13,11 @@ describe "non-empty Stack", :shared => true do
     @stack.peek.should == @last_item_added
     @stack.peek.should == @last_item_added
   end
-  
+
   it "should return the top item when sent #pop" do
     @stack.pop.should == @last_item_added
   end
-  
+
   it "should remove the top item when sent #pop" do
     @stack.pop.should == @last_item_added
     unless @stack.empty?
@@ -40,16 +40,16 @@ describe Stack, " (empty)" do
   before(:each) do
     @stack = Stack.new
   end
-  
+
   # NOTE that this one auto-generates the description "should be empty"
   it { @stack.should be_empty }
-  
+
   it_should_behave_like "non-full Stack"
-  
+
   it "should complain when sent #peek" do
     lambda { @stack.peek }.should raise_error(StackUnderflowError)
   end
-  
+
   it "should complain when sent #pop" do
     lambda { @stack.pop }.should raise_error(StackUnderflowError)
   end
@@ -73,7 +73,7 @@ describe Stack, " (with one item less than capacity)" do
     (1..9).each { |i| @stack.push i }
     @last_item_added = 9
   end
-  
+
   it_should_behave_like "non-empty Stack"
   it_should_behave_like "non-full Stack"
 end
@@ -86,12 +86,12 @@ describe Stack, " (full)" do
   end
 
   # NOTE that this one auto-generates the description "should be full"
-  it { @stack.should be_full }  
+  it { @stack.should be_full }
 
   it_should_behave_like "non-empty Stack"
 
   it "should complain on #push" do
     lambda { @stack.push Object.new }.should raise_error(StackOverflowError)
   end
-  
+
 end

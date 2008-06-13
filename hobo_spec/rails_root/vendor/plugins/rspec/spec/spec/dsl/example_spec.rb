@@ -35,7 +35,7 @@ module Spec
         Example.clear_before_and_after!
       end
     end
-    
+
     describe Example, ".it" do
       it_should_behave_like "Spec::DSL::Example"
 
@@ -48,17 +48,17 @@ module Spec
 
     describe Example, ".xit" do
       it_should_behave_like "Spec::DSL::Example"
-      
+
       before(:each) do
         Kernel.stub!(:warn)
       end
-      
+
       it "should NOT  should create an example instance" do
         lambda {
           @behaviour.xit("")
         }.should_not change(@behaviour.example_definitions, :length)
       end
-      
+
       it "should warn that it is disabled" do
         Kernel.should_receive(:warn).with("Example disabled: foo")
         @behaviour.xit("foo")
@@ -178,7 +178,7 @@ module Spec
     describe "Example", ".run" do
       it_should_behave_like "Spec::DSL::Example"
     end
-    
+
     describe "Example" do
       it "should be exposed as Spec::ExampleGroup" do
         Spec::ExampleGroup.should equal(Spec::DSL::Example)
@@ -281,7 +281,7 @@ module Spec
 
       it "should allow class variables to be defined" do
         @@foo.should == 1
-      end      
+      end
     end
 
     class ExampleClassVariablePollutionSpec < Example
@@ -383,7 +383,7 @@ module Spec
         block_ran.should == true
       end
     end
-    
+
     describe Example, "#run" do
       before do
         @options = ::Spec::Runner::Options.new(StringIO.new, StringIO.new)
@@ -405,7 +405,7 @@ module Spec
         suite.run
       end
     end
-    
+
     class ExampleSubclass < Example
     end
 

@@ -4,7 +4,7 @@ module Bug8302
   class Foo
     def Foo.class_method(arg)
     end
-  
+
     def instance_bar(arg)
     end
   end

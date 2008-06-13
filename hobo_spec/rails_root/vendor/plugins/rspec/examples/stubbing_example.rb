@@ -19,7 +19,7 @@ describe "A stubbed method on a class" do
     StubbableClass.stub!(:find).and_return(:stub_return)
     StubbableClass.find(1).should equal(:stub_return)
   end
-  
+
   it "should revert to the original method after each spec" do
     StubbableClass.find(1).should equal(:original_return)
   end
@@ -43,7 +43,7 @@ describe "A mock" do
     mock.stub!(:msg).and_return(:value)
     (1..10).each {mock.msg.should equal(:value)}
   end
-  
+
   it "can stub! and mock" do
     mock = mock("stubbing mock")
     mock.stub!(:stub_message).and_return(:stub_value)
@@ -52,7 +52,7 @@ describe "A mock" do
     mock.mock_message.should equal(:mock_value)
     (1..10).each {mock.stub_message.should equal(:stub_value)}
   end
-  
+
   it "can stub! and mock the same message" do
     mock = mock("stubbing mock")
     mock.stub!(:msg).and_return(:stub_value)
@@ -66,4 +66,4 @@ describe "A mock" do
   end
 end
 
-    
+

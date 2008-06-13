@@ -59,7 +59,7 @@ unless [/mswin/, /java/].detect{|p| p =~ RUBY_PLATFORM}
       heckle_runner.heckle_with
     end
   end
-  
+
   describe "Heckler" do
     it "should say yes to tests_pass? if specs pass" do
       options = mock("options", :null_object => true)

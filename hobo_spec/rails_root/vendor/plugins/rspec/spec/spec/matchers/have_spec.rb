@@ -35,7 +35,7 @@ describe "should have(n).items" do
       owner.should have(4).items_in_collection_with_size_method
     }.should fail_with("expected 4 items_in_collection_with_size_method, got 3")
   end
-  
+
   it "should fail if target has a collection of items with > n members" do
     owner = create_collection_owner_with(3)
     lambda {
@@ -68,7 +68,7 @@ describe "should_not have(n).items" do
     owner.should_not have(4).items_in_collection_with_length_method
     owner.should_not have(4).items_in_collection_with_size_method
   end
-  
+
   it "should pass if target has a collection of items with > n members" do
     owner = create_collection_owner_with(3)
     owner.should_not have(2).items_in_collection_with_length_method
@@ -110,7 +110,7 @@ describe "should have_exactly(n).items" do
       owner.should have_exactly(4).items_in_collection_with_size_method
     }.should fail_with("expected 4 items_in_collection_with_size_method, got 3")
   end
-  
+
   it "should fail if target has a collection of items with > n members" do
     owner = create_collection_owner_with(3)
     lambda {
@@ -130,7 +130,7 @@ describe "should have_at_least(n).items" do
     owner.should have_at_least(3).items_in_collection_with_length_method
     owner.should have_at_least(3).items_in_collection_with_size_method
   end
-  
+
   it "should pass if target has a collection of items with > n members" do
     owner = create_collection_owner_with(3)
     owner.should have_at_least(2).items_in_collection_with_length_method
@@ -146,17 +146,17 @@ describe "should have_at_least(n).items" do
       owner.should have_at_least(4).items_in_collection_with_size_method
     }.should fail_with("expected at least 4 items_in_collection_with_size_method, got 3")
   end
-  
+
   it "should provide educational negative failure messages" do
     #given
     owner = create_collection_owner_with(3)
     length_matcher = have_at_least(3).items_in_collection_with_length_method
     size_matcher = have_at_least(3).items_in_collection_with_size_method
-    
+
     #when
     length_matcher.matches?(owner)
     size_matcher.matches?(owner)
-    
+
     #then
     length_matcher.negative_failure_message.should == <<-EOF
 Isn't life confusing enough?
@@ -194,7 +194,7 @@ describe "should have_at_most(n).items" do
       owner.should have_at_most(2).items_in_collection_with_size_method
     }.should fail_with("expected at most 2 items_in_collection_with_size_method, got 3")
   end
-  
+
   it "should pass if target has a collection of items with < n members" do
     owner = create_collection_owner_with(3)
     owner.should have_at_most(4).items_in_collection_with_length_method
@@ -206,11 +206,11 @@ describe "should have_at_most(n).items" do
     owner = create_collection_owner_with(3)
     length_matcher = have_at_most(3).items_in_collection_with_length_method
     size_matcher = have_at_most(3).items_in_collection_with_size_method
-    
+
     #when
     length_matcher.matches?(owner)
     size_matcher.matches?(owner)
-    
+
     #then
     length_matcher.negative_failure_message.should == <<-EOF
 Isn't life confusing enough?
@@ -219,7 +219,7 @@ Instead of having to figure out the meaning of this:
 We recommend that you use this instead:
   should have_at_least(4).items_in_collection_with_length_method
 EOF
-    
+
     size_matcher.negative_failure_message.should == <<-EOF
 Isn't life confusing enough?
 Instead of having to figure out the meaning of this:

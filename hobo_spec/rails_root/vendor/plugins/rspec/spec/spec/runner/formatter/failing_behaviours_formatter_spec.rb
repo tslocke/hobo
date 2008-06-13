@@ -9,7 +9,7 @@ module Spec
           @options = Options.new(StringIO.new, @io)
           @formatter = @options.create_formatter(FailingBehavioursFormatter)
         end
-        
+
         def description(s)
           Spec::DSL::BehaviourDescription.new(s)
         end

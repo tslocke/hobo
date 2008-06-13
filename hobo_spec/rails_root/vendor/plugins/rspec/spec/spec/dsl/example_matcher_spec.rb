@@ -7,15 +7,15 @@ module Spec
         def initialize(description)
           @description = description
         end
-        
+
         def matches?(matcher)
           matcher.matches?(@description)
         end
-        
+
         def failure_message
           "expected matcher.matches?(#{@description.inspect}) to return true, got false"
         end
-        
+
         def negative_failure_message
           "expected matcher.matches?(#{@description.inspect}) to return false, got true"
         end
@@ -27,41 +27,41 @@ module Spec
 
     describe ExampleMatcher, "#matches?" do
       include ExampleMatcherSpecHelper
-      
+
       it "should match correct behaviour and example" do
         matcher = ExampleMatcher.new("behaviour", "example")
         matcher.should match_description("behaviour example")
       end
-      
+
       it "should not match wrong example" do
         matcher = ExampleMatcher.new("behaviour", "other example")
         matcher.should_not match_description("behaviour example")
       end
-      
+
       it "should not match wrong behaviour" do
         matcher = ExampleMatcher.new("other behaviour", "example")
         matcher.should_not match_description("behaviour example")
       end
-      
+
       it "should match example only" do
         matcher = ExampleMatcher.new("behaviour", "example")
         matcher.should match_description("example")
       end
-      
+
       it "should match behaviour only" do
         matcher = ExampleMatcher.new("behaviour", "example")
         matcher.should match_description("behaviour")
       end
-      
+
       it "should escape regexp chars" do
         matcher = ExampleMatcher.new("(con|text)", "[example]")
         matcher.should_not match_description("con p")
       end
-      
+
       it "should match when behaviour is modularized" do
         matcher = ExampleMatcher.new("MyModule::MyClass", "example")
         matcher.should match_description("MyClass example")
-      end      
+      end
     end
 
     describe ExampleMatcher, "#matches? normal case" do

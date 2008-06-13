@@ -5,7 +5,7 @@ describe "Test::Unit interaction" do
     `ruby #{dir}/sample_spec_test.rb`
     $?.should be_success
   end
-  
+
   it "monkey patches AutoRunner" do
     `ruby #{dir}/autorunner_test.rb`
     $?.should be_success

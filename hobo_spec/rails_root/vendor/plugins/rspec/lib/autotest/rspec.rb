@@ -3,7 +3,7 @@ require 'autotest'
 class RspecCommandError < StandardError; end
 
 class Autotest::Rspec < Autotest
-  
+
   def initialize(kernel=Kernel, separator=File::SEPARATOR, alt_separator=File::ALT_SEPARATOR) # :nodoc:
     super()
     @kernel, @separator, @alt_separator = kernel, separator, alt_separator
@@ -13,24 +13,24 @@ class Autotest::Rspec < Autotest
     # %r(/) != /\//
     # since Ruby compares the REGEXP source, not the resulting pattern
     @test_mappings = {
-      %r%^spec/.*\.rb$% => kernel.proc { |filename, _| 
-        filename 
+      %r%^spec/.*\.rb$% => kernel.proc { |filename, _|
+        filename
       },
-      %r%^lib/(.*)\.rb$% => kernel.proc { |_, m| 
-        ["spec/#{m[1]}_spec.rb"] 
+      %r%^lib/(.*)\.rb$% => kernel.proc { |_, m|
+        ["spec/#{m[1]}_spec.rb"]
       },
-      %r%^spec/(spec_helper|shared/.*)\.rb$% => kernel.proc { 
-        files_matching %r%^spec/.*_spec\.rb$% 
+      %r%^spec/(spec_helper|shared/.*)\.rb$% => kernel.proc {
+        files_matching %r%^spec/.*_spec\.rb$%
       }
     }
   end
-  
+
   def tests_for_file(filename)
     super.select { |f| @files.has_key? f }
   end
-  
+
   alias :specs_for_file :tests_for_file
-  
+
   def failed_results(results)
     results.scan(/^\d+\)\n(?:\e\[\d*m)?(?:.*?Error in )?'([^\n]*)'(?: FAILED)?(?:\e\[\d*m)?\n(.*?)\n\n/m)
   end
@@ -61,7 +61,7 @@ class Autotest::Rspec < Autotest
   def make_test_cmd(files_to_test)
     return "#{ruby} -S #{@spec_command} #{add_options_if_present} #{files_to_test.keys.flatten.join(' ')}"
   end
-  
+
   def add_options_if_present
     File.exist?("spec/spec.opts") ? "-O spec/spec.opts " : ""
   end
@@ -78,7 +78,7 @@ class Autotest::Rspec < Autotest
     end
     raise RspecCommandError, "No spec command could be found!"
   end
-  
+
   # Autotest will look for spec commands in the following
   # locations, in this order:
   #

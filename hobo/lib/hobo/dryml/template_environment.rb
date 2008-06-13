@@ -1,26 +1,26 @@
 module Hobo::Dryml
 
   class TemplateEnvironment
-    
+
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
       end
       attr_accessor :load_time, :compiled_local_names
-           
-      
+
+
       def _register_tag_attrs(tag_name, attrs)
         @tag_attrs ||= {}
         @tag_attrs[tag_name] = attrs
       end
-     
-      
+
+
       def tag_attrs
         @tag_attrs ||= {}
       end
-      
+
       alias_method :delayed_alias_method_chain, :alias_method_chain
-      
+
     end
 
     for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}
@@ -55,12 +55,12 @@ module Hobo::Dryml
                  :form_field_path, :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
     end
-    
+
     def this_key=(key)
       @_this_key = key
     end
-    
-    
+
+
     # The type of this, or when this is nil, the type that would be expected in the current field
     def this_type
       @_this_type ||= if this == false || this == true
@@ -83,23 +83,23 @@ module Hobo::Dryml
                           type
                         end
                       else
-                        # Nothing to go on at all 
+                        # Nothing to go on at all
                         Object
                       end
     end
-    
-    
+
+
     def this_field_reflection
       this.try.proxy_reflection ||
         (this_parent && this_field && this_parent.class.respond_to?(:reflections) && this_parent.class.reflections[this_field.to_sym])
     end
-    
-    
+
+
     def attrs_for(name)
       self.class.tag_attrs[name.to_sym]
     end
-    
-    
+
+
     def add_classes!(attributes, *classes)
       classes = classes.flatten.select{|x|x}.map{|x| x.to_s.dasherize}
       current = attributes[:class]
@@ -112,7 +112,7 @@ module Hobo::Dryml
       add_classes!(HashWithIndifferentAccess.new(attributes), classes)
     end
 
-    
+
     def merge_attrs(attrs, overriding_attrs)
       return {}.update(attrs) if overriding_attrs.nil?
       attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
@@ -120,8 +120,8 @@ module Hobo::Dryml
       attrs = add_classes(attrs, *classes.split) if classes
       attrs.update(overriding_attrs - [:class])
     end
-    
-    
+
+
     def scope
       @_scoped_variables
     end
@@ -131,8 +131,8 @@ module Hobo::Dryml
       AttributeExtensionString.new(s)
     end
 
-    
-    def dom_id(object=nil, attribute=nil)      
+
+    def dom_id(object=nil, attribute=nil)
       if object.nil?
         # nothing passed -- use context
         if this_parent && this_field
@@ -141,7 +141,7 @@ module Hobo::Dryml
           object = this
         end
       end
-      
+
       id = object.try.typed_id
       if id
         attribute ? "#{id}_#{attribute}" : id
@@ -149,8 +149,8 @@ module Hobo::Dryml
         "nil"
       end
     end
-    
-    
+
+
     def call_part(part_node_id, part_name, part_this=nil, *locals)
       res = ''
       if part_this
@@ -167,12 +167,12 @@ module Hobo::Dryml
       res
     end
 
-    
+
     def call_polymorphic_tag(name, *args)
       name = name.to_s.gsub('-', '_')
       type = args.first.is_a?(Class) ? args.shift : nil
       attributes, parameters = args
-      
+
       tag = find_polymorphic_tag(name, type)
       if tag != name
         send(tag, attributes || {}, parameters || {})
@@ -181,7 +181,7 @@ module Hobo::Dryml
       end
     end
 
-    
+
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= (this.is_a?(Array) && this.respond_to?(:member_class) && this.member_class) || this_type
 
@@ -197,20 +197,20 @@ module Hobo::Dryml
         end
       end
     end
-    
-    
+
+
     def repeat_attribute(array, &b)
       res = array.map { |x| new_object_context(x, &b) }.join
       Hobo::Dryml.last_if = !array.empty?
       res
     end
 
-    
+
     def _erbout
       @_erb_output
     end
-    
-    
+
+
     def _output(s)
       @_erb_output.concat(s)
     end
@@ -230,7 +230,7 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
-        @_this_parent, @_this_field = [new_this.origin, new_this.origin_attribute] if new_this.respond_to?(:origin) 
+        @_this_parent, @_this_field = [new_this.origin, new_this.origin_attribute] if new_this.respond_to?(:origin)
         @_this = new_this
         yield
       end
@@ -256,7 +256,7 @@ module Hobo::Dryml
 
     def _tag_context(attributes)
       with = attributes[:with] == "page" ? @this : attributes[:with]
-      
+
       if attributes.has_key?(:field)
         new_field_context(attributes[:field], with) { yield }
       elsif attributes.has_key?(:with)
@@ -276,8 +276,8 @@ module Hobo::Dryml
       @_form_this = @_form_field_path = @_form_field_names = nil
       [res, field_names]
     end
-    
-    
+
+
     def register_form_field(name)
       @_form_field_names << name
     end
@@ -288,16 +288,16 @@ module Hobo::Dryml
       #ensure with and field are not in attributes
       attributes.delete(:with)
       attributes.delete(:field)
-      
+
       # declared attributes don't appear in the attributes hash
       stripped_attributes = HashWithIndifferentAccess.new.update(attributes)
       locals.each {|a| stripped_attributes.delete(a.to_sym) }
-      
+
       # Return locals declared as local variables (attrs="...")
       locals.map {|a| attributes[a.to_sym]} + [stripped_attributes]
     end
-    
-    
+
+
     def call_tag_parameter_with_default_content(the_tag, attributes, default_content, overriding_content_proc)
       if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_content_proc
@@ -317,45 +317,45 @@ module Hobo::Dryml
         send(the_tag, attributes, { :default => d })
       end
     end
-    
-    
+
+
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
       overriding_proc = caller_parameters[param_name]
       replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
-      
+
       if param_name == :default && overriding_proc
         # :default content is handled specially
-        
+
         call_tag_parameter_with_default_content(the_tag, attributes, parameters[:default], overriding_proc)
 
       elsif replacing_proc
         # The caller is replacing this parameter. Don't call the tag
         # at all, just the overriding proc, but pass the restorable
         # tag as a parameter to the overriding proc
-        
+
         tag_restore = proc do |restore_attrs, restore_params|
           # Call the replaced tag with the attributes and parameters
           # as given in the original tag definition, and with the
           # specialisation given on the 'restore' call
-          
+
           if overriding_proc
             overriding_attributes, overriding_parameters = overriding_proc.call
             restore_attrs  = overriding_attributes.merge(restore_attrs)
             restore_params = overriding_parameters.merge(restore_params)
           end
-          
+
           override_and_call_tag(the_tag, attributes, parameters, restore_attrs, restore_params)
         end
         replacing_proc.call(tag_restore)
-        
-        
+
+
       else
         overriding_attributes, overriding_parameters = overriding_proc._?.call
         override_and_call_tag(the_tag, attributes, parameters, overriding_attributes, overriding_parameters)
-      end     
+      end
     end
-    
-    
+
+
     def override_and_call_tag(the_tag, general_attributes, general_parameters, overriding_attributes, overriding_parameters)
       attributes = overriding_attributes ? merge_attrs(general_attributes, overriding_attributes) : general_attributes
       if overriding_parameters
@@ -364,9 +364,9 @@ module Hobo::Dryml
       else
         parameters = general_parameters
       end
-        
+
       default_content = parameters[:default]
-      
+
       if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_default_content
                  new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
@@ -383,7 +383,7 @@ module Hobo::Dryml
               proc { |default| default_content._?.call(default) }
             end
         parameters = parameters.merge(:default => d)
-        
+
         if the_tag.is_a?(String, Symbol)
           # It's a defined DRYML tag
           send(the_tag, attributes, parameters)
@@ -408,18 +408,18 @@ module Hobo::Dryml
           # The override is a replace parameter - just pass it on
           overriding_proc
         else
-          proc do 
+          proc do
             overriding_attrs, overriding_parameters = overriding_proc.call
             general_attrs, general_parameters = general_proc.call
-            
+
             attrs  = merge_attrs(general_attrs, overriding_attrs)
             overriding_default = overriding_parameters.delete(:default)
             params = general_parameters.merge(overriding_parameters)
-            
+
             # The overrider should provide its :default as the new
             # 'default_content'
             if overriding_default
-              params[:default] = 
+              params[:default] =
                 if general_parameters[:default]
                   proc do |default|
                     overriding_default.call(proc { new_context { _output(general_parameters[:default].call(default)) } } )
@@ -436,19 +436,19 @@ module Hobo::Dryml
         end
       end
     end
-    
+
 
     def part_contexts_javascripts
       storage = part_contexts_storage
       storage.blank? ? "" : "<script>\n#{storage}</script>\n"
     end
-    
-    
+
+
     def part_contexts_storage
       PartContext.client_side_storage(@_part_contexts, session)
     end
-    
-    
+
+
     def render_tag(tag_name, attributes)
       method_name = tag_name.to_s.gsub('-', '_')
       if respond_to?(method_name)
@@ -456,7 +456,7 @@ module Hobo::Dryml
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
         if false && RAILS_ENV == "development"
-          res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
+          res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
         else
           res
         end
@@ -464,16 +464,16 @@ module Hobo::Dryml
         false
       end
     end
-    
-    
+
+
     def element(name, attributes, content=nil, escape = true, &block)
       unless attributes.blank?
         attrs = []
         if escape
           attributes.each do |key, value|
             next unless value
-            key = key.to_s.gsub("_", "-") 
-            
+            key = key.to_s.gsub("_", "-")
+
             value = if ActionView::Helpers::TagHelper::BOOLEAN_ATTRIBUTES.include?(key)
                       key
                     else
@@ -482,7 +482,7 @@ module Hobo::Dryml
                     end
             attrs << %(#{key}="#{value}")
           end
-          
+
         else
           attrs = options.map do |key, value|
             key = key.to_s.gsub("_", "-")
@@ -491,7 +491,7 @@ module Hobo::Dryml
         end
         attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
       end
-      
+
       content = new_context(&block) if block_given?
       res = if content
               "<#{name}#{attr_string}>#{content}</#{name}>"
@@ -505,11 +505,11 @@ module Hobo::Dryml
       end
     end
 
-  
+
     def session
       @view ? @view.session : {}
     end
-    
+
 
     def method_missing(name, *args, &b)
       if @view
@@ -518,7 +518,7 @@ module Hobo::Dryml
         raise NoMethodError, name.to_s
       end
     end
-    
+
   end
 
 end

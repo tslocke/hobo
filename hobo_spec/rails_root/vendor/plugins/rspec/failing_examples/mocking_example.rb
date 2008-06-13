@@ -12,7 +12,7 @@ describe "Mocker" do
     mock = mock("poke me")
     mock.should_receive(:poke)
   end
-  
+
   it "should fail when messages are received out of order" do
     mock = mock("one two three")
     mock.should_receive(:one).ordered

@@ -17,7 +17,7 @@ module Spec
         @main.send(:rspec_options).should be_instance_of(Spec::Runner::Options)
         @main.send(:rspec_options).should === $rspec_options
       end
-  
+
       specify {@main.should respond_to(:describe)}
       specify {@main.should respond_to(:context)}
 
@@ -28,7 +28,7 @@ module Spec
       it "should raise when no description given to describe" do
         lambda { @main.describe do; end }.should raise_error(ArgumentError)
       end
-  
+
     end
   end
 end

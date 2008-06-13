@@ -8,7 +8,7 @@ module Spec
         @added_behaviour = description
       end
     end
-    
+
     describe ExampleSuite, "#run", :shared => true do
       before :all do
         @original_rspec_options = $rspec_options
@@ -48,7 +48,7 @@ module Spec
 
     describe ExampleSuite, "#run with failure in example", :shared => true do
       it_should_behave_like "Spec::DSL::ExampleSuite#run"
-      
+
       it "should add an example failure to the TestResult" do
         suite = @behaviour.suite
         suite.run.should be_false
@@ -61,7 +61,7 @@ module Spec
       before do
         @options.dry_run = true
       end
-    
+
       it "should not run before(:all) or after(:all)" do
         before_all_ran = false
         after_all_ran = false
@@ -185,7 +185,7 @@ module Spec
         @special_behaviour.before(:all) { fiddle << "special.before(:all, :behaviour_type => :special)" }
         @special_behaviour.prepend_before(:all) { fiddle << "special.prepend_before(:all, :behaviour_type => :special)" }
         @special_behaviour.append_before(:each) { fiddle << "special.append_before(:each, :behaviour_type => :special)" }
-        
+
         behaviour = Class.new(@special_behaviour).describe("I'm a special behaviour") {}
         behaviour.it("test") {true}
         suite = behaviour.suite
@@ -421,7 +421,7 @@ module Spec
       before do
         Example.before(:each) { raise NonStandardError }
       end
-      
+
       it "should run after(:all)" do
         after_all_ran = false
         Example.after(:all) { after_all_ran = true }
@@ -437,7 +437,7 @@ module Spec
       before do
         @behaviour.it("should") { raise NonStandardError }
       end
-      
+
       it "should run after(:all)" do
         after_all_ran = false
         Example.after(:all) { after_all_ran = true }
@@ -460,11 +460,11 @@ module Spec
           first_after_ran = true
           raise "first"
         end
-        
+
         suite = @behaviour.suite
         suite.run.should be_false
-      end      
-      
+      end
+
       it "should run second after(:each) block" do
         second_after_ran = false
         @behaviour.after(:each) do
@@ -502,7 +502,7 @@ module Spec
         @behaviour.before(:each) do
           second_before_ran = true
         end
-        
+
         suite = @behaviour.suite
         suite.run.should be_false
       end
@@ -541,7 +541,7 @@ module Spec
       it "should return false" do
         suite = @behaviour.suite
         suite.run.should be_false
-      end      
+      end
 
       it "should provide after(:all) as description" do
         @reporter.should_receive(:example_finished) do |example, error, location|

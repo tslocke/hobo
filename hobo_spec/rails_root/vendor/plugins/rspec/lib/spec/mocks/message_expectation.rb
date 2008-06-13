@@ -3,7 +3,7 @@ module Spec
 
     class BaseExpectation
       attr_reader :sym
-      
+
       def initialize(error_generator, expectation_ordering, expected_from, sym, method_block, expected_received_count=1, opts={})
         @error_generator = error_generator
         @error_generator.opts = opts
@@ -22,7 +22,7 @@ module Spec
         @at_most = nil
         @args_to_yield = []
       end
-      
+
       def expected_args
         @args_expectation.args
       end
@@ -40,7 +40,7 @@ module Spec
         end
         @return_block = block_given? ? return_block : lambda { value }
       end
-      
+
       # :call-seq:
       #   and_raise()
       #   and_raise(Exception) #any exception class
@@ -55,20 +55,20 @@ module Spec
       def and_raise(exception=Exception)
         @exception_to_raise = exception
       end
-      
+
       def and_throw(symbol)
         @symbol_to_throw = symbol
       end
-      
+
       def and_yield(*args)
         @args_to_yield << args
         self
       end
-  
+
       def matches(sym, args)
         @sym == sym and @args_expectation.check_args(args)
       end
-      
+
       def invoke(args, block)
         @order_group.handle_order_constraint self
 
@@ -89,7 +89,7 @@ module Spec
           @actual_received_count += 1
         end
       end
-      
+
       protected
 
       def invoke_method_block(args)
@@ -99,7 +99,7 @@ module Spec
           @error_generator.raise_block_failed_error @sym, detail.message
         end
       end
-      
+
       def invoke_with_yield(block)
         if block.nil?
           @error_generator.raise_missing_block_error @args_to_yield
@@ -111,55 +111,55 @@ module Spec
           block.call(*args_to_yield_this_time)
         end
       end
-      
+
       def invoke_consecutive_return_block(args, block)
         args << block unless block.nil?
         value = @return_block.call(*args)
-        
+
         index = [@actual_received_count, value.size-1].min
         value[index]
       end
-      
+
       def invoke_return_block(args, block)
         args << block unless block.nil?
         value = @return_block.call(*args)
-    
+
         value
       end
     end
-    
+
     class MessageExpectation < BaseExpectation
-      
+
       def matches_name_but_not_args(sym, args)
         @sym == sym and not @args_expectation.check_args(args)
       end
-       
-      def verify_messages_received        
+
+      def verify_messages_received
         return if ignoring_args? || matches_exact_count? ||
            matches_at_least_count? || matches_at_most_count?
-    
+
         generate_error
       rescue Spec::Mocks::MockExpectationError => error
         error.backtrace.insert(0, @expected_from)
         Kernel::raise error
       end
-      
+
       def ignoring_args?
         @expected_received_count == :any
       end
-      
+
       def matches_at_least_count?
         @at_least && @actual_received_count >= @expected_received_count
       end
-      
+
       def matches_at_most_count?
         @at_most && @actual_received_count <= @expected_received_count
       end
-      
+
       def matches_exact_count?
         @expected_received_count == @actual_received_count
       end
-      
+
       def generate_error
         @error_generator.raise_expectation_error(@sym, @expected_received_count, @actual_received_count, *@args_expectation.args)
       end
@@ -169,17 +169,17 @@ module Spec
         @args_expectation = ArgumentExpectation.new(args)
         self
       end
-      
+
       def exactly(n)
         set_expected_received_count :exactly, n
         self
       end
-      
+
       def at_least(n)
         set_expected_received_count :at_least, n
         self
       end
-      
+
       def at_most(n)
         set_expected_received_count :at_most, n
         self
@@ -189,41 +189,41 @@ module Spec
         @method_block = block if block
         self
       end
-  
+
       def any_number_of_times(&block)
         @method_block = block if block
         @expected_received_count = :any
         self
       end
-  
+
       def never
         @expected_received_count = 0
         self
       end
-  
+
       def once(&block)
         @method_block = block if block
         @expected_received_count = 1
         self
       end
-  
+
       def twice(&block)
         @method_block = block if block
         @expected_received_count = 2
         self
       end
-  
+
       def ordered(&block)
         @method_block = block if block
         @order_group.register(self)
         @ordered = true
         self
       end
-      
+
       def negative_expectation_for?(sym)
         return false
       end
-      
+
       protected
         def set_expected_received_count(relativity, n)
           @at_least = (relativity == :at_least)
@@ -237,18 +237,18 @@ module Spec
               2
           end
         end
-      
+
     end
-    
+
     class NegativeMessageExpectation < MessageExpectation
       def initialize(message, expectation_ordering, expected_from, sym, method_block)
         super(message, expectation_ordering, expected_from, sym, method_block, 0)
       end
-      
+
       def negative_expectation_for?(sym)
         return @sym == sym
       end
     end
-    
+
   end
 end

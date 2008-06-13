@@ -1,12 +1,12 @@
 module Hobo
-  
+
   module Lifecycles
-    
+
     class Transition < Struct.new(:lifecycle, :name, :who, :start_states, :end_state, :on_transition, :options)
-      
+
       include Actions
-            
-      
+
+
       def initialize(*args)
         super
         start_states.each do |from|
@@ -21,29 +21,29 @@ module Hobo
         end
         lifecycle.transitions << self
       end
-      
-            
+
+
       def allowed?(record, user, attributes=nil)
         prepare_and_check!(record, user, attributes) && true
       end
-      
-      
+
+
       def extract_attributes(attributes)
         update_attributes = options.fetch(:update, [])
         attributes & update_attributes
       end
-      
-      
+
+
       def run!(record, user, attributes)
         if prepare_and_check!(record, user, attributes)
           fire_event(record, on_transition)
           record.become end_state
         else
           raise Hobo::Model::PermissionDeniedError
-        end        
+        end
       end
-      
-      
+
+
       def set_or_check_who_with_key!(record, user)
         if who == :with_key
           record.lifecycle.valid_key? or raise LifecycleKeyError
@@ -52,7 +52,7 @@ module Hobo
         end
       end
       alias_method_chain :set_or_check_who!, :key
-      
+
 
       def parameters
         options[:update] || []
@@ -60,7 +60,7 @@ module Hobo
 
 
     end
-    
+
   end
-  
+
 end

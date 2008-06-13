@@ -1,7 +1,7 @@
 module Spec
   module Runner
     module Formatter
-      class FailingBehavioursFormatter < BaseTextFormatter      
+      class FailingBehavioursFormatter < BaseTextFormatter
         def add_behaviour(behaviour_name)
           if behaviour_name =~ /(.*) \(druby.*\)$/
             @behaviour_name = $1
@@ -9,10 +9,10 @@ module Spec
             @behaviour_name = behaviour_name
           end
         end
-      
+
         def example_failed(example, counter, failure)
           unless @behaviour_name.nil?
-            @output.puts @behaviour_name 
+            @output.puts @behaviour_name
             @behaviour_name = nil
             @output.flush
           end

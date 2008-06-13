@@ -52,7 +52,7 @@ module Spec
         behaviours.each do |behaviour|
           number = behaviour.set_sequence_numbers(number)
         end
-      end      
+      end
 
       def behaviours
         @options.behaviours

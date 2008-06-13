@@ -54,7 +54,7 @@ describe "should change { block }" do
       lambda {}.should change{ @instance.some_value }
     end.should fail_with("result should have changed, but is still 5")
   end
-  
+
   it "should warn if passed a block using do/end" do
     lambda do
       lambda {}.should change do
@@ -78,7 +78,7 @@ describe "should_not change { block }" do
       lambda {@instance.some_value = 6}.should_not change { @instance.some_value }
     end.should fail_with("result should not have changed, but did change from 5 to 6")
   end
-  
+
   it "should warn if passed a block using do/end" do
     lambda do
       lambda {}.should_not change do
@@ -172,7 +172,7 @@ describe "should change(actual, message).to(new)" do
     @instance = SomethingExpected.new
     @instance.some_value = 'string'
   end
-  
+
   it "should pass when attribute is == to expected value after executing block" do
     lambda { @instance.some_value = "cat" }.should change(@instance, :some_value).to("cat")
   end
@@ -189,7 +189,7 @@ describe "should change{ block }.to(new)" do
     @instance = SomethingExpected.new
     @instance.some_value = 'string'
   end
-  
+
   it "should pass when attribute is == to expected value after executing block" do
     lambda { @instance.some_value = "cat" }.should change{@instance.some_value}.to("cat")
   end
@@ -206,7 +206,7 @@ describe "should change(actual, message).from(old).to(new)" do
     @instance = SomethingExpected.new
     @instance.some_value = 'string'
   end
-  
+
   it "should pass when #to comes before #from" do
     lambda { @instance.some_value = "cat" }.should change(@instance, :some_value).to("cat").from("string")
   end
@@ -221,7 +221,7 @@ describe "should change{ block }.from(old).to(new)" do
     @instance = SomethingExpected.new
     @instance.some_value = 'string'
   end
-  
+
   it "should pass when #to comes before #from" do
     lambda { @instance.some_value = "cat" }.should change{@instance.some_value}.to("cat").from("string")
   end

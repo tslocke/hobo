@@ -9,14 +9,14 @@ module Hobo::Dryml
     def render(src, local_assigns)
       renderer = Hobo::Dryml.page_renderer(@view, local_assigns.keys)
       this = @view.instance_variable_set("@this", @view.controller.send(:dryml_context) || local_assigns[:this])
-      s = renderer.render_page(this, local_assigns) 
+      s = renderer.render_page(this, local_assigns)
 
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
       s = s.strip
-      
+
       # TODO: Temporary hack to get the dryml metadata comments in the right place
       if RAILS_ENV == "development"
-        s.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1") 
+        s.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
       else
         s
       end
@@ -27,33 +27,33 @@ module Hobo::Dryml
 end
 
 module ActionController
-  
+
 
   class Base
-    
+
     def dryml_context
       @this
     end
-    
+
     def dryml_fallback_tag(tag_name)
       @dryml_fallback_tag = tag_name
     end
-    
-    
+
+
     def call_dryml_tag(tag, options={})
       add_variables_to_assigns
-      
+
       # TODO: Figure out what this bit is all about :-)
       if options[:with]
         @this = options[:with] unless options[:field]
       else
         options[:with] = dryml_context
       end
-      
+
       Hobo::Dryml.render_tag(@template, tag, options)
     end
-    
-    
+
+
     # TODO: This is namespace polution, should be called render_dryml_tag
     def render_tag(tag, options={}, render_options={})
       text = call_dryml_tag(tag, options)
@@ -72,6 +72,6 @@ module ActionController
       end
     end
     alias_method_chain :render_for_file, :dryml
-    
+
   end
 end

@@ -10,7 +10,7 @@ end
 if __FILE__ == $0
   require File.dirname(__FILE__) + '/io_processor'
   require 'pathname'
-  
+
   accessor = FileAccessor.new
   io_processor = IoProcessor.new
   file = Pathname.new ARGV[0]

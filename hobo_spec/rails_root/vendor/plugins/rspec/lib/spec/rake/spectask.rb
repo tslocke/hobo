@@ -11,7 +11,7 @@ module Spec
     # A Rake task that runs a set of RSpec contexts.
     #
     # Example:
-    #  
+    #
     #   Spec::Rake::SpecTask.new do |t|
     #     t.warning = true
     #     t.rcov = true
@@ -76,7 +76,7 @@ module Spec
       # Whether or not to use RCov (default is false)
       # See http://eigenclass.org/hiki.rb?rcov
       attr_accessor :rcov
-      
+
       # Array of commandline options to pass to RCov. Defaults to ['--exclude', 'lib\/spec,bin\/spec'].
       # Ignored if rcov=false
       # Setting the RCOV_OPTS environment variable overrides this.
@@ -106,7 +106,7 @@ module Spec
       # used, then the list of spec files is the union of the two.
       # Setting the SPEC environment variable overrides this.
       attr_accessor :spec_files
-      
+
       # Use verbose output. If this is set to true, the task will print
       # the executed spec command to stdout. Defaults to false.
       attr_accessor :verbose
@@ -199,7 +199,7 @@ module Spec
         STDERR.puts "RSPECOPTS is DEPRECATED and will be removed in a future version. Use SPEC_OPTS instead." if ENV['RSPECOPTS']
         ENV['SPEC_OPTS'] || ENV['RSPECOPTS'] || spec_opts.join(" ") || ""
       end
-      
+
       def evaluate(o) # :nodoc:
         case o
           when Proc then o.call

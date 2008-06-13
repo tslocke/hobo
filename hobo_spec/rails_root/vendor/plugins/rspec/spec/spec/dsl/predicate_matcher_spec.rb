@@ -7,7 +7,7 @@ module Spec
         distance_in_yards < 1000
       end
     end
-    
+
     describe "predicate_matcher[method_on_object] = matcher_method" do
       predicate_matchers[:swim] = :can_swim?
       it "should match matcher_method if method_on_object returns true" do
