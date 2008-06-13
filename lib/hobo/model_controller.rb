@@ -148,12 +148,6 @@ module Hobo
       end
 
 
-
-      def def_auto_action(name, &block)
-        define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
-      end
-
-
       def def_collection_actions(name)
         def_auto_action name do
           hobo_show_collection(name)
