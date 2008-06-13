@@ -35,7 +35,7 @@ module Hobo
 
     @renderer_classes = {}
     @tag_page_renderer_classes = {}
-    
+
     extend self
 
     attr_accessor :last_if

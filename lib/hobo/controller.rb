@@ -3,15 +3,15 @@ module Hobo
   module Controller
 
     include AuthenticationSupport
-    
+
     class << self
-      
+
       def included(base)
         if base.is_a?(Class)
           included_in_class(base)
         end
       end
-      
+
       def included_in_class(klass)
         klass.extend(ClassMethods)
         klass.class_eval do
@@ -20,28 +20,28 @@ module Hobo
         end
         Hobo::HoboHelper.add_to_controller(klass)
       end
-      
+
       attr_accessor :request_host
 
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
       end
-      
+
     end
 
     module ClassMethods
 
       attr_reader :included_taglibs
-      
+
       def include_taglib(src, options={})
         @included_taglibs << options.merge(:src => src)
       end
-      
+
     end
 
-    
+
     protected
-    
+
     def redirect_to_with_object_url(destination, *args)
       if destination.is_a?(String, Hash, Symbol)
         redirect_to_without_object_url(destination)
@@ -50,7 +50,7 @@ module Hobo
       end
     end
 
-    
+
     def hobo_ajax_response(*args)
       results = args.extract_options!
       this = args.first || @this
@@ -74,7 +74,7 @@ module Hobo
         for spec in render_specs
           function = spec[:function] || "_update"
           dom_id = spec[:id]
-          
+
           if spec[:part_context]
             part_name, part_this, locals = Dryml::PartContext.unmarshal(spec[:part_context], this, session)
             part_content = renderer.call_part(dom_id, part_name, part_this, *locals)
@@ -89,8 +89,8 @@ module Hobo
         page << renderer.part_contexts_storage if renderer
       end
     end
-    
-    
+
+
     def dryml_context
       @this
     end
@@ -100,12 +100,12 @@ module Hobo
       for_type = options.delete(:for_type)
       add_variables_to_assigns
       dryml_renderer = Hobo::Dryml.empty_page_renderer(@template)
-      
-      results = objects.map do |o| 
+
+      results = objects.map do |o|
         tag = dryml_renderer.find_polymorphic_tag(tag, o.class) if for_type
         dryml_renderer.send(tag, options.merge(:with => o))
       end.join
-      
+
       render :text => results + dryml_renderer.part_contexts_storage
     end
 
@@ -131,9 +131,9 @@ module Hobo
     def request_no_cache?
       request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
     end
-    
+
     def not_found
-      
+
     end
 
   end
@@ -141,9 +141,9 @@ end
 
 
 class ActionController::Base
-  
+
   def home_page
     ""
   end
-  
+
 end

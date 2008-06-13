@@ -1,9 +1,9 @@
 module Hobo
-  
+
   module Scopes
 
     module ApplyScopes
-      
+
       def apply_scopes(scopes)
         result = self
         scopes.each_pair do |scope, arg|
@@ -15,9 +15,9 @@ module Hobo
         end
         result
       end
-      
+
     end
-    
+
   end
-  
+
 end

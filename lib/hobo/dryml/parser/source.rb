@@ -1,8 +1,8 @@
 module Hobo::Dryml::Parser
-  
+
   # A REXML source that keeps track of where in the buffer it is
   class Source < REXML::Source
-    
+
     def initialize(src)
       super(src)
       @buffer_offset = 0
@@ -50,7 +50,7 @@ module Hobo::Dryml::Parser
 
     def current_line
       pos = last_match_offset || 0
-      [0, 0, @orig[0..pos].count("\n") + 1] 
+      [0, 0, @orig[0..pos].count("\n") + 1]
     end
 
   end

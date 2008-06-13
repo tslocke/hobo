@@ -1,13 +1,13 @@
 module Hobo
-  
+
   module AuthenticationSupport
-    
+
     # Filter method to enforce a login requirement.
     def logged_in?
       not current_user.guest?
     end
-    
-    
+
+
     # Check if the user is authorized.
     #
     # Override this method in your controllers if you want to restrict access
@@ -39,7 +39,7 @@ module Hobo
     #
     def login_required(user_model=nil)
       auth_model = user_model || User.default_user_model
-      if current_user.guest? 
+      if current_user.guest?
         username, passwd = get_auth_data
         self.current_user = auth_model.authenticate(username, passwd) || nil if username && passwd && auth_model
       end
@@ -91,7 +91,7 @@ module Hobo
     # cookie and log the user back in if apropriate
     def login_from_cookie
       return unless (token = cookies[:auth_token]) && !logged_in?
-      
+
       user_model = token[:user_model].constantize
       user = user_model.find_by_remember_token(token)
       if user && user.remember_token?
@@ -100,7 +100,7 @@ module Hobo
         create_auth_cookie
       end
     end
-    
+
     def create_auth_cookie
       cookies[:auth_token] = { :value => current_user.remember_token ,
                                :expires => current_user.remember_token_expires_at,
@@ -121,5 +121,5 @@ module Hobo
     end
 
   end
-  
+
 end

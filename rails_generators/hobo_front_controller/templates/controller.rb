@@ -1,7 +1,7 @@
 class <%= class_name %>Controller < ApplicationController
 
   hobo_controller
-  
+
   def index; end
 
   def search

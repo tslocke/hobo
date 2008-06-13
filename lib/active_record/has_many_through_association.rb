@@ -5,7 +5,7 @@ module ActiveRecord::Associations
     def member_class
       proxy_reflection.klass
     end
-    
+
     def origin
       proxy_owner
     end
