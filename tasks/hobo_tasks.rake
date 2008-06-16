@@ -9,8 +9,8 @@ namespace :hobo do
         `rm -f hobo-rapid.js`
         `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js`
       end
-      
-      Dir.chdir("hobothemes") do       
+
+      Dir.chdir("hobothemes") do
         puts "hobothemes/clean"
         `rm -f clean`
         `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public clean`
