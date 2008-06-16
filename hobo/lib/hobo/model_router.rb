@@ -76,8 +76,10 @@ module Hobo
         subsites.each { |subsite| add_routes_for(map, subsite) }
 
         add_developer_routes(map) if Hobo.developer_features?
-      rescue ActiveRecord::StatementInvalid
+      rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
+        ActiveRecord::Base.logger.info "!! Database exception during Hobo routing -- continuing without routes"
+        ActiveRecord::Base.logger.info "!! #{e.to_s}"
       end
 
 
@@ -145,7 +147,7 @@ module Hobo
         collection_routes
         web_method_routes
         show_action_routes
-        
+
         reorder_route
         user_routes      if controller < Hobo::UserController
       end
@@ -217,21 +219,21 @@ module Hobo
     def reorder_route
       linkable_route("reorder_#{plural}", "#{plural}/reorder", 'reorder', :conditions => { :method => :post })
     end
-    
-    
+
+
     def lifecycle_routes
       model::Lifecycle.creator_names.each do |creator|
         linkable_route("#{singular}_#{creator}",      "#{plural}/#{creator}", creator,           :conditions => { :method => :post }, :format => false)
         linkable_route("#{singular}_#{creator}_page", "#{plural}/#{creator}", "#{creator}_page", :conditions => { :method => :get },  :format => false)
       end
       model::Lifecycle.transition_names.each do |transition|
-        linkable_route("#{singular}_#{transition}",      "#{plural}/:id/#{transition}", transition, 
+        linkable_route("#{singular}_#{transition}",      "#{plural}/:id/#{transition}", transition,
                        :conditions => { :method => :put }, :format => false)
-        linkable_route("#{singular}_#{transition}_page", "#{plural}/:id/#{transition}", "#{transition}_page", 
+        linkable_route("#{singular}_#{transition}_page", "#{plural}/:id/#{transition}", "#{transition}_page",
                        :conditions => { :method => :get }, :format => false)
       end
     end
-        
+
 
     def user_routes
       prefix = plural == "users" ? "" : "#{singular}_"
