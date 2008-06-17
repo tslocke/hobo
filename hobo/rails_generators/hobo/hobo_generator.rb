@@ -4,7 +4,7 @@ class HoboGenerator < Rails::Generator::Base
     if options[:add_routes]
       routes_path = File.join(RAILS_ROOT, "config/routes.rb")
 
-      hobo_require = "gem 'hobo'\nrequire 'hobo'\n"
+      hobo_require = "(gem 'hobo'; require 'hobo') unless defined?(Hobo)\n"
       route = "  Hobo.add_routes(map)\n"
 
       route_src = File.read(routes_path)
