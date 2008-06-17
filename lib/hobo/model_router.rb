@@ -78,8 +78,8 @@ module Hobo
         add_developer_routes(map) if Hobo.developer_features?
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
-        ActiveRecord::Base.logger.info "!! Database exception during Hobo routing -- continuing without routes"
-        ActiveRecord::Base.logger.info "!! #{e.to_s}"
+        ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
+        ActiveRecord::Base.logger.warn "!! #{e.to_s}"
       end
 
 
