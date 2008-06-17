@@ -845,7 +845,6 @@ module Hobo::Dryml
                 else
                   dryml_exception("invalid quote(s) in attribute value")
                 end
-                #attr.starts_with?("++") ? "attr_extension(#{str})" : str
               end
         options[:symbolize] ? (res + ".to_sym") : res
       end
