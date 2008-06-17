@@ -14,10 +14,6 @@ module Hobo
       end
     end
 
-    class AttributeExtensionString < String;
-      def drop_prefix; self[2..-1]; end
-    end
-
     TagDef = Struct.new "TagDef", :name, :attrs, :proc
 
     RESERVED_WORDS = %w{if for while do class else elsif unless case when module in}
