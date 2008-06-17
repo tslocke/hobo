@@ -9,7 +9,24 @@ class HoboMigrationGenerator < Rails::Generator::Base
                                             end
   end
 
+  def migrations_pending?
+    pending_migrations = ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
+
+    if pending_migrations.any?
+      puts "You have #{pending_migrations.size} pending migrations:"
+      pending_migrations.each do |pending_migration|
+        puts '  %4d %s' % [pending_migration.version, pending_migration.name]
+      end
+      true
+    else
+      false
+    end
+  end
+
+
   def manifest
+    return record {|m| } if migrations_pending?
+
     generator = HoboFields::MigrationGenerator.new(self)
     up, down = generator.generate
 
