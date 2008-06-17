@@ -1,7 +1,6 @@
 bin/hobo
 CHANGES.txt
 init.rb
-lib/action_view_extensions/base.rb
 lib/active_record/association_proxy.rb
 lib/active_record/association_reflection.rb
 lib/active_record/has_many_association.rb

@@ -64,7 +64,7 @@ end
 puts "\nGenerating Rails app...\n"
 opts = []
 opts << "-d #{database_type}" if database_type
-system("rails _2.0.2_ #{opts * ' '} #{app_path}")
+system("rails #{opts * ' '} #{app_path}")
 
 
 Dir.chdir(app_path) do

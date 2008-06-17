@@ -6,8 +6,10 @@ module Hobo
 
       def create_automatic_scope(name)
         ScopeBuilder.new(self, name).create_scope
-      rescue ActiveRecord::StatementInvalid
+      rescue ActiveRecord::StatementInvalid => e
         # Problem with the database? Don't try to create automatic scopes
+        ActiveRecord::Base.logger.warn "!! Database exception during hobo auto-scope creation -- continuing automatic scopes"
+        ActiveRecord::Base.logger.warn "!! #{e.to_s}"
         false
       end
 
@@ -157,16 +159,12 @@ module Hobo
         # published
         elsif (col = column(name)) && (col.type == :boolean)
 
-          def_scope do
-            { :conditions => ["#{column_sql(col)} = ?", true] }
-          end
+          def_scope :conditions => ["#{column_sql(col)} = ?", true]
 
         # not_published
         elsif name =~ /^not_(.*)$/ && (col = column($1)) && (col.type == :boolean)
 
-          def_scope do
-            { :conditions => ["#{column_sql(col)} <> ?", true] }
-          end
+          def_scope :conditions => ["#{column_sql(col)} <> ?", true]
 
         # published_before(time)
         elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
@@ -192,9 +190,7 @@ module Hobo
          # active (a lifecycle state)
         elsif @klass.has_lifecycle? && name.in?(@klass::Lifecycle.state_names)
 
-          def_scope do
-            { :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name] }
-          end
+          def_scope :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name]
 
         # self is / is not
         elsif name == "is"
@@ -312,7 +308,7 @@ module Hobo
 
 
       def def_scope(options={}, &block)
-        @klass.send(:def_scope, name, options, &block)
+        @klass.send(:named_scope, name, block || options)
       end
 
 

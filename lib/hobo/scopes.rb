@@ -4,10 +4,6 @@ module Hobo
 
     def self.included_in_class(base)
       base.extend(ClassMethods)
-
-      class << base
-        alias_method_chain :has_many, :defined_scopes
-      end
     end
 
     module ClassMethods
@@ -15,50 +11,6 @@ module Hobo
       include AutomaticScopes
 
       include ApplyScopes
-
-      def defined_scopes
-        @defined_scopes ||= {}
-      end
-
-
-      def def_scope(name, scope=nil, &block)
-        defined_scopes[name.to_sym] = block || scope
-
-        meta_def(name) do |*args|
-          ScopedProxy.new(self, block ? block.call(*args) : scope)
-        end
-      end
-
-
-      def apply_scopes(scopes)
-        result = self
-        scopes.each_pair do |scope, arg|
-          if arg.is_a?(Array)
-            result = result.send(scope, *arg) unless arg.first.blank?
-          else
-            result = result.send(scope, arg) unless arg.blank?
-          end
-        end
-        result
-      end
-
-
-      def alias_scope(new_name, old_name)
-        metaclass.send(:alias_method, new_name, old_name)
-        defined_scopes[new_name] = defined_scopes[old_name]
-      end
-
-
-      def has_many_with_defined_scopes(name, options={}, &block)
-        if options.has_key?(:extend) || block
-          # Normal has_many
-          has_many_without_defined_scopes(name, options, &block)
-        else
-          options[:extend] = Hobo::Scopes::DefinedScopeProxyExtender
-          has_many_without_defined_scopes(name, options, &block)
-        end
-      end
-
 
       # --- monkey-patches to allow :scope key on has_many, has_one and belongs_to ---
 

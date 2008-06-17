@@ -127,11 +127,6 @@ module Hobo::Dryml
     end
 
 
-    def attr_extension(s)
-      AttributeExtensionString.new(s)
-    end
-
-
     def dom_id(object=nil, attribute=nil)
       if object.nil?
         # nothing passed -- use context
