@@ -19,7 +19,7 @@
   <if test="&can_view?">
     <set has-heading="&this.class.name_attribute || all_parameters[:heading]"/>
     <set has-link="&has_heading && linkable?"/>
-    <div class="card #{has_link ? 'linkable' : 'content'} #{'with-owner' if this.class.creator_attribute} #{type_name :dasherize => true}" 
+    <div class="card #{has_link ? 'linkable' : 'content'} #{'with-owner' if this.class.creator_attribute} #{type_name :dasherize => true}"
          merge-attrs>
       <div class="controls" param="controls">
         <a action="edit" class="edit" if="&!has_link && linkable?(:edit) && can_edit?" param="edit-link">Edit</a>
@@ -59,8 +59,8 @@
   <set-scoped collection-contains-delete-button="&false">
     <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
     <base-collection if="&poly.nil?" merge/>
-    <p class="empty-collection-message" 
-       if="&this.empty? || scope.collection_contains_delete_button" 
+    <p class="empty-collection-message"
+       if="&this.empty? || scope.collection_contains_delete_button"
        style="#{'display:none' if !this.empty?}"
        param="empty-message">
       No <name-for-collection lowercase/> to display
@@ -69,7 +69,7 @@
 </def>
 
 
-<def tag="base-collection" attrs="sortable, sortable-options"><% 
+<def tag="base-collection" attrs="sortable, sortable-options"><%
   sortable &&= (first = this.first and
                 first.respond_to?(:position_column) and
                 reorder_url = object_url(this.member_class, :reorder, :method => :post) and
@@ -92,7 +92,7 @@
                  :scroll => :window,
                  :handle => 'ordering-handle',
                  :complete => [visual_effect(:highlight, attributes[:id])]
-                } 
+                }
         opts.update(sortable_options) if sortable_options
         sortable_element attributes[:id], opts
       end
@@ -102,12 +102,12 @@
 
 <def tag="collection-preview" attrs="limit, if-any">
   <% limit ||= 6 %>
-  <do with="&this.is_a?(Class) ? this.limit(limit).all : this.limit(limit)">
+  <do with="&this.limit(limit)">
     <unless test="&if_any && this.empty?">
       <set collection-name="&(this.try.origin_attribute || this.member_class.name.pluralize).to_s"/>
       <div class="collection-preview" merge-attrs>
         <h2>
-          <do param="heading"><collection-name.titleize/></do> 
+          <do param="heading"><collection-name.titleize/></do>
           <span param="show-all-link" if="&linkable? && this.count > limit">(<a>show all</a>)</span>
         </h2>
         <collection merge-params>
