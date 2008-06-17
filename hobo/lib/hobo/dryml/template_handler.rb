@@ -2,14 +2,10 @@ module Hobo::Dryml
 
   class TemplateHandler < ActionView::TemplateHandler
 
-    def initialize(view)
-      @view = view
-    end
-
-    def render(src, local_assigns)
-      renderer = Hobo::Dryml.page_renderer(@view, local_assigns.keys)
-      this = @view.instance_variable_set("@this", @view.controller.send(:dryml_context) || local_assigns[:this])
-      s = renderer.render_page(this, local_assigns)
+    def render(template)
+      renderer = Hobo::Dryml.page_renderer_for_template(@view, template)
+      this = @view.instance_variable_set("@this", @view.controller.send(:dryml_context) || template.locals[:this])
+      s = renderer.render_page(this, template.locals)
 
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
       s = s.strip

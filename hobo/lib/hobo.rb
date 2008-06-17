@@ -386,12 +386,8 @@ module Hobo
       require 'active_record/has_many_through_association'
       require 'active_record/association_proxy'
       require 'active_record/association_reflection'
-      require 'action_view_extensions/base'
 
-      ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-      # TODO - Rails 2.1 requires ActionView::Template
-      # ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-
+      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
 
       Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
 
