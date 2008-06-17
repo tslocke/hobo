@@ -1,4 +1,4 @@
-# Add support for :scope => :my_scope to has_many and :belongs_to
+# Add support for :scope => :my_scope to has_many and belongs_to
 
 module Hobo
 
