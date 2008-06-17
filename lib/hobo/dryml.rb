@@ -53,12 +53,16 @@ module Hobo
     end
 
 
+    def page_renderer_for_template(view, template)
+      page_renderer(view, template.locals.keys, template.path_without_extension)
+    end
+
+
     def page_renderer(view, local_names=[], page=nil)
       if RAILS_ENV == "development"
         clear_cache
         Taglib.clear_cache
       end
-      page ||= view.instance_variable_get('@hobo_template_path')
 
       prepare_view!(view)
       included_taglibs = ([subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
