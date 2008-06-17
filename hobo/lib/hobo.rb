@@ -6,9 +6,6 @@ begin
 rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
-require "active_record"
-require "action_controller"
-require "action_view"
 
 Dependencies.load_paths |= [ File.dirname(__FILE__) ]
 
