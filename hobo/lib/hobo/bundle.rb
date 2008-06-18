@@ -95,7 +95,7 @@ module ::Hobo
       self.name = args.first || self.class.name.match(/[^:]+$/)[0].underscore
       Bundle.bundles[name] = self
 
-      options = defaults.with_indifferent_access
+      options = defaults(caller_options).with_indifferent_access
       options.recursive_update(caller_options)
 
       @renames, @options = separate_renames(options)
