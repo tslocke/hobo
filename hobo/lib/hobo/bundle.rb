@@ -113,7 +113,7 @@ module ::Hobo
     # optionally overridden by the bundle subclass
     def includes; end
     def init;     end
-    def defaults; {}; end
+    def defaults(options); {}; end
 
 
     def plugin
