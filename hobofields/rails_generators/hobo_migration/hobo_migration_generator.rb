@@ -13,7 +13,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
     pending_migrations = ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
 
     if pending_migrations.any?
-      puts "You have #{pending_migrations.size} pending migrations:"
+      puts "You have #{pending_migrations.size} pending migration#{'s' if pending_migrations.size > 1}:"
       pending_migrations.each do |pending_migration|
         puts '  %4d %s' % [pending_migration.version, pending_migration.name]
       end
