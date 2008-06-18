@@ -116,8 +116,10 @@ module Hobo
 
 
       def user_new(user, attributes={})
-        record = new(attributes)
-        record.user_changes(user) and record
+        record = new(attributes) {|r| r.acting_user = user; yield if block_given? }
+        allowed = record.user_changes(user)
+        record.acting_user = nil
+        allowed && record
       end
 
 
