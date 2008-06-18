@@ -1,6 +1,6 @@
 module Hobo::Dryml
 
-  class TemplateHandler < ActionView::TemplateHandler
+  class TemplateHandler
 
     def initialize(view)
       @view = view
