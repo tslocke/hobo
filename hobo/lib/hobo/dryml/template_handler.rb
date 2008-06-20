@@ -61,7 +61,7 @@ module ActionController
           tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
 
           # The template was missing, try to use a DRYML <page> tag instead
-          render_tag(tag_name) or raise ActionController::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
+          render_tag(tag_name) or raise ActionView::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
       else
         render_for_file_without_dryml(template_path, *args)
       end
