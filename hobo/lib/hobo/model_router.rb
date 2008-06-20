@@ -63,7 +63,6 @@ module Hobo
         end
 
         require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
-        load "#{APP_ROOT}/assemble.rb" if File.exists? "#{APP_ROOT}/assemble.rb"
 
         # Don't create routes if it's a generator that's running
         return if caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
