@@ -463,6 +463,10 @@ class ::Array
 
 end
 
+class ActiveRecord::NamedScope::Scope
+  delegate :origin, :origin_attribute, :member_class, :to => :proxy_found
+end
+
 
 class NilClass
   def typed_id
