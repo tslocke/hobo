@@ -103,13 +103,14 @@ var Hobo = {
 
         Hobo.showSpinner(options.message, options.spinnerNextTo)
         var complete = function() {
-            if (form && options.resetForm) form.reset();
             Hobo.hideSpinner();
-
-            if (options.onComplete)
-                options.onComplete.apply(this, arguments)
+            if (options.onComplete) options.onComplete.apply(this, arguments)
             if (form && options.refocusForm) Form.focusFirstElement(form)
             Event.addBehavior.reload()
+        }
+        var success = function() {
+            if (options.onSuccess) options.onSuccess.apply(this, arguments)
+            if (form && options.resetForm) form.reset();            
         }
         if (options.method && options.method.toLowerCase() == "put") {
             delete options.method
@@ -122,7 +123,7 @@ var Hobo = {
             }
         }
 
-        new Ajax.Request(url, Object.merge(options, { parameters: params.join("&"), onComplete: complete }))
+        new Ajax.Request(url, Object.merge(options, { parameters: params.join("&"), onComplete: complete, onSuccess: success }))
     },
 
     hide: function() {
