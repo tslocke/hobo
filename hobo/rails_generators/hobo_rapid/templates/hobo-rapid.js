@@ -547,7 +547,7 @@ SelectManyInput = Behavior.create({
     addOne : function() {
         var select = this.element.down('select') 
         var selected = select.options[select.selectedIndex]
-        if (selected.value != "") {
+        if ($F(select) != "") {
             var newItem = $(DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip()))
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
@@ -589,7 +589,7 @@ NameManyInput = Object.extend(SelectManyInput, {
     addOne : function() {
         var select = this.element.down('select') 
         var selected = select.options[select.selectedIndex]
-        if (selected.value != "") {
+        if ($F(select)  != "") {
             var newItem = $(DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip()))
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
