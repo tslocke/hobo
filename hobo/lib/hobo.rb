@@ -109,19 +109,24 @@ module Hobo
           # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
           # By default, search all models, but filter out...
           Hobo.models.select do |m|
-          ModelRouter.linkable?(m, :show) && # ...non-linkables
-            m.search_columns.any?             # and models with no search-columns
+            ModelRouter.linkable?(m, :show) &&  # ...non-linkables
+              m.search_columns.any?             # and models with no search-columns
           end
         end
 
       query_words = ActiveRecord::Base.connection.quote_string(query).split
 
       search_targets.build_hash do |search_target|
-        conditions = query_words.map do |word|
-          "(" + search_target.search_columns.map { |column| %(#{column} like "%#{word}%") }.join(" or ") + ")"
-        end.join(" and ")
+        conditions = []
+        parameters = []
+        query_words.each do |word|
+          column_queries = search_target.search_columns.map { |column| "#{column} like ?" }
+          conditions << "(" + column_queries.join(" or ") + ")"
+          parameters.concat(["%#{word}%"] * column_queries.length)
+        end
+        conditions = conditions.join(" and ")
 
-        results = search_target.find(:all, :conditions => conditions)
+        results = search_target.find(:all, :conditions => [conditions, *parameters])
         [search_target.name, results] unless results.empty?
       end
     end
