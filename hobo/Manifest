@@ -47,9 +47,6 @@ lib/hobo/rapid_helper.rb
 lib/hobo/scopes/apply_scopes.rb
 lib/hobo/scopes/association_proxy_extensions.rb
 lib/hobo/scopes/automatic_scopes.rb
-lib/hobo/scopes/defined_scope_proxy_extender.rb
-lib/hobo/scopes/scope_reflection.rb
-lib/hobo/scopes/scoped_proxy.rb
 lib/hobo/scopes.rb
 lib/hobo/static_tags
 lib/hobo/undefined.rb
