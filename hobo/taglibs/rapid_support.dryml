@@ -7,7 +7,7 @@
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
                   columns = klass.content_columns.*.name
-                  columns -= %w{created_at updated_at created_on updated_on} unless include_timestamps
+                  columns -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
 
                   if skip_associations == "has_many"
                     assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
@@ -36,7 +36,7 @@
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.member_class
                   columns = klass.content_columns.*.name
-                  columns -= %w{created_at updated_at created_on updated_on} unless include_timestamps
+                  columns -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
 
                   if skip_associations == "has_many"
                     assocs = this.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
