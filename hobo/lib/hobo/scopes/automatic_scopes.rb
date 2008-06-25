@@ -212,6 +212,11 @@ module Hobo
         else
 
           case name
+            
+          when "by_most_recent"
+            def_scope do
+              { :order => "#{@klass.table_name}.created_at DESC" }
+            end
 
           when "recent"
             def_scope do |*args|
