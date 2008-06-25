@@ -386,8 +386,7 @@ module Hobo
 
 
     def hobo_new(new_record=nil, &b)
-      self.this = new_record || model.new
-      this.user_changes!(current_user) # set_creator and permission check
+      self.this = new_record || model.user_new!(current_user)
       response_block(&b)
     end
 
