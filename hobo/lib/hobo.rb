@@ -387,6 +387,7 @@ module Hobo
       require 'active_record/association_proxy'
       require 'active_record/association_reflection'
       require 'action_view_extensions/base'
+      require 'action_view_extensions/helpers/tag_helper'
 
       ActionView::Base.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
       # TODO - Rails 2.1 requires ActionView::Template
