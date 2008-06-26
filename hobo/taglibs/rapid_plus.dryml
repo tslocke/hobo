@@ -30,7 +30,7 @@
             </if>
           </th>
         </with-field-names>
-        <th if="&all_parameters[:controls]" class="controls"/>
+        <th if="&all_parameters[:controls]" class="controls"></th>
       </field-heading-row>
     </table>    
     <do param="empty-message" if="empty?">No <name-for-collection lowercase/> to display</do>

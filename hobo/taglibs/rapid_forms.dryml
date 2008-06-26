@@ -61,9 +61,9 @@
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
                    ''
                  else
-                   element(:input, :type => "hidden", 
+                   element(:input, {:type => "hidden", 
                            :name => request_forgery_protection_token.to_s,
-                           :value => form_authenticity_token)
+                           :value => form_authenticity_token}, nil, true, true)
                  end
      
     page_path = if request.post? || request.put? && params[:page_path]
@@ -100,7 +100,7 @@
 
 <def tag="input"><%=     
   if attributes[:type]
-    element :input, attributes
+    element :input, attributes, nil, true, true
   elsif !can_edit?
     view
   else
@@ -189,7 +189,7 @@
     ajax_attributes[:message] ||= label
     func = ajax_updater(url, update, ajax_attributes)
     html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
-    element(:input, html_attributes)
+    element(:input, html_attributes, nil, true, true)
   else
     button_to(label, url, html_attributes)
   end
@@ -205,7 +205,7 @@
    func = ajax_updater(object_url(this), update, ajax_attributes)
    html_attributes.reverse_merge!(:type =>'button', :onclick => func, :value => label)
    
-   element :input, add_classes(html_attributes, "button update-button update-#{this.class.name.underscore}-button") %>
+   element :input, add_classes(html_attributes, "button update-button update-#{this.class.name.underscore}-button"), nil, true, true %>
 </def>
 
 
@@ -234,7 +234,7 @@
         scope.collection_contains_delete_button = true if fade
         attributes[:value] = label
         attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
-        element(:input, attributes)
+        element(:input, attributes, nil, true, true)
       end
     end
   else
@@ -264,7 +264,7 @@
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
     func = ajax_updater(object_url(new.class), update, ajax_attributes)
     element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
-                                "button create-button create-#{class_name}-button")
+                                "button create-button create-#{class_name}-button"), nil, true, true
   end
 %></def>
 
