@@ -300,7 +300,7 @@
 %></def>
 
 <def tag="html" attrs="doctype">
-  <% doctype ||= 'HTML 4.01 STRICT' -%>
+  <% doctype ||= 'XHTML 1.0 TRANSITIONAL' -%>
   <doctype version="&doctype"/>
   <% attributes.reverse_merge!(:xmlns => "http://www.w3.org/1999/xhtml") if doctype =~ /^XHTML/ -%>
   <%= "<html#{tag_options(attributes)}>" %>
@@ -309,7 +309,7 @@
 </def>
 
 <!-- empty tags should be written as <br> in HTML and <br /> in XHTML -->
-<def tag="empty-tag" attrs="tag-name"><%= "<#{tag_name}#{tag_options(attributes.inject({}) {|options, (key,value)| options[key.to_s.dasherize] = value; options})}#{scope.xmldoctype  ? ' /' : ''}>" %></def>
+<def tag="empty-tag" attrs="tag-name"><%= element(tag_name, attributes, nil, true, true) %></def>
 <def tag="base"><empty-tag tag-name="base" merge/></def>
 <def tag="meta"><empty-tag tag-name="meta" merge/></def>
 <def tag="link"><empty-tag tag-name="link" merge/></def>
