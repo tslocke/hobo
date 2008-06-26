@@ -1,7 +1,6 @@
-<def tag="base-page" attrs="title, full-title, doctype, nicedit">
+<def tag="base-page" attrs="title, full-title, nicedit">
   <% full_title ||= "#{title} : #{app_name}" %>
-  <doctype param version="&doctype || 'HTML 4.01 STRICT'"/>
-  <html>
+  <html merge-attrs>
     <head param>
       <title param><%= full_title.gsub(/<.*?>/, '') %></title>
       <do param="stylesheets">
@@ -12,7 +11,7 @@
 
       <do param="scripts">
         <javascript param name="#{'nicedit, ' if nicedit} prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
-        <do param="fix-ie6"><%= "<!--[if lt IE 7]>" %><javascript name="IE7"/><%= "<![endif]-->" %></do>
+        <if-ie version="lt IE 7" param="fix-ie6"><javascript name="IE7"/></if-ie>
         <hobo-rapid-javascripts param/>
       </do>
     </head>
@@ -20,7 +19,6 @@
     <body onload="Hobo.applyEvents();" param/>
   </html>
 </def>
-
 
 <def tag="simple-layout">
   <base-page merge>
@@ -290,7 +288,7 @@
       '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + 
         '"http://www.w3.org/TR/html4/loose.dtd">'
     when "XHTML 1.0 STRICT"
-      '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' + 
         '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
     when "XHTML 1.0 TRANSITIONAL"
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
@@ -301,6 +299,31 @@
   end
 %></def>
 
+<def tag="html" attrs="doctype">
+  <% doctype ||= 'XHTML 1.0 TRANSITIONAL' -%>
+  <doctype version="&doctype"/>
+  <% attributes.reverse_merge!(:xmlns => "http://www.w3.org/1999/xhtml") if doctype =~ /^XHTML/ -%>
+  <%= "<html#{tag_options(attributes)}>" %>
+    <set-scoped xmldoctype="&doctype =~ /^XHTML/"><do param="default"/></set-scoped>
+  <%= "</html>" %>
+</def>
+
+<!-- empty tags should be written as <br> in HTML and <br /> in XHTML -->
+<def tag="empty-tag" attrs="tag-name"><%= element(tag_name, attributes, nil, true, true) %></def>
+<def tag="base"><empty-tag tag-name="base" merge/></def>
+<def tag="meta"><empty-tag tag-name="meta" merge/></def>
+<def tag="link"><empty-tag tag-name="link" merge/></def>
+<def tag="img"><empty-tag tag-name="img" merge/></def>
+<def tag="br"><empty-tag tag-name="br" merge/></def>
+<def tag="hr"><empty-tag tag-name="hr" merge/></def>
+<def tag="frame"><empty-tag tag-name="frame" merge/></def>
+<def tag="area"><empty-tag tag-name="area" merge/></def>
+<def tag="param"><empty-tag tag-name="param" merge/></def>
+<def tag="col"><empty-tag tag-name="col" merge/></def>
+
+<def tag="if-ie" attrs="version">
+  <%= "<!--[if #{version || 'IE'}]>" %><do param="default"/><%= "<![endif]-->" %>
+</def>
 
 <def tag="stylesheet" attrs="name, media">
   <repeat with="&comma_split(name)">

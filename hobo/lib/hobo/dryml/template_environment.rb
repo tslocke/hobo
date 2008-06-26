@@ -466,7 +466,7 @@ module Hobo::Dryml
     end
 
 
-    def element(name, attributes, content=nil, escape = true, &block)
+    def element(name, attributes, content=nil, escape = true, empty = false, &block)
       unless attributes.blank?
         attrs = []
         if escape
@@ -493,10 +493,10 @@ module Hobo::Dryml
       end
 
       content = new_context(&block) if block_given?
-      res = if content
-              "<#{name}#{attr_string}>#{content}</#{name}>"
+      res = if empty
+            "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
             else
-              "<#{name}#{attr_string} />"
+              "<#{name}#{attr_string}>#{content}</#{name}>"
             end
       if block && eval("defined? _erbout", block.binding) # in erb context
         _output(res)
