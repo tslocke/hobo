@@ -63,3 +63,4 @@ end
 
 ActiveRecord::Associations::AssociationProxy.send(:include, Hobo::Scopes::AssociationProxyExtensions)
 ActiveRecord::Associations::HasManyThroughAssociation.send(:include, Hobo::Scopes::HasManyThroughAssociationExtensions)
+require "hobo/scopes/named_scope_extensions"
