@@ -156,7 +156,7 @@ module Hobo
             { :conditions => ["#{column_sql(col)} NOT LIKE ?", "%#{str}"] }
           end
 
-        # published
+        # published (a boolean column)
         elsif (col = column(name)) && (col.type == :boolean)
 
           def_scope :conditions => ["#{column_sql(col)} = ?", true]
@@ -210,9 +210,7 @@ module Hobo
           case name
             
           when "by_most_recent"
-            def_scope do
-              { :order => "#{@klass.table_name}.created_at DESC" }
-            end
+            def_scope :order => "#{@klass.table_name}.created_at DESC"
 
           when "recent"
             def_scope do |*args|
@@ -297,7 +295,7 @@ module Hobo
           name = string_or_record
           reflection.klass.named(name)
         else
-          string_or_record
+          string_or_record # a record
         end
       end
 
@@ -313,7 +311,7 @@ module Hobo
 
 
       def def_scope(options={}, &block)
-        @klass.send(:named_scope, name, block || options)
+        @klass.named_scope(name.to_sym, block || options)
       end
 
 

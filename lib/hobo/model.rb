@@ -297,7 +297,7 @@ module Hobo
           # FIXME: Do we need this now?
           call_method_chain(name, args, &block)
         elsif create_automatic_scope(name)
-          send(name, *args, &block)
+          send(name.to_sym, *args, &block)
         else
           super(name.to_sym, *args, &block)
         end
