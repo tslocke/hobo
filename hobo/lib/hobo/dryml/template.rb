@@ -35,7 +35,7 @@ module Hobo::Dryml
     def initialize(src, environment, template_path, bundle=nil)
       @src = src
       @environment = environment # a class or a module
-      @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "")
+      @template_path = template_path.sub(/^#{Regexp.escape(RAILS_ROOT)}/, "").sub(%r(^/), '')
       @bundle = bundle
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
