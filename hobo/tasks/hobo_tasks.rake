@@ -6,15 +6,21 @@ namespace :hobo do
     Dir.chdir("#{RAILS_ROOT}/public") do
       Dir.chdir("javascripts") do
         puts "hobo-rapid.js"
-        `rm -f hobo-rapid.js`
+        `rm -fi hobo-rapid.js`
         `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js`
       end
 
       Dir.chdir("hobothemes") do
-        puts "hobothemes/clean"
-        `rm -f clean`
+        puts "public/hobothemes/clean"
+        `rm -rfi clean`
         `ln -s ../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/public clean`
       end
+    end
+    
+    Dir.chdir("#{RAILS_ROOT}/app/views/taglibs/themes") do
+      puts 'taglibs/themes/clean'
+      `rm -rfi clean`
+      `ln -s ../../../../vendor/plugins/hobo/rails_generators/hobo_rapid/templates/themes/clean/views clean`
     end
 
   end
