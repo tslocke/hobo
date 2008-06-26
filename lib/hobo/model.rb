@@ -357,6 +357,17 @@ module Hobo
     def to_url_path
       "#{self.class.to_url_path}/#{to_param}" unless new_record?
     end
+    
+    
+    def to_param
+      name_attr = self.class.name_attribute
+      if name_attr
+        readable = send(name_attr).to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+$/, '').split('-')[0..5].join('-')
+        @to_param ||= "#{id}-#{readable}"
+      else
+        id
+      end
+    end
 
 
     def with_acting_user(user)
