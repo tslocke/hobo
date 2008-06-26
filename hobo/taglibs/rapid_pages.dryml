@@ -309,7 +309,7 @@
 </def>
 
 <!-- empty tags should be written as <br> in HTML and <br /> in XHTML -->
-<def tag="empty-tag" attrs="tag-name"><%= "<#{tag_name}#{tag_options(attributes)}#{scope.xmldoctype  ? ' /' : ''}>" %></def>
+<def tag="empty-tag" attrs="tag-name"><%= "<#{tag_name}#{tag_options(attributes.inject({}) {|options, (key,value)| options[key.to_s.dasherize] = value; options})}#{scope.xmldoctype  ? ' /' : ''}>" %></def>
 <def tag="base"><empty-tag tag-name="base" merge/></def>
 <def tag="meta"><empty-tag tag-name="meta" merge/></def>
 <def tag="link"><empty-tag tag-name="link" merge/></def>
