@@ -12,7 +12,7 @@ module HoboFields
       self =~ /^\s*([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\s*$/i
     end
 
-    def to_html
+    def to_html(xmldoctype = true)
       self
     end
 

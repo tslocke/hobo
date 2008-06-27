@@ -440,7 +440,7 @@ module Hobo::Dryml
 
     def part_contexts_javascripts
       storage = part_contexts_storage
-      storage.blank? ? "" : "<script>\n#{storage}</script>\n"
+      storage.blank? ? "" : "<script type=\"text/javascript\">\n#{storage}</script>\n"
     end
 
 
