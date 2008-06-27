@@ -6,7 +6,7 @@ module HoboFields
 
     HoboFields.register_type(:password, self)
 
-    def to_html
+    def to_html(xmldoctype = true)
       "[password hidden]"
     end
 

@@ -37,7 +37,7 @@ This class defines the methods `to_html` to customize the way the type is render
 	    "is too long (you shouldn't shout that much)" if length > 100
 	  end
 
-	  def to_html
+	  def to_html(xmldoctype = true)
 	    upcase
 	  end
 

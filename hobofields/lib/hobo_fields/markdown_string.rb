@@ -4,7 +4,7 @@ module HoboFields
 
     HoboFields.register_type(:markdown, self)
 
-    def to_html
+    def to_html(xmldoctype = true)
       blank? ? "" : BlueCloth.new(self).to_html
     end
 

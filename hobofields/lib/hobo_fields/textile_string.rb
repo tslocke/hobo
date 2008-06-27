@@ -4,7 +4,7 @@ module HoboFields
 
   class TextileString < HoboFields::Text
 
-    def to_html
+    def to_html(xmldoctype = true)
       if blank?
         ""
       else
