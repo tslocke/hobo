@@ -113,7 +113,7 @@
                     if refl.options[:through]
                       select_many(attrs)
                     else
-                      has_many_input(attrs)
+                      raise NotImlementedError, "An input for has-many associations has not been implemented yet"
                     end
                   end
                 else
@@ -129,7 +129,7 @@
   end
 %></def>
 
-     
+
 <def tag="input" for="text" attrs="name">
   <%= text_area_tag(name, this, attributes) %>
 </def>
