@@ -75,7 +75,7 @@
 
     hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].join)
      
-    body = [hiddens_div, body].join
+    body = [body, hiddens_div].join
     
     if action.nil? # don't add automatic css classes if the action was specified
       if web_method
