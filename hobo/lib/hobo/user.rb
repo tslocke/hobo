@@ -78,7 +78,7 @@ module Hobo
       def signup_lifecycle_for(login_attribute)
         lifecycle do
 
-          state :active
+          initial_state :active
 
           create :anybody, :signup, :params => [login_attribute, :email_address, :password, :password_confirmation].uniq,
                  :become => :active, :if => proc {|_, u| u.guest?}
