@@ -175,8 +175,7 @@
       
 <def tag="integer-select-editor" attrs="options, min, max, update, nil-option, message">
  <% options ||= (min.to_i..max.to_i).to_a %>
- <select class="number-editor-bhv" hobo-update="#{update}"
-          hobo-model-id="#{dom_id}"
+ <select class="number-editor-bhv #{model_id_class} #{'update:' + comma_split(update).join(':') unless update.blank?}"
           merge-attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
    <if test="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
    <%= options_for_select(options, this) %>

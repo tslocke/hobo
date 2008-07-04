@@ -25,8 +25,8 @@ var Hobo = {
 
     updatesForElement: function(el) {
         el = $(el)
-        var updates = el.getAttribute("hobo-update")
-        return updates ? updates.split(/\s*,\s*/) : []
+        var updates = Hobo.getClassData(el, 'update')
+        return updates ? updates.split(':') : []
     },
 
     ajaxSetFieldForElement: function(el, val, options) {
@@ -152,7 +152,15 @@ var Hobo = {
                 }
             }
         }
-        },
+    },
+    
+    getClassData: function(el, name) {
+        return el.className.match(new RegExp("^" + name + ":(\S+)$"))[1]
+    },
+    
+    getModelId: function(el) {
+        return Hobo.getClassData(el, 'model')
+    },
 
     onFieldEditComplete: function(el, newValue) {
         el = $(el)
@@ -166,9 +174,9 @@ var Hobo = {
             el.update(newValue)
         }
 
-        var modelId = el.getAttribute('hobo-model-id')
+        var modelId = Hobo.getModelId(el)
         if (oldValue) {
-            $$("*[hobo-model-id=" + modelId + "]").each(function(e) {
+            $$(".model:" + modelId).each(function(e) {
                 if (e != el && e.innerHTML == oldValue) e.update(newValue)
             })
         }
@@ -388,7 +396,7 @@ var Hobo = {
 
 
     parseFieldId: function(el) {
-        id = el.getAttribute("hobo-model-id")
+        var id = Hobo.getModelId(el)
         return id && Hobo.parseId(id)
     },
 
@@ -411,7 +419,7 @@ var Hobo = {
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
-            id = el.getAttribute("hobo-model-id");
+            id = Hobo.getModelId(el)
             if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
             if (m) break;
             el = el.parentNode;
@@ -421,7 +429,7 @@ var Hobo = {
 
     modelIdFor: function(el) {
         var e = Hobo.objectElementFor(el)
-        return e && e.getAttribute("hobo-model-id");
+        return e && Hobo.getModelId(e)
     },
 
 

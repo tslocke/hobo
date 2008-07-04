@@ -140,6 +140,11 @@ module Hobo
       type, field = args.empty? ? [this_parent.class, this_field] : args
       "#{type.typed_id}_#{field}" if type.respond_to?(:typed_id)
     end
+    
+    
+    def model_id_class(object=nil, attribute=nil)
+      this.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
+    end
 
 
     def map_this

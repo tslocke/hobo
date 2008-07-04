@@ -95,9 +95,8 @@ module Hobo::RapidHelper
   def in_place_editor(behaviour_class, attributes)
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
-    attributes = add_classes(attributes, behaviour_class)
-    attributes.update(:hobo_model_id => dom_id,
-                      :hobo_blank_message => blank_message,
+    attributes = add_classes(attributes, behaviour_class, model_id_class)
+    attributes.update(:hobo_blank_message => blank_message,
                       :if_blank => blank_message,
                       :no_wrapper => false)
 
