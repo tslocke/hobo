@@ -39,8 +39,7 @@
       <% element "ul", attributes do %>
       <do param="head"/>
       <repeat>
-        <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize}"
-            merge-attrs="&{'hobo-model-id' => dom_id(this)} if this.respond_to?(:typed_id)">
+        <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize} #{model_id_class}">
           <do param="default"><a/></do>
         </li>
       </repeat>
@@ -72,8 +71,7 @@
       <tbody>
         <repeat>
           <tr param if="&can_view?"
-              class="#{scope.even_odd} #{this_type.name.underscore}"
-              hobo-model-id="#{dom_id(this)}">
+              class="#{scope.even_odd} #{this_type.name.underscore} #{model_id_class}">
             <if test="&fields">
               <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
                 <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
@@ -240,9 +238,7 @@
               this.to_s
             end
           else
-            attrs = add_classes(attributes, "view", type_and_field)
-            id = dom_id
-            attrs['hobo-model-id'] = id unless id == "nil"
+            attrs = add_classes(attributes, "view", type_and_field, model_id_class)
 
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)

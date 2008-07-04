@@ -19,8 +19,8 @@
   <if><%= 
     if even_odd
       map_this do
-        klass = [attributes[:class], cycle("even", "odd")].compact.join(' ')
-        element(even_odd, attributes.merge(:class => klass, "hobo-model-id" => dom_id(this)), parameters.default)
+        klass = [attributes[:class], model_id_class, cycle("even", "odd")].compact.join(' ')
+        element(even_odd, attributes.merge(:class => klass), parameters.default)
       end.join(join)
     else
       scope.new_scope do
