@@ -1,6 +1,7 @@
 bin/hobo
 CHANGES.txt
 init.rb
+lib/action_view_extensions/helpers/tag_helper.rb
 lib/active_record/association_proxy.rb
 lib/active_record/association_reflection.rb
 lib/active_record/has_many_association.rb
@@ -47,6 +48,7 @@ lib/hobo/rapid_helper.rb
 lib/hobo/scopes/apply_scopes.rb
 lib/hobo/scopes/association_proxy_extensions.rb
 lib/hobo/scopes/automatic_scopes.rb
+lib/hobo/scopes/named_scope_extensions.rb
 lib/hobo/scopes.rb
 lib/hobo/static_tags
 lib/hobo/undefined.rb
