@@ -15,3 +15,29 @@
     </div>
   </if>
 </def>
+
+<def tag="transition-button" attrs="transition, update, label"><%= 
+    transition = transition.name unless transition.is_a?(String)
+    ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+
+    url = object_url(this, transition, :method => :put)
+    add_classes!(html_attributes, "transition-button #{transition}-button")
+    label ||= transition.titleize
+    if update || !ajax_attributes.empty?
+      ajax_attributes[:message] ||= label
+      func = ajax_updater(url, update, ajax_attributes)
+      html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
+      element(:input, html_attributes, nil, true, true)
+    else
+      button_to(label, url, html_attributes)
+    end
+  %>
+</def>
+  
+<def tag="transition-buttons">
+  <div class="transitions">
+    <% this.lifecycle.available_transitions_for(current_user).each do |t| %>
+      <transition-button transition="&t"/>
+    <% end %>
+  </div>
+</def>
