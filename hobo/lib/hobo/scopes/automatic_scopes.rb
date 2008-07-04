@@ -190,7 +190,13 @@ module Hobo
          # active (a lifecycle state)
         elsif @klass.has_lifecycle? && name.in?(@klass::Lifecycle.state_names)
 
-          def_scope :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name]
+          if @klass::Lifecycle.state_names.length == 1
+            # nothing to check for - create a dummy scope
+            def_scope :conditions => ""
+            true
+          else
+            def_scope :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name]
+          end
 
         # self is / is not
         elsif name == "is"
