@@ -3,10 +3,14 @@ class Hobo::DevController < ActionController::Base
   hobo_controller
 
   before_filter :developer_modes_only
-
+  
   def set_current_user
     model = params[:model] || Hobo::User.default_user_model
-    self.current_user = params[:name] ? model.named(params[:name]) : model.find(params[:id])
+    self.current_user = if params[:login]
+                          model.find(:first, :conditions => {model.login_attribute => params[:login]})
+                        else
+                          model.find(params[:id])
+                        end
     redirect_to(request.env["HTTP_REFERER"] ? :back : home_page)
   end
 

@@ -102,7 +102,7 @@ but rather write your own navigation using the `<navigation>` tag -->
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"
                first-option="Guest" options="&user.all(:limit => 10).*.login"
-               onchange="location.href = '/dev/set_current_user?name=' + this.options[this.selectedIndex].value"
+               onchange="location.href = '/dev/set_current_user?login=' + this.options[this.selectedIndex].value"
                selected="#{current_user.login}"
                class="dev-user-changer"/>
 </def>
