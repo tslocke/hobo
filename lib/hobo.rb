@@ -257,7 +257,7 @@ module Hobo
             # return false.
             new.send(setter, if current == true
                                false
-                             elsif current == false
+                             elsif current == false || (current.nil? && object.class.try.attr_type(field) == Hobo::Boolean)
                                true
                              elsif refl and refl.macro == :belongs_to
                                Hobo::Undefined.new(refl.klass)
