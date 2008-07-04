@@ -184,8 +184,8 @@
 
   url = object_url(this, method, :method => :post)
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
-  if update || result_update || !ajax_attrs.empty?
-    label ||= method.titleize
+  label ||= method.titleize
+  if update || !ajax_attributes.empty?
     ajax_attributes[:message] ||= label
     func = ajax_updater(url, update, ajax_attributes)
     html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
