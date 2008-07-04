@@ -122,7 +122,7 @@
                     raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
                 end
     if this_parent.errors[this_field]
-      "<div class='field-with-errors'>#{the_input}</div>"
+      "<span class='field-with-errors'>#{the_input}</span>"
     else
       the_input
     end
