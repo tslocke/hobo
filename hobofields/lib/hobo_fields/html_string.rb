@@ -2,7 +2,7 @@ module HoboFields
 
   class HtmlString < HoboFields::Text
 
-    def to_html
+    def to_html(xmldoctype = true)
       self
     end
 

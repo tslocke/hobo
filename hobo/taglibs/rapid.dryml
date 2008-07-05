@@ -233,7 +233,7 @@
           
           if view_tag == "view" # i.e. it didn't find a type specific tag
             if this.respond_to?(:to_html)
-              this.to_html
+              this.to_html(scope.xmldoctype)
             else
               this.to_s
             end
@@ -278,7 +278,7 @@
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
-<def tag="view" for="string"><%= this.try.to_html || h(this).gsub("\n", "<br/>") %></def>
+<def tag="view" for="string"><%= this.try.to_html(scope.xmldoctype) || h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") %></def>
 
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
@@ -409,8 +409,10 @@ in the future - use at your own risk. -->
 <def tag="filter-menu" attrs="param-name, options, no-filter">
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu">
+    <div>
     <hidden-form-field name="filter-parameter" value="&param_name"/>
     <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
+    </div>
   </form>
 </def>
 

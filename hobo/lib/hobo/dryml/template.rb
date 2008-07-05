@@ -681,7 +681,7 @@ module Hobo::Dryml
       part_name = el.attributes['part']
       if part_name
         part_id = part_name && "<%= #{attribute_to_ruby(el.attributes['id'] || part_name)} %>"
-        "<span class='part-wrapper' id='#{part_id}'>" + part_element(el, call) + "</span>"
+        "<div class='part-wrapper' id='#{part_id}'>" + part_element(el, call) + "</div>"
       else
         call
       end
