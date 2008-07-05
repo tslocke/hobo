@@ -72,9 +72,10 @@
                   view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
                 end
     page_path_hidden = hidden_field_tag("page_path", page_path) unless method == "get"
+
+    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].join)
      
-    body = [http_method_hidden, page_path_hidden, auth_token, hiddens, body].join
-     
+    body = [hiddens_div, body].join
     
     if action.nil? # don't add automatic css classes if the action was specified
       if web_method
