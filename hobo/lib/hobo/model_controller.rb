@@ -71,7 +71,7 @@ module Hobo
           index_action "complete_#{name}", &block
         else
           index_action "complete_#{name}" do
-            hobo_completetions name, model, options
+            hobo_completions name, model, options
           end
         end
       end
