@@ -136,9 +136,8 @@ module Hobo::Dryml
           object = this
         end
       end
-
-      id = object.try.typed_id
-      if id
+      
+      if (id = object.try.typed_id)
         attribute ? "#{id}_#{attribute}" : id
       else
         "nil"
