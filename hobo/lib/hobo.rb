@@ -463,8 +463,7 @@ class ::Array
   end
 
   def typed_id
-    origin_id = origin.try.typed_id
-    "#{origin_id}_#{origin_attribute}" if origin_id
+    origin and origin_id = origin.try.typed_id and "#{origin_id}_#{origin_attribute}"
   end
 
 end
@@ -473,11 +472,5 @@ class ActiveRecord::NamedScope::Scope
   delegate :origin, :origin_attribute, :member_class, :to => :proxy_found
 end
 
-
-class NilClass
-  def typed_id
-    "nil"
-  end
-end
 
 Hobo.enable if defined?(Rails)
