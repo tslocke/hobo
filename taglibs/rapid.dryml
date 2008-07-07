@@ -410,7 +410,7 @@ in the future - use at your own risk. -->
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu">
     <div>
-    <hidden-form-field name="filter-parameter" value="&param_name"/>
+    <input type="hidden" name="filter-parameter" value="&param_name"/>
     <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
     </div>
   </form>

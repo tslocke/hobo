@@ -36,7 +36,7 @@
       <error-messages param/>
 
       <form lifecycle="&transition_name" param>
-        <hidden-form-field name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
+        <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
         <field-list fields="&@transition.parameters" param/>
         <div class="actions" param="actions">
           <submit label="&transition_title" param/><do param="back-link"> or <a>Cancel</a></do>
