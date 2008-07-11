@@ -193,9 +193,17 @@ module Hobo::Dryml
     end
 
 
-    def repeat_attribute(array, &b)
-      res = array.map { |x| new_object_context(x, &b) }.join
-      Hobo::Dryml.last_if = !array.empty?
+    def repeat_attribute(string_or_array, &b)
+      res = nil
+      if string_or_array.instance_of?(String)
+        new_field_context(string_or_array) do
+           res = map_this(&b).join
+           Hobo::Dryml.last_if = !this.empty?
+         end
+      else
+        res = string_or_array.map { |x| new_object_context(x, &b) }.join
+        Hobo::Dryml.last_if = !string_or_array.empty?
+      end
       res
     end
 

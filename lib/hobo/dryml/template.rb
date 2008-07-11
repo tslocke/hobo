@@ -805,7 +805,7 @@ module Hobo::Dryml
                   elsif is_code_attribute?(val)
                     "#{val[1..-1]}"
                   else
-                    "this.#{val}"
+                    attr == "repeat" ? %("#{val}") : "this.#{val}"
                   end
 
         x = gensym
