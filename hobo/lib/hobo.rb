@@ -165,6 +165,8 @@ module Hobo
       return nil if object.nil?
       if field.to_s =~ /^\d+$/
         object[field.to_i]
+      elsif field.to_s =~ /^\[(.*)\]$/
+        object[$1]
       else
         object.send(field)
       end
