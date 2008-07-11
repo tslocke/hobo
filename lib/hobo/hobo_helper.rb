@@ -150,10 +150,21 @@ module Hobo
     def map_this
       res = []
       empty = true
-      if this.respond_to?(:each_index)
+      if this.is_a?(Hash)
+        this.map do |key, value| 
+          empty = false;
+          self.this_key = key;
+          case key
+          when String
+            new_field_context("[#{key}]") { res << yield }
+          when Fixnum
+            new_field_context(key) { res << yield }
+          else
+            new_object_context(value) { res << yield }
+          end
+        end
+      elsif this.respond_to?(:each_index)
         this.each_index {|i| empty = false; new_field_context(i) { res << yield } }
-      elsif this.is_a?(Hash)
-        this.map {|key, value| empty = false; self.this_key = key; new_object_context(value) { res << yield } }
       else
         this.map {|e| empty = false; new_object_context(e) { res << yield } }
       end
