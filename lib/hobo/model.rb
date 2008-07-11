@@ -592,10 +592,11 @@ module Hobo
 
 
     def convert_collection_for_mass_assignment(reflection, value)
-      if reflection.klass.try.name_attribute && value.is_a?(Array)
+      klass = reflection.safe_class
+      if klass.try.name_attribute && value.is_a?(Array)
         value.map do |x|
           if x.is_a?(String)
-            reflection.klass.named(x) unless x.blank?
+            klass.named(x) unless x.blank?
           else
             x
           end
