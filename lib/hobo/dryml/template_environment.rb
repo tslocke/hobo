@@ -502,7 +502,7 @@ module Hobo::Dryml
 
       content = new_context(&block) if block_given?
       res = if empty
-            "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
+              "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
             else
               "<#{name}#{attr_string}>#{content}</#{name}>"
             end
