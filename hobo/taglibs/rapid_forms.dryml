@@ -99,10 +99,10 @@
 </def>
 
 
-<def tag="input"><%=     
+<def tag="input" attrs="force"><%=     
   if attributes[:type]
     element :input, attributes, nil, true, true
-  elsif !can_edit?
+  elsif !(force || can_edit?)
     view
   else
     attrs = add_classes(attributes, type_id, type_and_field)
