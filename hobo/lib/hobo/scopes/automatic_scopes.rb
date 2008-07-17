@@ -82,7 +82,7 @@ module Hobo
             end
           end
 
-        # team_is(a_team)
+        # team_is_not(a_team)
         elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
 
           if refl.options[:polymorphic]
