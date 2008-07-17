@@ -49,12 +49,17 @@ module Hobo::Dryml
       end
     end
 
-
     for attr in [:erb_binding, :part_contexts, :view_name,
                  :this, :this_parent, :this_field, :this_key,
-                 :form_field_path, :form_this, :form_field_names]
+                 :form_this, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
     end
+    
+    def form_field_path
+      raise Hobo::Dryml::DrymlException, "DRYML cannot provide the correct form-field name here" if @_form_field_path == :invalid
+      @_form_field_path
+    end
+
 
     def this_key=(key)
       @_this_key = key
@@ -193,9 +198,17 @@ module Hobo::Dryml
     end
 
 
-    def repeat_attribute(array, &b)
-      res = array.map { |x| new_object_context(x, &b) }.join
-      Hobo::Dryml.last_if = !array.empty?
+    def repeat_attribute(string_or_array, &b)
+      res = nil
+      if string_or_array.instance_of?(String)
+        new_field_context(string_or_array) do
+           res = map_this(&b).join
+           Hobo::Dryml.last_if = !this.empty?
+         end
+      else
+        res = string_or_array.map { |x| new_object_context(x, &b) }.join
+        Hobo::Dryml.last_if = !string_or_array.empty?
+      end
       res
     end
 
@@ -224,6 +237,7 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
+        @_form_field_path = :invalid if @_form_field_path
         @_this_parent, @_this_field = [new_this.origin, new_this.origin_attribute] if new_this.respond_to?(:origin)
         @_this = new_this
         yield
@@ -242,7 +256,7 @@ module Hobo::Dryml
                end
         parent, field, obj = Hobo.get_field_path(tag_this || this, path)
         @_this, @_this_parent, @_this_field = obj, parent, field
-        @_form_field_path += path if @_form_field_path
+        @_form_field_path += path if @_form_field_path && @_form_field_path != :invalid
         yield
       end
     end

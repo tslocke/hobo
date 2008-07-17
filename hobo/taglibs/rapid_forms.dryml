@@ -99,10 +99,10 @@
 </def>
 
 
-<def tag="input"><%=     
+<def tag="input" attrs="force"><%=     
   if attributes[:type]
     element :input, attributes, nil, true, true
-  elsif !can_edit?
+  elsif !(force || can_edit?)
     view
   else
     attrs = add_classes(attributes, type_id, type_and_field)
@@ -338,8 +338,8 @@
       <set param-name="&param_name_for_this"/>
       <repeat>
         <div class="item" param="item">
-          <span><%= this %></span>
-          <input type="hidden" name="#{param_name}[]" value="#{this}" param="hidden"/>
+          <span><name/></span>
+          <input type="hidden" name="#{param_name}[]" value="#{name :no_wrapper => true}" param="hidden"/>
           <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="remove-button"/>
         </div>
       </repeat>
@@ -347,7 +347,7 @@
     <select>
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><name/></option>
+              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><name no-wrapper/></option>
     </select>
   </div>
 </def>

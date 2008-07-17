@@ -146,7 +146,7 @@ module HoboFields
       attr_types[name] or
 
         if (refl = reflections[name.to_sym])
-          if refl.macro.in?([:has_one, :belongs_to])
+          if refl.macro.in?([:has_one, :belongs_to]) && !refl.options[:polymorphic]
             refl.klass
           else
             refl
