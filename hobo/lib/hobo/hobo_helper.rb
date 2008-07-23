@@ -142,8 +142,8 @@ module Hobo
     end
     
     
-    def model_id_class(object=nil, attribute=nil)
-      this.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
+    def model_id_class(object=this, attribute=nil)
+      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
     end
 
 
