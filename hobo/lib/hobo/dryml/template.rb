@@ -251,6 +251,16 @@ module Hobo::Dryml
         name        += suffix
         unsafe_name += suffix
       end
+      
+      if el.attributes['polymorphic']
+        %w(for alias-of extend-with).each do |attr|
+          dryml_exception("def cannot have both 'polymorphic' and '#{attr}' attributes") if el.attributes[attr]
+        end
+        
+        define_polymorphic_dispatcher(el, ruby_name(name))
+        name        += "__base"
+        unsafe_name += "__base"
+      end
 
       @def_element = el
 
