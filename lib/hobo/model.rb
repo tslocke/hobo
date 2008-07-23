@@ -28,6 +28,7 @@ module Hobo
         bool_attr_accessor :exempt_from_edit_checks
 
         include Hobo::Lifecycles::ModelExtensions
+        include Hobo::IncludeInSave
       end
 
       class << base
