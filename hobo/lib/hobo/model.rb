@@ -33,6 +33,7 @@ module Hobo
       class << base
         alias_method_chain :has_many,      :join_record_management
         alias_method_chain :belongs_to,    :creator_metadata
+        alias_method_chain :belongs_to,    :target_is
         alias_method_chain :attr_accessor, :creator_metadata
 
         alias_method_chain :has_one, :new_method
@@ -186,6 +187,24 @@ module Hobo
       def belongs_to_with_creator_metadata(name, options={}, &block)
         self.creator_attribute = name.to_sym if options.delete(:creator)
         belongs_to_without_creator_metadata(name, options, &block)
+      end
+
+      def belongs_to_with_target_is(name, options={}, &block)
+        belongs_to_without_target_is(name, options, &block)
+        refl = reflections[name]
+        if options[:polymorphic]
+          class_eval %{
+            def #{name}_is?(target)
+              target.id == self.#{refl.primary_key_name} && target.class.name == self.#{refl.options[:foreign_type]}
+            end
+          }
+        else
+          class_eval %{
+            def #{name}_is?(target)
+              target.id == self.#{refl.primary_key_name}
+            end
+          }
+        end
       end
 
 
