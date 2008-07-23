@@ -305,6 +305,11 @@ module Hobo
       end
 
 
+      def respond_to?(method)
+        super || create_automatic_scope(method)
+      end
+
+
       def call_method_chain(chain, args, &block)
         parts = chain.split(".")
         s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
