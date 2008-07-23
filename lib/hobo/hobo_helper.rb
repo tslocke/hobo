@@ -58,7 +58,7 @@ module Hobo
       options[:subsite] ||= self.subsite
       subsite, method = options.get :subsite, :method
 
-      if obj.respond_to?(:origin)
+      if obj.respond_to?(:member_class)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
