@@ -163,10 +163,9 @@ module Hobo
 
     def get_field(object, field)
       return nil if object.nil?
-      if field.to_s =~ /^\d+$/
+      field_str = field.to_s
+      if field_str =~ /^\d+$/
         object[field.to_i]
-      elsif field.to_s =~ /^\[(.*)\]$/
-        object[$1]
       else
         object.send(field)
       end
@@ -174,12 +173,10 @@ module Hobo
 
 
     def get_field_path(object, path)
-      path = if path.is_a? Array
-               path
-             elsif path.is_a? String
+      path = if path.is_a? String
                path.split('.')
              else
-               [path]
+               Array(path)
              end
 
       field, parent = nil
