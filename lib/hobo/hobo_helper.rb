@@ -147,31 +147,28 @@ module Hobo
     end
 
 
-    def map_this
+    def context_map(enum = this)
       res = []
       empty = true
-      if this.is_a?(Hash)
-        this.map do |key, value| 
+      if enum.respond_to?(:each_pair)
+        enum.each_pair do |key, value| 
           empty = false;
           self.this_key = key;
-          case key
-          when String
-            new_field_context("[#{key}]") { res << yield }
-          when Fixnum
-            new_field_context(key) { res << yield }
+          new_object_context(value) { res << yield }
+        end
+      else
+        enum.each do |e|
+          empty = false; 
+          if enum.respond_to?(:id)
+            new_field_context(e.id.to_s, e) { res << yield }
           else
-            new_object_context(value) { res << yield }
+            new_object_context(e) { res << yield }
           end
         end
-      elsif this.respond_to?(:each_index)
-        this.each_index {|i| empty = false; new_field_context(i) { res << yield } }
-      else
-        this.map {|e| empty = false; new_object_context(e) { res << yield } }
       end
       Dryml.last_if = !empty
       res
     end
-    alias_method :collect_this, :map_this
 
 
     def comma_split(x)

@@ -56,7 +56,8 @@ module Hobo::Dryml
     end
     
     def form_field_path
-      raise Hobo::Dryml::DrymlException, "DRYML cannot provide the correct form-field name here" if @_form_field_path == :invalid
+      @_form_field_path.nil? and raise Hobo::Dryml::DrymlException, 
+        "DRYML cannot provide the correct form-field name here (this_field = #{this_field.inspect}, this = #{this.inspect})"
       @_form_field_path
     end
 
@@ -198,18 +199,16 @@ module Hobo::Dryml
     end
 
 
-    def repeat_attribute(string_or_array, &b)
+    def repeat_attribute(string_or_array)
       res = nil
       if string_or_array.instance_of?(String)
         new_field_context(string_or_array) do
-           res = map_this(&b).join
-           Hobo::Dryml.last_if = !this.empty?
+           res = context_map { yield }
          end
       else
-        res = string_or_array.map { |x| new_object_context(x, &b) }.join
-        Hobo::Dryml.last_if = !string_or_array.empty?
+        res = context_map(string_or_array) { yield }
       end
-      res
+      res.join
     end
 
 
@@ -237,36 +236,75 @@ module Hobo::Dryml
 
     def new_object_context(new_this)
       new_context do
-        @_form_field_path = :invalid if @_form_field_path
-        @_this_parent, @_this_field = [new_this.origin, new_this.origin_attribute] if new_this.respond_to?(:origin)
+        if new_this.respond_to?(:origin)
+          @_this_parent, @_this_field = new_this.origin, new_this.origin_attribute
+        else
+          @_this_parent, @_this_field = [nil, nil]
+        end
         @_this = new_this
+
+        # We might have lost track of where 'this' is relative to the form_this
+        # check if this or this_parent are objects we've seen before in this form
+        @_form_field_path = find_form_field_path(new_this) if @_form_field_path
+
         yield
       end
     end
 
 
-    def new_field_context(field_path, tag_this=nil)
+    def new_field_context(field_path, new_this=nil)
       new_context do
-        path = if field_path.is_a? Array
-                 field_path
-               elsif field_path.is_a? String
+        path = if field_path.is_a? String
                  field_path.split('.')
                else
-                 [field_path]
+                 Array(field_path)
                end
-        parent, field, obj = Hobo.get_field_path(tag_this || this, path)
-        @_this, @_this_parent, @_this_field = obj, parent, field
-        @_form_field_path += path if @_form_field_path && @_form_field_path != :invalid
+        if new_this
+          raise ArgumentError, "invlaid context change" unless path.length == 1
+          @_this_parent, @_this_field, @_this = this, path.first, new_this
+        else
+          parent, field, obj = Hobo.get_field_path(this, path)
+          @_this, @_this_parent, @_this_field = obj, parent, field
+        end
+        
+        if @_form_field_path
+          @_form_field_path += path 
+          @_form_field_paths_by_object[@_this] = @_form_field_path
+        end
+        
         yield
       end
     end
+    
+    
+    def find_form_field_path(object)
+      back = []
+      while object
+        path = @_form_field_paths_by_object[object]
+        if path
+          path = path + back unless back.empty?
+          return path
+        end
+        if object.respond_to? :origin
+          back.unshift object.origin_attribute
+          object = object.origin
+        else
+          return nil
+        end
+      end
+    end
+        
+        
 
 
     def _tag_context(attributes)
-      with = attributes[:with] == "page" ? @this : attributes[:with]
+      with  = attributes[:with]
+      field = attributes[:field]
 
-      if attributes.has_key?(:field)
-        new_field_context(attributes[:field], with) { yield }
+      if with && field
+        new_object_context(with) { new_field_context(field) { yield } }
+      elsif field
+        new_field_context(field) { yield }
       elsif attributes.has_key?(:with)
         new_object_context(with) { yield }
       else
@@ -279,9 +317,10 @@ module Hobo::Dryml
       @_form_this = this
       @_form_field_path = []
       @_form_field_names = []
+      @_form_field_paths_by_object = { @_form_this => [] }
       res = yield
       field_names = @_form_field_names
-      @_form_this = @_form_field_path = @_form_field_names = nil
+      @_form_this = @_form_field_path = @_form_field_names = @_form_field_paths_by_object = nil
       [res, field_names]
     end
 
