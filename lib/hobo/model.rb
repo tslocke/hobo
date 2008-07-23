@@ -22,7 +22,8 @@ module Hobo
       base.class_eval do
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
-        attr_accessor :acting_user
+
+        attr_accessor :acting_user, :origin, :origin_attribute
 
         bool_attr_accessor :exempt_from_edit_checks
 
