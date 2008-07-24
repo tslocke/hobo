@@ -228,7 +228,8 @@ module Hobo
         end
 
       else
-        setter = "#{field.to_s.sub /\?$/, ''}="
+        attribute_name = field.to_s.sub /\?$/, ''
+        setter = "#{attribute_name}="
         return false if !object.respond_to?(setter)
 
         refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
@@ -246,26 +247,29 @@ module Hobo
           false
         else
           # Fake an edit test by setting the field in question to
-          # Hobo::Undefined and then testing for update permission
+          # Hobo::Undefined and then testing for update/create permission
           current = object.send(field)
           new = object.duplicate
 
+          edit_test_value = if current == true
+                              false
+                            elsif current == false || (current.nil? && object.class.try.attr_type(field) == Hobo::Boolean)
+                              true
+                            elsif refl and refl.macro == :belongs_to
+                              Hobo::Undefined.new(refl.klass)
+                            else
+                              Hobo::Undefined.new
+                            end
+                            
           begin
-            # Setting the undefined value can sometimes result in an
-            # UndefinedAccessError. In that case we have no choice but
-            # return false.
-            new.send(setter, if current == true
-                               false
-                             elsif current == false || (current.nil? && object.class.try.attr_type(field) == Hobo::Boolean)
-                               true
-                             elsif refl and refl.macro == :belongs_to
-                               Hobo::Undefined.new(refl.klass)
-                             else
-                               Hobo::Undefined.new
-                             end)
+            if object.class.columns.detect { |c| c.name == attribute_name }
+              new.write_attribute(attribute_name, edit_test_value)
+            else
+              new.send(setter, edit_test_value)
+            end
           rescue Hobo::UndefinedAccessError
             raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " +
-                              "define #{field}_editable_by?(user)")
+                                "define #{field}_editable_by?(user)")
           end
 
           begin
@@ -275,6 +279,8 @@ module Hobo
               check_permission(:update, person, object, new)
             end
           rescue Hobo::UndefinedAccessError
+            # The permission method performed some test on the undefined value
+            # so this field is not editable
             false
           end
         end
