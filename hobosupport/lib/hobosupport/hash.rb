@@ -109,3 +109,9 @@ if defined? HashWithIndifferentAccess
   end
 
 end
+
+if defined? ActiveSupport
+  class ActiveSupport::OrderedHash
+    alias each_pair each
+  end
+end
