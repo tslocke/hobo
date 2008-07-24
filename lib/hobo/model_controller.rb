@@ -337,7 +337,12 @@ module Hobo
         # Give up
         home_page
     end
-
+    
+    
+    def redirect_after_submit(*args)
+      redirect_to destination_after_submit(*args)
+    end
+    
 
     def response_block(&b)
       if b
@@ -421,7 +426,7 @@ module Hobo
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_to destination_after_submit }
+            wants.html { redirect_after_submit }
             wants.js   { hobo_ajax_response || render(:nothing => true) }
           end
         else
@@ -457,7 +462,7 @@ module Hobo
         if valid?
           respond_to do |wants|
             wants.html do
-              redirect_to destination_after_submit
+              redirect_after_submit
             end
             wants.js do
               if in_place_edit_field
@@ -495,7 +500,7 @@ module Hobo
     def destroy_response(&b)
       response_block(&b) or
         respond_to do |wants|
-          wants.html { redirect_to destination_after_submit(this, true) }
+          wants.html { redirect_after_submit(this, true) }
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
@@ -542,7 +547,7 @@ module Hobo
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_to destination_after_submit
+          redirect_after_submit
         else
           dryml_fallback_tag "lifecycle_start_page"
           re_render_form(name)
@@ -570,7 +575,7 @@ module Hobo
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_to destination_after_submit
+          redirect_after_submit
         else
           dryml_fallback_tag "lifecycle_transition_page"
           re_render_form(name)
