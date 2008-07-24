@@ -402,7 +402,7 @@ var Hobo = {
 
 
     parseId: function(id) {
-        m = id.match(/^([a-z_]+)-([0-9]+)(?:-([a-z-]+))?$/)
+        m = id.gsub('-', '_').match(/^([a-z_]+)_([0-9]+)(?:_([a-z_]+))?$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
     },
 
