@@ -206,9 +206,9 @@ module Hobo
         end
       else
         object, field = args.length == 2 ? args : [this, args.first]
-
-        if !field && object.respond_to?(:origin)
-          Hobo.can_edit?(current_user, object.origin, object.origin_attribute)
+        
+        if !field && (origin = object.try.origin)
+          Hobo.can_edit?(current_user, origin, object.origin_attribute)
         else
           Hobo.can_edit?(current_user, object, field)
         end
