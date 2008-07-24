@@ -29,16 +29,6 @@ module ActiveRecord::Associations
     end
 
 
-    def origin
-      proxy_owner
-    end
-
-
-    def origin_attribute
-      proxy_reflection.name
-    end
-    
-    
     def proxy_respond_to_with_automatic_scopes?(method, include_priv = false)
       proxy_respond_to_without_automatic_scopes?(method, include_priv) || member_class.try.create_automatic_scope(method)
     end

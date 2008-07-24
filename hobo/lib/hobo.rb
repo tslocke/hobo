@@ -393,8 +393,6 @@ module Hobo
     def enable
       # Rails monkey patches
       require 'active_record/has_many_association'
-      require 'active_record/belongs_to_association'
-      require 'active_record/belongs_to_polymorphic_association'
       require 'active_record/association_proxy'
       require 'active_record/association_reflection'
       require 'action_view_extensions/helpers/tag_helper'

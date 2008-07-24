@@ -2,6 +2,14 @@ module ActiveRecord
   module Associations
     class AssociationProxy #:nodoc:
 
+    def origin
+      proxy_owner
+    end
+
+    def origin_attribute
+      proxy_reflection.name
+    end
+
       private
 
 
