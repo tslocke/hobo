@@ -39,6 +39,23 @@ module ActiveRecord
       alias_method_chain :proxy_respond_to?, :automatic_scopes
 
 
+      protected
+
+      # hack/fix to change the order in which to look for missing methods
+      # without this, the proxy's target (which is [] initially) is checked first for the method.
+      # after that, (automatic) scopes are looked for.
+      # this is problematic for the 'search' scope, since the initial [] also responds to #search
+      # because of HoboSupport's enumerable extension
+      def method_missing_with_automatic_scopes(method, *args)
+        if @reflection.klass.respond_to?(method) && @reflection.klass.scopes.include?(method)
+          @reflection.klass.scopes[method].call(self, *args)
+        else
+          method_missing_without_automatic_scopes(method, *args)
+	end
+      end
+      alias_method_chain :method_missing, :automatic_scopes
+
+
       private
 
 
