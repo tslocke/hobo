@@ -1,6 +1,6 @@
 module Enumerable
 
-  def search(not_found=nil)
+  def map_and_find(not_found=nil)
     each do |x|
       val = yield(x)
       return val if val
