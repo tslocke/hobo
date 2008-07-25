@@ -84,7 +84,7 @@ module Hobo
         define_method web_name do
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
-          @this = find_instance(opts) unless opts[:no_find]
+          self.this = find_instance(opts) unless opts[:no_find]
           raise Hobo::Model::PermissionDeniedError unless Hobo.can_call?(current_user, @this, method)
           if got_block
             instance_eval(&block)
