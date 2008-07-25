@@ -7,7 +7,7 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
-Dependencies.load_paths |= [ File.dirname(__FILE__) ]
+(defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : Dependencies).load_paths |= [ File.dirname(__FILE__) ]
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
