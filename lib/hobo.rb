@@ -473,4 +473,15 @@ class ::Array
 end
 
 
+module ::Enumerable
+  def group_by_with_metadata(&block)
+    group_by_without_metadata(&block).each do |k,v|
+      v.origin = origin
+      v.origin_attribute = origin_attribute
+      v.member_class = member_class
+    end
+  end
+  alias_method_chain :group_by, :metadata
+end
+
 Hobo.enable if defined?(Rails)
