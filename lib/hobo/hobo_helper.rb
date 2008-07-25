@@ -58,7 +58,7 @@ module Hobo
       options[:subsite] ||= self.subsite
       subsite, method = options.get :subsite, :method
 
-      if obj.respond_to?(:origin)
+      if obj.respond_to?(:member_class)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
@@ -142,36 +142,33 @@ module Hobo
     end
     
     
-    def model_id_class(object=nil, attribute=nil)
-      this.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
+    def model_id_class(object=this, attribute=nil)
+      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
     end
 
 
-    def map_this
+    def context_map(enum = this)
       res = []
       empty = true
-      if this.is_a?(Hash)
-        this.map do |key, value| 
+      if enum.respond_to?(:each_pair)
+        enum.each_pair do |key, value| 
           empty = false;
           self.this_key = key;
-          case key
-          when String
-            new_field_context("[#{key}]") { res << yield }
-          when Fixnum
-            new_field_context(key) { res << yield }
+          new_object_context(value) { res << yield }
+        end
+      else
+        enum.each do |e|
+          empty = false; 
+          if enum.respond_to?(:id)
+            new_field_context(e.id.to_s, e) { res << yield }
           else
-            new_object_context(value) { res << yield }
+            new_object_context(e) { res << yield }
           end
         end
-      elsif this.respond_to?(:each_index)
-        this.each_index {|i| empty = false; new_field_context(i) { res << yield } }
-      else
-        this.map {|e| empty = false; new_object_context(e) { res << yield } }
       end
       Dryml.last_if = !empty
       res
     end
-    alias_method :collect_this, :map_this
 
 
     def comma_split(x)
@@ -209,9 +206,9 @@ module Hobo
         end
       else
         object, field = args.length == 2 ? args : [this, args.first]
-
-        if !field && object.respond_to?(:origin)
-          Hobo.can_edit?(current_user, object.origin, object.origin_attribute)
+        
+        if !field && (origin = object.try.origin)
+          Hobo.can_edit?(current_user, origin, object.origin_attribute)
         else
           Hobo.can_edit?(current_user, object, field)
         end
@@ -341,17 +338,6 @@ module Hobo
             user_or_class.class
           end
       send("#{c.name.underscore}_logout_url") rescue nil
-    end
-
-
-    # Sign-up url for a given user record or user class
-    def signup_url(user_or_class=nil)
-      c = case user_or_class
-          when Class; user_or_class
-          when nil;   Hobo::User.default_user_model
-          else user_or_class
-          end
-      send("#{c.name.underscore}_signup_url") rescue nil
     end
 
 

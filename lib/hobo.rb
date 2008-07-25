@@ -163,10 +163,9 @@ module Hobo
 
     def get_field(object, field)
       return nil if object.nil?
-      if field.to_s =~ /^\d+$/
+      field_str = field.to_s
+      if field_str =~ /^\d+$/
         object[field.to_i]
-      elsif field.to_s =~ /^\[(.*)\]$/
-        object[$1]
       else
         object.send(field)
       end
@@ -174,12 +173,10 @@ module Hobo
 
 
     def get_field_path(object, path)
-      path = if path.is_a? Array
-               path
-             elsif path.is_a? String
+      path = if path.is_a? String
                path.split('.')
              else
-               [path]
+               Array(path)
              end
 
       field, parent = nil
@@ -231,7 +228,8 @@ module Hobo
         end
 
       else
-        setter = "#{field.to_s.sub /\?$/, ''}="
+        attribute_name = field.to_s.sub /\?$/, ''
+        setter = "#{attribute_name}="
         return false if !object.respond_to?(setter)
 
         refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
@@ -249,26 +247,29 @@ module Hobo
           false
         else
           # Fake an edit test by setting the field in question to
-          # Hobo::Undefined and then testing for update permission
+          # Hobo::Undefined and then testing for update/create permission
           current = object.send(field)
           new = object.duplicate
 
+          edit_test_value = if current == true
+                              false
+                            elsif current == false || (current.nil? && object.class.try.attr_type(field) == Hobo::Boolean)
+                              true
+                            elsif refl and refl.macro == :belongs_to
+                              Hobo::Undefined.new(refl.klass)
+                            else
+                              Hobo::Undefined.new
+                            end
+                            
           begin
-            # Setting the undefined value can sometimes result in an
-            # UndefinedAccessError. In that case we have no choice but
-            # return false.
-            new.send(setter, if current == true
-                               false
-                             elsif current == false || (current.nil? && object.class.try.attr_type(field) == Hobo::Boolean)
-                               true
-                             elsif refl and refl.macro == :belongs_to
-                               Hobo::Undefined.new(refl.klass)
-                             else
-                               Hobo::Undefined.new
-                             end)
+            if object.class.columns.detect { |c| c.name == attribute_name }
+              new.write_attribute(attribute_name, edit_test_value)
+            else
+              new.send(setter, edit_test_value)
+            end
           rescue Hobo::UndefinedAccessError
             raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " +
-                              "define #{field}_editable_by?(user)")
+                                "define #{field}_editable_by?(user)")
           end
 
           begin
@@ -278,6 +279,8 @@ module Hobo
               check_permission(:update, person, object, new)
             end
           rescue Hobo::UndefinedAccessError
+            # The permission method performed some test on the undefined value
+            # so this field is not editable
             false
           end
         end
@@ -390,7 +393,8 @@ module Hobo
     def enable
       # Rails monkey patches
       require 'active_record/has_many_association'
-      require 'active_record/has_many_through_association'
+      require 'active_record/belongs_to_association'
+      require 'active_record/belongs_to_polymorphic_association'
       require 'active_record/association_proxy'
       require 'active_record/association_reflection'
       require 'action_view_extensions/helpers/tag_helper'
@@ -468,10 +472,6 @@ class ::Array
     origin and origin_id = origin.try.typed_id and "#{origin_id}_#{origin_attribute}"
   end
 
-end
-
-class ActiveRecord::NamedScope::Scope
-  delegate :origin, :origin_attribute, :member_class, :to => :proxy_found
 end
 
 

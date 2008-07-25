@@ -270,7 +270,7 @@
     
 <def tag="belongs-to-view"><a merge-attrs/></def>
 
-<def tag="has-many-view"><%= this.empty? ? "(none)" : map_this { a }.join(", ") %></def>
+<def tag="has-many-view"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
 
 <def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
