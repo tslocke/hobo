@@ -7,7 +7,7 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
-Dependencies.load_paths |= [ File.dirname(__FILE__) ]
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__) ]
 
 # Modules that must *not* be auto-reloaded by activesupport
 # (explicitly requiring them means they're never unloaded)
