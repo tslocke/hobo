@@ -1,6 +1,6 @@
 require 'hobosupport'
 
-Dependencies.load_paths |= [ File.dirname(__FILE__) ]
+(defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : Dependencies).load_paths |= [ File.dirname(__FILE__) ]
 
 module Hobo
   # Empty class to represent the boolean type.
