@@ -169,11 +169,13 @@
   <%= text_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
 </def>
 
-<def tag="input" for="HoboFields::EnumString" attrs="labels,titleize">
-  <% labels ||= {} %>
-  <% titleize = true if titleize.nil? %>
+<def tag="input" for="HoboFields::EnumString" attrs="labels, titleize"><%
+  labels ||= {}
+  titleize = true if titleize.nil?
+  options = this_type.values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }
+  %>
   <select name="#{param_name_for_this}" merge-attrs>
-    <%= options_for_select(this_type.values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }, this) %>
+    <%= options_for_select(options, this) %>
   </select>
 </def>
 

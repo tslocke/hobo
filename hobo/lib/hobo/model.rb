@@ -22,16 +22,20 @@ module Hobo
       base.class_eval do
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
-        attr_accessor :acting_user
+
+        attr_accessor :acting_user, :origin, :origin_attribute
 
         bool_attr_accessor :exempt_from_edit_checks
 
         include Hobo::Lifecycles::ModelExtensions
+        include Hobo::FindFor
+        include Hobo::IncludeInSave
       end
 
       class << base
         alias_method_chain :has_many,      :join_record_management
         alias_method_chain :belongs_to,    :creator_metadata
+        alias_method_chain :belongs_to,    :target_is
         alias_method_chain :attr_accessor, :creator_metadata
 
         alias_method_chain :has_one, :new_method
@@ -187,6 +191,24 @@ module Hobo
         belongs_to_without_creator_metadata(name, options, &block)
       end
 
+      def belongs_to_with_target_is(name, options={}, &block)
+        belongs_to_without_target_is(name, options, &block)
+        refl = reflections[name]
+        if options[:polymorphic]
+          class_eval %{
+            def #{name}_is?(target)
+              target.id == self.#{refl.primary_key_name} && target.class.name == self.#{refl.options[:foreign_type]}
+            end
+          }
+        else
+          class_eval %{
+            def #{name}_is?(target)
+              target.id == self.#{refl.primary_key_name}
+            end
+          }
+        end
+      end
+
 
       def attr_accessor_with_creator_metadata(*args)
         options = args.extract_options!
@@ -301,6 +323,11 @@ module Hobo
         else
           super(name.to_sym, *args, &block)
         end
+      end
+
+
+      def respond_to?(method)
+        super || create_automatic_scope(method)
       end
 
 

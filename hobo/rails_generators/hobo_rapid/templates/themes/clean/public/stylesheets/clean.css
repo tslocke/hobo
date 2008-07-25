@@ -180,7 +180,7 @@ ul.main-nav {float: left; margin: 0 10px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 150px !important; width: 150px;}
 .login-page .content-header { position: relative; }
-.login-page .forgot-password { position: absolute; top: 0; right: 0; }
+.login-page .forgot-password { font-size: 12px;}
 
 .edit-page .content-header {overflow: hidden; height: 100%;}
 .edit-page .content-header h1 {float: left;}

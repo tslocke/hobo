@@ -155,7 +155,8 @@ var Hobo = {
     },
     
     getClassData: function(el, name) {
-        return el.className.match(new RegExp("^" + name + ":(\S+)$"))[1]
+        var match = el.className.match(new RegExp("(^| )" + name + ":(\\S+)($| )"))
+        return match && match[2]
     },
     
     getModelId: function(el) {
@@ -184,7 +185,6 @@ var Hobo = {
 
     _makeInPlaceEditor: function(el, options) {
         var old
-        var spec = Hobo.parseFieldId(el)
         var updates = Hobo.updatesForElement(el)
         var id = el.id
         if (!id) { id = el.id = Hobo.uid() }
@@ -402,7 +402,7 @@ var Hobo = {
 
 
     parseId: function(id) {
-        m = id.match(/^([a-z_]+)_([0-9]+)(?:_([a-z_]+))?$/)
+        m = id.gsub('-', '_').match(/^([a-z_]+)_([0-9]+)(?:_([a-z_]+))?$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
     },
 

@@ -120,10 +120,14 @@
 </def>
 
 
-<def tag="string-select-editor" attrs="update, values"><%
+<def tag="string-select-editor" attrs="update, values, labels, titleize"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
 
   values = comma_split(values)
+  labels ||= {}
+  titleize = true if titleize.nil?
+  options = values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }
+  
   f = ajax_updater(object_url(this_parent, :method => :put),
                    update,
                    :method => "put",
@@ -133,8 +137,8 @@
   html_attributes = add_classes(attributes, editor_class)
 %>
   <select onchange="#{f}" merge-attrs="&html_attributes">
-    <%= options_for_select(values, this) %>
-  </select>  
+    <%= options_for_select(options, this) %>
+  </select>
 </def>
 
 
