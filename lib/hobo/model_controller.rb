@@ -84,7 +84,7 @@ module Hobo
         define_method web_name do
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
-          @this = find_instance(opts) unless opts[:no_find]
+          self.this = find_instance(opts) unless opts[:no_find]
           raise Hobo::Model::PermissionDeniedError unless Hobo.can_call?(current_user, @this, method)
           if got_block
             instance_eval(&block)
@@ -593,7 +593,7 @@ module Hobo
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query)
-      finder = finder.limit(options[:limit]) unless finder.scope(:find, :limit)
+      finder = finder.limit(options[:limit]) unless finder.send(:scope, :find, :limit)
       finder = finder.send("#{attribute}_contains", params[options[:param]])
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
