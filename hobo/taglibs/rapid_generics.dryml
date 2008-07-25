@@ -1,7 +1,6 @@
 <def tag="creation-details">
   <div class="creation-details">
     <span class="creator" param="by"><if:get_creator><view/></if:get_creator></span>
-    <view:created_at class="created-at" if="&this.respond_to?(:created_at)" param="at"/>
   </div>
 </def>
 
@@ -78,8 +77,9 @@
     singular_name = first.class.name.underscore
     attributes[:id] ||= "#{singular_name}_ordering"
   end
+  collection_name = this.try.origin_attribute || this.member_class.name.underscore
   %>
-  <ul class="collection #{this.origin_attribute.to_s.gsub('_', '-')}" merge-attrs>
+  <ul class="collection #{collection_name.to_s.gsub('_', '-')}" merge-attrs>
     <li: id="&%(#{singular_name}_#{this.id}) if sortable" param>
       <div class="ordering-handle" param="handle" if="&sortable">&uarr;<br/>&darr;</div>
       <card param/>
