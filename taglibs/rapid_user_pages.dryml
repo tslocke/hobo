@@ -7,7 +7,7 @@
 
 
 <def tag="login-page" attrs="remember-me">
-  <simple-page title="Log in to #{app_name}" merge>
+  <simple-page title="Log in" merge>
    
     <body: class="login-page" param/>
     
@@ -123,7 +123,7 @@
 
 <def tag="account-disabled-page">
 
-  <simple-page title="#{app_name} - account not available" merge>
+  <simple-page title="Account not available" merge>
        
     <body: class="account-disabled-page" param/>
 

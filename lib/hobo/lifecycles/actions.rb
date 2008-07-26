@@ -62,6 +62,10 @@ module Hobo
       def prepare_and_check!(record, user, attributes=nil)
         prepare(record, user, attributes) && check_guard(record, user) && check_invariants(record)
       end
+      
+      def publishable?
+        who != :nobody
+      end
 
     end
 
