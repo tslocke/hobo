@@ -6,7 +6,7 @@ module Hobo
       def included(base)
         base.class_eval do
           filter_parameter_logging "password"
-          skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password]
+          skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password_page, :reset_password]
 
           include_taglib "rapid_user_pages", :plugin => "hobo"
 
