@@ -21,7 +21,7 @@ module Hobo
         Hobo::HoboHelper.add_to_controller(klass)
       end
 
-      attr_accessor :request_host
+      attr_accessor :request_host, :app_name
 
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
