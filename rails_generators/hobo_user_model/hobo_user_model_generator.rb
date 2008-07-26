@@ -17,7 +17,7 @@ class HoboUserModelGenerator < Rails::Generator::NamedBase
       m.template 'unit_test.rb',        File.join('test/unit',     class_path, "#{file_name}_test.rb")
       m.template 'fixtures.yml',        File.join('test/fixtures', class_path, "#{table_name}.yml")
 
-      m.template 'mailer.erb',          File.join('app/models', class_path, "#{file_name}_mailer.rb")
+      m.template 'mailer.rb',           File.join('app/models', class_path, "#{file_name}_mailer.rb")
       m.template 'forgot_password.erb', File.join(mailer_dir, "forgot_password.erb")
     end
   end
