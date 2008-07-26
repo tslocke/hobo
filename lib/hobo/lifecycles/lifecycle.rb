@@ -97,7 +97,7 @@ module Hobo
 
       attr_reader :record
 
-      attr_accessor :provided_key, :current_key
+      attr_accessor :provided_key
 
 
       def initialize(record)
