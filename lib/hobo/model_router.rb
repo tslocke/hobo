@@ -221,11 +221,11 @@ module Hobo
 
 
     def lifecycle_routes
-      model::Lifecycle.creator_names.each do |creator|
+      model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator|
         linkable_route("#{singular}_#{creator}",      "#{plural}/#{creator}", creator,           :conditions => { :method => :post }, :format => false)
         linkable_route("#{singular}_#{creator}_page", "#{plural}/#{creator}", "#{creator}_page", :conditions => { :method => :get },  :format => false)
       end
-      model::Lifecycle.transition_names.each do |transition|
+      model::Lifecycle.transitions.where.publishable?.*.name.each do |transition|
         linkable_route("#{singular}_#{transition}",      "#{plural}/:id/#{transition}", transition,
                        :conditions => { :method => :put }, :format => false)
         linkable_route("#{singular}_#{transition}_page", "#{plural}/:id/#{transition}", "#{transition}_page",
