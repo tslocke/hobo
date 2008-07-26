@@ -21,7 +21,7 @@ module Hobo
         Hobo::HoboHelper.add_to_controller(klass)
       end
 
-      attr_accessor :request_host
+      attr_accessor :request_host, :app_name
 
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
@@ -98,17 +98,28 @@ module Hobo
 
     def render_tags(objects, tag, options={})
       for_type = options.delete(:for_type)
-      add_variables_to_assigns
-      dryml_renderer = Hobo::Dryml.empty_page_renderer(@template)
 
       results = objects.map do |o|
-        tag = dryml_renderer.find_polymorphic_tag(tag, o.class) if for_type
-        dryml_renderer.send(tag, options.merge(:with => o))
+        tag = tag_renderer.find_polymorphic_tag(tag, o.class) if for_type
+        tag_renderer.send(tag, options.merge(:with => o))
       end.join
 
-      render :text => results + dryml_renderer.part_contexts_storage
+      render :text => results + tag_renderer.part_contexts_storage
     end
-
+    
+    
+    def tag_renderer
+      @tag_renderer ||= begin
+        add_variables_to_assigns
+        Hobo::Dryml.empty_page_renderer(@template)
+      end
+    end    
+    
+    
+    def call_tag(name, options={})
+      tag_renderer.send(name, options)
+    end
+    
 
     def site_search(query)
       results = Hobo.find_by_search(query).select{|r| Hobo.can_view?(current_user, r, nil)}
