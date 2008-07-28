@@ -129,28 +129,28 @@ module Hobo
           end
 
         # name_starts(str)
-        elsif name =~ /^(.*)_contains$/ && (col = column($1))
+        elsif name =~ /^(.*)_starts$/ && (col = column($1))
 
           def_scope do |str|
             { :conditions => ["#{column_sql(col)} LIKE ?", "#{str}%"] }
           end
 
         # name_does_not_start
-        elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+        elsif name =~ /^(.*)_does_not_start$/ && (col = column($1))
 
           def_scope do |str|
             { :conditions => ["#{column_sql(col)} NOT LIKE ?", "#{str}%"] }
           end
 
         # name_ends(str)
-        elsif name =~ /^(.*)_contains$/ && (col = column($1))
+        elsif name =~ /^(.*)_ends$/ && (col = column($1))
 
           def_scope do |str|
             { :conditions => ["#{column_sql(col)} LIKE ?", "%#{str}"] }
           end
 
         # name_does_not_end(str)
-        elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+        elsif name =~ /^(.*)_does_not_end$/ && (col = column($1))
 
           def_scope do |str|
             { :conditions => ["#{column_sql(col)} NOT LIKE ?", "%#{str}"] }

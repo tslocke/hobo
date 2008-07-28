@@ -97,7 +97,7 @@ module Hobo
 
       attr_reader :record
 
-      attr_accessor :provided_key, :current_key
+      attr_accessor :provided_key
 
 
       def initialize(record)
@@ -176,7 +176,8 @@ module Hobo
 
       def current_key
         require 'digest/sha1'
-        Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{record.read_attribute key_timestamp_field}")
+        timestamp = record.read_attribute(key_timestamp_field).utc
+        Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
       end
 
       def valid_key?
