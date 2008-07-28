@@ -103,7 +103,7 @@
       <form param>
         <field-list param/>
         <div class="actions" param="actions">
-          <submit label="Create #{type_name}" param/><do param="back-link"> or <a>Cancel</a></do>
+          <submit label="Create #{type_name}" param/><or-cancel param/>
         </div>
       </form>
     </content-body>
@@ -199,7 +199,7 @@
       <form param>
         <field-list param/>
         <div class="actions" param="actions">
-          <submit label="Save Changes" param/><do param="back-link"> or <a>Cancel</a></do>
+          <submit label="Save Changes" param/><or-cancel param/>
         </div>
       </form>
           
@@ -224,7 +224,7 @@
         <field-list skip="#{@association.origin.class.reverse_reflection(association_name.to_sym).name}" param/>
         <div class="actions" param="actions">
           <submit label="Create #{association_name.singularize.titleize}" param/>
-          <do param="back-link"> or <a with="&@association.origin">Cancel</a></do>
+          <or-cancel with="&@association.origin" param/>
         </div>
       </form>
     </content-body>
@@ -372,3 +372,11 @@
     %><do field="&name" param="default"/><%
   end
 %></def>
+
+
+<def tag="or-cancel">
+  <if test="&linkable?">or <a>Cancel</a></if>
+  <else>
+    <if test="&linkable?(this.class)">or <a to="&this.class">Cancel</a></if>
+  </else>
+</def>
