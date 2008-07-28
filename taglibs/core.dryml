@@ -5,7 +5,7 @@
 
 <def tag="wrap" attrs="tag, when, parameter">
   <% parameter ||= :default %>
-  <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameter.default %>
+  <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameters.default %>
 </def>
 
     
