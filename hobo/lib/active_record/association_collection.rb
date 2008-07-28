@@ -12,19 +12,19 @@ module ActiveRecord
 
       def build_with_reverse_reflection(*args)
         res = build_without_reverse_reflection(*args)
-	set_reverse_association(res) if hobo_association_collection?
-	res
+        set_reverse_association(res) if hobo_association_collection?
+        res
       end
       alias_method_chain :build, :reverse_reflection
 
 
       def new(attributes = {})
         record = @reflection.klass.new(attributes)
-	if hobo_association_collection?
-	  set_belongs_to_association_for(record)
-	  set_reverse_association(record) unless proxy_reflection.options[:as]
-	end
-	record
+        if hobo_association_collection?
+          set_belongs_to_association_for(record)
+          set_reverse_association(record) unless proxy_reflection.options[:as]
+        end
+        record
       end
 
 
@@ -41,14 +41,13 @@ module ActiveRecord
 
       private
 
-
         def set_reverse_association(object)
-	  if @owner.new_record? && (refl = @owner.class.reverse_reflection(@reflection.name))
-	    bta = ActiveRecord::Associations::BelongsToAssociation.new(object, refl)
-	    bta.replace(@owner)
-	    object.instance_variable_set("@#{refl.name}", bta)
-	  end
-	end
+          if @owner.new_record? && (refl = @owner.class.reverse_reflection(@reflection.name))
+            bta = ActiveRecord::Associations::BelongsToAssociation.new(object, refl)
+            bta.replace(@owner)
+            object.instance_variable_set("@#{refl.name}", bta)
+          end
+        end
 
     end
   end
