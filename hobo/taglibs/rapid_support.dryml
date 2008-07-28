@@ -6,7 +6,7 @@
                                                                                                                 
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
-                  columns = klass.content_columns.*.name
+                  columns = klass.attr_order.*.to_s & klass.content_columns.*.name
                   columns -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
 
                   if skip_associations == "has_many"

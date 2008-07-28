@@ -6,6 +6,7 @@ module HoboFields
     # attr_types holds the type class for any attribute reader (i.e. getter
     # method) that returns rich-types
     inheriting_cattr_reader :attr_types => HashWithIndifferentAccess.new
+    inheriting_cattr_reader :attr_order => []
 
     # field_specs holds FieldSpec objects for every declared
     # field. Note that attribute readers are created (by ActiveRecord)
@@ -70,7 +71,7 @@ module HoboFields
       returning belongs_to_without_field_declarations(name, options, &block) do
         refl = reflections[name.to_sym]
         fkey = refl.primary_key_name
-        declare_field(fkey, :integer, column_options)
+        declare_field(fkey.to_sym, :integer, column_options)
         declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
       end
     end
@@ -108,6 +109,7 @@ module HoboFields
       add_validations_for_field(name, type, args, options)
       declare_attr_type(name, type) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
+      attr_order << name unless name.in?(attr_order)
     end
 
 
