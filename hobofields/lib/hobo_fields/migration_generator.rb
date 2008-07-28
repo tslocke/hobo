@@ -40,15 +40,24 @@ module HoboFields
     end
 
 
-    def connection
+    def self.connection
       ActiveRecord::Base.connection
     end
+    def connection; self.class.connection; end
 
 
-    def native_types
-      connection.native_database_types
+    def self.fix_native_types(types)
+      case connection.class.name
+      when /mysql/i
+        types[:integer][:limit] = 11
+      end
+      types
     end
 
+    def self.native_types
+      @native_types ||= fix_native_types connection.native_database_types
+    end
+    def native_types; self.class.native_types; end
 
     # Returns an array of model classes and an array of table names
     # that generation needs to take into account
