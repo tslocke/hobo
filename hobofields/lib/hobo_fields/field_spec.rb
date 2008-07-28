@@ -64,7 +64,7 @@ module HoboFields
     end
 
     def native_types
-      model.connection.native_database_types
+      MigrationGenerator.native_types
     end
 
   end
