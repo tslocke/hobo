@@ -302,9 +302,9 @@
 <def tag="html" attrs="doctype">
   <% doctype ||= 'XHTML 1.0 TRANSITIONAL' -%>
   <doctype version="&doctype"/>
-  <% attributes.reverse_merge!(:xmlns => "http://www.w3.org/1999/xhtml") if doctype =~ /^XHTML/ -%>
+  <% attributes.reverse_merge!(:xmlns => "http://www.w3.org/1999/xhtml") if doctype.upcase =~ /^XHTML/ -%>
   <%= "<html#{tag_options(attributes)}>" %>
-    <set-scoped xmldoctype="&doctype =~ /^XHTML/"><do param="default"/></set-scoped>
+    <set-scoped xmldoctype="&doctype.upcase =~ /^XHTML/"><do param="default"/></set-scoped>
   <%= "</html>" %>
 </def>
 
