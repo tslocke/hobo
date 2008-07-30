@@ -346,11 +346,11 @@ module Hobo
     end
 
     def query_params
-      query = request.request_uri.match(/(?:\?(.+))/)._?[1]
+      query = request.request_uri.match(/(?:\?([^?]+))/)._?[1]
       if query
         params = query.split('&')
         pairs = params.map do |param|
-          pair = param.split('=')
+          pair = param.split('=', 2)
           pair.length == 1 ? pair + [''] : pair
         end
         HashWithIndifferentAccess[*pairs.flatten]
