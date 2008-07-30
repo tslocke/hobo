@@ -137,7 +137,7 @@ module Hobo
 
 
     def compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs=[])
-      template = Template.new(template_src, renderer_class, template_path)
+      template = Dryml::Template.new(template_src, renderer_class, template_path)
       imports.each {|m| template.import_module(m)}
 
       taglibs = [CORE_TAGLIB, APPLICATION_TAGLIB] + included_taglibs
