@@ -262,13 +262,9 @@ module Hobo
                             end
                             
           begin
-            if object.class.columns.detect { |c| c.name == attribute_name }
-              new.write_attribute(attribute_name, edit_test_value)
-            else
-              new.send(setter, edit_test_value)
-            end
+            new.send(setter, edit_test_value)
           rescue Hobo::UndefinedAccessError
-            raise HoboError, ("#{object.class.name}##{field} does not support undefined assignements, " +
+            raise HoboError, ("#{object.class.name}##{field} does not support undefined assignments, " +
                                 "define #{field}_editable_by?(user)")
           end
 
