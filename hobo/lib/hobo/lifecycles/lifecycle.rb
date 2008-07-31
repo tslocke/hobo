@@ -184,7 +184,7 @@ module Hobo
       end
 
       def valid_key?
-        provided_key == current_key
+        provided_key && provided_key == current_key
       end
 
 
