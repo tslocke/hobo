@@ -4,6 +4,8 @@ module ActiveRecord
 
       delegate :member_class, :to => :proxy_found
 
+      include Hobo::Scopes::ApplyScopes
+
       def respond_to?(method)
         super || scopes.include?(method) || proxy_scope.respond_to?(method)
       end
