@@ -276,6 +276,8 @@
 
 <def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
 <def tag="view" for="string"><%= this.try.to_html(scope.xmldoctype) || h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") %></def>
