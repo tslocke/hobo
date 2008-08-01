@@ -229,8 +229,7 @@ module Hobo
 
       else
         attribute_name = field.to_s.sub /\?$/, ''
-        setter = "#{attribute_name}="
-        return false if !object.respond_to?(setter)
+        return false if !object.respond_to?("#{attribute_name}=")
 
         refl = object.class.reflections[field.to_sym] if object.is_a?(ActiveRecord::Base)
 
@@ -261,12 +260,7 @@ module Hobo
                               Hobo::Undefined.new
                             end
                             
-          begin
-            new.send(setter, edit_test_value)
-          rescue Hobo::UndefinedAccessError
-            raise HoboError, ("#{object.class.name}##{field} does not support undefined assignments, " +
-                                "define #{field}_editable_by?(user)")
-          end
+          new.metaclass.send(:define_method, attribute_name) { edit_test_value }
 
           begin
             if object.new_record?
