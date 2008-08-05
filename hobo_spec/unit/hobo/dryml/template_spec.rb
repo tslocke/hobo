@@ -326,7 +326,7 @@ describe Template do
 
       <def tag="static-merge"><p>a <b name="big" param>bold</b> word</p></def>
 
-      <def tag="empty-static-merge"><img name="big" src="..." param/></def>
+      <def tag="empty-static-merge"><div name="big" src="..." param/></def>
 
       <def tag="def-tag-merge">foo <defined param b="3">baa</defined>!</def>
 
@@ -372,8 +372,8 @@ describe Template do
   end
 
   it "should merge into static tags with no body" do
-    eval_with_templates("<empty-static-merge><img: name='small'/></empty-static-merge>").should ==
-      '<img name="small" src="..." />'
+    eval_with_templates("<empty-static-merge><div: name='small'/></empty-static-merge>").should ==
+      '<div name="small" src="..."></div>'
   end
 
   it "should merge template parameters into nested templates" do
@@ -388,7 +388,7 @@ describe Template do
 
   it "should allow param names to be defined dynamically" do
     eval_dryml('<def tag="t"><p param="& :a.to_s + :b.to_s"/></def>' +
-               '<t><ab: x="1"/></t>').should == '<p x="1" />'
+               '<t><ab: x="1"/></t>').should == '<p x="1"></p>'
   end
 
   it "should allow params to be defined on other params" do
@@ -416,8 +416,9 @@ describe Template do
     eval_dryml("<def tag='t1'><p: class='c1' c='c' param/></def>" +
                "<def tag='t2'><t1: merge/></def>" +
                "<def tag='t3'><t2: merge><p: class='c2' b='b' param/></t2></def>" +
-               "<t3><p: class='call' a='a'/></t3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'/>")
+               "<t3><p: class='call' a='a'/></t3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'></p>")
   end
+
 
   # --- Replacing Parameters --- #
 
@@ -576,8 +577,8 @@ describe Template do
 
   it "should support scoped variables" do
     tags =
-      "<def tag='t1'><set-scoped my-var='ping'><%= parameters.default %></set-scoped></def>" +
-      "<def tag='t2'><set-scoped my-var='pong'><%= parameters.default %></set-scoped></def>"
+      "<def tag='t1' debug-source><set-scoped my-var='ping'><%= parameters.default %></set-scoped></def>" +
+      "<def tag='t2' debug-source><set-scoped my-var='pong'><%= parameters.default %></set-scoped></def>"
     eval_dryml(tags + "<t1><%= scope.my_var %></t1>").should == 'ping'
     eval_dryml(tags + "<t1><t2><%= scope.my_var %></t2> <%= scope.my_var %></t1>").should == 'pong ping'
   end
@@ -605,12 +606,12 @@ describe Template do
   end
 
   it "should alow static tags to be repeated with the 'repeat' attribute" do
-    eval_dryml('<img repeat="&[1,2,3]" src="#{this}" />').should ==
-      '<img src="1" /><img src="2" /><img src="3" />'
+    eval_dryml('<div repeat="&[1,2,3]" src="#{this}" />').should ==
+      '<div src="1" /><div src="2" /><div src="3" />'
 
     # Make sure <%= %> doesn't break
-    eval_dryml('<img repeat="&[1,2,3]" src="<%= this %>" />').should ==
-      '<img src="1" /><img src="2" /><img src="3" />'
+    eval_dryml('<div repeat="&[1,2,3]" id="<%= this %>" />').should ==
+      '<div id="1" /><div id="2" /><div id="3" />'
   end
 
   it "should alow defined tags to be repeated with the 'repeat' attribute" do
@@ -672,7 +673,9 @@ describe Template do
   end
 
   def new_renderer
-    @env.new("test-view", nil)
+    returning @env.new("test-view", nil) do |r|
+      r.scope[:xmldoctype] = true
+    end
   end
 
   def compile_in_template(src)
