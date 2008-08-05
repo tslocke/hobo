@@ -73,6 +73,9 @@ module Hobo::Dryml
       @build_instructions.each do |instruction|
         name = instruction[:name]
         case instruction[:type]
+        when :eval
+          @environment.class_eval(instruction[:src], template_path, instruction[:line_num])
+
         when :def
           src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
