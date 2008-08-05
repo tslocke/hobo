@@ -71,8 +71,7 @@ module Hobo::Dryml
       # compile the build instructions
       @builder.build(local_names, auto_taglibs, mtime)
 
-      from_cache = (parsed ? '' : ' (from cache)')
-      logger.info("  DRYML: Compiled#{from_cache} #{template_path} in %.2fs" % (Time.now - now))
+      logger.info("  DRYML: Compiled #{template_path} in %.2fs" % (Time.now - now)) if parsed
     end
 
 
