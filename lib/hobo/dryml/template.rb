@@ -759,7 +759,7 @@ module Hobo::Dryml
       if el.children.empty?
         dryml_exception("part attribute on empty static tag", el) if part
 
-        "<%= " + apply_control_attributes("element(:#{el.name}, #{attrs} #{tag_newlines(el)})", el) + " %>"
+        "<%= " + apply_control_attributes("element(:#{el.name}, #{attrs}, nil, true, #{!el.has_end_tag?} #{tag_newlines(el)})", el) + " %>"
       else
         if part
           body = part_element(el, children_to_erb(el))
