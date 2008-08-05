@@ -240,7 +240,7 @@ module Hobo
     end
 
 
-    def select_viewable(collection)
+    def select_viewable(collection=this)
       collection.select {|x| can_view?(x)}
     end
 
