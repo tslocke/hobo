@@ -269,10 +269,9 @@ module Hobo::Dryml
       dryml_exception("def cannot have both alias-of and extend-with", el) if alias_of && extend_with
       dryml_exception("def with alias-of must be empty", el) if alias_of and el.size > 0
 
-
-      @builder.add_build_instruction(:alias_method,
-                                     :new => ruby_name(name).to_sym,
-                                     :old => ruby_name(Hobo::Dryml.unreserve(alias_of)).to_sym) if alias_of
+      alias_of and @builder.add_build_instruction(:alias_method,
+                                                  :new => ruby_name(name).to_sym,
+                                                  :old => ruby_name(Hobo::Dryml.unreserve(alias_of)).to_sym)
 
       res = if alias_of
               "<% #{tag_newlines(el)} %>"
