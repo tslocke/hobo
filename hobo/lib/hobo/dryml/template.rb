@@ -226,6 +226,16 @@ module Hobo::Dryml
     end
 
 
+    def define_polymorphic_dispatcher(el, name)
+      src = %(
+      def #{name}(*args)
+        call_polymorphic_tag('#{name}', *args) { #{name}__base(*args) }
+      end
+      )
+      @builder.add_build_instruction(:eval, :src => src, :line_num => element_line_num(el))
+    end
+
+
     def def_element(el)
       require_toplevel(el)
       require_attribute(el, "tag", DRYML_NAME_RX)
@@ -442,9 +452,17 @@ module Hobo::Dryml
 
     def call_name(el)
       dryml_exception("invalid tag name", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
-      Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
+      name = Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
+      call_to_self_from_type_specific_def?(el) ? "#{name}__base" : name
     end
 
+
+    def call_to_self_from_type_specific_def?(el)
+      @def_element &&                                       # We are in a def
+        el.dryml_name == @def_element.attributes['tag'] &&  # with the same name as this call
+        @def_element.attributes['for'] &&                   # The def is for="SomeType"
+        !el.attributes['for-type']                          # This call is not a polymorphic call
+    end
 
     def polymorphic_call_type(el)
       t = el.attributes['for-type']
