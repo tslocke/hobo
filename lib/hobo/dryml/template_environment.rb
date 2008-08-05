@@ -177,7 +177,7 @@ module Hobo::Dryml
       if tag != name
         send(tag, attributes || {}, parameters || {})
       else
-        nil
+        block_given? ? yield : nil
       end
     end
 
