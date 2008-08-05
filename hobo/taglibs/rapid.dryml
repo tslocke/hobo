@@ -134,11 +134,12 @@
 %></def>
      
 
-<def tag="name-for-collection" attrs="singular, lowercase"><%=
+<def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
   name = (attr = this.try.origin_attribute and attr.to_s) || type_name(:plural => true)
   name = name.titleize
   name = name.singularize if singular
   name = name.downcase if lowercase
+  name = name.underscore.gsub('_', '-') if dasherize
   name
 %></def>
 
