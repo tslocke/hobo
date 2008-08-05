@@ -92,7 +92,7 @@ module Hobo::RapidHelper
 
 
 
-  def in_place_editor(behaviour_class, attributes)
+  def in_place_editor(attributes)
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
     attributes = add_classes(attributes, behaviour_class, model_id_class(this_parent, this_field))
