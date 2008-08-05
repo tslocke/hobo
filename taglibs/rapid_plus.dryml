@@ -33,7 +33,7 @@
         <th if="&all_parameters[:controls]" class="controls"></th>
       </field-heading-row>
     </table>    
-    <do param="empty-message" if="empty?">No <name-for-collection lowercase/> to display</do>
+    <do param="empty-message" if="empty?">No <collection-name lowercase/> to display</do>
 
    
     <nav class="page" if="&this.respond_to? :page_count">
