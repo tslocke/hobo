@@ -271,7 +271,7 @@
 <def tag="view" for="ActiveRecord::Base"><a/></def>
 
 
-<def tag="count" attrs="label, prefix, if-any, lowercase"><%=
+<def tag="count" attrs="label, prefix, if-any, lowercase"><span class="count"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
   c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
@@ -299,7 +299,7 @@
       main
     end
   end
-%></def>
+%></span></def>
 
 
 <def tag="theme-stylesheet" attrs="name">
