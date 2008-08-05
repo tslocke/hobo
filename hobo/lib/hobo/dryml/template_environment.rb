@@ -541,7 +541,7 @@ module Hobo::Dryml
         attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
       end
 
-      content = new_context(&block) if block_given?
+      content = new_context { yield } if block_given?
       res = if empty
               "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
             else
