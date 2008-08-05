@@ -416,7 +416,7 @@ module Hobo::Dryml
 
       if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_default_content
-                 new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
+                 new_context { overriding_default_content.call(proc { default_content.call(nil) if default_content }) }
                elsif default_content
                  new_context { default_content.call(nil) }
                else
@@ -424,12 +424,14 @@ module Hobo::Dryml
                end
         element(the_tag, attributes, body)
       else
-        d = if overriding_default_content
-              proc { |default| overriding_default_content.call(proc { default_content._?.call(default) }) }
-            else
-              proc { |default| default_content._?.call(default) }
-            end
-        parameters = parameters.merge(:default => d)
+        if default_content || overriding_default_content
+          d = if overriding_default_content
+                proc { |default| overriding_default_content.call(proc { default_content.call(default) if default_content }) }
+              else
+                proc { |default| default_content.call(default) if default_content }
+              end
+          parameters = parameters.merge(:default => d) 
+        end
 
         if the_tag.is_a?(String, Symbol)
           # It's a defined DRYML tag

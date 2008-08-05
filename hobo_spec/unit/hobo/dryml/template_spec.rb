@@ -419,6 +419,12 @@ describe Template do
                "<t3><p: class='call' a='a'/></t3>").should be_dom_equal_to("<p class='c1 c2 call' a='a' b='b' c='c'></p>")
   end
 
+  it "should not lose the default default when calling tags marked param" do
+    eval_dryml("<def tag='t1'><p param='default'>The default default</p></def>" +
+               "<def tag='t2'><t1 param/></def>" +
+               "<t2/>").should == "<p>The default default</p>"
+  end
+
 
   # --- Replacing Parameters --- #
 
