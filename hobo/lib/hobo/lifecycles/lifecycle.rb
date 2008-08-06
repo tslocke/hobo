@@ -176,12 +176,15 @@ module Hobo
 
       def current_key
         require 'digest/sha1'
-        timestamp = record.read_attribute(key_timestamp_field).utc
-        Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
+        timestamp = record.read_attribute(key_timestamp_field)
+        if timestamp
+          timestamp = timestamp.utc
+          Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
+        end
       end
 
       def valid_key?
-        provided_key == current_key
+        provided_key && provided_key == current_key
       end
 
 

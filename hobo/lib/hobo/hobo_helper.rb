@@ -140,8 +140,8 @@ module Hobo
       type, field = args.empty? ? [this_parent.class, this_field] : args
       "#{type.typed_id}_#{field}" if type.respond_to?(:typed_id)
     end
-    
-    
+
+
     def model_id_class(object=this, attribute=nil)
       object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
     end
@@ -151,14 +151,14 @@ module Hobo
       res = []
       empty = true
       if enum.respond_to?(:each_pair)
-        enum.each_pair do |key, value| 
+        enum.each_pair do |key, value|
           empty = false;
           self.this_key = key;
           new_object_context(value) { res << yield }
         end
       else
         enum.each do |e|
-          empty = false; 
+          empty = false;
           if e.respond_to?(:new_record?) && !e.new_record?
             new_field_context(e.id.to_s, e) { res << yield }
           else
@@ -206,7 +206,7 @@ module Hobo
         end
       else
         object, field = args.length == 2 ? args : [this, args.first]
-        
+
         if !field && (origin = object.try.origin)
           Hobo.can_edit?(current_user, origin, object.origin_attribute)
         else
@@ -346,11 +346,11 @@ module Hobo
     end
 
     def query_params
-      query = request.request_uri.match(/(?:\?(.+))/)._?[1]
+      query = request.request_uri.match(/(?:\?([^?]+))/)._?[1]
       if query
         params = query.split('&')
         pairs = params.map do |param|
-          pair = param.split('=')
+          pair = param.split('=', 2)
           pair.length == 1 ? pair + [''] : pair
         end
         HashWithIndifferentAccess[*pairs.flatten]

@@ -555,7 +555,7 @@ SelectManyInput = Behavior.create({
     addOne : function() {
         var select = this.element.down('select') 
         var selected = select.options[select.selectedIndex]
-        if (selected.value != "") {
+        if ($F(select) != "") {
             var newItem = $(DOM.Builder.fromHTML(this.element.down('.item-proto').innerHTML.strip()))
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
@@ -578,7 +578,7 @@ SelectManyInput = Behavior.create({
                              afterFinish: function (ef) { ef.element.remove() } } ) 
         var label = el.down('span').innerHTML
         var option = $A(this.element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
-	option.disabled = false
+        option.disabled = false
     },
 
     itemAdded: function(item, option) {
