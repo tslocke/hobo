@@ -438,7 +438,7 @@ end
 
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
-::HOBO_ROOT = File.dirname(__FILE__) + "/.."
+::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 
 if defined? HoboFields
