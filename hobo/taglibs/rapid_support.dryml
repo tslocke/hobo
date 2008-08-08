@@ -6,8 +6,7 @@
                                                                                                                 
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
-                  columns = klass.attr_order.*.to_s & klass.content_columns.*.name
-                  columns -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
+                  columns = standard_fields(klass, include_timestamps)
 
                   if skip_associations == "has_many"
                     assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
