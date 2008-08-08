@@ -25,9 +25,13 @@ module HoboFields
 
     attr_accessor :renames
 
+
     def load_rails_models
       if defined? RAILS_ROOT
-        Dir["#{RAILS_ROOT}/app/models/**/[a-z]*.rb"].each { |f| load f }
+        Dir["#{RAILS_ROOT}/app/models/**/[a-z]*.rb"].each do |f|
+          _, filename = *f.match(%r{/app/models/([_a-z/]*).rb$})
+          filename.classify.constantize
+        end
       end
     end
 
