@@ -183,7 +183,7 @@ module Hobo::Dryml
 
 
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= (this.is_a?(Array) && this.respond_to?(:member_class) && this.member_class) || this_type
+      call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
 
       while true
         if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
