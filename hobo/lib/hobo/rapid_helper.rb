@@ -142,5 +142,13 @@ module Hobo::RapidHelper
 
     names - through_collection_names
   end
+  
+  def standard_fields(model, include_timestamps=false)
+    fields = model.attr_order.*.to_s & model.content_columns.*.name
+    fields -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
+    debugger if model == User
+    fields.reject! { |f| model.never_show? f }
+    fields
+  end
 
 end
