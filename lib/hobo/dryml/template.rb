@@ -227,9 +227,12 @@ module Hobo::Dryml
 
 
     def define_polymorphic_dispatcher(el, name)
+      # FIXME: The new erb context ends up being set-up twice 
       src = %(
-      def #{name}(*args)
-        call_polymorphic_tag('#{name}', *args) { #{name}__base(*args) }
+      def #{name}(attributes={}, parameters={})
+        _tag_context(attributes) do
+          call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes, parameters) }
+        end
       end
       )
       @builder.add_build_instruction(:eval, :src => src, :line_num => element_line_num(el))
