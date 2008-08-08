@@ -387,8 +387,8 @@ module Hobo
       require 'active_record/association_reflection'
       require 'action_view_extensions/helpers/tag_helper'
 
-      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-
+      Hobo::Dryml.enable
+      
       Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
 
       require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
