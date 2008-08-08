@@ -30,7 +30,7 @@ module HoboFields
       if defined? RAILS_ROOT
         Dir["#{RAILS_ROOT}/app/models/**/[a-z]*.rb"].each do |f|
           _, filename = *f.match(%r{/app/models/([_a-z/]*).rb$})
-          filename.classify.constantize
+          filename.camelize.constantize
         end
       end
     end
