@@ -35,6 +35,11 @@ module Hobo
     extend self
 
     attr_accessor :last_if
+    
+    def enable
+      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+    end
+    
 
     def clear_cache
       @renderer_classes = {}
