@@ -234,14 +234,6 @@ var Hobo = {
         return nic.instanceById(element)
     },
 
-    applyEvents: function(root) {
-        root = $(root)
-        function select(p) {
-            return new Selector(p).findElements(root)
-        }
-
-    },
-
 
     doSearch: function(el) {
         el = $(el)
