@@ -115,8 +115,8 @@ body.aside-layout {width: 960px;}
 	margin: 0; padding: 0 30px 30px; 
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
 }
-.page-header .nav {height: 100%; overflow: hidden; margin: 0 20px;}
-.page-header .nav li {float: left; margin-left: 0; list-style: none;}
+.page-header ul {height: 100%; overflow: hidden; margin: 0 20px;}
+.page-header li {float: left; margin-left: 0; list-style: none;}
 .page-header a, .page-header a:hover {border: none; color: white; background: none;}
 
 .page-header div.search {

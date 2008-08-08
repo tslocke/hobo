@@ -85,7 +85,7 @@
 
 
 <def tag="hobo-rapid-javascripts"><%=
-   res = '<script type="text/javascript">var hoboParts = {};'
+   res = 'var hoboParts = {};'
    # FIXME: This should interrogate the model-router - not the models
    unless Hobo.all_models.empty?
      # Tell JS code how to pluralize names, unless they follow the simple rule
@@ -99,7 +99,6 @@
    if request_forgery_protection_token
      res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
    end
-   res << "</script>"
    res
 %></def>
 
@@ -404,3 +403,4 @@ in the future - use at your own risk. -->
 
 
 <def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
+

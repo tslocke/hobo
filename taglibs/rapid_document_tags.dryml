@@ -6,10 +6,6 @@
 
 <def tag="item-value"><td merge-attrs><do param="default"/></td></def>
 
-<def tag="nav">
-  <div class="nav" merge-attrs><do param="default"/></div>
-</def>  
-
 <!-- section represents a generic document or application section. -->
 <def tag="section" attrs="empty">
   <set body="&parameters.default"/>

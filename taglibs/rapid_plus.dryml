@@ -55,3 +55,28 @@
     </div>
   </form>
 </def>
+
+
+<def tag="sortable-collection"><%
+  singular_name = member_class.name.underscore
+  attributes[:id] ||= "#{singular_name}_ordering"
+%>
+  <collection class="sortable" merge>
+    <item: id="#{singular_name}_#{this.id}" param>
+      <div class="ordering-handle" param="handle" if="&sortable">&uarr;<br/>&darr;</div>
+      <card param/>
+    </item:>
+  </collection>
+  <%= if Hobo::Dryml.last_if
+        opts = { :url => reorder_url,
+                 :constraint => :vertical,
+                 :overlap => :vertical,
+                 :scroll => :window,
+                 :handle => 'ordering-handle',
+                 :complete => [visual_effect(:highlight, attributes[:id])]
+                }
+        opts.update(sortable_options) if sortable_options
+        sortable_element attributes[:id], opts
+      end # FIXME: Make unobstrusive
+   %>
+</def>
