@@ -1,0 +1,49 @@
+<% each_model do -%>
+<%
+name_attribute     = model.name_attribute
+content_attribute  = model.primary_content_attribute
+creator_attribute  = model.creator_attribute
+primary_collection = primary_collection_name
+
+show_link     = linkable?(:show)
+edit_link     = !show_link && linkable?(:edit)
+delete_button = !edit_link && linkable?(:destroy)
+
+-%>
+<% if name_attribute || content_attribute || creator_attribute || primary_collection || edit_link || delete_button -%>
+<def tag="card" for="<%= model.name %>">
+  <card class="<%= model.name.dasherize %>" merge-attrs>
+<% if name_attribute -%>
+    <header:>
+      <h4 param="heading"><% if show_link %><a><name/></a><% else %><name/><% end %></h4>
+    </header:>
+<% end -%>
+<% if content_attribute || creator_attribute || primary_collection || edit_link || delete_button -%>
+    <body:>
+<% if !show_link && content_attribute -%>
+      <view:<%= content_attribute %> param="description"/>
+<% end -%>
+<% if creator_attribute -%>
+      <creator param/>
+<% end -%>
+<% if primary_collection -%>
+      <count:<%= primary_collection%> param/>
+<% end -%>
+<% if edit_link || delete_button -%>
+      <div param="actions" if-content>
+<% if edit_link -%>
+        <a action="edit" if="&can_edit?" param="edit-link">Edit</a>
+<% end -%>
+<% if delete_button -%>
+        <delete-button label="X" param/>
+<% end -%>
+      </div>
+<% end -%>
+    </body:>
+<% end -%>
+  </card>
+</def>
+
+<% end -%>
+
+<% end -%>
