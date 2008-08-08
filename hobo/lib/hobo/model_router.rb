@@ -4,11 +4,13 @@ if defined? ActionController::Routing::RouteSet
     # Monkey patch this method so routes are reloaded on *every*
     # request. Without this Rails checks the mtime of config/routes.rb
     # which doesn't take into account Hobo's auto routing
-    #def reload
-    #  # TODO: This can get slow - quicker to stat routes.rb and the
-    #  # controllers and only do a load if there's been a change
-    #  load!
-    #end
+
+    def reload
+      # TODO: This can get slow - quicker to stat routes.rb and the
+      # controllers and only do a load if there's been a change
+      load!
+      Hobo::Dryml::DrymlGenerator.run
+    end
 
     # temporay hack -- reload assemble.rb whenever routes need reloading
     def reload_with_hobo_assemble
