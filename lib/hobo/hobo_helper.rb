@@ -185,8 +185,8 @@ module Hobo
     end
 
 
-    def can_create?(object=nil)
-      Hobo.can_create?(current_user, object || this)
+    def can_create?(object=this)
+      Hobo.can_create?(current_user, object)
     end
 
 
