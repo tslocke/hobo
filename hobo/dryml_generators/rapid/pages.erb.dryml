@@ -1,0 +1,159 @@
+<% each_model do -%>
+  
+<!-- ====== <%= model.name %> Pages ====== -->
+<%
+new_link = linkable?(:new)
+new_form = !new_link && linkable?(:create, :method => :post)
+-%>
+
+
+<def tag="index-page" for="<%= model.name %>">
+  <page title="<%= model_name :title, :plural %>" merge>
+    <body: class="index-page <%= model_class %>" param/>
+    
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading"><%= model_name :title, :plural %></h2>
+
+        <p param="count">
+          <if>There <count prefix="are"/></if>
+          <else>There aren't any <%= model_name :lowercase, :plural %> yet.</else>
+        </p>
+      </header>
+      
+      <section param="content-body">
+<% if new_link -%>
+
+        <a action="new" to="&model" merge-params/>      
+<% end -%>
+
+        <page-nav param="top-page-nav"/>
+      
+        <collection param/>
+        <else>There aren't any <%= model_name :lowercase, :plural %> yet.</else>
+      
+        <page-nav param="bottom-page-nav"/>
+<% if new_form -%>
+
+        <form with="&<%= model.name %>.new" without-or-cancel/>
+<% end -%>
+      </section>
+    </content:>
+  </page>
+</def>
+
+
+<def tag="new-page" for="<%= model.name %>">
+  <page title="New <%= model_name :title, :plural %>" merge>
+    <body: class="new-page <%= model_class %>" param/>
+    
+    <content: param>
+      <section param="content-header">
+        <h2 param="heading">New <%= model_name :title %></h2>
+      </section>
+      
+      <section param="content-body">
+        <form param/>
+      </section>
+    </content:>
+  </page>
+</def>
+
+
+<%
+back_link      = model.dependent_on.detect { |x| !(model.reflections[x].klass < Hobo::User) }
+boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name
+creator        = model.creator_attribute
+creator_link   = creator && linkable?(model.reflections[creator].klass, :show)
+edit_link      = linkable?(:edit)
+main_content   = model.primary_content_attribute
+show_fields    = standard_fields - [model.name_attribute, main_content, creator, back_link, *boolean_fields]
+collection     = model.dependent_collections.first
+add_link       = linkable?(:"new_#{collection.to_s.singularize}")
+add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}", :method => :post)
+-%>
+<def tag="show-page" for="<%= model.name %>" attrs="collection">
+  <%% collection ||= <%= collection.inspect -%>%>
+  <page merge title="<%= model_name :title %>">
+
+    <body: class="show-page <%= model_class %>" param/>
+
+    <content: param>
+      <header param="content-header">
+<% if  back_link -%>
+        <a:<%= back_link %> param="parent-link">&laquo; <name/></a>
+<% end -%>
+        <h2 param="heading"><name/></h2>
+<% if boolean_fields.any? -%>
+
+        <field-names-where-true fields="<%= boolean_fields * ', ' %>"/>        
+<% end -%>
+<% if creator_link -%>
+
+        <a:<%= model.creator_attribute %> param="creator-link"/>
+<% elsif creator -%>        
+
+        <view:get-creator param="creator-name"/>
+<% end -%>
+<% if edit_link -%>
+
+        <a action="edit" if="&can_edit?" param="edit-link">Edit <%= model_name :title %></a>
+<% end -%>
+      </header>
+    
+      <section param="content-body">
+<% if main_content -%>
+        <view:<%= main_content %>/>        
+<% end -%>
+<% if show_fields.any? -%>
+        <field-list fields="<%= show_fields * ', ' %>" param/>
+<% end -%>
+<% if collection -%>
+        <section param="collection-section">
+          <h3 param="collection-heading"><%= collection.to_s.titleize %></h3>
+              
+          <collection:<%= collection %> sortable param/>
+<% if add_link -%>
+
+          <a action="new" if="&can_create?" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
+<% elsif add_form -%>
+
+          <section param="add-to-collection">
+            <h3>Add A <%= collection.to_s.singularize.titleize %></h3>
+            <form:<%= collection %>.new to="&@this.<%= collection %>" method="post" param="form">
+              <submit: label="Add"/>
+            </form>
+          </section>
+<% end -%>
+        </section>
+<% end -%>
+      </section>
+    </content:>
+    
+  </page>
+</def>
+
+
+<%
+name_attribute = model.name_attribute
+-%>
+<def tag="edit-page">
+  <page merge title="<%= model_name :title %>">
+
+    <body: class="edit-page <%= model_class %>" param/>
+
+    <content:>
+      <section param="content-header">
+        <h2 param="heading"><name/></h2>
+        <delete-button label="Remove This <%= model_name :title %>" param/>
+      </section>
+
+      <section param="content-body">
+        <form param/>
+      </section>
+    </content:>
+    
+  </page>
+</def>
+
+<% end -%>
