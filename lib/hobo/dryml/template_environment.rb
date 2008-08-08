@@ -369,6 +369,9 @@ module Hobo::Dryml
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
       overriding_proc = caller_parameters[param_name]
       replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
+      
+      classes = attributes[:class]
+      attributes[:class] = classes ? "#{classes} #{param_name}" : param_name.to_s
 
       if param_name == :default && overriding_proc
         # :default content is handled specially
