@@ -325,10 +325,9 @@
   <%= "<!--[if #{version || 'IE'}]>" %><do param="default"/><%= "<![endif]-->" %>
 </def>
 
-<def tag="stylesheet" attrs="name, media">
+<def tag="stylesheet" attrs="name">
   <repeat with="&comma_split(name)">
-    <link href="#{base_url}/stylesheets/#{this}.css" media="#{ media || 'all' }"
-          rel="stylesheet" type="text/css" />
+    <%= stylesheet_link_tag name, attributes %>
   </repeat>
 </def>
 
