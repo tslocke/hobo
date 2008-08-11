@@ -114,7 +114,7 @@ add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}"
           <collection:<%= collection %> sortable param/>
 <% if add_link -%>
 
-          <a action="new" if="&can_create?" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
+          <a:<%= collection %> action="new" if="&can_create?" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
 <% elsif add_form -%>
 
           <section param="add-to-collection">
