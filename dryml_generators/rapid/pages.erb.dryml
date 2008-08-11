@@ -72,8 +72,7 @@ collection     = model.dependent_collections.first
 add_link       = linkable?(:"new_#{collection.to_s.singularize}")
 add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}", :method => :post)
 -%>
-<def tag="show-page" for="<%= model.name %>" attrs="collection">
-  <%% collection ||= <%= collection.inspect -%>%>
+<def tag="show-page" for="<%= model.name %>" >
   <page merge title="<%= model_name :title %>">
 
     <body: class="show-page <%= model_class %>" param/>
