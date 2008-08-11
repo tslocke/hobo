@@ -92,23 +92,8 @@ input.file_upload {
 .content-header, .content-body {padding-bottom: 15px;}
 .content-footer {padding-bottom: 20px;}
 
-.page-content {padding-top: 20px; background: white;}
-
-/* aside layout */
-body.aside-layout {width: 960px;}
-.aside-layout .page-content {height: 100%; overflow: hidden; padding-top: 0;}
-.aside-layout .main-content {padding-top: 20px;}
-.main-content {float: left; width: 670px;}
-.aside {float: right; width: 220px; padding: 20px 30px; background: #E5E5E5;}
-.aside-content {
-	color: #222; font-size: 11px;
-}
-.aside-content h2 {padding-bottom: 10px; border-bottom: 1px dotted #666;}
-.aside-content h3 {padding-bottom: 5px; border-bottom: 1px dotted #666;}
-.aside-content a {background: none;}
-/* trick to produce equal height columns */
-.aside, .main-content {padding-bottom: 10000px; margin-bottom: -10000px;}
-
+.content-wrapper {padding-top: 20px; background: white;}
+.content-wrapper > * {margin: 0 20px;}
 
 .page-header {position: relative; margin-top: 20px; padding: 20px 0 0; color: white; background: black;}
 .page-header h1 {
@@ -140,7 +125,7 @@ body.aside-layout {width: 960px;}
 #search-spinner {position: absolute; top: 6px; right: 7px;}
 
 
-ul.main-nav {float: left; margin: 0 10px;}
+ul.main-nav { margin: 0 10px;}
 .main-nav li {margin-right: 10px;}
 .main-nav a {
 	display: block;
