@@ -114,11 +114,6 @@ module Hobo
         Digest::SHA1.hexdigest("--#{salt}--#{password}--")
       end
 
-
-      def set_admin_on_first_user
-        before_create { |user| user.administrator = true if count == 0 }
-      end
-
     end
 
     # Encrypts the password with the user salt
