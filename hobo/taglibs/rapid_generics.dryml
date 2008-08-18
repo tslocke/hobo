@@ -18,15 +18,13 @@
 </def>
 
 
-<def tag="collection" attrs="limit">
-  <ul with="&limit ? this.limit(limit) : this"
-      class="collection #{collection_name :dasherize => true}"
-      merge-attributes 
-      unless="empty?">
+<def tag="collection">
+  <ul class="collection #{collection_name :dasherize => true}" merge-attributes unless="empty?">
     <li param="item" class="#{scope.even_odd} #{model_id_class}" repeat="&select_viewable">
-      <do param="default"><card/></do>
+      <do param="default"><card param/></do>
     </li>
   </ul>
+  <else><empty-collection-message param="empty-message"/></else>
 </def>
 
 
