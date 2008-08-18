@@ -546,7 +546,7 @@ module Hobo::Dryml
       call_type = nil
 
       metadata_name = containing_tag_name || el.expanded_name
-
+      
       param_items = el.map do |node|
         case node
         when REXML::Text
@@ -581,6 +581,8 @@ module Hobo::Dryml
           param_items = " :default => #{default_param_proc(el, containing_tag_name)}, "
         end
       end
+      
+      param_items.concat without_parameters(el)
 
       merge_params = el.attributes['merge-params'] || merge_attribute(el)
       if merge_params
@@ -596,6 +598,12 @@ module Hobo::Dryml
       else
         "{#{param_items}}"
       end
+    end
+    
+    
+    def without_parameters(el)
+      without_names = el.attributes.keys.map { |name| name =~ /^without-(.*)/ and $1 }.compact
+      without_names.map { |name| ":#{ruby_name name}_replacement => proc {|__discard__| '' }, " }.join
     end
 
 
@@ -729,7 +737,7 @@ module Hobo::Dryml
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}'", el) unless n =~ DRYML_NAME_RX
 
-        unless n.in?(SPECIAL_ATTRIBUTES)
+        unless n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
           ":#{ruby_name n} => #{attribute_to_ruby(v)}"
         end
       end.compact
