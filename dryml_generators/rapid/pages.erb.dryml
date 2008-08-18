@@ -155,4 +155,71 @@ name_attribute = model.name_attribute
   </page>
 </def>
 
+<% controller.owner_actions.each_pair do |owner, actions| -%>
+<%
+collection_name = model.reverse_reflection(owner).name.to_s
+owner_model     = model.reflections[owner].klass
+owner_tag       = linkable?(owner_model) ? "a" : "name"
+owner    = owner.to_s
+-%>
+<% if :index.in? actions -%>
+<%
+new_link = :new.in?(actions)
+-%>
+<def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
+<def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
+  <page merge title="<%= model_name :title, :plural %> for #{name :with => @<%= owner %>}">
+    <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
+    
+    <content: param>
+      <header param="content-header">
+        <div param="back-to">Back to <a with="&@<%= owner %>"/></div>
+        <h2 param="heading"><%= model_name :title, :plural %></h2>
+
+        <p param="count" if>There <count prefix="are"/></p>
+      </header>
+      
+      <section param="content-body">
+<% if new_link -%>
+
+        <a action="new" to="&model" merge-params/>      
+<% end -%>
+
+        <page-nav param="top-page-nav"/>
+      
+        <collection param/>
+      
+        <page-nav param="bottom-page-nav"/>
+      </section>
+    </content:>
+  </page>
+</def>
+<% end -%>
+
+
+<% if :new.in? actions -%>
+<def tag="new-for-<%= owner.dasherize %>-page" polymorphic/>
+<def tag="new-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
+  <page merge title="New <%= model_name :title %> for #{name :with => @<%= owner %>}">
+    
+    <body: class="new-for-owner-page <% owner.dasherize %> <%= model_class %>" param/>
+    
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">New <%= collection_name.singularize.titleize %></h2>
+        <h3 class="subheading" param>For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
+      </header>
+      
+      <section param="content-body">
+        <error-messages/>
+
+        <form owner="<%= owner %>" method="post" param/>
+      </section>
+    </content:>
+  </page>
+</def>
+<% end -%>
+
+<% end -%>
+
 <% end -%>

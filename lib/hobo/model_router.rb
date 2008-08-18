@@ -130,7 +130,7 @@ module Hobo
         index_action_routes
         lifecycle_routes if defined? model::Lifecycle
         resource_routes
-        collection_routes
+        owner_routes
         web_method_routes
         show_action_routes
 
@@ -159,27 +159,33 @@ module Hobo
     end
 
 
-    def collection_routes
-      controller.collections.each do |collection|
-        linkable_route("#{singular}_#{collection}",
-                       "#{plural}/:id/#{collection}",
-                       collection.to_s,
-                       :conditions => { :method => :get })
-
-        if Hobo.simple_has_many_association?(model.reflections[collection])
-          linkable_route("new_#{singular}_#{collection.to_s.singularize}",
-                         "#{plural}/:id/#{collection}/new",
-                         "new_#{collection.to_s.singularize}",
-                         :conditions => { :method => :get })
-          linkable_route("create_#{singular}_#{collection.to_s.singularize}",
-                         "#{plural}/:id/#{collection}",
-                         "create_#{collection.to_s.singularize}",
-                         :conditions => { :method => :post })
-
+    def owner_routes
+      controller.owner_actions.each_pair do |owner, actions|
+        collection     = model.reverse_reflection(owner).name
+        owner_singular = model.reflections[owner].klass.name.underscore
+        owner_plural   = owner_singular.pluralize
+        
+        actions.each do |action| 
+          case action
+          when :index
+            linkable_route("#{plural}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
+                           "index_for_#{owner}",
+                           :conditions => { :method => :get })
+          when :new
+            linkable_route("new_#{singular}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}/new",
+                           "new_for_#{owner}",
+                           :conditions => { :method => :get })
+          when :create
+            linkable_route("create_#{singular}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
+                           "create_for_#{owner}",
+                           :conditions => { :method => :post })
+          end
         end
       end
-    end
-
+    end 
 
     def web_method_routes
       controller.web_methods.each do |method|

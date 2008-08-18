@@ -20,7 +20,7 @@
 %></def>
 
 
-<def tag="form" attrs="to, update, hidden-fields, action, method, web-method, lifecycle"><%= 
+<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
   new_record = this.try.new_record?
@@ -31,7 +31,17 @@
              method.downcase
            end
 
-  html_attrs[:action] = action || object_url(to || this, web_method || lifecycle, :method => method)
+
+
+  html_attrs[:action] = action || begin
+     target = if owner
+                collection_name = this.class.reverse_reflection(owner).name
+                this.send(owner).send(collection_name)
+              else
+                this
+              end
+     object_url(target, web_method || lifecycle, :method => method)
+   end
    
   if html_attrs[:action].nil? || (lifecycle.nil? && new_record && !this.user_can_create?(current_user))
     Hobo::Dryml.last_if = false
