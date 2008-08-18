@@ -53,27 +53,6 @@ module Hobo
     end
 
 
-    def models=(models)
-      @models = models.*.name
-    end
-
-
-    def models
-      unless @models_loaded
-        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
-          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
-        end
-        @models_loaded = true
-      end
-      @models.*.constantize
-    end
-
-
-    def register_model(model)
-      @models << model.name unless @models.include? model.name
-    end
-
-
     def object_from_dom_id(dom_id)
       return nil if dom_id == 'nil'
 
@@ -108,7 +87,7 @@ module Hobo
         begin
           # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
           # By default, search all models, but filter out...
-          Hobo.models.select do |m|
+          Hobo::Model.all_models.select do |m|
             ModelRouter.linkable?(m, :show) &&  # ...non-linkables
               m.search_columns.any?             # and models with no search-columns
           end
@@ -133,12 +112,6 @@ module Hobo
 
     def add_routes(m)
       Hobo::ModelRouter.add_routes(m)
-    end
-
-
-    # FIXME: This method won't be needed
-    def all_models
-      Hobo.models.map { |m| m.name.underscore }
     end
 
 

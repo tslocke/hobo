@@ -15,7 +15,7 @@ module Hobo
 
       included_in_class_callbacks(base)
 
-      Hobo.register_model(base)
+      register_model(base)
 
       patch_will_paginate
 
@@ -71,6 +71,26 @@ module Hobo
         end
 
       end
+    end
+    
+    
+    def self.register_model(model)
+      @model_names ||= Set.new
+      @model_names << model.name
+    end
+
+
+    def self.all_models
+      # Load every controller in app/controllers...
+      unless @models_loaded
+        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+        end
+        @models_loaded = true
+      end
+
+      # ...but only return the ones that registered themselves
+      @model_names.*.constantize
     end
 
 
