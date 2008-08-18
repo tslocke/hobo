@@ -18,7 +18,8 @@ module Hobo
         base.class_eval do
           @auto_actions ||= {}
 
-          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => []
+          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [], 
+                                  :owner_actions => {}
 
           extend ClassMethods
 
@@ -122,7 +123,6 @@ module Hobo
         except = Array(options[:except])
         except_actions = except.map do |arg|
           case arg
-            when :collections then available_auto_collection_actions
             when :lifecycle   then available_auto_lifecycle_actions
             else arg
           end
@@ -149,30 +149,12 @@ module Hobo
           def reorder; hobo_reorder end if include_action?(:reorder)
         end
 
-        collections.each { |c| def_collection_actions(c.to_sym) }
         def_lifecycle_actions
       end
 
 
       def def_auto_action(name, &block)
         define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
-      end
-
-
-      def def_collection_actions(name)
-        def_auto_action name do
-          hobo_show_collection(name)
-        end
-
-        if Hobo.simple_has_many_association?(model.reflections[name])
-          def_auto_action "new_#{name.to_s.singularize}" do
-            hobo_new_in_collection(name)
-          end
-
-          def_auto_action "create_#{name.to_s.singularize}" do
-            hobo_create_in_collection(name)
-          end
-        end
       end
 
 
@@ -227,11 +209,26 @@ module Hobo
           end
         end
       end
-
-
-      def publish_collection(*names)
-        collections.concat(names)
-        names.each {|n| def_collection_actions(n)}
+      
+      
+      def auto_actions_for(owner, actions)
+        model.reverse_reflection(owner)._?.klass == model or 
+          raise ArgumentError, "Invalid owner association '#{owner}' for #{model}"
+        
+        owner_actions[owner] ||= []
+        actions.each do |action|
+          case action
+          when :new
+            define_method("new_for_#{owner}")    { hobo_new_for owner }
+          when :index
+            define_method("index_for_#{owner}")  { hobo_index_for owner }
+          when :create
+            define_method("create_for_#{owner}") { hobo_create_for owner }
+          else
+            raise ArgumentError, "Invalid owner action: #{action}"
+          end
+          owner_actions[owner] << action
+        end
       end
 
 
@@ -244,13 +241,12 @@ module Hobo
         (available_auto_read_actions +
          available_auto_write_actions +
          FORM_ACTIONS +
-         available_auto_collection_actions +
          available_auto_lifecycle_actions).uniq
       end
 
 
       def available_auto_read_actions
-        READ_ONLY_ACTIONS + collections
+        READ_ONLY_ACTIONS
       end
 
 
@@ -260,13 +256,6 @@ module Hobo
         else
           WRITE_ONLY_ACTIONS
         end
-      end
-
-
-      def available_auto_collection_actions
-        collections.map do |c|
-          [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
-        end.flatten
       end
 
 
@@ -321,6 +310,7 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
+        @this = instance_variable_get("@#{controller.singularize}")
         render :template => "#{controller}/#{view}"
       else
         render :action => default_action
@@ -384,6 +374,16 @@ module Hobo
         finder.all(options)
       end
     end
+    
+    
+    def find_owner_and_association(owner_association)
+      refl = model.reflections[owner_association]
+      klass = refl.klass
+      id = params["#{klass.name.underscore}_id"]
+      owner = klass.find(id)
+      instance_variable_set("@#{owner_association}", owner)
+      [owner, owner.send(model.reverse_reflection(owner_association).name)]
+    end
 
 
     # --- Action implementations --- #
@@ -391,6 +391,15 @@ module Hobo
     def hobo_index(*args, &b)
       options = args.extract_options!
       finder = args.first || model
+      self.this = find_or_paginate(finder, options)
+      response_block(&b)
+    end
+    
+    
+    def hobo_index_for(owner, *args, &b)
+      options = args.extract_options!
+      owner, association = find_owner_and_association(owner)
+      finder = args.first || association
       self.this = find_or_paginate(finder, options)
       response_block(&b)
     end
@@ -403,8 +412,15 @@ module Hobo
     end
 
 
-    def hobo_new(new_record=nil, &b)
-      self.this = new_record || model.user_new!(current_user)
+    def hobo_new(record=nil, &b)
+      self.this = record || model.user_new!(current_user)
+      response_block(&b)
+    end
+    
+    
+    def hobo_new_for(owner, record=nil, &b)
+      owner, association = find_owner_and_association(owner)
+      self.this = record || association.user_new(current_user)
       response_block(&b)
     end
 
@@ -415,6 +431,15 @@ module Hobo
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:new, &b)
     end
+    
+    
+    def hobo_create_for(owner, *args, &b)
+      options = args.extract_options!
+      owner, association = find_owner_and_association(owner)
+      self.this = args.first || association.new
+      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
+      create_response(:"new_for_#{owner}", &b)    
+    end
 
 
     def attribute_parameters
@@ -423,12 +448,17 @@ module Hobo
 
 
     def new_for_create
-      if model.has_inheritance_column? && (type_attr = params['type']) && type_attr.in?(model.send(:subclasses).*.name)
-        type_attr.constantize
-      else
-        model
-      end.new
+      type_param = subtype_for_create
+      create_model = type_param ? type_param.constantize : model
+      create_model.new
     end
+    
+    
+    def subtype_for_create
+      model.has_inheritance_column? && (t = params['type']) && t.in?(model.send(:subclasses).*.name) and
+        t
+    end
+    
 
 
     def create_response(new_action, &b)
@@ -514,40 +544,6 @@ module Hobo
           wants.html { redirect_after_submit(this, true) }
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
-    end
-
-
-    # --- Collection Actions --- #
-
-    def hobo_show_collection(association, *args, &b)
-      options = args.extract_options!
-      association = find_instance.send(association) if association.is_a?(String, Symbol)
-      if association.respond_to?(:origin)
-        association.origin.user_view(current_user, association.origin_attribute) # permission check
-      end
-      self.this = find_or_paginate(association, options)
-      dryml_fallback_tag("show_collection_page")
-      response_block(&b)
-    end
-
-
-    # TODO: This action needs some more tidying up
-    def hobo_new_in_collection(association, *args, &b)
-      options = args.extract_options!
-      @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
-      self.this = args.first || @association.new
-      this.user_changes(current_user) # set_creator and permission check
-      dryml_fallback_tag("new_in_collection_page")
-      response_block(&b)
-    end
-
-
-    def hobo_create_in_collection(association, *args, &b)
-      options = args.extract_options!
-      @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
-      self.this = args.first || @association.new
-      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response("new_#{association}", &b)
     end
 
 
@@ -669,7 +665,7 @@ module Hobo
       ivar = if object.is_a?(Array)
                (object.try.member_class || model).name.underscore.pluralize
              else
-               model.name.underscore
+               object.class.name.underscore
              end
       @this = instance_variable_set("@#{ivar}", object)
     end

@@ -60,19 +60,21 @@ module Hobo
 
       if obj.respond_to?(:member_class)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
+        
+        owner_name = obj.origin.class.reverse_reflection(obj.origin_attribute).name.to_s
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
-          action = :"new_#{obj.origin_attribute.to_s.singularize}"
+          action = :"new_for_#{owner_name}"
         elsif action.nil?
+          action_path = obj.origin_attribute
           if method.to_s == 'post'
-            action_path = obj.origin_attribute
-            action = :"create_#{obj.origin_attribute.to_s.singularize}"
+            action = :"create_for_#{owner_name}"
           else
-            action = obj.origin_attribute
+            action = :"index_for_#{owner_name}"
           end
         end
+        klass = obj.member_class
         obj = obj.origin
-
       else
         action ||= case options[:method].to_s
                    when 'put';    :update
@@ -85,9 +87,10 @@ module Hobo
           # Asking for url to post new record to
           obj = obj.class
         end
+        
+        klass = obj.is_a?(Class) ? obj : obj.class
       end
 
-      klass = obj.is_a?(Class) ? obj : obj.class
       if Hobo::ModelRouter.linkable?(klass, action, options)
 
         url = base_url_for(obj, subsite, action)

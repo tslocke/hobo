@@ -50,55 +50,6 @@
 <def tag="edit-page"  polymorphic/>
 
 
-<def tag="new-in-collection-page">
-  <set association-name="&@association.origin_attribute.to_s"/>
-  <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{association_name.underscore.dasherize} #{type_name :dasherize => true}" param/>
-    <content-header: param>
-      <h2 param="heading">New <association-name.singularize.titleize/></h2>
-      <h3 class="subheading" param>For: <a with="&@association.origin"/></h3>
-    </content-header>
-
-    <content-body: param>
-      <error-messages/>
-
-      <form to="&@association" method="post" param>
-        <field-list skip="#{@association.origin.class.reverse_reflection(association_name.to_sym).name}" param/>
-        <div class="actions" param="actions">
-          <submit label="Create #{association_name.singularize.titleize}" param/>
-          <or-cancel with="&@association.origin" param/>
-        </div>
-      </form>
-    </content-body>
-  </page>
-</def>
-
-
-<def tag="show-collection-page">
-  <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin)}" %>
-  <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name(:plural => true, :dasherize => true)}" param/>
-    <content-header: param>
-      <nav param="back-to">Back to <a:origin/></nav>
-      <h2 param="heading"><%= title %></h2>
-      <h3 class="subheading" param><count/></h3>
-    </content-header>
-
-    <content-body: param>
-      <nav param="top-pagination-nav"><page-nav/></nav>
-
-      <collection param/>
-      
-      <nav param="bottom-pagination-nav"><page-nav/></nav>
-      
-      <nav if="&Hobo.simple_has_many_association?(this)" param="new-link">
-        <a action="new"/>
-      </nav>
-    </content-body>
-  </page>
-</def>
-
-
 <def tag="permission-denied-page" attrs="message">
   <% message ||= "That operation is not allowed" %>
   <page merge>
