@@ -29,8 +29,6 @@ module Hobo
 
   class ModelRouter
 
-    APP_ROOT = "#{RAILS_ROOT}/app"
-
     class << self
 
       def reset_linkables
@@ -64,17 +62,13 @@ module Hobo
           return
         end
 
-        require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
+        require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
 
         # Don't create routes if it's a generator that's running
         return if caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
 
-        # Add non-subsite routes
-        add_routes_for(map, nil)
-
-        # Any directory inside app/controllers defines a subsite
-        subsites = Dir["#{APP_ROOT}/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
-        subsites.each { |subsite| add_routes_for(map, subsite) }
+        # Add non-subsite, and all subsite routes
+        [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
 
         add_developer_routes(map) if Hobo.developer_features?
       rescue ActiveRecord::StatementInvalid => e
@@ -87,20 +81,7 @@ module Hobo
       def add_routes_for(map, subsite)
         module_name = subsite._?.camelize
 
-        # FIXME: This should go directly to the controllers, not load the models first.
-        Hobo.models.each do |model|
-          controller_name = "#{model.name.pluralize}Controller"
-          is_defined = if subsite
-                         Object.const_defined?(module_name) && module_name.constantize.const_defined?(controller_name)
-                       else
-                         Object.const_defined?(controller_name)
-                       end
-          controller_filename = File.join(*["#{APP_ROOT}/controllers", subsite, "#{controller_name.underscore}.rb"].compact)
-          if is_defined || File.exists?(controller_filename)
-            controller = (subsite ? "#{module_name}::#{controller_name}" : controller_name).constantize
-            ModelRouter.new(map, model, controller, subsite)
-          end
-        end
+        Hobo::ModelController.all_controllers(subsite).each { |controller| ModelRouter.new(map, controller, subsite) }
       end
 
 
@@ -112,9 +93,8 @@ module Hobo
     end
 
 
-    def initialize(map, model, controller, subsite)
+    def initialize(map, controller, subsite)
       @map = map
-      @model = model
       @controller = controller
       @subsite = subsite
       add_routes
@@ -122,6 +102,11 @@ module Hobo
 
 
     attr_reader :map, :model, :controller, :subsite
+    
+    
+    def model
+      controller.model
+    end
 
 
     def plural
