@@ -400,7 +400,6 @@ module Hobo
   ModelExtensions = classy_module do
     def self.hobo_model
       include Hobo::Model
-      fields # force hobofields to load
     end
     def self.hobo_user_model
       include Hobo::Model
@@ -415,10 +414,8 @@ module Hobo
 
 end
 
-
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
-
 
 if defined? HoboFields
   HoboFields.never_wrap(Hobo::Undefined)

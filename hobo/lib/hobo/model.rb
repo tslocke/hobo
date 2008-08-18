@@ -48,7 +48,8 @@ module Hobo
           end
         end
       end
-
+      
+      base.fields # force hobofields to load
     end
 
     def self.patch_will_paginate
