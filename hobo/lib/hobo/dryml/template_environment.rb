@@ -184,7 +184,7 @@ module Hobo::Dryml
 
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
-
+      
       while true
         if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
           return poly_name
@@ -371,7 +371,8 @@ module Hobo::Dryml
       replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
       
       classes = attributes[:class]
-      attributes[:class] = classes ? "#{classes} #{param_name}" : param_name.to_s
+      param_class = param_name.to_s.gsub('_', '-')
+      attributes[:class] = classes ? "#{classes} #{param_class}" : param_class
 
       if param_name == :default && overriding_proc
         # :default content is handled specially
