@@ -315,7 +315,13 @@ module Hobo
     end
 
     attr_writer :static_tags
-
+    
+    
+    def subsites
+      # Any directory inside app/controllers defines a subsite
+      @subsites ||= Dir["#{RAILS_ROOT}/app/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
+    end
+    
 
     private
 
