@@ -312,7 +312,7 @@ module Hobo
 
       # FIXME: This should really be a method on AssociationReflection
       def reverse_reflection(association_name)
-        refl = reflections[association_name]
+        refl = reflections[association_name.to_sym] or raise "No reverse reflection for #{name}.#{association_name}"
         return nil if refl.options[:conditions] || refl.options[:polymorphic]
 
         reverse_macro = if refl.macro == :has_many
