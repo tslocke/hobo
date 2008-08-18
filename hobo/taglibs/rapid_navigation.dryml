@@ -29,18 +29,20 @@
 
 <def tag="account-nav">
   <dev-user-changer/>
-  <ul with="&current_user" class="account-nav" param>
-    <if test="&logged_in?">
-      <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
-      <li class='nav-item' param="account"><a action="account">Account</a></li>
-      <li class='nav-item' param="log-out"><a href="&logout_url">Log out</a></li>
-    </if>
-    <else>
-      <set user="&Hobo::User.default_user_model"/>
-      <li class='nav-item' param="log-in"><a href="&login_url(user)">Log in</a></li>
-      <li if="&signup_url(user)" class="nav-item" param="sign-up"><a href="&signup_url(user)">Sign up</a></li>
-    </else>
-  </ul>
+  <do with="&current_user">
+    <ul class="account-nav" param>
+      <if test="&logged_in?">
+        <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
+        <li class='nav-item' param="account"><a action="account">Account</a></li>
+        <li class='nav-item' param="log-out"><a href="&logout_url">Log out</a></li>
+      </if>
+      <else>
+        <set user="&Hobo::User.default_user_model"/>
+        <li class='nav-item' param="log-in"><a href="&login_url(user)">Log in</a></li>
+        <li if="&signup_url(user)" class="nav-item" param="sign-up"><a href="&signup_url(user)">Sign up</a></li>
+      </else>
+    </ul>
+  </do>
 </def>
 
 
