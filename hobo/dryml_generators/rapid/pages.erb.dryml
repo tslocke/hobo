@@ -1,14 +1,13 @@
-<% each_model do -%>
+ <% each_model do -%>
   
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
 new_link = linkable?(:new)
-new_form = !new_link && linkable?(:create, :method => :post)
 -%>
 
 
 <def tag="index-page" for="<%= model.name %>">
-  <page title="<%= model_name :title, :plural %>" merge>
+  <page merge title="<%= model_name :title, :plural %>">
     <body: class="index-page <%= model_class %>" param/>
     
     <content: param>
@@ -33,10 +32,6 @@ new_form = !new_link && linkable?(:create, :method => :post)
         <else>There aren't any <%= model_name :lowercase, :plural %> yet.</else>
       
         <page-nav param="bottom-page-nav"/>
-<% if new_form -%>
-
-        <form with="&<%= model.name %>.new" without-or-cancel/>
-<% end -%>
       </section>
     </content:>
   </page>
@@ -44,7 +39,7 @@ new_form = !new_link && linkable?(:create, :method => :post)
 
 
 <def tag="new-page" for="<%= model.name %>">
-  <page title="New <%= model_name :title, :plural %>" merge>
+  <page merge title="New <%= model_name :title %>">
     <body: class="new-page <%= model_class %>" param/>
     
     <content: param>
@@ -69,8 +64,12 @@ edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields - [model.name_attribute, main_content, creator, back_link, *boolean_fields]
 collection     = model.dependent_collections.first
-add_link       = linkable?(:"new_#{collection.to_s.singularize}")
-add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}", :method => :post)
+if collection
+  collection_class = model.reflections[collection].klass
+  owner            = model.reverse_reflection(collection).name
+  add_link = collection &&linkable?(collection_class, :"new_for_#{owner}")
+  add_form = !add_link && linkable?(collection_class, :"create_for_#{owner}", :method => :post)
+end
 -%>
 <def tag="show-page" for="<%= model.name %>" >
   <page merge title="<%= model_name :title %>">
@@ -118,8 +117,8 @@ add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}"
 <% elsif add_form -%>
 
           <section param="add-to-collection">
-            <h3>Add A <%= collection.to_s.singularize.titleize %></h3>
-            <form:<%= collection %>.new to="&@this.<%= collection %>" method="post" param="form">
+            <h3 param="add-form-heading">Add <%= a_or_an collection.to_s.singularize.titleize %></h3>
+            <form with="&@<%= collection_class.name.underscore %> || @<%= model_name.underscore %>.<%= collection %>.new" owner="<%= owner %>" method="post" without-or-cancel param>
               <submit: label="Add"/>
             </form>
           </section>
@@ -136,8 +135,8 @@ add_form       = !add_link && linkable?(:"create_#{collection.to_s.singularize}"
 <%
 name_attribute = model.name_attribute
 -%>
-<def tag="edit-page">
-  <page merge title="<%= model_name :title %>">
+<def tag="edit-page" for="<%= model.name %>">
+  <page merge title="Edit <%= model_name :title %>">
 
     <body: class="edit-page <%= model_class %>" param/>
 

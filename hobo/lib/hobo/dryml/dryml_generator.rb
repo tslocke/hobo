@@ -161,6 +161,10 @@ module Hobo
       end
       
       
+      def a_or_an(word)
+        (word =~ /^[aeiou]/i ? "an " : "a ") + word
+      end
+            
     end
     
   end
