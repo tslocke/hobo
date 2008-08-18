@@ -231,7 +231,9 @@ module Hobo::Dryml
       src = %(
       def #{name}(attributes={}, parameters={})
         _tag_context(attributes) do
-          call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes, parameters) }
+          attributes.delete :with
+          attributes.delete :field
+          call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes.except, parameters) }
         end
       end
       )
