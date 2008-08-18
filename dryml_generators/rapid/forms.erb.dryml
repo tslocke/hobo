@@ -1,0 +1,16 @@
+<% each_model do -%>
+<%
+form_fields = standard_fields
+-%>
+<def tag="form" for="<%= model.name %>">
+  <form merge>
+    <error-messages/>
+    <field-list fields="<%= form_fields * ', ' %>" param/>
+    <div class="actions">
+      <submit label="Save" param/>
+      <do param="or-cancel">or <a param="cancel-link">Cancel</a></do>
+    </div>
+  </form>
+</def>
+
+<% end -%>
