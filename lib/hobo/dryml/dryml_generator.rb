@@ -24,6 +24,8 @@ module Hobo
         load_templates
       end
       
+      attr_accessor :subsite
+      
       
       def load_templates
         Dir["#{TEMPLATES}/**/*.erb.dryml"].each do |f|
@@ -31,18 +33,29 @@ module Hobo
           erb = File.read(f)
           @templates[name] = ERB.new(erb, nil, '-').src
           
-          # Create output directory and parents if required
-          FileUtils.mkdir_p(File.dirname("#{OUTPUT}/#{name}"))
+          # Create output directories and parents as required
+          [nil, *Hobo.subsites].each do |s| 
+            FileUtils.mkdir_p(File.dirname("#{output_dir s}/#{name}"))
+          end
         end
       end
       
       
       def run
-        now = Time.now
+        [nil, *Hobo.subsites].each { |s| run_for_subsite(s) }
+      end
+      
+      
+      def run_for_subsite(subsite)
+        self.subsite = subsite
         @templates.each_pair do |name, src|
           run_one(name, src)
-        end
-        puts "DRYML Generator took #{Time.now - now}s"
+        end        
+      end
+      
+      
+      def output_dir(s=subsite)
+        s ? "#{OUTPUT}/#{s}" : OUTPUT
       end
       
       
@@ -50,7 +63,7 @@ module Hobo
         dryml = instance_eval(src)
         if dryml_changed?(name, dryml)
           out = HEADER + dryml
-          File.open("#{OUTPUT}/#{name}.dryml", 'w') { |f| f.write(out) }
+          File.open("#{output_dir}/#{name}.dryml", 'w') { |f| f.write(out) }
         end
       end
       
@@ -121,6 +134,7 @@ module Hobo
 
       def linkable?(*args)
         options = args.extract_options!
+        options[:subsite] = subsite
         klass, action = if args.length == 1
                           [model, args.first]
                         else
