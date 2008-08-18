@@ -103,9 +103,9 @@
   <% message ||= "That operation is not allowed" %>
   <page merge>
     <body: class="permission-denied"/>
-    <content-header: param>
+    <content: param>
       <h2 param="heading"><message/></h2>
-    </content-header>
+    </content:>
   </page>
 </def>
 
@@ -114,9 +114,9 @@
   <% message ||= "The page you were looking for could not be found" %>
   <page merge>
     <body: class="not-found"/>
-    <content-header: param>
+    <content: param>
       <h2 param="heading"><message/></h2>
-    </content-header>
+    </content:>
   </page>
 </def>
 
