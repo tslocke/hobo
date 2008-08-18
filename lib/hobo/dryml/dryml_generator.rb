@@ -73,13 +73,18 @@ module Hobo
       
       # --- Helper methods for the templates --- #
       
-      attr_reader :model
-      
+      attr_reader :controller
+    
       def each_model
-        Hobo.models.each do |m|
-          @model = m
+        Hobo::ModelController.all_controllers(subsite).each do |controller|
+          @controller = controller
           yield
         end
+      end
+      
+      
+      def model
+        @controller.model
       end
       
       

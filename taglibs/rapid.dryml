@@ -87,11 +87,12 @@
 <def tag="hobo-rapid-javascripts"><%=
    res = 'var hoboParts = {};'
    # FIXME: This should interrogate the model-router - not the models
-   unless Hobo.all_models.empty?
+   unless Hobo::Model.all_models.empty?
      # Tell JS code how to pluralize names, unless they follow the simple rule
-     names = Hobo.all_models.map do |m|
-                                "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
-                              end.compact
+     names = Hobo::Model.all_models.map do |m|
+                                          m = m.name.underscore
+                                          "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+                                        end.compact
      res << "var pluralisations = {#{names * ', '}}; "
    end
    base = [base_url, subsite].compact.join("/")

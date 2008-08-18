@@ -34,30 +34,41 @@ module Hobo
           alias_method_chain :render, :hobo_model
 
         end
+        register_controller(base)
 
         Hobo::Controller.included_in_class(base)
       end
 
     end
+    
+    
+    def self.register_controller(controller)
+      @controller_names ||= Set.new
+      @controller_names << controller.name
+    end
+
+
+    def self.all_controllers(subsite=nil)
+      # Load every controller in app/controllers/<subsite>...
+      dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
+      @controllers_loaded ||= {}
+      unless @controllers_loaded[subsite]
+        Dir.entries(dir).each do |f|
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+        end
+        @controllers_loaded[subsite] = true
+      end
+      
+      # ...but only return the ones that registered themselves
+      names = @controller_names.select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
+      @controller_names.*.constantize
+    end
+    
 
 
     module ClassMethods
 
       attr_writer :model
-
-      def collections
-        # FIXME The behaviour here is weird if the superclass does
-        # define collections *and* this class adds some more. The
-        # added ones won't be published
-
-        # by default By default, all has_many associations are published
-        @collections ||= if superclass.respond_to?(:collections)
-                           superclass.collections
-                         else
-                           model.reflections.values.map {|r| r.name if r.macro == :has_many}.compact
-                         end
-      end
-
 
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
