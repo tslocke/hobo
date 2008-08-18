@@ -179,7 +179,7 @@ module Hobo
       def def_lifecycle_actions
         if model.has_lifecycle?
           model::Lifecycle.creator_names.each do |creator|
-            def_auto_action "#{creator}_page" do
+            def_auto_action "#{creator}" do
               creator_page_action creator
             end
             def_auto_action creator do
@@ -188,11 +188,11 @@ module Hobo
           end
 
           model::Lifecycle.transition_names.each do |transition|
-            def_auto_action "#{transition}_page" do
-              transition_page_action transition
+            def_auto_action "do_#{transition}" do
+              do_transition_page_action transition
             end
             def_auto_action transition do
-              transition_action transition
+              do_transition_action transition
             end
           end
         end
@@ -272,12 +272,12 @@ module Hobo
 
       def available_auto_lifecycle_actions
         # For each creator/transition there are two possible
-        # actions. e.g. for signup, 'signup_page' would be routed to
-        # GET users/signup, and would show the form, while 'signup'
+        # actions. e.g. for signup, 'signup' would be routed to
+        # GET users/signup, and would show the form, while 'do_signup'
         # would be routed to POST /users/signup)
         if model.has_lifecycle?
-          (model::Lifecycle.creator_names.map { |c| [c, "#{c}_page"] } +
-           model::Lifecycle.transition_names.map { |t| [t, "#{t}_page"] }).flatten.*.to_sym
+          (model::Lifecycle.creator_names.map { |c| [c, "do_#{c}"] } +
+           model::Lifecycle.transition_names.map { |t| [t, "do_#{t}"] }).flatten.*.to_sym
         else
           []
         end
@@ -553,7 +553,7 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def creator_action(name, &b)
+    def do_creator_action(name, &b)
       @creator = model::Lifecycle.creators[name.to_s]
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
@@ -581,7 +581,7 @@ module Hobo
     end
 
 
-    def transition_action(name, *args, &b)
+    def do_transition_action(name, *args, &b)
       prepare_for_transition(name)
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
