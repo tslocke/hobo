@@ -6,10 +6,9 @@ if defined? ActionController::Routing::RouteSet
     # which doesn't take into account Hobo's auto routing
 
     def reload
-      # TODO: This can get slow - quicker to stat routes.rb and the
-      # controllers and only do a load if there's been a change
+      # TODO: This can get slow
       load!
-      Hobo::Dryml::DrymlGenerator.run
+      Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
     end
 
     # temporay hack -- reload assemble.rb whenever routes need reloading
@@ -51,8 +50,15 @@ module Hobo
         options[:method] ||= :get
         @linkable.member? linkable_key(klass, action, options)
       end
+      
+      def called_from_generator?
+        caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
+      end
 
       def add_routes(map)
+        # Don't create routes if it's a generator that's running
+        return if called_from_generator?
+
         reset_linkables
 
         begin
@@ -63,9 +69,6 @@ module Hobo
         end
 
         require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
-
-        # Don't create routes if it's a generator that's running
-        return if caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
 
         # Add non-subsite, and all subsite routes
         [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
