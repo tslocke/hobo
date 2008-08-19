@@ -12,6 +12,7 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
 And we'll require:
 
     >> require 'activerecord'
+    >> require 'action_controller'
     >> require 'hobofields'
 
 We also need to get ActiveRecord set up with a database connection

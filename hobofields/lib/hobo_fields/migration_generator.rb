@@ -125,6 +125,13 @@ module HoboFields
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities in table #{table_name}"
       end
     end
+    
+    
+    def always_ignore_tables
+      sessions_table = CGI::Session::ActiveRecordStore::Session.table_name if
+        ActionController::Base.session_store == CGI::Session::ActiveRecordStore
+      ['schema_info', 'schema_migrations',  sessions_table].compact
+    end
 
 
     def generate
@@ -133,7 +140,7 @@ module HoboFields
       model_table_names = models.*.table_name
 
       to_create = model_table_names - db_tables
-      to_drop = db_tables - model_table_names - ['schema_info', 'schema_migrations']
+      to_drop = db_tables - model_table_names - always_ignore_tables
       to_change = model_table_names
 
       to_rename = extract_table_renames!(to_create, to_drop)
