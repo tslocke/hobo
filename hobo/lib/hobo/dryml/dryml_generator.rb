@@ -60,7 +60,7 @@ module Hobo
       
       
       def run_one(name, src)
-        dryml = instance_eval(src)
+        dryml = instance_eval(src, name)
         if dryml_changed?(name, dryml)
           out = HEADER + dryml
           File.open("#{output_dir}/#{name}.dryml", 'w') { |f| f.write(out) }
@@ -153,9 +153,21 @@ module Hobo
       end
       
       
-      def standard_fields(klass=model, include_timestamps=false)
+      def standard_fields(*args)
+        klass = args.first.is_a?(Class) ? args.shift : model
+        extras = args
+        
         fields = klass.attr_order.*.to_s & klass.content_columns.*.name
-        fields -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
+
+        fields -= %w{created_at updated_at created_on updated_on deleted_at} unless extras.include?(:include_timestamps)
+        
+        bt = extras.include?(:belongs_to)
+        hm = extras.include?(:has_many)
+        klass.reflections.values.map do |refl|
+          fields << refl.name.to_s if bt && refl.macro == :belongs_to
+          fields << refl.name.to_s if hm && refl.macro == :has_many
+        end
+
         fields.reject! { |f| model.never_show? f }
         fields
       end
