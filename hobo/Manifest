@@ -67,6 +67,7 @@ rails_generators/hobo/hobo_generator.rb
 rails_generators/hobo/templates/application.dryml
 rails_generators/hobo/templates/dryml-support.js
 rails_generators/hobo/templates/guest.rb
+rails_generators/hobo/templates/initializer.rb
 rails_generators/hobo_front_controller/hobo_front_controller_generator.rb
 rails_generators/hobo_front_controller/templates/controller.rb
 rails_generators/hobo_front_controller/templates/functional_test.rb

@@ -4,25 +4,23 @@ class HoboGenerator < Rails::Generator::Base
     if options[:add_routes]
       routes_path = File.join(RAILS_ROOT, "config/routes.rb")
 
-      hobo_require = "(gem 'hobo'; require 'hobo') unless defined?(Hobo)\n"
       route = "  Hobo.add_routes(map)\n"
-
       route_src = File.read(routes_path)
-
       unless route_src.include?(route)
         head = "ActionController::Routing::Routes.draw do |map|"
-        route_src.sub!(head, hobo_require + head + "\n\n" + route)
+        route_src.sub!(head, head + "\n\n" + route)
         File.open(routes_path, 'w') {|f| f.write(route_src) }
       end
     end
 
     record do |m|
-      m.directory File.join("app/views/taglibs")
-      m.directory File.join("app/views/taglibs/themes")
-      m.directory File.join("public/hobothemes")
+      m.directory                     File.join("app/views/taglibs")
+      m.directory                     File.join("app/views/taglibs/themes")
+      m.directory                     File.join("public/hobothemes")
       m.template "application.dryml", File.join("app/views/taglibs/application.dryml")
-      m.file "guest.rb", File.join("app/models/guest.rb")
-      m.file "dryml-support.js", File.join("public/javascripts/dryml-support.js")
+      m.file "guest.rb",              File.join("app/models/guest.rb")
+      m.file "dryml-support.js",      File.join("public/javascripts/dryml-support.js")
+      m.file "initializer.rb",        File.join("config/initializers/hobo.rb")
     end
   end
 
