@@ -1,6 +1,6 @@
 <% each_model do -%>
 <%
-form_fields = standard_fields
+form_fields = standard_fields :belongs_to, :has_many
 -%>
 <def tag="form" for="<%= model.name %>">
   <form merge>
