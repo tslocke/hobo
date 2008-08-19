@@ -286,7 +286,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this, this_field_reflection).conditions
+  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
