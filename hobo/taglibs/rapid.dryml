@@ -386,12 +386,12 @@ in the future - use at your own risk. -->
 
 
 <def tag="a-or-an" attrs="word"><%=
-  (word =~ /^[aeiouh]/i ? "an " : "a ") + word
+  (word =~ /^[aeiou]/i ? "an " : "a ") + word
 %></def>
 
 
 <def tag="A-or-An" attrs="word"><%=
-  (word =~ /^[aeiouh]/i ? "An " : "A ") + word
+  (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
 
 
