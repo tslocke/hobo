@@ -107,7 +107,7 @@ module Hobo::Dryml
 
 
     def add_classes!(attributes, *classes)
-      classes = classes.flatten.select{|x|x}.map{|x| x.to_s.dasherize}
+      classes = classes.flatten.select{|x|x}
       current = attributes[:class]
       attributes[:class] = (current ? current.split + classes : classes).uniq.join(' ')
       attributes
