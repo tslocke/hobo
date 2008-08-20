@@ -168,7 +168,10 @@ module Hobo
 
 
       def generate_key
-        key_timestamp = Time.now
+        if Time.zone.nil?
+          raise RuntimeError, "Cannot generate lifecycle key timestamp if the time-zone is not configured. Please add, e.g. config.time_zone = 'UTC' to environment.rb"
+        end
+        key_timestamp = Time.now.utc
         record.write_attribute key_timestamp_field, key_timestamp
         current_key
       end
@@ -178,7 +181,7 @@ module Hobo
         require 'digest/sha1'
         timestamp = record.read_attribute(key_timestamp_field)
         if timestamp
-          timestamp = timestamp.utc
+          timestamp = timestamp.getutc
           Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
         end
       end
