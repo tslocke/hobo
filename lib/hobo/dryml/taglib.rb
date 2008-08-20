@@ -82,7 +82,7 @@ module Hobo
             end
             attr_reader :tag_attrs
 
-            def delayed_alias_method_chain(tag, feature)
+            def alias_method_chain_on_include(tag, feature)
               @tag_aliases[tag] = feature
             end
 

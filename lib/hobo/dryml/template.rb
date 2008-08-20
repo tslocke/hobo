@@ -150,6 +150,9 @@ module Hobo::Dryml
       when "def"
         def_element(el)
 
+      when "extend"
+        extend_element(el)
+
       when "set"
         set_element(el)
 
@@ -239,35 +242,50 @@ module Hobo::Dryml
       )
       @builder.add_build_instruction(:eval, :src => src, :line_num => element_line_num(el))
     end
-
-
-    def def_element(el)
-      require_toplevel(el)
-      require_attribute(el, "tag", DRYML_NAME_RX)
-      require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
-      require_attribute(el, "alias-of", DRYML_NAME_RX, true)
-      require_attribute(el, "extend-with", DRYML_NAME_RX, true)
-
-      unsafe_name = el.attributes["tag"]
-      name = Hobo::Dryml.unreserve(unsafe_name)
-      if (for_type = el.attributes['for'])
+    
+    
+    def extend_element(el)
+      def_element(el, true)
+    end
+    
+    
+    def type_specific_suffix
+      el = @def_element
+      for_type = el.attributes['for']
+      if for_type
         type_name = if defined?(HoboFields) && for_type =~ /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
-                      klass = HoboFields.to_class(for_type)
-                      dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el) unless klass
+                      klass = HoboFields.to_class(for_type) or 
+                        dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el)
                       klass.name
                     elsif for_type =~ /^_.*_$/
                       rename_class(for_type)
                     else
                       for_type
                     end.underscore.gsub('/', '__')
-        suffix = "__for_#{type_name}"
+        "__for_#{type_name}"
+      end
+    end
+        
+
+    def def_element(el, extend_tag=false)
+      require_toplevel(el)
+      require_attribute(el, "tag", DRYML_NAME_RX)
+      require_attribute(el, "attrs", /^\s*#{DRYML_NAME}(\s*,\s*#{DRYML_NAME})*\s*$/, true)
+      require_attribute(el, "alias-of", DRYML_NAME_RX, true)
+
+      @def_element = el
+
+      unsafe_name = el.attributes["tag"]
+      name = Hobo::Dryml.unreserve(unsafe_name)
+      suffix = type_specific_suffix
+      if suffix
         name        += suffix
         unsafe_name += suffix
       end
       
       if el.attributes['polymorphic']
-        %w(for alias-of extend-with).each do |attr|
+        %w(for alias-of).each do |attr|
           dryml_exception("def cannot have both 'polymorphic' and '#{attr}' attributes") if el.attributes[attr]
         end
         
@@ -276,12 +294,7 @@ module Hobo::Dryml
         unsafe_name += "__base"
       end
 
-      @def_element = el
-
       alias_of = el.attributes['alias-of']
-      extend_with = el.attributes['extend-with']
-
-      dryml_exception("def cannot have both alias-of and extend-with", el) if alias_of && extend_with
       dryml_exception("def with alias-of must be empty", el) if alias_of and el.size > 0
 
       alias_of and @builder.add_build_instruction(:alias_method,
@@ -291,12 +304,7 @@ module Hobo::Dryml
       res = if alias_of
               "<% #{tag_newlines(el)} %>"
             else
-              src = ""
-              if extend_with
-                src << "<% delayed_alias_method_chain :#{ruby_name name}, :#{ruby_name extend_with} %>"
-                name = "#{name}-with-#{extend_with}"
-              end
-              src << tag_method(name, el) +
+              src = tag_method(name, el, extend_tag) +
                 "<% _register_tag_attrs(:#{ruby_name name}, #{declared_attributes(el).inspect.underscore}) %>"
 
               logger.debug(restore_erb_scriptlets(src)) if el.attributes["debug-source"]
@@ -322,14 +330,23 @@ module Hobo::Dryml
     end
 
 
-    def tag_method(name, el)
+    def tag_method(name, el, extend_tag=false)
+      name = ruby_name name
       param_names = param_names_in_definition(el)
-
-      "<% def #{ruby_name name}(all_attributes={}, all_parameters={}); " +
+      
+      if extend_tag
+        @extend_key = 'a' + Digest::SHA1.hexdigest(el.to_s)[0..10]
+        alias_statement = "; alias_method_chain_on_include :#{name}, :#{@extend_key}"
+        name = "#{name}_with_#{@extend_key}"
+      end
+            
+      src = "<% def #{name}(all_attributes={}, all_parameters={}); " +
         "parameters = Hobo::Dryml::TagParameters.new(all_parameters, #{param_names.inspect.underscore}); " +
         "all_parameters = Hobo::Dryml::TagParameters.new(all_parameters); " +
         tag_method_body(el) +
-        "; end %>"
+        "; end#{alias_statement} %>"
+      @extend_key = nil
+      src
     end
 
 
@@ -363,9 +380,7 @@ module Hobo::Dryml
 
     def wrap_tag_method_body_with_metadata(content)
       name   = @def_element.attributes['tag']
-      extend = @def_element.attributes['extend-with']
       for_   = @def_element.attributes['for']
-      name = extend ? "#{name}-with-#{extend}" : name
       name += " for #{for_}" if for_
       wrap_source_with_metadata(content, "def", name, element_line_num(@def_element))
     end
@@ -439,13 +454,18 @@ module Hobo::Dryml
     def part_delegate_tag_name(el)
       "#{@def_name}_#{el.attributes['part']}__part_delegate"
     end
+    
+    
+    def current_def_name
+      @def_element && @def_element.attributes['tag']
+    end
 
 
     def get_param_name(el)
       param_name = el.attributes["param"]
 
       if param_name
-        def_tag = find_ancestor(el) {|e| e.name == "def"}
+        def_tag = find_ancestor(el) {|e| e.name == "def" || e.name == "extend" }
         dryml_exception("param is not allowed outside of tag definitions", el) if def_tag.nil?
 
         ruby_name(param_name == "&true" ? el.dryml_name : param_name)
@@ -453,21 +473,38 @@ module Hobo::Dryml
         nil
       end
     end
+    
+    
+    def inside_def_for_type?
+      @def_element && @def_element.attributes['for']
+    end
 
 
     def call_name(el)
       dryml_exception("invalid tag name", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
+      
       name = Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
-      call_to_self_from_type_specific_def?(el) ? "#{name}__base" : name
+      if call_to_self_from_type_specific_def?(el)
+        "#{name}__base"
+      elsif old_tag_call?(el)
+        name = name[4..-1] # remove 'old-' prefix
+        name += type_specific_suffix if inside_def_for_type?
+        "#{name}_without_#{@extend_key}"
+      else
+        name
+      end
+    end
+    
+    
+    def old_tag_call?(el)
+      @def_element && el.dryml_name == "old-#{current_def_name}"
     end
 
 
     def call_to_self_from_type_specific_def?(el)
-      @def_element &&                                       # We are in a def
-        el.dryml_name == @def_element.attributes['tag'] &&  # with the same name as this call
-        @def_element.attributes['for'] &&                   # The def is for="SomeType"
-        !el.attributes['for-type']                          # This call is not a polymorphic call
+      inside_def_for_type? && el.dryml_name == current_def_name &&!el.attributes['for-type']
     end
+    
 
     def polymorphic_call_type(el)
       t = el.attributes['for-type']
