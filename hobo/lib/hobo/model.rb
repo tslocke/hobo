@@ -33,7 +33,6 @@ module Hobo
       end
 
       class << base
-        alias_method_chain :has_many,      :join_record_management
         alias_method_chain :belongs_to,    :creator_metadata
         alias_method_chain :belongs_to,    :target_is
         alias_method_chain :attr_accessor, :creator_metadata
@@ -375,34 +374,6 @@ module Hobo
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
       end
 
-
-      def manage_join_records(association)
-
-        method = "manage_join_records_for_#{association}"
-        after_save method
-        class_eval %{
-          def #{method}
-            assigned = #{association}.dup
-            current = #{association}.reload
-
-            through = #{association}.proxy_reflection.through_reflection
-            source  = #{association}.proxy_reflection.source_reflection
-
-            to_delete = current - assigned
-            to_add    = assigned - current
-            through.klass.delete_all(["\#{through.primary_key_name} = ? and \#{source.primary_key_name} in (?)",
-                                             self.id, to_delete.*.id]) if to_delete.any?
-            to_add.each { |record| #{association} << record }
-          end
-        }
-      end
-
-      def has_many_with_join_record_management(name, options={}, &b)
-        manage = options.delete(:managed)
-        returning (has_many_without_join_record_management(name, options, &b)) do
-          manage_join_records(name) if manage
-        end
-      end
 
     end # --- of ClassMethods --- #
 
