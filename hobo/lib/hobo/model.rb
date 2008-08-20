@@ -292,6 +292,13 @@ module Hobo
         result.member_class = self if result.is_a?(Array)
         result
       end
+      
+      
+      def find_by_sql(*args)
+        result = super
+        result.member_class = self # find_by_sql always returns array
+        result
+      end
 
 
       def all(options={})
