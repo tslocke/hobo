@@ -185,7 +185,7 @@ Let's apply that change to the database
     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => "change_column :adverts, :title, :text"
+    => "change_column :adverts, :title, :text, :limit => nil"
     >> down
     => "change_column :adverts, :title, :string"
 
@@ -201,7 +201,7 @@ Let's apply that change to the database
     end
     >> up, down = migrate
     >> up
-    => 'change_column :adverts, :title, :string, :default => "Untitled"'
+    => 'change_column :adverts, :title, :string, :default => "Untitled", :limit => 255'
     >> down
     => "change_column :adverts, :title, :string"
 
@@ -380,7 +380,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     >> up
     =>""
     rename_column :adverts, :title, :name
-    change_column :adverts, :name, :string, :default => "No Name"
+    change_column :adverts, :name, :string, :default => "No Name", :limit => 255
     >> down
     =>""
     rename_column :adverts, :name, :title
