@@ -204,7 +204,37 @@ Let's apply that change to the database
     => 'change_column :adverts, :title, :string, :default => "Untitled", :limit => 255'
     >> down
     => "change_column :adverts, :title, :string"
+    
+    
+### Limits
 
+    >>
+    class Advert
+      fields do
+        price :integer, :limit => 4
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    "add_column :advert, :integer, :limit => 4"
+
+
+Note that limit on a decimal column is ignored (use :scale and :precision)
+    
+    >>
+    class Advert
+      fields do
+        price :decimal, :limit => 4
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    => "add_column :adverts, :price, :decimal"
+
+Cleanup
+
+    >> Advert.field_specs.delete :price
+    
 
 ### Foreign Keys
 
@@ -405,6 +435,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
     add_column :ads, :created_at, :datetime
     >>
+    
 
 ## Cleanup
 
