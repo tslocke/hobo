@@ -32,7 +32,7 @@ Echoe.new('hobo') do |p|
     'hobosupport >=0.7.5',
     'hobofields >=0.7.5',
     'rails =2.1',
-    'will_paginate >= 2.2.1']
+    'mislav-will_paginate >=2.2.1']
 end
 
 
