@@ -13,6 +13,26 @@ class <%= class_name %> < ActiveRecord::Base
   # Just remove it if you don't want that
   before_create { |user| user.administrator = true if count == 0 }
   
+  
+  # --- Signup lifecycle --- #
+
+  lifecycle do
+
+    initial_state :active
+
+    create :anybody, :signup, 
+           :params => [:username, :email_address, :password, :password_confirmation],
+           :become => :active, :if => proc {|_, u| u.guest?}
+
+    transition :nobody, :request_password_reset, { :active => :active } do
+      UserMailer.deliver_forgot_password(self, lifecycle.generate_key)
+    end
+
+    transition :with_key, :reset_password, { :active => :active }, 
+               :update => [ :password, :password_confirmation ]
+
+  end
+  
 
   # --- Hobo Permissions --- #
 
