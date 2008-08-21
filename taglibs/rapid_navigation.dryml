@@ -22,9 +22,6 @@
 </def>
 
 
-<def tag="main-nav"><magic-nav class="main-nav"/></def>
-
-
 <!--- Account Navigation (log in / out / signup) -->
 
 <def tag="account-nav">
@@ -87,16 +84,6 @@
      href="&url_for(params.merge(:page => this.page_count))">
     <do param="default">Last page &raquo;</do>
   </a>
-</def>
-
-
-<!-- magic nav, just to get you started. Don't try to customise this
-but rather write your own navigation using the `<navigation>` tag -->
-<def tag="magic-nav">
-  <navigation merge-attrs>
-    <nav-item href="#{base_url}/">Home</nav-item>
-    <nav-item repeat="&front_models[0..5]"><name/></nav-item>
-  </navigation>
 </def>
 
 
