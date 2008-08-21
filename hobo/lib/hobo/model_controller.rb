@@ -161,19 +161,19 @@ module Hobo
       def def_lifecycle_actions
         if model.has_lifecycle?
           model::Lifecycle.creator_names.each do |creator|
-            def_auto_action "#{creator}" do
+            def_auto_action creator do
               creator_page_action creator
             end
-            def_auto_action creator do
-              creator_action creator
+            def_auto_action "do_#{creator}" do
+              do_creator_action creator
             end
           end
 
           model::Lifecycle.transition_names.each do |transition|
-            def_auto_action "do_#{transition}" do
-              do_transition_page_action transition
-            end
             def_auto_action transition do
+              transition_page_action transition
+            end
+            def_auto_action "do_#{transition}" do
               do_transition_action transition
             end
           end
@@ -556,7 +556,6 @@ module Hobo
         if valid?
           redirect_after_submit
         else
-          dryml_fallback_tag "lifecycle_start_page"
           re_render_form(name)
         end
     end
@@ -564,8 +563,7 @@ module Hobo
 
     def creator_page_action(name)
       self.this = model.new
-      @creator = model::Lifecycle.creators[name]
-      dryml_fallback_tag "lifecycle_start_page"
+      @creator = model::Lifecycle.creators[name.to_s] or raise ArgumentError, "No such creator in lifecycle: #{name}"
     end
 
 
@@ -584,7 +582,6 @@ module Hobo
         if valid?
           redirect_after_submit
         else
-          dryml_fallback_tag "lifecycle_transition_page"
           re_render_form(name)
         end
     end
@@ -593,7 +590,6 @@ module Hobo
     def transition_page_action(name, *args)
       options = args.extract_options!
       prepare_for_transition(name, options)
-      dryml_fallback_tag "lifecycle_transition_page"
     end
 
     # --- Miscelaneous Actions --- #

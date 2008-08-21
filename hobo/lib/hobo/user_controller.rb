@@ -64,7 +64,7 @@ module Hobo
 
 
     def hobo_signup(&b)
-      creator_action(:signup) do
+      creator_page_action(:signup) do
         response_block(&b) or if valid?
                                 self.current_user = this
                                 flash[:notice] = "Thanks for signing up!"

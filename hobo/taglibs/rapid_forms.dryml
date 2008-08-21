@@ -40,7 +40,8 @@
               else
                 this
               end
-     object_url(target, web_method || lifecycle, :method => method)
+     action = web_method || ("do_#{lifecycle}" if lifecycle)
+     object_url(target, action, :method => method)
    end
    
   if html_attrs[:action].nil? || (lifecycle.nil? && new_record && !this.user_can_create?(current_user))
