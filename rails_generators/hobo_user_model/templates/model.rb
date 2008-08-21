@@ -9,13 +9,12 @@ class <%= class_name %> < ActiveRecord::Base
     timestamps
   end
 
-  set_admin_on_first_user
+  # This gives admin rights to the first sign-up.
+  # Just remove it if you don't want that
+  before_create { |user| user.administrator = true if count == 0 }
+  
 
   # --- Hobo Permissions --- #
-
-  # It is possible to override the permission system entirely by
-  # returning true from super_user?
-  # def super_user?; true; end
 
   def creatable_by?(creator)
     creator.administrator? || !administrator
@@ -30,27 +29,6 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   def viewable_by?(viewer, field)
-    true
-  end
-
-
-  # --- Fallback permissions --- #
-
-  # (Hobo checks these for models that do not define the *_by? methods)
-
-  def can_create?(obj)
-    false
-  end
-
-  def can_update?(obj, new)
-    false
-  end
-
-  def can_delete?(obj)
-    false
-  end
-
-  def can_view?(obj, field)
     true
   end
 

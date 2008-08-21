@@ -184,7 +184,7 @@ module Hobo
         elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time1, time2|
-            { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} =< ?", time1, time2] }
+            { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} <= ?", time1, time2] }
           end
 
          # active (a lifecycle state)
