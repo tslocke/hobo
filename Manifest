@@ -125,7 +125,6 @@ taglibs/rapid_document_tags.dryml
 taglibs/rapid_editing.dryml
 taglibs/rapid_forms.dryml
 taglibs/rapid_generics.dryml
-taglibs/rapid_lifecycle_pages.dryml
 taglibs/rapid_lifecycles.dryml
 taglibs/rapid_navigation.dryml
 taglibs/rapid_pages.dryml
