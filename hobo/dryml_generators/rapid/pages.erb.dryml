@@ -223,7 +223,9 @@ new_link = :new.in?(actions)
       </header>
       
       <section param="content-body">
-        <form owner="<%= owner %>" method="post" param/>
+        <form owner="<%= owner %>" method="post" param>
+          <field-list: skip="<%= owner %>"/>
+        </form>
       </section>
     </content:>
   </page>
