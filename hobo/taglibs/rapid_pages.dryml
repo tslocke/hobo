@@ -21,7 +21,7 @@
       <header class="page-header" param>
         <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
         <live-search param if="&defined_route? :site_search"/>
-        <account-nav if="&Hobo::User.default_user_model" param/>
+        <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
         <main-nav param/>
       </header>
       <section class="content-wrapper" param="content-wrapper">
