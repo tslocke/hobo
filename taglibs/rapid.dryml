@@ -3,7 +3,6 @@
 <include src="rapid_support"/>
 <include src="rapid_document_tags"/>
 <include src="rapid_pages"/>
-<include src="rapid_lifecycle_pages"/>
 <include src="rapid_editing"/>
 <include src="rapid_forms"/>
 <include src="rapid_navigation"/>

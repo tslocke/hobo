@@ -13,4 +13,31 @@ form_fields = standard_fields :belongs_to, :has_many
   </form>
 </def>
 
+<% if defined? model::Lifecycle -%>
+<% model::Lifecycle.creators.values.where.publishable?.each do |creator| -%>
+<def tag="<%= creator.name.dasherize %>-form" polymorphic/>
+<def tag="<%= creator.name.dasherize %>-form" for="<%= model.name %>">
+  <form lifecycle="<%= creator.name %>">
+    <field-list fields="<%= creator.parameters * ', ' %>" param/>
+    <div class="actions" param="actions">
+      <submit label="<%= creator.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
+    </div>
+  </form>
+</def>
 <% end -%>
+
+<% model::Lifecycle.transitions.where.publishable?.each do |transition| -%>
+<def tag="<%= transition.name.dasherize %>-form" polymorphic/>
+<def tag="<%= transition.name.dasherize %>-form" for="<%= model.name %>">
+  <form lifecycle="<%= transition.name %>">
+    <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
+    <field-list fields="<%= transition.parameters * ', ' %>" param/>
+    <div class="actions" param="actions">
+      <submit label="<%= transition.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
+    </div>
+  </form>
+</def>
+<% end -%>
+<% end # of if defined? model::Lifecycle -%>
+
+<% end # of each_model do -%>
