@@ -223,8 +223,6 @@ new_link = :new.in?(actions)
       </header>
       
       <section param="content-body">
-        <error-messages/>
-
         <form owner="<%= owner %>" method="post" param/>
       </section>
     </content:>
@@ -250,8 +248,6 @@ new_link = :new.in?(actions)
       
 
       <section param="content-body">
-        <error-messages param/>
-
         <<%= creator.dasherize %>-form param="form"/>
       </section>
     </content:>
@@ -273,8 +269,6 @@ new_link = :new.in?(actions)
       </header>
       
       <section param="content-body">
-        <error-messages param/>
-
         <<%= transition.dasherize %>-form param="form"/>
       </section>
     </content:>
