@@ -134,9 +134,8 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.value')
                     } })
-  html_attributes = add_classes(attributes, editor_class)
 %>
-  <select onchange="#{f}" merge-attrs="&html_attributes">
+  <select onchange="#{f}" merge-attrs>
     <%= options_for_select(options, this) %>
   </select>
 </def>
@@ -152,7 +151,6 @@
                    :params => { this_parent.class.name.underscore => {
                        this_field => Hobo.raw_js('this.checked')
                     } })
-  attributes = add_classes(attributes, editor_class)
 %>
   <input type="checkbox" value="1" onclick="#{f}"
          merge-attrs="& this ? attributes.merge(:checked => 'checked') : attributes" />

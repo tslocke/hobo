@@ -116,7 +116,7 @@
   elsif !(force || can_edit?)
     view
   else
-    attrs = add_classes(attributes, type_id, type_and_field)
+    attrs = add_classes(attributes, type_id.dasherize, type_and_field.dasherize)
     attrs[:name] ||= param_name_for_this
     the_input = if (refl = this_field_reflection)
                   if refl.macro == :belongs_to
