@@ -146,7 +146,7 @@ module Hobo
 
 
     def model_id_class(object=this, attribute=nil)
-      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
+      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute).dasherize}" : ""
     end
 
 
