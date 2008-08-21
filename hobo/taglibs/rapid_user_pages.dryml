@@ -1,4 +1,4 @@
-<def tag="simple-page" debug-source>
+<def tag="simple-page">
   <page without-live-search without-account-nav without-main-nav merge/>
 </def>    
 
