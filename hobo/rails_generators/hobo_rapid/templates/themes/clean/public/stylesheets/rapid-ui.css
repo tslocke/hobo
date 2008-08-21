@@ -80,7 +80,7 @@ div.completions-popup ul li {
     text-align: left; width: 1px; white-space: nowrap; vertical-align: top;
     padding-top: 10px; padding-bottom: 10px;
 }
-.field-list textarea, .field-list input.string, .field-list input.password, input.email-address { width: 99%; margin: 0; }
+.field-list textarea, .field-list input[type=text], .field-list input[type=password] { width: 99%; margin: 0; }
 
 /*input[type=text].wide { width: 100%; }*/
 textarea { height: 170px; }
