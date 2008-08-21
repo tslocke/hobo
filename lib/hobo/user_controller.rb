@@ -5,6 +5,13 @@ module Hobo
     class << self
       def included(base)
         base.class_eval do
+          extend ClassMethods
+          
+          class << self
+            alias_method_chain :available_auto_actions, :user_actions
+            alias_method_chain :def_auto_actions, :user_actions
+          end
+          
           filter_parameter_logging "password"
           skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password_page, :reset_password]
 
@@ -14,18 +21,34 @@ module Hobo
 
           alias_method_chain :hobo_update, :account_flash
         end
+        
       end
+
+          
+    end
+    
+    module ClassMethods
+
+      def available_auto_actions_with_user_actions
+        available_auto_actions_without_user_actions + 
+          [:login, :signup, :logout, :forgot_password, :reset_password]
+      end
+
+      
+      def def_auto_actions_with_user_actions
+        def_auto_actions_without_user_actions
+        
+        class_eval do
+          def login; hobo_login;                     end if include_action?(:login)
+          def signup; hobo_signup;                   end if include_action?(:signup)
+          def logout; hobo_logout;                   end if include_action?(:logout)
+          def forgot_password; hobo_forgot_password; end if include_action?(:forgot_password)
+          def reset_password; hobo_reset_password;   end if include_action?(:reset_password)
+        end
+      end
+
     end
 
-    def login; hobo_login; end
-
-    def signup; hobo_signup; end
-
-    def logout; hobo_logout; end
-
-    def forgot_password; hobo_forgot_password; end
-
-    def reset_password; hobo_reset_password; end
 
     private
 
