@@ -5,11 +5,15 @@ if defined? ActionController::Routing::RouteSet
     # request. Without this Rails checks the mtime of config/routes.rb
     # which doesn't take into account Hobo's auto routing
 
-    def reload
-      # TODO: This can get slow
-      load!
-      Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
+    def reload_with_hobo_routes
+      if Hobo::ModelRouter.reload_routes_on_every_request
+        load!
+        Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
+      else
+        reload_without_hobo_routes
+      end
     end
+    alias_method_chain :reload, :hobo_routes
 
     # temporay hack -- reload assemble.rb whenever routes need reloading
     def reload_with_hobo_assemble
@@ -29,6 +33,8 @@ module Hobo
   class ModelRouter
 
     class << self
+      
+      attr_accessor :reload_routes_on_every_request
 
       def reset_linkables
         @linkable =Set.new
