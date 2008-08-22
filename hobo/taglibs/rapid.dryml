@@ -224,7 +224,7 @@
               this.to_s
             end
           else
-            attrs = add_classes(attributes, "view", type_and_field.dasherize, model_id_class)
+            attrs = add_classes(attributes, "view", type_and_field._?.dasherize, model_id_class)
 
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)

@@ -6,7 +6,7 @@ form_fields = standard_fields :belongs_to, :has_many
   <form merge>
     <error-messages/>
     <field-list fields="<%= form_fields * ', ' %>" param/>
-    <div class="actions">
+    <div param="actions">
       <submit label="Save" param/>
       <do param="or-cancel">or <a param="cancel-link">Cancel</a></do>
     </div>
@@ -19,7 +19,7 @@ form_fields = standard_fields :belongs_to, :has_many
 <def tag="<%= creator.name.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= creator.name %>">
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
-    <div class="actions" param="actions">
+    <div param="actions">
       <submit label="<%= creator.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
     </div>
   </form>
@@ -32,7 +32,7 @@ form_fields = standard_fields :belongs_to, :has_many
   <form lifecycle="<%= transition.name %>">
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
-    <div class="actions" param="actions">
+    <div param="actions">
       <submit label="<%= transition.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
     </div>
   </form>

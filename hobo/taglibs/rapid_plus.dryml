@@ -36,9 +36,7 @@
     <do param="empty-message" if="empty?">No <collection-name lowercase/> to display</do>
 
    
-    <nav class="page" if="&this.respond_to? :page_count">
-      <page-nav param/>
-    </nav>
+    <page-nav param if="&this.respond_to? :page_count"/>
   </div>
 </def>
 
