@@ -613,7 +613,7 @@ module Hobo::Dryml
         end
       end.join
 
-      if call_type == :default_param_only || (el.children.empty? && el.has_end_tag?)
+      if call_type == :default_param_only || (call_type.nil? && param_items.length > 0) || (el.children.empty? && el.has_end_tag?)
         with_containing_tag_name(el) do
           param_items = " :default => #{default_param_proc(el, containing_tag_name)}, "
         end
