@@ -1,8 +1,26 @@
-html, body {background: #666;}
+/* Graphite */
+/*html, body {color: #222; background: #222;}
+.page-header {color: white; background: #444;}
+.page-header .main-nav a {background: #666;}
+.page-header .main-nav a:hover {background: #222;}
+.content-wrapper {background: white;}
+.button {color: white; background: #666;}
+.button:hover {background-color: #222;}
+.add-to-collection {background: #f5f5f5;}
+*/
+/* Cubicle Blue */
+html, body {color: #193440; background: #193440;}
+.page-header {color: white; background: #3F606E;}
+.page-header .main-nav a {background: #5B8BA0;}
+.page-header .main-nav a:hover {background: #193440;}
+.content-wrapper {background: #FCFFF5;}
+.button {color: white; background: #5B8BA0;}
+.button:hover {background-color: #193440;}
+.add-to-collection {background: #E6E7DE;}
+
 body {
-	width: 760px;  
+	width: 960px;  
 	margin: 0 auto 20px;
-	color: #222;
 	font: 12px "Lucida Grande", "Trebuchet MS", Arial, sans-serif; line-height: 18px;
 }
 h1, h2, h3 {font-weight: normal;}
@@ -41,24 +59,19 @@ input.file_upload {
 
 .button {
 	padding: 6px 10px;
-	border-top:1px solid #ddd;
-	border-left:1px solid #c3c3c3;
-	border-right:1px solid #c3c3c3;
-	border-bottom:1px solid #8c8c8c;
-	background: #eee; 
+	border: none;
 	overflow: visible; width: auto;
 	font-size: 11px; font-weight: bold;
 }
 .button:hover {cursor: pointer;}
-.button:active {border-top: 1px solid #8c8c8c; border-bottom: 1px solid #ddd;}
-.actions {height: 100%; overflow:hidden; font-size: 11px;}
+.actions {height: 100%; overflow: hidden; font-size: 11px;}
 
 .flash {
 	margin: 0 40px 10px; padding: 10px 30px; border-width: 2px 0;
 	color: white;
 }
-.flash.notice {border: 1px solid #829862; background: #92ab6e; text-shadow: #728852 1px 1px 0;}
-.flash.error {border: 1px solid #900024; background: #BC1C3D; text-shadow: #900024 1px 1px 0;}
+.flash.notice {background: #92ab6e;}
+.flash.error {background: #BC1C3D;}
 
 /* rails error message */
 .error-messages {
@@ -67,10 +80,9 @@ input.file_upload {
 	padding: 15px 30px;
 	color: white;
 	margin-bottom: 20px;
-	text-shadow: #900024 1px 1px 0;
 }
 .error-messages h2 {
-	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px; text-shadow: #900024 2px 2px 0;
+	color: white; margin-top: 0; padding-bottom: 0; font-size: 16px;
 }
 .error-messages li {margin-left: 20px; list-style: square;}
 
@@ -80,7 +92,7 @@ input.file_upload {
 	padding: 8px 20px 8px 40px;
 	border: 1px solid #444;
 	color: #cfc; background: black url(../images/spinner.gif) no-repeat 10px 8px;
-	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
+	font-size: 13px; font-weight: bold;
 }
 
 .article {margin: 20px 0; border-top: 1px dotted #ccc;}
@@ -89,18 +101,19 @@ input.file_upload {
 .field-list td {width: auto;}
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
-.content-header, .content-body {padding-bottom: 15px;}
+.content-header {padding: 5px 0;} 
+.content-body {padding: 15px 0;}
 .content-footer {padding-bottom: 20px;}
 
-.content-wrapper {padding: 20px 0; background: white;}
-.content-wrapper > * {margin: 0 20px;}
+.content-wrapper {padding: 10px 0;}
+.content-wrapper > * {margin: 0 40px;}
 
-.page-header {position: relative; margin-top: 20px; padding: 20px 0 0; color: white; background: black;}
+.page-header {position: relative; margin-top: 25px; padding: 20px 0 0;}
 .page-header h1 {
 	margin: 0; padding: 0 30px 30px; 
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
 }
-.page-header ul {height: 100%; overflow: hidden; margin: 0 20px;}
+.page-header ul {height: 100%; overflow: hidden;}
 .page-header li {float: left; margin-left: 0; list-style: none;}
 .page-header a, .page-header a:hover {border: none; color: white; background: none;}
 
@@ -124,16 +137,13 @@ input.file_upload {
 #search-results-panel .card.linkable a {color: black;}
 #search-spinner {position: absolute; top: 6px; right: 7px;}
 
-
-ul.main-nav { margin: 0 10px;}
+.main-nav {padding: 0 30px;}
 .main-nav li {margin-right: 10px;}
 .main-nav a {
 	display: block;
-	padding: 5px 15px 7px; border: 1px solid #313131; border-width: 1px 1px 0;
-	background: #282828;
-	font-size: 13px; font-weight: bold; text-shadow: black 1px 1px 2px;
+	padding: 5px 15px 7px;
+	font-size: 13px; font-weight: bold;
 }
-.main-nav a:hover {border: 1px solid #555; border-width: 1px 1px 0; background: #444;}
 
 .account-nav {
 	position: absolute; top: -20px; right: 35px;
@@ -160,37 +170,35 @@ ul.main-nav { margin: 0 10px;}
 .login-page, .forgot-password-page {width: 470px; margin-top: 40px;}
 .login-page .content-header {padding-bottom: 0;}
 .login-page .field-list {width: 370px;}
+.login-page .actions {text-align: left; margin: 10px 0 10px 160px;}
 .signup-page .field-list {width: 370px;}
 .signup-page .content-body, .signup-page .content-header { margin-left: 120px; margin-right: 120px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
 .login-page .field-list th, .signup-page .field-list th {width: 150px !important; width: 150px;}
 .login-page .content-header { position: relative; }
-.login-page .forgot-password { font-size: 12px;}
+.login-page .forgot-password {font-size: 11px; margin-left: 160px;}
 
 .edit-page .content-header {overflow: hidden; height: 100%;}
 .edit-page .content-header h1 {float: left;}
 .edit-page .content-header .delete-button {float: right; margin-top: 25px;}
 form .actions {margin: 30px 0; width: 100%; text-align: center;}
 
-.show-page .content-header {position: relative; border-bottom: 1px dotted black;}
+.show-page .content-header {position: relative; border-bottom: 1px dotted #888;}
 .show-page .content-header h1, .new-in-collection-page .content-header h1 {margin-bottom: 2px; margin-right: 70px;}
-.show-page .content-header a.edit-link {position: absolute; top: 0; right: 0;}
+.show-page .content-header a.edit-link {position: absolute; top: 30px; right: 0;}
 .aside-content .collection {padding-bottom: 10px;}
 
-.content-header .creation-details, .content-header .primary-collection-count {font-size: 11px; line-height: 11px;}
+.content-header .creation-details {font-size: 11px; line-height: 11px;}
 .content-header .creator {margin-right: 15px;}
 .content-header .created-at {color: #444;}
-.content-header .primary-collection-count {font-weight: bold;}
 
 .new-in-collection-page .content-header h2 {margin-top: 6px; font-size: 14px;}
 .new-in-collection-page .content-header h2, .new-in-collection-page .content-header h2 a {color: #222;}
 
-.create-new {
-	margin-top: 20px; padding: 0 30px; border-top: 1px dotted #ddd;
-	background: #f5f5f5;
-}
-.create-new form .submit-button {margin: 20px 130px;}
-.primary-collection .create-new h2 {margin: 20px 0; padding: 0; border-bottom: none;}
+.add-to-collection {padding: 20px 30px; margin-top: 20px;}
+.collection-section .add-to-collection h3 {margin: 0 0 20px; padding: 0; border-bottom: none;}
+.add-to-collection form .submit-button {margin: 20px 130px;}
+.add-to-collection .actions {text-align: left; margin-top: 0; margin-bottom: 0;}
 
 /* styling of generic elements */
 .creator {font-weight: bold;}
@@ -227,8 +235,8 @@ ul.collection > li {clear: both; margin-left: 0; list-style: none;}
 
 .new-link {margin-top: 20px;}
 
-.primary-collection h2 {
-	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted black;
+.collection-section h3 {
+	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted #888;
 }
 
 .table-plus .header {height: 100%; overflow: hidden;}
