@@ -5,3 +5,5 @@ unless defined? Hobo
   gem 'hobo'
   require 'hobo'
 end
+
+Hobo::ModelRouter.reload_routes_on_every_request = true
