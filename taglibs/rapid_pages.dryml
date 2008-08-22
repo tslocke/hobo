@@ -118,10 +118,9 @@
   <%= "<!--[if #{version || 'IE'}]>" %><do param="default"/><%= "<![endif]-->" %>
 </def>
 
-<def tag="stylesheet" attrs="name, media">
+<def tag="stylesheet" attrs="name">
   <repeat with="&comma_split(name)">
-    <link href="#{base_url}/stylesheets/#{this}.css" media="#{ media || 'all' }"
-          rel="stylesheet" type="text/css" />
+    <%= stylesheet_link_tag name, attributes %>
   </repeat>
 </def>
 
@@ -139,14 +138,14 @@
 
 
 <def tag="flash-message" attrs="type">
-  <% type = type ? type.to_sym : :notice %>
+  <% type = type ? type.to_sym : :notice -%>
   <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
 </def>
 
 
-<def tag="flash-messages" attrs="names"><%
-  names = name.nil? ? flash.keys : comma_split(names)
-  names.each { |name| flash_message :type => name }
+<def tag="flash-messages" attrs="names"><%=
+  names = names.nil? ? flash.keys : comma_split(names)
+  names.map { |name| flash_message :type => name }
 %></def>
 
 <def tag="ajax-progress">

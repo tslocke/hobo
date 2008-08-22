@@ -372,7 +372,11 @@ module Hobo::Dryml
       
       classes = attributes[:class]
       param_class = param_name.to_s.gsub('_', '-')
-      attributes[:class] = classes ? "#{classes} #{param_class}" : param_class
+      attributes[:class] = if classes
+                             classes =~ /\b#{param_class}\b/ ? classes : "#{classes} #{param_class}"
+                           else 
+                             param_class
+                           end
 
       if param_name == :default && overriding_proc
         # :default content is handled specially
@@ -398,7 +402,6 @@ module Hobo::Dryml
           override_and_call_tag(the_tag, attributes, parameters, restore_attrs, restore_params)
         end
         replacing_proc.call(tag_restore)
-
 
       else
         overriding_attributes, overriding_parameters = overriding_proc._?.call

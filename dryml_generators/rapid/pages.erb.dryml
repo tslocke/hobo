@@ -243,7 +243,6 @@ new_link = :new.in?(actions)
       <header param="content-header">
         <h2 param="heading"><%= creator.titleize %></h2>
       </header>
-      
 
       <section param="content-body">
         <<%= creator.dasherize %>-form param="form"/>
@@ -255,7 +254,7 @@ new_link = :new.in?(actions)
 <% end -%>
 
 <% model::Lifecycle.transitions.where.publishable?.*.name.each do |transition| -%>
-<def tag="<%= transition.dasherize %>-page polymorphic/>
+<def tag="<%= transition.dasherize %>-page" polymorphic/>
 <def tag="<%= transition.dasherize %>-page" for="<%= model.name %>">
   <page title="<%= transition.titleize %>" merge>
     
