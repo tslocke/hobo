@@ -399,7 +399,6 @@ module Hobo::Dryml
         end
         replacing_proc.call(tag_restore)
 
-
       else
         overriding_attributes, overriding_parameters = overriding_proc._?.call
         override_and_call_tag(the_tag, attributes, parameters, overriding_attributes, overriding_parameters)
