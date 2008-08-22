@@ -68,7 +68,7 @@ new_link = linkable?(:new)
 back_link      = model.dependent_on.detect { |x| !(model.reflections[x].klass < Hobo::User) }
 boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name
 creator        = model.creator_attribute
-creator_link   = creator && linkable?(model.reflections[creator].klass, :show)
+creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
 edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields - [model.name_attribute, main_content, creator, back_link, *boolean_fields]
