@@ -37,13 +37,13 @@ module Hobo
       
       def def_auto_actions_with_user_actions
         def_auto_actions_without_user_actions
-        
+
         class_eval do
-          def login; hobo_login;                     end if include_action?(:login)
-          def signup; hobo_signup;                   end if include_action?(:signup)
-          def logout; hobo_logout;                   end if include_action?(:logout)
-          def forgot_password; hobo_forgot_password; end if include_action?(:forgot_password)
-          def reset_password; hobo_reset_password;   end if include_action?(:reset_password)
+          def login; hobo_login;                         end if include_action?(:login)
+          def logout; hobo_logout;                       end if include_action?(:logout)
+          def do_signup; hobo_do_signup                  end if include_action?(:do_signup)
+          def forgot_password; hobo_forgot_password;     end if include_action?(:forgot_password)
+          def do_reset_password; hobo_do_reset_password; end if include_action?(:do_reset_password)
         end
       end
 
@@ -86,8 +86,8 @@ module Hobo
     end
 
 
-    def hobo_signup(&b)
-      creator_page_action(:signup) do
+    def hobo_do_signup(&b)
+      do_creator_action(:signup) do
         response_block(&b) or if valid?
                                 self.current_user = this
                                 flash[:notice] = "Thanks for signing up!"
@@ -121,8 +121,8 @@ module Hobo
     end
 
 
-    def hobo_reset_password(&b)
-      transition_action :reset_password do
+    def hobo_do_reset_password(&b)
+      do_transition_action :reset_password do
         response_block(&b) or if valid?
                                 self.current_user = this
                                 flash[:notice] = "Your password has been reset"
