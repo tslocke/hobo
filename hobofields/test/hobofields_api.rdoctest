@@ -9,6 +9,7 @@ In order for the API examples to run we need a connection to a database. You can
     >> Dependencies.load_paths << '.'
     >> Dependencies.mechanism = :require
     >> require 'activerecord'
+    >> require 'action_controller'
     >> require 'hobofields'
     >> mysql_database = "hobofields_doctest"
     >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
