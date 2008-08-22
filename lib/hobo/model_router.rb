@@ -8,7 +8,6 @@ if defined? ActionController::Routing::RouteSet
     def reload_with_hobo_routes
       if Hobo::ModelRouter.reload_routes_on_every_request
         load!
-        Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
       else
         reload_without_hobo_routes
       end
@@ -80,6 +79,10 @@ module Hobo
         [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
 
         add_developer_routes(map) if Hobo.developer_features?
+
+        # Run the DRYML generators
+        # TODO: This needs a proper home 
+        Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
         ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
