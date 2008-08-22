@@ -138,14 +138,14 @@
 
 
 <def tag="flash-message" attrs="type">
-  <% type = type ? type.to_sym : :notice %>
+  <% type = type ? type.to_sym : :notice -%>
   <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
 </def>
 
 
-<def tag="flash-messages" attrs="names"><%
-  names = name.nil? ? flash.keys : comma_split(names)
-  names.each { |name| flash_message :type => name }
+<def tag="flash-messages" attrs="names"><%=
+  names = names.nil? ? flash.keys : comma_split(names)
+  names.map { |name| flash_message :type => name }
 %></def>
 
 <def tag="ajax-progress">
