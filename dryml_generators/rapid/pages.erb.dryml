@@ -27,10 +27,7 @@ new_link = linkable?(:new)
       <header param="content-header">
         <h2 param="heading"><%= model_name :title, :plural %></h2>
 
-        <p param="count">
-          <if>There <count prefix="are"/></if>
-          <else>There aren't any <%= model_name :lowercase, :plural %> yet.</else>
-        </p>
+        <p param="count" if>There <count prefix="are"/></p>
       </header>
       
       <section param="content-body">
@@ -42,7 +39,6 @@ new_link = linkable?(:new)
         <page-nav param="top-page-nav"/>
       
         <collection param/>
-        <else>There aren't any <%= model_name :lowercase, :plural %> yet.</else>
       
         <page-nav param="bottom-page-nav"/>
       </section>
