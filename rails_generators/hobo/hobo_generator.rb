@@ -20,6 +20,7 @@ class HoboGenerator < Rails::Generator::Base
       m.template "application.dryml", File.join("app/views/taglibs/application.dryml")
       m.file "guest.rb",              File.join("app/models/guest.rb")
       m.file "dryml-support.js",      File.join("public/javascripts/dryml-support.js")
+      m.file "application.css",       File.join("public/stylesheets/application.css")
       m.file "initializer.rb",        File.join("config/initializers/hobo.rb")
     end
   end

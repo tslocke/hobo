@@ -64,6 +64,7 @@ lib/hobo.rb
 LICENSE.txt
 Manifest
 rails_generators/hobo/hobo_generator.rb
+rails_generators/hobo/templates/application.css
 rails_generators/hobo/templates/application.dryml
 rails_generators/hobo/templates/dryml-support.js
 rails_generators/hobo/templates/guest.rb
