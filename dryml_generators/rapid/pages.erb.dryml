@@ -3,7 +3,7 @@
 <def tag="main-nav">
   <navigation merge-attrs>
     <nav-item href="#{base_url}/">Home</nav-item>
-<% models.select { |m| linkable?(m, :index) }.each do |m| -%>
+<% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
     <nav-item with="&<%= m.name %>"><%= m.name.titleize.pluralize %></nav-item>
 <% end -%>
   </navigation>
