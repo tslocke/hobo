@@ -3,7 +3,7 @@
 form_fields = standard_fields :belongs_to, :has_many
 -%>
 <def tag="form" for="<%= model.name %>">
-  <form merge>
+  <form merge param="default">
     <error-messages/>
     <field-list fields="<%= form_fields * ', ' %>" param/>
     <div param="actions">

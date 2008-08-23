@@ -12,7 +12,7 @@ delete_button = !edit_link && linkable?(:destroy)
 -%>
 <% if name_attribute || content_attribute || creator_attribute || primary_collection || edit_link || delete_button -%>
 <def tag="card" for="<%= model.name %>">
-  <card class="<%= model_name :dashed %>" merge>
+  <card class="<%= model_name :dashed %>" param="default" merge>
 <% if name_attribute || show_link -%>
     <header: param>
       <h4 param="heading"><% if show_link %><a><name/></a><% else %><name/><% end %></h4>
