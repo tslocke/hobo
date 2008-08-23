@@ -36,7 +36,7 @@ module Hobo
       attr_accessor :reload_routes_on_every_request
 
       def reset_linkables
-        @linkable =Set.new
+        @linkable = Set.new
       end
 
       def linkable_key(klass, action, options)
@@ -82,7 +82,7 @@ module Hobo
 
         # Run the DRYML generators
         # TODO: This needs a proper home 
-        Hobo::Dryml::DrymlGenerator.run unless Hobo::ModelRouter.called_from_generator? || caller[-1] =~ /[\/\\]rake:\d+$/
+        Hobo::Dryml::DrymlGenerator.run unless caller[-1] =~ /[\/\\]rake:\d+$/
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
         ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
@@ -91,9 +91,7 @@ module Hobo
 
 
       def add_routes_for(map, subsite)
-        module_name = subsite._?.camelize
-
-        Hobo::ModelController.all_controllers(subsite).each { |controller| ModelRouter.new(map, controller, subsite) }
+        Hobo::ModelController.all_controllers(subsite, :force).each { |controller| ModelRouter.new(map, controller, subsite) }
       end
 
 
