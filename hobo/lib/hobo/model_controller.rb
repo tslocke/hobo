@@ -47,13 +47,13 @@ module Hobo
       @controller_names ||= Set.new
       @controller_names << controller.name
     end
-
-
-    def self.all_controllers(subsite=nil)
+    
+    
+    def self.all_controllers(subsite=nil, force=false)
       # Load every controller in app/controllers/<subsite>...
-      dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
       @controllers_loaded ||= {}
-      unless @controllers_loaded[subsite]
+      if force || !@controllers_loaded[subsite]
+        dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
           f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
         end
@@ -61,8 +61,16 @@ module Hobo
       end
       
       # ...but only return the ones that registered themselves
-      names = @controller_names.select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
-      @controller_names.*.constantize
+      names = (@controller_names || []).select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
+      
+      names.map do |name|
+        begin
+          name.constantize
+        rescue NameError
+          @controller_names.delete name
+          nil
+        end
+      end.compact
     end
     
 
@@ -216,7 +224,7 @@ module Hobo
           raise ArgumentError, "Invalid owner association '#{owner}' for #{model}"
         
         owner_actions[owner] ||= []
-        actions.each do |action|
+        Array(actions).each do |action|
           case action
           when :new
             define_method("new_for_#{owner}")    { hobo_new_for owner }
