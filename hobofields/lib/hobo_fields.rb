@@ -16,7 +16,7 @@ module HoboFields
   PLAIN_TYPES = {
     :boolean       => Hobo::Boolean,
     :date          => Date,
-    :datetime      => Time,
+    :datetime      => (defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : Time),
     :integer       => Fixnum,
     :big_integer   => BigDecimal,
     :decimal       => BigDecimal,
