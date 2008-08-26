@@ -199,11 +199,11 @@ module Hobo::Dryml
 
 
     def set_scoped_element(el)
-      assigns = el.attributes.map do |name, value|
+      variables = el.attributes.map do |name, value|
         dryml_exception("invalid name in <set-scoped>", el) unless name =~ DRYML_NAME_RX
-        "scope[:#{ruby_name name}] = #{attribute_to_ruby(value)}; "
-      end.join
-      "<% scope.new_scope { #{assigns}#{tag_newlines(el)} %>#{children_to_erb(el)}<% } %>"
+        ":#{ruby_name name} => #{attribute_to_ruby(value)} "
+      end
+      "<% scope.new_scope(#{variables * ', '}) { #{tag_newlines(el)} %>#{children_to_erb(el)}<% } %>"
     end
 
 
