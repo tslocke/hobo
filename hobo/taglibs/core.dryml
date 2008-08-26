@@ -23,8 +23,7 @@
         element(even_odd, attributes.merge(:class => klass), parameters.default)
       end.join(join)
     else
-      scope.new_scope do
-        scope[:even_odd] = "odd"
+      scope.new_scope :even_odd => "odd" do
         context_map do
           res = parameters.default
           scope.even_odd = scope.even_odd == "even" ? "odd" : "even"

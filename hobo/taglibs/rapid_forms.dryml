@@ -62,8 +62,7 @@
       html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
     end
      
-    body, field_names = scope.new_scope do
-      scope[:in_form] = true
+    body, field_names = scope.new_scope :in_form => true do
       with_form_context { parameters.default }
     end
      
