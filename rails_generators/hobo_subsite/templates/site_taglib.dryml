@@ -1,0 +1,13 @@
+<!-- Tag definitions for the <%= subsite_name %> subsite -->
+  
+<% if options[:rapid] -%>
+<include src="rapid" plugin="hobo"/>
+
+<include src="taglibs/auto/<%= file_name %>/rapid/cards"/>
+<include src="taglibs/auto/<%= file_name %>/rapid/pages"/>
+<include src="taglibs/auto/<%= file_name %>/rapid/forms"/>
+
+<set-theme name="clean"/>
+<% end -%>
+
+<def tag="app-name"><%= app_name %></def>
