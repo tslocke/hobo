@@ -10,10 +10,6 @@
 <include src="rapid_generics"/>
 <include src="rapid_lifecycles"/>
 
-<include src="taglibs/auto/rapid/cards"/>
-<include src="taglibs/auto/rapid/pages"/>
-<include src="taglibs/auto/rapid/forms"/>
-
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
