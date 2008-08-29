@@ -165,12 +165,17 @@ module Hobo
       end  
 
 
-      def should_be_sortable?
-        raise "just pasting this junk in here for now"
-        first = this.first and
-          first.respond_to?(:position_column) and
-          reorder_url = object_url(this.member_class, :reorder, :method => :post) and
-          can_edit?(first, first.position_column)
+      def sortable_collection?(collection, model=self.model)
+        # There's no perfect way to detect for this, given that acts_as_list
+        # does not provide any metadata to reflect on, but if the :order
+        # option is the same as the target classes position_column, that's a
+        # pretty safe bet
+        if defined? ActiveRecord::Acts::List::InstanceMethods
+          refl = model.reflections[collection]
+          klass = refl.klass
+          klass < ActiveRecord::Acts::List::InstanceMethods && 
+            klass.new.position_column == refl.options[:order].to_s
+        end
       end
       
       
