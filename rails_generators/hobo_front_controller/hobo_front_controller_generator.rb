@@ -34,9 +34,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
                  File.join('app/helpers', class_path, "#{file_name}_helper.rb"))
 
 
-      for page in %w{index search}
-        m.template("#{page}.dryml", File.join('app/views', class_path, file_name, "#{page}.dryml"))
-      end
+      m.template("index.dryml", File.join('app/views', class_path, file_name, "index.dryml"))
     end
   end
 
