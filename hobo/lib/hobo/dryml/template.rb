@@ -190,11 +190,12 @@ module Hobo::Dryml
 
     def set_element(el)
       assigns = el.attributes.map do |name, value|
+        next if name.in?(SPECIAL_ATTRIBUTES)
         dryml_exception("invalid name in <set>", el) unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
         "#{ruby_name name} = #{attribute_to_ruby(value)}; "
       end.join
       code = apply_control_attributes("begin; #{assigns}; end", el)
-      "<% #{assigns}#{tag_newlines(el)} %>"
+      "<% #{code}#{tag_newlines(el)} %>"
     end
 
 
