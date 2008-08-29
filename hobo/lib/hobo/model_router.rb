@@ -225,12 +225,13 @@ module Hobo
 
     def lifecycle_routes
       model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator|
-        linkable_route("do_#{singular}_#{creator}", "#{plural}/#{creator}", "do_#{creator}", :conditions => { :method => :post }, :format => false)
-        linkable_route("#{singular}_#{creator}",    "#{plural}/#{creator}", creator,         :conditions => { :method => :get },  :format => false)
+        linkable_route("do_#{singular}_#{creator}", "#{plural}/#{creator}", "do_#{creator}",
+                       :conditions => { :method => :post }, :format => false, :linkable_action => creator)
+        linkable_route("#{singular}_#{creator}",    "#{plural}/#{creator}", creator,  :conditions => { :method => :get },  :format => false)
       end
       model::Lifecycle.transitions.where.publishable?.*.name.each do |transition|
         linkable_route("do_#{singular}_#{transition}", "#{plural}/:id/#{transition}", "do_#{transition}",
-                       :conditions => { :method => :put }, :format => false)
+                       :conditions => { :method => :put }, :format => false, :linkable_action => transition)
         linkable_route("#{singular}_#{transition}", "#{plural}/:id/#{transition}", transition,
                        :conditions => { :method => :get }, :format => false)
       end
@@ -261,10 +262,11 @@ module Hobo
 
 
     def linkable_route(name, route, action, options={})
+      linkable_action = options.delete(:linkable_action) || action
       named_route(name, route, options.merge(:action => action.to_s)) and
         begin
           linkable_options = { :method => options[:conditions]._?[:method], :subsite => subsite }
-          self.class.linkable!(model, action, linkable_options)
+          self.class.linkable!(model, linkable_action, linkable_options)
         end
     end
 
