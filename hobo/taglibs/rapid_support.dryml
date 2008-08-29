@@ -6,8 +6,7 @@
                                                                                                                 
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
-                  columns = klass.attr_order.*.to_s & klass.content_columns.*.name
-                  columns -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps
+                  columns = standard_fields(klass, include_timestamps)
 
                   if skip_associations == "has_many"
                     assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
@@ -52,7 +51,7 @@
                 end
 
   field_names -= comma_split(skip) if skip
-  scope.new_scope do
+  scope.new_scope :field_name => nil, :field_path => nil do
     field_names.map do |n|
       scope.field_name = n == "this" ? this.member_class.name : n.to_s.gsub("." , "_") 
       scope.field_path = n

@@ -107,7 +107,7 @@ module Hobo::Dryml
 
 
     def add_classes!(attributes, *classes)
-      classes = classes.flatten.select{|x|x}.map{|x| x.to_s.dasherize}
+      classes = classes.flatten.select{|x|x}
       current = attributes[:class]
       attributes[:class] = (current ? current.split + classes : classes).uniq.join(' ')
       attributes
@@ -177,14 +177,14 @@ module Hobo::Dryml
       if tag != name
         send(tag, attributes || {}, parameters || {})
       else
-        nil
+        block_given? ? yield : nil
       end
     end
 
 
     def find_polymorphic_tag(name, call_type=nil)
-      call_type ||= (this.is_a?(Array) && this.respond_to?(:member_class) && this.member_class) || this_type
-
+      call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
+      
       while true
         if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
           return poly_name
@@ -369,6 +369,16 @@ module Hobo::Dryml
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
       overriding_proc = caller_parameters[param_name]
       replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
+      
+      unless param_name == the_tag || param_name == :default
+        classes = attributes[:class]
+        param_class = param_name.to_s.gsub('_', '-')
+        attributes[:class] = if classes
+                               classes =~ /\b#{param_class}\b/ ? classes : "#{classes} #{param_class}"
+                             else 
+                               param_class
+                             end
+      end
 
       if param_name == :default && overriding_proc
         # :default content is handled specially
@@ -395,7 +405,6 @@ module Hobo::Dryml
         end
         replacing_proc.call(tag_restore)
 
-
       else
         overriding_attributes, overriding_parameters = overriding_proc._?.call
         override_and_call_tag(the_tag, attributes, parameters, overriding_attributes, overriding_parameters)
@@ -416,7 +425,7 @@ module Hobo::Dryml
 
       if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_default_content
-                 new_context { overriding_default_content.call(proc { default_content._?.call(nil) }) }
+                 new_context { overriding_default_content.call(proc { default_content.call(nil) if default_content }) }
                elsif default_content
                  new_context { default_content.call(nil) }
                else
@@ -424,12 +433,14 @@ module Hobo::Dryml
                end
         element(the_tag, attributes, body)
       else
-        d = if overriding_default_content
-              proc { |default| overriding_default_content.call(proc { default_content._?.call(default) }) }
-            else
-              proc { |default| default_content._?.call(default) }
-            end
-        parameters = parameters.merge(:default => d)
+        if default_content || overriding_default_content
+          d = if overriding_default_content
+                proc { |default| overriding_default_content.call(proc { default_content.call(default) if default_content }) }
+              else
+                proc { |default| default_content.call(default) if default_content }
+              end
+          parameters = parameters.merge(:default => d) 
+        end
 
         if the_tag.is_a?(String, Symbol)
           # It's a defined DRYML tag
@@ -539,7 +550,7 @@ module Hobo::Dryml
         attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
       end
 
-      content = new_context(&block) if block_given?
+      content = new_context { yield } if block_given?
       res = if empty
               "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
             else

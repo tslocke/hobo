@@ -18,7 +18,8 @@ module Hobo
         base.class_eval do
           @auto_actions ||= {}
 
-          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => []
+          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [], 
+                                  :owner_actions => {}
 
           extend ClassMethods
 
@@ -34,30 +35,49 @@ module Hobo
           alias_method_chain :render, :hobo_model
 
         end
+        register_controller(base)
 
         Hobo::Controller.included_in_class(base)
       end
 
     end
+    
+    
+    def self.register_controller(controller)
+      @controller_names ||= Set.new
+      @controller_names << controller.name
+    end
+    
+    
+    def self.all_controllers(subsite=nil, force=false)
+      # Load every controller in app/controllers/<subsite>...
+      @controllers_loaded ||= {}
+      if force || !@controllers_loaded[subsite]
+        dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
+        Dir.entries(dir).each do |f|
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+        end
+        @controllers_loaded[subsite] = true
+      end
+      
+      # ...but only return the ones that registered themselves
+      names = (@controller_names || []).select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
+      
+      names.map do |name|
+        begin
+          name.constantize
+        rescue NameError
+          @controller_names.delete name
+          nil
+        end
+      end.compact
+    end
+    
 
 
     module ClassMethods
 
       attr_writer :model
-
-      def collections
-        # FIXME The behaviour here is weird if the superclass does
-        # define collections *and* this class adds some more. The
-        # added ones won't be published
-
-        # by default By default, all has_many associations are published
-        @collections ||= if superclass.respond_to?(:collections)
-                           superclass.collections
-                         else
-                           model.reflections.values.map {|r| r.name if r.macro == :has_many}.compact
-                         end
-      end
-
 
       def model
         @model ||= name.sub(/Controller$/, "").singularize.constantize
@@ -111,7 +131,6 @@ module Hobo
         except = Array(options[:except])
         except_actions = except.map do |arg|
           case arg
-            when :collections then available_auto_collection_actions
             when :lifecycle   then available_auto_lifecycle_actions
             else arg
           end
@@ -138,7 +157,6 @@ module Hobo
           def reorder; hobo_reorder end if include_action?(:reorder)
         end
 
-        collections.each { |c| def_collection_actions(c.to_sym) }
         def_lifecycle_actions
       end
 
@@ -148,40 +166,23 @@ module Hobo
       end
 
 
-      def def_collection_actions(name)
-        def_auto_action name do
-          hobo_show_collection(name)
-        end
-
-        if Hobo.simple_has_many_association?(model.reflections[name])
-          def_auto_action "new_#{name.to_s.singularize}" do
-            hobo_new_in_collection(name)
-          end
-
-          def_auto_action "create_#{name.to_s.singularize}" do
-            hobo_create_in_collection(name)
-          end
-        end
-      end
-
-
       def def_lifecycle_actions
         if model.has_lifecycle?
           model::Lifecycle.creator_names.each do |creator|
-            def_auto_action "#{creator}_page" do
+            def_auto_action creator do
               creator_page_action creator
             end
-            def_auto_action creator do
-              creator_action creator
+            def_auto_action "do_#{creator}" do
+              do_creator_action creator
             end
           end
 
           model::Lifecycle.transition_names.each do |transition|
-            def_auto_action "#{transition}_page" do
+            def_auto_action transition do
               transition_page_action transition
             end
-            def_auto_action transition do
-              transition_action transition
+            def_auto_action "do_#{transition}" do
+              do_transition_action transition
             end
           end
         end
@@ -216,11 +217,26 @@ module Hobo
           end
         end
       end
-
-
-      def publish_collection(*names)
-        collections.concat(names)
-        names.each {|n| def_collection_actions(n)}
+      
+      
+      def auto_actions_for(owner, actions)
+        model.reverse_reflection(owner)._?.klass == model or 
+          raise ArgumentError, "Invalid owner association '#{owner}' for #{model}"
+        
+        owner_actions[owner] ||= []
+        Array(actions).each do |action|
+          case action
+          when :new
+            define_method("new_for_#{owner}")    { hobo_new_for owner }
+          when :index
+            define_method("index_for_#{owner}")  { hobo_index_for owner }
+          when :create
+            define_method("create_for_#{owner}") { hobo_create_for owner }
+          else
+            raise ArgumentError, "Invalid owner action: #{action}"
+          end
+          owner_actions[owner] << action
+        end
       end
 
 
@@ -233,13 +249,12 @@ module Hobo
         (available_auto_read_actions +
          available_auto_write_actions +
          FORM_ACTIONS +
-         available_auto_collection_actions +
          available_auto_lifecycle_actions).uniq
       end
 
 
       def available_auto_read_actions
-        READ_ONLY_ACTIONS + collections
+        READ_ONLY_ACTIONS
       end
 
 
@@ -252,21 +267,14 @@ module Hobo
       end
 
 
-      def available_auto_collection_actions
-        collections.map do |c|
-          [c, "new_#{c.to_s.singularize}".to_sym, "create_#{c.to_s.singularize}".to_sym]
-        end.flatten
-      end
-
-
       def available_auto_lifecycle_actions
         # For each creator/transition there are two possible
-        # actions. e.g. for signup, 'signup_page' would be routed to
-        # GET users/signup, and would show the form, while 'signup'
+        # actions. e.g. for signup, 'signup' would be routed to
+        # GET users/signup, and would show the form, while 'do_signup'
         # would be routed to POST /users/signup)
         if model.has_lifecycle?
-          (model::Lifecycle.creator_names.map { |c| [c, "#{c}_page"] } +
-           model::Lifecycle.transition_names.map { |t| [t, "#{t}_page"] }).flatten.*.to_sym
+          (model::Lifecycle.creator_names.map { |c| [c, "do_#{c}"] } +
+           model::Lifecycle.transition_names.map { |t| [t, "do_#{t}"] }).flatten.*.to_sym
         else
           []
         end
@@ -310,6 +318,7 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
+        @this = instance_variable_get("@#{controller.singularize}")
         render :template => "#{controller}/#{view}"
       else
         render :action => default_action
@@ -373,6 +382,16 @@ module Hobo
         finder.all(options)
       end
     end
+    
+    
+    def find_owner_and_association(owner_association)
+      refl = model.reflections[owner_association]
+      klass = refl.klass
+      id = params["#{klass.name.underscore}_id"]
+      owner = klass.find(id)
+      instance_variable_set("@#{owner_association}", owner)
+      [owner, owner.send(model.reverse_reflection(owner_association).name)]
+    end
 
 
     # --- Action implementations --- #
@@ -380,6 +399,15 @@ module Hobo
     def hobo_index(*args, &b)
       options = args.extract_options!
       finder = args.first || model
+      self.this = find_or_paginate(finder, options)
+      response_block(&b)
+    end
+    
+    
+    def hobo_index_for(owner, *args, &b)
+      options = args.extract_options!
+      owner, association = find_owner_and_association(owner)
+      finder = args.first || association
       self.this = find_or_paginate(finder, options)
       response_block(&b)
     end
@@ -392,8 +420,15 @@ module Hobo
     end
 
 
-    def hobo_new(new_record=nil, &b)
-      self.this = new_record || model.user_new!(current_user)
+    def hobo_new(record=nil, &b)
+      self.this = record || model.user_new!(current_user)
+      response_block(&b)
+    end
+    
+    
+    def hobo_new_for(owner, record=nil, &b)
+      owner, association = find_owner_and_association(owner)
+      self.this = record || association.user_new(current_user)
       response_block(&b)
     end
 
@@ -404,6 +439,15 @@ module Hobo
       this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:new, &b)
     end
+    
+    
+    def hobo_create_for(owner, *args, &b)
+      options = args.extract_options!
+      owner, association = find_owner_and_association(owner)
+      self.this = args.first || association.new
+      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
+      create_response(:"new_for_#{owner}", &b)    
+    end
 
 
     def attribute_parameters
@@ -412,12 +456,17 @@ module Hobo
 
 
     def new_for_create
-      if model.has_inheritance_column? && (type_attr = params['type']) && type_attr.in?(model.send(:subclasses).*.name)
-        type_attr.constantize
-      else
-        model
-      end.new
+      type_param = subtype_for_create
+      create_model = type_param ? type_param.constantize : model
+      create_model.new
     end
+    
+    
+    def subtype_for_create
+      model.has_inheritance_column? && (t = params['type']) && t.in?(model.send(:subclasses).*.name) and
+        t
+    end
+    
 
 
     def create_response(new_action, &b)
@@ -506,50 +555,15 @@ module Hobo
     end
 
 
-    # --- Collection Actions --- #
-
-    def hobo_show_collection(association, *args, &b)
-      options = args.extract_options!
-      association = find_instance.send(association) if association.is_a?(String, Symbol)
-      if association.respond_to?(:origin)
-        association.origin.user_view(current_user, association.origin_attribute) # permission check
-      end
-      self.this = find_or_paginate(association, options)
-      dryml_fallback_tag("show_collection_page")
-      response_block(&b)
-    end
-
-
-    # TODO: This action needs some more tidying up
-    def hobo_new_in_collection(association, *args, &b)
-      options = args.extract_options!
-      @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
-      self.this = args.first || @association.new
-      this.user_changes(current_user) # set_creator and permission check
-      dryml_fallback_tag("new_in_collection_page")
-      response_block(&b)
-    end
-
-
-    def hobo_create_in_collection(association, *args, &b)
-      options = args.extract_options!
-      @association = association.is_a?(String, Symbol) ? find_instance.send(association) : association
-      self.this = args.first || @association.new
-      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response("new_#{association}", &b)
-    end
-
-
     # --- Lifecycle Actions --- #
 
-    def creator_action(name, &b)
+    def do_creator_action(name, &b)
       @creator = model::Lifecycle.creators[name.to_s]
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
           redirect_after_submit
         else
-          dryml_fallback_tag "lifecycle_start_page"
           re_render_form(name)
         end
     end
@@ -557,8 +571,7 @@ module Hobo
 
     def creator_page_action(name)
       self.this = model.new
-      @creator = model::Lifecycle.creators[name]
-      dryml_fallback_tag "lifecycle_start_page"
+      @creator = model::Lifecycle.creators[name.to_s] or raise ArgumentError, "No such creator in lifecycle: #{name}"
     end
 
 
@@ -570,14 +583,13 @@ module Hobo
     end
 
 
-    def transition_action(name, *args, &b)
+    def do_transition_action(name, *args, &b)
       prepare_for_transition(name)
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
           redirect_after_submit
         else
-          dryml_fallback_tag "lifecycle_transition_page"
           re_render_form(name)
         end
     end
@@ -586,7 +598,6 @@ module Hobo
     def transition_page_action(name, *args)
       options = args.extract_options!
       prepare_for_transition(name, options)
-      dryml_fallback_tag "lifecycle_transition_page"
     end
 
     # --- Miscelaneous Actions --- #
@@ -658,7 +669,7 @@ module Hobo
       ivar = if object.is_a?(Array)
                (object.try.member_class || model).name.underscore.pluralize
              else
-               model.name.underscore
+               object.class.name.underscore
              end
       @this = instance_variable_set("@#{ivar}", object)
     end

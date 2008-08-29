@@ -35,6 +35,11 @@ module Hobo
     extend self
 
     attr_accessor :last_if
+    
+    def enable
+      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+    end
+    
 
     def clear_cache
       @renderer_classes = {}
@@ -107,10 +112,9 @@ module Hobo
 
     def subsite_taglib(page)
       parts = page.split("/")
-      if parts.length == 3
-        subsite = parts.first
-        { :src => "taglibs/#{subsite}" } if File.exists?("#{RAILS_ROOT}/app/views/taglibs/#{subsite}.dryml")
-      end
+      subsite = parts.length >= 3 ? parts[0..-3].join('_') : "front"
+      src = "taglibs/#{subsite}_site"
+      { :src => src } if File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
     end
 
 

@@ -1,134 +1,33 @@
-<def tag="creation-details">
-  <div class="creation-details">
-    <span class="creator" param="by"><if:get_creator><view/></if:get_creator></span>
+<def tag="card" polymorphic>
+  <div class="card" param="default" merge-attrs>
+    <header param if-content/>
+    <div param="body" if-content/>
   </div>
 </def>
 
-<def tag="primary-content">
-  <view class="primary-content" field="&this.class.primary_content_attribute" if="&this.class.primary_content_attribute" merge/>
+
+<def tag="search-card" polymorphic>
+  <card/>
 </def>
 
-<def tag="association-count">
-  <a class="association-count #{this_field.to_s.underscore}" href="##{this_field.to_s.underscore}" merge>
-    <count/>
-  </a>
+
+<def tag="empty-collection-message">
+  <p class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
+    No <collection-name lowercase/> to display
+  </p>
 </def>
 
-<def tag="base-card">
-  <if test="&can_view?">
-    <set has-heading="&this.class.name_attribute || all_parameters[:heading]"/>
-    <set has-link="&has_heading && linkable?"/>
-    <div class="card #{has_link ? 'linkable' : 'content'} #{'with-owner' if this.class.creator_attribute} #{type_name :dasherize => true}"
-         merge-attrs>
-      <div class="controls" param="controls">
-        <a action="edit" class="edit" if="&!has_link && linkable?(:edit) && can_edit?" param="edit-link">Edit</a>
-        <delete-button label="X" unless="&linkable?(:edit)" param/>
-      </div>
-
-      <h4 param="heading" if="&has_heading"><a><name/></a></h4>
-      <div class="body" param="body">
-        <div class="content" param="content" unless="&has_link">
-          <primary-content/>
-        </div>
-        <creation-details param/>
-        <do param="count">
-          <set primary-collection="&primary_collection_name"/>
-          <if test="&primary_collection">
-            <span class="dependents"><count field="&primary_collection"/></span>
-          </if>
-        </do>
-      </div>
-    </div>
-  </if>
-</def>
-
-<def tag="card">
-  <if test="&can_view?">
-    <%= poly = call_polymorphic_tag('card', attributes, parameters) %>
-    <base-card unless="&poly" merge/>
-  </if>
-</def>
-
-<def tag="search-card">
-  <%= poly = call_polymorphic_tag('search-card', attributes, parameters) %>
-  <card unless="&poly"/>
-</def>
 
 <def tag="collection">
-  <set-scoped collection-contains-delete-button="&false">
-    <%= poly = call_polymorphic_tag('collection', attributes, parameters) %>
-    <base-collection if="&poly.nil?" merge/>
-    <p class="empty-collection-message"
-       if="&this.empty? || scope.collection_contains_delete_button"
-       style="#{'display:none' if !this.empty?}"
-       param="empty-message">
-      No <name-for-collection lowercase/> to display
-    </p>
-  </set-scoped>
-</def>
-
-
-<def tag="base-collection" attrs="sortable, sortable-options"><%
-  sortable &&= (first = this.first and
-                first.respond_to?(:position_column) and
-                reorder_url = object_url(this.member_class, :reorder, :method => :post) and
-                can_edit?(first, first.position_column))
-  if sortable
-    singular_name = first.class.name.underscore
-    attributes[:id] ||= "#{singular_name}_ordering"
-  end
-  collection_name = this.try.origin_attribute || this.member_class.name.underscore
-  %>
-  <ul class="collection #{collection_name.to_s.gsub('_', '-')}" merge-attrs>
-    <li: id="&%(#{singular_name}_#{this.id}) if sortable" param>
-      <div class="ordering-handle" param="handle" if="&sortable">&uarr;<br/>&darr;</div>
-      <card param/>
-    </li:>
+  <ul class="collection #{collection_name :dasherize => true}" merge-attrs unless="empty?">
+    <li param="item" class="#{scope.even_odd} #{model_id_class}" repeat="&select_viewable">
+      <do param="default"><card param/></do>
+    </li>
   </ul>
-  <%= if sortable && Hobo::Dryml.last_if
-        opts = { :url => reorder_url,
-                 :constraint => :vertical,
-                 :overlap => :vertical,
-                 :scroll => :window,
-                 :handle => 'ordering-handle',
-                 :complete => [visual_effect(:highlight, attributes[:id])]
-                }
-        opts.update(sortable_options) if sortable_options
-        sortable_element attributes[:id], opts
-      end
-   %>
+  <empty-collection-message param="empty-message"/>
 </def>
 
 
-<def tag="collection-preview" attrs="limit, if-any">
-  <% limit ||= 6 %>
-  <do with="&this.limit(limit)">
-    <unless test="&if_any && this.empty?">
-      <set collection-name="&(this.try.origin_attribute || this.member_class.name.pluralize).to_s"/>
-      <div class="collection-preview" merge-attrs>
-        <header param>
-          <h3 param="heading"><collection-name.titleize/></h3>
-          <div if="&linkable? && this.count > limit" class="show-all" param="show-all-link">(<a>show all</a>)</div>
-        </header>
-        <collection merge-params>
-          <card: class="small"/>
-        </collection>
-      </div>
-    </unless>
-  </do>
-</def>
-
-
-<def tag="new-link-or-form" attrs="model">
-  <if test="&linkable?(model, :create, :method => :post)">
-    <a to="&model" action="new" param="new-link"/>
-    <else>
-      <if with="&model.user_new current_user">
-        <section class="create-new">
-          <h2>New <type-name/></h2>
-          <form><field-list param="new-field-list"/><submit label="Create"/></form>
-        </section>
-      </if>
-    </else>
-  </if>
-</def>
+<def tag="field-names-where-true" attrs="fields"><%=
+  comma_split(fields).select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
+%></def>

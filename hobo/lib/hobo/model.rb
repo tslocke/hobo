@@ -15,7 +15,7 @@ module Hobo
 
       included_in_class_callbacks(base)
 
-      Hobo.register_model(base)
+      register_model(base)
 
       patch_will_paginate
 
@@ -33,7 +33,6 @@ module Hobo
       end
 
       class << base
-        alias_method_chain :has_many,      :join_record_management
         alias_method_chain :belongs_to,    :creator_metadata
         alias_method_chain :belongs_to,    :target_is
         alias_method_chain :attr_accessor, :creator_metadata
@@ -48,7 +47,8 @@ module Hobo
           end
         end
       end
-
+      
+      base.fields # force hobofields to load
     end
 
     def self.patch_will_paginate
@@ -71,6 +71,26 @@ module Hobo
         end
 
       end
+    end
+    
+    
+    def self.register_model(model)
+      @model_names ||= Set.new
+      @model_names << model.name
+    end
+
+
+    def self.all_models
+      # Load every controller in app/controllers...
+      unless @models_loaded
+        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
+          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+        end
+        @models_loaded = true
+      end
+
+      # ...but only return the ones that registered themselves
+      @model_names.*.constantize
     end
 
 
@@ -271,6 +291,13 @@ module Hobo
         result.member_class = self if result.is_a?(Array)
         result
       end
+      
+      
+      def find_by_sql(*args)
+        result = super
+        result.member_class = self # find_by_sql always returns array
+        result
+      end
 
 
       def all(options={})
@@ -291,7 +318,7 @@ module Hobo
 
       # FIXME: This should really be a method on AssociationReflection
       def reverse_reflection(association_name)
-        refl = reflections[association_name]
+        refl = reflections[association_name.to_sym] or raise "No reverse reflection for #{name}.#{association_name}"
         return nil if refl.options[:conditions] || refl.options[:polymorphic]
 
         reverse_macro = if refl.macro == :has_many
@@ -347,34 +374,6 @@ module Hobo
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
       end
 
-
-      def manage_join_records(association)
-
-        method = "manage_join_records_for_#{association}"
-        after_save method
-        class_eval %{
-          def #{method}
-            assigned = #{association}.dup
-            current = #{association}.reload
-
-            through = #{association}.proxy_reflection.through_reflection
-            source  = #{association}.proxy_reflection.source_reflection
-
-            to_delete = current - assigned
-            to_add    = assigned - current
-            through.klass.delete_all(["\#{through.primary_key_name} = ? and \#{source.primary_key_name} in (?)",
-                                             self.id, to_delete.*.id]) if to_delete.any?
-            to_add.each { |record| #{association} << record }
-          end
-        }
-      end
-
-      def has_many_with_join_record_management(name, options={}, &b)
-        manage = options.delete(:managed)
-        returning (has_many_without_join_record_management(name, options, &b)) do
-          manage_join_records(name) if manage
-        end
-      end
 
     end # --- of ClassMethods --- #
 

@@ -1,8 +1,5 @@
 <def tag="simple-page">
-  <page layout="simple" merge>
-    <live-search: replace/>
-    <nav: replace/>
-  </page>
+  <page without-live-search without-account-nav without-main-nav merge/>
 </def>    
 
 
@@ -11,34 +8,38 @@
    
     <body: class="login-page" param/>
     
-    <content-header: param>
-      <h2 param>Log In</h2>
-    </content-header>
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">Log In</h2>
+      </header>
+      
+      <section param="content-body">      
+        <form action="&request.request_uri" class="login" param>
+          <labelled-item-list param>
+            <labelled-item>
+              <item-label param="login-label"><%= model.login_attribute.to_s.titleize %></item-label>
+              <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
+            </labelled-item>
 
-    <content-body: param>
-      <form action="&request.request_uri" class="login" param>
-        <labelled-item-list param>
-          <labelled-item>
-            <item-label param="login-label"><%= model.login_attribute.to_s.titleize %></item-label>
-            <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
-          </labelled-item>
+            <labelled-item>
+              <item-label param="password-label">Password</item-label>
+              <item-value>
+                <input type="password" name="password" id="password" class="string" param="password-input"/>
+              </item-value>
+            </labelled-item>
 
-          <labelled-item>
-            <item-label param="password-label">Password</item-label>
-            <item-value><input type="password" name="password" id="password" class="string" param="password-input"/></item-value>
-          </labelled-item>
-
-          <labelled-item if="&remember_me">
-            <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
-            <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
-          </labelled-item>
-        </labelled-item-list>
-        <div class="actions" param="actions">
-          <submit label='Log in' param/><if test="&signup_url" class='nav-item'> or <a href="&signup_url">Sign up</a></if>
-        </div>
-      </form>
-      <a class="forgot-password" href="&forgot_password_url">Forgot your password?</a>
-    </content-body>
+            <labelled-item if="&remember_me">
+              <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
+              <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
+            </labelled-item>
+          </labelled-item-list>
+          <div class="actions" param="actions">
+            <submit label='Log in' param/><if test="&signup_url" class='nav-item'> or <a href="&signup_url">Sign up</a></if>
+          </div>
+        </form>
+        <a class="forgot-password" href="&forgot_password_url">Forgot your password?</a>
+      </section>
+    </content:>
   </simple-page>
 </def>
 
@@ -48,26 +49,31 @@
    
     <body: class="forgot-password-page" param/>
     
-    <content-header: param>
-      <h2 param>Forgotten Password</h2>
-      <p>Enter the email address you signed up with. If we have it in
-      our records we'll send you an email allowing you to chose a new
-      password.</p>
-    </content-header>
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">Forgotten Password</h2>
+        <p>Enter the email address you signed up with. If we have it in
+        our records we'll send you an email allowing you to chose a new
+        password.</p>
+      </header>
 
-    <content-body: param>
-      <form action="" class="forgot-password" param>
-        <labelled-item-list param>
-          <labelled-item>
-            <item-label param="email-address-label">Email Address</item-label>
-            <item-value><input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" /></item-value>
-          </labelled-item>
-        </labelled-item-list>
-        <div class="actions" param="actions">
-          <submit label="Send" param/>
-        </div>
-      </form>
-    </content-body>
+      <section param="content-body">
+        <form action="" class="forgot-password" param>
+          <labelled-item-list param>
+            <labelled-item>
+              <item-label param="email-address-label">Email Address</item-label>
+              <item-value>
+                <input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" />
+              </item-value>
+            </labelled-item>
+          </labelled-item-list>
+          <div class="actions" param="actions">
+            <submit label="Send" param/>
+          </div>
+        </form>
+      </section>
+    </content:>
+      
   </simple-page>
 </def>
 
@@ -77,26 +83,32 @@
    
     <body: class="forgot-password-page" param/>
     
-    <content-header: param>
-      <h2 param>Forgotten Password</h2>
-      <p>Enter the email address you signed up with. If we have it in
-      our records we'll send you an email allowing you to chose a new
-      password.</p>
-    </content-header>
+    <content: param>
+      <header param="content-header">
+        <h2 param>Forgotten Password</h2>
+        <p>Enter the email address you signed up with. If we have it in
+        our records we'll send you an email allowing you to chose a new
+        password.</p>
+      </header>
 
-    <content-body: param>
-      <form action="" class="forgot-password" param>
-        <labelled-item-list param>
-          <labelled-item>
-            <item-label param="email-address-label">Email Address</item-label>
-            <item-value><input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" /></item-value>
-          </labelled-item>
-        </labelled-item-list>
-        <div class="actions" param="actions">
-          <submit label="Send" param/>
-        </div>
-      </form>
-    </content-body>
+      <section param="content-body">
+        <form action="" class="forgot-password" param>
+          <labelled-item-list param>
+            <labelled-item>
+              <item-label param="email-address-label">Email Address</item-label>
+              <item-value>
+                <input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" />
+              </item-value>
+            </labelled-item>
+          </labelled-item-list>
+          <div class="actions" param="actions">
+            <submit label="Send" param/>
+          </div>
+        </form>
+      </section>
+      
+    </content:>
+      
   </simple-page>
 </def>
 
@@ -105,18 +117,21 @@
   <simple-page>
     <body: class="forgot-password-page" param/>
     
-    <content-header: param>
-      <h2 param>Forgotten Password - Sent</h2>
-    </content-header:>
+    <content: param>
+      <header param="content-header">
+        <h2 param>Forgotten Password - Sent</h2>
+      </header>
 
-    <content-body: param>
-      <p param="message">If the e-mail address you entered, <%= h params[:email_address] %>,
-        is in our records, you will
-      receive an e-mail from us with instructions for resetting your
-      password. If you don't receive this e-mail, please check your
-      junk mail folder.</p>
-      <p><a href="#{base_url}/">Back to <app-name/></a></p>
-    </content-body:>
+      <section param="content-body">
+        <p param="message">If the e-mail address you entered, <%= h params[:email_address] %>,
+          is in our records, you will
+        receive an e-mail from us with instructions for resetting your
+        password. If you don't receive this e-mail, please check your
+        junk mail folder.</p>
+        <p><a href="#{base_url}/">Back to <app-name/></a></p>
+      </section>
+    </content:>
+        
   </simple-page>
 </def>
 
@@ -127,11 +142,15 @@
        
     <body: class="account-disabled-page" param/>
 
-    <content-header: param><h2 param>Account is not available</h2></content-header>
+    <content: param>
+      <header param="content-header">
+        <h2 param>Account is not available</h2>
+      </header>
 
-    <content-body: param>
-      <p>Your account is not available at this time.</p>
-    </content-body>
+      <section param="content-body">
+        <p>Your account is not available at this time.</p>
+      </section>
+    </content:>
   </simple-page>
 
 </def>
@@ -143,15 +162,17 @@
 
     <body: class="user-account-page #{type_name}" param/>
 
-    <content-header: param>
-      <h2><name/></h2>
-    </content-header:>
+    <content: param>
+      <header param="content-header">
+        <h2><name/></h2>
+      </header>
 
-    <content-body: param>
-      <error-messages param/>
-      <h2>Change Password</h2>
-      <change-password-form/>
-    </content-body:>
+      <section param="content-body">
+        <error-messages param/>
+        <h2>Change Password</h2>
+        <change-password-form/>
+      </section>
+    </content:>
     
   </page>
 

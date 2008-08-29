@@ -1,10 +1,10 @@
-<def tag="page" extend-with="theme">
-  <page-without-theme merge>
+<extend tag="page">
+  <old-page merge>
     <stylesheets: param>
       <stylesheet name="reset"/>
       <theme-stylesheet/>
       <theme-stylesheet name="rapid-ui"/>
       <stylesheet name="application"/>
     </stylesheets>
-  </page-without-theme>
-</def>  
+  </old-page>
+</extend>  

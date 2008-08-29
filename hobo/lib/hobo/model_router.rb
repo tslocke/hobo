@@ -4,11 +4,15 @@ if defined? ActionController::Routing::RouteSet
     # Monkey patch this method so routes are reloaded on *every*
     # request. Without this Rails checks the mtime of config/routes.rb
     # which doesn't take into account Hobo's auto routing
-    #def reload
-    #  # TODO: This can get slow - quicker to stat routes.rb and the
-    #  # controllers and only do a load if there's been a change
-    #  load!
-    #end
+
+    def reload_with_hobo_routes
+      if Hobo::ModelRouter.reload_routes_on_every_request
+        load!
+      else
+        reload_without_hobo_routes
+      end
+    end
+    alias_method_chain :reload, :hobo_routes
 
     # temporay hack -- reload assemble.rb whenever routes need reloading
     def reload_with_hobo_assemble
@@ -27,12 +31,12 @@ module Hobo
 
   class ModelRouter
 
-    APP_ROOT = "#{RAILS_ROOT}/app"
-
     class << self
+      
+      attr_accessor :reload_routes_on_every_request
 
       def reset_linkables
-        @linkable =Set.new
+        @linkable = Set.new
       end
 
       def linkable_key(klass, action, options)
@@ -51,8 +55,15 @@ module Hobo
         options[:method] ||= :get
         @linkable.member? linkable_key(klass, action, options)
       end
+      
+      def called_from_generator?
+        caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
+      end
 
       def add_routes(map)
+        # Don't create routes if it's a generator that's running
+        return if called_from_generator?
+
         reset_linkables
 
         begin
@@ -62,19 +73,16 @@ module Hobo
           return
         end
 
-        require "#{APP_ROOT}/controllers/application" unless Object.const_defined? :ApplicationController
+        require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
 
-        # Don't create routes if it's a generator that's running
-        return if caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
-
-        # Add non-subsite routes
-        add_routes_for(map, nil)
-
-        # Any directory inside app/controllers defines a subsite
-        subsites = Dir["#{APP_ROOT}/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
-        subsites.each { |subsite| add_routes_for(map, subsite) }
+        # Add non-subsite, and all subsite routes
+        [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
 
         add_developer_routes(map) if Hobo.developer_features?
+
+        # Run the DRYML generators
+        # TODO: This needs a proper home 
+        Hobo::Dryml::DrymlGenerator.run unless caller[-1] =~ /[\/\\]rake:\d+$/
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
         ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
@@ -83,22 +91,7 @@ module Hobo
 
 
       def add_routes_for(map, subsite)
-        module_name = subsite._?.camelize
-
-        # FIXME: This should go directly to the controllers, not load the models first.
-        Hobo.models.each do |model|
-          controller_name = "#{model.name.pluralize}Controller"
-          is_defined = if subsite
-                         Object.const_defined?(module_name) && module_name.constantize.const_defined?(controller_name)
-                       else
-                         Object.const_defined?(controller_name)
-                       end
-          controller_filename = File.join(*["#{APP_ROOT}/controllers", subsite, "#{controller_name.underscore}.rb"].compact)
-          if is_defined || File.exists?(controller_filename)
-            controller = (subsite ? "#{module_name}::#{controller_name}" : controller_name).constantize
-            ModelRouter.new(map, model, controller, subsite)
-          end
-        end
+        Hobo::ModelController.all_controllers(subsite, :force).each { |controller| ModelRouter.new(map, controller, subsite) }
       end
 
 
@@ -110,9 +103,8 @@ module Hobo
     end
 
 
-    def initialize(map, model, controller, subsite)
+    def initialize(map, controller, subsite)
       @map = map
-      @model = model
       @controller = controller
       @subsite = subsite
       add_routes
@@ -120,6 +112,11 @@ module Hobo
 
 
     attr_reader :map, :model, :controller, :subsite
+    
+    
+    def model
+      controller.model
+    end
 
 
     def plural
@@ -143,7 +140,7 @@ module Hobo
         index_action_routes
         lifecycle_routes if defined? model::Lifecycle
         resource_routes
-        collection_routes
+        owner_routes
         web_method_routes
         show_action_routes
 
@@ -172,27 +169,33 @@ module Hobo
     end
 
 
-    def collection_routes
-      controller.collections.each do |collection|
-        linkable_route("#{singular}_#{collection}",
-                       "#{plural}/:id/#{collection}",
-                       collection.to_s,
-                       :conditions => { :method => :get })
-
-        if Hobo.simple_has_many_association?(model.reflections[collection])
-          linkable_route("new_#{singular}_#{collection.to_s.singularize}",
-                         "#{plural}/:id/#{collection}/new",
-                         "new_#{collection.to_s.singularize}",
-                         :conditions => { :method => :get })
-          linkable_route("create_#{singular}_#{collection.to_s.singularize}",
-                         "#{plural}/:id/#{collection}",
-                         "create_#{collection.to_s.singularize}",
-                         :conditions => { :method => :post })
-
+    def owner_routes
+      controller.owner_actions.each_pair do |owner, actions|
+        collection     = model.reverse_reflection(owner).name
+        owner_singular = model.reflections[owner].klass.name.underscore
+        owner_plural   = owner_singular.pluralize
+        
+        actions.each do |action| 
+          case action
+          when :index
+            linkable_route("#{plural}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
+                           "index_for_#{owner}",
+                           :conditions => { :method => :get })
+          when :new
+            linkable_route("new_#{singular}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}/new",
+                           "new_for_#{owner}",
+                           :conditions => { :method => :get })
+          when :create
+            linkable_route("create_#{singular}_for_#{owner}",
+                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
+                           "create_for_#{owner}",
+                           :conditions => { :method => :post })
+          end
         end
       end
-    end
-
+    end 
 
     def web_method_routes
       controller.web_methods.each do |method|
@@ -222,13 +225,14 @@ module Hobo
 
     def lifecycle_routes
       model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator|
-        linkable_route("#{singular}_#{creator}",      "#{plural}/#{creator}", creator,           :conditions => { :method => :post }, :format => false)
-        linkable_route("#{singular}_#{creator}_page", "#{plural}/#{creator}", "#{creator}_page", :conditions => { :method => :get },  :format => false)
+        linkable_route("do_#{singular}_#{creator}", "#{plural}/#{creator}", "do_#{creator}",
+                       :conditions => { :method => :post }, :format => false, :linkable_action => creator)
+        linkable_route("#{singular}_#{creator}",    "#{plural}/#{creator}", creator,  :conditions => { :method => :get },  :format => false)
       end
       model::Lifecycle.transitions.where.publishable?.*.name.each do |transition|
-        linkable_route("#{singular}_#{transition}",      "#{plural}/:id/#{transition}", transition,
-                       :conditions => { :method => :put }, :format => false)
-        linkable_route("#{singular}_#{transition}_page", "#{plural}/:id/#{transition}", "#{transition}_page",
+        linkable_route("do_#{singular}_#{transition}", "#{plural}/:id/#{transition}", "do_#{transition}",
+                       :conditions => { :method => :put }, :format => false, :linkable_action => transition)
+        linkable_route("#{singular}_#{transition}", "#{plural}/:id/#{transition}", transition,
                        :conditions => { :method => :get }, :format => false)
       end
     end
@@ -247,8 +251,8 @@ module Hobo
         options.reverse_merge!(:controller => route_with_subsite(plural))
         name = name_with_subsite(name)
         route = route_with_subsite(route)
-        map.named_route(name, route, options)
         format_route = options.delete(:format) != false
+        map.named_route(name, route, options)
         map.named_route("formatted_#{name}", "#{route}.:format", options) if format_route
         true
       else
@@ -258,10 +262,11 @@ module Hobo
 
 
     def linkable_route(name, route, action, options={})
+      linkable_action = options.delete(:linkable_action) || action
       named_route(name, route, options.merge(:action => action.to_s)) and
         begin
           linkable_options = { :method => options[:conditions]._?[:method], :subsite => subsite }
-          self.class.linkable!(model, action, linkable_options)
+          self.class.linkable!(model, linkable_action, linkable_options)
         end
     end
 

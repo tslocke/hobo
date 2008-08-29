@@ -13,6 +13,7 @@ class HoboRapidGenerator < Hobo::Generator
       m.file "hobo-rapid.js",      "public/javascripts/hobo-rapid.js"
       m.file "lowpro.js",          "public/javascripts/lowpro.js"
       m.file "IE7.js",             "public/javascripts/IE7.js"
+      m.file "blank.gif",          "public/javascripts/blank.gif"
       m.file "nicedit.js",         "public/javascripts/nicedit.js"
       m.file "nicEditorIcons.gif", "public/images/nicEditorIcons.gif"
       m.file "reset.css",          "public/stylesheets/reset.css"
@@ -25,7 +26,14 @@ class HoboRapidGenerator < Hobo::Generator
   def import_tags
     path = File.join(RAILS_ROOT, "app/views/taglibs/application.dryml")
 
-    tag = %(<include src="rapid" plugin="hobo"/>\n\n<set-theme name="clean"/>\n)
+    tag = %(<include src="rapid" plugin="hobo"/>
+
+<include src="taglibs/auto/rapid/cards"/>
+<include src="taglibs/auto/rapid/pages"/>
+<include src="taglibs/auto/rapid/forms"/>
+
+<set-theme name="clean"/>
+)
 
     src = File.read(path)
     return if src.include?(tag)

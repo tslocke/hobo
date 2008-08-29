@@ -2,15 +2,15 @@
 
     >> require 'hobosupport'
 
-## `Enumerable#search`
+## `Enumerable#map_and_find`
 
-* `enum.search(not_found) { |element| block}`
+* `enum.map_and_find(not_found) { |element| block}`
 
 Iterates through an enumerable passing each element in turn to the block. Returns the first true value returned by the block, or `not_found` if the block never returns a true value.
 
 E.g. The length of the first word that starts with a capital letter
 
-    >> %w(my name is Fred).search { |s| s.length if s =~ /^[A-Z]/ }
+    >> %w(my name is Fred).map_and_find { |s| s.length if s =~ /^[A-Z]/ }
     => 4
 
 ## `Enumerable#map_with_index`

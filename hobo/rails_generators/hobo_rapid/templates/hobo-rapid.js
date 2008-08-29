@@ -234,58 +234,6 @@ var Hobo = {
         return nic.instanceById(element)
     },
 
-    applyEvents: function(root) {
-        root = $(root)
-        function select(p) {
-            return new Selector(p).findElements(root)
-        }
-
-        select(".in-place-textfield-bhv").each(function (el) {
-            var ipe = Hobo._makeInPlaceEditor(el)
-            ipe.getText = function() {
-                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
-            }
-        })
-
-        select(".in-place-textarea-bhv").each(function (el) {
-            var ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
-            ipe.getText = function() {
-                return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
-            }
-        })
-
-        select(".in-place-html-textarea-bhv").each(function (el) {
-            var nicEditPresent = typeof(nicEditor) != "undefined"
-            var options = { rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save" }
-            if (nicEditPresent) options["submitOnBlur"] = false
-            var ipe = Hobo._makeInPlaceEditor(el, options) 
-            if (nicEditPresent) {
-                ipe.afterEnterEditMode = function() {
-                    var editor = this._controls.editor
-                    var id = editor.id = Hobo.uid()
-                    var nicInstance = Hobo.makeNicEditor(editor)
-                    var panel = this._form.down(".nicEdit-panel")
-                    panel.appendChild(this._controls.cancel)
-                    panel.appendChild(this._controls.ok)
-                    bkLib.addEvent(this._controls.ok,'click', function () {
-                        nicInstance.saveContent()
-                        setTimeout(function() {nicInstance.remove()}, 1)
-                    })
-                }
-            }
-        })
-
-        select("select.number-editor-bhv").each(function(el) {
-            el.onchange = function() {
-                Hobo.ajaxSetFieldForElement(el, $F(el))
-            }
-        })
-                                                
-        select(".search-bhv").each(function(el) {
-            new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
-        });
-    },
-
 
     doSearch: function(el) {
         el = $(el)
@@ -407,20 +355,11 @@ var Hobo = {
     },
 
 
-    appendRow: function(el, rowSrc) {
-        // IE friendly method to add a <tr> (from html source) to a table
-        // el should be an element that contains *only* a table
-        el = $(el);
-        el.innerHTML = el.innerHTML.replace("</table>", "") + rowSrc + "</table>";
-        Hobo.applyEvents(el)
-    },
-
-
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
             id = Hobo.getModelId(el)
-            if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
+            if (id) m = id.match(/^([a-z0-9-]+)-([0-9]+)(-[a-z0-9-]*)?$/);
             if (m) break;
             el = el.parentNode;
         }
@@ -461,8 +400,8 @@ var Hobo = {
 
 
     updateElement: function(id, content) {
+        // TODO: Do we need this method?
         Element.update(id, content)
-        Hobo.applyEvents(id)
     },
 
     getStyle: function(el, styleProp) {
@@ -494,8 +433,26 @@ var Hobo = {
         }
 
         return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
-    }
+    },
+    
+    
+    fixSectionGroup: function(e) {
+        alert(e.outerHTML)
+	    rows = e.childElements().map(function(e, i) {
+    	    cells = e.childElements().map(function(e, i) {
+        	    return e.outerHTML.sub("<DIV", "<td  valign='top'").sub(/<\/DIV>$/i, "</td>")
+            }).join('')
 
+            var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
+            return "<tr" + attrs + ">" + cells + "</tr>"
+	    }).join("\n")
+
+        var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
+
+	    var table= "<table cellpadding='0' cellspacing='0' border='0' style='border-collapse: collapse; border-spacing: 0'" + attrs + ">" + 
+	               rows + "</table>"
+	    e.outerHTML = table
+    }
 
 }
 
@@ -629,6 +586,10 @@ AutocompleteBehavior = Behavior.create({
 
 
 Event.addBehavior({
+    
+    'div.section-group' : function() {
+        if (Prototype.Browser.IE) Hobo.fixSectionGroup(this);
+    },
 
     'textarea.html' : function(e) {
         if (typeof(nicEditors) != "undefined") {
@@ -640,22 +601,68 @@ Event.addBehavior({
 
     '.association-count:click' : function(e) {
 	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
-	Event.stop(e);
+	    Event.stop(e);
     },
 
     'form.filter-menu select:change': function(event) {
         var paramName = this.up('form').down('input[type=hidden]').value.gsub("-", "_")
         var params = {}
         var remove = [ 'page' ]
-	if ($F(this) == '') { 
+	    if ($F(this) == '') { 
             remove.push(paramName)
         } else {
             params[paramName] = $F(this)
-	}
-	location.href = Hobo.addUrlParams(params, {remove: remove})
+	    }
+	    location.href = Hobo.addUrlParams(params, {remove: remove})
     },
 
-    '.autocompleter' : AutocompleteBehavior()
+    '.autocompleter' : AutocompleteBehavior(),
+
+    '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
+     function (el) {
+        var ipe = Hobo._makeInPlaceEditor(el)
+        ipe.getText = function() {
+            return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
+        }
+    },
+
+    '.text.in-place-edit' : function (el) {
+        var ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
+        ipe.getText = function() {
+            return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
+        }
+    },
+
+    ".html.in-place-edit" : function (el) {
+        var nicEditPresent = typeof(nicEditor) != "undefined"
+        var options = { rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save" }
+        if (nicEditPresent) options["submitOnBlur"] = false
+        var ipe = Hobo._makeInPlaceEditor(el, options) 
+        if (nicEditPresent) {
+            ipe.afterEnterEditMode = function() {
+                var editor = this._controls.editor
+                var id = editor.id = Hobo.uid()
+                var nicInstance = Hobo.makeNicEditor(editor)
+                var panel = this._form.down(".nicEdit-panel")
+                panel.appendChild(this._controls.cancel)
+                panel.appendChild(this._controls.ok)
+                bkLib.addEvent(this._controls.ok,'click', function () {
+                    nicInstance.saveContent()
+                    setTimeout(function() {nicInstance.remove()}, 1)
+                })
+            }
+        }
+    },
+
+    "select.integer.editor" : function(el) {
+        el.onchange = function() {
+            Hobo.ajaxSetFieldForElement(el, $F(el))
+        }
+    },
+                                            
+    "input.live-search[type=text]" : function(el) {
+        new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
+    }
 
 
 });

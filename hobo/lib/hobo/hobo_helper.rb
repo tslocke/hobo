@@ -60,19 +60,21 @@ module Hobo
 
       if obj.respond_to?(:member_class)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
+        
+        owner_name = obj.origin.class.reverse_reflection(obj.origin_attribute).name.to_s
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
-          action = :"new_#{obj.origin_attribute.to_s.singularize}"
+          action = :"new_for_#{owner_name}"
         elsif action.nil?
+          action_path = obj.origin_attribute
           if method.to_s == 'post'
-            action_path = obj.origin_attribute
-            action = :"create_#{obj.origin_attribute.to_s.singularize}"
+            action = :"create_for_#{owner_name}"
           else
-            action = obj.origin_attribute
+            action = :"index_for_#{owner_name}"
           end
         end
+        klass = obj.member_class
         obj = obj.origin
-
       else
         action ||= case options[:method].to_s
                    when 'put';    :update
@@ -85,9 +87,10 @@ module Hobo
           # Asking for url to post new record to
           obj = obj.class
         end
+        
+        klass = obj.is_a?(Class) ? obj : obj.class
       end
 
-      klass = obj.is_a?(Class) ? obj : obj.class
       if Hobo::ModelRouter.linkable?(klass, action, options)
 
         url = base_url_for(obj, subsite, action)
@@ -143,7 +146,7 @@ module Hobo
 
 
     def model_id_class(object=this, attribute=nil)
-      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute)}" : ""
+      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute).dasherize}" : ""
     end
 
 
@@ -185,8 +188,8 @@ module Hobo
     end
 
 
-    def can_create?(object=nil)
-      Hobo.can_create?(current_user, object || this)
+    def can_create?(object=this)
+      Hobo.can_create?(current_user, object)
     end
 
 
@@ -240,7 +243,7 @@ module Hobo
     end
 
 
-    def select_viewable(collection)
+    def select_viewable(collection=this)
       collection.select {|x| can_view?(x)}
     end
 
@@ -387,7 +390,7 @@ module Hobo
 
     # FIXME: this should interrogate the routes to find index methods, not the models
     def front_models
-      Hobo.models.select {|m| linkable?(m) }
+      Hobo::Model.all_models.select {|m| linkable?(m) }
     end
 
 

@@ -20,7 +20,7 @@
 %></def>
 
 
-<def tag="form" attrs="to, update, hidden-fields, action, method, web-method, lifecycle"><%= 
+<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
   new_record = this.try.new_record?
@@ -31,7 +31,18 @@
              method.downcase
            end
 
-  html_attrs[:action] = action || object_url(to || this, web_method || lifecycle, :method => method)
+
+
+  html_attrs[:action] = action || begin
+     target = if owner
+                collection_name = this.class.reverse_reflection(owner).name
+                this.send(owner).send(collection_name)
+              else
+                this
+              end
+     action = web_method || lifecycle
+     object_url(target, action, :method => method)
+   end
    
   if html_attrs[:action].nil? || (lifecycle.nil? && new_record && !this.user_can_create?(current_user))
     Hobo::Dryml.last_if = false
@@ -51,8 +62,7 @@
       html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
     end
      
-    body, field_names = scope.new_scope do
-      scope[:in_form] = true
+    body, field_names = scope.new_scope :in_form => true do
       with_form_context { parameters.default }
     end
      
@@ -105,7 +115,7 @@
   elsif !(force || can_edit?)
     view
   else
-    attrs = add_classes(attributes, type_id, type_and_field)
+    attrs = add_classes(attributes, type_id.dasherize, type_and_field.dasherize)
     attrs[:name] ||= param_name_for_this
     the_input = if (refl = this_field_reflection)
                   if refl.macro == :belongs_to
@@ -132,15 +142,15 @@
 
 
 <def tag="input" for="text" attrs="name">
-  <%= text_area_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= text_area_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="boolean" attrs="name">
-  <%= check_box_tag(name, '1', this, attributes.reverse_merge(:id => nil)) + hidden_field_tag(name, '0') %>
+  <%= check_box_tag(name, '1', this, attributes) + hidden_field_tag(name, '0') %>
 </def>
   
 <def tag="input" for="password" attrs="name">
-  <%= password_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= password_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="date" attrs="order">
@@ -154,19 +164,19 @@
 </def>
 
 <def tag="input" for="integer" attrs="name">
-  <%= text_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="float" attrs="name">
-  <%= text_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="string" attrs="name">
-  <%= text_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="big_integer" attrs="name">
-  <%= text_field_tag(name, this, attributes.reverse_merge(:id => nil)) %>
+  <%= text_field_tag(name, this, attributes) %>
 </def>
 
 <def tag="input" for="HoboFields::EnumString" attrs="labels, titleize"><%
@@ -234,7 +244,6 @@
         button_to(label, url, attributes)
       else
         fade = true if fade.nil?
-        scope.collection_contains_delete_button = true if fade
         attributes[:value] = label
         attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
         element(:input, attributes, nil, true, true)
@@ -276,7 +285,7 @@
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this, this_field_reflection).conditions
+  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
@@ -315,8 +324,8 @@
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
-    <ul:errors.full_messages param>
-      <li: param><%= this %></li:>
+    <ul param>
+      <li repeat="errors.full_messages" param><%= this %></li>
     </ul>
   </section>
 </def>
@@ -365,6 +374,6 @@
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
   <select merge-attrs param="default">
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
-    <do param="options"><% options_for_select(options.*.to_s, selected) %></do>
+    <do param="options"><% options_for_select(options.*.to_s, selected.to_s) %></do>
   </select>
 </def>

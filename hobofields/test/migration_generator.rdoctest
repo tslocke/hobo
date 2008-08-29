@@ -12,6 +12,7 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
 And we'll require:
 
     >> require 'activerecord'
+    >> require 'action_controller'
     >> require 'hobofields'
 
 We also need to get ActiveRecord set up with a database connection
@@ -184,7 +185,7 @@ Let's apply that change to the database
     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => "change_column :adverts, :title, :text"
+    => "change_column :adverts, :title, :text, :limit => nil"
     >> down
     => "change_column :adverts, :title, :string"
 
@@ -200,10 +201,40 @@ Let's apply that change to the database
     end
     >> up, down = migrate
     >> up
-    => 'change_column :adverts, :title, :string, :default => "Untitled"'
+    => 'change_column :adverts, :title, :string, :default => "Untitled", :limit => 255'
     >> down
     => "change_column :adverts, :title, :string"
+    
+    
+### Limits
 
+    >>
+    class Advert
+      fields do
+        price :integer, :limit => 4
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    "add_column :advert, :integer, :limit => 4"
+
+
+Note that limit on a decimal column is ignored (use :scale and :precision)
+    
+    >>
+    class Advert
+      fields do
+        price :decimal, :limit => 4
+      end
+    end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    => "add_column :adverts, :price, :decimal"
+
+Cleanup
+
+    >> Advert.field_specs.delete :price
+    
 
 ### Foreign Keys
 
@@ -379,7 +410,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     >> up
     =>""
     rename_column :adverts, :title, :name
-    change_column :adverts, :name, :string, :default => "No Name"
+    change_column :adverts, :name, :string, :default => "No Name", :limit => 255
     >> down
     =>""
     rename_column :adverts, :name, :title
@@ -404,6 +435,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
     add_column :ads, :created_at, :datetime
     >>
+    
 
 ## Cleanup
 

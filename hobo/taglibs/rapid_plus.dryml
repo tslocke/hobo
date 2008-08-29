@@ -33,12 +33,10 @@
         <th if="&all_parameters[:controls]" class="controls"></th>
       </field-heading-row>
     </table>    
-    <do param="empty-message" if="empty?">No <name-for-collection lowercase/> to display</do>
+    <do param="empty-message" if="empty?">No <collection-name lowercase/> to display</do>
 
    
-    <nav class="page" if="&this.respond_to? :page_count">
-      <page-nav param/>
-    </nav>
+    <page-nav param if="&this.respond_to? :page_count"/>
   </div>
 </def>
 
@@ -54,4 +52,30 @@
       <submit label="Change Password" param/>
     </div>
   </form>
+</def>
+
+
+<def tag="sortable-collection" attrs="sortable-options"><%
+  singular_name = this.member_class.name.underscore
+  attributes[:id] ||= "#{singular_name}_ordering"
+  reorder_url = send("reorder_#{singular_name.pluralize}_url")
+%>
+  <collection class="sortable" merge>
+    <item: id="#{singular_name}_#{this.id}" param>
+      <div class="ordering-handle" param="handle">&uarr;<br/>&darr;</div>
+      <card param/>
+    </item:>
+  </collection>
+  <%= if Hobo::Dryml.last_if
+        opts = { :url => reorder_url,
+                 :constraint => :vertical,
+                 :overlap => :vertical,
+                 :scroll => :window,
+                 :handle => 'ordering-handle',
+                 :complete => [visual_effect(:highlight, attributes[:id])]
+                }
+        opts.update(sortable_options) if sortable_options
+        sortable_element attributes[:id], opts
+      end # FIXME: Make unobstrusive
+   %>
 </def>

@@ -2,23 +2,24 @@
 
   <body: class="front-page"/>
 
-  <content-header:>
-    <h1 class="front-page-title">Welcome to <app-name/></h1>
-    <section class="welcome-message">
-      <h3>Congratulations! Your Hobo Rails App is up and running</h3>
-      <ul>
-        <li>To customise this page: edit app/views/<%= file_name %>/index.dryml</li>
-      </ul>
-    </section>
-  </content-header>
+  <content:>
+    <header>
+      <h1>Welcome to <app-name/></h1>
+      <section class="welcome-message">
+        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
+        <ul>
+          <li>To customise this page: edit app/views/front/index.dryml</li>
+        </ul>
+      </section>
+    </header>
 
-  <content-body:>
-    <ul with="&front_models">
-      <li:>
-        <collection-preview/>
+    <section class="body" repeat="&front_models">
+      <div class="model">
+        <h3><type-name plural/></h3>
+        <collection:recent/>
         <p if="&can_create? && linkable?(:new)">Create a <a to="&this" action="new"/>.</p>
-      </li:>
-    </ul>  
-  </content-body>
+      </div>
+    </section>
+  </content:>
   
 </page>

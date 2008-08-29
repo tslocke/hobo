@@ -28,8 +28,8 @@ module HoboFields
 
     def load_rails_models
       if defined? RAILS_ROOT
-        Dir["#{RAILS_ROOT}/app/models/**/[a-z]*.rb"].each do |f|
-          _, filename = *f.match(%r{/app/models/([_a-z/]*).rb$})
+        Dir["#{RAILS_ROOT}/app/models/**/[a-z0-9_]*.rb"].each do |f|
+          _, filename = *f.match(%r{/app/models/([_a-z0-9/]*).rb$})
           filename.camelize.constantize
         end
       end
@@ -125,6 +125,13 @@ module HoboFields
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities in table #{table_name}"
       end
     end
+    
+    
+    def always_ignore_tables
+      sessions_table = CGI::Session::ActiveRecordStore::Session.table_name if
+        ActionController::Base.session_store == CGI::Session::ActiveRecordStore
+      ['schema_info', 'schema_migrations',  sessions_table].compact
+    end
 
 
     def generate
@@ -133,7 +140,7 @@ module HoboFields
       model_table_names = models.*.table_name
 
       to_create = model_table_names - db_tables
-      to_drop = db_tables - model_table_names - ['schema_info', 'schema_migrations']
+      to_drop = db_tables - model_table_names - always_ignore_tables
       to_change = model_table_names
 
       to_rename = extract_table_renames!(to_create, to_drop)

@@ -20,7 +20,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "0.7.5"
+  VERSION = "0.7.99.1"
 
   class RawJs < String; end
 
@@ -50,27 +50,6 @@ module Hobo
 
     def user_model
       @user_model && @user_model.constantize
-    end
-
-
-    def models=(models)
-      @models = models.*.name
-    end
-
-
-    def models
-      unless @models_loaded
-        Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
-          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
-        end
-        @models_loaded = true
-      end
-      @models.*.constantize
-    end
-
-
-    def register_model(model)
-      @models << model.name unless @models.include? model.name
     end
 
 
@@ -108,7 +87,7 @@ module Hobo
         begin
           # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
           # By default, search all models, but filter out...
-          Hobo.models.select do |m|
+          Hobo::Model.all_models.select do |m|
             ModelRouter.linkable?(m, :show) &&  # ...non-linkables
               m.search_columns.any?             # and models with no search-columns
           end
@@ -133,12 +112,6 @@ module Hobo
 
     def add_routes(m)
       Hobo::ModelRouter.add_routes(m)
-    end
-
-
-    # FIXME: This method won't be needed
-    def all_models
-      Hobo.models.map { |m| m.name.underscore }
     end
 
 
@@ -342,7 +315,13 @@ module Hobo
     end
 
     attr_writer :static_tags
-
+    
+    
+    def subsites
+      # Any directory inside app/controllers defines a subsite
+      @subsites ||= Dir["#{RAILS_ROOT}/app/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
+    end
+    
 
     private
 
@@ -387,8 +366,8 @@ module Hobo
       require 'active_record/association_reflection'
       require 'action_view_extensions/helpers/tag_helper'
 
-      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-
+      Hobo::Dryml.enable
+      
       Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
 
       require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
@@ -421,7 +400,6 @@ module Hobo
   ModelExtensions = classy_module do
     def self.hobo_model
       include Hobo::Model
-      fields # force hobofields to load
     end
     def self.hobo_user_model
       include Hobo::Model
@@ -436,10 +414,8 @@ module Hobo
 
 end
 
-
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
-::HOBO_ROOT = File.dirname(__FILE__) + "/.."
-
+::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 if defined? HoboFields
   HoboFields.never_wrap(Hobo::Undefined)

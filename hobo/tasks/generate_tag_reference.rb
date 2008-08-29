@@ -5,10 +5,6 @@ Dependencies.load_paths << File.dirname(__FILE__) + "/../lib"
 require 'rexml/xpath'
 XPath = REXML::XPath
 
-gem 'maruku'
-require 'maruku'
-
-
 def tag_title(tag, link=false)
   if tag.is_a? String
     name = tag
@@ -134,6 +130,8 @@ namespace :hobo do
 
   desc "Generate markdown formatted reference docs automatically from DRYML taglibs"
   task :generate_tag_reference do
+    gem 'maruku'
+    require 'maruku'
 
     src = ENV['src']
 

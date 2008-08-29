@@ -3,14 +3,12 @@
 <include src="rapid_support"/>
 <include src="rapid_document_tags"/>
 <include src="rapid_pages"/>
-<include src="rapid_lifecycle_pages"/>
 <include src="rapid_editing"/>
 <include src="rapid_forms"/>
 <include src="rapid_navigation"/>
 <include src="rapid_plus"/>
 <include src="rapid_generics"/>
 <include src="rapid_lifecycles"/>
-
 
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "view" %>
@@ -31,25 +29,8 @@
 
 <def tag="item"><% scope.items << parameters.default %></def>
 
-<def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
-<def tag="ul" attrs="empty">
-  <% if all_parameters.li? # don't use dryml if, because it will mess up <ul/><else> %>
-    <if test="&empty || all_parameters[:head] || all_parameters[:foot] || !this.empty?">
-      <% element "ul", attributes do %>
-      <do param="head"/>
-      <repeat>
-        <li param if="&can_view?" class="#{scope.even_odd} #{this_type.name.underscore.dasherize} #{model_id_class}">
-          <do param="default"><a/></do>
-        </li>
-      </repeat>
-      <do param="foot"/>
-      <% end %>
-    </if>
-  <% else %>
-    <%= element("ul", attributes, all_parameters.default) %>
-  <% end %>      
-</def>
+<def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
 
 <def tag="table" attrs="fields, field-tag, empty">
@@ -102,13 +83,14 @@
 
 
 <def tag="hobo-rapid-javascripts"><%=
-   res = '<script type="text/javascript">var hoboParts = {};'
+   res = 'var hoboParts = {};'
    # FIXME: This should interrogate the model-router - not the models
-   unless Hobo.all_models.empty?
+   unless Hobo::Model.all_models.empty?
      # Tell JS code how to pluralize names, unless they follow the simple rule
-     names = Hobo.all_models.map do |m|
-                                "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
-                              end.compact
+     names = Hobo::Model.all_models.map do |m|
+                                          m = m.name.underscore
+                                          "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+                                        end.compact
      res << "var pluralisations = {#{names * ', '}}; "
    end
    base = [base_url, subsite].compact.join("/")
@@ -116,7 +98,6 @@
    if request_forgery_protection_token
      res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
    end
-   res << "</script>"
    res
 %></def>
 
@@ -151,11 +132,12 @@
 %></def>
      
 
-<def tag="name-for-collection" attrs="singular, lowercase"><%=
+<def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
   name = (attr = this.try.origin_attribute and attr.to_s) || type_name(:plural => true)
   name = name.titleize
   name = name.singularize if singular
   name = name.downcase if lowercase
+  name = name.underscore.gsub('_', '-') if dasherize
   name
 %></def>
 
@@ -238,7 +220,7 @@
               this.to_s
             end
           else
-            attrs = add_classes(attributes, "view", type_and_field, model_id_class)
+            attrs = add_classes(attributes, "view", type_and_field._?.dasherize, model_id_class)
 
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)
@@ -287,7 +269,7 @@
 <def tag="view" for="ActiveRecord::Base"><a/></def>
 
 
-<def tag="count" attrs="label, prefix, if-any, lowercase"><%=
+<def tag="count" attrs="label, prefix, if-any, lowercase"><span class="count"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
   c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
@@ -315,7 +297,7 @@
       main
     end
   end
-%></def>
+%></span></def>
 
 
 <def tag="theme-stylesheet" attrs="name">
@@ -399,12 +381,12 @@ in the future - use at your own risk. -->
 
 
 <def tag="a-or-an" attrs="word"><%=
-  (word =~ /^[aeiouh]/i ? "an " : "a ") + word
+  (word =~ /^[aeiou]/i ? "an " : "a ") + word
 %></def>
 
 
 <def tag="A-or-An" attrs="word"><%=
-  (word =~ /^[aeiouh]/i ? "An " : "A ") + word
+  (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
 
 
@@ -412,11 +394,12 @@ in the future - use at your own risk. -->
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu">
     <div>
-    <input type="hidden" name="filter-parameter" value="&param_name"/>
-    <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
+      <input type="hidden" name="filter-parameter" value="&param_name"/>
+      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
     </div>
   </form>
 </def>
 
 
 <def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
+

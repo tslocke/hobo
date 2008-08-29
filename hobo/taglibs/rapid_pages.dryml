@@ -1,269 +1,62 @@
-<def tag="base-page" attrs="title, full-title, nicedit">
+<def tag="page" attrs="title, full-title">
   <% full_title ||= "#{title} : #{app_name}" %>
   <html merge-attrs>
     <head param>
-      <title param><%= full_title.gsub(/<.*?>/, '') %></title>
+      <title param><%= strip_tags full_title %></title>
       <do param="stylesheets">
         <stylesheet name="reset"/>
         <stylesheet name="hobo-rapid"/>
+        <theme-stylesheet/>
         <stylesheet name="application"/>
       </do>
 
       <do param="scripts">
-        <javascript param name="#{'nicedit, ' if nicedit} prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
         <if-ie version="lt IE 7" param="fix-ie6"><javascript name="IE7"/></if-ie>
-        <hobo-rapid-javascripts param/>
       </do>
     </head>
 
-    <body onload="Hobo.applyEvents();" param/>
-  </html>
-</def>
-
-<def tag="simple-layout">
-  <base-page merge>
-    <body: param>
-      <ajax-progress/>
+    <body param>
+      <ajax-progress param/>
       <header class="page-header" param>
         <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
         <live-search param if="&defined_route? :site_search"/>
-        <nav param>
-          <account-nav if="&Hobo::User.default_user_model" param/>
-          <main-nav param/>
-        </nav>
+        <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
+        <main-nav param/>
       </header>
-      <section class="page-content" param="content">
-        <flash-message param/>
-        <flash-message type="error" param="flash-error-message"/>
-        <header class="content-header" param="content-header"/>
-        <section class="content-body" param="content-body"/>
-        <footer class="content-footer" param="content-footer"/>
+      <section param="content-wrapper">
+        <flash-messages param/>
+        <section param="content"/>
       </section>
       <footer class="page-footer" param/>
-      <part-contexts-javascripts/>
-    </body:>
-  </base-page>
+      <page-scripts param/>
+    </body>
+  </html>
 </def>
 
 
-<def tag="aside-layout">
-  <simple-layout merge>
-    <body: class="aside-layout" param/>
-    <content: param>
-      <section class="main-content" param="main-content">
-        <param-content for="content"/>
-      </section>
-      <aside class="aside-content" empty param/>
-    </content:>
-  </simple-layout>
+
+<def tag="page-scripts">
+  <script type="text/javascript" param="default">
+    <hobo-rapid-javascripts/>
+    <part-contexts-storage/>
+  </script>
 </def>
 
 
-<def tag="page" attrs="layout"><call-tag tag="#{layout || 'simple'}-layout" merge/></def>
-
-
-<def tag="index-page">
-  <set model="&this.try.member_class || self.model"/>
-  <set model-name="&model.name.titleize"/>
-  <page title="All #{type_name :with => model, :plural => true}" merge>
-    <body: class="index-page #{type_id model}" param/>
-    <content-header: param>
-      <h2 param="heading"><type-name with="&model" plural/></h2>
-      <p class="note" param="count">
-        <if>There <count prefix="are"/></if>
-        <else>There aren't any <type-name lowercase plural/> yet.</else>
-      </p>
-    </content-header:>
-
-    <content-body: param>
-      <nav param="top-pagination-nav"><page-nav/></nav>
-      
-      <collection param><empty-message:></empty-message:></collection>
-      
-      <nav param="bottom-pagination-nav"><page-nav/></nav>
-    </content-body>
-    
-    <content-footer: param>
-      <new-link-or-form model="&model" merge-params/>
-    </content-footer:>
-  </page>
-</def>
-
-
-<def tag="new-page">
-  <page title="New #{type_name}" merge>
-    <body: class="new-page #{type_name :dasherize => true}" param/>
-    <content-header: param>
-      <h2 param="heading">New <type-name title/></h2>
-    </content-header>
-
-    <content-body: param>
-      <error-messages param/>
-
-      <form param>
-        <field-list param/>
-        <div class="actions" param="actions">
-          <submit label="Create #{type_name}" param/><or-cancel param/>
-        </div>
-      </form>
-    </content-body>
-  </page>
-</def>
-
-
-<def tag="show-page" attrs="primary-collection">
-  <set primary-collection-name="&(primary_collection || self.primary_collection_name).to_s" model="&this.class"/>
-  <set boolean-fields="&model.columns.select {|c| c.type == :boolean }.*.name"/>
-  <set skip-fields="&boolean_fields + [model.name_attribute, model.primary_content_attribute, model.creator_attribute, model.dependent_on.first].compact"/>
-  <set flags="&boolean_fields.map {|f| f.titleize if this.send(f)}.compact.join(', ')"/>
-
-  <page merge title="#{name :no_wrapper => true}">
-
-    <body: class="show-page #{type_name :dasherize => true}" param/>
-
-    <content-header: param>
-      <if with="&this.dependent_on.reject{|x| x.is_a?(Hobo::User)}.first">
-        <div class="container"><a>&laquo; <name/></a></div>
-      </if>
-
-      <h2 param="heading"><name/></h2>
-
-      <div class="flags" param="flags"><flags/></div>
-      
-      <creation-details param/>
-      <do field="&primary_collection_name" if="&primary_collection_name" param="primary-collection-count">
-        <association-count class="primary-collection-count" part="primary-collection-count"/>
-      </do>
-                         
-      <a action="edit" class="edit" if="&linkable?(:edit) && can_edit?" param="edit-link">Edit <type-name/></a>
-    </content-header>
-    
-    <content-body: param>
-      <primary-content param/>
-
-      <field-list skip="&skip_fields" skip-associations="has_many" param/>
-
-      <with-primary-collection name="&primary_collection_name" if="&primary_collection_name">
-        <section class="primary-collection">
-          <h3 param="primary-collection-heading"><primary-collection-name.titleize/></h3>
-
-          <do param="primary-collection">
-            <collection part="primary-collection" sortable>
-              <card:><delete-button: update="primary-collection-count"></delete-button:></card:>
-            </collection>
-          </do>
-
-          <do with="&@this.send(primary_collection_name)">
-            <if test="&can_create?" param="primary-collection-add">
-              <nav class="new-link"><a action="new" if="&linkable?(:new) && can_create?"/></nav>
-              <else>
-                <section class="create-new" with="&new_for_current_user">
-                  <h3>Add <A-or-An word="&primary_collection_name.singularize.titleize"/></h3>
-                  <form to="&@this.send(primary_collection_name)" method="post" 
-                        update="primary-collection, primary-collection-count"
-                        message="Adding #{primary_collection_name.singularize.titleize}..." reset-form param="add-new-form">
-                    <field-list skip="#{@this.class.reverse_reflection(@this.send(primary_collection_name).proxy_reflection.name).name}"
-                                skip-associations="has_many" param="primary-collection-field-list"/>
-                    <submit label="Add"/>
-                  </form>
-                </section>
-              </else>
-            </if>
-          </do>
-        </section>
-      </with-primary-collection>
-    </content-body:>
-
-    <aside: param>
-      <section class="preview-collections">
-        <with-fields fields="&non_through_collections - [(primary_collection_name.to_sym unless primary_collection_name.blank?)]">
-          <collection-preview class="#{this_field.dasherize}"/>
-        </with-fields>
-      </section>
-    </aside:>
-
-  </page>
-</def>
-
-
-<def tag="edit-page">
-  <page merge>    
-    <body: class="edit-page #{type_name :dasherize => true}" param/>
-    <content-header: param>
-      <h2 param="heading"><if test="&this.respond_to? :name"><name/></if><else><type-name/></else></h2>
-      <delete-button label="Remove This #{type_name}" param/>
-    </content-header>
-
-    <content-body: param>
-      <error-messages param/>
-      <form param>
-        <field-list param/>
-        <div class="actions" param="actions">
-          <submit label="Save Changes" param/><or-cancel param/>
-        </div>
-      </form>
-          
-    </content-body>
-  </page>
-</def>
-
-
-<def tag="new-in-collection-page">
-  <set association-name="&@association.origin_attribute.to_s"/>
-  <page title="New #{type_name}" merge>
-    <body: class="new-in-collection-page #{association_name.underscore.dasherize} #{type_name :dasherize => true}" param/>
-    <content-header: param>
-      <h2 param="heading">New <association-name.singularize.titleize/></h2>
-      <h3 class="subheading" param>For: <a with="&@association.origin"/></h3>
-    </content-header>
-
-    <content-body: param>
-      <error-messages/>
-
-      <form to="&@association" method="post" param>
-        <field-list skip="#{@association.origin.class.reverse_reflection(association_name.to_sym).name}" param/>
-        <div class="actions" param="actions">
-          <submit label="Create #{association_name.singularize.titleize}" param/>
-          <or-cancel with="&@association.origin" param/>
-        </div>
-      </form>
-    </content-body>
-  </page>
-</def>
-
-
-<def tag="show-collection-page">
-  <% title = "#{this.origin_attribute.to_s.titleize} for #{name(:with => this.origin)}" %>
-  <page title="&title" merge>
-    <body: class="show-collection-page #{type_name(:with => this.origin, :dasherize => true)} #{type_name(:plural => true, :dasherize => true)}" param/>
-    <content-header: param>
-      <nav param="back-to">Back to <a:origin/></nav>
-      <h2 param="heading"><%= title %></h2>
-      <h3 class="subheading" param><count/></h3>
-    </content-header>
-
-    <content-body: param>
-      <nav param="top-pagination-nav"><page-nav/></nav>
-
-      <collection param/>
-      
-      <nav param="bottom-pagination-nav"><page-nav/></nav>
-      
-      <nav if="&Hobo.simple_has_many_association?(this)" param="new-link">
-        <a action="new"/>
-      </nav>
-    </content-body>
-  </page>
-</def>
+<def tag="index-page" polymorphic/>
+<def tag="new-page"   polymorphic/>
+<def tag="show-page"  polymorphic/>
+<def tag="edit-page"  polymorphic/>
 
 
 <def tag="permission-denied-page" attrs="message">
   <% message ||= "That operation is not allowed" %>
   <page merge>
     <body: class="permission-denied"/>
-    <content-header: param>
+    <content: param>
       <h2 param="heading"><message/></h2>
-    </content-header>
+    </content:>
   </page>
 </def>
 
@@ -272,9 +65,9 @@
   <% message ||= "The page you were looking for could not be found" %>
   <page merge>
     <body: class="not-found"/>
-    <content-header: param>
+    <content: param>
       <h2 param="heading"><message/></h2>
-    </content-header>
+    </content:>
   </page>
 </def>
 
@@ -345,10 +138,15 @@
 
 
 <def tag="flash-message" attrs="type">
-  <% type = type ? type.to_sym : :notice %>
+  <% type = type ? type.to_sym : :notice -%>
   <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
 </def>
 
+
+<def tag="flash-messages" attrs="names"><%=
+  names = names.nil? ? flash.keys : comma_split(names)
+  names.map { |name| flash_message :type => name }
+%></def>
 
 <def tag="ajax-progress">
   <div id="ajax-progress">

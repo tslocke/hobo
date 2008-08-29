@@ -2,8 +2,8 @@ module Hobo::Dryml
 
   class ScopedVariables
 
-    def initialize
-      @scopes = [{}]
+    def initialize(variables=nil)
+      @scopes = variables ? [variables] : []
     end
 
     def [](key)
@@ -11,12 +11,12 @@ module Hobo::Dryml
     end
 
     def []=(key, val)
-      s = scope_with_key(key) || @scopes.last
+      s = scope_with_key(key) or raise ArgumentError, "no such scoped variable: #{key}"
       s[key] = val
     end
 
-    def new_scope
-      @scopes << {}
+    def new_scope(variables)
+      @scopes << variables.dup
       res = yield
       @scopes.pop
       res
