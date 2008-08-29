@@ -11,7 +11,7 @@
 
 
 
- <% each_model do -%>
+ <% each_controller do -%>
   
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
