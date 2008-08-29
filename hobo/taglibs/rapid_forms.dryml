@@ -31,8 +31,6 @@
              method.downcase
            end
 
-
-
   html_attrs[:action] = action || begin
      target = if owner
                 collection_name = this.class.reverse_reflection(owner).name
@@ -44,7 +42,9 @@
      object_url(target, action, :method => method)
    end
    
-  if html_attrs[:action].nil? || (lifecycle.nil? && new_record && !this.user_can_create?(current_user))
+  if action.nil? && (html_attrs[:action].nil? ||
+                     (lifecycle.nil? && new_record && !this.user_can_create?(current_user)) ||
+                     (lifecycle.nil? && !new_record && !can_edit?))
     Hobo::Dryml.last_if = false
     ""
   else
