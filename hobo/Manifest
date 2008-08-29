@@ -74,7 +74,6 @@ rails_generators/hobo_front_controller/templates/controller.rb
 rails_generators/hobo_front_controller/templates/functional_test.rb
 rails_generators/hobo_front_controller/templates/helper.rb
 rails_generators/hobo_front_controller/templates/index.dryml
-rails_generators/hobo_front_controller/templates/search.dryml
 rails_generators/hobo_front_controller/USAGE
 rails_generators/hobo_model/hobo_model_generator.rb
 rails_generators/hobo_model/templates/fixtures.yml
@@ -91,6 +90,7 @@ rails_generators/hobo_model_resource/templates/controller.rb
 rails_generators/hobo_model_resource/templates/functional_test.rb
 rails_generators/hobo_model_resource/templates/helper.rb
 rails_generators/hobo_rapid/hobo_rapid_generator.rb
+rails_generators/hobo_rapid/templates/blank.gif
 rails_generators/hobo_rapid/templates/hobo-rapid.css
 rails_generators/hobo_rapid/templates/hobo-rapid.js
 rails_generators/hobo_rapid/templates/IE7.js
@@ -105,6 +105,10 @@ rails_generators/hobo_rapid/templates/themes/clean/public/images/spinner.gif
 rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/clean.css
 rails_generators/hobo_rapid/templates/themes/clean/public/stylesheets/rapid-ui.css
 rails_generators/hobo_rapid/templates/themes/clean/views/clean.dryml
+rails_generators/hobo_subsite/hobo_subsite_generator.rb
+rails_generators/hobo_subsite/templates/application.dryml
+rails_generators/hobo_subsite/templates/controller.rb
+rails_generators/hobo_subsite/templates/site_taglib.dryml
 rails_generators/hobo_user_controller/hobo_user_controller_generator.rb
 rails_generators/hobo_user_controller/templates/controller.rb
 rails_generators/hobo_user_controller/templates/functional_test.rb

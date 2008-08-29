@@ -13,7 +13,7 @@ require 'hobosupport/module'
 
 module HoboSupport
 
-  VERSION = "0.7.99.1"
+  VERSION = "0.7.99.2"
 
 end
 

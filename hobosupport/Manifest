@@ -13,6 +13,7 @@ lib/hobosupport/methodcall.rb
 lib/hobosupport/methodphitamine.rb
 lib/hobosupport/module.rb
 lib/hobosupport.rb
+Manifest
 Manifest.txt
 README.txt
 test/hobosupport/enumerable.rdoctest
@@ -22,4 +23,3 @@ test/hobosupport/metaid.rdoctest
 test/hobosupport/methodphitamine.rdoctest
 test/hobosupport/module.rdoctest
 test/hobosupport.rdoctest
-Manifest
