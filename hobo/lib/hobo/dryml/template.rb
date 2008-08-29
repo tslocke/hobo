@@ -730,7 +730,11 @@ module Hobo::Dryml
 
         replace_parameter_proc(el, metadata_name)
       else
-        attributes = el.attributes.map do |name, value|
+        attributes = el.attributes.dup
+        # Providing one of 'with' or 'field' but not the other should cancel out the other
+        attributes[:with] = "&nil"  if attributes.key?(:field) && !attributes.key?(:with)
+        attributes[:field] = "&nil" if !attributes.key?(:field) && attributes.key?(:with)
+        attribute_items = attributes.map do |name, value|
           if name.in?(VALID_PARAMETER_TAG_ATTRIBUTES)
             # just ignore
           elsif name.in?(SPECIAL_ATTRIBUTES)
@@ -741,7 +745,7 @@ module Hobo::Dryml
         end.compact
 
         nested_parameters_hash = parameter_tags_hash(el, metadata_name)
-        "proc { [{#{attributes * ', '}}, #{nested_parameters_hash}] #{nl}}"
+        "proc { [{#{attribute_items * ', '}}, #{nested_parameters_hash}] #{nl}}"
       end
     end
 
