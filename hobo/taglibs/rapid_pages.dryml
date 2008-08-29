@@ -55,7 +55,9 @@
   <page merge>
     <body: class="permission-denied"/>
     <content: param>
-      <h2 param="heading"><message/></h2>
+      <header param="content-header">
+        <h2 param="heading"><message/></h2>
+      </header>
     </content:>
   </page>
 </def>
@@ -66,7 +68,9 @@
   <page merge>
     <body: class="not-found"/>
     <content: param>
-      <h2 param="heading"><message/></h2>
+      <header param="content-header">
+        <h2 param="heading"><message/></h2>
+      </header>
     </content:>
   </page>
 </def>
