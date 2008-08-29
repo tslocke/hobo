@@ -400,6 +400,11 @@ module Hobo::Dryml
     end
 
 
+    def param_content_local_name(name)
+      "_#{ruby_name name}__default_content"
+    end
+
+
     def param_content_element(name_or_el)
       name = if name_or_el.is_a?(String)
                name_or_el
@@ -745,11 +750,6 @@ module Hobo::Dryml
       content ||= wrap_replace_parameter(el, metadata_name)
       param_name = el.dryml_name.sub(/^(before|after|append|prepend)-/, "")
       "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{content}<% } #{tag_newlines(el)}}"
-    end
-
-
-    def param_content_local_name(name)
-      "_#{ruby_name name}__default_content"
     end
 
 
