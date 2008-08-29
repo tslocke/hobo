@@ -55,13 +55,14 @@
 </def>
 
 
-<def tag="sortable-collection"><%
-  singular_name = member_class.name.underscore
+<def tag="sortable-collection" attrs="sortable-options"><%
+  singular_name = this.member_class.name.underscore
   attributes[:id] ||= "#{singular_name}_ordering"
+  reorder_url = send("reorder_#{singular_name.pluralize}_url")
 %>
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>
-      <div class="ordering-handle" param="handle" if="&sortable">&uarr;<br/>&darr;</div>
+      <div class="ordering-handle" param="handle">&uarr;<br/>&darr;</div>
       <card param/>
     </item:>
   </collection>
