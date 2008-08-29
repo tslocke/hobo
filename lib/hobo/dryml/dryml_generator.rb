@@ -69,9 +69,10 @@ module Hobo
       
       
       def dryml_changed?(name, dryml)
+        key = "#{subsite}/#{name}"
         d = digest dryml
-        if d != @digests[name]
-          @digests[name] = d
+        if d != @digests[key]
+          @digests[key] = d
           true
         else
           false
