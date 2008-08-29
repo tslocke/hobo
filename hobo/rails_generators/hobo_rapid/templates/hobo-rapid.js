@@ -433,8 +433,26 @@ var Hobo = {
         }
 
         return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
-    }
+    },
+    
+    
+    fixSectionGroup: function(e) {
+        alert(e.outerHTML)
+	    rows = e.childElements().map(function(e, i) {
+    	    cells = e.childElements().map(function(e, i) {
+        	    return e.outerHTML.sub("<DIV", "<td  valign='top'").sub(/<\/DIV>$/i, "</td>")
+            }).join('')
 
+            var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
+            return "<tr" + attrs + ">" + cells + "</tr>"
+	    }).join("\n")
+
+        var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
+
+	    var table= "<table cellpadding='0' cellspacing='0' border='0' style='border-collapse: collapse; border-spacing: 0'" + attrs + ">" + 
+	               rows + "</table>"
+	    e.outerHTML = table
+    }
 
 }
 
@@ -568,6 +586,10 @@ AutocompleteBehavior = Behavior.create({
 
 
 Event.addBehavior({
+    
+    'div.section-group' : function() {
+        if (Prototype.Browser.IE) Hobo.fixSectionGroup(this);
+    },
 
     'textarea.html' : function(e) {
         if (typeof(nicEditors) != "undefined") {
