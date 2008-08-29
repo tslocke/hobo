@@ -1,5 +1,4 @@
 <page title="Search">
-  <body: onload="Hobo.applyEvents(); Hobo.doSearch('search-field')"/>
 
   <content-body:>
     <panel class="red" style="margin-top: 40px">
