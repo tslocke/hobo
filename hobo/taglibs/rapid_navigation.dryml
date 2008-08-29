@@ -27,7 +27,7 @@
 <def tag="account-nav">
   <dev-user-changer/>
   <do with="&current_user">
-    <ul class="account-nav" param>
+    <ul class="navigation account-nav" param>
       <if test="&logged_in?">
         <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
         <li class='nav-item' param="account"><a action="account">Account</a></li>

@@ -370,7 +370,7 @@ in the future - use at your own risk. -->
 
 <def tag="live-search">
   <div class="search">
-    <label for="search-field">Search</label><input type="search" id="search-field" name="search-field" class="search-bhv search"/>
+    <label for="search-field">Search</label><input type="search" class="live-search"/>
     <spinner id="search-spinner"/>
   </div>
   <section class="hidden" id="search-results-panel">

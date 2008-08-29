@@ -11,8 +11,8 @@
 /* Cubicle Blue */
 html, body {color: #193440; background: #193440;}
 .page-header {color: white; background: #3F606E;}
-.page-header .main-nav a {background: #5B8BA0;}
-.page-header .main-nav a:hover {background: #193440;}
+.page-header .navigation.main-nav a {background: #5B8BA0;}
+.page-header .navigation.main-nav a:hover {background: #193440;}
 .content-wrapper {background: #FCFFF5;}
 .button {color: white; background: #5B8BA0;}
 .button:hover {background-color: #193440;}
@@ -122,7 +122,12 @@ input.file_upload {
 }
 .page-header ul {height: 100%; overflow: hidden;}
 .page-header li {float: left; margin-left: 0; list-style: none;}
-.page-header a, .page-header a:hover {border: none; color: white; background: none;}
+
+.page-header .navigation a, 
+.page-header .navigation a:hover,
+.page-header h1 a, 
+.page-header h1 a:hover
+ {border: none; color: white; background: none;}
 
 .page-header div.search {
 	position: absolute; top: 10px; right: 5px;
@@ -146,7 +151,7 @@ input.file_upload {
 
 .main-nav {padding: 0 30px;}
 .main-nav li {margin-right: 10px;}
-.main-nav a {
+.page-header .main-nav a {
 	display: block;
 	padding: 5px 15px 7px;
 	font-size: 13px; font-weight: bold;
@@ -155,6 +160,7 @@ input.file_upload {
 .account-nav {
 	position: absolute; top: -20px; right: 35px;
 	font-size: 11px;
+	z-index: -1;
 }
 .account-nav li {
 	float: left; 
