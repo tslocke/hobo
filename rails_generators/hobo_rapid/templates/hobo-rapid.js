@@ -355,15 +355,6 @@ var Hobo = {
     },
 
 
-    appendRow: function(el, rowSrc) {
-        // IE friendly method to add a <tr> (from html source) to a table
-        // el should be an element that contains *only* a table
-        el = $(el);
-        el.innerHTML = el.innerHTML.replace("</table>", "") + rowSrc + "</table>";
-        Hobo.applyEvents(el)
-    },
-
-
     objectElementFor: function(el) {
         var m
         while(el.getAttribute) {
@@ -409,8 +400,8 @@ var Hobo = {
 
 
     updateElement: function(id, content) {
+        // TODO: Do we need this method?
         Element.update(id, content)
-        Hobo.applyEvents(id)
     },
 
     getStyle: function(el, styleProp) {
