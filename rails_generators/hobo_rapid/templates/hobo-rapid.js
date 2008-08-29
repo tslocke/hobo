@@ -242,7 +242,6 @@ var Hobo = {
         var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results-panel")
         var url = el.getAttribute("search-url") || (urlBase + "/search")
 
-        el.focus();
         var value = $F(el)
         if (Hobo.searchRequest) { Hobo.searchRequest.transport.abort() }
         if (value.length >= 3) {
@@ -256,7 +255,6 @@ var Hobo = {
                                                         if (search_results_panel) {
                                                             Hobo.show(search_results_panel)
                                                         }
-                                                        setTimeout(function() {Hobo.applyEvents(search_results)}, 1)
                                                     },
                                                     method: "get",
                                                     parameters:"query=" + value });
@@ -660,8 +658,9 @@ Event.addBehavior({
         }
     },
                                             
-    "input.live-search[type=text]" : function(el) {
-        new Form.Element.Observer(el, 1.0, function() { Hobo.doSearch(el) })
+    "input.live-search[type=search]" : function(e) {
+        var element = this
+        new Form.Element.Observer(element, 1.0, function() { Hobo.doSearch(element) })
     }
 
 

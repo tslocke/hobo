@@ -4,7 +4,7 @@
     <panel class="red" style="margin-top: 40px">
       <h2>Search</h2>
       <div class="search">
-        <input type="text" id="search-field" class="search-bhv" style="width: 90%"/>
+        <live-search/>
         <spinner id="search_spinner"/>
       </div>
     </panel>
