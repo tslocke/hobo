@@ -1,5 +1,5 @@
 <def tag="card" polymorphic>
-  <div class="card" param="default">
+  <div class="card" param="default" merge-attrs>
     <header param if-content/>
     <div param="body" if-content/>
   </div>
@@ -7,7 +7,7 @@
 
 
 <def tag="search-card" polymorphic>
-  <card unless="&poly"/>
+  <card/>
 </def>
 
 
@@ -19,15 +19,15 @@
 
 
 <def tag="collection">
-  <ul class="collection #{collection_name :dasherize => true}" merge-attributes unless="empty?">
+  <ul class="collection #{collection_name :dasherize => true}" merge-attrs unless="empty?">
     <li param="item" class="#{scope.even_odd} #{model_id_class}" repeat="&select_viewable">
       <do param="default"><card param/></do>
     </li>
   </ul>
-  <else><empty-collection-message param="empty-message"/></else>
+  <empty-collection-message param="empty-message"/>
 </def>
 
 
 <def tag="field-names-where-true" attrs="fields"><%=
-  fields.select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
+  comma_split(fields).select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
 %></def>
