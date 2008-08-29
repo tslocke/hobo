@@ -17,6 +17,17 @@ html, body {color: #193440; background: #193440;}
 .button {color: white; background: #5B8BA0;}
 .button:hover {background-color: #193440;}
 .add-to-collection {background: #E6E7DE;}
+.aside { background: #E5E5E5;}
+
+/* Column Layout */
+
+.section-group       {display: table; width: 100%;}
+.section-group-inner {display: table-row;}
+.section-group-inner > * {display: table-cell; vertical-align: top;}
+.aside {width: 210px;} /* works with % too */
+.aside { padding: 20px;}
+/* ------ */
+
 
 body {
 	width: 960px;  
@@ -100,13 +111,9 @@ input.file_upload {
 .field-list th {width: 120px;}
 .field-list td {width: auto;}
 
-.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
-.content-header {padding: 5px 0;} 
-.content-body {padding: 15px 0;}
-.content-footer {padding-bottom: 20px;}
+.content-wrapper > .content, .section-group-inner > .section { padding: 30px; margin: 0;}
 
-.content-wrapper {padding: 10px 0;}
-.content-wrapper > * {margin: 0 40px;}
+/*.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}*/
 
 .page-header {position: relative; margin-top: 25px; padding: 20px 0 0;}
 .page-header h1 {

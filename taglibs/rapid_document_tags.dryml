@@ -6,6 +6,8 @@
 
 <def tag="item-value"><td merge-attrs><do param="default"/></td></def>
 
+<def tag="section-group"><div class="section-group"><div class="section-group-inner" param="default"></div></div></def>
+
 <!-- section represents a generic document or application section. -->
 <def tag="section" attrs="empty">
   <set body="&parameters.default"/>
