@@ -1,4 +1,4 @@
-<% each_model do -%>
+<% each_controller do -%>
 <%
 form_fields = standard_fields :belongs_to, :has_many
 -%>
