@@ -17,19 +17,18 @@
     </head>
 
     <body param>
-      <ajax-progress param/>
-      <header class="page-header" param>
-        <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
-        <live-search param if="&defined_route? :site_search"/>
-        <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
-        <main-nav param/>
-      </header>
-      <section param="content-wrapper">
-        <flash-messages param/>
-        <section param="content"/>
-      </section>
-      <footer class="page-footer" param/>
-      <page-scripts param/>
+      <set-scoped flash-rendered="&false">
+        <ajax-progress param/>
+        <header class="page-header" param>
+          <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
+          <live-search param if="&defined_route? :site_search"/>
+          <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
+          <main-nav param/>
+        </header>
+        <section with-flash-messages param="content"/>
+        <footer class="page-footer" param/>
+        <page-scripts param/>
+      </set-scoped>
     </body>
   </html>
 </def>
