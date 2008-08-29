@@ -8,7 +8,7 @@ form_fields = standard_fields :belongs_to, :has_many
     <field-list fields="<%= form_fields * ', ' %>" param/>
     <div param="actions">
       <submit label="Save" param/>
-      <do param="or-cancel">or <a param="cancel-link">Cancel</a></do>
+      <do param="cancel">or <a param="cancel-link">Cancel</a></do>
     </div>
   </form>
 </def>
