@@ -359,7 +359,7 @@ var Hobo = {
         var m
         while(el.getAttribute) {
             id = Hobo.getModelId(el)
-            if (id) m = id.match(/^([a-z_]+)_([0-9]+)(_[a-z0-9_]*)?$/);
+            if (id) m = id.match(/^([a-z0-9-]+)-([0-9]+)(-[a-z0-9-]*)?$/);
             if (m) break;
             el = el.parentNode;
         }
