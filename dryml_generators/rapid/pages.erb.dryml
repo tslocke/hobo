@@ -80,7 +80,7 @@ if collection
   add_form = !add_link && linkable?(collection_class, :"create_for_#{owner}", :method => :post)
 end
 -%>
-<def tag="show-page" for="<%= model.name %>" >
+<def tag="show-page" for="<%= model.name %>">
   <page merge title="<%= model_name :title %>">
 
     <body: class="show-page <%= model_class %>" param/>
