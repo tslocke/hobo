@@ -111,9 +111,10 @@ input.file_upload {
 .field-list th {width: 120px;}
 .field-list td {width: auto;}
 
-.content-wrapper > .content, .section-group-inner > .section { padding: 30px; margin: 0;}
-
-/*.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}*/
+.content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
+.content-header {padding: 5px 0;} 
+.content-body {padding: 15px 0;}
+.content-footer {padding-bottom: 20px;}
 
 .page-header {position: relative; margin-top: 25px; padding: 20px 0 0;}
 .page-header h1 {
