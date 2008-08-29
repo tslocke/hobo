@@ -94,21 +94,30 @@ module Hobo
       end
       
       
-      def models
-        controllers.*.model
+      def models 
+        Hobo::Model.all_models
       end
       
-    
-      def each_model
+      def each_controller
         controllers.each do |controller|
           @controller = controller
           yield
         end
+        @controller = nil
+      end
+      
+      
+      def each_model
+        models.each do |model|
+          @model = model
+          yield
+        end
+        @model = nil
       end
       
       
       def model
-        @controller.model
+        @model || @controller.model
       end
       
       
