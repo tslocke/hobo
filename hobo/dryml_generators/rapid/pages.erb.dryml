@@ -119,7 +119,11 @@ end
         <section param="collection-section">
           <h3 param="collection-heading"><%= collection.to_s.titleize %></h3>
               
-          <collection:<%= collection %> sortable param/>
+<% if sortable_collection?(collection) -%>
+          <sortable-collection:<%= collection %> param="collection"/>
+<% else -%>
+          <collection:<%= collection %> param/>
+<% end -%>
 <% if add_link -%>
 
           <a:<%= collection %> action="new" if="&can_create?" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
