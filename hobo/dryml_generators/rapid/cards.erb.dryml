@@ -5,26 +5,34 @@ content_attribute  = model.primary_content_attribute
 creator_attribute  = model.creator_attribute
 primary_collection = primary_collection_name
 
+if creator_attribute
+  creator_refl = model.reflections[creator_attribute]
+  creator_link = creator_refl && linkable?(creator_refl.klass, :show)
+end
+
+body_content = content_attribute || creator_attribute || primary_collection
+
 show_link     = linkable?(:show)
 edit_link     = !show_link && linkable?(:edit)
-delete_button = !edit_link && linkable?(:destroy)
+delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :delete)
 
 -%>
-<% if name_attribute || content_attribute || creator_attribute || primary_collection || edit_link || delete_button -%>
 <def tag="card" for="<%= model.name %>">
   <card class="<%= model_name :dashed %>" param="default" merge>
-<% if name_attribute || show_link -%>
+<% if name_attribute || show_link || !body_content -%>
     <header: param>
       <h4 param="heading"><% if show_link %><a><name/></a><% else %><name/><% end %></h4>
     </header:>
 <% end -%>
-<% if content_attribute || creator_attribute || primary_collection || edit_link || delete_button -%>
+<% if body_content || edit_link || delete_button -%>
     <body: param>
 <% if !show_link && content_attribute -%>
       <view:<%= content_attribute %> param="description"/>
 <% end -%>
-<% if creator_attribute -%>
-      <creator param/>
+<% if creator_link -%>
+      <a:<%= creator_attribute %> param="creator-link"/>
+<% elsif creator_attribute -%>
+      <view:<%= creator_attribute %> param="creator"/>
 <% end -%>
 <% if primary_collection -%>
       <count:<%= primary_collection%> param/>
@@ -43,7 +51,5 @@ delete_button = !edit_link && linkable?(:destroy)
 <% end -%>
   </card>
 </def>
-
-<% end -%>
 
 <% end -%>
