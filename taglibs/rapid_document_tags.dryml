@@ -9,7 +9,7 @@
 <def tag="section-group"><div class="section-group"><div class="section-group-inner" param="default"></div></div></def>
 
 <!-- section represents a generic document or application section. -->
-<def tag="section" attrs="empty, with-flash-messages" debug-source>
+<def tag="section" attrs="empty, with-flash-messages">
   <set body="&parameters.default" flash="&with_flash_messages && !scope.flash_rendered"/>
   <div class="section #{'with-flash' if flash}" merge-attrs if="&!body.blank? || empty">
     <flash-messages if="&flash"/>
