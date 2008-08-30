@@ -248,7 +248,7 @@ module HoboFields
           change_spec[:limit]     = spec.limit     unless spec.limit.nil? && col.limit.nil?
           change_spec[:precision] = spec.precision unless spec.precision.nil?
           change_spec[:scale]     = spec.scale     unless spec.scale.nil?
-          change_spec[:null]      = false          unless spec.null
+          change_spec[:null]      = spec.null      unless spec.null && col.null
           change_spec[:default]   = spec.default   unless spec.default.nil? && col.default.nil?
 
           changes << "change_column :#{new_table_name}, :#{c}, " +
