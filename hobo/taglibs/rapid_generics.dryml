@@ -1,7 +1,7 @@
 <def tag="card" polymorphic>
   <div class="card" param="default" merge-attrs>
     <header param if-content/>
-    <div param="body" if-content/>
+    <div param="body" if="&all_parameters[:body]"/>
   </div>
 </def>
 
