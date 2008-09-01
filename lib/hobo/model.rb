@@ -584,7 +584,7 @@ module Hobo
           value
         end
 
-      elsif field_type <= Time
+      elsif field_type <= Time || field_type <= ActiveSupport::TimeWithZone
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
         elsif value.is_a? String
