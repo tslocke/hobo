@@ -147,6 +147,7 @@
 
 
 <def tag="flash-messages" attrs="names"><%=
+  scope.flash_rendered = true
   names = names.nil? ? flash.keys : comma_split(names)
   names.map { |name| flash_message :type => name }
 %></def>
