@@ -15,7 +15,6 @@
     <flash-messages if="&flash"/>
     <%= body %>
   </div>
-  <set scope.flash-rendered="&true" if="&flash"/>
 </def>
 
 <def tag="aside" attrs="empty">
