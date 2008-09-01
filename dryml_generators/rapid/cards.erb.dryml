@@ -10,21 +10,31 @@ if creator_attribute
   creator_link = creator_refl && linkable?(creator_refl.klass, :show)
 end
 
-body_content = content_attribute || creator_attribute || primary_collection
-
 show_link     = linkable?(:show)
 edit_link     = !show_link && linkable?(:edit)
 delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :delete)
 
+has_actions = edit_link || delete_button
+has_body    = (!show_link && content_attribute) || creator_link || creator_attribute || primary_collection
 -%>
 <def tag="card" for="<%= model.name %>">
   <card class="<%= model_name :dashed %>" param="default" merge>
-<% if name_attribute || show_link || !body_content -%>
+<% if name_attribute || show_link || has_actions || !has_body -%>
     <header: param>
       <h4 param="heading"><% if show_link %><a><name/></a><% else %><name/><% end %></h4>
+<% if has_actions -%>
+      <div param="actions">
+<% if edit_link -%>
+        <a action="edit" if="&can_edit?" param="edit-link">Edit</a>
+<% end -%>
+<% if delete_button -%>
+        <delete-button label="X" param/>
+<% end -%>
+      </div>
+<% end -%>
     </header:>
 <% end -%>
-<% if body_content || edit_link || delete_button -%>
+<% if has_body -%>
     <body: param>
 <% if !show_link && content_attribute -%>
       <view:<%= content_attribute %> param="description"/>
@@ -36,16 +46,6 @@ delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :dele
 <% end -%>
 <% if primary_collection -%>
       <count:<%= primary_collection%> param/>
-<% end -%>
-<% if edit_link || delete_button -%>
-      <div param="actions" if-content>
-<% if edit_link -%>
-        <a action="edit" if="&can_edit?" param="edit-link">Edit</a>
-<% end -%>
-<% if delete_button -%>
-        <delete-button label="X" param/>
-<% end -%>
-      </div>
 <% end -%>
     </body:>
 <% end -%>
