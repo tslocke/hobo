@@ -3,7 +3,7 @@
   <body: class="front-page"/>
 
   <content:>
-    <header>
+    <header class="content-header">
       <h1>Welcome to <app-name/></h1>
       <section class="welcome-message">
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
@@ -13,7 +13,7 @@
       </section>
     </header>
 
-    <section class="body" repeat="&front_models">
+    <section class="content-body" repeat="&front_models">
       <div class="model">
         <h3><type-name plural/></h3>
         <collection:recent/>
