@@ -1,3 +1,394 @@
+=== Hobo 0.8 ===
+
+(There's a million changes in this release -- most of the fixes are *not* mentioned)
+
+Hobo now works with, and indeed requires, Rails 2.1
+
+Hobo can now be used entirely from the gem, and need not be installed in vendor/plugins. To activate Hobo in this manner in an existing Rails app, just run the hobo generator. This will add the Hobo initializer to config/initializers.
+
+hobo command
+
+  Now shows you what it's doing
+  
+  Renamed --create-dbs to --db-create to match the name of the rake task
+  
+
+DRYML
+  
+  DRYML generators
+
+    Hobo now provides a facility to generate DRYML tags on the fly using normal erb based templates. (the generators run
+    when needed in development mode). The taglibs are written to taglibs/auto. Note that the generated tablibs are *not*
+    intended to be modified, but rather should be imported and overridden in your application.
+
+  Extending tags: The extend-with attribute is gone, instead we have the <extend> tag, e.g. instead of the rather
+  confusing:
+
+    <def tag="page" extend-with="app">
+      <page-without-app>
+       
+    we now have
+     
+    <extend tag="page">
+      <old-page>
+        
+    Also works with polymorphic tags, e.g. <extend tag="card" for="Product">
+    
+  Polymorphic tags: new mechanism for defining polymorphic tags.
+    
+    <def tag="foo" polymorphic> ... "base" definition here ... </def>
+      
+    <def tag="foo" for="Product">
+      ... in here you can call <foo> and it's not a recursive call
+          but a call to the base definition ...
+    </def>
+
+  "without" attributes: <page without-live-search> is a shorthand for <page><live-search: replace/>. Doesn't sound like
+  much but it's great. You'll like it.
+  
+  <set> now respects the 'if' attribute
+
+  Using 'with' and 'field' on a parameter works more sensibly now -- DRYML will never merge with attributes and field
+  attributes
+  
+  New semantics for scoped variables.
+
+    Scoped variables must be declared at the start of the scope. Assignments and reads always go back to the scope where
+    that variable was declared.
+    
+  Fix to <foo:> </foo:> (i.e. one or more whitespace chars) being ignored
+
+  Removed feature from add_classes helper that was converting all _ to -. Closes #11
+  
+  param='x' now adds class='x' to the output. Closes #22. Doesn't add a css class if the param name is the same as the tag
+  name, or is 'default'
+  
+  Fixes to errors when reporting syntax error : )
+  
+  Now raises an error rather than outputting nonsensical name attributes on form inputs
+  
+  Removed incorrect leading '/' on template paths (e.g. in logs, stack traces)
+  
+  Fix -- was accepting close tags that are a prefix of the start tags, e.g. <foo>...</fo>
+
+
+Rapid tag Library
+
+  Rapid generators utilising the new DRYML generators feature. Pages, cards, forms, and the main navigation tag, are all
+  generated now.
+
+  New layout mechanism, and simplified <page> tag. Together with the Clean theme, it is not very easy to create column
+  based layouts. As a result, the "layout" attribute (to <page>) is gone, as are tags like <aside-layout>.
+
+  The standard <page> tag now has just a <content:> parameter. Specific pages might add <content-header:> or
+  <content-body:> themselves.
+
+  As a result of the switch to generators and the simplified page-layout stuff, there's quite a lot of change in Rapid. 
+
+  <section with-flash-messages> will include the flash messages at the top of the section *unless* they are rendered by a
+  sub-section or have been rendered already
+
+  Update forms with not render if the user doesn't have permission
+  
+  Removed <nav> tag
+  
+  Changed <a-or-an> to give you 'a hotel' not 'an hotel'
+
+  <card> now always renders a link if there is a show action. Closes #54
+ 
+  <collection> is no longer a polymorphic tag. Drag and drop support moved into separate tag: <sortable-collection>.
+ 
+  Got rid of <collection-preview>
+
+  <stylesheet> tag now calls Rails helper stylesheet_link_tag name to construct the link tag. This change was made so that the
+  css files are automatically cached using the timestamp mechanism, e.g. application.css?1218209632. The media attribute is now
+  'screen' instead of 'all' by default
+  
+  Wrapped the output of <count> in a <span class='count'>
+
+  Renamed <name-for-collection> to <collection-name> and added a dasherize parameter
+  
+  <ul> is gone from Rapid and is just a static tag again. Just do <ul><li repeat>
+  
+  New version of IE7.js (http://ie7-js.googlecode.com/svn/trunk/lib/IE7.js rev 29)
+  
+  <with-fields> (and hence <field-list>) now display fields in the order declared in the model
+  
+  <card> and <show-page> no longer include the created_at timestamp
+
+  Added labels and titleize attributes to <editor for='HoboFields::EnumString'>
+  
+  Added force (no edit check) attribute to <input>
+  
+  <hidden-form-field> (formerly <hidden-field>) is gone
+  
+  Fix to default label on non-ajax <remote-method-button>
+  
+  Now outputs <span> not <div> to wrap field-with-errors (<div> is invalid)
+
+  Added <transition-buttons> and <transition-button> (lifecycles)
+
+  Added <dev-user-changer> when in development mode if there is a user model
+  
+  <with-fields> now skips deleted_at by default
+  
+  <name> now properly respects :name => true (in the model)
+  
+  Optimised <count> so that it doesn't hit the DB for already loaded collections
+  
+  Removed <heading> and <sub-heading> and <article>
+  
+  Allowing <def tag=input for=MyModel> to customise inputs for any belongs_to :my_model
+  
+  Changed 'There are no whatsits' message to 'No whatsits to display'
+  
+  Moved to nicedit (nicedit.com) for HTML inputs and editors. Dropped all TinyMCE stuff. It turns out that this change too will
+  be temporary, as nicedit is a bit lacking. It seems that the YUI Editor will be the editor of choice, but we'll support it
+  with a plugin, rather than make it part of core Hobo.
+  
+  Added default empty message to <table-plus>
+  
+  Rename <belongs-to-menu-editor> to <select-one-editor> and improvements. Removed "View" link.
+  
+  Made <view> fall back on to_s rather than giving up
+
+  select-many: disabled options in the select drop down instead of trying to hide them. Fixed a problem in safari where 'choose
+  xxx...' would get added by mistake to the list
+  
+  New 'options' attribute for <integer-select-editor>
+  
+  If no <input> tag found, fall back on an input for the COLUMN_TYPE if defined
+  
+
+Model Controller
+
+  The collection actions, e.g. PostController#comments, PostController#new_comment and PostController#create_comment have
+  now been moved to the controller that looks after that particular model, e.g. CommentsController#index_for_post,
+  CommentsController#new_for_post and CommentsController#create_for_post. The old way was just plain wrong.
+  
+  Named instance var (e.g. @post) is set in body of web methods
+  
+  Factored out redirect code into #redirect_after_submit
+  
+  Ensure default ordering is respected when paginating
+  
+  Fix to checking in superclass for permission_denied and not_found methods
+
+
+Migration generator
+
+  Fixed bug with :null setting
+  
+  Ignore sessions table when using the ActiveRecord session store. Closes #187.
+  
+  Fix to loading models that was causing stack overflows (double alias_method_chain)
+  
+  Ignore schema_migrations table
+  
+  Fix to loading of namespaced models
+
+  Fix to 'm' option on Windows
+
+
+hobo_front_conroller -- removed search page
+
+
+Clean theme
+
+  Fix to form submit buttons in IE
+
+  Fixed problem with height of user-changer
+
+
+hobo-rapid.js
+
+  Hobo.applyEvents is gone - now uses lowpro for all JS events
+  
+  Only do resetForm on success. Add new onSuccess callback to Hobo.ajaxRequest
+
+
+Routing
+
+  Routes are now reloaded automaticaly on every request in development mode, but you can turn this off if it gets slow.
+  (See hobo generator, below)
+
+  Fixes to lifecycle routes, so that object_url(obj, :signup, :method => 'post') works
+  
+  Clean-up so that :format => false doesn't sneak into route options
+  
+  Better error reporting if DB problems occur during routing
+  
+  Doesn't try to load routes when running script/destroy
+
+
+Subsites
+
+  New hobo_subsite generator, and introduced app/views/taglibs/front_site.dryml as the taglib for non-subsite pages.
+
+  The subsite taglib for, say, admin, is not admin_site.dryml, not admin.dryml
+
+  Added Hobo.subsites method to enumerate available subsites. Used by Hobo::ModelRouter
+
+hobo generator
+
+  Added config option in initializers/hobo.rb to choose if routes are reloaded on every request (default is yes)
+
+    Hobo::ModelRouter.reload_routes_on_every_request = true
+
+  Now generates a blank application.css
+
+
+User controller
+
+  The standard actions (login, signup, logout, forgot_password, reset_password) now respect the auto_actions declaration.
+  Closes #80
+
+
+Fix to generate_tag_reference.rake so that maruku is not required when not being used
+
+
+Lifecycles
+
+  Moving default user lifecycle (signup) from Hobo::User into the generated model file (hobo_user_model generator). Closes #148
+
+  Fixed problem with lifecycle keys when timezone was not configured. Now raises an error in that case. Closes #146
+  
+  Changing lifecycle action names from signup_page (the form page) and signup (the post action), to signup (the form page) and
+  do_signup (th epost action)
+
+    
+Hobo models
+
+  Removed :manged => true option for has_many :through. ActiveRecord now does behaves like this by default.
+
+  Adding member_class meta-data when calling find_by_sql. Closes #231.
+  
+  Moved Hobo.models to Hobo::Model.all_models, (also added Hobo::ModelController.all_controllers)
+  
+  Added #foo_is? for every belongs_to :foo 
+  
+    record.foo_is?(x) is like record.foo == x but does not force foo to load
+    
+  Have an SEO friendly URL (#to_param) by default on any model with a name attribute
+  
+  Added #acting_user, virtual attribute set to the user that does a user_update, user_save etc.
+  
+  Include virtual attributes (e.g. a #name method) when guessing name, description etc.
+
+
+HoboFields
+
+  Removed RedCloth monkey-patch. Not needed (and broken) in RedCloth 4
+  
+  Support :null => true/false on belongs_to
+  
+  Making HoboFields::HtmlString a subclass of HoboFields::Text
+  
+  Adding :decimal as another name for BigDecimal
+
+
+Removing symlink_plugins script now that it turns out there's no need for symlinks
+    
+  Just clone the whole hobo repo to vendor/plugins/hobo
+
+
+
+hobo_user_model generator
+
+  Removed permission methods that are never used
+  
+  Replaced set_admin_on_forst_user with the actual code (a one liner) for greater clarity
+  
+  Added forgotton password mailer
+  
+  Adding email address to standard model (for forgotten password email)
+  
+
+
+Scopes
+
+  Goodbye def_scope (Rails now has named_scope). Made automatic scopes work with named_scope
+ 
+  apply_scopes now works on other scopes, e.g. User.admin?.apply_scopes(...)
+  
+  Added by_most_recent automatic scope
+  
+  Added is and is_not automatic scopes
+  
+  Made search scope AND terms rather than OR
+  
+
+Removed dump_fixtures rake task. See lighthouse #51
+
+
+Hobo controller -- adding #call_tag (#render_tag without the render)
+
+
+Symlinked generators now even work when they call each other (hobo_model_resource => hobo_model)
+    
+
+Hobo support - renamed Enumerable#search to Enumerable#map_and_find. Was clashing with the #search automatic scope
+
+
+Multi-model forms
+
+  Hobo's support for multi-model forms has been improved, but not completed as Rails is moving in this direction too, so we
+  need to wait and see what happens:
+
+    DRYML - improvements to DRYML's mechanism to figure out name='...' attributes on form inputs
+
+    Added experimental support for post.comments_by_user[a_user]
+
+    Hobo models -- adding include_in_save support for transactional and validated multi-model saves
+
+    Hobo models -- add origin and origin_attribute accessors, to help DRYML figure out the correct name attribute for input
+    tags
+
+    Tweaks to Hobo.get_field_path semantics
+
+    Better handling of hashes wrt DRYML implicit context
+
+
+Valid HTML
+
+  Various improvements to outputting valid HTML have been made to both DRYML and Rapid
+
+    Removed use of invalid html attributes like hobo-model-id, hobo-update
+
+    Empty are output as <br> when using a HTML doctype and <br /> when using XHTML
+
+
+Fix to site-search for better DB comptibility (Oracle in particular had a problem)
+
+
+Hack Rails so that generators are found in symlinked plugins (didn't this get fixed once already?\!)
+
+Bundles
+
+  Pass the callers options to the Bundle#defaults
+
+
+Hobo Modles -- 
+
+    Migration generator -- exit with a warning if there are pending migrations
+
+    
+Removed tabla theme
+
+
+Added Guest#login ("Guest") (used by user-changer menu)
+
+
+Adding #signed_up? to Hobo::User and Hobo::Guest (opposite of #guest?)
+
+
+All generators moved to rails_generators directory
+
+
+Hobo::HoboHelper -- new hook for customising URLs - base_url_for
+
+
+
 == Hobo 0.7.5 ===
 
    Restructuring the git repo -- all the different gems/plugins live
