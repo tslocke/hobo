@@ -91,12 +91,12 @@ module Hobo
       
       
       def controllers
-        Hobo::ModelController.all_controllers(subsite)
+        Hobo::ModelController.all_controllers(subsite).sort_by &:name
       end
       
       
       def models 
-        Hobo::Model.all_models
+        Hobo::Model.all_models.sort_by &:name
       end
       
       def each_controller
@@ -189,7 +189,7 @@ module Hobo
         
         bt = extras.include?(:belongs_to)
         hm = extras.include?(:has_many)
-        klass.reflections.values.map do |refl|
+        klass.reflections.values.sort_by { |refl| refl.name.to_s }.map do |refl|
           fields << refl.name.to_s if bt && refl.macro == :belongs_to
           fields << refl.name.to_s if hm && refl.macro == :has_many
         end
