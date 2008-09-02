@@ -72,7 +72,7 @@ creator_link   = creator && model.reflections[creator] && linkable?(model.reflec
 edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields(:belongs_to).*.to_s - [model.name_attribute, main_content, creator, back_link, *boolean_fields].*.to_s
-collection     = model.dependent_collections.first
+collection     = model.dependent_collections.sort_by(&:to_s).first
 if collection
   collection_class = model.reflections[collection].klass
   owner            = model.reverse_reflection(collection).name
