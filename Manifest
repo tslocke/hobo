@@ -1,8 +1,8 @@
 bin/hobo
 CHANGES.txt
-dryml_generators/rapid/cards.erb.dryml
-dryml_generators/rapid/forms.erb.dryml
-dryml_generators/rapid/pages.erb.dryml
+dryml_generators/rapid/cards.dryml.erb
+dryml_generators/rapid/forms.dryml.erb
+dryml_generators/rapid/pages.dryml.erb
 init.rb
 lib/action_view_extensions/helpers/tag_helper.rb
 lib/active_record/association_collection.rb
