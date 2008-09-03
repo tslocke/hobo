@@ -8,7 +8,7 @@ Echoe.new('hobofields') do |p|
   p.project = "hobo"
 
   p.changelog = "CHANGES.txt"
-  p.version   = "0.7.99.2"
+  p.version   = "0.8"
 
   p.dependencies = ['hobosupport >=0.8']
 end
