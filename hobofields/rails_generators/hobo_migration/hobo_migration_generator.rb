@@ -38,14 +38,14 @@ class HoboMigrationGenerator < Rails::Generator::Base
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
 
-    action = input("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", %w(g m c))
+    action = input("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
 
     if action == 'c'
       # record nothing to keep the generator happy
       record {|m| }
     else
       puts "\nMigration filename:", "(you can type spaces instead of '_' -- every little helps)"
-      migration_name = input("Filename [#@migration_name]:").strip.gsub(' ', '_')
+      migration_name = input("Filename [#@migration_name]:", /^[a-z0-9_ ]/).strip.gsub(' ', '_')
       migration_name = @migration_name if migration_name.blank?
 
       at_exit { rake_migrate } if action == 'm'
@@ -97,10 +97,10 @@ class HoboMigrationGenerator < Rails::Generator::Base
   end
 
 
-  def input(prompt, options=nil)
+  def input(prompt, format=nil)
     print(prompt + " ")
-    if options
-      while !(response = STDIN.readline.strip.downcase).in?(options);
+    if format
+      while (response = STDIN.readline.strip.downcase) !~ format
         print(prompt + " ")
       end
       response
