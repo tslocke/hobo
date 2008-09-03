@@ -603,9 +603,9 @@ module Hobo
     # --- Miscelaneous Actions --- #
 
     def hobo_completions(attribute, finder, options={})
-      options = options.reverse_merge(:limit => 10, :param => :query)
+      options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
       finder = finder.limit(options[:limit]) unless finder.send(:scope, :find, :limit)
-      finder = finder.send("#{attribute}_contains", params[options[:param]])
+      finder = finder.send(options[:query_scope], params[options[:param]])
       items = finder.find(:all)
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
