@@ -1,4 +1,5 @@
 require 'rexml/document'
+require 'pathname'
 
 module Hobo::Dryml
 
@@ -50,24 +51,25 @@ module Hobo::Dryml
       now = Time.now
 
       unless @template_path.ends_with?(EMPTY_PAGE)
-        filename = RAILS_ROOT + (@template_path.starts_with?("/") ? @template_path : "/" + @template_path)
-        mtime = File.stat(filename).mtime rescue nil
-      end
+        p = Pathname.new template_path
+        p = Pathname.new(RAILS_ROOT) + p unless p.absolute?
+        mtime = p.mtime
+      
+        if !@builder.ready?(mtime)
+          @builder.start
+          parsed = true
+          # parse the DRYML file creating a list of build instructions
+          if is_taglib?
+            process_src
+          else
+            create_render_page_method
+          end
 
-      if mtime.nil? || !@builder.ready?(mtime)
-        @builder.clear_instructions
-        parsed = true
-        # parse the DRYML file creating a list of build instructions
-        if is_taglib?
-          process_src
-        else
-          create_render_page_method
+          # store build instructions in the cache
+          Template.build_cache[@template_path] = @builder
         end
-
-        # store build instructions in the cache
-        Template.build_cache[@template_path] = @builder
       end
-
+      
       # compile the build instructions
       @builder.build(local_names, auto_taglibs, mtime)
 
