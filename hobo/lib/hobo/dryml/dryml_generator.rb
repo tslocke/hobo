@@ -28,7 +28,7 @@ module Hobo
       
       
       def load_templates
-        Dir["#{TEMPLATES}/**/*.erb.dryml"].each do |f|
+        Dir["#{TEMPLATES}/**/*.dryml.erb"].each do |f|
           name = f[TEMPLATES.length + 1..-11]
           erb = File.read(f)
           @templates[name] = ERB.new(erb, nil, '-').src
