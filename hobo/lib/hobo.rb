@@ -9,12 +9,18 @@ end
 
 Dependencies.load_paths |= [ File.dirname(__FILE__) ]
 
+# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
+::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+
+
 # Modules that must *not* be auto-reloaded by activesupport
 # (explicitly requiring them means they're never unloaded)
 require 'hobo/model_router'
 require 'hobo/undefined'
 require 'hobo/user'
-
+require 'hobo/dryml'
+require 'hobo/dryml/template'
+require 'hobo/dryml/dryml_generator'
 
 class HoboError < RuntimeError; end
 
@@ -414,8 +420,6 @@ module Hobo
 
 end
 
-# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
-::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 if defined? HoboFields
   HoboFields.never_wrap(Hobo::Undefined)

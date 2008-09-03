@@ -4,7 +4,7 @@ module Hobo::Dryml
 
     def initialize(template)
       @template = template
-      @build_instructions = Array.new
+      @build_instructions = nil # set to [] on the first add_build_instruction
       @part_names = []
     end
 
@@ -20,14 +20,14 @@ module Hobo::Dryml
     end
 
 
-    def ready?(mtime)
-      !@build_instructions.empty? && @last_build_mtime && @last_build_mtime >= mtime
+    def ready?(mtime, d=false)
+      @build_instructions && @last_build_mtime && @last_build_mtime >= mtime
     end
 
 
-    def clear_instructions
+    def start
       @part_names.clear
-      @build_instructions.clear
+      @build_instructions = []
     end
 
 
@@ -70,7 +70,7 @@ module Hobo::Dryml
 
       auto_taglibs.each { |t| import_taglib(t) }
 
-      @build_instructions.each do |instruction|
+      @build_instructions._?.each do |instruction|
         name = instruction[:name]
         case instruction[:type]
         when :eval
