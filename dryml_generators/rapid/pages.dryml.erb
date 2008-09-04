@@ -128,7 +128,7 @@ end
 <% end -%>
 <% if add_link -%>
 
-          <a:<%= collection %> action="new" if="&can_create?" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
+          <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
 <% elsif add_form -%>
 
           <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
