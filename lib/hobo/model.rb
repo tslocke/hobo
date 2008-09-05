@@ -284,7 +284,11 @@ module Hobo
           options = if default_order.blank?
                       options.except :order
                     else
-                      options.merge(:order => "#{table_name}.#{default_order}")
+                      options.merge(:order => if default_order[/(\.|\(|,| )/]
+                                                default_order
+                                              else
+                                                "#{table_name}.#{default_order}"
+                                              end)
                     end
         end
         result = super(*args + [options])
