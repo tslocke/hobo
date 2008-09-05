@@ -618,7 +618,7 @@ Event.addBehavior({
 
     '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
      function (el) {
-        var ipe = Hobo._makeInPlaceEditor(el)
+        var ipe = Hobo._makeInPlaceEditor(this)
         ipe.getText = function() {
             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
         }
