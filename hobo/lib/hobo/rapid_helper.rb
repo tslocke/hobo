@@ -95,7 +95,7 @@ module Hobo::RapidHelper
   def in_place_editor(attributes)
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
-    attributes = add_classes(attributes, behaviour_class, model_id_class(this_parent, this_field))
+    attributes = add_classes(attributes, "in-place-edit", model_id_class(this_parent, this_field))
     attributes.update(:hobo_blank_message => blank_message,
                       :if_blank => blank_message,
                       :no_wrapper => false)
@@ -113,10 +113,6 @@ module Hobo::RapidHelper
   AJAX_ATTRS = AJAX_CALLBACKS + [ :type, :method,
                                   :script, :form, :params, :confirm, :message,
                                   :reset_form, :refocus_form, :result_update, :spinner_next_to ]
-
-
-  def editor_class
-  end
 
 
   def through_collection_names(object=this)
