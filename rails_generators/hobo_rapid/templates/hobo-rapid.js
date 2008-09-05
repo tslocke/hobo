@@ -617,25 +617,25 @@ Event.addBehavior({
     '.autocompleter' : AutocompleteBehavior(),
 
     '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
-     function (el) {
-        var ipe = Hobo._makeInPlaceEditor(el)
+     function (e) {
+        var ipe = Hobo._makeInPlaceEditor(this)
         ipe.getText = function() {
             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
         }
     },
 
-    '.text.in-place-edit' : function (el) {
-        var ipe = Hobo._makeInPlaceEditor(el, {rows: 2})
+    '.text.in-place-edit, .markdown.in-place-edit, .textile.in-place-edit' : function (e) {
+        var ipe = Hobo._makeInPlaceEditor(this, {rows: 2})
         ipe.getText = function() {
             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
         }
     },
 
-    ".html.in-place-edit" : function (el) {
+    ".html.in-place-edit" : function (e) {
         var nicEditPresent = typeof(nicEditor) != "undefined"
         var options = { rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save" }
         if (nicEditPresent) options["submitOnBlur"] = false
-        var ipe = Hobo._makeInPlaceEditor(el, options) 
+        var ipe = Hobo._makeInPlaceEditor(this, options) 
         if (nicEditPresent) {
             ipe.afterEnterEditMode = function() {
                 var editor = this._controls.editor
@@ -652,7 +652,8 @@ Event.addBehavior({
         }
     },
 
-    "select.integer.editor" : function(el) {
+    "select.integer.editor" : function(e) {
+        var el = this
         el.onchange = function() {
             Hobo.ajaxSetFieldForElement(el, $F(el))
         }
