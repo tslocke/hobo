@@ -112,7 +112,7 @@ end
     
       <section param="content-body">
 <% if main_content -%>
-        <view:<%= main_content %>/>        
+        <view:<%= main_content %> param="primary-content"/>
 <% end -%>
 <% if show_fields.any? -%>
         <field-list fields="<%= show_fields * ', ' %>" param/>
