@@ -97,6 +97,10 @@ module Hobo
 
     end
 
+    def account_active?
+      state == 'active'
+    end
+
     # Encrypts the password with the user salt
     def encrypt(password)
       self.class.encrypt(password, salt)

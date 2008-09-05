@@ -89,7 +89,7 @@ module Hobo
     def hobo_do_signup(&b)
       do_creator_action(:signup) do
         response_block(&b) or if valid?
-                                self.current_user = this
+                                self.current_user = this if this.account_active?
                                 flash[:notice] = "Thanks for signing up!"
                                 redirect_back_or_default(home_page)
                               end
