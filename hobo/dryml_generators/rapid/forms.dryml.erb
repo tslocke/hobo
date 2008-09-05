@@ -1,14 +1,16 @@
 <% each_controller do -%>
 <%
 form_fields = standard_fields :belongs_to, :has_many
+
+cancel_to_show_page  = linkable?(:show)
+cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 -%>
 <def tag="form" for="<%= model.name %>">
   <form merge param="default">
     <error-messages/>
     <field-list fields="<%= form_fields * ', ' %>" param/>
     <div param="actions">
-      <submit label="Save" param/>
-      <do param="cancel">or <a param="cancel-link">Cancel</a></do>
+      <submit label="Save" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
@@ -20,7 +22,7 @@ form_fields = standard_fields :belongs_to, :has_many
   <form lifecycle="<%= creator.name %>">
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= creator.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
+      <submit label="<%= creator.name.titleize %>" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
@@ -33,7 +35,7 @@ form_fields = standard_fields :belongs_to, :has_many
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= transition.name.titleize %>" param/><do param="back-link"> or <a>Cancel</a></do>
+      <submit label="<%= transition.name.titleize %>" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>

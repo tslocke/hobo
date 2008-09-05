@@ -133,7 +133,7 @@ end
 
           <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
             <h3 param="add-form-heading">Add <%= a_or_an collection.to_s.singularize.titleize %></h3>
-            <form with="&@<%= collection_class.name.underscore %> || @<%= model_name.underscore %>.<%= collection %>.new" owner="<%= owner %>" method="post" without-or-cancel param>
+            <form with="&@<%= collection_class.name.underscore %> || @<%= model_name.underscore %>.<%= collection %>.new" owner="<%= owner %>" method="post" without-cancel param>
               <field-list: skip="<%= owner %>"/>
               <submit: label="Add"/>
             </form>
