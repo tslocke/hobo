@@ -32,7 +32,7 @@ module Hobo
   class ModelRouter
 
     class << self
-      
+
       attr_accessor :reload_routes_on_every_request
 
       def reset_linkables
@@ -102,6 +102,8 @@ module Hobo
 
     end
 
+    # specify that an id CANNOT be null - needed to disambiguate /models from /models/[nil] - see #251
+    ID_REQUIREMENT = { :id => /[^#{ActionController::Routing::SEPARATORS.join}]+/ }
 
     def initialize(map, controller, subsite)
       @map = map
@@ -132,7 +134,7 @@ module Hobo
     def add_routes
       # Simple support for composite models, we might later need a CompositeModelController
       if model < Hobo::CompositeModel
-        map.connect "#{plural}/:id", :controller => plural, :action => 'show'
+        map.connect "#{plural}/:id", :controller => plural, :action => 'show', :requirements => ID_REQUIREMENT
 
       elsif controller < Hobo::ModelController
         # index routes need to be first so the index names don't get
@@ -161,11 +163,11 @@ module Hobo
       linkable_route("new_#{singular}",  "#{plural}/new",      :new,  :conditions => { :method => :get })
       linkable_route("edit_#{singular}", "#{plural}/:id/edit", :edit, :conditions => { :method => :get })
 
-      linkable_route(singular, "#{plural}/:id", :show, :conditions => { :method => :get })
+      linkable_route(singular, "#{plural}/:id", :show, :conditions => { :method => :get }, :requirements => ID_REQUIREMENT)
 
       linkable_route("create_#{singular}",  plural,          :create,  :conditions => { :method => :post })
-      linkable_route("update_#{singular}",  "#{plural}/:id", :update,  :conditions => { :method => :put })
-      linkable_route("destroy_#{singular}", "#{plural}/:id", :destroy, :conditions => { :method => :delete })
+      linkable_route("update_#{singular}",  "#{plural}/:id", :update,  :conditions => { :method => :put }, :requirements => ID_REQUIREMENT)
+      linkable_route("destroy_#{singular}", "#{plural}/:id", :destroy, :conditions => { :method => :delete }, :requirements => ID_REQUIREMENT)
     end
 
 
