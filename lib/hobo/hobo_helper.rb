@@ -235,8 +235,8 @@ module Hobo
 
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||=
-        if !field && object.respond_to?(:origin)
-          Hobo.can_view?(current_user, object.origin, object.origin_attribute)
+        if !field && (origin = object.try.origin)
+          Hobo.can_view?(current_user, origin, object.origin_attribute)
         else
           Hobo.can_view?(current_user, object, field)
         end
