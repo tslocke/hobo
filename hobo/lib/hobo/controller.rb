@@ -16,7 +16,11 @@ module Hobo
         klass.extend(ClassMethods)
         klass.class_eval do
           alias_method_chain :redirect_to, :object_url
-          before_filter :store_request_params
+          around_filter do |controller, action|
+            Thread.current['Hobo::current_controller'] = controller
+            action.call
+            Thread.current['Hobo::current_controller'] = nil  # should avoid memory-leakage
+          end
           @included_taglibs = []
         end
         Hobo::HoboHelper.add_to_controller(klass)
@@ -29,11 +33,11 @@ module Hobo
       end
 
       def request_host
-        @request_host || Thread.current['Hobo::Controller.request']._?.host_with_port
+        @request_host || Thread.current['Hobo::current_controller'].request.host_with_port
       end
 
       def app_name
-        @app_name || Thread.current['Hobo::Controller.app_name']
+        @app_name || Thread.current['Hobo::current_controller'].send(:call_tag, :app_name)
       end
 
     end
@@ -154,11 +158,6 @@ module Hobo
 
     def not_found
 
-    end
-
-    def store_request_params
-      Thread.current['Hobo::Controller.request'] = request
-      Thread.current['Hobo::Controller.app_name'] = call_tag(:app_name)
     end
 
   end
