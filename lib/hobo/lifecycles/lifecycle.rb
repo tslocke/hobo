@@ -144,7 +144,7 @@ module Hobo
       end
 
 
-      def become(state_name, validate=false)
+      def become(state_name, validate=true)
         state_name = state_name.to_s
         if self.state != state_name
           record.write_attribute self.class.state_field, state_name
