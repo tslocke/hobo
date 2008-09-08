@@ -53,7 +53,7 @@ module HoboFields
     def self.fix_native_types(types)
       case connection.class.name
       when /mysql/i
-        types[:integer][:limit] = 11
+        types[:integer][:limit] ||= 11
       end
       types
     end
