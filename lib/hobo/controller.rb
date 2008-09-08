@@ -16,15 +16,28 @@ module Hobo
         klass.extend(ClassMethods)
         klass.class_eval do
           alias_method_chain :redirect_to, :object_url
+          around_filter do |controller, action|
+            Thread.current['Hobo::current_controller'] = controller
+            action.call
+            Thread.current['Hobo::current_controller'] = nil  # should avoid memory-leakage
+          end
           @included_taglibs = []
         end
         Hobo::HoboHelper.add_to_controller(klass)
       end
 
-      attr_accessor :request_host, :app_name
+      attr_writer :request_host, :app_name # DEPRECIATED AFTER 0.9 - setting them should not be needed
 
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
+      end
+
+      def request_host
+        @request_host || Thread.current['Hobo::current_controller'].request.host_with_port
+      end
+
+      def app_name
+        @app_name || Thread.current['Hobo::current_controller'].send(:call_tag, :app_name)
       end
 
     end

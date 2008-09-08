@@ -89,7 +89,7 @@ module Hobo
     def hobo_do_signup(&b)
       do_creator_action(:signup) do
         response_block(&b) or if valid?
-                                self.current_user = this
+                                self.current_user = this if this.account_active?
                                 flash[:notice] = "Thanks for signing up!"
                                 redirect_back_or_default(home_page)
                               end
@@ -112,8 +112,6 @@ module Hobo
       if request.post?
         user = model.find_by_email_address(params[:email_address])
         if user && (!block_given? || yield(user))
-          Hobo::Controller.request_host = request.host_with_port
-          Hobo::Controller.app_name = call_tag(:app_name)
           user.lifecycle.request_password_reset(:nobody)
         end
         render_tag :forgot_password_email_sent_page
