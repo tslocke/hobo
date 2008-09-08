@@ -96,7 +96,7 @@
       end
     end
 
-    html_attr[:enctype] = enctype
+    html_attrs[:enctype] = enctype
      
     Hobo::Dryml.last_if = true
     element("form", html_attrs, body)
