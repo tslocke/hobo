@@ -45,7 +45,7 @@ class HoboSubsiteGenerator < Rails::Generator::NamedBase
       m.directory File.join('app', 'controllers', file_name)
       m.directory File.join('app', 'views', file_name)
 
-      m.template "controller.rb", File.join('app/controllers', file_name, "#{file_name}_site.rb")
+      m.template "controller.rb", File.join('app/controllers', file_name, "#{file_name}_site_controller.rb")
       m.template "site_taglib.dryml",  File.join('app/views/taglibs', "#{file_name}_site.dryml")
     end
   end

@@ -55,7 +55,11 @@ module Hobo
       if force || !@controllers_loaded[subsite]
         dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
-          f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
+          if f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/
+            name = f.sub(/.rb$/, '').camelize
+            name = "#{subsite.camelize}::#{name}" if subsite
+            name.constantize
+          end
         end
         @controllers_loaded[subsite] = true
       end
