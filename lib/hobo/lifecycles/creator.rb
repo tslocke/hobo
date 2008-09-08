@@ -57,8 +57,9 @@ module Hobo
       def run!(user, attributes)
         record = lifecycle.model.new
         if prepare_and_check!(record, user, attributes)
-          fire_event(record, on_create)
-          change_state(record)
+          if change_state(record)
+            fire_event(record, on_create)
+          end
           record
         else
           raise Hobo::Model::PermissionDeniedError

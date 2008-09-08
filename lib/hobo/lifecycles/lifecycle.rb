@@ -144,18 +144,22 @@ module Hobo
       end
 
 
-      def state=(state_name)
+      def become(state_name, validate=false)
         state_name = state_name.to_s
         if self.state != state_name
           record.write_attribute self.class.state_field, state_name
 
           if state_name == "destroy"
             record.destroy
+            true
           else
             s = self.class.states[state_name]
             raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
-            if record.save
+            if record.save(validate)
               s.activate! record
+              true
+            else
+              false
             end
           end
         end
@@ -173,11 +177,11 @@ module Hobo
         end
         key_timestamp = Time.now.utc
         record.write_attribute key_timestamp_field, key_timestamp
-        current_key
+        key
       end
 
 
-      def current_key
+      def key
         require 'digest/sha1'
         timestamp = record.read_attribute(key_timestamp_field)
         if timestamp
@@ -187,13 +191,14 @@ module Hobo
       end
 
       def valid_key?
-        provided_key && provided_key == current_key
+        provided_key && provided_key == key
       end
 
 
       def invariants_satisfied?
         self.class.invariants.all? { |i| record.instance_eval(&i) }
       end
+
 
       def preconditions_satisfied?
         self.class.preconditions.all? { |i| record.instance_eval(&i) }

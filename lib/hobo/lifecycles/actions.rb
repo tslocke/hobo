@@ -55,6 +55,7 @@ module Hobo
           attributes = extract_attributes(attributes)
           record.attributes = attributes
         end
+        record.lifecycle.generate_key if options[:new_key]
         set_or_check_who!(record, user) && record
       end
 
