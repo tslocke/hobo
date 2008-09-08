@@ -1,3 +1,59 @@
+=== Hobo 0.8.1 ===
+
+    Fixes to generating and loading subsite controllers
+
+    Add Rails routing monkey-patch to hobo generator
+
+    Fixed deprecated use of ActiveSupport Dependencies module
+
+    Migration generator -- fix to mysql limit problem in Rails 2.1.1
+
+    Migration generator -- fixed bug with validation of filename input by user
+
+    New lifecycle semantics.
+    
+      Lifecycle create and transition actions (blocks) now run *after* the create or transition, and not at all
+      if there are validation errors.
+    
+      To create a key, you can no longer call lifecycle.generate_key in the action, as the key timestamp will not
+      be saved (record has already been saved)
+    
+      Instead pass :new_key => true as an option to the create or transition, and access it in the block using
+      lifecycle.key
+
+    Fix usage of 'skip' on hidden-fields tag; wasn't comma-splitting input. Correctly skip search field in
+    table-plus search form.
+
+    Fix to viewable_by? helper
+
+    Partial fix #251 - add requirement that :id not be empty to resource routes
+
+    Fix for #256, generating user model not named 'User'
+
+    Maade request and app_name available by default
+
+    New user model method account_active? Default implementation is state == 'active' but this method is intended
+    as a hook that can be overridden as required.
+    
+        On signup, the user is only logged in if user has #account_active?
+
+    Rapid generators -- fixes for form cancel links
+
+    Rapid generators -- added parameter to show-page
+
+    Fixes to in-place-editors
+
+    Allow more advanced default ordering options like 'lower(users.last_name), lower(users.first_name)'
+
+    Fixed typo in dryml-generator lifecycle pages
+
+    show-page generator -- fix to test for create permission
+
+    Rapid generators -- fix for show-page generator, when the 'owner' association that goes with the page's
+    collection cannot be found
+    
+    
+    
 === Hobo 0.8 ===
 
 (There's a million changes in this release -- most of the fixes are *not* mentioned)
