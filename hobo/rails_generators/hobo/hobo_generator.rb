@@ -22,6 +22,7 @@ class HoboGenerator < Rails::Generator::Base
       m.file "dryml-support.js",      File.join("public/javascripts/dryml-support.js")
       m.file "application.css",       File.join("public/stylesheets/application.css")
       m.file "initializer.rb",        File.join("config/initializers/hobo.rb")
+      m.file "patch_routing.rb",      File.join("config/initializers/patch_routing.rb")
     end
   end
 
