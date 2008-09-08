@@ -21,8 +21,6 @@ if Rails::VERSION::STRING.in? ["2.1.0", "2.1.1"]
     end
   end
 
-  ActionController::Routing::Routes.reload!
-
 else
   RAILS_DEFAULT_LOGGER.info "****"
   RAILS_DEFAULT_LOGGER.info "**** The file config/initializers/patch_routing.rb is not in use"
