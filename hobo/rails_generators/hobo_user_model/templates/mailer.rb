@@ -1,4 +1,4 @@
-class UserMailer < ActionMailer::Base
+class <%= class_name -%>Mailer < ActionMailer::Base
   
   def forgot_password(user, key)
     host = Hobo::Controller.request_host
