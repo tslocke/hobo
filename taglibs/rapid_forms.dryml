@@ -21,7 +21,7 @@
 %></def>
 
 
-<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner"><%= 
+<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, enctype"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
    
   new_record = this.try.new_record?
@@ -95,6 +95,8 @@
         add_classes!(html_attrs, "#{'new_' if new_record}#{type_id}")
       end
     end
+
+    html_attrs[:enctype] = enctype
      
     Hobo::Dryml.last_if = true
     element("form", html_attrs, body)
