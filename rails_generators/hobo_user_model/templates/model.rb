@@ -24,8 +24,8 @@ class <%= class_name %> < ActiveRecord::Base
            :params => [:username, :email_address, :password, :password_confirmation],
            :become => :active, :if => proc {|_, u| u.guest?}
 
-    transition :nobody, :request_password_reset, { :active => :active } do
-      <%= class_name -%>Mailer.deliver_forgot_password(self, lifecycle.generate_key)
+    transition :nobody, :request_password_reset, { :active => :active }, :new_key => true do
+      <%= class_name %>Mailer.deliver_forgot_password(self, lifecycle.key)
     end
 
     transition :with_key, :reset_password, { :active => :active }, 

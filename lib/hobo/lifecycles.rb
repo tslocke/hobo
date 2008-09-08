@@ -49,7 +49,7 @@ module Hobo
 
 
       def become(state)
-        self.lifecycle.state = state
+        self.lifecycle.become state
       end
 
     end

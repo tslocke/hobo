@@ -1,4 +1,5 @@
 <def tag="hidden-fields" attrs="fields, skip, for-query-string"><%= 
+  skip = comma_split(skip)
   pairs = if for_query_string
             query_params.to_a
           else

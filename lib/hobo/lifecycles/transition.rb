@@ -36,8 +36,9 @@ module Hobo
 
       def run!(record, user, attributes)
         if prepare_and_check!(record, user, attributes)
-          fire_event(record, on_transition)
-          record.become end_state
+          if record.lifecycle.become end_state
+            fire_event(record, on_transition)
+          end
         else
           raise Hobo::Model::PermissionDeniedError
         end
