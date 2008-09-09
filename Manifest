@@ -69,6 +69,7 @@ rails_generators/hobo/templates/application.dryml
 rails_generators/hobo/templates/dryml-support.js
 rails_generators/hobo/templates/guest.rb
 rails_generators/hobo/templates/initializer.rb
+rails_generators/hobo/templates/patch_routing.rb
 rails_generators/hobo_front_controller/hobo_front_controller_generator.rb
 rails_generators/hobo_front_controller/templates/controller.rb
 rails_generators/hobo_front_controller/templates/functional_test.rb
@@ -121,6 +122,7 @@ rails_generators/hobo_user_model/templates/mailer.rb
 rails_generators/hobo_user_model/templates/model.rb
 rails_generators/hobo_user_model/templates/unit_test.rb
 rails_generators/hobo_user_model/USAGE
+Rakefile
 README
 script/destroy
 script/generate
