@@ -151,6 +151,7 @@ module Hobo
 
 
     def context_map(enum = this)
+      # TODO: Calls to respond_to? in here can cause the full collection hiding behind a scoped collection to get loaded
       res = []
       empty = true
       if enum.respond_to?(:each_pair)
