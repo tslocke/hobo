@@ -435,7 +435,6 @@ var Hobo = {
     
     
     fixSectionGroup: function(e) {
-        alert(e.outerHTML)
 	    rows = e.childElements().map(function(e, i) {
     	    cells = e.childElements().map(function(e, i) {
         	    return e.outerHTML.sub("<DIV", "<td  valign='top'").sub(/<\/DIV>$/i, "</td>")
