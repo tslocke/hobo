@@ -10,6 +10,6 @@ Echoe.new('hobofields') do |p|
   p.changelog = "CHANGES.txt"
   p.version   = "0.8.1"
 
-  p.dependencies = ['hobosupport >=0.8']
+  p.dependencies = ['hobosupport >=0.8', 'rails >=2.1']
 end
 
