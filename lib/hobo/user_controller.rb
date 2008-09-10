@@ -65,12 +65,8 @@ module Hobo
           old_user = current_user
           self.current_user = user
 
-          # If supplied, a block can be used to test if this user is
-          # allowed to log in (e.g. the account may be disabled)
-          account_available = block_given? ? yield : user.account_can_login?
-
-          if !account_available
-            # block returned false - cancel this login
+          if !user.account_active?
+            # account not activated yet - cancel this login
             self.current_user = old_user
             render :action => :account_disabled unless performed?
           else
