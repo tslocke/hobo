@@ -101,6 +101,10 @@ module Hobo
       !self.class.has_lifecycle? || !'active'.in?(self.class::Lifecycle.state_names) || state == 'active'
     end
 
+    def account_can_login?
+      account_active?
+    end
+
     # Encrypts the password with the user salt
     def encrypt(password)
       self.class.encrypt(password, salt)
@@ -108,7 +112,7 @@ module Hobo
 
     # Check if the encrypted passwords match
     def authenticated?(password)
-      account_active? && crypted_password == encrypt(password)
+      crypted_password == encrypt(password)
     end
 
     # Do we still need to remember the login token, or has it expired?

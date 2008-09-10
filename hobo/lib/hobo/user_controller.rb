@@ -67,7 +67,7 @@ module Hobo
 
           # If supplied, a block can be used to test if this user is
           # allowed to log in (e.g. the account may be disabled)
-          account_available = block_given? ? yield : true
+          account_available = block_given? ? yield : user.account_can_login?
 
           if !account_available
             # block returned false - cancel this login
