@@ -133,6 +133,7 @@ module Hobo
 
       def user_find(user, *args)
         record = find(*args)
+        yield(record) if block_given?
         raise PermissionDeniedError unless Hobo.can_view?(user, record)
         record
       end
