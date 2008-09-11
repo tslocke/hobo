@@ -308,7 +308,9 @@ module Hobo
 
 
     def find_instance(options={})
-      model.user_find(current_user, params[:id], options)
+      model.user_find(current_user, params[:id], options) do |record|
+        yield record if block_given?
+      end
     end
 
 
@@ -580,9 +582,11 @@ module Hobo
 
 
     def prepare_for_transition(name, options={})
-      self.this = find_instance
-      this.exempt_from_edit_checks = true
-      this.lifecycle.provided_key = params[:key]
+      self.this = find_instance do |record|
+        # The block allows us to perform actions on the records before the permission check
+        record.exempt_from_edit_checks = true
+        record.lifecycle.provided_key = params[:key]
+      end
       @transition = this.lifecycle.find_transition(name, current_user)
     end
 
