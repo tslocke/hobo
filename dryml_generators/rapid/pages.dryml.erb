@@ -57,7 +57,9 @@ new_link = linkable?(:new)
       </section>
       
       <section param="content-body">
-        <form param/>
+        <form param>
+          <submit: label="Create <%= model_name :title %>"/>
+        </form>
       </section>
     </content:>
   </page>
@@ -228,6 +230,7 @@ new_link = :new.in?(actions)
       <section param="content-body">
         <form owner="<%= owner %>" method="post" param>
           <field-list: skip="<%= owner %>"/>
+          <submit: label="Create <%= model_name :title %>"/>
         </form>
       </section>
     </content:>
