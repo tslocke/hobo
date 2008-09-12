@@ -108,7 +108,7 @@ module Hobo
 
     # Check if the encrypted passwords match
     def authenticated?(password)
-      account_active? && crypted_password == encrypt(password)
+      crypted_password == encrypt(password)
     end
 
     # Do we still need to remember the login token, or has it expired?
