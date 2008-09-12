@@ -17,6 +17,7 @@ module HoboFields
     :boolean       => Hobo::Boolean,
     :date          => Date,
     :datetime      => (defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : Time),
+    :time          => Time,
     :integer       => Fixnum,
     :big_integer   => BigDecimal,
     :decimal       => BigDecimal,

@@ -159,6 +159,11 @@
   <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
 </def>
 
+<def tag="input" for="time" attrs="order">
+  <% order = order.nil? ? [:year, :month, :day, :hour, :minute, :second] : comma_split(order).*.to_sym -%>
+  <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+</def>
+
 <def tag="input" for="datetime" attrs="order">
   <% order = order.nil? ? [:year, :month, :day, :hour, :minute, :second] : comma_split(order).*.to_sym -%>
   <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
