@@ -64,9 +64,11 @@ module Hobo
         else
           old_user = current_user
           self.current_user = user
+          
+          yield if block_given?
 
           if !user.account_active?
-            # account not activated yet - cancel this login
+            # account not activate - cancel this login
             self.current_user = old_user
             render :action => :account_disabled unless performed?
           else
