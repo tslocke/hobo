@@ -275,7 +275,7 @@
     ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
-    func = ajax_updater(object_url(new.class), update, ajax_attributes)
+    func = ajax_updater(object_url(new.class, :method => :post), update, ajax_attributes)
     element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
                                 "button create-button create-#{class_name}-button"), nil, true, true
   end
