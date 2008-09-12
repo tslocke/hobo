@@ -134,10 +134,9 @@
 
 <def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
   name = (attr = this.try.origin_attribute and attr.to_s) || type_name(:plural => true)
-  name = name.titleize
+  name = dasherize ? name.dasherize : name.titleize
   name = name.singularize if singular
   name = name.downcase if lowercase
-  name = name.underscore.gsub('_', '-') if dasherize
   name
 %></def>
 
@@ -188,7 +187,7 @@
         # This target is registered with ModelRouter as not linkable
         content
       else
-        css_class = target.try.origin_attribute || target.class.name.underscore
+        css_class = target.try.origin_attribute || target.class.name.underscore.dasherize
         add_classes!(attributes, "#{css_class}-link")
       
         href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
