@@ -11,5 +11,6 @@ Echoe.new('hobofields') do |p|
   p.version   = "0.8.1"
 
   p.dependencies = ['hobosupport >=0.8', 'rails >=2.1']
+  p.development_dependencies = []
 end
 

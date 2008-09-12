@@ -33,6 +33,8 @@ Echoe.new('hobo') do |p|
     'hobofields >=0.8.1',
     'rails >=2.1',
     'mislav-will_paginate >=2.2.1']
+    
+  p.development_dependencies = []
 end
 
 
