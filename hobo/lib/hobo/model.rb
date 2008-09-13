@@ -391,9 +391,9 @@ module Hobo
     
     
     def to_param
-      name_attr = self.class.name_attribute
-      if name_attr
-        readable = send(name_attr).to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+$/, '').split('-')[0..5].join('-')
+      name_attr = self.class.name_attribute and name = send(name_attr)
+      if name_attr && !name.blank?
+        readable = name.to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+$/, '').split('-')[0..5].join('-')
         @to_param ||= "#{id}-#{readable}"
       else
         id
