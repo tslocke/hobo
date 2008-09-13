@@ -142,7 +142,7 @@ tasks/environments.rake
 tasks/fix_dryml.rake
 tasks/generate_tag_reference.rb
 tasks/hobo_tasks.rake
-test/test_generator_helper.rb
-test/test_helper.rb
-test/test_hobo_model_controller_generator.rb
+test/generators/test_generator_helper.rb
+test/generators/test_helper.rb
+test/generators/test_hobo_model_controller_generator.rb
 uninstall.rb
