@@ -1,3 +1,48 @@
+=== Hobo 0.8.2 ===
+
+Hobo models -- improvement to name-in-URL (#to_param)
+
+Added missing input for time fields
+
+Rapid forms -- added missing hours/minutes/seconds fields to datetime input
+
+Reorg of Hobo Rakefile, in preprartion for move to Shoulda
+
+Rapid -- fix to <create-button>
+
+Echoe tasks -- adding workaround for developer-dependencies problem
+
+Rapid -- fixes to css class named that had '_' instead of '-'
+
+Rapid pages generators -- improvements to form submit button labels
+
+ModelController - set the provided key on the record *before* the view permission check during a lifecycle
+transition
+
+Hobo Models -- Model.user_find can now take a block to perform actions on the record prior to the permission check
+
+Added Rails dependency to hobofields gem
+
+Fix to Rails dependency - any Rails >= 2.1 is ok
+
+Reorganised generator tests
+
+Hobo users now have an #account_active? method. Used in two places:
+
+  - This method rather than the return value of the block passed to hobo_login, is now used to figure out if an
+    account is active when logging in.
+    
+  - After signing up, also log the user in iff account_active? is true. This is useful if there is a second step to
+    signing up, such as email activation
+
+hobo_front_controller generator -- improved title of home page
+
+Rapid generators -- fix to owner link on new-for-owner page
+
+Fix to bug where validations were not happening during lifecycle creates/transitions
+
+
+
 === Hobo 0.8.1 ===
 
     Fixes to generating and loading subsite controllers

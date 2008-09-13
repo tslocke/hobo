@@ -42,11 +42,11 @@ Echoe.new('hobo') do |p|
   p.project = "hobo"
 
   p.changelog = "CHANGES.txt"
-  p.version   = "0.8.1"
+  p.version   = "0.8.2"
 
   p.dependencies = [
-    'hobosupport >=0.8.1',
-    'hobofields >=0.8.1',
+    'hobosupport >=0.8.2',
+    'hobofields >=0.8.2',
     'rails >=2.1',
     'mislav-will_paginate >=2.2.1']
     
