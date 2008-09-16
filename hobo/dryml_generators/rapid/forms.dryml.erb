@@ -7,7 +7,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 -%>
 <def tag="form" for="<%= model.name %>">
   <form merge param="default">
-    <error-messages/>
+    <error-messages param/>
     <field-list fields="<%= form_fields * ', ' %>" param/>
     <div param="actions">
       <submit label="Save" param/><or-cancel param="cancel"/>
@@ -20,6 +20,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 <def tag="<%= creator.name.dasherize %>-form" polymorphic/>
 <def tag="<%= creator.name.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= creator.name %>">
+    <error-messages param/>
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
     <div param="actions">
       <submit label="<%= creator.name.titleize %>" param/><or-cancel param="cancel"/>
@@ -32,6 +33,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 <def tag="<%= transition.name.dasherize %>-form" polymorphic/>
 <def tag="<%= transition.name.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= transition.name %>">
+    <error-messages param/>
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
     <div param="actions">
