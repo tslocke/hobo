@@ -79,16 +79,16 @@ module Hobo
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
-        template_path = "app/views/" + page + ".dryml"
-        src_file = File.join(RAILS_ROOT, template_path)
-        mtime = File.mtime(src_file)
+        template_path = view.finder.pick_template(page, "dryml")
+ 
+        mtime = File.mtime(template_path)
         renderer_class = @renderer_classes[page]
 
         # do we need to recompile?
         if (!renderer_class or                                          # nothing cached?
             (local_names - renderer_class.compiled_local_names).any? or # any new local names?
             renderer_class.load_time < mtime)                           # cache out of date?
-          renderer_class = make_renderer_class(File.read(src_file), template_path, local_names,
+          renderer_class = make_renderer_class(File.read(template_path), template_path, local_names,
                                                DEFAULT_IMPORTS, included_taglibs)
           renderer_class.load_time = mtime
           @renderer_classes[page] = renderer_class
