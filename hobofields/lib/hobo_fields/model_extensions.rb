@@ -142,7 +142,7 @@ module HoboFields
     # AssociationReflection instead
     def self.attr_type(name)
       if attr_types.nil? && self != self.name.constantize
-        raise RuntimeError, "attr_types called on a stale class object (#{self.name}). Avoid storing persistent refereces to classes"
+        raise RuntimeError, "attr_types called on a stale class object (#{self.name}). Avoid storing persistent references to classes"
       end
 
       attr_types[name] or
