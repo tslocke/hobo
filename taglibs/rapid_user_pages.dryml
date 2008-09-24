@@ -33,8 +33,9 @@
               <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
             </labelled-item>
           </labelled-item-list>
-          <div class="actions" param="actions">
-            <submit label='Log in' param/><if test="&signup_url" class='nav-item'> or <a href="&signup_url">Sign up</a></if>
+          <div param="actions">
+            <submit label='Log in' param/><if test="&signup_url" class='nav-item'>
+            or <a href="&signup_url">Sign up</a></if>
           </div>
         </form>
         <a href="&forgot_password_url" param="forgot-password">Forgot your password?</a>
@@ -67,7 +68,7 @@
               </item-value>
             </labelled-item>
           </labelled-item-list>
-          <div class="actions" param="actions">
+          <div param="actions">
             <submit label="Send" param/>
           </div>
         </form>
