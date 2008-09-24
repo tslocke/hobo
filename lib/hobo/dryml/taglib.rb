@@ -73,7 +73,11 @@ module Hobo
 
             def included(base)
               @tag_aliases.each do |tag, feature|
-                base.send(:alias_method_chain, tag, feature)
+                if base.respond_to? :alias_method_chain_on_include
+                  base.alias_method_chain_on_include tag, feature
+                else
+                  base.send(:alias_method_chain, tag, feature)
+                end
               end
             end
 
