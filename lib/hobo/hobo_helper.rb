@@ -161,10 +161,16 @@ module Hobo
           new_object_context(value) { res << yield }
         end
       else
+        new_count = 1
         enum.each do |e|
           empty = false;
-          if e.respond_to?(:new_record?) && !e.new_record?
-            new_field_context(e.id.to_s, e) { res << yield }
+          if e.respond_to?(:new_record?)
+            if e.new_record?
+              new_field_context("new_#{new_count}", e) { res << yield }
+              new_count += 1
+            else
+              new_field_context(e.id.to_s, e) { res << yield }
+            end
           else
             new_object_context(e) { res << yield }
           end
