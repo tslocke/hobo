@@ -37,7 +37,7 @@
             <submit label='Log in' param/><if test="&signup_url" class='nav-item'> or <a href="&signup_url">Sign up</a></if>
           </div>
         </form>
-        <a class="forgot-password" href="&forgot_password_url">Forgot your password?</a>
+        <a href="&forgot_password_url" param="forgot-password">Forgot your password?</a>
       </section>
     </content:>
   </simple-page>
