@@ -97,7 +97,7 @@ end
         <h2 param="heading"><name/></h2>
 <% if boolean_fields.any? -%>
 
-        <field-names-where-true fields="<%= boolean_fields * ', ' %>"/>        
+        <field-names-where-true fields="<%= boolean_fields * ', ' %>" param/>
 <% end -%>
 <% if creator_link -%>
 
