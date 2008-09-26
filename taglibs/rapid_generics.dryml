@@ -12,9 +12,9 @@
 
 
 <def tag="empty-collection-message">
-  <p class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
+  <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
     No <collection-name lowercase/> to display
-  </p>
+  </div>
 </def>
 
 
