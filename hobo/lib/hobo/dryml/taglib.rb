@@ -67,7 +67,7 @@ module Hobo
         @module = Module.new do
 
           @tag_attrs = {}
-          @tag_aliases = {}
+          @tag_aliases = []
 
           class << self
 
@@ -87,7 +87,7 @@ module Hobo
             attr_reader :tag_attrs
 
             def alias_method_chain_on_include(tag, feature)
-              @tag_aliases[tag] = feature
+              @tag_aliases << [tag, feature]
             end
 
           end
