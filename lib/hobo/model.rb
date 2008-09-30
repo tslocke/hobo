@@ -582,7 +582,12 @@ module Hobo
 
       elsif field_type <= Date
         if value.is_a? Hash
-          Date.new(*(%w{year month day}.map{|s| value[s].to_i}))
+          parts = %w{year month day}.map{|s| value[s].to_i}
+          if parts.include?(0)
+            nil
+          else
+            Date.new(*parts)
+          end
         elsif value.is_a? String
           dt = parse_datetime(value)
           dt && dt.to_date
