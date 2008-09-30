@@ -565,10 +565,11 @@ new HoboBehavior("ul.input-many", {
   
   removeOne: function(ev, el) {
       Event.stop(ev)
-      this.updateButtons()
       var self = this;
-      new Effect.BlindUp(el.up('li'), { duration: 0.5, afterFinish: function (ef) { 
-          ef.element.remove() 
+      var li = el.up('li')
+      new Effect.BlindUp(li, { duration: 0.5, afterFinish: function (ef) { 
+          li.remove() 
+          self.updateButtons()
           self.updateInputNames()
       } });
   },
@@ -594,9 +595,10 @@ new HoboBehavior("ul.input-many", {
       var prefix = Hobo.getClassData(this.element, 'input-many-prefix')
       
       this.element.children('li').each(function(li, index) {
-          li.select('input').each(function(input) {
-              input.id   = input.id.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
-              input.name = input.id
+          li.select('*[name]').each(function(control) {
+              var changeId = control.id == control.name
+              control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
+              if (changeId) control.id = control.name
           })
       })
   }
