@@ -497,7 +497,113 @@ Element.Methods.$$ = function(e, css) {
     return new Selector(css).findElements(e)
 }
 
-// --- has_many_through_input --- //
+
+HoboBehavior = Class.create({
+    
+    initialize: function(mainSelector, features) {
+        this.mainSelector = mainSelector
+        this.features = features
+        this.addEvents(mainSelector, features.events)
+    },
+    
+    addEvents: function(parentSelector, events) {
+        var self = this
+        
+        for (selector in events) {
+            fullSelector = parentSelector + ' ' + selector
+            var rhs = events[selector]
+            if (Object.isString(rhs)) {
+                this.addBehavior(fullSelector, this.features[rhs])
+            } else {
+                this.addEvents(fullSelector, rhs)
+            }
+        }
+        
+    },
+    
+    addBehavior: function(selector, handler) {
+        var self = this
+        behavior = {}
+        behavior[selector] = function(ev) {
+            self.features.element = this.up(self.mainSelector)
+            handler.call(self.features, ev, this)
+        }
+        Event.addBehavior(behavior)
+    }
+    
+})
+
+
+new HoboBehavior("ul.input-many", {
+  
+  events: {
+      "> li > div.buttons": {
+          ".add-item:click":    'addOne',
+          ".remove-item:click": 'removeOne'
+      }
+  },
+  
+  addOne: function(ev, el) {
+      Event.stop(ev)
+      var ul = el.up('ul'), li = el.up('li')
+      
+      var thisItem = li.down('div.has-many-input-item')
+      var newItem = "<li style='display:none'><div class='has-many-input-item'>" + 
+                    thisItem.innerHTML + 
+                    "</div>" + 
+                    "<div class='buttons' />" +
+                    "</div></li>"
+      var newItem = DOM.Builder.fromHTML(newItem)
+      ul.appendChild(newItem)
+      newItem.select('input').each(function(input){input.value=""})
+      
+      this.updateButtons()
+      this.updateInputNames()
+      
+      new Effect.BlindDown(newItem, {duration: 0.5})
+  },
+  
+  removeOne: function(ev, el) {
+      Event.stop(ev)
+      this.updateButtons()
+      var self = this;
+      new Effect.BlindUp(el.up('li'), { duration: 0.5, afterFinish: function (ef) { 
+          ef.element.remove() 
+          self.updateInputNames()
+      } });
+  },
+  
+  updateButtons: function() {
+      var removeButton = "<button class='remove-item'>-</button>"
+      var addButton = "<button class='add-item'>+</button>"
+      
+      
+      var ul = this.element
+      if (ul.childElements().length == 1) {
+          ul.down('li').down('div.buttons').innerHTML = addButton
+      } else {
+          ul.children('li').children('div.buttons').down('button.add-item').remove()
+          ul.children('li:first-child').child('div.buttons').innerHTML = removeButton
+          ul.children('li:last-child').child('div.buttons').innerHTML = removeButton + ' ' + addButton
+      }
+      
+      Event.addBehavior.reload()
+  },
+  
+  updateInputNames: function() {
+      var prefix = Hobo.getClassData(this.element, 'input-many-prefix')
+      
+      this.element.children('li').each(function(li, index) {
+          console.log(index)
+          li.select('input').each(function(input) {
+              input.id   = input.id.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
+              input.name = input.id
+          })
+      })
+  }
+  
+})
+
 
 SelectManyInput = Behavior.create({
 
@@ -665,3 +771,54 @@ Event.addBehavior({
 
 
 });
+
+ElementSet = Class.create(Enumerable, {
+    
+    initialize: function(array) {
+        this.items = array
+    },
+    
+    _each: function(fn) {
+        return this.items.each(fn)
+    },
+    
+    children: function(selector) {
+        return new ElementSet(this.items.invoke('children', selector).pluck('items').flatten())
+    },
+    
+    child: function(selector) {
+        return this.children(selector).first()
+    },
+    
+    select: function(selector) {
+        return new ElementSet(this.items.invoke('select', selector).flatten())
+    },
+    
+    down: function(selector) {
+        for (var i = 0; i < this.items.length; i++) {
+            var match = this.items[i].down(selector)
+            if (match) return match
+        }
+        return null
+    },
+    
+    size: function() {
+        return this.items.length
+    },
+    
+    first: function() {
+        return this.items.first()
+    },
+
+    last: function() {
+        return this.items.last()
+    }
+    
+})
+
+Element.addMethods({
+    children: function(element, selector) {
+        return new ElementSet(Selector.matchElements(element.childElements(), selector))
+    }
+})
+
