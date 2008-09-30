@@ -383,3 +383,41 @@
     <do param="options"><% options_for_select(options.*.to_s, selected.to_s) %></do>
   </select>
 </def>
+
+<def tag="input-many">
+  <set show-blank="&this.empty?"/>
+  <ul class="input-many input-many-prefix:#{param_name_for_this}">
+    <li repeat>      
+      <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
+      <div class="has-many-input-item" param="default"/>
+      <div class="buttons">
+        <button class="remove-item">-</button>
+        <button class="add-item" if="&last_item?">+</button>
+      </div>
+    </li>
+    <!--
+    <li with="&this.new" style="display: #{show_blank ? 'none' : 'block'};">
+      <do param="default"/>
+    </li>
+    -->
+  </ul>
+</def>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
