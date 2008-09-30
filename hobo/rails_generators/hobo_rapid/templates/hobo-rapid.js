@@ -594,7 +594,6 @@ new HoboBehavior("ul.input-many", {
       var prefix = Hobo.getClassData(this.element, 'input-many-prefix')
       
       this.element.children('li').each(function(li, index) {
-          console.log(index)
           li.select('input').each(function(input) {
               input.id   = input.id.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
               input.name = input.id
