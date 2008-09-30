@@ -29,7 +29,7 @@ module Hobo
 
         include Hobo::Lifecycles::ModelExtensions
         include Hobo::FindFor
-        include Hobo::IncludeInSave
+        include Hobo::MassAssignment
       end
 
       class << base
