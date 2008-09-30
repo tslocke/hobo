@@ -246,7 +246,7 @@ module Hobo
 
 
       def has_one_with_new_method(name, options={}, &block)
-        has_one_without_new_method(name, options)
+        has_one_without_new_method(name, options, &block)
         class_eval "def new_#{name}(attributes={}); build_#{name}(attributes, false); end"
       end
 
