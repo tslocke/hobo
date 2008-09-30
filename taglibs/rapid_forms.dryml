@@ -386,12 +386,12 @@
 
 <def tag="input-many">
   <set show-blank="&this.empty?"/>
-  <ul class="input-many input-many-prefix:#{param_name_for_this}">
+  <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
     <li repeat>      
       <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
       <div class="has-many-input-item" param="default"/>
       <div class="buttons">
-        <button class="remove-item">-</button>
+        <button class="remove-item" unless="&this_parent.length == 1">-</button>
         <button class="add-item" if="&last_item?">+</button>
       </div>
     </li>
