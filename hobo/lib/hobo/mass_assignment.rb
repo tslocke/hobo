@@ -21,20 +21,24 @@ module Hobo
 
     def prepare_has_many_assignment(association_name, array_or_hash)
       association = send(association_name)
-      
+
       array = if array_or_hash.is_a?(Hash)
                 array = array_or_hash.get(*array_or_hash.keys.sort_by(&:to_i))
               else
                 array_or_hash
               end
-        
+
       array.map do |record_or_hash|
         if record_or_hash.is_a?(Hash)
           hash = record_or_hash
+
           id = hash.delete(:id)
           record = if id
                      association.find(id) # TODO: We don't really want to find these one by one
                    else
+                     # Remove completely blank hashes
+                     next if hash.values.join.blank?
+
                      record = association.build
                    end
           record.attributes = hash
@@ -43,7 +47,9 @@ module Hobo
           record = record_or_hash
         end
         record
-      end
+
+      end.compact
+
     end      
     
   end
