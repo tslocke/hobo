@@ -560,14 +560,14 @@ new HoboBehavior("ul.input-many", {
       this.updateButtons()
       this.updateInputNames()
       
-      new Effect.BlindDown(newItem, {duration: 0.5})
+      new Effect.BlindDown(newItem, {duration: 0.3})
   },
   
   removeOne: function(ev, el) {
       Event.stop(ev)
       var self = this;
       var li = el.up('li')
-      new Effect.BlindUp(li, { duration: 0.5, afterFinish: function (ef) { 
+      new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
           li.remove() 
           self.updateButtons()
           self.updateInputNames()
