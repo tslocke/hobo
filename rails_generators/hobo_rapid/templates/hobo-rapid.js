@@ -583,7 +583,8 @@ new HoboBehavior("ul.input-many", {
       if (ul.childElements().length == 1) {
           ul.down('li').down('div.buttons').innerHTML = addButton
       } else {
-          ul.children('li').children('div.buttons').down('button.add-item').remove()
+          var add = ul.children('li').children('div.buttons').down('button.add-item')
+          if (add) add.remove()
           ul.children('li:first-child').child('div.buttons').innerHTML = removeButton
           ul.children('li:last-child').child('div.buttons').innerHTML = removeButton + ' ' + addButton
       }
