@@ -339,7 +339,7 @@
 
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
-  prompt ||= "Add a #{this_field.titleize.singularize}"
+  prompt ||= "Add #{a_or_an(:word => this_field)} #{this_field.titleize.singularize}"
   options ||= this.member_class.all
   values = this
   %>
