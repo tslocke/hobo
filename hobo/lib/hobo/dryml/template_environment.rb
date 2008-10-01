@@ -316,17 +316,15 @@ module Hobo::Dryml
     def with_form_context
       @_form_this = this
       @_form_field_path = []
-      @_form_field_names = []
       @_form_field_paths_by_object = { @_form_this => [] }
       res = yield
-      field_names = @_form_field_names
-      @_form_this = @_form_field_path = @_form_field_names = @_form_field_paths_by_object = nil
-      [res, field_names]
+      @_form_this = @_form_field_path = @_form_field_paths_by_object = nil
+      res
     end
 
 
     def register_form_field(name)
-      @_form_field_names << name
+      scope.form_field_names << name
     end
 
 
