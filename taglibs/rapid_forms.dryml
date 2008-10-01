@@ -384,8 +384,10 @@
   </select>
 </def>
 
+
 <def tag="input-many">
-  <set show-blank="&this.empty?"/>
+  <set empty="&this.empty?"/>
+  <% this.build if empty # temporarily add a blank item, remove below %>
   <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
     <li repeat>      
       <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
@@ -395,12 +397,8 @@
         <button class="add-item" if="&last_item?">+</button>
       </div>
     </li>
-    <!--
-    <li with="&this.new" style="display: #{show_blank ? 'none' : 'block'};">
-      <do param="default"/>
-    </li>
-    -->
   </ul>
+  <% this.pop if empty %>
 </def>
 
 
