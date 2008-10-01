@@ -547,8 +547,8 @@ new HoboBehavior("ul.input-many", {
       Event.stop(ev)
       var ul = el.up('ul'), li = el.up('li')
       
-      var thisItem = li.down('div.has-many-input-item')
-      var newItem = "<li style='display:none'><div class='has-many-input-item'>" + 
+      var thisItem = li.down('div.input-many-item')
+      var newItem = "<li style='display:none'><div class='input-many-item'>" + 
                     thisItem.innerHTML + 
                     "</div>" + 
                     "<div class='buttons' />" +
