@@ -88,8 +88,9 @@ module Hobo
       end
 
 
-      def autocomplete(name, options={}, &block)
-        options = options.dup
+      def autocomplete(*args, &block)
+        options = args.extract_options!
+        name = args.first || model.name_attribute
         field = options.delete(:field) || name
         if block
           index_action "complete_#{name}", &block
