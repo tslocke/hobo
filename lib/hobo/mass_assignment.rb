@@ -57,5 +57,5 @@ module Hobo
         array_or_hash
       end
     end
-    
+  end    
 end
