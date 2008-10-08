@@ -26,6 +26,7 @@ module Hobo
 
           helper_method :model, :current_user
           before_filter :set_no_cache_headers
+          after_filter  :remember_page_path
 
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
 
@@ -332,13 +333,11 @@ module Hobo
     end
 
 
-    def destination_after_submit(record=nil, destroyed=false)
-      record ||= this
-
+    def destination_after_submit(record=this, destroyed=false)
       after_submit = params[:after_submit]
 
       # The after_submit post parameter takes priority
-      (after_submit == "stay-here" ? :back : after_submit) ||
+      (after_submit == "stay-here" ? session[:previous_page_path] : after_submit) ||
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
@@ -703,6 +702,10 @@ module Hobo
       #headers["Cache-Control"] = "no-cache"
       headers["Cache-Control"] = "no-store"
       headers["Expires"] ='0'
+    end
+
+    def remember_page_path
+      session[:previous_page_path] = request.path if request.method == :get
     end
 
     # --- end filters --- #
