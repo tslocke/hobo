@@ -1,23 +1,23 @@
-<def tag="hidden-fields" attrs="fields, skip, for-query-string"><%= 
-  skip = comma_split(skip)
+<def tag="hidden-fields" attrs="fields, for-query-string, skip"><%= 
   pairs = if for_query_string
             query_params.to_a
           else
             hiddens = case fields
                       when '*', nil
-                        this.class.column_names - ['type', 'created_at', 'updated_at']
+                        # TODO: Need a better (i.e. extensible) way to eleminate certain fields
+                        this.class.column_names - ['type', 'created_at', 'updated_at'] - comma_split(skip)
                       else
                         comma_split(fields)
                       end
-            pname = this.class.name.underscore
             hiddens.map do |field| 
               val = this.send(field)
-              ["#{pname}[#{field}]", val] unless val.nil? || 
-                                                   field.to_sym.in?(this.class.attr_protected) || 
-                                                   (this.new_record? && val == this.class.column(field).default)
+              param_name = param_name_for(form_this, form_field_path + [field])
+              [param_name, val] unless val.nil? || 
+                                       field.to_sym.in?(this.class.attr_protected) || 
+                                       (this.new_record? && val == this.class.column(field).default)
             end.compact
           end
-  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(skip) }.compact.join("\n")
+  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.join("\n")
 %></def>
 
 
@@ -63,11 +63,12 @@
       html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
     end
      
-    body, field_names = scope.new_scope :in_form => true do
-      with_form_context { parameters.default }
+    body = hiddens = nil
+    scope.new_scope :in_form => true, :form_field_names => [] do
+      body = with_form_context { parameters.default }
+      hiddens = hidden_fields(:fields => hidden_fields) if new_record
     end
      
-    hiddens = hidden_fields(:fields => hidden_fields, :skip => field_names) if new_record
      
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
                    ''
@@ -307,9 +308,13 @@
 </def>
 
 
-<def tag="name-one" attrs="complete-target, completer">
+<def tag="name-one" attrs="complete-target, completer"><%
+  complete_target ||= this_field_reflection.klass
+  completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
+%>
   <input type="text" name="#{param_name_for_this}" 
          class="autocompleter #{type_and_field} complete-on:#{dom_id complete_target}:#{completer}"
+         value="&name :no_wrapper => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
 </def>
@@ -339,7 +344,7 @@
 
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
-  prompt ||= "Add a #{this_field.titleize.singularize}"
+  prompt ||= "Add #{a_or_an(:word => this_field)} #{this_field.titleize.singularize}"
   options ||= this.member_class.all
   values = this
   %>
@@ -383,3 +388,57 @@
     <do param="options"><% options_for_select(options.*.to_s, selected.to_s) %></do>
   </select>
 </def>
+
+
+<def tag="hidden-id-field">
+  <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
+</def>
+
+
+<def tag="input-many">
+  <set empty="&this.empty?"/>
+  <% this.push(this.member_class.new) if empty # temporarily add a blank item, remove below %>
+  <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
+    <li repeat>      
+      <hidden-id-field/>
+      <div class="input-many-item" param="default"/>
+      <div class="buttons">
+        <button class="remove-item" unless="&this_parent.length == 1">-</button>
+        <button class="add-item" if="&last_item?">+</button>
+      </div>
+    </li>
+  </ul>
+  <% this.pop if empty %>
+</def>
+
+
+<def tag="input-all">
+  <% association_fkey = this_field_reflection.primary_key_name %>
+  <ul class="input-all #{this_field.dasherize}">
+    <li repeat>
+      <set-scoped form-field-names="&[]">
+        <hidden-id-field/>
+        <do param="default"/>
+        <hidden-fields skip="&association_fkey"/>
+      </set-scoped>
+    </li>
+  </ul>
+</def>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

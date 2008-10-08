@@ -4,7 +4,7 @@ class <%= class_name %> < ActiveRecord::Base
 
   fields do
 <% for attribute in attributes -%>
-    <%= attribute.name %> :<%= attribute.type %>
+    <%= "%-#{max_attribute_length}s" % attribute.name %> :<%= attribute.type %>
 <% end -%>
     timestamps
   end
