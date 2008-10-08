@@ -89,8 +89,9 @@ module Hobo
       end
 
 
-      def autocomplete(name, options={}, &block)
-        options = options.dup
+      def autocomplete(*args, &block)
+        options = args.extract_options!
+        name = args.first || model.name_attribute
         field = options.delete(:field) || name
         if block
           index_action "complete_#{name}", &block
@@ -224,6 +225,34 @@ module Hobo
       end
       
       
+      def creator_page_action(name, options={}, &block)
+        define_method(name) do
+          creator_page_action name, options, &block
+        end
+      end
+
+
+      def do_creator_action(name, options={}, &block)
+        define_method("do_#{name}") do
+          do_creator_action name, options, &block
+        end
+      end
+      
+
+      def transtion_page_action(name, options={}, &block)
+        define_method(name) do
+          transtion_page_action name, options, &block
+        end
+      end
+
+
+      def do_transition_action(name, options={}, &block)
+        define_method("do_#{name}") do
+          do_transition_action name, options, &block
+        end
+      end
+
+      
       def auto_actions_for(owner, actions)
         model.reverse_reflection(owner)._?.klass == model or 
           raise ArgumentError, "Invalid owner association '#{owner}' for #{model}"
@@ -354,7 +383,18 @@ module Hobo
     
     
     def redirect_after_submit(*args)
-      redirect_to destination_after_submit(*args)
+      options = args.extract_options!
+      o = options[:redirect]
+      if o
+        url = if o.is_a?(Symbol)
+                object_url(this, o)
+              else
+                object_url(Array(o))
+              end
+        redirect_to url
+      else
+        redirect_to destination_after_submit(*args)
+      end
     end
     
 
@@ -474,13 +514,13 @@ module Hobo
     
 
 
-    def create_response(new_action, &b)
+    def create_response(new_action, options={}, &b)
       flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid?
 
       response_block(&b) or
         if valid?
           respond_to do |wants|
-            wants.html { redirect_after_submit }
+            wants.html { redirect_after_submit(options) }
             wants.js   { hobo_ajax_response || render(:nothing => true) }
           end
         else
@@ -505,18 +545,18 @@ module Hobo
       @current_user = @this if @this == current_user
 
       in_place_edit_field = changes.keys.first if changes.size == 1 && params[:render]
-      update_response(in_place_edit_field, &b)
+      update_response(in_place_edit_field, options, &b)
     end
 
 
-    def update_response(in_place_edit_field=nil, &b)
+    def update_response(in_place_edit_field=nil, options={}, &b)
       flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
 
       response_block(&b) or
         if valid?
           respond_to do |wants|
             wants.html do
-              redirect_after_submit
+              redirect_after_submit options
             end
             wants.js do
               if in_place_edit_field
@@ -551,10 +591,10 @@ module Hobo
     end
 
 
-    def destroy_response(&b)
+    def destroy_response(options={}, &b)
       response_block(&b) or
         respond_to do |wants|
-          wants.html { redirect_after_submit(this, true) }
+          wants.html { redirect_after_submit(this, true, options) }
           wants.js   { hobo_ajax_response || render(:nothing => true) }
         end
     end
@@ -562,12 +602,12 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def do_creator_action(name, &b)
+    def do_creator_action(name, options={}, &b)
       @creator = model::Lifecycle.creators[name.to_s]
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit
+          redirect_after_submit options
         else
           re_render_form(name)
         end
@@ -576,6 +616,7 @@ module Hobo
 
     def creator_page_action(name)
       self.this = model.new
+      this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creators[name.to_s] or raise ArgumentError, "No such creator in lifecycle: #{name}"
     end
 
@@ -591,11 +632,12 @@ module Hobo
 
 
     def do_transition_action(name, *args, &b)
+      options = args.extract_options!
       prepare_for_transition(name)
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit
+          redirect_after_submit options
         else
           re_render_form(name)
         end

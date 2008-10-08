@@ -154,24 +154,38 @@ module Hobo
       # TODO: Calls to respond_to? in here can cause the full collection hiding behind a scoped collection to get loaded
       res = []
       empty = true
-      if enum.respond_to?(:each_pair)
-        enum.each_pair do |key, value|
-          empty = false;
-          self.this_key = key;
-          new_object_context(value) { res << yield }
-        end
-      else
-        enum.each do |e|
-          empty = false;
-          if e.respond_to?(:new_record?) && !e.new_record?
-            new_field_context(e.id.to_s, e) { res << yield }
-          else
-            new_object_context(e) { res << yield }
+      scope.new_scope(:repeat_collection => enum) do
+        if enum.respond_to?(:each_pair)
+          enum.each_pair do |key, value|
+            empty = false;
+            self.this_key = key;
+            new_object_context(value) { res << yield }
+          end
+        else
+          index = 0
+          enum.each do |e|
+            empty = false;
+            if enum == this
+              new_field_context(index, e) { res << yield }
+            else
+              new_object_context(e) { res << yield }
+            end
+            index += 1
           end
         end
+        Dryml.last_if = !empty
       end
-      Dryml.last_if = !empty
       res
+    end
+    
+    
+    def first_item?
+      this == scope.repeat_collection.first
+    end
+    
+    
+    def last_item?
+      this == scope.repeat_collection.last
     end
 
 

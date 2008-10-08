@@ -33,7 +33,7 @@ module Enumerable
   end
 
   def rest
-    self[1..-1]
+    self[1..-1] || []
   end
 
   class MultiSender

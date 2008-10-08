@@ -84,6 +84,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
         if resp == "drop " + t
           # Leave things as they are
         else
+          resp.gsub!(' ', '_')
           to_drop.delete(t)
           if resp.in?(rename_to_choices)
             to_rename[t] = resp

@@ -75,7 +75,7 @@ input.file_upload {
 	font-size: 11px; font-weight: bold;
 }
 .button:hover {cursor: pointer;}
-.actions {zoom: 1; overflow: hidden; font-size: 11px;}
+.actions {height: 100%; overflow: hidden; font-size: 11px;}
 
 .flash {
 	margin: 0 40px 10px; padding: 10px 30px; border-width: 2px 0;
@@ -222,8 +222,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 	background: #f5f5f5;
 	position: relative;
 }
-.card h4 {margin-top: 0; margin-bottom: 0;}
-.card .body {margin-top: 6px;}
+.card h4 {margin-top: 0;}
 .card a {background: #f5f5f5;}
 .card .creation-details {
 	display: block; color: #333; font-size: 11px; 
@@ -300,4 +299,21 @@ div.select-many .item .remove-item { float: right; }
 	font-size: 18px; line-height: 27px;
 }
 .front-page ul.models li {margin-left: 0; list-style: none;}
+
+ul.input-many {list-style-type: none;}
+
+ul.input-many > li { overflow:hidden; zoom:1;}
+ul.input-many .input-many-item {float:left;}
+ul.input-many div.buttons {float:left; margin-left:10px;}
+
+
+
+
+
+
+
+
+
+
+
 

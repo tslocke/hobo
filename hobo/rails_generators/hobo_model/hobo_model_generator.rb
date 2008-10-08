@@ -21,5 +21,9 @@ class HoboModelGenerator < Rails::Generator::NamedBase
     def banner
       "Usage: #{$0} #{spec.name} ModelName [field:type, field:type]"
     end
+    
+    def max_attribute_length
+      attributes.*.name.*.length.max
+    end
 
 end
