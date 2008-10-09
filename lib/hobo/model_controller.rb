@@ -747,7 +747,10 @@ module Hobo
     end
 
     def remember_page_path
-      session[:previous_page_path] = request.path if request.method == :get
+      if request.method == :get
+        session[:previous_page_path] = request.path
+        session[:previous_page_path] += "?#{request.query_string}" unless request.query_string.blank?
+      end
     end
 
     # --- end filters --- #
