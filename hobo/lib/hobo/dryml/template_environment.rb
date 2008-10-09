@@ -136,7 +136,7 @@ module Hobo::Dryml
     def dom_id(object=nil, attribute=nil)
       if object.nil?
         # nothing passed -- use context
-        if this_parent && this_field
+        if this_parent && this_field && !this_parent.respond_to?(:member_class)
           object, attribute = this_parent, this_field
         else
           object = this
