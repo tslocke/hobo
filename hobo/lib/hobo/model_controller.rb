@@ -389,7 +389,7 @@ module Hobo
         url = if o.is_a?(Symbol)
                 object_url(this, o)
               else
-                object_url(Array(o))
+                object_url(*Array(o))
               end
         redirect_to url
       else
