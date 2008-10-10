@@ -21,8 +21,9 @@
 %></def>
 
 
-<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner"><%= 
+<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+  html_attrs[:enctype] ||= "multipart/form-data" if multipart
    
   new_record = this.try.new_record?
 
