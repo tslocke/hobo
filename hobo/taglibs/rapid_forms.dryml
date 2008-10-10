@@ -63,12 +63,11 @@
       html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
     end
      
-    body = hiddens = nil
-    scope.new_scope :in_form => true, :form_field_names => [] do
-      body = with_form_context { parameters.default }
-      hiddens = hidden_fields(:fields => hidden_fields) if new_record
+    hiddens = nil
+    body = with_form_context do
+      hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
+      parameters.default
     end
-     
      
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
                    ''
