@@ -317,7 +317,9 @@ module Hobo::Dryml
       @_form_this = this
       @_form_field_path = []
       @_form_field_paths_by_object = { @_form_this => [] }
-      res = yield
+      res = scope.new_scope :in_form => true, :form_field_names => [] do
+        yield
+      end
       @_form_this = @_form_field_path = @_form_field_paths_by_object = nil
       res
     end
