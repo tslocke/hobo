@@ -37,7 +37,7 @@ has_body    = (!show_link && content_attribute) || creator_link || creator_attri
 <% if has_body -%>
     <body: param>
 <% if !show_link && content_attribute -%>
-      <view:<%= content_attribute %> param="description"/>
+      <view:<%= content_attribute %> param="content"/>
 <% end -%>
 <% if creator_link -%>
       <a:<%= creator_attribute %> param="creator-link"/>
