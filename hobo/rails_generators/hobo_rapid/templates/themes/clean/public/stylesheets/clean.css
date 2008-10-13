@@ -301,6 +301,7 @@ div.select-many .item .remove-item { float: right; }
 .front-page ul.models li {margin-left: 0; list-style: none;}
 
 ul.input-many {list-style-type: none;}
+ul.input-all  {list-style-type: none;}
 
 ul.input-many > li { overflow:hidden; zoom:1;}
 ul.input-many .input-many-item {float:left;}
