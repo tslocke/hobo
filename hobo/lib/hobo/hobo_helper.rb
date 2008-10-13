@@ -61,7 +61,9 @@ module Hobo
       if obj.respond_to?(:member_class)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
         
-        owner_name = obj.origin.class.reverse_reflection(obj.origin_attribute).name.to_s
+        refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
+        owner_name = refl.name.to_s
+        owner_name = owner_name.singularize if refl.macro == :has_many
         if action == :new
           action_path = "#{obj.origin_attribute}/new"
           action = :"new_for_#{owner_name}"
