@@ -321,21 +321,39 @@ module Hobo
       end
 
 
-      # FIXME: This should really be a method on AssociationReflection
       def reverse_reflection(association_name)
         refl = reflections[association_name.to_sym] or raise "No reverse reflection for #{name}.#{association_name}"
         return nil if refl.options[:conditions] || refl.options[:polymorphic]
-
-        reverse_macro = if refl.macro == :has_many
-                          :belongs_to
-                        elsif refl.macro == :belongs_to
-                          :has_many
-                        end
-        refl.klass.reflections.values.find do |r|
-          r.macro == reverse_macro &&
-            r.klass == self &&
-            !r.options[:conditions] &&
-            r.primary_key_name == refl.primary_key_name
+        
+        if refl.macro == :has_many && (self_to_join = refl.through_reflection)
+          # Find the reverse of a has_many :through (another has_many :through)
+          
+          join_to_self  = reverse_reflection(self_to_join.name)
+          join_to_other = refl.source_reflection
+          other_to_join = self_to_join.klass.reverse_reflection(join_to_other.name)
+          
+          return nil if self_to_join.options[:conditions] || join_to_other.options[:conditions]
+          
+          refl.klass.reflections.values.find do |r|
+            r.macro == :has_many &&
+              !r.options[:conditions] &&
+              r.through_reflection == other_to_join && 
+              r.source_reflection  == join_to_self
+          end
+        else
+          # Find the :belongs_to that corresponds to a :has_many or vice versa
+          
+          reverse_macro = if refl.macro == :has_many
+                            :belongs_to
+                          elsif refl.macro == :belongs_to
+                            :has_many
+                          end
+          refl.klass.reflections.values.find do |r|
+            r.macro == reverse_macro &&
+              r.klass == self &&
+              !r.options[:conditions] &&
+              r.primary_key_name == refl.primary_key_name
+          end
         end
       end
 

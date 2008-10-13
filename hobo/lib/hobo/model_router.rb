@@ -173,26 +173,23 @@ module Hobo
 
     def owner_routes
       controller.owner_actions.each_pair do |owner, actions|
-        collection     = model.reverse_reflection(owner).name
-        owner_singular = model.reflections[owner].klass.name.underscore
-        owner_plural   = owner_singular.pluralize
-        
+        collection         = model.reverse_reflection(owner).name
+        owner_class        = model.reflections[owner].klass.name.underscore
+
+        owner = owner.to_s.singularize if model.reflections[owner].macro == :has_many
+
+        collection_path = "#{owner_class.pluralize}/:#{owner_class}_id/#{collection}"
+
         actions.each do |action| 
           case action
           when :index
-            linkable_route("#{plural}_for_#{owner}",
-                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
-                           "index_for_#{owner}",
+            linkable_route("#{plural}_for_#{owner}",          collection_path,          "index_for_#{owner}",
                            :conditions => { :method => :get })
           when :new
-            linkable_route("new_#{singular}_for_#{owner}",
-                           "#{owner_plural}/:#{owner_singular}_id/#{collection}/new",
-                           "new_for_#{owner}",
+            linkable_route("new_#{singular}_for_#{owner}",    "#{collection_path}/new", "new_for_#{owner}",
                            :conditions => { :method => :get })
           when :create
-            linkable_route("create_#{singular}_for_#{owner}",
-                           "#{owner_plural}/:#{owner_singular}_id/#{collection}",
-                           "create_for_#{owner}",
+            linkable_route("create_#{singular}_for_#{owner}", collection_path,          "create_for_#{owner}",
                            :conditions => { :method => :post })
           end
         end
