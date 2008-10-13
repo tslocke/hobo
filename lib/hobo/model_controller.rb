@@ -83,9 +83,13 @@ module Hobo
     module ClassMethods
 
       attr_writer :model
-
+      
+      def model_name
+        name.sub(/Controller$/, "").singularize
+      end
+      
       def model
-        @model ||= name.sub(/Controller$/, "").singularize.constantize
+        @model ||= model_name.constantize
       end
 
 
@@ -254,18 +258,17 @@ module Hobo
 
       
       def auto_actions_for(owner, actions)
-        model.reverse_reflection(owner)._?.klass == model or 
-          raise ArgumentError, "Invalid owner association '#{owner}' for #{model}"
+        name = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner
         
         owner_actions[owner] ||= []
         Array(actions).each do |action|
           case action
           when :new
-            define_method("new_for_#{owner}")    { hobo_new_for owner }
+            define_method("new_for_#{name}")    { hobo_new_for owner }
           when :index
-            define_method("index_for_#{owner}")  { hobo_index_for owner }
+            define_method("index_for_#{name}")  { hobo_index_for owner }
           when :create
-            define_method("create_for_#{owner}") { hobo_create_for owner }
+            define_method("create_for_#{name}") { hobo_create_for owner }
           else
             raise ArgumentError, "Invalid owner action: #{action}"
           end
@@ -434,7 +437,7 @@ module Hobo
       klass = refl.klass
       id = params["#{klass.name.underscore}_id"]
       owner = klass.find(id)
-      instance_variable_set("@#{owner_association}", owner)
+      instance_variable_set("@#{owner.class.name.underscore}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
     end
 
