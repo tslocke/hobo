@@ -696,12 +696,6 @@ Event.addBehavior({
         if (Prototype.Browser.IE) Hobo.fixSectionGroup(this);
     },
 
-    'textarea.html' : function(e) {
-        if (typeof(nicEditors) != "undefined") {
-            Hobo.makeNicEditor(this)
-        }
-    },
-
     'div.select-many.input' : SelectManyInput(),
 
     '.association-count:click' : function(e) {
@@ -724,38 +718,28 @@ Event.addBehavior({
     '.autocompleter' : AutocompleteBehavior(),
 
     '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
-     function (e) {
+     function (ev) {
         var ipe = Hobo._makeInPlaceEditor(this)
         ipe.getText = function() {
             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
         }
     },
 
-    '.text.in-place-edit, .markdown.in-place-edit, .textile.in-place-edit' : function (e) {
+    '.text.in-place-edit, .markdown.in-place-edit, .textile.in-place-edit' : function (ev) {
         var ipe = Hobo._makeInPlaceEditor(this, {rows: 2})
         ipe.getText = function() {
             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
         }
     },
 
-    ".html.in-place-edit" : function (e) {
-        var nicEditPresent = typeof(nicEditor) != "undefined"
-        var options = { rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save" }
-        if (nicEditPresent) options["submitOnBlur"] = false
-        var ipe = Hobo._makeInPlaceEditor(this, options) 
-        if (nicEditPresent) {
-            ipe.afterEnterEditMode = function() {
-                var editor = this._controls.editor
-                var id = editor.id = Hobo.uid()
-                var nicInstance = Hobo.makeNicEditor(editor)
-                var panel = this._form.down(".nicEdit-panel")
-                panel.appendChild(this._controls.cancel)
-                panel.appendChild(this._controls.ok)
-                bkLib.addEvent(this._controls.ok,'click', function () {
-                    nicInstance.saveContent()
-                    setTimeout(function() {nicInstance.remove()}, 1)
-                })
+    ".html.in-place-edit" : function (ev) {
+        if (Hobo.makeInPlaceHtmlEditor) {
+            Hobo.makeInPlaceHtmlEditor(this)
+        } else {
+            var options = { 
+                rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save", submitOnBlur: false
             }
+            var ipe = Hobo._makeInPlaceEditor(this, options) 
         }
     },
 
