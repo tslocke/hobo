@@ -176,8 +176,10 @@ name_attribute = model.name_attribute
 <%
 collection_name = model.reverse_reflection(owner).name.to_s
 owner_model     = model.reflections[owner].klass
-owner_tag       = linkable?(owner_model, :show) ? "a" : "name"
-owner    = owner.to_s
+linkable_owner  = linkable?(owner_model, :show)
+owner_tag       = linkable_owner ? "a" : "name"
+
+owner = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner.to_s
 -%>
 <% if :index.in? actions -%>
 <%
@@ -185,13 +187,14 @@ new_link = :new.in?(actions)
 -%>
 <def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="<%= model_name :title, :plural %> for #{name :with => @<%= owner %>}">
+  <page merge title="<%= model_name :title, :plural %> for #{name :with => @<%= owner %>, :no_wrapper => true}">
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
     
     <content: param>
       <header param="content-header">
-        <div param="back-to">Back to <a with="&@<%= owner %>"/></div>
+        <% if linkable_owner %><div param="back-to">Back to <a with="&@<%= owner %>"/></div><% end %>
         <h2 param="heading"><%= model_name :title, :plural %></h2>
+        <h3 param="subheading">For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
 
         <p param="count" if>There <count prefix="are"/></p>
       </header>
