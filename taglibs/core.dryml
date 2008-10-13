@@ -15,8 +15,7 @@
 %></def>
 
 
-<def tag="repeat" attrs="even-odd, join">
-  <if><%= 
+<def tag="repeat" attrs="even-odd, join"><if><%= 
     if even_odd
       context_map do
         klass = [attributes[:class], model_id_class, cycle("even", "odd")].compact.join(' ')
@@ -30,9 +29,7 @@
           res
         end.join(join)
       end
-    end %>
-  </if>
-</def>
+    end %></if></def>
 
 
 <def tag="do"><%= parameters.default %></def>
