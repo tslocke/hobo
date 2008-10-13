@@ -554,8 +554,8 @@ new HoboBehavior("ul.input-many", {
                     "<div class='buttons' />" +
                     "</div></li>"
       var newItem = DOM.Builder.fromHTML(newItem)
-      ul.appendChild(newItem)
-      newItem.select('input').each(function(input){input.value=""})
+      ul.appendChild(newItem);
+      $(newItem).select('input').each(function(input){ input.value="" })
       
       this.updateButtons()
       this.updateInputNames()
@@ -583,10 +583,10 @@ new HoboBehavior("ul.input-many", {
       if (ul.childElements().length == 1) {
           ul.down('li').down('div.buttons').innerHTML = addButton
       } else {
-          var add = ul.children('li').children('div.buttons').down('button.add-item')
+          var add = ul.selectChildren('li').selectChildren('div.buttons').down('button.add-item')
           if (add) add.remove()
-          ul.children('li:first-child').child('div.buttons').innerHTML = removeButton
-          ul.children('li:last-child').child('div.buttons').innerHTML = removeButton + ' ' + addButton
+          ul.selectChildren('li:first-child').child('div.buttons').innerHTML = removeButton
+          ul.selectChildren('li:last-child').child('div.buttons').innerHTML = removeButton + ' ' + addButton
       }
       
       Event.addBehavior.reload()
@@ -595,7 +595,7 @@ new HoboBehavior("ul.input-many", {
   updateInputNames: function() {
       var prefix = Hobo.getClassData(this.element, 'input-many-prefix')
       
-      this.element.children('li').each(function(li, index) {
+      this.element.selectChildren('li').each(function(li, index) {
           li.select('*[name]').each(function(control) {
               var changeId = control.id == control.name
               control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
@@ -705,7 +705,7 @@ Event.addBehavior({
     'div.select-many.input' : SelectManyInput(),
 
     '.association-count:click' : function(e) {
-	new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
+	    new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
 	    Event.stop(e);
     },
 
@@ -784,12 +784,12 @@ ElementSet = Class.create(Enumerable, {
         return this.items.each(fn)
     },
     
-    children: function(selector) {
-        return new ElementSet(this.items.invoke('children', selector).pluck('items').flatten())
+    selectChildren: function(selector) {
+        return new ElementSet(this.items.invoke('selectChildren', selector).pluck('items').flatten())
     },
     
     child: function(selector) {
-        return this.children(selector).first()
+        return this.selectChildren(selector).first()
     },
     
     select: function(selector) {
@@ -819,7 +819,7 @@ ElementSet = Class.create(Enumerable, {
 })
 
 Element.addMethods({
-    children: function(element, selector) {
+    selectChildren: function(element, selector) {
         return new ElementSet(Selector.matchElements(element.childElements(), selector))
     }
 })
