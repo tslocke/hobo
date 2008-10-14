@@ -102,9 +102,9 @@
 %></def>
 
 
-<def tag="name"><%= 
+<def tag="name" attrs="if-present"><%= 
   if this.nil?
-    nil_view
+    nil_view unless if_present
   else
     name_tag = find_polymorphic_tag("name")
     if name_tag != "name"
