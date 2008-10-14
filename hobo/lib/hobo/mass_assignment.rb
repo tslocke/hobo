@@ -14,7 +14,10 @@ module Hobo
       if accessible
         class_eval %{
           def #{name}_with_mass_assignment=(array_or_hash)
-            self.#{name}_without_mass_assignment = prepare_has_many_assignment(:#{name}, array_or_hash)
+            items = prepare_has_many_assignment(:#{name}, array_or_hash)
+            self.#{name}_without_mass_assignment = items
+            # ensure the loaded array contains any changed records
+            self.#{name}.proxy_target[0..-1] = items
           end}, __FILE__, __LINE__ - 3
         alias_method_chain :"#{name}=", :mass_assignment
       end
