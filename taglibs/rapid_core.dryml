@@ -1,0 +1,400 @@
+<def tag="field-list" attrs="tag">
+  <% tag ||= scope.in_form ? "input" : "view" %>
+  <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
+    <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
+      <labelled-item unless="&tag == 'input' && !can_edit?">
+        <item-label param="#{this_field.to_s.sub('?', '')}-label">
+          <do param="label"><%= this_field.to_s.titleize %></do>
+        </item-label>
+        <item-value param="#{this_field.to_s.sub('?', '')}-view">
+          <do param="view"><call-tag tag="&tag" param="#{this_field.to_s.sub('?', '')}-tag"/></do>
+        </item-value>
+      </labelled-item>
+    </with-fields>
+  </labelled-item-list>
+</def>
+
+
+<def tag="item"><% scope.items << parameters.default %></def>
+
+
+<def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
+
+
+<def tag="table" attrs="fields, field-tag, empty">
+  <if test="&!(fields || all_parameters.tr?)">
+    <%= element("table", attributes, all_parameters.default) %>
+  </if>
+  <else>
+    <% field_tag ||= "view" %>
+    <unless test="&this.empty? && !empty">
+      <% element "table", attributes - attrs_for(:with_fields) do %>
+      <thead if="&all_parameters[:thead] || fields" param>
+        <tr param="field-heading-row">
+          <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
+            <th param="#{scope.field_name}-heading"><%= scope.field_name.titleize %></th>
+          </with-field-names>
+          <th if="&all_parameters[:controls]" class="controls"/>
+        </tr>
+      </thead>
+      <tbody>
+        <repeat>
+          <tr param if="&can_view?"
+              class="#{scope.even_odd} #{this_type.name.underscore} #{model_id_class}">
+            <if test="&fields">
+              <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
+                <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+              </with-fields>
+              <td class="controls" param="controls" if="&all_parameters[:controls]">
+                <a param="edit-link" action="edit">Edit</a>
+                <delete-button param/>
+              </td>
+            </if>
+          </tr>
+        </repeat>      
+      </tbody>
+      <tfoot if="&all_parameters[:tfoot]" param/>
+      <% end %>
+    </unless>
+  </else>
+</def>
+
+
+<def tag="image" attrs="src">
+  <img src="#{base_url}/images/#{src}" merge-attrs/>
+</def>
+
+
+<def tag="spinner">
+  <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
+</def>
+
+
+<def tag="hobo-rapid-javascripts"><%=
+   res = 'var hoboParts = {};'
+   # FIXME: This should interrogate the model-router - not the models
+   unless Hobo::Model.all_models.empty?
+     # Tell JS code how to pluralize names, unless they follow the simple rule
+     names = Hobo::Model.all_models.map do |m|
+                                          m = m.name.underscore
+                                          "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+                                        end.compact
+     res << "var pluralisations = {#{names * ', '}}; "
+   end
+   base = [base_url, subsite].compact.join("/")
+   res << "urlBase = '#{base}'; hoboPagePath = '#{view_name}'"
+   if request_forgery_protection_token
+     res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
+   end
+   res
+%></def>
+
+
+<def tag="name" attrs="if-present, raw"><%= 
+  if this.nil?
+    nil_view unless if_present
+  else
+    name_tag = find_polymorphic_tag("name")
+    if name_tag != "name"
+      send(name_tag, attributes)
+    elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
+      count
+    elsif this.is_a? Class and this < ActiveRecord::Base
+      this.name.pluralize.titleize
+    elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
+      if raw
+        this.send(name_attr)
+      else
+        view(merge_attrs(attributes, {:field => name_attr}))
+      end
+    elsif can_view?(this)
+      this.to_s
+    end
+  end
+%></def>
+
+
+<def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
+  type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
+
+  name = dasherize ? type.name.underscore.dasherize : type.name.titleize
+  name = name.pluralize if plural
+  name = name.downcase if lowercase
+  name
+%></def>
+     
+
+<def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
+  if (attr = this.try.origin_attribute)
+    name = attr.to_s
+    name = dasherize ? name.underscore.dasherize : name.titleize
+    name = name.singularize if singular
+    name = name.downcase if lowercase
+    name
+  else
+    type_name(:plural => !singular, :lowercase => lowercase, :dasherize => dasherize)
+  end
+%></def>
+
+
+<def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
+  content = parameters.default
+   
+  params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
+  
+  if href || attributes[:name]
+    # Regular link
+    href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if !params.blank?
+    element(:a, attributes.update(:href => href), content)
+  else
+    target = to || this
+  
+    if target.nil?
+      Hobo::Dryml.last_if = false
+      nil_view
+    elsif action == "new"
+      # Link to a new object form
+      new_record = target.new
+      new_record.set_creator(current_user)
+      href = object_url(target, "new", params._?.merge(:subsite => subsite))
+      
+      if href && can_create?(new_record)
+        new_class_name = if target.respond_to?(:proxy_reflection)
+                           target.proxy_reflection.klass.name
+                         else
+                           target.name
+                         end
+
+        add_classes!(attributes, "new-#{new_class_name.underscore}-link")
+        content = "New #{new_class_name.titleize}" if content.blank?
+        Hobo::Dryml.last_if = true
+        element(:a, attributes.update(:href => href), content)
+      else
+        Hobo::Dryml.last_if = false
+        ""
+      end
+    else
+      # Link to an existing object
+
+      content = name if content.blank?
+      
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
+      if href.nil?
+        # This target is registered with ModelRouter as not linkable
+        content
+      else
+        css_class = target.try.origin_attribute || target.class.name.underscore.dasherize
+        add_classes!(attributes, "#{css_class}-link")
+      
+        href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
+      
+        # Set default link text if none given
+        element(:a, attributes.update(:href => href), content)
+      end
+    end
+  end
+%></def>
+
+        
+<def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
+  raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+    can_view?
+   
+  res = if this.nil? && if_blank.nil?
+          this_type.is_a?(Class) && this_type <= String ? "" : nil_view
+        elsif (refl = this_field_reflection) && refl.macro == :has_many
+          has_many_view(attributes)
+        else
+         
+          view_tag = find_polymorphic_tag("view")
+          
+          if view_tag == "view" # i.e. it didn't find a type specific tag
+            if this.respond_to?(:to_html)
+              this.to_html(scope.xmldoctype)
+            else
+              this.to_s
+            end
+          else
+            attrs = add_classes(attributes, "view", type_and_field._?.dasherize, model_id_class)
+
+            view_attrs = attrs_for(view_tag)
+            the_view = send(view_tag, attrs & view_attrs)
+            
+            the_view = if_blank if if_blank && the_view.blank?
+
+            truncate = 30 if truncate == true
+            the_view = self.truncate(the_view, truncate.to_i) if truncate
+            the_view = the_view.strip
+            
+            if no_wrapper
+              the_view
+            else
+              wrapper = if inline
+                          :span
+                        elsif block || this.is_a?(HoboFields::Text)
+                          :div
+                        else
+                          :span
+                        end
+              element(wrapper, attrs - view_attrs, the_view)
+            end
+          end
+        end
+   Hobo::Dryml.last_if = !res.blank?
+   res
+%></def>
+
+    
+<def tag="belongs-to-view"><a merge-attrs/></def>
+
+<def tag="has-many-view"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
+
+<def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+
+<def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+
+<def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+
+<def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
+
+<def tag="view" for="string"><%= this.try.to_html(scope.xmldoctype) || h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") %></def>
+
+<def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
+
+<def tag="view" for="ActiveRecord::Base"><a/></def>
+
+
+<def tag="count" attrs="label, prefix, if-any, lowercase"><span class="count"><%=
+  raise Exception.new("asked for count of a string") if this.is_a?(String)
+   
+  c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+
+  label ||= if this.is_a?(Class)
+              this.name
+            elsif (attr = this.try.origin_attribute)
+              attr.to_s.singularize
+            else
+              this.member_class.name
+            end.titleize
+
+  label = label.downcase if lowercase
+   
+  Hobo::Dryml.last_if = c > 0 if if_any
+  if if_any && c == 0
+    ""
+  else
+    main = label.blank? ? c : pluralize(c, label)
+   
+    if prefix.in? %w(are is)
+      p = c == 1 ? "is" : "are"
+      p + ' ' + main.to_s
+    else
+      main
+    end
+  end
+%></span></def>
+
+
+<def tag="theme-stylesheet" attrs="name">
+  <% name ||= Hobo.current_theme -%>
+  <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
+        media="screen" rel="Stylesheet" type="text/css" />
+</def>
+
+
+<!-- The Tags defined below here are a bit rough and will be improved
+in the future - use at your own risk. -->
+
+<def tag="has-many-table" attrs="part-id, delete-buttons, headings, id">
+  <table-for headings="&headings" merge-attrs="&true">
+
+    <do param="default"/>
+
+    <if test="&delete_buttons != false && can_delete?(this)">
+      <td><delete-button/></td>
+    </if>
+  </table-for>
+  <else>
+    <p>No <%= this.member_class.name.titleize.pluralize.downcase %> to display</p>
+  </else>
+  <div>
+    <create-button update="&id || part_id"/>
+  </div>
+</def>
+
+
+<def tag="add-by-name" attrs="action-name, add-text, update, part-id">
+  <% add_to = this
+     refl = this_type
+     joins = this_parent.send(refl.through_reflection.name)
+     add_name = refl.klass.name.titleize
+     action_name ||= "Add #{add_name}"
+     add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
+                  "enter its name"
+     source = refl.source_reflection.name
+  %>
+  <do param="default" with="&joins"/>
+  <with with="&joins.new_without_appending">
+    <if test="can_create?">
+       <form update="&[update, part_id]" message="&action_name" hidden-fields="*">
+         <p>
+           <%= add_text %>:
+           <belongs-to-autocompleting-field field="&source" where-not-in="&dom_id(add_to)" class="autosubmit"/>
+         </p>
+       </form>
+    </if>
+  </with>
+</def>
+
+
+<def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
+
+<def tag="You"><you merge titleize/></def>
+
+<def tag="your">
+  <if test="&this == current_user">your</if>
+  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+</def>
+
+
+<def tag="Your">
+  <if test="&this == current_user">Your</if>
+  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+</def>
+
+
+<def tag="live-search">
+  <div class="search">
+    <label for="search-field">Search</label><input type="search" class="live-search"/>
+    <spinner id="search-spinner"/>
+  </div>
+  <section class="hidden" id="search-results-panel">
+    <h2>Search Results</h2>
+    <section id="search-results">&nbsp;</section>
+  </section>
+</def>
+
+
+<def tag="a-or-an" attrs="word"><%=
+  (word =~ /^[aeiou]/i ? "an " : "a ") + word
+%></def>
+
+
+<def tag="A-or-An" attrs="word"><%=
+  (word =~ /^[aeiou]/i ? "An " : "A ") + word
+%></def>
+
+
+<def tag="filter-menu" attrs="param-name, options, no-filter">
+  <% no_filter ||= "All" %>
+  <form action="&request.request_uri" method="get" class="filter-menu">
+    <div>
+      <input type="hidden" name="filter-parameter" value="&param_name"/>
+      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
+    </div>
+  </form>
+</def>
+
+
+<def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
+
