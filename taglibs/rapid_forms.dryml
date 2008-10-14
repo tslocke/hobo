@@ -401,7 +401,6 @@
 
 <def tag="input-many">
   <set empty="&this.empty?"/>
-  <% this.push(this.member_class.new) if empty # temporarily add a blank item, remove below %>
   <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
@@ -412,8 +411,15 @@
         <button class="add-item" if="&last_item?">+</button>
       </div>
     </li>
+    <li if="&empty">
+      <fake-field-context fake-field="0" context="&this.member_class.new">
+        <div class="input-many-item" param="default"/>
+      </fake-field-context>
+      <div class="buttons">
+        <button class="add-item">+</button>
+      </div>
+    </li>
   </ul>
-  <% this.pop if empty %>
 </def>
 
 
