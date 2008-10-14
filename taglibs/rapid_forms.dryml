@@ -349,7 +349,11 @@
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
-  options ||= this.member_class.all
+  options ||= begin
+                conditions = ActiveRecord::Associations::HasManyThroughAssociation.new(this_parent, this_field_reflection).sql_conditions
+                this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+              end
+                
   values = this
   %>
   <div class="input select-many" merge-attrs>
