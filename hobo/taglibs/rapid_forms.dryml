@@ -93,9 +93,9 @@
     
     if action.nil? # don't add automatic css classes if the action was specified
       if web_method
-        add_classes!(html_attrs, "#{type_id}-#{web_method}-form")
+        add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
       else
-        add_classes!(html_attrs, "#{'new-' if new_record}#{type_id}")
+        add_classes!(html_attrs, "#{'new-' if new_record}#{type_id.dasherize}")
       end
     end
 
