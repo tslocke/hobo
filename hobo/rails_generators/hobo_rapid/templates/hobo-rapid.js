@@ -242,6 +242,13 @@ var Hobo = {
         var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results-panel")
         var url = el.getAttribute("search-url") || (urlBase + "/search")
 
+        // Close window on [Escape]
+        Event.observe(el, 'keypress', function(ev) { 
+            if (ev.keyCode == 27) Hobo.hide(search_results_panel);
+        });
+
+        Event.observe(search_results_panel.down('.close-button'), 'click', function() {Hobo.hide(search_results_panel)})
+
         var value = $F(el)
         if (Hobo.searchRequest) { Hobo.searchRequest.transport.abort() }
         if (value.length >= 3) {

@@ -286,6 +286,10 @@ div.select-many .item {
 div.select-many .item span { float: left; }
 div.select-many .item .remove-item { float: right; }
 
+/* <live-search> */
+
+#search-results-panel { postition: relative; }
+#search-results-panel .close-button { cursor: pointer; text-decoration: underline; position: absolute; top: 3px; right: 6px;}
 
 /*******************************************************/
 /* these styles are for the generated front index page */
