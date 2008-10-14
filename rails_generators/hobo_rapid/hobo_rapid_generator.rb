@@ -14,8 +14,6 @@ class HoboRapidGenerator < Hobo::Generator
       m.file "lowpro.js",          "public/javascripts/lowpro.js"
       m.file "IE7.js",             "public/javascripts/IE7.js"
       m.file "blank.gif",          "public/javascripts/blank.gif"
-      m.file "nicedit.js",         "public/javascripts/nicedit.js"
-      m.file "nicEditorIcons.gif", "public/images/nicEditorIcons.gif"
       m.file "reset.css",          "public/stylesheets/reset.css"
       m.file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
       create_all(m, "themes/clean/public", "public/hobothemes/clean")
