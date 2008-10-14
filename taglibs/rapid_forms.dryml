@@ -316,7 +316,7 @@
 %>
   <input type="text" name="#{param_name_for_this}" 
          class="autocompleter #{type_and_field} complete-on:#{dom_id complete_target}:#{completer}"
-         value="&name :no_wrapper => true"
+         value="&name :no_wrapper => true, :if_present => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
 </def>
