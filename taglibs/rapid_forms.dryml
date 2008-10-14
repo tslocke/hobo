@@ -298,7 +298,7 @@
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
-            [ name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x, :raw => true), x.id ]
           }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
