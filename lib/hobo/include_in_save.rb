@@ -16,12 +16,20 @@ module Hobo
     def validate_included_in_save
       if included_in_save
         included_in_save._?.each_pair do |association, records|
+          added = false
           records.each do |record|
-            errors.add association, "is invalid" unless record.valid?
+            # we want to call valid? on each one, but only add the error to self once
+            unless record.valid?
+              unless added
+                errors.add association, "..."
+                added = true
+              end
+            end
           end
         end
       end
     end
+
 
     def save_included
       if included_in_save

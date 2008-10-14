@@ -336,7 +336,9 @@
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
-      <li repeat="errors.full_messages" param><%= this %></li>
+      <repeat:errors><% next if this.last == "..." %>
+        <li param><%= this.first.titleize %> <%= this.last %></li>
+      </repeat>
     </ul>
   </section>
 </def>
@@ -399,7 +401,8 @@
   <set empty="&this.empty?"/>
   <% this.push(this.member_class.new) if empty # temporarily add a blank item, remove below %>
   <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
-    <li repeat>      
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+      <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <div class="input-many-item" param="default"/>
       <div class="buttons">
@@ -415,7 +418,7 @@
 <def tag="input-all">
   <% association_fkey = this_field_reflection.primary_key_name %>
   <ul class="input-all #{this_field.dasherize}">
-    <li repeat>
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <set-scoped form-field-names="&[]">
         <hidden-id-field/>
         <do param="default"/>
