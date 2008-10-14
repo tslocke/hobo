@@ -102,19 +102,23 @@
 %></def>
 
 
-<def tag="name" attrs="if-present"><%= 
+<def tag="name" attrs="if-present, raw"><%= 
   if this.nil?
     nil_view unless if_present
   else
     name_tag = find_polymorphic_tag("name")
     if name_tag != "name"
-      send(name_tag)
+      send(name_tag, attributes)
     elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
       count
     elsif this.is_a? Class and this < ActiveRecord::Base
       this.name.pluralize.titleize
     elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
-      view(merge_attrs(attributes, {:field => name_attr}))
+      if raw
+        this.send(name_attr)
+      else
+        view(merge_attrs(attributes, {:field => name_attr}))
+      end
     elsif can_view?(this)
       this.to_s
     end
