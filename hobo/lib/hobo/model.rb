@@ -647,7 +647,7 @@ module Hobo
 
 
     def convert_collection_for_mass_assignment(reflection, value)
-      klass = reflection.safe_class
+      klass = reflection.klass
       if klass.try.name_attribute && value.is_a?(Array)
         value.map do |x|
           if x.is_a?(String)
