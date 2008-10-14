@@ -96,8 +96,6 @@ rails_generators/hobo_rapid/templates/hobo-rapid.css
 rails_generators/hobo_rapid/templates/hobo-rapid.js
 rails_generators/hobo_rapid/templates/IE7.js
 rails_generators/hobo_rapid/templates/lowpro.js
-rails_generators/hobo_rapid/templates/nicedit.js
-rails_generators/hobo_rapid/templates/nicEditorIcons.gif
 rails_generators/hobo_rapid/templates/reset.css
 rails_generators/hobo_rapid/templates/themes/clean/public/images/fieldbg.gif
 rails_generators/hobo_rapid/templates/themes/clean/public/images/pencil.png
