@@ -1,21 +1,3 @@
-<def tag="start-lifecycle" attrs="model, name, parameters">
-  <% 
-  model   = model.constantize if model.is_a?(String) 
-  creator = model::Lifecycle.creators[name]
-  candidate = creator.candidate(current_user, parameters)
-  %>
-  <if with="&candidate">
-    <div class="lifecycle #{name}" merge-attrs>
-      <h2 param="heading"><name.titleize/></h2>
-
-      <form lifecycle="#{name}" method="post" param>
-        <field-list fields="&creator.parameters - parameters.keys" param/>
-        <submit label="#{name.titleize}" param/>
-      </form>
-    </div>
-  </if>
-</def>
-
 <def tag="transition-button" attrs="transition, update, label"><%= 
     transition = transition.name unless transition.is_a?(String)
     ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)

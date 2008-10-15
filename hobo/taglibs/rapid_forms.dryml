@@ -66,8 +66,10 @@
      
     hiddens = nil
     body = with_form_context do
+      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
+      b = parameters.default
       hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
-      parameters.default
+      b
     end
      
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
@@ -338,9 +340,9 @@
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
-      <repeat:errors><% next if this.last == "..." %>
-        <li param><%= this.first.titleize %> <%= this.last %></li>
-      </repeat>
+      <% this.errors.each do |attr, message|; next if message == "..." %>
+        <li param><%= attr.titleize %> <%= message %></li>
+      <% end %>
     </ul>
   </section>
 </def>

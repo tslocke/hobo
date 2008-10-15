@@ -15,6 +15,7 @@ lib/hobosupport/module.rb
 lib/hobosupport.rb
 Manifest
 Manifest.txt
+Rakefile
 README.txt
 test/hobosupport/enumerable.rdoctest
 test/hobosupport/hash.rdoctest
