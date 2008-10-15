@@ -4,6 +4,7 @@
 
 
 <def tag="login-page" attrs="remember-me">
+  <% remember_me = true if remember_me.nil? %>
   <simple-page title="Log in" merge>
    
     <body: class="login-page" param/>
