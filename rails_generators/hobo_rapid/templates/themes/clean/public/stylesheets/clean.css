@@ -149,7 +149,7 @@ input.file_upload {
 	color: black; background: #f2f2f2;
 }
 #search-results-panel .card.linkable a {color: black;}
-#search-spinner {position: absolute; top: 6px; right: 7px;}
+#search-spinner {background:black;border:1px solid #666666;opacity:0.6;padding:2px;position:absolute;right:4px;top:6px;}
 
 .main-nav {padding: 0 30px;}
 .main-nav li {margin-right: 10px;}
