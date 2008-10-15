@@ -130,7 +130,7 @@
                     if refl.options[:through]
                       select_many(attrs)
                     else
-                      raise NotImlementedError, "An input for has-many associations has not been implemented yet"
+                      raise NotImplementedError, "An input for has-many associations has not been implemented yet"
                     end
                   end
                 else
@@ -300,7 +300,7 @@
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
-            [ name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x, :raw => true), x.id ]
           }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
@@ -351,7 +351,11 @@
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
-  options ||= this.member_class.all
+  options ||= begin
+                conditions = ActiveRecord::Associations::HasManyThroughAssociation.new(this_parent, this_field_reflection).sql_conditions
+                this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+              end
+                
   values = this
   %>
   <div class="input select-many" merge-attrs>
@@ -403,7 +407,6 @@
 
 <def tag="input-many">
   <set empty="&this.empty?"/>
-  <% this.push(this.member_class.new) if empty # temporarily add a blank item, remove below %>
   <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
@@ -414,8 +417,15 @@
         <button class="add-item" if="&last_item?">+</button>
       </div>
     </li>
+    <li if="&empty">
+      <fake-field-context fake-field="0" context="&this.member_class.new">
+        <div class="input-many-item" param="default"/>
+      </fake-field-context>
+      <div class="buttons">
+        <button class="add-item">+</button>
+      </div>
+    </li>
   </ul>
-  <% this.pop if empty %>
 </def>
 
 

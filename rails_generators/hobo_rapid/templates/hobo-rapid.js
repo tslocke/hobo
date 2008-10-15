@@ -219,21 +219,6 @@ var Hobo = {
         return new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
     },
 
-    nicEditorOptions: { buttonList : ['bold','italic',
-                                      'left','center','right',
-                                      'ul',
-                                      'fontFormat',
-                                      'indent','outdent',
-                                      'link','unlink',
-                                      'image', 'removeLink']},
-
-    makeNicEditor: function(element) {
-        if (!Hobo.nicEditorOptions.iconsPath) { Hobo.nicEditorOptions.iconsPath = urlBase + '/images/nicEditorIcons.gif' }
-        var nic = new nicEditor(Hobo.nicEditorOptions)
-        nic.panelInstance(element, {hasPanel : true})
-        return nic.instanceById(element)
-    },
-
 
     doSearch: function(el) {
         el = $(el)

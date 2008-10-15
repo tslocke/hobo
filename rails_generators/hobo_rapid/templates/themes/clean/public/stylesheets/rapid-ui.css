@@ -16,8 +16,6 @@ table.new-record textarea, table.new-record input {
 .inplaceeditor-form, .inplaceeditor-form input {
 	display: inline;	
 }
-.inplaceeditor-form .nicEdit-panel .editor_ok_button {display: block; float: right; width: 50px; margin-top: 2px; height:21px; padding-top: 1px;}
-.inplaceeditor-form .nicEdit-panel .editor_cancel_link {display: block; float: right; margin: 3px 10px; background: transparent; }
 
 /**** Admin ****/
 
