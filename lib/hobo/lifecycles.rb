@@ -1,5 +1,3 @@
-%w[lifecycle actions creator state transition].each { |lib| require "hobo/lifecycles/#{lib}" }
-
 module Hobo
 
   module Lifecycles
