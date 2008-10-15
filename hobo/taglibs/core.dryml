@@ -54,3 +54,9 @@
   res
 %></def>
 
+
+
+<def tag="fake-field-context" attrs="fake-field, context"><%=
+  res = ""
+  new_field_context(fake_field, context) { res << parameters.default }
+  res %></def>
