@@ -179,6 +179,8 @@ owner_model     = model.reflections[owner].klass
 linkable_owner  = linkable?(owner_model, :show)
 owner_tag       = linkable_owner ? "a" : "name"
 
+owner_is_user = owner_model < Hobo::User
+
 owner = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner.to_s
 -%>
 <% if :index.in? actions -%>
@@ -192,10 +194,15 @@ new_link = :new.in?(actions)
     
     <content: param>
       <header param="content-header">
-        <% if linkable_owner %><div param="back-to">Back to <a with="&@<%= owner %>"/></div><% end %>
+<% if linkable_owner -%>
+        <div param="back-to">Back to <a with="&@<%= owner %>"/></div>
+<% end -%>
+<% if owner_is_user %>
+        <h2 param="heading"><Your with="&current_user"/> <%= model_name :title, :plural %></h2>
+<% else -%>
         <h2 param="heading"><%= model_name :title, :plural %></h2>
         <h3 param="subheading">For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
-
+<% end -%>
         <p param="count" if>There <count prefix="are"/></p>
       </header>
       
