@@ -50,7 +50,7 @@ module Hobo
 
       def change_state(record)
         state = options[:become]
-        record.become(state) if state
+        record.lifecycle.become(state) if state
       end
 
 

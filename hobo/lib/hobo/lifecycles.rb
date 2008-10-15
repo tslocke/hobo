@@ -45,11 +45,6 @@ module Hobo
         @lifecycle ||= self.class::Lifecycle.new(self)
       end
 
-
-      def become(state)
-        self.lifecycle.become state
-      end
-
     end
 
 
