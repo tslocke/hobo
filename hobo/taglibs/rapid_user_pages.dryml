@@ -54,7 +54,7 @@
       <header param="content-header">
         <h2 param="heading">Forgotten Password</h2>
         <p>Enter the email address you signed up with. If we have it in
-        our records we'll send you an email allowing you to chose a new
+        our records we'll send you an email allowing you to choose a new
         password.</p>
       </header>
 
