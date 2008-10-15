@@ -27,7 +27,7 @@ module Hobo
         name = name.to_s
         returning(State.new(name, on_enter)) do |s|
           states[name] = s
-          class_eval "def #{name}?; record.state == '#{name}'; end"
+          class_eval "def #{name}_state?; state_name == '#{name}' end"
         end
       end
 
