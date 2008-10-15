@@ -415,7 +415,7 @@ module Hobo
         readable = name.to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+$/, '').split('-')[0..5].join('-')
         @to_param ||= "#{id}-#{readable}"
       else
-        id
+        id.to_s
       end
     end
 
