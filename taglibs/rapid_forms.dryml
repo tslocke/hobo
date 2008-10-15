@@ -66,8 +66,10 @@
      
     hiddens = nil
     body = with_form_context do
+      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
+      b = parameters.default
       hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
-      parameters.default
+      b
     end
      
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
