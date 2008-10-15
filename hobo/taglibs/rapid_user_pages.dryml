@@ -45,7 +45,7 @@
 </def>
 
 
-<def tag="forgot-password-page" attrs="remember-me">
+<def tag="forgot-password-page">
   <simple-page title="Forgotten Password" merge>
    
     <body: class="forgot-password-page" param/>
