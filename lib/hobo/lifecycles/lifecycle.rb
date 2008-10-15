@@ -74,7 +74,10 @@ module Hobo
 
 
       def self.create(name, user, attributes=nil)
-        creators[name.to_s].run!(user, attributes)
+        creator = creators[name.to_s]
+        record = creator.run!(user, attributes)
+        record.lifecycle.active_step = creator
+        record
       end
 
 
@@ -97,7 +100,7 @@ module Hobo
 
       attr_reader :record
 
-      attr_accessor :provided_key
+      attr_accessor :provided_key, :active_step
 
 
       def initialize(record)
@@ -112,6 +115,7 @@ module Hobo
 
       def transition(name, user, attributes=nil)
         transition = find_transition(name, user, attributes)
+        self.active_step = transition
         transition.run!(record, user, attributes)
       end
 
@@ -157,6 +161,7 @@ module Hobo
             raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
             if record.save(validate)
               s.activate! record
+              self.active_step = nil # That's the end of this step
               true
             else
               false
