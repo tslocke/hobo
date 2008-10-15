@@ -639,7 +639,7 @@ module Hobo::Dryml
                          merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_")
                          "all_parameters & #{merge_param_names.inspect}"
                        end
-        "{#{param_items}}.merge((#{extra_params}) || {})"
+        "merge_parameter_hashes({#{param_items}}, (#{extra_params}) || {})"
       else
         "{#{param_items}}"
       end
