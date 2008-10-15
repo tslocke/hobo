@@ -1,5 +1,3 @@
-%w[lifecycle actions creator state transition].each { |lib| require "hobo/lifecycles/#{lib}" }
-
 module Hobo
 
   module Lifecycles
@@ -45,11 +43,6 @@ module Hobo
 
       def lifecycle
         @lifecycle ||= self.class::Lifecycle.new(self)
-      end
-
-
-      def become(state)
-        self.lifecycle.become state
       end
 
     end

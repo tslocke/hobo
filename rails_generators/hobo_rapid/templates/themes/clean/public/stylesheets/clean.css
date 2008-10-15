@@ -149,7 +149,7 @@ input.file_upload {
 	color: black; background: #f2f2f2;
 }
 #search-results-panel .card.linkable a {color: black;}
-#search-spinner {position: absolute; top: 6px; right: 7px;}
+#search-spinner {background:black;border:1px solid #666666;opacity:0.6;padding:2px;position:absolute;right:4px;top:6px;}
 
 .main-nav {padding: 0 30px;}
 .main-nav li {margin-right: 10px;}
@@ -286,6 +286,10 @@ div.select-many .item {
 div.select-many .item span { float: left; }
 div.select-many .item .remove-item { float: right; }
 
+/* <live-search> */
+
+#search-results-panel { postition: relative; }
+#search-results-panel .close-button { cursor: pointer; text-decoration: underline; position: absolute; top: 3px; right: 6px;}
 
 /*******************************************************/
 /* these styles are for the generated front index page */

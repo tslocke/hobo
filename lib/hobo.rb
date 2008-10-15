@@ -26,7 +26,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "0.8.2"
+  VERSION = "0.8.3"
 
   class RawJs < String; end
 

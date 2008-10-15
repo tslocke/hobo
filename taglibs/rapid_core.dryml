@@ -369,7 +369,7 @@ in the future - use at your own risk. -->
     <spinner id="search-spinner"/>
   </div>
   <section class="hidden" id="search-results-panel">
-    <h2>Search Results</h2>
+    <h2>Search Results</h2><div param="close-button">close</div>
     <section id="search-results">&nbsp;</section>
   </section>
 </def>
@@ -397,4 +397,3 @@ in the future - use at your own risk. -->
 
 
 <def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
-
