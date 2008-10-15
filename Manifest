@@ -45,6 +45,7 @@ lib/hobo/lifecycles/lifecycle.rb
 lib/hobo/lifecycles/state.rb
 lib/hobo/lifecycles/transition.rb
 lib/hobo/lifecycles.rb
+lib/hobo/mass_assignment.rb
 lib/hobo/model.rb
 lib/hobo/model_controller.rb
 lib/hobo/model_router.rb
