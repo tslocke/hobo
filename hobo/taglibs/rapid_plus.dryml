@@ -79,3 +79,19 @@
       end # FIXME: Make unobstrusive
    %>
 </def>
+
+
+<def tag="preview-with-more" attrs="name">
+  <% name ||= this.member_class.name.pluralize -%>
+  <section class="#{name.gsub(' ', '-').dasherize} preview-with-more" param="default">
+    <h3 param="heading"><%= name.titleize %></h3>
+    <a param="more">More <type-name plural lowercase/>...</a>
+    <collection param/>
+  </section>
+</def>
+
+
+<def tag="gravatar" attrs="size, rating">
+  <% size ||= 80; rating ||= 'g'; digest = Digest::MD5.hexdigest(this.email_address) -%>
+  <a class="gravatar"><img class="gravatar" src="http://www.gravatar.com/avatar/#{digest}?s=#{size}&r=#{rating}" merge-attrs/></a>
+</def>
