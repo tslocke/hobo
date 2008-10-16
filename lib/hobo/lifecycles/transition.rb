@@ -35,6 +35,7 @@ module Hobo
 
 
       def run!(record, user, attributes)
+        record.lifecycle.active_step = self
         if prepare_and_check!(record, user, attributes)
           if record.lifecycle.become end_state
             fire_event(record, on_transition)

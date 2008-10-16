@@ -56,6 +56,7 @@ module Hobo
 
       def run!(user, attributes)
         record = lifecycle.model.new
+        record.lifecycle.active_step = self
         if prepare_and_check!(record, user, attributes)
           if change_state(record)
             fire_event(record, on_create)

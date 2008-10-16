@@ -75,9 +75,7 @@ module Hobo
 
       def self.create(name, user, attributes=nil)
         creator = creators[name.to_s]
-        record = creator.run!(user, attributes)
-        record.lifecycle.active_step = creator
-        record
+        creator.run!(user, attributes)
       end
 
 
@@ -115,7 +113,6 @@ module Hobo
 
       def transition(name, user, attributes=nil)
         transition = find_transition(name, user, attributes)
-        self.active_step = transition
         transition.run!(record, user, attributes)
       end
 
@@ -169,8 +166,8 @@ module Hobo
           end
         end
       end
-
-
+      
+      
       def key_timestamp_field
         record.class::Lifecycle.options[:key_timestamp_field]
       end
