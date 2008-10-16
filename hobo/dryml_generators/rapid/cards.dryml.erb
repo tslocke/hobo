@@ -3,7 +3,7 @@
 name_attribute     = model.name_attribute
 content_attribute  = model.primary_content_attribute
 creator_attribute  = model.creator_attribute
-primary_collection = primary_collection_name
+primary_collection = model.view_hints.primary_children
 
 if creator_attribute
   creator_refl = model.reflections[creator_attribute]
