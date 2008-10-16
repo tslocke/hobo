@@ -415,7 +415,15 @@ module Hobo
     def front_models
       Hobo::Model.all_models.select {|m| linkable?(m) }
     end
+    
+    
+    def this_field_name
+      this_parent.class.view_hints.field_name(this_field)
+    end
 
+    def this_field_help
+      this_parent.class.view_hints.field_help[this_field.to_sym]
+    end
 
 
     # debugging support

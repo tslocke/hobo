@@ -396,6 +396,11 @@ module Hobo
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
       end
+      
+      
+      def view_hints
+        Object.class_eval "#{name}Hints"
+      end
 
 
     end # --- of ClassMethods --- #
