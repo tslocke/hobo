@@ -317,7 +317,7 @@
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
 %>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field} complete-on:#{dom_id complete_target}:#{completer}"
+         class="autocompleter #{type_and_field.dasherize} complete-on:#{dom_id complete_target}:#{completer}"
          value="&name :no_wrapper => true, :if_present => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
