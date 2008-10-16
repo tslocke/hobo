@@ -112,6 +112,7 @@ input.file_upload {
 
 .field-list th {width: 120px; white-space: nowrap;}
 .field-list td {width: auto;}
+.field-list .input-help { color: #888;}
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header {padding: 5px 0;} 
