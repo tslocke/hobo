@@ -97,7 +97,7 @@
       if web_method
         add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
       else
-        add_classes!(html_attrs, "#{'new-' if new_record}#{type_id.dasherize}")
+        add_classes!(html_attrs, "#{'new ' if new_record}#{type_id.dasherize}")
       end
     end
 
