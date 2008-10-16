@@ -74,7 +74,7 @@ creator_link   = creator && model.reflections[creator] && linkable?(model.reflec
 edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields(:belongs_to).*.to_s - [model.name_attribute, main_content, creator, back_link, *boolean_fields].*.to_s
-collection     = model.dependent_collections.sort_by(&:to_s).first
+collection     = model.view_hints.primary_children
 if collection
   collection_class = model.reflections[collection].klass
   owner            = model.reverse_reflection(collection)._?.name
@@ -83,6 +83,8 @@ if collection
     add_form = !add_link && linkable?(collection_class, :"create_for_#{owner}", :method => :post)
   end
 end
+
+aside_collections = model.view_hints.secondary_children unless model.view_hints.secondary_children.empty?
 -%>
 <def tag="show-page" for="<%= model.name %>">
   <page merge title="<%= model_name :title %>">
@@ -90,60 +92,76 @@ end
     <body: class="show-page <%= model_class %>" param/>
 
     <content: param>
-      <header param="content-header">
-<% if  back_link -%>
-        <a:<%= back_link %> param="parent-link">&laquo; <name/></a>
+<% if aside_collections -%>
+      <section-group param="content-body">
+        <section param="main-content">
 <% end -%>
-        <h2 param="heading"><name/></h2>
-<% if boolean_fields.any? -%>
+          <header param="content-header">
+<% if  back_link -%>
+            <a:<%= back_link %> param="parent-link">&laquo; <name/></a>
+<% end -%>
+            <h2 param="heading"><name/></h2>
+<% if boolean_fields -%>
 
-        <field-names-where-true fields="<%= boolean_fields * ', ' %>" param/>
+            <field-names-where-true fields="<%= boolean_fields * ', ' %>" param/>
 <% end -%>
 <% if creator_link -%>
 
-        <a:<%= model.creator_attribute %> param="creator-link"/>
+            <a:<%= model.creator_attribute %> param="creator-link"/>
 <% elsif creator -%>        
 
-        <view:get-creator param="creator-name"/>
+            <view:get-creator param="creator-name"/>
 <% end -%>
 <% if edit_link -%>
 
-        <a action="edit" if="&can_edit?" param="edit-link">Edit <%= model_name :title %></a>
+            <a action="edit" if="&can_edit?" param="edit-link">Edit <%= model_name :title %></a>
 <% end -%>
-      </header>
+          </header>
     
-      <section param="content-body">
+          <section param="content-body"<%= ' with-flash-messages' if aside_collections %>>
 <% if main_content -%>
-        <view:<%= main_content %> param="primary-content"/>
+            <view:<%= main_content %> param="primary-content"/>
 <% end -%>
 <% if show_fields.any? -%>
-        <field-list fields="<%= show_fields * ', ' %>" param/>
+            <field-list fields="<%= show_fields * ', ' %>" param/>
 <% end -%>
 <% if collection -%>
-        <section param="collection-section">
-          <h3 param="collection-heading"><%= collection.to_s.titleize %></h3>
+            <section param="collection-section">
+              <h3 param="collection-heading"><%= collection.to_s.titleize %></h3>
               
 <% if sortable_collection?(collection) -%>
-          <sortable-collection:<%= collection %> param="collection"/>
+              <sortable-collection:<%= collection %> param="collection"/>
 <% else -%>
-          <collection:<%= collection %> param/>
+              <collection:<%= collection %> param/>
 <% end -%>
 <% if add_link -%>
 
-          <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
+              <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
 <% elsif add_form -%>
 
-          <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
-            <h3 param="add-form-heading">Add <%= a_or_an collection.to_s.singularize.titleize %></h3>
-            <form with="&@<%= collection_class.name.underscore %> || @<%= model_name.underscore %>.<%= collection %>.new" owner="<%= owner %>" method="post" without-cancel param>
-              <field-list: skip="<%= owner %>"/>
-              <submit: label="Add"/>
-            </form>
+              <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
+                <h3 param="add-form-heading">Add <%= a_or_an collection.to_s.singularize.titleize %></h3>
+                <form with="&@<%= collection_class.name.underscore %> || @<%= model_name.underscore %>.<%= collection %>.new" owner="<%= owner %>" method="post" without-cancel param>
+                  <field-list: skip="<%= owner %>"/>
+                  <submit: label="Add"/>
+                </form>
+              </section>
+<% end -%>
+            </section>
+<% end # of main collection -%>
           </section>
-<% end -%>
+<% if aside_collections -%>
         </section>
+        
+        <aside param>
+<% for collection in aside_collections -%>
+          <preview-with-more:<%= collection %>.recent param="preview-<%= collection %>">
+            <more:>more</more:>
+          </preview-with-more>
 <% end -%>
-      </section>
+        </aside>
+      </section-group>
+<% end -%>
     </content:>
     
   </page>
