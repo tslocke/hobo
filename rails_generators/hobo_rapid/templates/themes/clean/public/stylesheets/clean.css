@@ -12,7 +12,7 @@
 html, body {color: #193440; background: #193440;}
 .page-header {color: white; background: #3F606E;}
 .page-header .navigation.main-nav a {background: #5B8BA0;}
-.page-header .navigation.main-nav li.current a {background: #74B9D5; }
+.page-header .navigation.main-nav li.current a {background: #FCFFF4; color: #444;}
 .page-header .navigation.main-nav a:hover {background: #193440;}
 .section.content {background: #FCFFF5;}
 .button {color: white; background: #5B8BA0;}
