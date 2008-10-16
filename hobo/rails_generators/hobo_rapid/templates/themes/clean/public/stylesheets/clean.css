@@ -110,7 +110,7 @@ input.file_upload {
 
 .article {margin: 20px 0; border-top: 1px dotted #ccc;}
 
-.field-list th {width: 120px;}
+.field-list th {width: 120px; white-space: nowrap;}
 .field-list td {width: auto;}
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
