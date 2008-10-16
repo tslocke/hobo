@@ -41,20 +41,6 @@
 </def>
 
 
-<def tag="change-password-form">
-  <form class="change-password" param>
-    <field-list fields="current_password, password, password_confirmation" param>
-      <password-label:>New Password</password-label:>
-      <password-confirmation-label:>Confirm New Password</password-confirmation-label:>
-    </field-list>
-    
-    <div class="actions" param="actions">
-      <submit label="Change Password" param/>
-    </div>
-  </form>
-</def>
-
-
 <def tag="sortable-collection" attrs="sortable-options"><%
   singular_name = this.member_class.name.underscore
   attributes[:id] ||= "#{singular_name}_ordering"
