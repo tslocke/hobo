@@ -147,13 +147,17 @@ module Hobo
 
 
     def changing_password?
-      crypted_password? && (password || password_confirmation) && !lifecycle.valid_key?
+      !lifecycle_changing_password? && (current_password.present? || password.present? || password_confirmation.present?)
     end
-
+    
+    
+    def lifecycle_changing_password?
+      lifecycle.active_step && :password.in?(lifecycle.active_step.parameters)
+    end
 
     # Is a new password (and confirmation) required? (i.e. signing up or changing password)
     def new_password_required?
-      (account_active? && crypted_password.blank?) || password || password_confirmation
+      lifecycle_changing_password? || changing_password?
     end
 
 
