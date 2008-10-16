@@ -206,7 +206,6 @@
         elsif (refl = this_field_reflection) && refl.macro == :has_many
           has_many_view(attributes)
         else
-         
           view_tag = find_polymorphic_tag("view")
           
           if view_tag == "view" # i.e. it didn't find a type specific tag
@@ -258,7 +257,13 @@
 
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
-<def tag="view" for="string"><%= this.try.to_html(scope.xmldoctype) || h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") %></def>
+<def tag="view" for="string"><%= 
+  if !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
+    this.to_html(scope.xmldoctype)
+  else
+    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") 
+  end
+%></def>
 
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
