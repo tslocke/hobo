@@ -27,5 +27,10 @@ class Object
   def is_a?(*args)
     args.any? {|a| is_a_without_multiple_args?(a) }
   end
+  
+  # This is in ActiveSupport but only in edge Rails.
+  def present?
+    !blank?
+  end
 
 end
