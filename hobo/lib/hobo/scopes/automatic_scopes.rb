@@ -219,11 +219,19 @@ module Hobo
             def_scope :order => "#{@klass.table_name}.created_at DESC"
 
           when "recent"
-            def_scope do |*args|
-              count = args.first || 3
-              { :limit => count, :order => "#{@klass.table_name}.created_at DESC" }
+            
+            if "created_at".in?(@klass.columns.*.name)
+              def_scope do |*args|
+                count = args.first || 6
+                { :limit => count, :order => "#{@klass.table_name}.created_at DESC" }
+              end
+            else
+              def_scope do |*args|
+                count = args.first || 6
+                { :limit => count }
+              end
             end
-
+            
           when "limit"
             def_scope do |count|
               { :limit => count }
