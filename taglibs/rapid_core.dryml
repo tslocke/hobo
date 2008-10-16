@@ -1,13 +1,14 @@
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
-    <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
+    <with-fields merge-attrs="&attributes & attrs_for(:with_fields)"><% field_name = this_field_name %>
       <labelled-item unless="&tag == 'input' && !can_edit?">
-        <item-label param="#{this_field.to_s.sub('?', '')}-label">
-          <do param="label"><%= this_field.to_s.titleize %></do>
+        <item-label param="#{this_field.to_s.sub('?', '')}-label" unless="&field_name.blank?">
+          <do param="label"><%= field_name %></do>
         </item-label>
-        <item-value param="#{this_field.to_s.sub('?', '')}-view">
+        <item-value param="#{this_field.to_s.sub('?', '')}-view" colspan="&2 if field_name.blank?">
           <do param="view"><call-tag tag="&tag" param="#{this_field.to_s.sub('?', '')}-tag"/></do>
+          <div param="input-help" if="&tag.to_sym == :input && !this_field_help.blank?"><%= this_field_help %></div>
         </item-value>
       </labelled-item>
     </with-fields>
@@ -32,7 +33,7 @@
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">
           <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-            <th param="#{scope.field_name}-heading"><%= scope.field_name.titleize %></th>
+            <th param="#{scope.field_name}-heading"><%= this.class.view_hints.field_name(scope.field_name) %></th>
           </with-field-names>
           <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
