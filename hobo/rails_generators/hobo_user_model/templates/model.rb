@@ -41,7 +41,8 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   def updatable_by?(updater, updated)
-    updater.administrator? || (updater == self && only_changed_fields?(updated, :password, :password_confirmation))
+    updater.administrator? ||
+      (updater == self && only_changed_fields?(updated, :password, :password_confirmation, :email_address))
   end
 
   def deletable_by?(deleter)
