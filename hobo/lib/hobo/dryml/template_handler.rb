@@ -60,7 +60,7 @@ module ActionController
     def render_for_file_with_dryml(template_path, *args)
       if template_exists?(template_path)   ||   # A template is available in app/views
           template_path =~ /^([a-z]:)?\//i ||   # an absolute path (e.g. an exception ERB template)
-          template_path =~ /^\.public\//        # A public asset
+          template_path =~ /^\.\/public\//        # A public asset
         # Let Rails handle it normally                       
         render_for_file_without_dryml(template_path, *args)
       else
