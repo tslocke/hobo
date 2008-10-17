@@ -74,6 +74,9 @@ creator_link   = creator && model.reflections[creator] && linkable?(model.reflec
 edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields(:belongs_to).*.to_s - [model.name_attribute, main_content, creator, back_link, *boolean_fields].*.to_s
+
+is_user_model = model < Hobo::Model
+
 collection     = model.view_hints.primary_children
 if collection
   collection_class = model.reflections[collection].klass
@@ -127,7 +130,7 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
 <% end -%>
 <% if collection -%>
             <section param="collection-section">
-              <h3 param="collection-heading"><%= collection.to_s.titleize %></h3>
+              <h3 param="collection-heading"><%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %></h3>
               
 <% if sortable_collection?(collection) -%>
               <sortable-collection:<%= collection %> param="collection"/>
