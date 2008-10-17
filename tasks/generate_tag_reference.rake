@@ -155,8 +155,8 @@ def process_directory(src, output_dir)
 
       doc = Hobo::Dryml::Parser::Document.new(File.read(f), f)
 
-      markdown = doc_for_taglib(title, doc)
-      html = Maruku.new(markdown).to_html
+      markdown = doc.restore_erb_scriptlets(doc_for_taglib(title, doc))
+      html = Maruku.new(markdown).to_html.gsub('&amp;', '&')
 
       output_file = "#{output_dir}/#{basename}.html"
       puts output_file
