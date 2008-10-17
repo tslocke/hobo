@@ -137,7 +137,7 @@ def index_page(output_files, output_dir)
   File.open("#{output_dir}/index.html", 'w') { |f| f.write(html) }
 end
 
-def process_directory(src, output_dir)
+def process_directory(src, output_dir, output_format)
   raise RuntimeError, "#{output_dir} is not a directory" if File.exists?(output_dir) && !File.directory?(output_dir)
 
   FileUtils.mkdir output_dir unless File.exists? output_dir
@@ -148,19 +148,19 @@ def process_directory(src, output_dir)
 
   dryml_files.each do |f|
     if File.directory?(f)
-      output_files += process_directory(f, "#{output_dir}/#{File.basename(f)}")
+      output_files += process_directory(f, "#{output_dir}/#{File.basename(f)}", output_format)
     elsif f =~ /\.dryml$/
       basename = File.basename(f).sub(/\.dryml$/, '')
       title = basename.titleize
 
       doc = Hobo::Dryml::Parser::Document.new(File.read(f), f)
 
-      markdown = doc.restore_erb_scriptlets(doc_for_taglib(title, doc))
-      html = Maruku.new(markdown).to_html.gsub('&amp;', '&')
+      output = doc.restore_erb_scriptlets(doc_for_taglib(title, doc))
+      output = Maruku.new(output).to_html.gsub('&amp;', '&') if output_format == 'html'
 
-      output_file = "#{output_dir}/#{basename}.html"
+      output_file = "#{output_dir}/#{basename}.#{output_format}"
       puts output_file
-      File.open(output_file, 'w') { |f| f.write(html) }
+      File.open(output_file, 'w') { |f| f.write(output) }
       output_files << output_file
     end
   end
@@ -180,7 +180,9 @@ namespace :hobo do
 
     output_dir = ENV['output'] || "taglib-docs"
     
-    output_files = process_directory(src, output_dir)
+    output_format = ENV['format'] || "markdown"
+    
+    output_files = process_directory(src, output_dir, output_format)
     
     index_page(output_files, output_dir)
   end
