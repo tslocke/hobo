@@ -68,7 +68,7 @@
 
 
 <def tag="preview-with-more" attrs="name">
-  <% name ||= this.member_class.name.pluralize -%>
+  <% name ||= collection_name.pluralize -%>
   <section class="#{name.gsub(' ', '-').dasherize} preview-with-more" param="default">
     <h3 param="heading"><%= name.titleize %></h3>
     <a param="more">More <type-name plural lowercase/>...</a>
