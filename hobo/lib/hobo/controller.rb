@@ -95,7 +95,7 @@ module Hobo
             page.call(function, dom_id, part_content)
           elsif spec[:result]
             result = results[spec[:result].to_sym]
-            page.call(function, spec[:id], result)
+            page.call(function, dom_id, result)
           else
             # spec didn't specify any action :-/
           end
