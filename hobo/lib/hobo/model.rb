@@ -103,6 +103,7 @@ module Hobo
 
         alias_method :has_hobo_method?, :respond_to_without_attributes?
       end
+            
     end
 
 
