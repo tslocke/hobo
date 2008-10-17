@@ -159,6 +159,9 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
         <aside param>
 <% for collection in aside_collections -%>
           <preview-with-more:<%= collection %>.recent param="preview-<%= collection %>">
+<% if is_user_model -%>
+            <heading:><Your with="&@<%= model_name.underscore %>"/> <%= collection.to_s.titleize %></heading:>
+<% end -%>
             <more:>more</more:>
           </preview-with-more>
 <% end -%>
