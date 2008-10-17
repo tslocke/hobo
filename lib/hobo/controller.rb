@@ -15,6 +15,7 @@ module Hobo
       def included_in_class(klass)
         klass.extend(ClassMethods)
         klass.class_eval do
+          before_filter :login_from_cookie 
           alias_method_chain :redirect_to, :object_url
           around_filter do |controller, action|
             Thread.current['Hobo::current_controller'] = controller
