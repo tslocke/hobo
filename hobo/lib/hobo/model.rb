@@ -399,7 +399,12 @@ module Hobo
       
       
       def view_hints
-        Object.class_eval "#{name}Hints"
+        @view_hints ||= begin
+          class_name = "#{name}Hints"
+          Object.class_eval "class #{class_name} < Hobo::ViewHints; end" unless 
+            ActiveSupport::Dependencies.qualified_const_defined?(class_name)
+          Object.class_eval class_name
+        end
       end
 
 
