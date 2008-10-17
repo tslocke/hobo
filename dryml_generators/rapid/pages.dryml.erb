@@ -75,7 +75,7 @@ edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields(:belongs_to).*.to_s - [model.name_attribute, main_content, creator, back_link, *boolean_fields].*.to_s
 
-is_user_model = model < Hobo::Model
+is_user_model = model < Hobo::User
 
 collection     = model.view_hints.primary_children
 if collection
