@@ -72,7 +72,7 @@ module Hobo
             self.current_user = old_user
             render :action => :account_disabled unless performed?
           else
-            if params[:remember_me] == "1"
+            if params[:remember_me].present?
               current_user.remember_me
               create_auth_cookie
             end

@@ -55,15 +55,18 @@ module ActionController
       text && render({:text => text, :layout => false }.merge(render_options))
     end
 
-    def render_for_file_with_dryml(template_path, *args)
-      if template_path !~ /^([a-z]:)?\//i &&                   # not an absolute path (e.g. an exception ERB template)
-          !template_exists?(template_path) &&                  # no template available in app/views
-          tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
 
-        # The template was missing, try to use a DRYML <page> tag instead
-        render_tag(tag_name) or raise ActionView::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
-      else
+    # DRYML fallback tags -- monkey patch this method to attempt to render a tag if there's no template
+    def render_for_file_with_dryml(template_path, *args)
+      if template_exists?(template_path)   ||   # A template is available in app/views
+          template_path =~ /^([a-z]:)?\//i ||   # an absolute path (e.g. an exception ERB template)
+          template_path =~ /^\.\/public\//        # A public asset
+        # Let Rails handle it normally                       
         render_for_file_without_dryml(template_path, *args)
+      else
+        # The template was missing, try to use a DRYML <page> tag instead
+        tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
+        render_tag(tag_name) or raise ActionView::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
       end
     end
     alias_method_chain :render_for_file, :dryml

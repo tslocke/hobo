@@ -3,7 +3,7 @@
 name_attribute     = model.name_attribute
 content_attribute  = model.primary_content_attribute
 creator_attribute  = model.creator_attribute
-primary_collection = primary_collection_name
+primary_collection = model.view_hints.primary_children
 
 if creator_attribute
   creator_refl = model.reflections[creator_attribute]
@@ -16,12 +16,16 @@ delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :dele
 
 has_actions = edit_link || delete_button
 has_body    = (!show_link && content_attribute) || creator_link || creator_attribute || primary_collection
+
+show_title = !show_link && (name_attribute || !has_body)
 -%>
 <def tag="card" for="<%= model.name %>">
   <card class="<%= model_name :dashed %>" param="default" merge>
 <% if name_attribute || show_link || has_actions || !has_body -%>
     <header: param>
+<% if show_link || show_title -%>
       <h4 param="heading"><% if show_link %><a><name/></a><% else %><name/><% end %></h4>
+<% end -%>
 <% if has_actions -%>
       <div param="actions">
 <% if edit_link -%>

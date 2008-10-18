@@ -12,19 +12,19 @@ class <%= class_name %> < ActiveRecord::Base
 
   # --- Hobo Permissions --- #
 
-  def creatable_by?(user)
-    user.administrator?
+  def creatable_by?(creator)
+    creator.administrator?
   end
 
-  def updatable_by?(user, new)
-    user.administrator?
+  def updatable_by?(updater, updated)
+    updater.administrator?
   end
 
-  def deletable_by?(user)
-    user.administrator?
+  def deletable_by?(deleter)
+    deleter.administrator?
   end
 
-  def viewable_by?(user, field)
+  def viewable_by?(viewer, field)
     true
   end
 

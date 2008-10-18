@@ -453,7 +453,7 @@ module Hobo::Dryml
     end
 
 
-    # This proc is used where 'param' is declared on a tag that is
+    # This method is used where 'param' is declared on a tag that is
     # itself a parameter tag.  Takes two procs that each return a pair
     # of hashes (attributes and parameters). Returns a single proc
     # that also returns a pair of hashes - the merged atributes and
@@ -472,7 +472,7 @@ module Hobo::Dryml
 
             attrs  = merge_attrs(general_attrs, overriding_attrs)
             overriding_default = overriding_parameters.delete(:default)
-            params = general_parameters.merge(overriding_parameters)
+            params = merge_parameter_hashes(general_parameters, overriding_parameters)
 
             # The overrider should provide its :default as the new
             # 'default_content'
@@ -494,6 +494,20 @@ module Hobo::Dryml
         end
       end
     end
+    
+    
+    def merge_parameter_hashes(given_parameters, overriding_parameters)
+      to_merge = given_parameters.keys & overriding_parameters.keys
+      no_merge = overriding_parameters.keys - to_merge
+      result = given_parameters.dup
+      
+      no_merge.each { |k| result[k] = overriding_parameters[k] }
+      to_merge.each { |k| result[k] = merge_tag_parameter(given_parameters[k], overriding_parameters[k])}
+      
+      result
+    end
+      
+      
 
 
     def part_contexts_javascripts

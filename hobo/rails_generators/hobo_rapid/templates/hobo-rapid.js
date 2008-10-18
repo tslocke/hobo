@@ -219,21 +219,6 @@ var Hobo = {
         return new Ajax.InPlaceEditor(el, Hobo.putUrl(el), opts)
     },
 
-    nicEditorOptions: { buttonList : ['bold','italic',
-                                      'left','center','right',
-                                      'ul',
-                                      'fontFormat',
-                                      'indent','outdent',
-                                      'link','unlink',
-                                      'image', 'removeLink']},
-
-    makeNicEditor: function(element) {
-        if (!Hobo.nicEditorOptions.iconsPath) { Hobo.nicEditorOptions.iconsPath = urlBase + '/images/nicEditorIcons.gif' }
-        var nic = new nicEditor(Hobo.nicEditorOptions)
-        nic.panelInstance(element, {hasPanel : true})
-        return nic.instanceById(element)
-    },
-
 
     doSearch: function(el) {
         el = $(el)
@@ -241,6 +226,15 @@ var Hobo = {
         var search_results = $(el.getAttribute("search-results") || "search-results")
         var search_results_panel = $(el.getAttribute("search-results-panel") || "search-results-panel")
         var url = el.getAttribute("search-url") || (urlBase + "/search")
+
+        var clear = function() { Hobo.hide(search_results_panel); el.clear() }
+
+        // Close window on [Escape]
+        Event.observe(el, 'keypress', function(ev) { 
+            if (ev.keyCode == 27) clear()
+        });
+
+        Event.observe(search_results_panel.down('.close-button'), 'click', clear)
 
         var value = $F(el)
         if (Hobo.searchRequest) { Hobo.searchRequest.transport.abort() }

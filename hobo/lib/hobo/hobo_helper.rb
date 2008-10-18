@@ -58,7 +58,7 @@ module Hobo
       options[:subsite] ||= self.subsite
       subsite, method = options.get :subsite, :method
 
-      if obj.respond_to?(:member_class)
+      if obj.respond_to?(:member_class) && obj.respond_to?(:origin)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
         
         refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
@@ -90,7 +90,13 @@ module Hobo
           obj = obj.class
         end
         
-        klass = obj.is_a?(Class) ? obj : obj.class
+        klass = if obj.is_a?(Class)
+                  obj
+                elsif obj.respond_to?(:member_class)
+                  obj.member_class # We get here if we're passed a scoped class
+                else
+                  obj.class
+                end
       end
 
       if Hobo::ModelRouter.linkable?(klass, action, options)
@@ -409,7 +415,15 @@ module Hobo
     def front_models
       Hobo::Model.all_models.select {|m| linkable?(m) }
     end
+    
+    
+    def this_field_name
+      this_parent.class.view_hints.field_name(this_field)
+    end
 
+    def this_field_help
+      this_parent.class.view_hints.field_help[this_field.to_sym]
+    end
 
 
     # debugging support

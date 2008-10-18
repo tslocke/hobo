@@ -20,7 +20,41 @@
   pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.join("\n")
 %></def>
 
+<!--
+`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base `<form>` tag, a form with contents is generated for each Hobo model. These are found in `app/views/taglibs/auto/rapid/forms.dryml`.
 
+### Usage
+
+`<form>` can be used as a regular HTML tag: 
+
+        <form action="/blog_posts/1" method="POST">...</form>
+
+If no `action` attribute is provided then the context is used to construct an appropriate action using restful routing:
+
+* If the context is a new record then the form action will be a `POST` to the create action:
+  
+        <form with="&BlogPost.new">...</form> -> <form action="/blog_posts" method="POST">...</form>
+
+* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method` with a value of `PUT`. Hobo adds this automatically:
+
+        <% blog_post = BlogPost.find(1) %>
+        <form with="&blog_post">...</form> -> 
+        <form action="/blog_posts/1" method="POST">
+          <input id="_method" type="hidden" value="PUT" name="_method"/>
+          ...
+        </form>
+
+AJAX based submission can be enabled by simply adding an `update` attribute. e.g.
+
+        <div part="comments"><collection:comments/></div>
+        <form with="&Comment.new" update="comments"/>
+
+### Additional Notes
+
+* Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
+
+* Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a validation error occurs.
+-->
 <def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
   html_attrs[:enctype] ||= "multipart/form-data" if multipart
@@ -66,8 +100,10 @@
      
     hiddens = nil
     body = with_form_context do
+      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
+      b = parameters.default
       hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
-      parameters.default
+      b
     end
      
     auth_token = if method.nil? || method == 'get' || request_forgery_protection_token.nil?
@@ -78,22 +114,24 @@
                            :value => form_authenticity_token}, nil, true, true)
                  end
      
-    page_path = if request.post? || request.put? && params[:page_path]
-                  params[:page_path]
-                else
-                  view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
-                end
-    page_path_hidden = hidden_field_tag("page_path", page_path) unless method == "get"
-
+    unless method == "get"
+      page_path = if (request.post? || request.put?) && params[:page_path]
+                    params[:page_path]
+                  else
+                    view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
+                  end
+      page_path_hidden = hidden_field_tag("page_path", page_path) 
+    end
+    
     hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].join)
      
     body = [hiddens_div, body].join
     
     if action.nil? # don't add automatic css classes if the action was specified
       if web_method
-        add_classes!(html_attrs, "#{type_id}-#{web_method}-form")
+        add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
       else
-        add_classes!(html_attrs, "#{'new-' if new_record}#{type_id}")
+        add_classes!(html_attrs, "#{'new ' if new_record}#{type_id.dasherize}")
       end
     end
 
@@ -102,7 +140,15 @@
   end
 %></def>
 
+<!--
+A shortcut for generating a submit button.
 
+### Usage
+
+    <submit label="Go!"/> -> <input type="submit" value="Go!" class="button submit-button"/>
+    <submit image="/images/go.png"/> -> <input type="image" src="/images/go.png" class="button submit-button"/>
+  
+-->
 <def tag="submit" attrs="label, image">
   <input if="&image" type="image" src="&image" merge-attrs class="image-button submit-button"/>
   <else>
@@ -110,7 +156,36 @@
   </else>
 </def>
 
+<!--
+Provides an editable control tailored to the type of the object in context. `<input>` tags should be used within a `<form>`. `<input>` is a _polymorphic_ tag which means that there are a variety of definitions, each one written for a particular type. For example there are inputs for `text`, `boolean`, `password`, `date`, `datetime`, `integer`, `float`, `string` and more.
 
+### Usage
+
+The tag behaves as a regular HTML input if the type attribute is given:
+
+    <input type="text" name="my_input"/> -> Output is exactly as provided, untouched by Rapid
+
+If no type attribute is given then the _context_ is used. For example if the context is a blog post:
+
+    <input:title/> -> 
+    <input id="blog_post[name]" class="string blog-post-name" type="text" value="My Blog Post" name="blog_post[name]"/>
+
+    <input:created_at/> -> 
+    <select id="blog_post_created_at_year" name="blog_post[created_at][year]">...</select>
+    <select id="blog_post_created_at_month" name="blog_post[created_at][month]">...</select>
+    <select id="blog_post_created_at_day" name="blog_post[created_at][day]">...</select>
+
+    <input:description/> -> 
+    <textarea class="text blog-post-description" id="blog_post[description]" name="blog_post[description]">...</textarea>
+
+If the context is a `belongs_to` association, the `<select-one>` tag is used.
+
+If the context is a `has_many :through` association, the `<select-many>` tag is used.
+
+### Additional Notes
+
+- The `can_edit?` permission is checked before rendering an `<input>`. If `can_edit?` returns false, the field is rendered using `<view>` instead.
+-->
 <def tag="input" attrs="force"><%=     
   if attributes[:type]
     element :input, attributes, nil, true, true
@@ -126,7 +201,7 @@
                     if refl.options[:through]
                       select_many(attrs)
                     else
-                      raise NotImlementedError, "An input for has-many associations has not been implemented yet"
+                      raise NotImplementedError, "An input for has-many associations has not been implemented yet"
                     end
                   end
                 else
@@ -296,7 +371,7 @@
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
   select_options = options.map { |x|
-            [ name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x, :raw => true), x.id ]
           }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
@@ -313,8 +388,8 @@
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
 %>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field} complete-on:#{dom_id complete_target}:#{completer}"
-         value="&name :no_wrapper => true"
+         class="autocompleter #{type_and_field.dasherize} complete-on:#{dom_id complete_target}:#{completer}"
+         value="&name :no_wrapper => true, :if_present => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
 </def>
@@ -336,7 +411,9 @@
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
-      <li repeat="errors.full_messages" param><%= this %></li>
+      <% this.errors.each do |attr, message|; next if message == "..." %>
+        <li param><%= attr.titleize %> <%= message %></li>
+      <% end %>
     </ul>
   </section>
 </def>
@@ -344,8 +421,12 @@
 
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
-  prompt ||= "Add #{a_or_an(:word => this_field)} #{this_field.titleize.singularize}"
-  options ||= this.member_class.all
+  prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
+  options ||= begin
+                conditions = ActiveRecord::Associations::HasManyThroughAssociation.new(this_parent, this_field_reflection).sql_conditions
+                this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+              end
+                
   values = this
   %>
   <div class="input select-many" merge-attrs>
@@ -374,7 +455,32 @@
   </div>
 </def>
 
+<!--
+Used inside a form to specify where to redirect after successful submission. This works by inserting a hidden field called `after_submit` which is used by Hobo if present to perform a redirect after the form submission.
 
+### Usage
+
+Use the `stay-here` attribute to remain on the current page:
+
+    <form>
+      <after-submit stay-here/>
+      ...
+    </form>
+
+Use the `go-back` option to return to the previous page:
+
+    <form>
+      <after-submit go-back/>
+      ...
+    </form>
+
+Use the `uri` option to specify a redirect location:
+
+    <form>
+      <after-submit uri="/admin"/>
+      ...
+    </form>
+-->
 <def tag="after-submit" attrs="uri, stay-here, go-back">
   <% uri = "stay-here" if stay_here %>
   <% uri = session[:previous_uri] if go_back %>
@@ -409,9 +515,9 @@
 
 <def tag="input-many">
   <set empty="&this.empty?"/>
-  <% this.push(this.member_class.new) if empty # temporarily add a blank item, remove below %>
   <ul class="input-many #{this_field.dasherize} input-many-prefix:#{param_name_for_this}">
-    <li repeat>      
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+      <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <div class="input-many-item" param="default"/>
       <div class="buttons">
@@ -419,15 +525,22 @@
         <button class="add-item" if="&last_item?">+</button>
       </div>
     </li>
+    <li if="&empty">
+      <fake-field-context fake-field="0" context="&this.member_class.new">
+        <div class="input-many-item" param="default"/>
+      </fake-field-context>
+      <div class="buttons">
+        <button class="add-item">+</button>
+      </div>
+    </li>
   </ul>
-  <% this.pop if empty %>
 </def>
 
 
 <def tag="input-all">
   <% association_fkey = this_field_reflection.primary_key_name %>
   <ul class="input-all #{this_field.dasherize}">
-    <li repeat>
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <set-scoped form-field-names="&[]">
         <hidden-id-field/>
         <do param="default"/>

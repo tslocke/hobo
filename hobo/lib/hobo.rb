@@ -7,7 +7,7 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
-(defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : Dependencies).load_paths |= [ File.dirname(__FILE__) ]
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__), "#{RAILS_ROOT}/app/viewhints"]
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -26,7 +26,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "0.8.2"
+  VERSION = "0.8.3"
 
   class RawJs < String; end
 

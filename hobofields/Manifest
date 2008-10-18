@@ -23,6 +23,7 @@ rails_generators/hobofield_model/templates/fixtures.yml.erb
 rails_generators/hobofield_model/templates/model.rb.erb
 rails_generators/hobofield_model/templates/test.rb.erb
 rails_generators/hobofield_model/USAGE
+Rakefile
 README.txt
 script/destroy
 script/generate

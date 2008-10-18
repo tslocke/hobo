@@ -396,6 +396,16 @@ module Hobo
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
       end
+      
+      
+      def view_hints
+        @view_hints ||= begin
+          class_name = "#{name}Hints"
+          Object.class_eval "class #{class_name} < Hobo::ViewHints; end" unless 
+            ActiveSupport::Dependencies.qualified_const_defined?(class_name)
+          Object.class_eval class_name
+        end
+      end
 
 
     end # --- of ClassMethods --- #
@@ -415,7 +425,7 @@ module Hobo
         readable = name.to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+$/, '').split('-')[0..5].join('-')
         @to_param ||= "#{id}-#{readable}"
       else
-        id
+        id.to_s
       end
     end
 
@@ -647,7 +657,7 @@ module Hobo
 
 
     def convert_collection_for_mass_assignment(reflection, value)
-      klass = reflection.safe_class
+      klass = reflection.klass
       if klass.try.name_attribute && value.is_a?(Array)
         value.map do |x|
           if x.is_a?(String)

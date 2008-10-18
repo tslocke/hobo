@@ -1,3 +1,134 @@
+=== Hobo 0.8.3 ===
+
+Hobo models -- improvements to logic for validating passwords. Closes #281
+
+Hobo users -- simpler definition of account_active?
+
+    This assumes the user has the default lifecycle or similar. If the lifecycle is cusomtised this method can be overridden
+
+Lifecycles -- Make current creator/transition available as lifecycle.active_step
+
+Lifecycles -- user a safer name for methods to test if the lifecycle is in a given state
+
+  Now record.lifecycle.is_active? instead of record.lifecycle.active?
+
+Lifecycles -- become method should not polute AR namespace (use lifecycle.become)
+
+Models -- to_param should always return a string. Closes #280
+
+Rapid -- <login-page> -- "remember me" is now on by default
+
+Fixed typo in <forgot-password-page>. Thanks to Jakub Suder
+
+Fixes and Clean theme improvements for site-wide live-search. Closes #290
+
+Removing hobo_spec - test will live in hobo/test, hobofields/test as is normal
+
+Adding close button (also, keyboard = ESC) to live-search popup
+
+Models -- classes for polymorphic assciations (e.g. Tagging::ble) are now automatically created instead of blowing up when
+calling reflection.klass. Closes #83
+
+Removed nicedit - we've moved to a plugin based system for rich editors now (see github.com/tablatom/hoboyui)
+
+Rapid -- the select menus in <select-many> now observe conditions applied to the has_many :through
+
+Rapid -- fix to double-escaping of names in <select-one>
+
+merge-attrs on <section-group>
+
+Rapid -- added if-present attribute to <name> to supress the nil-view if there is no name
+
+  Used in <name-one> to ensure the input box is blank
+
+Improved support for validation in multi-model-forms
+
+Added support for owner actions where the owner is a has_many :through (was only for :belongs_to owners)
+
+Rapid -- improvements to index-for-owner page
+
+Rapid -- renamed <card> parameter from 'description' to 'content'
+
+Rapid -- adding multipart attribute to <form>. Usage: <form multipart>
+
+Model Controller -- fix to :redirect option for hobo actions
+
+DRYML -- fix to dom_id helper when this_parent is a collection
+
+Model Controller -- improved remember_page_path to also remember the query string
+
+Rapid - fix to <remote-method-button> -- the confirm attribute was incorrectly changing the button into an ajax button
+
+Rapid -- <select-menu> now supports an array of label/value pairs, like the options_for_select helper
+
+Model Controller -- Now remembers the previous page path in the session and uses this to fix a problem with 
+<after-submit stay-here/> (occured after a validation error)
+
+New tag <input-all> for situations where you want input for every item in an existing collection (without the +/- buttons that
+<input-many> has)
+
+HoboSupport -- enum.rest now returns [] for an empty enumerable (was nil)
+
+Rapid + DRYML -- recfactoring the way DRYML keep track of which form field names.
+
+  It's now possible to track these for a sub-object by setting a new scoped variable form_field_names
+
+Rapid -- enhancements to <name-one>:
+
+ - sensible defaults for complete-target and completer
+   (you can now use <name-one> as a drop-in replacement for <select-one>
+
+ - The <name> of the referenced object is included in the input box if there is one
+
+Rapid -- improved grammar (use of 'a' or 'an') in <select-many>
+
+Model controller autocompleter enhancement -- you can ommit the name of the autocompleter, in which case it defaults to the
+model's name_attribute
+
+Hobo Model -- more robust handling of date hashes
+
+Support in Rapid and javascript for <input-many>
+
+  It's now very easy to embed form fields for items in a has_many collection.
+  These use javascript + and - buttons, but this does not use ajax.
+
+Hobo models -- improved support for mass assignment to has_many associations.
+
+    Any has_many association can now be assigned a hash. The keys are *only* for ordering purposes.
+    The values are themsleves hashes of attributes.
+    New records are created for any such hash that has no :id key
+
+Hobo model -- fix to has_one extension (was discarding the block)
+
+DRYML - New behaviour for context_map (repeat):
+  this_field is now the index (0 based) when iterating over a collection.
+  New helpers (HoboHelper) first_item? and last_item?
+
+DRYML - fix to loading of nested taglibs
+
+Rapid user pages -- don't show forgot-password link if the route is not present
+
+<empty-collection-message> should use <div> instead of <p>, otherwise block level elements won't be allowed inside and Firefox
+will sometimes treat them as if they are outside
+
+Rapid page generators -- added param to <field-names-where-true> on <show-page>
+
+DRYML - fix to using <extend> in a taglib included by a taglib
+
+Migration generator -- convert spaces to _ when responding to rename questions
+
+Rapid user pages -- made forgot-password link a param
+
+hobo_model generator -- formatting improvement
+
+Model Controller -- new :redirect option for controller actions
+
+Use the rails 'pick_template' mechanism to determine the correct template path when rendering a DRYML view
+
+Rapid generators -- adding missing <error-messages/> tags to lifecycle forms
+
+
+
 === Hobo 0.8.2 ===
 
 Hobo models -- improvement to name-in-URL (#to_param)
