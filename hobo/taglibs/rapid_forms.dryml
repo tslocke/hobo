@@ -390,6 +390,18 @@
 </def>
 
 
+<def tag="check-many">
+  <% collection = this; field = this_field; options ||= this.member_class.find(:all) -%>
+  <ul class="check-many">
+    <li repeat="&options">
+      <input type="checkbox" name="#{param_name_for(collection.origin, [field])}[]" value="#{name :no_wrapper => true}"
+             checked="&this.in?(collection)"/>
+      <name/>
+    </li>
+  </ul>
+</def>
+
+
 <def tag="hidden-id-field">
   <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
 </def>
@@ -424,11 +436,6 @@
     </li>
   </ul>
 </def>
-
-
-
-
-
 
 
 
