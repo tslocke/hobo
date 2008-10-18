@@ -4,6 +4,8 @@ module HoboFields
 
   class TextileString < HoboFields::Text
 
+    include SanitizeHtml
+
     def to_html(xmldoctype = true)
       if blank?
         ""
