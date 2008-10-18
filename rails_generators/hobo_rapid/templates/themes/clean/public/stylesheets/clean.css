@@ -12,8 +12,9 @@
 html, body {color: #193440; background: #193440;}
 .page-header {color: white; background: #3F606E;}
 .page-header .navigation.main-nav a {background: #5B8BA0;}
+.page-header .navigation.main-nav li.current a {background: #FCFFF4; color: #222;}
 .page-header .navigation.main-nav a:hover {background: #193440;}
-.content {background: #FCFFF5;}
+.section.content {background: #FCFFF5;}
 .button {color: white; background: #5B8BA0;}
 .button:hover {background-color: #193440;}
 .add-to-collection {background: #E6E7DE;}
@@ -109,8 +110,9 @@ input.file_upload {
 
 .article {margin: 20px 0; border-top: 1px dotted #ccc;}
 
-.field-list th {width: 120px;}
+.field-list th {width: 120px; white-space: nowrap;}
 .field-list td {width: auto;}
+.field-list .input-help { color: #888;}
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
 .content-header {padding: 5px 0;} 
@@ -149,7 +151,7 @@ input.file_upload {
 	color: black; background: #f2f2f2;
 }
 #search-results-panel .card.linkable a {color: black;}
-#search-spinner {position: absolute; top: 6px; right: 7px;}
+#search-spinner {background:black;border:1px solid #666666;opacity:0.6;padding:2px;position:absolute;right:4px;top:6px;}
 
 .main-nav {padding: 0 30px;}
 .main-nav li {margin-right: 10px;}
@@ -286,6 +288,10 @@ div.select-many .item {
 div.select-many .item span { float: left; }
 div.select-many .item .remove-item { float: right; }
 
+/* <live-search> */
+
+#search-results-panel { postition: relative; }
+#search-results-panel .close-button { cursor: pointer; text-decoration: underline; position: absolute; top: 3px; right: 6px;}
 
 /*******************************************************/
 /* these styles are for the generated front index page */
@@ -301,6 +307,7 @@ div.select-many .item .remove-item { float: right; }
 .front-page ul.models li {margin-left: 0; list-style: none;}
 
 ul.input-many {list-style-type: none;}
+ul.input-all  {list-style-type: none;}
 
 ul.input-many > li { overflow:hidden; zoom:1;}
 ul.input-many .input-many-item {float:left;}

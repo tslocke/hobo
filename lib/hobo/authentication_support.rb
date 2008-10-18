@@ -90,21 +90,27 @@ module Hobo
     # When called with before_filter :login_from_cookie will check for an :auth_token
     # cookie and log the user back in if apropriate
     def login_from_cookie
-      return unless (token = cookies[:auth_token]) && !logged_in?
-
-      user_model = token[:user_model].constantize
-      user = user_model.find_by_remember_token(token)
-      if user && user.remember_token?
+      if (user = authenticated_user_from_cookie)
         user.remember_me
-        current_user = user
+        self.current_user = user
         create_auth_cookie
       end
     end
+    
+    
+    def authenticated_user_from_cookie
+      !logged_in? and
+          cookie = cookies[:auth_token] and
+          (token, model_name = cookie.split) and
+          user_model = model_name.constantize rescue nil and
+          user = user_model.find_by_remember_token(token) and
+          user.remember_token? and
+          user
+    end
 
     def create_auth_cookie
-      cookies[:auth_token] = { :value => current_user.remember_token ,
-                               :expires => current_user.remember_token_expires_at,
-                               :user_model => current_user.model }
+      cookies[:auth_token] = { :value => "#{current_user.remember_token} #{current_user.class.name}",
+                               :expires => current_user.remember_token_expires_at }
     end
 
     private

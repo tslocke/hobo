@@ -31,13 +31,13 @@ module Hobo
           remember_token_expires_at :datetime
         end
 
-        validates_confirmation_of :password, :if => :password_required?
+        validates_confirmation_of :password, :if => :new_password_required?
+        password_validations
+        validate :validate_current_password_when_changing_password
 
         # Virtual attributes for setting and changing the password
         attr_accessor :current_password, :password, :password_confirmation, :type => :password
 
-
-        validate :validate_current_password_when_changing_password
 
         before_save :encrypt_password
 
@@ -45,7 +45,6 @@ module Hobo
 
         attr_protected *AUTHENTICATION_FIELDS
 
-        password_validations
 
       end
     end
@@ -55,7 +54,7 @@ module Hobo
 
       # Validation of the plaintext password
       def password_validations
-        validates_length_of :password, :within => 4..40, :if => :password_required?
+        validates_length_of :password, :within => 4..40, :if => :new_password_required?
       end
 
       def login_attribute=(attr, validate=true)
@@ -98,7 +97,7 @@ module Hobo
     end
 
     def account_active?
-      !self.class.has_lifecycle? || !'active'.in?(self.class::Lifecycle.state_names) || state == 'active'
+      lifecycle.active_state?
     end
 
     # Encrypts the password with the user salt
@@ -138,10 +137,6 @@ module Hobo
       true
     end
 
-    def changing_password?
-      crypted_password? && (password || password_confirmation) && !lifecycle.valid_key?
-    end
-
     protected
     # Before filter that encrypts the password before having it stored in the database.
     def encrypt_password
@@ -151,9 +146,18 @@ module Hobo
     end
 
 
-    # Is a password required for login? (or do we have an empty password?)
-    def password_required?
-      (crypted_password.blank? && password != nil) || !password.blank? || changing_password?
+    def changing_password?
+      !lifecycle_changing_password? && (current_password.present? || password.present? || password_confirmation.present?)
+    end
+    
+    
+    def lifecycle_changing_password?
+      lifecycle.active_step && :password.in?(lifecycle.active_step.parameters)
+    end
+
+    # Is a new password (and confirmation) required? (i.e. signing up or changing password)
+    def new_password_required?
+      lifecycle_changing_password? || changing_password?
     end
 
 

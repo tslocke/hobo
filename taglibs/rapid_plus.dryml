@@ -41,20 +41,6 @@
 </def>
 
 
-<def tag="change-password-form">
-  <form class="change-password" param>
-    <field-list fields="current_password, password, password_confirmation" param>
-      <password-label:>New Password</password-label:>
-      <password-confirmation-label:>Confirm New Password</password-confirmation-label:>
-    </field-list>
-    
-    <div class="actions" param="actions">
-      <submit label="Change Password" param/>
-    </div>
-  </form>
-</def>
-
-
 <def tag="sortable-collection" attrs="sortable-options"><%
   singular_name = this.member_class.name.underscore
   attributes[:id] ||= "#{singular_name}_ordering"
@@ -78,4 +64,20 @@
         sortable_element attributes[:id], opts
       end # FIXME: Make unobstrusive
    %>
+</def>
+
+
+<def tag="preview-with-more" attrs="name">
+  <% name ||= collection_name.pluralize -%>
+  <section class="#{name.gsub(' ', '-').dasherize} preview-with-more" param="default">
+    <h3 param="heading"><%= name.titleize %></h3>
+    <a param="more">More <type-name plural lowercase/>...</a>
+    <collection param/>
+  </section>
+</def>
+
+
+<def tag="gravatar" attrs="size, rating">
+  <% size ||= 80; rating ||= 'g'; digest = Digest::MD5.hexdigest(this.email_address) -%>
+  <a class="gravatar"><img class="gravatar" src="http://www.gravatar.com/avatar/#{digest}?s=#{size}&r=#{rating}" merge-attrs/></a>
 </def>

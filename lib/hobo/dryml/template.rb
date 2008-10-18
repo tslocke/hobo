@@ -523,7 +523,8 @@ module Hobo::Dryml
       elsif t =~ /^[A-Z]/
         t
       elsif t =~ /^[a-z]/ && defined? HoboFields.to_class
-        "Hobo.to_class(:#{t})"
+        klass = HoboFields.to_class(t)
+        klass.name
       elsif is_code_attribute?(t)
         t[1..-1]
       else
@@ -639,7 +640,7 @@ module Hobo::Dryml
                          merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_")
                          "all_parameters & #{merge_param_names.inspect}"
                        end
-        "{#{param_items}}.merge((#{extra_params}) || {})"
+        "merge_parameter_hashes({#{param_items}}, (#{extra_params}) || {})"
       else
         "{#{param_items}}"
       end

@@ -220,7 +220,11 @@ module Hobo
             define_method(name, &block)
           else
             if scope = options.delete(:scope)
-              define_method(name) { hobo_index scope, options.dup }
+              if scope.is_a?(Symbol)
+                define_method(name) { hobo_index model.send(scope), options.dup }
+              else
+                define_method(name) { hobo_index scope, options.dup }
+              end
             else
               define_method(name) { hobo_index options.dup }
             end

@@ -35,9 +35,13 @@ module Hobo
         if name =~ /^with_(.*)/ && (refl = reflection($1))
 
           def_scope do |*records|
-            records = records.flatten.compact.map {|r| find_if_named(refl, r) }
-            exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
-            { :conditions => [exists_sql] + records }
+            if records.empty?
+              { :conditions => exists_sql_condition(refl, true) }
+            else
+              records = records.flatten.compact.map {|r| find_if_named(refl, r) }
+              exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
+              { :conditions => [exists_sql] + records }
+            end
           end
 
         # with_player(a_player)
@@ -53,9 +57,13 @@ module Hobo
         elsif name =~ /^without_(.*)/ && (refl = reflection($1))
 
           def_scope do |*records|
-            records = records.flatten.compact.map {|r| find_if_named(refl, r) }
-            exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
-            { :conditions => ["NOT (#{exists_sql})"] + records }
+            if records.empty? 
+              { :conditions => "NOT (#{exists_sql_condition(refl, true)})" }
+            else
+              records = records.flatten.compact.map {|r| find_if_named(refl, r) }
+              exists_sql = ([exists_sql_condition(refl)] * records.length).join(" AND ")
+              { :conditions => ["NOT (#{exists_sql})"] + records }
+            end
           end
 
         # without_player(a_player)
@@ -219,11 +227,19 @@ module Hobo
             def_scope :order => "#{@klass.table_name}.created_at DESC"
 
           when "recent"
-            def_scope do |*args|
-              count = args.first || 3
-              { :limit => count, :order => "#{@klass.table_name}.created_at DESC" }
+            
+            if "created_at".in?(@klass.columns.*.name)
+              def_scope do |*args|
+                count = args.first || 6
+                { :limit => count, :order => "#{@klass.table_name}.created_at DESC" }
+              end
+            else
+              def_scope do |*args|
+                count = args.first || 6
+                { :limit => count }
+              end
             end
-
+            
           when "limit"
             def_scope do |count|
               { :limit => count }
@@ -276,22 +292,31 @@ module Hobo
       end
 
 
-      def exists_sql_condition(reflection)
+      def exists_sql_condition(reflection, any=false)
         owner = @klass
         owner_primary_key = "#{owner.table_name}.#{owner.primary_key}"
         if reflection.options[:through]
           join_table   = reflection.through_reflection.klass.table_name
-          source_fkey  = reflection.source_reflection.primary_key_name
           owner_fkey   = reflection.through_reflection.primary_key_name
-          "EXISTS (SELECT * FROM #{join_table} " +
-            "WHERE #{join_table}.#{source_fkey} = ? AND #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+          if any
+            "EXISTS (SELECT * FROM #{join_table} WHERE #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+          else
+            source_fkey  = reflection.source_reflection.primary_key_name
+            "EXISTS (SELECT * FROM #{join_table} " +
+              "WHERE #{join_table}.#{source_fkey} = ? AND #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+          end
         else
-          related     = reflection.klass
           foreign_key = reflection.primary_key_name
+          related     = reflection.klass
 
-          "EXISTS (SELECT * FROM #{related.table_name} " +
-            "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key} AND " +
-            "#{related.table_name}.#{related.primary_key} = ?)"
+          if any
+            "EXISTS (SELECT * FROM #{related.table_name} " +
+              "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key})"
+          else
+            "EXISTS (SELECT * FROM #{related.table_name} " +
+              "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key} AND " +
+              "#{related.table_name}.#{related.primary_key} = ?)"
+          end
         end
       end
 

@@ -33,4 +33,5 @@ class HoboModelControllerGenerator < Rails::Generator::NamedBase
                             "#{file_name}_helper.rb")
     end
   end
+
 end

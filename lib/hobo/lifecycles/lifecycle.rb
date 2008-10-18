@@ -27,7 +27,7 @@ module Hobo
         name = name.to_s
         returning(State.new(name, on_enter)) do |s|
           states[name] = s
-          class_eval "def #{name}?; record.state == '#{name}'; end"
+          class_eval "def #{name}_state?; state_name == '#{name}' end"
         end
       end
 
@@ -74,7 +74,8 @@ module Hobo
 
 
       def self.create(name, user, attributes=nil)
-        creators[name.to_s].run!(user, attributes)
+        creator = creators[name.to_s]
+        creator.run!(user, attributes)
       end
 
 
@@ -97,7 +98,7 @@ module Hobo
 
       attr_reader :record
 
-      attr_accessor :provided_key
+      attr_accessor :provided_key, :active_step
 
 
       def initialize(record)
@@ -157,6 +158,7 @@ module Hobo
             raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
             if record.save(validate)
               s.activate! record
+              self.active_step = nil # That's the end of this step
               true
             else
               false
@@ -164,8 +166,8 @@ module Hobo
           end
         end
       end
-
-
+      
+      
       def key_timestamp_field
         record.class::Lifecycle.options[:key_timestamp_field]
       end
