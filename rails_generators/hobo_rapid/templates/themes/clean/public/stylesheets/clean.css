@@ -306,6 +306,8 @@ ul.input-many > li { overflow:hidden; zoom:1;}
 ul.input-many .input-many-item {float:left;}
 ul.input-many div.buttons {float:left; margin-left:10px;}
 
+ul.check-many { list-style-type: none;}
+ul.check-many li input { vertical-align: -20%;}
 
 
 
