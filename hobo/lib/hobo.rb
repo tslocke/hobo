@@ -59,33 +59,8 @@ module Hobo
     end
 
 
-    def object_from_dom_id(dom_id)
-      return nil if dom_id == 'nil'
-
-      _, name, id, attr = *dom_id.match(/^([a-z_]+)(?:_([0-9]+(?:_[0-9]+)*))?(?:_([a-z_]+))?$/)
-      raise ArgumentError.new("invalid model-reference in dom id") unless name
-      if name
-        model_class = name.camelize.constantize rescue (raise ArgumentError.new("no such class in dom-id"))
-        return nil unless model_class
-
-        if id
-          obj = if false and attr and model_class.reflections[attr.to_sym].klass.superclass == ActiveRecord::Base
-                  # DISABLED - Eager loading is broken - doesn't support ordering
-                  # http://dev.rubyonrails.org/ticket/3438
-                  # Don't do this for STI subclasses - it breaks!
-                  model_class.find(id, :include => attr)
-                else
-                  model_class.find(id)
-                end
-          attr ? obj.send(attr) : obj
-        else
-          model_class
-        end
-      end
-    end
-
-    def dom_id(obj, attr=nil)
-      attr ? "#{obj.typed_id}_#{attr}" : obj.typed_id
+    def typed_id(obj, attr=nil)
+      attr ? "#{obj.typed_id}:#{attr}" : obj.typed_id
     end
 
     def find_by_search(query, search_targets=nil)
@@ -437,7 +412,7 @@ class ::Array
   end
 
   def typed_id
-    origin and origin_id = origin.try.typed_id and "#{origin_id}_#{origin_attribute}"
+    origin and origin_id = origin.try.typed_id and "#{origin_id}:#{origin_attribute}"
   end
 
 end
