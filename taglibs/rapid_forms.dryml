@@ -180,7 +180,7 @@ If no type attribute is given then the _context_ is used. For example if the con
 
 If the context is a `belongs_to` association, the `<select-one>` tag is used.
 
-If the context is a `has_many :through` association, the `<select-many>` tag is used.
+If the context is a `has_many :through` association, the polymorphic `<collection-input>` tag is used.
 
 ### Additional Notes
 
@@ -199,7 +199,7 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
                     call_polymorphic_tag('input', attrs) or select_one(attrs)
                   elsif refl.macro == :has_many
                     if refl.options[:through]
-                      select_many(attrs)
+                      collection_input(attrs)
                     else
                       raise NotImplementedError, "An input for has-many associations has not been implemented yet"
                     end
@@ -216,6 +216,18 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
     end
   end
 %></def>
+
+
+<!--
+This tag is called by `<input>` when the context is a `has_many :through` collection. By default a `<select-many>` is used, but this can be customised on a per-type basis. For example, say you would like the `<check-many>` tag used to edit collections a `Category` model in your application:
+
+    <def tag="collection-input" for="Category"><check-many merge/></def>
+-->
+<def tag="collection-input" polymorphic></def>
+
+<def tag="collection-input" for="ActiveRecord::Base"><select-many merge/></def>
+
+
 
 
 <def tag="input" for="text" attrs="name">
