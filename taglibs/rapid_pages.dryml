@@ -11,8 +11,10 @@
       </do>
 
       <do param="scripts">
-        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid, application"/>
+        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid"/>
         <if-ie version="lt IE 7" param="fix-ie6"><javascript name="IE7"/></if-ie>
+        <do param="custom-scripts"/>
+        <javascript param="application-javascript" name="application"/>
       </do>
     </head>
 
