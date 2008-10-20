@@ -443,7 +443,12 @@ var Hobo = {
 	    var table= "<table cellpadding='0' cellspacing='0' border='0' style='border-collapse: collapse; border-spacing: 0'" + attrs + ">" + 
 	               rows + "</table>"
 	    e.outerHTML = table
+    },
+
+    makeHtmlEditor: function(textarea) {
+        // do nothing - plugins can overwrite this method
     }
+
 
 }
 
@@ -692,9 +697,8 @@ Event.addBehavior({
 
     'div.select-many.input' : SelectManyInput(),
 
-    '.association-count:click' : function(e) {
-	    new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
-	    Event.stop(e);
+    'textarea.html' : function() {
+        Hobo.makeHtmlEditor(this)
     },
 
     'form.filter-menu select:change': function(event) {
@@ -801,4 +805,3 @@ Element.addMethods({
         return new ElementSet(Selector.matchElements(element.childElements(), selector))
     }
 })
-
