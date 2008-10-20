@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'hobosupport'
 ActiveSupport::Dependencies.load_paths << File.dirname(__FILE__) + "/../lib"
 
 require 'rexml/xpath'
@@ -115,46 +114,75 @@ end
 
 
 def contents(root)
-  tags = XPath.match(root, '/*/def')
+  tags = XPath.match(root, '/*/*[@tag]')
   tags.map { |tag| " * #{link_to_tag tag}\n" }.join
 end
 
 
 def doc_for_taglib(title, root)
-  tags = XPath.match(root, '/*/def').map { |e| doc_for_tag(e) }.join("\n\n")
+  tags = XPath.match(root, '/*/*[@tag]').map { |e| doc_for_tag(e) }.join("\n\n")
 
   "# #{title}\n\n" + contents(root) + "\n\n" + tags
 end
 
+def index_page(output_files, output_dir)
+  markdown = "# Tag Documentation\n\n" + output_files.map do |f|
+    link = f.gsub(output_dir+'/', '')
+    link_text = link.gsub('_', '\_').gsub(/\.html$/, '')
+    "* [#{link_text}](#{link})"
+  end.join("\n")
+
+  html = Maruku.new(markdown).to_html
+  
+  File.open("#{output_dir}/index.html", 'w') { |f| f.write(html) }
+end
+
+def process_directory(src, output_dir)
+  raise RuntimeError, "#{output_dir} is not a directory" if File.exists?(output_dir) && !File.directory?(output_dir)
+
+  FileUtils.mkdir output_dir unless File.exists? output_dir
+
+  dryml_files = File.directory?(src) ? Dir["#{src}/*"] : [src]
+
+  output_files = []
+
+  dryml_files.each do |f|
+    if File.directory?(f)
+      output_files += process_directory(f, "#{output_dir}/#{File.basename(f)}")
+    elsif f =~ /\.dryml$/
+      basename = File.basename(f).sub(/\.dryml$/, '')
+      title = basename.titleize
+
+      doc = Hobo::Dryml::Parser::Document.new(File.read(f), f)
+
+      markdown = doc.restore_erb_scriptlets(doc_for_taglib(title, doc))
+      html = Maruku.new(markdown).to_html.gsub('&amp;', '&')
+
+      output_file = "#{output_dir}/#{basename}.html"
+      puts output_file
+      File.open(output_file, 'w') { |f| f.write(html) }
+      output_files << output_file
+    end
+  end
+  output_files
+end
+
+  
+
 namespace :hobo do
 
   desc "Generate markdown formatted reference docs automatically from DRYML taglibs"
-  task :generate_tag_reference do
+  task :generate_tag_reference => :environment do
     gem 'maruku'
     require 'maruku'
 
     src = ENV['src']
 
     output_dir = ENV['output'] || "taglib-docs"
-    raise RuntimeError, "#{output_dir} is not a directory" if File.exists?(output_dir) && !File.directory?(output_dir)
-
-    FileUtils.mkdir output_dir unless File.exists? output_dir
-
-    dryml_files = File.directory?(src) ? Dir["#{src}/*"] : [src]
-
-    dryml_files.each do |f|
-      basename = File.basename(f).sub(/\.dryml$/, '')
-      title = basename.titleize
-
-      doc = Hobo::Dryml::Parser::Document.new(File.read(f), f)
-
-      markdown = doc_for_taglib(title, doc)
-      #html = Maruku.new(markdown).to_html
-
-      output_file = "#{output_dir}/#{basename}.markdown"
-      puts output_file
-      File.open(output_file, 'w') { |f| f.write(markdown) }
-    end
+    
+    output_files = process_directory(src, output_dir)
+    
+    index_page(output_files, output_dir)
   end
 
 end
