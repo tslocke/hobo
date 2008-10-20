@@ -7,7 +7,7 @@ module Hobo
 
       class TamperedWithPartContext < StandardError; end
 
-      class Id < String; end
+      class TypedId < String; end
 
       class << self
         attr_accessor :secret, :digest
@@ -34,7 +34,7 @@ module Hobo
 
       def pre_marshal(x)
         if x.is_a?(ActiveRecord::Base) && x.respond_to?(:typed_id)
-          Id.new(x.typed_id)
+          TypedId.new(x.typed_id)
         else
           x
         end
@@ -77,15 +77,15 @@ module Hobo
           elsif this_id == "nil"
             nil
           else
-            Hobo.object_from_dom_id(this_id)
+            Hobo::Model.find_by_typed_id(this_id)
           end
         end
 
 
         def restore_locals(locals)
           locals.map do |l|
-            if l.is_a?(Id)
-              Hobo.object_from_dom_id(l)
+            if l.is_a?(TypedId)
+              Hobo::Model.find_by_typed_id(this_id)
             else
               l
             end

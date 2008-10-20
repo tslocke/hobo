@@ -154,15 +154,6 @@ var Hobo = {
         }
     },
     
-    getClassData: function(el, name) {
-        var match = el.className.match(new RegExp("(^| )" + name + ":(\\S+)($| )"))
-        return match && match[2]
-    },
-    
-    getModelId: function(el) {
-        return Hobo.getClassData(el, 'model')
-    },
-
     onFieldEditComplete: function(el, newValue) {
         el = $(el)
         var oldValue = Hobo.ipeOldValues[el.id]
@@ -260,13 +251,13 @@ var Hobo = {
 
 
     putUrl: function(el) {
-        var spec = Hobo.parseFieldId(el)
+        var spec = Hobo.parseModelSpecForElement(el)
         return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
     },
 
     
     urlForId: function(id) {
-        var spec = Hobo.parseId(id)
+        var spec = Hobo.parseModelSpec(id)
         var url = urlBase + "/" + Hobo.pluralise(spec.name)
         if (spec.id) { url += "/" + spec.id }
         return url
@@ -274,7 +265,7 @@ var Hobo = {
 
         
     fieldSetParam: function(el, val) {
-        var spec = Hobo.parseFieldId(el)
+        var spec = Hobo.modelSpecForElement(el)
         var res = spec.name + '[' + spec.field + ']=' + encodeURIComponent(val)
         if (typeof(formAuthToken) != "undefined") {
             res = res + "&" + formAuthToken.name + "=" + formAuthToken.value
@@ -319,7 +310,7 @@ var Hobo = {
     ajaxUpdateField: function(element, field, value, updates) {
         var objectElement = Hobo.objectElementFor(element)
         var url = Hobo.putUrl(objectElement)
-        var spec = Hobo.parseFieldId(objectElement)
+        var spec = Hobo.modelSpecForElement(objectElement)
         var params = spec.name + '[' + field + ']=' + encodeURIComponent(value)
         new Hobo.ajaxRequest(url, updates, { method:'put', message: "Saving...", params: params });
     },
@@ -333,16 +324,27 @@ var Hobo = {
             new Effect.Appear(empty, {delay:0.3})
         }
     },
+    
 
+    getClassData: function(el, name) {
+        var match = el.className.match(new RegExp("(^| )" + name + "::(\\S+)($| )"))
+        return match && match[2]
+    },
+    
 
-    parseFieldId: function(el) {
-        var id = Hobo.getModelId(el)
-        return id && Hobo.parseId(id)
+    getModelId: function(el) {
+        return Hobo.getClassData(el, 'model')
     },
 
 
-    parseId: function(id) {
-        m = id.gsub('-', '_').match(/^([a-z_]+)(?:_([0-9]+))?(?:_([a-z_]+))?$/)
+    modelSpecForElement: function(el) {
+        var id = Hobo.getModelId(el)
+        return id && Hobo.parseModelSpec(id)
+    },
+
+
+    parseModelSpec: function(id) {
+        m = id.gsub('-', '_').match(/^([^:]+)(?::([^:]+)(?::([^:]+))?)?$/)
         if (m) return { name: m[1], id: m[2], field: m[3] }
     },
 
@@ -443,7 +445,12 @@ var Hobo = {
 	    var table= "<table cellpadding='0' cellspacing='0' border='0' style='border-collapse: collapse; border-spacing: 0'" + attrs + ">" + 
 	               rows + "</table>"
 	    e.outerHTML = table
+    },
+
+    makeHtmlEditor: function(textarea) {
+        // do nothing - plugins can overwrite this method
     }
+
 
 }
 
@@ -668,11 +675,11 @@ NameManyInput = Object.extend(SelectManyInput, {
                               
 AutocompleteBehavior = Behavior.create({
     initialize : function() {
-        var target    = this.element.className.match(/complete-on:([\S]+)/)[1].split(':')
-        var model     = target[0]
+        var target    = this.element.className.match(/complete-on::([\S]+)/)[1].split('::')
+        var typedId   = target[0]
         var completer = target[1]
 
-        var spec = Hobo.parseId(model)
+        var spec = Hobo.parseModelSpec(typedId)
         var url = urlBase + "/" + Hobo.pluralise(spec.name) +  "/complete_" + completer
         var parameters = spec.id ? "id=" + spec.id : ""
         new Ajax.Autocompleter(this.element, 
@@ -692,9 +699,8 @@ Event.addBehavior({
 
     'div.select-many.input' : SelectManyInput(),
 
-    '.association-count:click' : function(e) {
-	    new Effect.ScrollTo('primary-collection', {duration: 1.0, offset: -20, transition: Effect.Transitions.sinoidal});
-	    Event.stop(e);
+    'textarea.html' : function() {
+        Hobo.makeHtmlEditor(this)
     },
 
     'form.filter-menu select:change': function(event) {
@@ -801,4 +807,3 @@ Element.addMethods({
         return new ElementSet(Selector.matchElements(element.childElements(), selector))
     }
 })
-

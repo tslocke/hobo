@@ -8,7 +8,12 @@
 
 <def tag="section-group"><div class="section-group"><div class="section-group-inner" merge-attrs param="default"></div></div></def>
 
-<!-- section represents a generic document or application section. -->
+<!--
+A proposed HTML 5 tag for representing a generic document or application section. Slightly more semantic than `<div>` for indicating document structure. For the time being, `<section>` is output as `<div class="section">`. In Hobo, `<section>` also has one other important behaviour which is different to using `<div>` directly, when the content of the section is empty, the wrapper tag will disappear. e.g.
+  
+    <section>My Section</section> -> <div class="section">My Section</div>
+    <section><% # empty %></section> -> (nothing is generated)
+-->
 <def tag="section" attrs="empty, with-flash-messages">
   <set body="&parameters.default" flash="&with_flash_messages && !scope.flash_rendered"/>
   <div class="section #{'with-flash' if flash}" merge-attrs if="&!body.blank? || empty">
@@ -17,16 +22,25 @@
   </div>
 </def>
 
+<!--
+A proposed HTML 5 semantic tag. Outputs `<div class="aside">` and works in the same way as `<section>` with empty content.
+-->
 <def tag="aside" attrs="empty">
   <set body="&parameters.default"/>
   <div class="aside" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
+<!--
+A proposed HTML 5 semantic tag. Outputs `<div class="header">` and works in the same way as `<section>` with empty content.
+-->
 <def tag="header" attrs="empty">
   <set body="&parameters.default"/>
   <div class="header" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
+<!--
+A proposed HTML 5 semantic tag. Outputs `<div class="footer">` and works in the same way as `<section>` with empty content.
+-->
 <def tag="footer" attrs="empty">
   <set body="&parameters.default"/>
   <div class="footer" merge-attrs if="&!body.blank? || empty"><%= body %></div>
