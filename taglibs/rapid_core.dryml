@@ -21,7 +21,44 @@
 
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
+<!--
+`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute. 
 
+### Usage
+
+If the context is an array of blog posts...
+
+    <table fields="name, created_at, description"/>
+
+This will output a header row containing "Name", "Created At" and "Description" followed by a row for each record in the collection. By default, the `<view/>` tag is called for each field in the row. This can be altered with the `field-tag` attribute, e.g.
+
+    <table fields="name, created_at, description" field-tag="input"/>
+
+This will use `<input/>` as the tag in each table cell instead of `<view/>`
+
+### Additional Notes
+
+* `<table>` provides parameters based on the names of the fields which can be used to further customise the output. For each field a heading parameter is provided, e.g. name-heading, created-at-heading, description-heading. These can be used to customise the headings:
+
+        <table fields="name, created_at, description">
+          <created-at-heading:>Creation Date</created-at-heading:>
+        </table>
+* Similarly, "view" parameters are provided as an additional way to customise the table cells of the table body, e.g. `name-view`, `created-at-view`, `description-view`:
+
+        <table fields="name, created_at, description">
+          <created-at-view:><view format="%d %B %Y"/></created-at-view:>
+        </table>
+* By adding an empty `control` parameter, the default control column is enable adding an edit link and delete button for each table row:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+        </table>
+    The controls can be further customised using the "edit-link" and "delete-button" parameters or by providing completely new content for the control column, e.g.
+
+        <table fields="name, created_at, description">
+          <controls:>my controls!</controls:>
+        </table>
+-->
 <def tag="table" attrs="fields, field-tag, empty">
   <if test="&!(fields || all_parameters.tr?)">
     <%= element("table", attributes, all_parameters.default) %>
@@ -60,7 +97,14 @@
   </else>
 </def>
 
+<!--
+Provides a short hand way of displaying images in public/images
 
+### Usage
+
+    <image src="hobo.png"/> -> <img src="/images/hobo.png"/>
+    <image src="blog/funny.jpg" alt="Funny Scene"/> -> <img src="/images/blog/funny.jpg" alt="Funny Scene"/>
+-->
 <def tag="image" attrs="src">
   <img src="#{base_url}/images/#{src}" merge-attrs/>
 </def>
@@ -137,7 +181,51 @@
   end
 %></def>
 
+<!--
+`<a>` is extended in Rapid to automatically provide URLs for Hobo model routes
 
+### Usage
+
+The tag behaves as a regular HTML link or anchor if either the href or name attribute is given:
+
+    <a href="/admin">Admin</a> -> Output is exactly as provided, untouched by Rapid
+
+If no href or name is given then the _context_ is used to determine the link URL.
+The helper method `object_url` is used to construct the URL using restful routing:
+
+If the context is a class then the link will be an index page:
+
+    <a with="&BlogPost">My Blog</a> -> <a href="/blog_posts">My Blog</a>
+
+If the context is a hobo model instance then the link will be a show page:
+
+    <% blog_post = BlogPost.find(1) %>
+    <a with="&blog_post">My Blog Post</a> -> <a href="/blog_posts/1">My Blog Post</a>
+
+An action can be provided for an alternative show page:
+
+    <a with="&blog_post" action="edit">Edit Post</a> -> <a href="/blog_posts/1/edit">Edit Post</a>
+
+Or a new page if the context is a class:
+  
+    <a with="&BlogPost" action="new">New Blog Post</a> -> <a href="/blog_posts/new">New Blog Post</a>
+
+### Additional Features
+
+* If the constructed route does not exist then the link will not be created, but the content of the link will still be output. E.g. when `/blog_posts` does not exist (because the hobo model controller does not exist or the index action is disabled):
+
+        <a with="&BlogPost">My Blog</a> -> My Blog
+
+    when the show action `/blog_posts/:id` does not exist:
+
+        <a with="&blog_post">My Blog Post</a> -> My Blog Post
+* If no content text is provided then `<a>` will use the name method on the context to provide the text. E.g.
+
+        <a with="&blog_post"/> -> <a href="/blog_posts/1">My First Blog Post</a>`
+        <a with="&BlogPost"/> -> <a href="/blog_posts">Blog Posts</a>`
+* If `action="new"` then `<a>` will check that the current user has permission to create the object
+* Several useful classes are added automatically to the output `<a>`.
+-->
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
   content = parameters.default
    
@@ -146,7 +234,7 @@
   if href || attributes[:name]
     # Regular link
     href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if !params.blank?
-    element(:a, attributes.update(:href => href), content)
+      element(:a, attributes.update(:href => href), content)
   else
     target = to || this
   
@@ -196,7 +284,40 @@
   end
 %></def>
 
-        
+<!--
+Provides a read-only view tailored to the type of the object being viewed. `<view>` is a _polymorphic_ tag which means that there are a variety of definitions, each one written for a particular type. For example there are views for `Date`, `Time`, `Numeric`, `String` and `Boolean`. The type specific view is enclosed in a wrapper tag (typically a `<span>` or `<div>`) with some useful classes automatically added.
+
+### Usage
+
+Assuming the context is a blog post...
+
+* Viewing a DateTime field:
+
+        <view:created_at/> -> <span class="view blog-post-created-at">June 09, 2008 15:36</span>
+* Viewing a String field:
+
+        <view:title/> -> <span class="view blog-post-title">My First Blog Post</span>
+* Viewing an Integer field:
+
+        <view:comment_count/> -> <span class="view blog-post-comment-count">4</span>
+* Viewing the blog post itself results in a link to the blog post (using Rapid's `<a>` tag):
+
+        <view/> -> <span class="view model:blog-post-1"><a href="/blog_posts/1">My First Blog Post</a></span>
+
+### Additional Notes
+
+* The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` attribute to force a `<span>`, e.g.
+
+        <view:body/> -> <div class="view blog-post-body">This is my blog post body</div>
+
+        <view:body inline/> -> <span class="view blog-post-body">This is my blog post body</span>
+* Use the `block` attribute to change the wrapper tag to a `<div>` regardless of the field type e.g.
+
+        <view:created_at block/> -> <div class="view blog-post-created-at">June 09, 2008 15:36</div>
+* Use the `no-wrapper` attribute to remove the wrapper tag completely. e.g.
+
+        <view:created_at no-wrapper/> -> June 09, 2008 15:36
+-->
 <def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
@@ -270,6 +391,32 @@
 <def tag="view" for="ActiveRecord::Base"><a/></def>
 
 
+<!--
+A convenience tag used to output a count and a correctly pluralised label. Works with any kind of collection such as an `ActiveRecord` association or an array.
+
+### Usage
+
+    <count:comments/> -> <span class="count">1 Comment</span>
+
+    <count:viewings/> -> <span class="count">3 Viewings</span>
+
+The label can be customised using the `label` attribute, e.g.
+
+    <count:comments label="blog post comment"/> -> <span class="count">12 blog post comments</span>
+
+### Additional Notes
+
+* Use the `prefix` attribute to insert words before the count. If the prefix is "are" or "is" then it will be pluralised if needed:
+
+        There <count:comments prefix="are"/> -> There <span class="count">is 1 Comment</span>
+        There <count:viewings prefix="are"/> -> There <span class="count">are 3 Viewings</span>
+* Use the `lowercase` attribute to force the generated label to be lowercase:
+
+        <count:comments lowercase/> -> <span class="count">1 comment</span>
+* Use the `if-any` attribute to output nothing if the count is zero. This can be followed by an `<else>` tag to handle the empty case:
+
+        <count:comments if-any/><else>There are no comments</else>
+-->
 <def tag="count" attrs="label, prefix, if-any, lowercase"><span class="count"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
    
