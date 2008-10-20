@@ -401,15 +401,7 @@ module Hobo
       
       def view_hints
         class_name = "#{name}Hints"
-        Object.class_eval class_name
-      rescue NameError => e
-        if e.message =~ /\b#{class_name}\b/
-          Object.class_eval "class #{class_name} < Hobo::ViewHints; end"
-          Object.class_eval class_name
-        else
-          # oops - some other name error
-          raise
-        end
+        class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::ViewHints; end; #{class_name}")
       end
 
 
