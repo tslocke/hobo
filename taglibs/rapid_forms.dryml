@@ -431,6 +431,11 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
 </def>
 
 
+<!--
+An input for `has_many :through` associations that lets the user chose the items from a <select> menu.
+  
+To use this tag, the model of the items the user is chosing *must* have unique names, and the 
+-->
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
