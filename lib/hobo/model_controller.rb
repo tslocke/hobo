@@ -69,12 +69,7 @@ module Hobo
       names = (@controller_names || []).select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
       
       names.map do |name|
-        begin
-          name.constantize
-        rescue NameError
-          @controller_names.delete name
-          nil
-        end
+        name.safe_constantize || (@controller_names.delete name; nil)
       end.compact
     end
     

@@ -56,7 +56,7 @@ module Hobo
 
 
     def typed_id
-      "#{self.class.name.underscore}_#{id}"
+      "#{self.class.name.underscore}:#{id}"
     end
 
 

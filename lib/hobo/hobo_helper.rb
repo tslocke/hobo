@@ -20,7 +20,7 @@ module Hobo
       # simple one-hit-per-request cache
       @current_user ||= begin
                           id = session._?[:user]
-                          (id && Hobo.object_from_dom_id(id) rescue nil) || ::Guest.new
+                          (id && Hobo::Model.find_by_typed_id(id) rescue nil) || ::Guest.new
                         end
     end
 
@@ -125,7 +125,7 @@ module Hobo
         "#{name}=' + #{obj} + '"
       else
         v = if obj.is_a?(ActiveRecord::Base) or obj.is_a?(Array)
-              "@" + dom_id(obj)
+              "@" + typed_id(obj)
             else
               obj.to_s.gsub("'"){"\\'"}
             end
@@ -149,12 +149,12 @@ module Hobo
 
     def type_and_field(*args)
       type, field = args.empty? ? [this_parent.class, this_field] : args
-      "#{type.typed_id}_#{field}" if type.respond_to?(:typed_id)
+      "#{type.typed_id}:#{field}" if type.respond_to?(:typed_id)
     end
 
 
     def model_id_class(object=this, attribute=nil)
-      object.respond_to?(:typed_id) ? "model:#{dom_id(object, attribute).dasherize}" : ""
+      object.respond_to?(:typed_id) ? "model::#{typed_id(object, attribute).to_s.dasherize}" : ""
     end
 
 

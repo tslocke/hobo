@@ -133,7 +133,7 @@ module Hobo::Dryml
     end
 
 
-    def dom_id(object=nil, attribute=nil)
+    def typed_id(object=nil, attribute=nil)
       if object.nil?
         # nothing passed -- use context
         if this_parent && this_field && !this_parent.respond_to?(:member_class)
@@ -143,8 +143,8 @@ module Hobo::Dryml
         end
       end
       
-      if (id = object.try.typed_id)
-        attribute ? "#{id}_#{attribute}" : id
+      if (typed_id = object.try.typed_id)
+        attribute ? "#{typed_id}:#{attribute}" : id
       else
         "nil"
       end
@@ -155,12 +155,12 @@ module Hobo::Dryml
       res = ''
       if part_this
         new_object_context(part_this) do
-          @_part_contexts[part_node_id] = PartContext.new(part_name, dom_id, locals)
+          @_part_contexts[part_node_id] = PartContext.new(part_name, typed_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       else
         new_context do
-          @_part_contexts[part_node_id] = PartContext.new(part_name, dom_id, locals)
+          @_part_contexts[part_node_id] = PartContext.new(part_name, typed_id, locals)
           res = send("#{part_name}_part", *locals)
         end
       end
