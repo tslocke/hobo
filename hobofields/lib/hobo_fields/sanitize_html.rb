@@ -3,11 +3,11 @@ module HoboFields
   SanitizeHtml = classy_module do
 
     PERMITTED_TAGS       = %w(a abbr acronym address b bdo big blockquote caption center cite code colgroup dd del dfn dir
-                              div dl dt em fieldset font h1 h2 h3 h4 h5 h6 i ins kbd label legend li map menu ol optgroup
+                              div dl dt em fieldset font h1 h2 h3 h4 h5 h6 i img ins kbd label legend li map menu ol optgroup
                               option p pre q s samp select small span strike strong sub sup tbody td textarea tfoot
                               th thead tr tt u ul var)
 
-    PERMITTED_ATTRIBUTES = %w(href title class style align name)
+    PERMITTED_ATTRIBUTES = %w(href title class style align name src label)
 
     class Helper; include ActionView::Helpers::SanitizeHelper; end
 
