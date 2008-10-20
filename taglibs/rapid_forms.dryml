@@ -180,7 +180,7 @@ If no type attribute is given then the _context_ is used. For example if the con
 
 If the context is a `belongs_to` association, the `<select-one>` tag is used.
 
-If the context is a `has_many :through` association, the `<select-many>` tag is used.
+If the context is a `has_many :through` association, the polymorphic `<collection-input>` tag is used.
 
 ### Additional Notes
 
@@ -199,7 +199,7 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
                     call_polymorphic_tag('input', attrs) or select_one(attrs)
                   elsif refl.macro == :has_many
                     if refl.options[:through]
-                      select_many(attrs)
+                      collection_input(attrs)
                     else
                       raise NotImplementedError, "An input for has-many associations has not been implemented yet"
                     end
@@ -216,6 +216,18 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
     end
   end
 %></def>
+
+
+<!--
+This tag is called by `<input>` when the context is a `has_many :through` collection. By default a `<select-many>` is used, but this can be customised on a per-type basis. For example, say you would like the `<check-many>` tag used to edit collections a `Category` model in your application:
+
+    <def tag="collection-input" for="Category"><check-many merge/></def>
+-->
+<def tag="collection-input" polymorphic></def>
+
+<def tag="collection-input" for="ActiveRecord::Base"><select-many merge/></def>
+
+
 
 
 <def tag="input" for="text" attrs="name">
@@ -370,9 +382,7 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
   conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = options.map { |x|
-            [ name(:with => x, :raw => true), x.id ]
-          }
+  select_options = options.map { |x| [this.to_s, x.id ] }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
@@ -419,6 +429,11 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
 </def>
 
 
+<!--
+An input for `has_many :through` associations that lets the user chose the items from a <select> menu.
+  
+To use this tag, the model of the items the user is chosing *must* have unique names, and the 
+-->
 <def tag="select-many" attrs="options, targets, remove-label, prompt">
   <%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
@@ -442,15 +457,15 @@ If the context is a `has_many :through` association, the `<select-many>` tag is 
       <repeat>
         <div class="item" param="item">
           <span><name/></span>
-          <input type="hidden" name="#{param_name}[]" value="#{name :no_wrapper => true}" param="hidden"/>
+          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" param="hidden"/>
           <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="remove-button"/>
         </div>
       </repeat>
     </div>
     <select>
       <option value=""><prompt/></option>
-      <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><name no-wrapper/></option>
+      <option repeat="&options.sort_by {|x| x.to_s.downcase}" value="@#{this.id}"
+              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><%= h this.to_s %></option>
     </select>
   </div>
 </def>
@@ -496,6 +511,18 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
+<def tag="check-many">
+  <% collection = this; field = this_field; options ||= this.member_class.find(:all) -%>
+  <ul class="check-many">
+    <li repeat="&options">
+      <input type="checkbox" name="#{param_name_for(collection.origin, [field])}[]" value="#{name :no_wrapper => true}"
+             checked="&this.in?(collection)"/>
+      <name/>
+    </li>
+  </ul>
+</def>
+
+
 <def tag="hidden-id-field">
   <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
 </def>
@@ -537,11 +564,6 @@ Use the `uri` option to specify a redirect location:
     </li>
   </ul>
 </def>
-
-
-
-
-
 
 
 

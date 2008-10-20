@@ -135,25 +135,18 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 
-<def tag="name" attrs="if-present, raw"><%= 
+<def tag="name" attrs="if-present"><%= 
   if this.nil?
     nil_view unless if_present
   else
-    name_tag = find_polymorphic_tag("name")
-    if name_tag != "name"
-      send(name_tag, attributes)
-    elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
+    if this.is_a?(Array)
       count
-    elsif this.is_a? Class and this < ActiveRecord::Base
-      this.name.pluralize.titleize
+    elsif this.is_a?(Class) && this < ActiveRecord::Base
+      type_name(attributes)
     elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
-      if raw
-        this.send(name_attr)
-      else
-        view(merge_attrs(attributes, {:field => name_attr}))
-      end
+      view(merge_attrs(attributes, {:field => name_attr}))
     elsif can_view?(this)
-      this.to_s
+      h this.to_s
     end
   end
 %></def>
@@ -452,51 +445,6 @@ The label can be customised using the `label` attribute, e.g.
   <% name ||= Hobo.current_theme -%>
   <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
-</def>
-
-
-<!-- The Tags defined below here are a bit rough and will be improved
-in the future - use at your own risk. -->
-
-<def tag="has-many-table" attrs="part-id, delete-buttons, headings, id">
-  <table-for headings="&headings" merge-attrs="&true">
-
-    <do param="default"/>
-
-    <if test="&delete_buttons != false && can_delete?(this)">
-      <td><delete-button/></td>
-    </if>
-  </table-for>
-  <else>
-    <p>No <%= this.member_class.name.titleize.pluralize.downcase %> to display</p>
-  </else>
-  <div>
-    <create-button update="&id || part_id"/>
-  </div>
-</def>
-
-
-<def tag="add-by-name" attrs="action-name, add-text, update, part-id">
-  <% add_to = this
-     refl = this_type
-     joins = this_parent.send(refl.through_reflection.name)
-     add_name = refl.klass.name.titleize
-     action_name ||= "Add #{add_name}"
-     add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
-                  "enter its name"
-     source = refl.source_reflection.name
-  %>
-  <do param="default" with="&joins"/>
-  <with with="&joins.new_without_appending">
-    <if test="can_create?">
-       <form update="&[update, part_id]" message="&action_name" hidden-fields="*">
-         <p>
-           <%= add_text %>:
-           <belongs-to-autocompleting-field field="&source" where-not-in="&dom_id(add_to)" class="autosubmit"/>
-         </p>
-       </form>
-    </if>
-  </with>
 </def>
 
 

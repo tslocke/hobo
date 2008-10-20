@@ -92,6 +92,26 @@ module Hobo
       # ...but only return the ones that registered themselves
       @model_names.*.constantize
     end
+    
+    
+    def self.find_by_typed_id(typed_id)
+      return nil if typed_id == 'nil'
+
+      _, name, id, attr = *typed_id.match(/^([^:]+)(?::([^:]+)(?::([^:]+))?)?$/)
+      raise ArgumentError.new("invalid typed-id: #{typed_id}") unless name
+
+      model_class = name.camelize.safe_constantize or raise ArgumentError.new("no such class in typed-id: #{typed_id}")
+      return nil unless model_class
+
+      if id
+        obj = model_class.find(id)
+          # Optimise: can we use eager loading in the situation where the attr is a belongs_to?
+          # We used to, but hit a bug in AR
+        attr ? obj.send(attr) : obj
+      else
+        model_class
+      end
+    end
 
 
     def self.enable
@@ -103,6 +123,7 @@ module Hobo
 
         alias_method :has_hobo_method?, :respond_to_without_attributes?
       end
+            
     end
 
 
@@ -399,12 +420,8 @@ module Hobo
       
       
       def view_hints
-        @view_hints ||= begin
-          class_name = "#{name}Hints"
-          Object.class_eval "class #{class_name} < Hobo::ViewHints; end" unless 
-            ActiveSupport::Dependencies.qualified_const_defined?(class_name)
-          Object.class_eval class_name
-        end
+        class_name = "#{name}Hints"
+        class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::ViewHints; end; #{class_name}")
       end
 
 
@@ -577,7 +594,7 @@ module Hobo
 
 
     def typed_id
-      "#{self.class.name.underscore}_#{self.id}" if id
+      "#{self.class.name.underscore}:#{self.id}" if id
     end
 
 
@@ -645,8 +662,12 @@ module Hobo
     def convert_record_reference_for_mass_assignment(klass, value)
       if value.is_a?(String)
         if value.starts_with?('@')
-          # TODO: This @foo_1 feature is rarely (never?) used - get rid of it
-          Hobo.object_from_dom_id(value[1..-1])
+          value = value[1..-1] # get rid of the '@'
+          if value =~ /:/
+            Hobo::Model.find_by_typed_id(value[1..-1])
+          else
+            klass.find(value)
+          end
         else
           klass.named(value)
         end
@@ -658,17 +679,7 @@ module Hobo
 
     def convert_collection_for_mass_assignment(reflection, value)
       klass = reflection.klass
-      if klass.try.name_attribute && value.is_a?(Array)
-        value.map do |x|
-          if x.is_a?(String)
-            klass.named(x) unless x.blank?
-          else
-            x
-          end
-        end.compact
-      else
-        value
-      end
+      value.map { |x| convert_record_reference_for_mass_assignment(klass, x) unless x.blank? }.compact
     end
 
   end
