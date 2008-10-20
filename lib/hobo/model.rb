@@ -399,11 +399,15 @@ module Hobo
       
       
       def view_hints
-        @view_hints ||= begin
-          class_name = "#{name}Hints"
-          Object.class_eval "class #{class_name} < Hobo::ViewHints; end" unless 
-            ActiveSupport::Dependencies.qualified_const_defined?(class_name)
+        class_name = "#{name}Hints"
+        Object.class_eval class_name
+      rescue NameError => e
+        if e.message =~ /\b#{class_name}\b/
+          Object.class_eval "class #{class_name} < Hobo::ViewHints; end"
           Object.class_eval class_name
+        else
+          # oops - some other name error
+          raise
         end
       end
 
