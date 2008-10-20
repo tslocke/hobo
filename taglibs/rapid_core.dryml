@@ -455,51 +455,6 @@ The label can be customised using the `label` attribute, e.g.
 </def>
 
 
-<!-- The Tags defined below here are a bit rough and will be improved
-in the future - use at your own risk. -->
-
-<def tag="has-many-table" attrs="part-id, delete-buttons, headings, id">
-  <table-for headings="&headings" merge-attrs="&true">
-
-    <do param="default"/>
-
-    <if test="&delete_buttons != false && can_delete?(this)">
-      <td><delete-button/></td>
-    </if>
-  </table-for>
-  <else>
-    <p>No <%= this.member_class.name.titleize.pluralize.downcase %> to display</p>
-  </else>
-  <div>
-    <create-button update="&id || part_id"/>
-  </div>
-</def>
-
-
-<def tag="add-by-name" attrs="action-name, add-text, update, part-id">
-  <% add_to = this
-     refl = this_type
-     joins = this_parent.send(refl.through_reflection.name)
-     add_name = refl.klass.name.titleize
-     action_name ||= "Add #{add_name}"
-     add_text ||= "To #{action_name.downcase} #{a_or_an add_name.downcase}, " +
-                  "enter its name"
-     source = refl.source_reflection.name
-  %>
-  <do param="default" with="&joins"/>
-  <with with="&joins.new_without_appending">
-    <if test="can_create?">
-       <form update="&[update, part_id]" message="&action_name" hidden-fields="*">
-         <p>
-           <%= add_text %>:
-           <belongs-to-autocompleting-field field="&source" where-not-in="&dom_id(add_to)" class="autosubmit"/>
-         </p>
-       </form>
-    </if>
-  </with>
-</def>
-
-
 <def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
 
 <def tag="You"><you merge titleize/></def>
