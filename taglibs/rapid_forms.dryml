@@ -400,7 +400,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
 %>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field.dasherize} complete-on::#{typed_id complete_target}::#{completer}"
+         class="autocompleter #{type_and_field.dasherize} complete-on:#{dom_id complete_target}:#{completer}"
          value="&name :no_wrapper => true, :if_present => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
@@ -454,15 +454,15 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
       <repeat>
         <div class="item" param="item">
           <span><name/></span>
-          <input type="hidden" name="#{param_name}[]" value="#{name :no_wrapper => true}" param="hidden"/>
+          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" param="hidden"/>
           <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="remove-button"/>
         </div>
       </repeat>
     </div>
     <select>
       <option value=""><prompt/></option>
-      <option repeat="&options.sort_by {|x| name(:no_wrapper => true, :with => x).downcase}" 
-              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><name no-wrapper/></option>
+      <option repeat="&options.sort_by {|x| x.to_s.downcase}" value="@#{this.id}"
+              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><%= h this.to_s %></option>
     </select>
   </div>
 </def>
