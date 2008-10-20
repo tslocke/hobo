@@ -340,9 +340,9 @@
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
-      <% this.errors.each do |attr, message|; next if message == "..." %>
+      <% this.errors.each do |attr, message|; next if message == "..." -%>
         <li param><%= attr.titleize %> <%= message %></li>
-      <% end %>
+      <% end -%>
     </ul>
   </section>
 </def>
@@ -357,7 +357,7 @@
               end
                 
   values = this
-  %>
+  -%>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
       <div class="item" param="proto-item">
