@@ -18,7 +18,7 @@
                     columns + assocs
                   end
                 else
-                  comma_split(fields)
+                  comma_split(fields.gsub('-', '_'))
                 end
   field_names -= comma_split(skip) if skip
   field_names = field_names.select {|f| can_view?(this, f)} unless force_all
