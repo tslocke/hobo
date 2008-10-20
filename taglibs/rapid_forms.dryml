@@ -382,9 +382,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
   conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
   options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
     #Todo: switch to autocompleter for id_name when too many records, and id_name supported
-  select_options = options.map { |x|
-            [ name(:with => x, :raw => true), x.id ]
-          }
+  select_options = options.map { |x| [this.to_s, x.id ] }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)

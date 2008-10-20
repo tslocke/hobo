@@ -135,25 +135,18 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 
-<def tag="name" attrs="if-present, raw"><%= 
+<def tag="name" attrs="if-present"><%= 
   if this.nil?
     nil_view unless if_present
   else
-    name_tag = find_polymorphic_tag("name")
-    if name_tag != "name"
-      send(name_tag, attributes)
-    elsif this.is_a?(Array) && this.respond_to?(:proxy_reflection)
+    if this.is_a?(Array)
       count
-    elsif this.is_a? Class and this < ActiveRecord::Base
-      this.name.pluralize.titleize
+    elsif this.is_a?(Class) && this < ActiveRecord::Base
+      type_name(attributes)
     elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
-      if raw
-        this.send(name_attr)
-      else
-        view(merge_attrs(attributes, {:field => name_attr}))
-      end
+      view(merge_attrs(attributes, {:field => name_attr}))
     elsif can_view?(this)
-      this.to_s
+      h this.to_s
     end
   end
 %></def>
