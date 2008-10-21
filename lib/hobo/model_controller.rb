@@ -352,7 +352,7 @@ module Hobo
     def valid?; this.errors.empty?; end
 
 
-    def re_render_form(default_action)
+    def re_render_form(default_action=nil)
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
