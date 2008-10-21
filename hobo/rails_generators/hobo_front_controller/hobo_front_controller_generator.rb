@@ -47,7 +47,7 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     name = full_class_path
 
     route = ("  map.site_search  'search', :controller => '#{name}', :action => 'search'\n" +
-             "  map.homepage '', :controller => '#{name}', :action => 'index'")
+             "  map.root :controller => '#{name}', :action => 'index'")
 
     route_src = File.read(routes_path)
     return if route_src.include?(route)

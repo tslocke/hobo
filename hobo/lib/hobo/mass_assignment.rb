@@ -34,12 +34,13 @@ module Hobo
           hash = record_or_hash
 
           id = hash.delete(:id)
+
+          # Remove completely blank hashes
+          next if hash.values.join.blank?
+
           record = if id
                      association.find(id) # TODO: We don't really want to find these one by one
                    else
-                     # Remove completely blank hashes
-                     next if hash.values.join.blank?
-
                      record = association.build
                    end
           record.attributes = hash
