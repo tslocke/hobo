@@ -541,7 +541,7 @@ Use the `uri` option to specify a redirect location:
       </div>
     </li>
     <li if="&empty">
-      <fake-field-context fake-field="0" context="&this.member_class.new">
+      <fake-field-context fake-field="0" context="&this.new">
         <div class="input-many-item" param="default"/>
       </fake-field-context>
       <div class="buttons">
