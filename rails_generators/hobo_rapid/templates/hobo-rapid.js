@@ -645,7 +645,7 @@ SelectManyInput = Behavior.create({
     },
 
     itemAdded: function(item, option) {
-        this.hiddenField(item).value = option.innerHTML
+        this.hiddenField(item).value = option.value
     },
 
     hiddenField: function(item) {
