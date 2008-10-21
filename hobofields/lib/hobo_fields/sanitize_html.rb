@@ -7,7 +7,7 @@ module HoboFields
                               option p pre q s samp select small span strike strong sub sup tbody td textarea tfoot
                               th thead tr tt u ul var)
 
-    PERMITTED_ATTRIBUTES = %w(href title class style align name src label)
+    PERMITTED_ATTRIBUTES = %w(href title class style align name src label target)
 
     class Helper; include ActionView::Helpers::SanitizeHelper; end
 
