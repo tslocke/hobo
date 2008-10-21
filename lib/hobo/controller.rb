@@ -169,7 +169,7 @@ end
 class ActionController::Base
 
   def home_page
-    ""
+    base_url
   end
 
 end

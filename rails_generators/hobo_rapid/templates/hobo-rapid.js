@@ -556,7 +556,7 @@ new HoboBehavior("ul.input-many", {
                     "</div></li>"
       var newItem = DOM.Builder.fromHTML(newItem)
       ul.appendChild(newItem);
-      $(newItem).select('input').each(function(input){ input.value="" })
+      this.clearInputs(newItem);
       
       this.updateButtons()
       this.updateInputNames()
@@ -568,13 +568,22 @@ new HoboBehavior("ul.input-many", {
       Event.stop(ev)
       var self = this;
       var li = el.up('li')
-      new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
-          li.remove() 
-          self.updateButtons()
-          self.updateInputNames()
-      } });
+      if (li.parentNode.childElements().length == 1) {
+          // It's the last one - dont't remove it, just clear it
+          this.clearInputs(li)
+      } else {      
+          new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
+              li.remove() 
+              self.updateButtons()
+              self.updateInputNames()
+          } });
+      }
   },
   
+  clearInputs: function(item) {
+      $(item).select('input').each(function(input){ input.value="" })
+  },
+   
   updateButtons: function() {
       var removeButton = "<button class='remove-item'>-</button>"
       var addButton = "<button class='add-item'>+</button>"
@@ -779,7 +788,7 @@ ElementSet = Class.create(Enumerable, {
     select: function(selector) {
         return new ElementSet(this.items.invoke('select', selector).flatten())
     },
-    
+
     down: function(selector) {
         for (var i = 0; i < this.items.length; i++) {
             var match = this.items[i].down(selector)
