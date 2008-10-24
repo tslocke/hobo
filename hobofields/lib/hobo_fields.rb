@@ -60,7 +60,8 @@ module HoboFields
 
   def can_wrap?(type, val)
     klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
-    type.instance_method(:initialize).arity == 1 && !@never_wrap_types.any? { |c| klass <= c }
+    arity = type.instance_method(:initialize).arity
+    (arity == 1 || arity == -1) && !@never_wrap_types.any? { |c| klass <= c }
   end
 
 
