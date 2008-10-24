@@ -1,3 +1,3 @@
-require "hobosupport/fixes/chronic"
-require "hobosupport/fixes/pp"
-require "hobosupport/fixes/module"
+require "hobo_support/fixes/chronic"
+require "hobo_support/fixes/pp"
+require "hobo_support/fixes/module"
