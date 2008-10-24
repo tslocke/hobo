@@ -1,3 +1,4 @@
+
 <def tag="call-tag" attrs="tag">
   <%= send(tag.gsub('-', '_'), attributes, parameters) %>
 </def>
