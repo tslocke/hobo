@@ -1,3 +1,6 @@
+<!-- Core Rapid tags and tags that don't belong anywhere else. -->
+
+
 <def tag="field-list" attrs="tag">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
