@@ -89,7 +89,7 @@ module Hobo
         end
 
         %w(comment comment_intro comment_rest).each do |m|
-          class_eval "def #{m}_html; Maruku.new(#{m}).to_html; end"
+          class_eval "def #{m}_html; Maruku.new(#{m}).to_html.gsub(/&amp;/, '&'); end"
         end
         
         def comment_html
