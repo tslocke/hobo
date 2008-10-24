@@ -1,6 +1,15 @@
 <!-- Core Rapid tags and tags that don't belong anywhere else. -->
 
+<!-- Renders a table with one row per field, where each row contains a `<th>` with the field name, and a `<td>` with (by default)
+     a `<view>` of the field.
+         
+### Attributes
 
+ - tag: The name of a tag to use inside the `<td>` to display the value. Defaults to `view`
+ 
+ - show-non-editable: By default, if `tag` is set to `input`, fields for which the current user does not have edit permission will be skipped (the entire row is skipped). Set this attribute to keep them. (Note that `<input>` automatically degrades to `<view>` if the user does not have edit permission.)
+     
+-->
 <def tag="field-list" attrs="tag, show-non-editable">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
