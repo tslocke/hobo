@@ -1,3 +1,5 @@
+<!-- Extra tags for semantic markup -->
+
 <!-- Used as a semantic wrapper around a group of sections and asides. CSS layouts can be provided based on this structure. 
 
 ### Usage
