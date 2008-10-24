@@ -1,6 +1,6 @@
 module HoboFields
 
-  SanitizeHtml = classy_module do
+  module SanitizeHtml    
 
     PERMITTED_TAGS       = %w(a abbr acronym address b bdo big blockquote caption center cite code colgroup dd del dfn dir
                               div dl dt em fieldset font h1 h2 h3 h4 h5 h6 i img ins kbd label legend li map menu ol optgroup

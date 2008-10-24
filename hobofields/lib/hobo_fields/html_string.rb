@@ -1,15 +1,8 @@
 module HoboFields
-
-  class HtmlString < HoboFields::Text
-
+  
+  class HtmlString < RawHtmlString
     include SanitizeHtml
-
-    def to_html(xmldoctype = true)
-      self
-    end
-
     HoboFields.register_type(:html, self)
-
   end
 
 end
