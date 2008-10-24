@@ -63,20 +63,38 @@ module Hobo
         
         # The contents of the XML comment, if any, immediately above the tag definition
         def comment
-          space = node.previous_sibling and
-            space.to_s.blank? && space.to_s.count("\n") == 1 and
-            comment_node = space.previous_sibling
+          @comment ||= begin
+            space = node.previous_sibling and
+              space.to_s.blank? && space.to_s.count("\n") == 1 and
+              comment_node = space.previous_sibling
 
-          if comment_node.is_a?(REXML::Comment)
-            doc.restore_erb_scriptlets(comment_node.to_s.strip)
+            if comment_node.is_a?(REXML::Comment)
+              doc.restore_erb_scriptlets(comment_node.to_s.strip)
+            end
           end
         end
         
         
-        def comment_html
-          Maruku.new(comment).to_html
+        def comment_intro
+          comment && comment =~ /(.*?)^#/m ? $1 : comment
+        end
+
+        
+        def comment_rest
+          comment && comment[comment_intro.length..-1]
+        end
+
+        %w(comment comment_intro comment_rest).each do |m|
+          class_eval "def #{m}_html; Maruku.new(#{m}).to_html; end"
         end
         
+        def comment_html
+          
+        end
+        
+        def no_doc?
+          comment =~ /^nodoc\b/
+        end
         
         # An array of the arrtibute names defined by this tag
         def attributes
