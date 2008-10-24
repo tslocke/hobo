@@ -26,16 +26,19 @@ module HoboFields
   }
 
   # Provide a lookup for these rather than loading them all preemptively
+  
   STANDARD_TYPES = {
     :html          => "HtmlString",
     :markdown      => "MarkdownString",
     :textile       => "TextileString",
     :password      => "PasswordString",
     :text          => "Text",
-    :email_address => "EmailAddress"
+    :email_address => "EmailAddress",
+    :serialized    => "SerializedObject"
   }
 
-  @field_types   = HashWithIndifferentAccess.new(PLAIN_TYPES)
+  @field_types   = PLAIN_TYPES.with_indifferent_access
+  
   @never_wrap_types = Set.new([NilClass, Hobo::Boolean, TrueClass, FalseClass])
 
   attr_reader :field_types
@@ -55,10 +58,9 @@ module HoboFields
   end
 
 
-  def can_wrap?(val)
-    # Make sure we get the *real* class
-    klass = Object.instance_method(:class).bind(val).call
-    !@never_wrap_types.any? { |c| klass <= c }
+  def can_wrap?(type, val)
+    klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
+    type.instance_method(:initialize).arity == 1 && !@never_wrap_types.any? { |c| klass <= c }
   end
 
 
@@ -107,8 +109,8 @@ module HoboFields
         # value if we have a special type defined
         src = if connected? && (type_wrapper = try.attr_type(symbol)) &&
                   type_wrapper.is_a?(Class) && type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values)
-                "val = begin; #{access_code}; end; " +
-                  "if HoboFields.can_wrap?(val); self.class.attr_type(:#{attr_name}).new(val); else; val; end"
+                "val = begin; #{access_code}; end; wrapper_type = self.class.attr_type(:#{attr_name}); " +
+                  "if HoboFields.can_wrap?(wrapper_type, val); wrapper_type.new(val); else; val; end"
               else
                 access_code
               end
@@ -121,7 +123,7 @@ module HoboFields
         src = if connected? && (type_wrapper = try.attr_type(attr_name)) &&
                   type_wrapper.is_a?(Class) && type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values)
                 "begin; wrapper_type = self.class.attr_type(:#{attr_name}); " +
-                  "if !val.is_a?(wrapper_type) && HoboFields.can_wrap?(val); wrapper_type.new(val); else; val; end; end"
+                  "if !val.is_a?(wrapper_type) && HoboFields.can_wrap?(wrapper_type, val); wrapper_type.new(val); else; val; end; end"
               else
                 "val"
               end
@@ -131,7 +133,6 @@ module HoboFields
       end
 
     end
-
 
   end
 
