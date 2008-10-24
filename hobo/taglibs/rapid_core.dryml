@@ -5,9 +5,17 @@
          
 ### Attributes
 
+ - fields: Comma separated list of field names to display. Defaults to the fields returned by the `standard_fields` helper. That is, all fields apart from IDs and timestamps.
+ 
+ - force-all: All non-viewable fields will be skipped unless this attribute is given
+ 
+ - skip: Comma separated list of fields to exclude
+
  - tag: The name of a tag to use inside the `<td>` to display the value. Defaults to `view`
  
- - show-non-editable: By default, if `tag` is set to `input`, fields for which the current user does not have edit permission will be skipped (the entire row is skipped). Set this attribute to keep them. (Note that `<input>` automatically degrades to `<view>` if the user does not have edit permission.)
+ - show-non-editable: By default, if `tag` is set to `input`, fields for which the current user does not have edit permission
+   will be skipped (the entire row is skipped). Set this attribute to keep them. (Note that `<input>` automatically degrades
+   to `<view>` if the user does not have edit permission.)
      
 -->
 <def tag="field-list" attrs="tag, show-non-editable">
@@ -27,10 +35,15 @@
   </labelled-item-list>
 </def>
 
+<!-- Used to render nil values. By default renders "(Not Available)"
+  
+### Usage
 
-<def tag="item"><% scope.items << parameters.default %></def>
+Redefine in your app to have nil values displayed differently, e.g.:
 
-
+    <def tag="nil-view">-</def>
+  
+-->
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
 <!--
