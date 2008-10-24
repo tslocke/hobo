@@ -430,7 +430,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
 
 
 <!--
-An input for `has_many :through` associations that lets the user chose the items from a <select> menu.
+An input for `has_many :through` associations that lets the user chose the items from a `<select>` menu.
   
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
