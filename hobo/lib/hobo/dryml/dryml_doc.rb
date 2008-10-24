@@ -61,6 +61,10 @@ module Hobo
           node.attributes['tag']
         end
         
+        def source
+          doc.restore_erb_scriptlets(node.to_s).strip
+        end
+        
         # The contents of the XML comment, if any, immediately above the tag definition
         def comment
           @comment ||= begin
