@@ -1,11 +1,11 @@
 <!-- Core Rapid tags and tags that don't belong anywhere else. -->
 
 
-<def tag="field-list" attrs="tag">
+<def tag="field-list" attrs="tag, show-non-editable">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)"><% field_name = this_field_name %>
-      <labelled-item unless="&tag == 'input' && !can_edit?">
+      <labelled-item unless="&tag == 'input' && !can_edit? && !show_non_editable">
         <item-label param="#{this_field.to_s.sub('?', '')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
