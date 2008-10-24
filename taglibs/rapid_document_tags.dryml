@@ -46,7 +46,3 @@ A proposed HTML 5 semantic tag. Outputs `<div class="footer">` and works in the 
   <div class="footer" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
-<!-- temporary tag -->
-<def tag="panel">
-  <div class="panel" merge-attrs><do param="default"/></div>
-</def>
