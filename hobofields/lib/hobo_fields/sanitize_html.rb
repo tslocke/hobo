@@ -1,6 +1,6 @@
 module HoboFields
 
-  module SanitizeHtml    
+  module SanitizeHtml
 
     PERMITTED_TAGS       = %w(a abbr acronym address b bdo big blockquote caption center cite code colgroup dd del dfn dir
                               div dl dt em fieldset font h1 h2 h3 h4 h5 h6 i img ins kbd label legend li map menu ol optgroup
@@ -10,10 +10,9 @@ module HoboFields
     PERMITTED_ATTRIBUTES = %w(href title class style align name src label target)
 
     class Helper; include ActionView::Helpers::SanitizeHelper; end
-
-    def initialize(s)
-      s = Helper.new.sanitize(s, :tags => PERMITTED_TAGS, :attributes => PERMITTED_ATTRIBUTES)
-      super(s)
+        
+    def sanitize(s)
+      Helper.new.sanitize(s, :tags => PERMITTED_TAGS, :attributes => PERMITTED_ATTRIBUTES)
     end
 
   end
