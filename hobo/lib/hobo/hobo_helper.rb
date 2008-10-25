@@ -149,7 +149,7 @@ module Hobo
 
     def type_and_field(*args)
       type, field = args.empty? ? [this_parent.class, this_field] : args
-      "#{type.typed_id}:#{field}" if type.respond_to?(:typed_id)
+      "#{type.typed_id}_#{field}" if type.respond_to?(:typed_id)
     end
 
 
