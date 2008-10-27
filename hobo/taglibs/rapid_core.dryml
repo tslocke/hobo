@@ -166,7 +166,7 @@ Provides a short hand way of displaying images in public/images
   else
     if this.is_a?(Array)
       count
-    elsif this.is_a?(Class) && this < ActiveRecord::Base
+    elsif this.is_a?(Class)
       type_name(attributes)
     elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
       view(merge_attrs(attributes, {:field => name_attr}))
