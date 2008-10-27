@@ -5,7 +5,7 @@ module HoboFields
     include SanitizeHtml
     
     def self.declared(model, name, options)
-      model.before_save { |record| record[name] = sanitize(record[name]) }
+      model.before_save { |record| record[name] = HoboFields::SanitizeHtml.sanitize(record[name]) }
     end
     
     HoboFields.register_type(:html, self)

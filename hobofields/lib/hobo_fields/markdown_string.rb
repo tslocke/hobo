@@ -6,7 +6,7 @@ module HoboFields
     HoboFields.register_type(:markdown, self)
     
     def to_html(xmldoctype = true)
-      blank? ? "" : sanitize(BlueCloth.new(self).to_html)
+      blank? ? "" : HoboFields::SanitizeHtml.sanitize(BlueCloth.new(self).to_html)
     end
 
   end
