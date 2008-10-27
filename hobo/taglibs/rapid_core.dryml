@@ -177,7 +177,7 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 
-<def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
+<def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
 
   name = dasherize ? type.name.underscore.dasherize : type.name.titleize
