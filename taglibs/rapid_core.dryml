@@ -135,11 +135,13 @@ Provides a short hand way of displaying images in public/images
 </def>
 
 
+<!-- Renders an ajax-progress 'spinner' using `spinner.gif` from the current theme, with a `class='hidden' -->
 <def tag="spinner">
   <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
 </def>
 
 
+<!-- Renders some standard JavaScript code that various features of the Rapid library rely on. This tag would typicallu be called from your `<page>` tag. The default Rapid pages include this already. -->
 <def tag="hobo-rapid-javascripts"><%=
    res = 'var hoboParts = {};'
    # FIXME: This should interrogate the model-router - not the models
@@ -159,7 +161,21 @@ Provides a short hand way of displaying images in public/images
    res
 %></def>
 
+<!-- Renders the name of the current context using a variety of methods.
+  
+### Details
 
+ - Equivalent to `<nil-view>` if `this` is nil
+ - Equivalent to `<count>` if `this` is an Array
+ - Equivalent to `<type-name>` if `this` is a class
+ - If the context has a `name_attribute` defined, equivalent to `<view:abc/>` (where `abc` is the name attribute)
+ - Finally falls back to `this.to_s` (html escaped), but only if the user has view permission for `this`
+
+### Attributes
+
+ - if-present: if given, nothing at all will be rendered for nil values (as opposed to rendering `<nil-view>`)
+  
+-->
 <def tag="name" attrs="if-present"><%= 
   if this.nil?
     nil_view unless if_present
@@ -177,6 +193,21 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 
+<!-- Renders a human readable version of the type of the context
+  
+### Details
+
+ - If `this` is already a class, the name of that class is used
+ - Otherwise, first `this.member_class` (for collections), then `this.class` are tried
+ - By default the name is titleised and singular.
+ 
+### Attributes
+
+ - plural: pluralise the name
+ - lowercase: render the name in all lower case
+ - dasherize: render the name in lower case with dashes instead of spaces. 
+
+-->
 <def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
 
@@ -187,6 +218,21 @@ Provides a short hand way of displaying images in public/images
 %></def>
      
 
+<!-- Renders a human readable name of a collection
+  
+### Details
+
+ - Uses `this.origin_attribute` as the name.
+ - Falls back to `<type-name>` otherwise.
+ - By default the name is titleised and plural.
+ 
+### Attributes
+
+ - singular: singularise the name
+ - lowercase: render the name in all lower case
+ - dasherize: render the name in lower case with dashes instead of spaces. 
+
+-->
 <def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
   if (attr = this.try.origin_attribute)
     name = attr.to_s
@@ -324,12 +370,11 @@ Assuming the context is a blog post...
 
 ### Additional Notes
 
-* The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` attribute to force a `<span>`, e.g.
+* The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` or `block` attributes to force a `<span>` or a `<div>`, e.g.
 
         <view:body/> -> <div class="view blog-post-body">This is my blog post body</div>
 
         <view:body inline/> -> <span class="view blog-post-body">This is my blog post body</span>
-* Use the `block` attribute to change the wrapper tag to a `<div>` regardless of the field type e.g.
 
         <view:created_at block/> -> <div class="view blog-post-created-at">June 09, 2008 15:36</div>
 * Use the `no-wrapper` attribute to remove the wrapper tag completely. e.g.
@@ -385,19 +430,23 @@ Assuming the context is a blog post...
 
 <!-- `<view>` calls this tag when called for a `has_many` collection. By default calls `<links-for-collection/>` -->
 <def tag="collection-view" polymorphic><links-for-collection mergge-attrs/></def>
-    
 
 <!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
 <def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s`, or `format % this` if the `format` attribute is given -->
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
+<!-- Renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
 <def tag="view" for="string"><%= 
   if !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
     this.to_html(scope.xmldoctype)
@@ -406,8 +455,10 @@ Assuming the context is a blog post...
   end
 %></def>
 
+<!-- Renders 'Yes' for true and 'No' for false -->
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
+<!-- Renders a link (`<a>`) to `this` -->
 <def tag="view" for="ActiveRecord::Base"><a merge-attrs/></def>
 
 
@@ -468,34 +519,61 @@ The label can be customised using the `label` attribute, e.g.
 %></span></def>
 
 
+<!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages. 
+-->
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= Hobo.current_theme -%>
   <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 
+<!-- Convenience tag to help with the common situation where you need to address the current user as "you", and refer to other users by name
 
+### Usage
+
+The context should be a user object. If `this == current_user` the "you" form is rendered, otherwise the form with the user's name:
+
+ - `<you have/> new mail` -> "you have new mail" or "Jim has new mail"
+ - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
+ - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
+
+### Attributes
+
+ - titleize: render "You" instead of "you"
+  
+-->
 <def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
 
+<!-- Equivalent to `<you titleize/>`. Yes it's an abuse of Ruby naming conventions, but it's so cute : ) -->
 <def tag="You"><you merge titleize/></def>
 
+<!--  Similar to `<you>`, but renders "Your" or "Fred's" -->
 <def tag="your">
   <if test="&this == current_user">your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
 
-
+<!-- Capitalised versin of `<your>` -->
 <def tag="Your">
   <if test="&this == current_user">Your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
 
+<!-- Renders "a book" or "an orange" according the the word passed in the attribute `word`
 
+### Usage
+
+To render either "Please select a recipe" or "Please select an event", according to the type of the `this`:
+
+    <a-or-an word="&type_name"/>
+
+-->
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "an " : "a ") + word
 %></def>
 
 
+<!-- Capitalised version of `<a-or-an>` -->
 <def tag="A-or-An" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
