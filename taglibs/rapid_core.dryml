@@ -135,7 +135,7 @@ Provides a short hand way of displaying images in public/images
 </def>
 
 
-<!-- Renders an ajax-progress 'spinner' using `spinner.gif` from the current theme, with a `class='hidden' -->
+<!-- Renders an ajax-progress 'spinner' using `spinner.gif` from the current theme, with a `class='hidden'` -->
 <def tag="spinner">
   <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
 </def>
