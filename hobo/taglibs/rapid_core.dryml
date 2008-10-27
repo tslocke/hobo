@@ -491,18 +491,6 @@ The label can be customised using the `label` attribute, e.g.
 </def>
 
 
-<def tag="live-search">
-  <div class="search">
-    <label for="search-field">Search</label><input type="search" class="live-search"/>
-    <spinner id="search-spinner"/>
-  </div>
-  <section class="hidden" id="search-results-panel">
-    <h2>Search Results</h2><div param="close-button">close</div>
-    <section id="search-results">&nbsp;</section>
-  </section>
-</def>
-
-
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "an " : "a ") + word
 %></def>
@@ -511,17 +499,6 @@ The label can be customised using the `label` attribute, e.g.
 <def tag="A-or-An" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
-
-
-<def tag="filter-menu" attrs="param-name, options, no-filter">
-  <% no_filter ||= "All" %>
-  <form action="&request.request_uri" method="get" class="filter-menu">
-    <div>
-      <input type="hidden" name="filter-parameter" value="&param_name"/>
-      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
-    </div>
-  </form>
-</def>
 
 
 <def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
