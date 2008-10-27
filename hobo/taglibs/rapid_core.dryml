@@ -501,4 +501,5 @@ The label can be customised using the `label` attribute, e.g.
 %></def>
 
 
-<def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
+<!-- Renders a collection of string joined with ", ", or some other string passed in the `join` attribute -->
+<def tag="comma-list" attrs="join"><%= this.join(join || ", ") %></def>
