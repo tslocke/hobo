@@ -1,15 +1,14 @@
 module HoboFields
-
-  class HtmlString < HoboFields::Text
+  
+  class HtmlString < RawHtmlString
 
     include SanitizeHtml
-
-    def to_html(xmldoctype = true)
-      self
+    
+    def self.declared(model, name, options)
+      model.before_save { |record| record[name] = HoboFields::SanitizeHtml.sanitize(record[name]) }
     end
-
+    
     HoboFields.register_type(:html, self)
-
   end
 
 end

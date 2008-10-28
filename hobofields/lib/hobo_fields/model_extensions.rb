@@ -51,9 +51,9 @@ module HoboFields
       if type
         type = HoboFields.to_class(type)
         attrs.each do |attr|
-          declare_attr_type attr, type
+          declare_attr_type attr, type, options
           define_method "#{attr}=" do |val|
-            if !val.is_a?(type) && HoboFields.can_wrap?(val)
+            if !val.is_a?(type) && HoboFields.can_wrap?(type, val)
               val = type.new(val.to_s)
             end
             instance_variable_set("@#{attr}", val)
@@ -94,8 +94,10 @@ module HoboFields
     # Declare a rich-type for any attribute (i.e. getter method). This
     # does not effect the attribute in any way - it just records the
     # metadata.
-    def self.declare_attr_type(name, type)
+    def self.declare_attr_type(name, type, options={})
+      klass = HoboFields.to_class(type)
       attr_types[name] = HoboFields.to_class(type)
+      klass.try.declared(self, name, options)
     end
 
 
@@ -107,7 +109,7 @@ module HoboFields
       options = args.extract_options!
       try.field_added(name, type, args, options)
       add_validations_for_field(name, type, args, options)
-      declare_attr_type(name, type) unless HoboFields.plain_type?(type)
+      declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
       attr_order << name unless name.in?(attr_order)
     end

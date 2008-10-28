@@ -1,15 +1,18 @@
-<def tag="labelled-item-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
+<!-- Extra tags for semantic markup -->
 
-<def tag="labelled-item"><tr merge-attrs><do param="default"/></tr></def>
+<!-- Used as a semantic wrapper around a group of sections and asides. CSS layouts can be provided based on this structure. 
 
-<def tag="item-label"><th merge-attrs><do param="default"/></th></def>
+### Usage
 
-<def tag="item-value"><td merge-attrs><do param="default"/></td></def>
-
+    <section-group>
+      <section>My First Section</section>
+      <section>My Second Section</section>
+      <aside>My Aside</aside>
+    </section-group>
+-->
 <def tag="section-group"><div class="section-group"><div class="section-group-inner" merge-attrs param="default"></div></div></def>
 
-<!--
-A proposed HTML 5 tag for representing a generic document or application section. Slightly more semantic than `<div>` for indicating document structure. For the time being, `<section>` is output as `<div class="section">`. In Hobo, `<section>` also has one other important behaviour which is different to using `<div>` directly, when the content of the section is empty, the wrapper tag will disappear. e.g.
+<!-- A proposed HTML 5 tag for representing a generic document or application section. Slightly more semantic than `<div>` for indicating document structure. For the time being, `<section>` is output as `<div class="section">`. In Hobo, `<section>` also has one other important behaviour which is different to using `<div>` directly, when the content of the section is empty, the wrapper tag will disappear. e.g.
   
     <section>My Section</section> -> <div class="section">My Section</div>
     <section><% # empty %></section> -> (nothing is generated)
@@ -22,31 +25,32 @@ A proposed HTML 5 tag for representing a generic document or application section
   </div>
 </def>
 
-<!--
-A proposed HTML 5 semantic tag. Outputs `<div class="aside">` and works in the same way as `<section>` with empty content.
--->
+<!-- A proposed HTML 5 semantic tag. Outputs `<div class="aside">` and works in the same way as `<section>` with empty content. -->
 <def tag="aside" attrs="empty">
   <set body="&parameters.default"/>
   <div class="aside" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
-<!--
-A proposed HTML 5 semantic tag. Outputs `<div class="header">` and works in the same way as `<section>` with empty content.
--->
+<!-- A proposed HTML 5 semantic tag. Outputs `<div class="header">` and works in the same way as `<section>` with empty content. -->
 <def tag="header" attrs="empty">
   <set body="&parameters.default"/>
   <div class="header" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
-<!--
-A proposed HTML 5 semantic tag. Outputs `<div class="footer">` and works in the same way as `<section>` with empty content.
--->
+<!-- A proposed HTML 5 semantic tag. Outputs `<div class="footer">` and works in the same way as `<section>` with empty content. -->
 <def tag="footer" attrs="empty">
   <set body="&parameters.default"/>
   <div class="footer" merge-attrs if="&!body.blank? || empty"><%= body %></div>
 </def>
 
-<!-- temporary tag -->
-<def tag="panel">
-  <div class="panel" merge-attrs><do param="default"/></div>
-</def>
+<!-- nodoc - to be removed -->
+<def tag="labelled-item-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
+
+<!-- nodoc - to be removed -->
+<def tag="labelled-item"><tr merge-attrs><do param="default"/></tr></def>
+
+<!-- nodoc - to be removed -->
+<def tag="item-label"><th merge-attrs><do param="default"/></th></def>
+
+<!-- nodoc - to be removed -->
+<def tag="item-value"><td merge-attrs><do param="default"/></td></def>

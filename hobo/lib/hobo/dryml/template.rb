@@ -889,6 +889,7 @@ module Hobo::Dryml
                   elsif is_code_attribute?(val)
                     "#{val[1..-1]}"
                   else
+                    val.gsub!('-', '_')
                     attr == "repeat" ? %("#{val}") : "this.#{val}"
                   end
 

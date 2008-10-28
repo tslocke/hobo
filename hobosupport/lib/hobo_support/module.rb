@@ -10,7 +10,7 @@ class Module
   # like alias_method_chain on the class.
   def included_in_class_callbacks(base)
     if base.is_a?(Class)
-      included_modules.each { |m| m.included_in_class(base) if m.respond_to?(:included_in_class) }
+      included_modules.each { |m| m.try.included_in_class(base) }
     end
   end
 
@@ -70,12 +70,11 @@ end
 # still write it the same way
 module Kernel
 
-  def classy_module(&b)
-    m = Module.new
-    m.meta_def :included do |base|
+  def classy_module(mod=Module.new, &b)
+    mod.meta_def :included do |base|
       base.class_eval &b
     end
-    m
+    mod
   end
 
 end

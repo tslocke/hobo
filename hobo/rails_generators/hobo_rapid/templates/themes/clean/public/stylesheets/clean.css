@@ -74,6 +74,7 @@ input.file_upload {
 	border: none;
     width: auto;
 	font-size: 11px; font-weight: bold;
+	margin-top: 10px;
 }
 .button:hover {cursor: pointer;}
 .actions {height: 100%; overflow: hidden; font-size: 11px;}

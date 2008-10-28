@@ -291,7 +291,7 @@ var Hobo = {
             var objEl = Hobo.objectElementFor(el)
             Hobo.showSpinner('Removing');
             function complete() {
-                if (options.fade) { Hobo.fadeObjectElement(el) }
+                if (options.fade) { Hobo.fadeObjectElement(objEl) }
                 Hobo.hideSpinner()
             }
             if (updates && updates.length > 0) {
@@ -353,7 +353,7 @@ var Hobo = {
         var m
         while(el.getAttribute) {
             id = Hobo.getModelId(el)
-            if (id) m = id.match(/^([a-z0-9-]+)-([0-9]+)(-[a-z0-9-]*)?$/);
+            if (id) m = id.match(/^[^:]+:[^:]+$/);
             if (m) break;
             el = el.parentNode;
         }
