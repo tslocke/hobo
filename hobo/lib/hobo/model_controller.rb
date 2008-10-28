@@ -368,7 +368,7 @@ module Hobo
       after_submit = params[:after_submit]
 
       # The after_submit post parameter takes priority
-      (after_submit == "stay-here" ? session[:previous_page_path] : after_submit) ||
+      (after_submit == "stay-here" ? previous_page_path : after_submit) ||
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
@@ -381,6 +381,11 @@ module Hobo
 
         # Give up
         home_page
+    end
+    
+    
+    def previous_page_path
+      session[:previous_page_path]
     end
     
     
