@@ -147,7 +147,8 @@ module Hobo
 
 
     def changing_password?
-      !lifecycle_changing_password? && (current_password.present? || password.present? || password_confirmation.present?)
+      !new_record? && !lifecycle_changing_password? &&
+        (current_password.present? || password.present? || password_confirmation.present?)
     end
     
     
