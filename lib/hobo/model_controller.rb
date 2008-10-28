@@ -616,6 +616,7 @@ module Hobo
         if valid?
           redirect_after_submit options
         else
+          this.exempt_from_edit_checks = true
           re_render_form(name)
         end
     end
