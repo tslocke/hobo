@@ -47,7 +47,7 @@ Redefine in your app to have nil values displayed differently, e.g.:
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
 <!--
-`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute. 
+`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute (without the `field` attribute this is just the regular HTML `<table>` tag)
 
 ### Usage
 
