@@ -1,5 +1,7 @@
 <def tag="simple-page">
-  <page without-live-search without-account-nav without-main-nav merge/>
+  <page without-live-search without-main-nav merge>
+    <account-nav: replace><dev-user-changer/></account-nav:>
+  </page>
 </def>    
 
 
