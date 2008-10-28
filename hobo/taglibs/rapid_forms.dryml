@@ -182,9 +182,14 @@ If the context is a `belongs_to` association, the `<select-one>` tag is used.
 
 If the context is a `has_many :through` association, the polymorphic `<collection-input>` tag is used.
 
-### Additional Notes
+### Attributes
 
-- The `can_edit?` permission is checked before rendering an `<input>`. If `can_edit?` returns false, the field is rendered using `<view>` instead.
+ - no-edit: control what happens if `can_edit?` is false. Can be one of:
+ 
+   - view: render the current value using the `<view>` tag
+   - disable: render the input as normal, but add HTML's `disabled` attribute
+   - skip: render nothing at all
+   - ignore: render the input normally. That is, don't even perform the edit check.
 -->
 <def tag="input" attrs="no-edit"><%=
   if attributes[:type]
