@@ -317,7 +317,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
 
 
 <def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
-  in_place = false if in_place.nil? && this == @this && !request.xhr?
+  in_place = false if in_place.nil? && this == @this && request.method == :get
   url = object_url(this, :method => :delete, :subsite => subsite)
   if (Hobo::Dryml.last_if = url && can_delete?)
     attributes = attributes.merge(if image
