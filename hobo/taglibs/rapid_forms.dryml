@@ -186,33 +186,41 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
 
 - The `can_edit?` permission is checked before rendering an `<input>`. If `can_edit?` returns false, the field is rendered using `<view>` instead.
 -->
-<def tag="input" attrs="force"><%=     
+<def tag="input" attrs="no-edit"><%=
   if attributes[:type]
     element :input, attributes, nil, true, true
-  elsif !(force || can_edit?)
-    view
   else
-    attrs = add_classes(attributes, type_id.dasherize, type_and_field.dasherize)
-    attrs[:name] ||= param_name_for_this
-    the_input = if (refl = this_field_reflection)
-                  if refl.macro == :belongs_to
-                    call_polymorphic_tag('input', attrs) or select_one(attrs)
-                  elsif refl.macro == :has_many
-                    if refl.options[:through]
-                      collection_input(attrs)
-                    else
-                      raise NotImplementedError, "An input for has-many associations has not been implemented yet"
-                    end
-                  end
-                else
-                  call_polymorphic_tag('input', attrs) or
-                    (call_polymorphic_tag('input', HoboFields.to_class(this_type::COLUMN_TYPE), attrs) if defined?(this_type::COLUMN_TYPE)) or
-                    raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
-                end
-    if this_parent.errors[this_field]
-      "<span class='field-with-errors'>#{the_input}</span>"
+    no_edit ||= :view
+    no_edit = no_edit.to_sym
+    no_edit_permission = !can_edit? unless no_edit == :ignore
+    if no_edit_permission && no_edit == :view
+      view
+    elsif no_edit_permission && no_edit == :skip
+      ""
     else
-      the_input
+      attrs = add_classes(attributes, type_id.dasherize, type_and_field.dasherize)
+      attrs[:name] ||= param_name_for_this
+      attrs[:disabled] = true if no_edit_permission && no_edit == :disable
+      the_input = if (refl = this_field_reflection)
+                    if refl.macro == :belongs_to
+                      call_polymorphic_tag('input', attrs) or select_one(attrs)
+                    elsif refl.macro == :has_many
+                      if refl.options[:through]
+                        collection_input(attrs)
+                      else
+                        raise NotImplementedError, "An input for has-many associations has not been implemented yet"
+                      end
+                    end
+                  else
+                    call_polymorphic_tag('input', attrs) or
+                      (call_polymorphic_tag('input', HoboFields.to_class(this_type::COLUMN_TYPE), attrs) if defined?(this_type::COLUMN_TYPE)) or
+                      raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+                  end
+      if this_parent.errors[this_field]
+        "<span class='field-with-errors'>#{the_input}</span>"
+      else
+        the_input
+      end
     end
   end
 %></def>
