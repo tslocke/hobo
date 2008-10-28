@@ -53,6 +53,8 @@ module Hobo
     private
 
     def hobo_login(options={})
+      (redirect_to home_page; return) if logged_in?
+
       login_attr = model.login_attribute.to_s.titleize.downcase
       options.reverse_merge!(:success_notice => "You have logged in.",
                              :failure_notice => "You did not provide a valid #{login_attr} and password.")
