@@ -368,7 +368,7 @@ module Hobo
       after_submit = params[:after_submit]
 
       # The after_submit post parameter takes priority
-      (after_submit == "stay-here" ? session[:previous_page_path] : after_submit) ||
+      (after_submit == "stay-here" ? previous_page_path : after_submit) ||
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
@@ -381,6 +381,11 @@ module Hobo
 
         # Give up
         home_page
+    end
+    
+    
+    def previous_page_path
+      session[:previous_page_path]
     end
     
     
@@ -679,8 +684,8 @@ module Hobo
     # --- Response helpers --- #
 
     def permission_denied(error)
-      self.this = nil # Otherwise this gets sent user_view
-      if :permission_denied.in?(self.class.superclass.instance_methods)
+      self.this = true # Otherwise this gets sent user_view
+      if "permission_denied".in?(self.class.superclass.instance_methods)
         super
       else
         respond_to do |wants|
@@ -700,7 +705,7 @@ module Hobo
 
 
     def not_found(error)
-      if :not_found_response.in?(self.class.superclass.instance_methods)
+      if "not_found_response".in?(self.class.superclass.instance_methods)
         super
       elsif render_tag("not-found-page", {}, :status => 404)
         # cool

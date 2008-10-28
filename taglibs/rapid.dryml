@@ -1,3 +1,10 @@
+<!--
+
+The Rapid tag library makes web development go fast. The Rapid tag library is your friend.  
+  
+(This taglib defines no tags - it just includes all the other taglibs. More along. Nothing to see here.)
+-->
+
 <include module="Hobo::RapidHelper"/>
 
 <include src="rapid_core"/>

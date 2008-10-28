@@ -1,41 +1,82 @@
+<!-- Core DRYML tags. These are included implicitly and are always available. Contains mainly control-flow tags. -->
+
+<!-- Call the tag given by the `tag` attribute. This lets you call tags dynamically based on some runtime value.
+  It's the DRYML equivalent of Ruby's `send` method.
+-->
 <def tag="call-tag" attrs="tag">
   <%= send(tag.gsub('-', '_'), attributes, parameters) %>
 </def>
 
 
+<!-- Wrap the body in the tag specified by the `tag` attribute, iff `when` is true.
+
+Using regular DRYML conditional logic it is rather akward to conditionally wrap some tag in another tag. This tag makes it easy to do that.
+
+### Usage
+
+For example, you might want to wrap an `<img>` tag in an `<a>` tag but only under certain conditions. Say the current context has an `href` attribute that may or may not be nil. We want to wrap the img in `<a>` if `href` is not nil:
+  
+    <wrap when="&this.href.present?" tag="a" href="&this.href"><img src="&this.img_filename"/></wrap>
+{: .dryml}  
+-->
 <def tag="wrap" attrs="tag, when, parameter">
   <% parameter ||= :default %>
   <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameters.default %>
 </def>
 
-    
+
+<!-- DRYML version of `render(:partial => 'my_partial')`
+
+### Usage
+
+    <partial name="my-partial" locals="&{:x => 10, :y => 20}"/>
+-->
 <def tag="partial" attrs="name, locals"><%= 
    locals ||= {}
    render(:partial => name, :locals => locals.merge(:this => this))
 %></def>
 
 
-<def tag="repeat" attrs="even-odd, join"><if><%= 
-    if even_odd
-      context_map do
-        klass = [attributes[:class], model_id_class, cycle("even", "odd")].compact.join(' ')
-        element(even_odd, attributes.merge(:class => klass), parameters.default)
-      end.join(join)
-    else
-      scope.new_scope :even_odd => "odd" do
-        context_map do
-          res = parameters.default
-          scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
-          res
-        end.join(join)
-      end
-    end %></if></def>
+<!-- Repeat a section of mark-up. The context should be a collection (anything that responds to `each`). The content of the call to `<repeat>` will be repeated for each item in the collection, and the context will be set to each item in turn.
+
+### Attributes
+
+ - join: The value of this attribute, if given, will be inserted between each of the items (e.g. `join=", "` is very common).  
+-->
+<def tag="repeat" attrs="join"><if><%= 
+  raise ArgumentError, "Cannot <repeat> on #{this.inspect}" unless this.respond_to? :each
+  scope.new_scope :even_odd => "odd" do
+    context_map do
+      res = parameters.default
+      scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
+      res
+    end.join(join)
+  end
+%></if></def>
 
 
+<!-- The 'do nothing' tag. Used to add parameters or change context without adding any markup -->
 <def tag="do"><%= parameters.default %></def>
+
+<!-- Alias of `do` -->
 <def tag="with" alias-of="do"/>
 
+<!-- DRYML's 'if' test
 
+### Usage
+
+    <if test="&current_user.administrtator?">Logged in as administrator</if>
+    <else>Logged in as normal user</else>
+    
+**IMPORTANT NOTE**: `<if>` tests for non-blank vs. blank (as defined by ActiveSuport), not true vs. false. 
+
+If you do not give the `test` attribute, uses the current context instead. This allows a nice trick like this:
+
+    <if:comments>...</if>
+    
+This has the double effect of changing the context to the `this.comments`, and only evaluating the body if there are comments (because an empty
+collection is considered blank)  
+-->
 <def tag="if" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)
   res = (cond = !test.blank?) ? parameters.default : ""
@@ -43,10 +84,14 @@
   res
 %></def>
 
+<!-- General purpose `else` clause.
 
+`<else>` works with various tags such as `<if>` and `<repeat>` (the else clause will be output if the collection was empty). It simply outputs its content if `Hobo::Dryml.last_if` is false. This is pretty much a crazy hack which violates many good principles of language design, but it's very useful : )
+-->
 <def tag="else"><%= parameters.default unless Hobo::Dryml.last_if %></def>
 
 
+<!-- Same behaviour as `<if>`, except the test is negated. -->
 <def tag="unless" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)     
   res = (cond = test.blank?) ? parameters.default : ""
@@ -55,7 +100,7 @@
 %></def>
 
 
-
+<!-- nodoc. -->
 <def tag="fake-field-context" attrs="fake-field, context"><%=
   res = ""
   new_field_context(fake_field, context) { res << parameters.default }

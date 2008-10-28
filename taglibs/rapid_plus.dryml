@@ -81,3 +81,26 @@
   <% size ||= 80; rating ||= 'g'; digest = Digest::MD5.hexdigest(this.email_address) -%>
   <a class="gravatar"><img class="gravatar" src="http://www.gravatar.com/avatar/#{digest}?s=#{size}&r=#{rating}" merge-attrs/></a>
 </def>
+
+
+<def tag="live-search">
+  <div class="search">
+    <label for="search-field">Search</label><input type="search" class="live-search"/>
+    <spinner id="search-spinner"/>
+  </div>
+  <section class="hidden" id="search-results-panel">
+    <h2>Search Results</h2><div param="close-button">close</div>
+    <section id="search-results">&nbsp;</section>
+  </section>
+</def>
+
+
+<def tag="filter-menu" attrs="param-name, options, no-filter">
+  <% no_filter ||= "All" %>
+  <form action="&request.request_uri" method="get" class="filter-menu">
+    <div>
+      <input type="hidden" name="filter-parameter" value="&param_name"/>
+      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
+    </div>
+  </form>
+</def>

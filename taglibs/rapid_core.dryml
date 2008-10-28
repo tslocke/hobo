@@ -1,8 +1,28 @@
-<def tag="field-list" attrs="tag">
+<!-- Core Rapid tags and tags that don't belong anywhere else. -->
+
+<!-- Renders a table with one row per field, where each row contains a `<th>` with the field name, and a `<td>` with (by default)
+     a `<view>` of the field.
+         
+### Attributes
+
+ - fields: Comma separated list of field names to display. Defaults to the fields returned by the `standard_fields` helper. That is, all fields apart from IDs and timestamps.
+ 
+ - force-all: All non-viewable fields will be skipped unless this attribute is given
+ 
+ - skip: Comma separated list of fields to exclude
+
+ - tag: The name of a tag to use inside the `<td>` to display the value. Defaults to `view`
+ 
+ - show-non-editable: By default, if `tag` is set to `input`, fields for which the current user does not have edit permission
+   will be skipped (the entire row is skipped). Set this attribute to keep them. (Note that `<input>` automatically degrades
+   to `<view>` if the user does not have edit permission.)
+     
+-->
+<def tag="field-list" attrs="tag, show-non-editable">
   <% tag ||= scope.in_form ? "input" : "view" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)"><% field_name = this_field_name %>
-      <labelled-item unless="&tag == 'input' && !can_edit?">
+      <labelled-item unless="&tag == 'input' && !can_edit? && !show_non_editable">
         <item-label param="#{this_field.to_s.sub('?', '')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
@@ -15,14 +35,19 @@
   </labelled-item-list>
 </def>
 
+<!-- Used to render nil values. By default renders "(Not Available)"
+  
+### Usage
 
-<def tag="item"><% scope.items << parameters.default %></def>
+Redefine in your app to have nil values displayed differently, e.g.:
 
-
+    <def tag="nil-view">-</def>
+  
+-->
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
 <!--
-`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute. 
+`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute (without the `field` attribute this is just the regular HTML `<table>` tag)
 
 ### Usage
 
@@ -110,11 +135,13 @@ Provides a short hand way of displaying images in public/images
 </def>
 
 
+<!-- Renders an ajax-progress 'spinner' using `spinner.gif` from the current theme, with a `class='hidden'` -->
 <def tag="spinner">
   <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
 </def>
 
 
+<!-- Renders some standard JavaScript code that various features of the Rapid library rely on. This tag would typicallu be called from your `<page>` tag. The default Rapid pages include this already. -->
 <def tag="hobo-rapid-javascripts"><%=
    res = 'var hoboParts = {};'
    # FIXME: This should interrogate the model-router - not the models
@@ -134,14 +161,28 @@ Provides a short hand way of displaying images in public/images
    res
 %></def>
 
+<!-- Renders the name of the current context using a variety of methods.
+  
+### Details
 
+ - Equivalent to `<nil-view>` if `this` is nil
+ - Equivalent to `<count>` if `this` is an Array
+ - Equivalent to `<type-name>` if `this` is a class
+ - If the context has a `name_attribute` defined, equivalent to `<view:abc/>` (where `abc` is the name attribute)
+ - Finally falls back to `this.to_s` (html escaped), but only if the user has view permission for `this`
+
+### Attributes
+
+ - if-present: if given, nothing at all will be rendered for nil values (as opposed to rendering `<nil-view>`)
+  
+-->
 <def tag="name" attrs="if-present"><%= 
   if this.nil?
     nil_view unless if_present
   else
     if this.is_a?(Array)
       count
-    elsif this.is_a?(Class) && this < ActiveRecord::Base
+    elsif this.is_a?(Class)
       type_name(attributes)
     elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
       view(merge_attrs(attributes, {:field => name_attr}))
@@ -152,7 +193,22 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 
-<def tag="type-name" attrs="type, plural, lowercase, dasherize"><%=
+<!-- Renders a human readable version of the type of the context
+  
+### Details
+
+ - If `this` is already a class, the name of that class is used
+ - Otherwise, first `this.member_class` (for collections), then `this.class` are tried
+ - By default the name is titleised and singular.
+ 
+### Attributes
+
+ - plural: pluralise the name
+ - lowercase: render the name in all lower case
+ - dasherize: render the name in lower case with dashes instead of spaces. 
+
+-->
+<def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
 
   name = dasherize ? type.name.underscore.dasherize : type.name.titleize
@@ -162,6 +218,21 @@ Provides a short hand way of displaying images in public/images
 %></def>
      
 
+<!-- Renders a human readable name of a collection
+  
+### Details
+
+ - Uses `this.origin_attribute` as the name.
+ - Falls back to `<type-name>` otherwise.
+ - By default the name is titleised and plural.
+ 
+### Attributes
+
+ - singular: singularise the name
+ - lowercase: render the name in all lower case
+ - dasherize: render the name in lower case with dashes instead of spaces. 
+
+-->
 <def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
   if (attr = this.try.origin_attribute)
     name = attr.to_s
@@ -299,12 +370,11 @@ Assuming the context is a blog post...
 
 ### Additional Notes
 
-* The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` attribute to force a `<span>`, e.g.
+* The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` or `block` attributes to force a `<span>` or a `<div>`, e.g.
 
         <view:body/> -> <div class="view blog-post-body">This is my blog post body</div>
 
         <view:body inline/> -> <span class="view blog-post-body">This is my blog post body</span>
-* Use the `block` attribute to change the wrapper tag to a `<div>` regardless of the field type e.g.
 
         <view:created_at block/> -> <div class="view blog-post-created-at">June 09, 2008 15:36</div>
 * Use the `no-wrapper` attribute to remove the wrapper tag completely. e.g.
@@ -318,7 +388,7 @@ Assuming the context is a blog post...
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
         elsif (refl = this_field_reflection) && refl.macro == :has_many
-          has_many_view(attributes)
+          collection_view(attributes)
         else
           view_tag = find_polymorphic_tag("view")
           
@@ -358,19 +428,25 @@ Assuming the context is a blog post...
    res
 %></def>
 
-    
-<def tag="belongs-to-view"><a merge-attrs/></def>
+<!-- `<view>` calls this tag when called for a `has_many` collection. By default calls `<links-for-collection/>` -->
+<def tag="collection-view" polymorphic><links-for-collection mergge-attrs/></def>
 
-<def tag="has-many-view"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
+<!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
+<def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
 <def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
 
+<!-- Renders `this.to_s`, or `format % this` if the `format` attribute is given -->
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
 
+<!-- Renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
 <def tag="view" for="string"><%= 
   if !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
     this.to_html(scope.xmldoctype)
@@ -379,9 +455,11 @@ Assuming the context is a blog post...
   end
 %></def>
 
+<!-- Renders 'Yes' for true and 'No' for false -->
 <def tag="view" for="boolean"><%= this ? 'Yes' : 'No' %></def>
 
-<def tag="view" for="ActiveRecord::Base"><a/></def>
+<!-- Renders a link (`<a>`) to `this` -->
+<def tag="view" for="ActiveRecord::Base"><a merge-attrs/></def>
 
 
 <!--
@@ -441,60 +519,65 @@ The label can be customised using the `label` attribute, e.g.
 %></span></def>
 
 
+<!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages. 
+-->
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= Hobo.current_theme -%>
   <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
         media="screen" rel="Stylesheet" type="text/css" />
 </def>
 
+<!-- Convenience tag to help with the common situation where you need to address the current user as "you", and refer to other users by name
 
+### Usage
+
+The context should be a user object. If `this == current_user` the "you" form is rendered, otherwise the form with the user's name:
+
+ - `<you have/> new mail` -> "you have new mail" or "Jim has new mail"
+ - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
+ - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
+
+### Attributes
+
+ - titleize: render "You" instead of "you"
+  
+-->
 <def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
 
+<!-- Equivalent to `<you titleize/>`. Yes it's an abuse of Ruby naming conventions, but it's so cute : ) -->
 <def tag="You"><you merge titleize/></def>
 
+<!--  Similar to `<you>`, but renders "Your" or "Fred's" -->
 <def tag="your">
   <if test="&this == current_user">your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
 
-
+<!-- Capitalised versin of `<your>` -->
 <def tag="Your">
   <if test="&this == current_user">Your</if>
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
 
+<!-- Renders "a book" or "an orange" according the the word passed in the attribute `word`
 
-<def tag="live-search">
-  <div class="search">
-    <label for="search-field">Search</label><input type="search" class="live-search"/>
-    <spinner id="search-spinner"/>
-  </div>
-  <section class="hidden" id="search-results-panel">
-    <h2>Search Results</h2><div param="close-button">close</div>
-    <section id="search-results">&nbsp;</section>
-  </section>
-</def>
+### Usage
 
+To render either "Please select a recipe" or "Please select an event", according to the type of the `this`:
 
+    <a-or-an word="&type_name"/>
+
+-->
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "an " : "a ") + word
 %></def>
 
 
+<!-- Capitalised version of `<a-or-an>` -->
 <def tag="A-or-An" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
 
 
-<def tag="filter-menu" attrs="param-name, options, no-filter">
-  <% no_filter ||= "All" %>
-  <form action="&request.request_uri" method="get" class="filter-menu">
-    <div>
-      <input type="hidden" name="filter-parameter" value="&param_name"/>
-      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]" first-option="&no_filter" merge-params/>
-    </div>
-  </form>
-</def>
-
-
-<def tag="comma-list" attrs="separator"><%= this.join(separator || ", ") %></def>
+<!-- Renders a collection of string joined with ", ", or some other string passed in the `join` attribute -->
+<def tag="comma-list" attrs="join"><%= this.join(join || ", ") %></def>
