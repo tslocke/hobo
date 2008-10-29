@@ -295,19 +295,19 @@ module Hobo
     end
 
 
-    def param_name_for(object, field_path)
+    def param_name_for(path)
       field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
-      attrs = field_path.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
-      "#{object.class.name.underscore}#{attrs}"
+      attrs = path.rest.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
+      "#{path.first}#{attrs}"
     end
 
 
     def param_name_for_this(foreign_key=false)
       return "" unless form_this
       name = if foreign_key && (refl = this_field_reflection) && refl.macro == :belongs_to
-               param_name_for(form_this, form_field_path[0..-2] + [refl.primary_key_name])
+               param_name_for(path_for_form_field[0..-2] + [refl.primary_key_name])
              else
-               param_name_for(form_this, form_field_path)
+               param_name_for(path_for_form_field)
              end
       register_form_field(name)
       name

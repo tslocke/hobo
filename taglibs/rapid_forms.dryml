@@ -11,7 +11,7 @@
                       end
             hiddens.map do |field| 
               val = this.send(field)
-              param_name = param_name_for(form_this, form_field_path + [field])
+              param_name = param_name_for(form_field_path + [field])
               [param_name, val] unless val.nil? || 
                                        field.to_sym.in?(this.class.attr_protected) || 
                                        (this.new_record? && val == this.class.column(field).default)
@@ -421,7 +421,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
 
 
 <def tag="sti-type-input">
-  <select name="#{param_name_for(form_this, form_field_path + ['type'])}">
+  <select name="#{param_name_for(form_field_path + ['type'])}">
     <%= options_for_select(this.class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
   </select>
 </def>
@@ -527,11 +527,10 @@ Use the `uri` option to specify a redirect location:
 
 
 <def tag="check-many">
-  <% collection = this; field = this_field; options ||= this.member_class.find(:all) -%>
+  <% collection = this; param_name = param_name_for_this; options ||= this.member_class.find(:all) -%>
   <ul class="check-many">
     <li repeat="&options">
-      <input type="checkbox" name="#{param_name_for(collection.origin, [field])}[]" value="#{name :no_wrapper => true}"
-             checked="&this.in?(collection)"/>
+      <input type="checkbox" name="#{param_name}[]" value="&h this.to_s" checked="&this.in?(collection)"/>
       <name/>
     </li>
   </ul>

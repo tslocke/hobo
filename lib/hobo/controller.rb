@@ -67,11 +67,10 @@ module Hobo
 
     def hobo_ajax_response(*args)
       results = args.extract_options!
-      this = args.first || @this
       page_path = params[:page_path]
       r = params[:render]
       if r
-        ajax_update_response(this, page_path, r.values, results)
+        ajax_update_response(page_path, r.values, results)
         true
       else
         false
@@ -79,7 +78,7 @@ module Hobo
     end
 
 
-    def ajax_update_response(this, page_path, render_specs, results={})
+    def ajax_update_response(page_path, render_specs, results={})
       add_variables_to_assigns
       renderer = Hobo::Dryml.page_renderer(@template, [], page_path) if page_path
 
@@ -90,8 +89,7 @@ module Hobo
           dom_id = spec[:id]
 
           if spec[:part_context]
-            part_name, part_this, locals = Dryml::PartContext.unmarshal(spec[:part_context], this, session)
-            part_content = renderer.call_part(dom_id, part_name, part_this, *locals)
+            part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
             page.call(function, dom_id, part_content)
           elsif spec[:result]
             result = results[spec[:result].to_sym]
