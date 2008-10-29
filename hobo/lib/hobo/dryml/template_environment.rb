@@ -51,11 +51,11 @@ module Hobo::Dryml
 
     for attr in [:erb_binding, :part_contexts, :view_name,
                  :this, :this_parent, :this_field, :this_key,
-                 :form_this, :form_field_names]
+                 :form_this, :form_field_path, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
     end
     
-    def form_field_path
+    def path_for_form_field
       @_form_field_path.nil? and raise Hobo::Dryml::DrymlException, 
         "DRYML cannot provide the correct form-field name here (this_field = #{this_field.inspect}, this = #{this.inspect})"
       @_form_field_path
@@ -143,28 +143,50 @@ module Hobo::Dryml
         end
       end
       
-      if (typed_id = object.try.typed_id)
-        attribute ? "#{typed_id}:#{attribute}" : typed_id
-      else
-        "nil"
+      id = if (typed_id = object.try.typed_id)
+             typed_id
+           elsif object == @this
+             "this"
+           end
+      attribute ? "#{id}:#{attribute}" : id
+  end
+
+
+    def call_part(part_node_id, part_name, *locals)
+      res = ''
+      new_context do
+        @_part_contexts[part_node_id] = PartContext.for_call(part_name, self, locals)
+        res = send("#{part_name}_part", *locals)
+      end
+      res
+    end
+    
+    
+    def refresh_part(encoded_context, session, dom_id)
+      context = Hobo::Dryml::PartContext.for_refresh(encoded_context, @this, session)
+        
+      with_part_context(context) do
+        send("#{context.part_name}_part", *context.locals)
       end
     end
 
-
-    def call_part(part_node_id, part_name, part_this=nil, *locals)
-      res = ''
-      if part_this
-        new_object_context(part_this) do
-          @_part_contexts[part_node_id] = PartContext.new(part_name, typed_id, locals)
-          res = send("#{part_name}_part", *locals)
-        end
+    
+    def with_part_context(context, &block)
+      this, this_field = context.this, context.this_field
+      
+      b = if context.form_field_path
+            proc { with_form_context(:unknown, context.form_field_path, &block) }
+          else
+            block
+          end
+      
+      if this && this_field
+        new_object_context(this) { new_field_context(this_field, &b) }
+      elsif this
+        new_object_context(this, &b)
       else
-        new_context do
-          @_part_contexts[part_node_id] = PartContext.new(part_name, typed_id, locals)
-          res = send("#{part_name}_part", *locals)
-        end
+        new_context(&b)
       end
-      res
     end
 
 
@@ -313,10 +335,10 @@ module Hobo::Dryml
     end
 
 
-    def with_form_context
-      @_form_this = this
-      @_form_field_path = []
-      @_form_field_paths_by_object = { @_form_this => [] }
+    def with_form_context(form_this=this, form_field_path=[form_this.class.name.underscore])
+      @_form_this = form_this
+      @_form_field_path = form_field_path
+      @_form_field_paths_by_object = { form_this => form_field_path }
       res = scope.new_scope :in_form => true, :form_field_names => [] do
         yield
       end

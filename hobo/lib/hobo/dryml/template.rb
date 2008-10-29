@@ -443,7 +443,7 @@ module Hobo::Dryml
       @builder.add_part(part_name, restore_erb_scriptlets(part_src), element_line_num(el))
 
       newlines = "\n" * part_src.count("\n")
-      args = [attribute_to_ruby(dom_id), ":#{part_name}", "nil", part_locals].compact
+      args = [attribute_to_ruby(dom_id), ":#{part_name}", part_locals].compact
       "<%= call_part(#{args * ', '}) #{newlines} %>"
     end
 
