@@ -392,9 +392,10 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
   raise HoboError.new("Not allowed to edit") unless can_edit?
    
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-  options ||= this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
-    #Todo: switch to autocompleter for id_name when too many records, and id_name supported
+  options ||= begin
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
+    this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+  end
   select_options = options.map { |x| [x.to_s, x.id ] }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
