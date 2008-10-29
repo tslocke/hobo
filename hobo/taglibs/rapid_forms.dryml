@@ -449,7 +449,7 @@ An input for `has_many :through` associations that lets the user chose the items
   
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
-<def tag="select-many" attrs="options, targets, remove-label, prompt">
+<def tag="select-many" attrs="options, targets, remove-label, prompt, disabled">
   <%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
   options ||= begin
@@ -472,12 +472,14 @@ To use this tag, the model of the items the user is chosing *must* have unique n
       <repeat>
         <div class="item" param="item">
           <span><name/></span>
-          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" param="hidden"/>
-          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="remove-button"/>
+          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
+                 param="hidden"/>
+          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
+                 param="remove-button"/>
         </div>
       </repeat>
     </div>
-    <select>
+    <select disabled="&disabled">
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| x.to_s.downcase}" value="@#{this.id}"
               merge-attrs="&{:disabled => 'true'} if this.in?(values)"><%= h this.to_s %></option>
