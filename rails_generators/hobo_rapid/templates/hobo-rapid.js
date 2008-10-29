@@ -16,7 +16,7 @@ var Hobo = {
     searchRequest: null,
     uidCounter: 0,
     ipeOldValues: {},
-    spinnerMinTime: 1000, // milliseconds 
+    spinnerMinTime: 500, // milliseconds 
 
     uid: function() {
         Hobo.uidCounter += 1
@@ -369,12 +369,19 @@ var Hobo = {
     showSpinner: function(message, nextTo) {
         clearTimeout(Hobo.spinnerTimer)
         Hobo.spinnerHideAt = new Date().getTime() + Hobo.spinnerMinTime;
-        if(t = $('ajax-progress-text')) Element.update(t, message);
-        if(e = $('ajax-progress')) {
+        if (t = $('ajax-progress-text')) {
+            if (!message || message.length == 0) {
+                t.hide()
+            } else {
+                Element.update(t, message);
+                t.show()
+            }
+        }
+        if (e = $('ajax-progress')) {
             if (nextTo) {
                 var pos = $(nextTo).cumulativeOffset()
-                e.style.top = pos.top + "px"
-                e.style.left = (pos.left + nextTo.offsetWidth) + "px"
+                e.style.top = pos.top - nextTo.offsetHeight + "px"
+                e.style.left = (pos.left + nextTo.offsetWidth + 5) + "px"
             }
             e.style.display = "block";
         }
