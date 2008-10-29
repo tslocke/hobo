@@ -388,10 +388,11 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
 %></def>
 
 
-<def tag="select-one" attrs="include-none, blank-message, options, sort"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit?
-   
+<def tag="select-one" attrs="include-none, blank-message, options, sort, disabled"><%
+  raise HoboError.new("Not allowed to edit #{this_field}") if !disabled && !can_edit? 
+
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
+   
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
     this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
