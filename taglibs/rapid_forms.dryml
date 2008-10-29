@@ -479,7 +479,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
         </div>
       </repeat>
     </div>
-    <select disabled="&disabled">
+    <select merge-attrs="&{:disabled => disabled}">
       <option value=""><prompt/></option>
       <option repeat="&options.sort_by {|x| x.to_s.downcase}" value="@#{this.id}"
               merge-attrs="&{:disabled => 'true'} if this.in?(values)"><%= h this.to_s %></option>
