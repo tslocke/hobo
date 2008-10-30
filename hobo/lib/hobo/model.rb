@@ -678,8 +678,13 @@ module Hobo
 
 
     def convert_collection_for_mass_assignment(reflection, value)
-      klass = reflection.klass
-      value.map { |x| convert_record_reference_for_mass_assignment(klass, x) unless x.blank? }.compact
+      # TODO: Integrate this stuff with the new mass-assignment stuff
+      if value.is_a?(Hash)
+        value
+      else
+        klass = reflection.klass
+        value.map { |x| convert_record_reference_for_mass_assignment(klass, x) unless x.blank? }.compact
+      end
     end
 
   end
