@@ -407,7 +407,11 @@ module Hobo
 
       Hobo::ModelRouter.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
-
+    
+    def css_data(name, *args)
+      "#{name.to_s.dasherize}::#{args * '::'}"
+    end
+    
 
     # Convenience helper for the default app
 

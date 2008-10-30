@@ -691,7 +691,8 @@ NameManyInput = Object.extend(SelectManyInput, {
                               
 AutocompleteBehavior = Behavior.create({
     initialize : function() {
-        var target    = this.element.className.match(/complete-on::([\S]+)/)[1].split('::')
+        var match     = this.element.className.match(/complete-on::([\S]+)/)
+        var target    = match[1].split('::')
         var typedId   = target[0]
         var completer = target[1]
 

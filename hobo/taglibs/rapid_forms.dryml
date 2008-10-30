@@ -413,7 +413,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
 %>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field.dasherize} complete-on:#{dom_id complete_target}:#{completer}"
+         class="autocompleter #{type_and_field.dasherize} #{css_data :complete_on, typed_id(complete_target), completer}"
          value="&name :no_wrapper => true, :if_present => true"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
@@ -546,7 +546,7 @@ Use the `uri` option to specify a redirect location:
 
 <def tag="input-many">
   <set empty="&this.empty?"/>
-  <ul class="input-many #{this_field.dasherize} input-many-prefix::#{param_name_for_this}">
+  <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
