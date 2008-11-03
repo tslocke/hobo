@@ -45,13 +45,9 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
 -->
 <def tag="repeat" attrs="join"><if><%= 
   raise ArgumentError, "Cannot <repeat> on #{this.inspect}" unless this.respond_to? :each
-  scope.new_scope :even_odd => "odd" do
-    context_map do
-      res = parameters.default
-      scope.even_odd = scope.even_odd == "even" ? "odd" : "even"
-      res
-    end.join(join)
-  end
+  context_map do
+    parameters.default
+  end.join(join)
 %></if></def>
 
 
