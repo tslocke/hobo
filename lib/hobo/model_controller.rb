@@ -356,7 +356,6 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        @this = instance_variable_get("@#{controller.singularize}")
         render :template => "#{controller}/#{view}"
       else
         render :action => default_action
