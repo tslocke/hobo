@@ -57,7 +57,7 @@ module Hobo
         dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
           if f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/
-            name = f.sub(/.rb$/, '').camelize
+            name = f.remove(/.rb$/).camelize
             name = "#{subsite.camelize}::#{name}" if subsite
             name.constantize
           end
