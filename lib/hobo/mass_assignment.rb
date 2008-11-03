@@ -18,7 +18,7 @@ module Hobo
             self.#{name}_without_mass_assignment = items
             # ensure the loaded array contains any changed records
             self.#{name}.proxy_target[0..-1] = items
-          end}, __FILE__, __LINE__ - 3
+          end}, __FILE__, __LINE__ - 6
         alias_method_chain :"#{name}=", :mass_assignment
       end
     end
