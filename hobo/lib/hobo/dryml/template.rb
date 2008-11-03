@@ -611,9 +611,9 @@ module Hobo::Dryml
           when nil
             call_type = is_parameter_tag ? :named_params : :default_param_only
           when :named_params
-            dryml_exception("mixed parameter tags and non-parameter tags", el) unless is_parameter_tag
+            dryml_exception("mixed parameter tags and non-parameter tags (did you forget a ':'?)", el) unless is_parameter_tag
           when :default_param_only
-            dryml_exception("mixed parameter tags and non-parameter tags", el) if is_parameter_tag
+            dryml_exception("mixed parameter tags and non-parameter tags (did you forget a ':'?)", el) if is_parameter_tag
           end
 
           if is_parameter_tag
