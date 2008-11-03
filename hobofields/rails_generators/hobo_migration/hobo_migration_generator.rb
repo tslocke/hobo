@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../../lib/hobofields'
 class HoboMigrationGenerator < Rails::Generator::Base
 
+  default_options :force_drop => false
+
   def initialize(runtime_args, runtime_options = {})
     super
     @migration_name = runtime_args.first || begin
@@ -27,7 +29,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
   def manifest
     return record {|m| } if migrations_pending?
 
-    generator = HoboFields::MigrationGenerator.new(self)
+    generator = HoboFields::MigrationGenerator.new(self, :force_drop => options[:force_drop])
     up, down = generator.generate
 
     if up.blank?
@@ -117,6 +119,21 @@ class HoboMigrationGenerator < Rails::Generator::Base
       system "rake db:migrate"
     end
   end
+  
+  protected
+    def banner
+      "Usage: #{$0} #{spec.name} [<migration-name>] [--force-drop]"
+    end
+
+    def add_options!(opt)
+      opt.separator ''
+      opt.separator 'Options:'
+      opt.on("--force-drop",
+             "Don't prompt to disambiguate drops from renames - drop everything") do |v|
+        options[:force_drop] = true
+      end
+    end
+  
 
 end
 
