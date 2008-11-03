@@ -80,7 +80,7 @@ module Hobo
       attr_writer :model
       
       def model_name
-        name.sub(/Controller$/, "").singularize
+        name.demodulize.remove(/Controller$/).singularize
       end
       
       def model
