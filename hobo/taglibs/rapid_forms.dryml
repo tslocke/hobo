@@ -247,6 +247,7 @@ This tag is called by `<input>` when the context is a `has_many :through` collec
   <%= text_area_tag(name, this, attributes) %>
 </def>
 
+<!-- Renders a checkbox plus a hidden-field -->
 <def tag="input" for="boolean" attrs="name">
   <%= check_box_tag(name, '1', this, attributes) + hidden_field_tag(name, '0') %>
 </def>
