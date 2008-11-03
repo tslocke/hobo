@@ -58,7 +58,7 @@ module Hobo
         dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
           if f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/
-            name = f.sub(/.rb$/, '').camelize
+            name = f.remove(/.rb$/).camelize
             name = "#{subsite.camelize}::#{name}" if subsite
             name.constantize
           end
@@ -81,7 +81,7 @@ module Hobo
       attr_writer :model
       
       def model_name
-        name.sub(/Controller$/, "").singularize
+        name.demodulize.remove(/Controller$/).singularize
       end
       
       def model
@@ -357,7 +357,6 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        @this = instance_variable_get("@#{controller.singularize}")
         render :template => "#{controller}/#{view}"
       else
         render :action => default_action
