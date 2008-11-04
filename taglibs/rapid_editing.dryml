@@ -23,7 +23,7 @@
   <a merge-attrs/>
 </def>
   
-<def tag="belongs-to-editor"><%= select_one_editor(attributes) %></def>
+<def tag="belongs-to-editor" polymorphic><%= select_one_editor(attributes) %></def>
 
 <def tag="editor" for="string"><%= in_place_editor attributes %></def>
 
