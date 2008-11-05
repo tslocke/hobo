@@ -5,8 +5,37 @@ The main tags are:
  -  `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts otherwise.
    
  - `<input>`, which automatically choses an appropriate form control based on the type of the date.
-  
-  -->
+ 
+### Ajax Attributes
+
+Several of the tags in this taglib support the following set of ajax attributes:
+                                 
+ - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no update.
+ 
+   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are the same.
+
+ - params: a hash of name/value pairs that will be converted to HTTP parameters in the ajax request
+ 
+ - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
+ 
+ - message: a message to be displayed in the Ajax progress spinner. Default: "Saving..."
+ 
+ - spinner-next-to: DOM ID of an element to position the ajax progress spinner next to.
+ 
+### Ajax Callbacks
+
+The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script executed
+at various points in the ajax request cycle:
+ 
+ - before: script to run befofre the request
+ 
+ - success: script to run on successful completion of the request
+ 
+ - failure: script to run on a request failure 
+ 
+ - complete: script to run on completion, regardless of success or failure.
+ 
+-->
   
   
 <!-- nodoc. -->
@@ -70,6 +99,15 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
 
 - `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
   
+### Attributes
+
+ - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. The form automatically
+   becomes an ajax form. Default - no update.
+   
+ - reset-form: Clear the form after submission (only makes sense for ajax forms)
+ 
+ - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
+   
 -->
 <def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
@@ -364,13 +402,14 @@ The menus default to the current time if the current value is nil.
 </def>
 
 
-<!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller. Web Methods provide
-support for the RPC model of client-server interaction, in contrast to the REST model. The preference in Rails is to use REST as much as
-possible, but we are pragmatists, and sometimes you just to need a remote procedure call. 
+<!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller. Web Methods
+provide support for the RPC model of client-server interaction, in contrast to the REST model. The preference in Rails is to use REST
+as much as possible, but we are pragmatists, and sometimes you just to need a remote procedure call.
 
 The URL that the call is POSTed to is the `object_url` of `this`, plus the method name
 
-`<update-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms). If any ajax attributes are given, the button becomes an ajax button, if not, 
+`<remote-method-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms). If any ajax
+attributes are given, the button becomes an ajax button, if not,
 
 ### Attributes 
 
@@ -400,8 +439,23 @@ The URL that the call is POSTed to is the `object_url` of `this`, plus the metho
     button_to(label, url, html_attributes.merge(:confirm => confirm))
   end
 %></def>
-  
 
+  
+<!-- Provides an ajax button to send a RESTful update or "PUT" to the server. i.e. to udate one or more fields of a record.
+  
+Note that unlike simliar tags, `<update-button>` does not support both ajax and non-ajax modes at this time. It only does ajax.
+
+`<update-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms).
+
+### Attributes
+
+ - label: The label on the button
+ 
+ - fields: A hash with new field values pairs to update the resource with. The items in the hash will be converted to HTTP parameters.
+ 
+ - params: Another hash with additional HTTP parameters to include in the ajax request
+ 
+  -->
 <def tag="update-button" attrs="label, update, fields, params"><%=
    raise HoboError.new("no update specified") unless update
 
@@ -415,6 +469,27 @@ The URL that the call is POSTed to is the `object_url` of `this`, plus the metho
 </def>
 
 
+<!-- Provides either an ajax or non-ajax delete button to send a RESTful "DELETE". The context should be a record for which you to want
+provide a delete button.
+
+The Rapid Library has a convention of marking (in the output HTML, using a special CSS class) elements as "object elements", with the class and ID of the ActiveRecord object that they represent. `<delete-button>` assumes it is placed inside such an element, and will automatically find the right element to remove (fade out) from the DOM. The `<collection>` tag adds this metadata (CSS class) automatically, so `<delete-button>` works well when used inside a `<collection>`. This is a Clever Trick which needs to be revisted and perhaps simplified.
+
+If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to display" when you delete the last item. Clever Tricks abound.
+
+All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
+
+### Attributes
+
+ - label: The label for the button
+ 
+ - in-place: delete in place (ajax)? Default: true, or false if the record to be deleted is the same as the top level context of the
+   page
+
+ - image: URL of an image for the button. Changes the rendered tag from `<input type='button'>` to `<input type='image' src='...'>`
+ 
+ - fade: Perform the fade effect (true/false)? Default: true
+ 
+  -->
 <def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
   in_place = false if in_place.nil? && this == @this && request.method == :get
   url = object_url(this, :method => :delete, :subsite => subsite)
