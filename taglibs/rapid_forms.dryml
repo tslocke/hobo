@@ -471,7 +471,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
       <set param-name="&param_name_for_this"/>
       <repeat>
         <div class="item" param="item">
-          <span><name/></span>
+          <span><%= h this.to_s %></span>
           <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
                  param="hidden"/>
           <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
