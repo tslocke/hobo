@@ -20,6 +20,7 @@ module HoboFields
       fields do |f|
         f.field(inheritance_column, :string)
       end
+      super
     end
 
 
