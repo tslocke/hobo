@@ -2,7 +2,8 @@
 
 The main tags are:
 
- -  `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts otherwise.
+ - `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts 
+   otherwise.
    
  - `<input>`, which automatically choses an appropriate form control based on the type of the date.
  
@@ -10,9 +11,11 @@ The main tags are:
 
 Several of the tags in this taglib support the following set of ajax attributes:
                                  
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no update.
+ - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no
+   update.
  
-   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are the same.
+   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are
+   the same.
 
  - params: a hash of name/value pairs that will be converted to HTTP parameters in the ajax request
  
@@ -24,8 +27,8 @@ Several of the tags in this taglib support the following set of ajax attributes:
  
 ### Ajax Callbacks
 
-The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script executed
-at various points in the ajax request cycle:
+The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script
+executed at various points in the ajax request cycle:
  
  - before: script to run befofre the request
  
@@ -63,7 +66,9 @@ at various points in the ajax request cycle:
 
 
 <!--
-`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base `<form>` tag, a form with contents is generated for each Hobo model. These are found in `app/views/taglibs/auto/rapid/forms.dryml`.
+`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base
+`<form>` tag, a form with contents is generated for each Hobo model. These are found in
+`app/views/taglibs/auto/rapid/forms.dryml`.
 
 ### Usage
 
@@ -77,7 +82,9 @@ If no `action` attribute is provided then the context is used to construct an ap
   
         <form with="&BlogPost.new">...</form> -> <form action="/blog_posts" method="POST">...</form>
 
-* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method` with a value of `PUT`. Hobo adds this automatically:
+* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special
+  way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method`
+  with a value of `PUT`. Hobo adds this automatically:
 
         <% blog_post = BlogPost.find(1) %>
         <form with="&blog_post">...</form> -> 
@@ -91,19 +98,19 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
         <div part="comments"><collection:comments/></div>
         <form with="&Comment.new" update="comments"/>
 
+`<form>` support all of the standard ajax attributes.
+
 ### Additional Notes
 
 - Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
 
-- Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a validation error occurs.
+- Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a
+  validation error occurs.
 
 - `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
   
 ### Attributes
 
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. The form automatically
-   becomes an ajax form. Default - no update.
-   
  - reset-form: Clear the form after submission (only makes sense for ajax forms)
  
  - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
@@ -194,8 +201,7 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
   end
 %></def>
 
-<!--
-A shortcut for generating a submit button.
+<!-- A shortcut for generating a submit button.
 
 ### Usage
 
@@ -211,7 +217,10 @@ A shortcut for generating a submit button.
 </def>
 
 <!--
-Provides an editable control tailored to the type of the object in context. `<input>` tags should be used within a `<form>`. `<input>` is a _polymorphic_ tag which means that there are a variety of definitions, each one written for a particular type. For example there are inputs for `text`, `boolean`, `password`, `date`, `datetime`, `integer`, `float`, `string` and more.
+Provides an editable control tailored to the type of the object in context. `<input>` tags should be used within a
+`<form>`. `<input>` is a _polymorphic_ tag which means that there are a variety of definitions, each one written for a
+particular type. For example there are inputs for `text`, `boolean`, `password`, `date`, `datetime`, `integer`,
+`float`, `string` and more.
 
 ### Usage
 
@@ -285,8 +294,9 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
 %></def>
 
 
-<!--
-This tag is called by `<input>` when the context is a `has_many :through` collection. By default a `<select-many>` is used, but this can be customised on a per-type basis. For example, say you would like the `<check-many>` tag used to edit collections a `Category` model in your application:
+<!-- This tag is called by `<input>` when the context is a `has_many :through` collection. By default a `<select-many>`
+is used, but this can be customised on a per-type basis. For example, say you would like the `<check-many>` tag used to
+edit collections a `Category` model in your application:
 
     <def tag="collection-input" for="Category"><check-many merge/></def>
 -->
@@ -332,7 +342,8 @@ The menus default to the current date if the current value is nil.
   
 ### Attributes
 
- - order: The order of the year, month and date menus. A comma separated string or an array. Default: "year, month, day, hour, minute, second"
+ - order: The order of the year, month and date menus. A comma separated string or an array. Default: "year, month,
+   day, hour, minute, second"
  
 Any other attributes are passed through to the `select_date` helper.
  
@@ -349,7 +360,8 @@ The menus default to the current time if the current value is nil.
   
 ### Attributes
 
- - order: The order of the year, month and date menus. A comma separated string or an array. Default: "year, month, day, hour, minute, second"
+ - order: The order of the year, month and date menus. A comma separated string or an array. Default: "year, month,
+   day, hour, minute, second"
  
 Any other attributes are passed through to the `select_datetime` helper.
  
@@ -402,26 +414,21 @@ The menus default to the current time if the current value is nil.
 </def>
 
 
-<!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller. Web Methods
-provide support for the RPC model of client-server interaction, in contrast to the REST model. The preference in Rails is to use REST
-as much as possible, but we are pragmatists, and sometimes you just to need a remote procedure call.
+<!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller.
+Web Methods provide support for the RPC model of client-server interaction, in contrast to the REST model. The
+preference in Rails is to use REST as much as possible, but we are pragmatists, and sometimes you just to need a remote
+procedure call.
 
 The URL that the call is POSTed to is the `object_url` of `this`, plus the method name
 
-`<remote-method-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms). If any ajax
-attributes are given, the button becomes an ajax button, if not,
+`<remote-method-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid
+Forms). If any ajax attributes are given, the button becomes an ajax button, if not,
 
 ### Attributes 
 
  - method: the name of the web-method to call
  
  - label: the label on the button
- 
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no update.
- 
-   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are the same.
-
- - confirm: A message to display in a JavaScript confirm dialog. Default: don't have a confirm dialog
  
  -->
 <def tag="remote-method-button" attrs="method, update, label, confirm"><%= 
@@ -441,17 +448,20 @@ attributes are given, the button becomes an ajax button, if not,
 %></def>
 
   
-<!-- Provides an ajax button to send a RESTful update or "PUT" to the server. i.e. to udate one or more fields of a record.
+<!-- Provides an ajax button to send a RESTful update or "PUT" to the server. i.e. to udate one or more fields of a
+record.
   
-Note that unlike simliar tags, `<update-button>` does not support both ajax and non-ajax modes at this time. It only does ajax.
+Note that unlike simliar tags, `<update-button>` does not support both ajax and non-ajax modes at this time. It only
+does ajax.
 
 `<update-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms).
 
 ### Attributes
 
- - label: The label on the button
+ - label: The label on the button. 
  
- - fields: A hash with new field values pairs to update the resource with. The items in the hash will be converted to HTTP parameters.
+ - fields: A hash with new field values pairs to update the resource with. The items in the hash will be converted to
+   HTTP parameters.
  
  - params: Another hash with additional HTTP parameters to include in the ajax request
  
@@ -469,23 +479,29 @@ Note that unlike simliar tags, `<update-button>` does not support both ajax and 
 </def>
 
 
-<!-- Provides either an ajax or non-ajax delete button to send a RESTful "DELETE". The context should be a record for which you to want
-provide a delete button.
+<!-- Provides either an ajax or non-ajax delete button to send a RESTful "DELETE". The context should be a record for
+which you to want provide a delete button.
 
-The Rapid Library has a convention of marking (in the output HTML, using a special CSS class) elements as "object elements", with the class and ID of the ActiveRecord object that they represent. `<delete-button>` assumes it is placed inside such an element, and will automatically find the right element to remove (fade out) from the DOM. The `<collection>` tag adds this metadata (CSS class) automatically, so `<delete-button>` works well when used inside a `<collection>`. This is a Clever Trick which needs to be revisted and perhaps simplified.
+The Rapid Library has a convention of marking (in the output HTML, using a special CSS class) elements as "object
+elements", with the class and ID of the ActiveRecord object that they represent. `<delete-button>` assumes it is placed
+inside such an element, and will automatically find the right element to remove (fade out) from the DOM. The
+`<collection>` tag adds this metadata (CSS class) automatically, so `<delete-button>` works well when used inside a
+`<collection>`. This is a Clever Trick which needs to be revisted and perhaps simplified.
 
-If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to display" when you delete the last item. Clever Tricks abound.
+If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to
+display" when you delete the last item. Clever Tricks abound.
 
 All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
 
 ### Attributes
 
- - label: The label for the button
+ - label: The label for the button. Default: "Remove"
  
- - in-place: delete in place (ajax)? Default: true, or false if the record to be deleted is the same as the top level context of the
-   page
+ - in-place: delete in place (ajax)? Default: true, or false if the record to be deleted is the same as the top level
+   context of the page
 
- - image: URL of an image for the button. Changes the rendered tag from `<input type='button'>` to `<input type='image' src='...'>`
+ - image: URL of an image for the button. Changes the rendered tag from `<input type='button'>` to `<input type='image'
+   src='...'>`
  
  - fade: Perform the fade effect (true/false)? Default: true
  
@@ -523,6 +539,15 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 %></def>
 
 
+<!-- Provides either an ajax or non-ajax create button that will send a RESTful "POST" to the server to create a new resource.
+  
+All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
+
+### Attributes
+
+ - model: The class to instantiate, pass either the class name or the class object.
+
+ -->
 <def tag="create-button" attrs="model, update, label, fields, message"><%=
   raise HoboError.new("no update specified") unless update
 
@@ -562,7 +587,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
-  %>
+  -%>
   <select name="#{param_name_for_this(true)}" merge-attrs="&attributes.except :name">
     <%= options_for_select(select_options, this ? this.id : "") %>
   </select>
@@ -572,7 +597,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 <def tag="name-one" attrs="complete-target, completer"><%
   complete_target ||= this_field_reflection.klass
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
-%>
+  -%>
   <input type="text" name="#{param_name_for_this}" 
          class="autocompleter #{type_and_field.dasherize} #{css_data :complete_on, typed_id(complete_target), completer}"
          value="&name :no_wrapper => true, :if_present => true"
@@ -610,8 +635,7 @@ An input for `has_many :through` associations that lets the user chose the items
   
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
-<def tag="select-many" attrs="options, targets, remove-label, prompt, disabled">
-  <%
+<def tag="select-many" attrs="options, targets, remove-label, prompt, disabled"><%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
   options ||= begin
                 conditions = ActiveRecord::Associations::HasManyThroughAssociation.new(this_parent, this_field_reflection).sql_conditions
@@ -674,9 +698,10 @@ Use the `uri` option to specify a redirect location:
       ...
     </form>
 -->
-<def tag="after-submit" attrs="uri, stay-here, go-back">
-  <% uri = "stay-here" if stay_here %>
-  <% uri = session[:previous_uri] if go_back %>
+<def tag="after-submit" attrs="uri, stay-here, go-back"><% 
+  uri = "stay-here" if stay_here %>
+  uri = session[:previous_uri] if go_back
+  -%>
   <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
 </def>
 
@@ -730,7 +755,7 @@ Use the `uri` option to specify a redirect location:
 
 
 <def tag="input-all">
-  <% association_fkey = this_field_reflection.primary_key_name %>
+  <% association_fkey = this_field_reflection.primary_key_name -%>
   <ul class="input-all #{this_field.dasherize}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <set-scoped form-field-names="&[]">
