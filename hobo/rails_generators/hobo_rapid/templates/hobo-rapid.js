@@ -251,7 +251,7 @@ var Hobo = {
 
 
     putUrl: function(el) {
-        var spec = Hobo.parseModelSpecForElement(el)
+        var spec = Hobo.modelSpecForElement(el)
         return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
     },
 
