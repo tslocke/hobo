@@ -7,6 +7,7 @@ module Hobo
     VIEWLIB_DIR = "taglibs"
 
     DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
+    WILL_PAGINATE_OPTIONS = [ :page, :per_page, :total_entries, :count, :finder]
 
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :destroy]
@@ -57,7 +58,7 @@ module Hobo
         dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
           if f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/
-            name = f.sub(/.rb$/, '').camelize
+            name = f.remove(/.rb$/).camelize
             name = "#{subsite.camelize}::#{name}" if subsite
             name.constantize
           end
@@ -80,7 +81,7 @@ module Hobo
       attr_writer :model
       
       def model_name
-        name.sub(/Controller$/, "").singularize
+        name.demodulize.remove(/Controller$/).singularize
       end
       
       def model
@@ -356,7 +357,6 @@ module Hobo
       if params[:page_path]
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        @this = instance_variable_get("@#{controller.singularize}")
         render :template => "#{controller}/#{view}"
       else
         render :action => default_action
@@ -431,7 +431,7 @@ module Hobo
         options.reverse_merge!(:page => params[:page] || 1)
         finder.paginate(options)
       else
-        finder.all(options)
+        finder.all(options.except(*WILL_PAGINATE_OPTIONS))
       end
     end
     

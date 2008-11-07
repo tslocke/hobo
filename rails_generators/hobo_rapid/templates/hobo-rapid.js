@@ -252,7 +252,7 @@ var Hobo = {
 
 
     putUrl: function(el) {
-        var spec = Hobo.parseModelSpecForElement(el)
+        var spec = Hobo.modelSpecForElement(el)
         return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
     },
 
@@ -743,10 +743,11 @@ Event.addBehavior({
 
     '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
      function (ev) {
-        var ipe = Hobo._makeInPlaceEditor(this)
-        ipe.getText = function() {
-            return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
-        }
+
+         var ipe = Hobo._makeInPlaceEditor(this)
+         ipe.getText = function() {
+             return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML()
+         }
     },
 
     '.text.in-place-edit, .markdown.in-place-edit, .textile.in-place-edit' : function (ev) {
