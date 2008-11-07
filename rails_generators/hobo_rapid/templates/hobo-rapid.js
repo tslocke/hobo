@@ -643,21 +643,27 @@ SelectManyInput = Behavior.create({
             selected.disabled = true
             select.value = ""
             Event.addBehavior.reload()
+            this.element.fire("rapid:add", { element: newItem })
+            this.element.fire("rapid:change", { element: newItem })
         }
     },
 
-    onclick : function(e) {
-        var el = Event.element(e);
-        Event.stop(e);
+    onclick : function(ev) {
+        var el = Event.element(ev);
         if (el.match(".remove-item")) { this.removeOne(el.parentNode) }
     },
 
     removeOne : function(el) {
+        var element = this.element
         new Effect.BlindUp(el, 
                            { duration: 0.3,
-                             afterFinish: function (ef) { ef.element.remove() } } ) 
+                             afterFinish: function (ef) { 
+                                 ef.element.remove() 
+                                 element.fire("rapid:remove", { element: el })
+                                 element.fire("rapid:change", { element: el })
+                                 } } ) 
         var label = el.down('span').innerHTML
-        var option = $A(this.element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
+        var option = $A(element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
         option.disabled = false
     },
 
