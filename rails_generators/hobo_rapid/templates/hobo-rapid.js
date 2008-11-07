@@ -101,9 +101,10 @@ var Hobo = {
             params.push(Form.serialize(form))
         }
 
-        Hobo.showSpinner(options.message, options.spinnerNextTo)
+        if (options.message != false) Hobo.showSpinner(options.message, options.spinnerNextTo)
+        
         var complete = function() {
-            Hobo.hideSpinner();
+            if (options.message != false) Hobo.hideSpinner();
             if (options.onComplete) options.onComplete.apply(this, arguments)
             if (form && options.refocusForm) Form.focusFirstElement(form)
             Event.addBehavior.reload()
