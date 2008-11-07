@@ -27,6 +27,11 @@ namespace :hobo do
     end
 
   end
+  
+  desc "Run the DRYML generators to generate taglibs in app/views/taglibs/auto"
+  task :generate_taglibs => :environment do
+    Hobo::Dryml::DrymlGenerator.run
+  end
 
 end
 
