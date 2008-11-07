@@ -1,4 +1,4 @@
-class <%= class_name %>Controller < ApplicationController
+class <%= class_name %>Controller < <%= subsite ? "#{subsite}::#{subsite}SiteController" : "ApplicationController" %>
 
   hobo_model_controller
 
