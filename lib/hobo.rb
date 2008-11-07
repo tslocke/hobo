@@ -7,6 +7,7 @@ rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
+ActiveSupport::Dependencies = Dependencies if RAILS_GEM_VERSION = "2.1"
 ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__), "#{RAILS_ROOT}/app/viewhints"]
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
