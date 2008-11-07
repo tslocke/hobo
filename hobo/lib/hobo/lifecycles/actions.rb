@@ -15,7 +15,12 @@ module Hobo
         when Array
           who.detect {|attribute| record.send(attribute) == user }
         else
-          if (current = record.send(who)) # it's already set, check it's the same user
+          current = record.send(who)
+          # If there is a current value, it must either be the user, or an array containing the user
+          # If not, and the type of the attribute matches, set it to be the acting user
+          if current.is_a?(Array)
+            user.in? current
+          elsif current
             user == current
           elsif user.is_a?(record.class.attr_type(who))
             record.send("#{who}=", user)
