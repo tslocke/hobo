@@ -1,4 +1,8 @@
 require 'fileutils'
+
+# Temporary hack so Hobo runs in Rails 2.1
+ActiveSupport::Dependencies = Dependencies unless defined? ActiveSupport::Dependencies
+
 ActiveSupport::Dependencies.load_paths << File.dirname(__FILE__) + "/../lib"
 
 require 'rexml/xpath'
