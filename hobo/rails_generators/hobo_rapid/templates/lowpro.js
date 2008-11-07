@@ -119,7 +119,7 @@ Object.extend(Event.addBehavior, {
       var observer = rules[selector];
       var sels = selector.split(',');
       sels.each(function(sel) {
-        var parts = sel.split(/:(?=[a-z]+$)/), css = parts[0], event = parts[1];
+        var parts = sel.split(/:(?=[a-z:]+$)/), css = parts[0], event = parts[1];
         $$(css).each(function(element) {
           if (event) {
             observer = Event.addBehavior._wrapObserver(observer);
