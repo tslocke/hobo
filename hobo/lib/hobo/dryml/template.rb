@@ -799,7 +799,8 @@ module Hobo::Dryml
                         elsif is_code_attribute?(merge_attrs)
                           merge_attrs[1..-1]
                         else
-                          dryml_exception("invalid merge-attrs", el)
+                          merge_attr_names = merge_attrs.split(/\s*,\s*/).*.gsub("-", "_")
+                          "all_attributes & #{merge_attr_names.inspect}"
                         end
         "merge_attrs({#{items}},(#{extra_attributes}) || {})"
       else
