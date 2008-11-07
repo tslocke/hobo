@@ -208,24 +208,23 @@ module Hobo::Dryml
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
       
-      @_polymorphic_tag_cache["#{name}:#{call_type.name}"] ||=      
-        begin
-          found = nil
-          while true
-            if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
-              found = poly_name
+      begin
+        found = nil
+        while true
+          if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
+            found = poly_name
+            break
+          else
+            if call_type == ActiveRecord::Base || call_type == Object
+              found = name
               break
             else
-              if call_type == ActiveRecord::Base || call_type == Object
-                found = name
-                break
-              else
-                call_type = call_type.superclass
-              end
+              call_type = call_type.superclass
             end
           end
-          found
         end
+        found
+      end
     end
 
 
