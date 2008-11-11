@@ -13,6 +13,7 @@ module Hobo
       HEADER = "<!-- AUTOMATICALLY GENERATED FILE - DO NOT EDIT -->\n\n"
       
       def self.run
+        return if RAILS_ENV == "production"
         @generator ||= DrymlGenerator.new
         @generator.run
       end
