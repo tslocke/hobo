@@ -25,7 +25,7 @@
           <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
           <live-search param if="&defined_route? :site_search"/>
           <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
-          <main-nav param/>
+          <main-nav current="&title" param/>
         </header>
         <section with-flash-messages param="content"/>
         <footer class="page-footer" param/>
