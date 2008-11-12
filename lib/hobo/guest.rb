@@ -5,7 +5,7 @@ module Hobo
     alias_method :has_hobo_method?, :respond_to?
 
     def to_s
-      "Guest"
+      "guest"
     end
 
     def guest?
@@ -25,7 +25,7 @@ module Hobo
     end
 
     def login
-      "Guest"
+      "guest"
     end
 
   end
