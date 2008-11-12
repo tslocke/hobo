@@ -701,7 +701,7 @@ Use the `uri` option to specify a redirect location:
     </form>
 -->
 <def tag="after-submit" attrs="uri, stay-here, go-back"><% 
-  uri = "stay-here" if stay_here %>
+  uri = "stay-here" if stay_here
   uri = session[:previous_uri] if go_back
   -%>
   <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
