@@ -199,6 +199,23 @@ module Hobo
       end
       
       
+      def creators
+        defined?(model::Lifecycle) ? model::Lifecycle.creators.values.where.publishable? : []
+      end
+      
+      def transitions
+        defined?(model::Lifecycle) ? model::Lifecycle.transitions.where.publishable? : []
+      end
+            
+      def creator_names
+        creators.map { |c| c.name.to_s }
+      end
+      
+      def transition_names
+        transitions.map { |t| t.name.to_s }
+      end
+      
+      
       def a_or_an(word)
         (word =~ /^[aeiou]/i ? "an " : "a ") + word
       end
