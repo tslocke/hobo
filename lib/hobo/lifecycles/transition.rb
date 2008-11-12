@@ -24,8 +24,8 @@ module Hobo
       end
 
 
-      def allowed?(record, user, attributes=nil)
-        prepare_and_check!(record, user, attributes) && true
+      def allowed?(record, attributes=nil)
+        prepare_and_check!(record, attributes) && true
       end
 
 
@@ -37,21 +37,23 @@ module Hobo
 
       def run!(record, user, attributes)
         record.lifecycle.active_step = self
-        if prepare_and_check!(record, user, attributes)
-          if record.lifecycle.become end_state
-            fire_event(record, on_transition)
+        record.with_acting_user(user) do
+          if prepare_and_check!(record, attributes)
+            if record.lifecycle.become end_state
+              fire_event(record, on_transition)
+            end
+          else
+            raise Hobo::Model::PermissionDeniedError
           end
-        else
-          raise Hobo::Model::PermissionDeniedError
         end
       end
 
 
-      def set_or_check_who_with_key!(record, user)
+      def set_or_check_who_with_key!(record)
         if who == :with_key
           record.lifecycle.valid_key? or raise LifecycleKeyError
         else
-          set_or_check_who_without_key!(record, user)
+          set_or_check_who_without_key!(record)
         end
       end
       alias_method_chain :set_or_check_who!, :key

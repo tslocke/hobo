@@ -16,21 +16,21 @@ module Hobo
       end
 
 
-      def prepare_and_check_with_preconditions!(record, user, attributes=nil)
-        prepare_and_check_without_preconditions!(record, user, attributes) && check_preconditions(record)
+      def prepare_and_check_with_preconditions!(record, attributes=nil)
+        prepare_and_check_without_preconditions!(record, attributes) && check_preconditions(record)
       end
       alias_method_chain :prepare_and_check!, :preconditions
 
 
       def allowed?(user, attributes=nil)
         record = lifecycle.model.new
-        prepare_and_check!(record, user, attributes)
+        record.with_acting_user(user) { prepare_and_check!(record, user, attributes) }
       end
 
 
       def candidate(user, attributes=nil)
         record = lifecycle.model.new
-        prepare_and_check!(record, user, attributes)
+        record.with_acting_user(user) { prepare_and_check!(record, attributes) }
         record.exempt_from_edit_checks = true
         record
       end
@@ -58,13 +58,15 @@ module Hobo
       def run!(user, attributes)
         record = lifecycle.model.new
         record.lifecycle.active_step = self
-        if prepare_and_check!(record, user, attributes)
-          if change_state(record)
-            fire_event(record, on_create)
+        record.with_acting_user(user) do
+          if prepare_and_check!(record, attributes)
+            if change_state(record)
+              fire_event(record, on_create)
+            end
+            record
+          else
+            raise Hobo::Model::PermissionDeniedError
           end
-          record
-        else
-          raise Hobo::Model::PermissionDeniedError
         end
       end
 

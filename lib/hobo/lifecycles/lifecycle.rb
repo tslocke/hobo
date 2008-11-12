@@ -142,8 +142,9 @@ module Hobo
         name = name.to_sym if name
         matches = available_transitions
         matches = matches.select { |t| t.name == name } if name
-        matches = matches.select { |t| t.name == name.to_s } if name
-        matches.select { |t| t.allowed?(record, user, attributes) }
+        record.with_acting_user(user) do
+          matches.select { |t| t.allowed?(record, attributes) }
+        end
       end
 
 
