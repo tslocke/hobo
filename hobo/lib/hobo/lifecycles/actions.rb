@@ -4,7 +4,9 @@ module Hobo
 
     module Actions
 
-      def set_or_check_who!(record, user)
+      def set_or_check_who!(record)
+        user = record.acting_user
+        
         case who
         when :nobody
           user == :nobody
@@ -13,7 +15,7 @@ module Hobo
         when :self
           record == user
         when Array
-          who.detect {|attribute| record.send(attribute) == user }
+          who.detect { |attribute| record.send(attribute) == user }
         else
           current = record.send(who)
           # If there is a current value, it must either be the user, or an array containing the user
@@ -46,8 +48,8 @@ module Hobo
       end
 
 
-      def check_guard(record, user)
-        !options[:if] || run_hook(record, options[:if], user)
+      def check_guard(record)
+        !options[:if] || run_hook(record, options[:if])
       end
 
       def check_invariants(record)
@@ -55,18 +57,18 @@ module Hobo
       end
 
 
-      def prepare(record, user, attributes=nil)
+      def prepare(record, attributes=nil)
         if attributes
           attributes = extract_attributes(attributes)
           record.attributes = attributes
         end
         record.lifecycle.generate_key if options[:new_key]
-        set_or_check_who!(record, user) && record
+        set_or_check_who!(record) && record
       end
 
 
-      def prepare_and_check!(record, user, attributes=nil)
-        prepare(record, user, attributes) && check_guard(record, user) && check_invariants(record)
+      def prepare_and_check!(record, attributes=nil)
+        prepare(record, attributes) && check_guard(record) && check_invariants(record)
       end
       
       def publishable?
