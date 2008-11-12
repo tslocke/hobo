@@ -5,6 +5,7 @@ module Hobo
 
       def initialize(*args)
         super
+        self.name = name.to_sym
         lifecycle.creators[name] = self
       end
 
