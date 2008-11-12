@@ -33,7 +33,7 @@ new_link = linkable?(:new)
       <section param="content-body">
 <% if new_link -%>
 
-        <a action="new" to="&model" merge-params/>      
+        <a action="new" to="&model" param="new-link"/>      
 <% end -%>
 
         <page-nav param="top-page-nav"/>
@@ -233,7 +233,7 @@ new_link = :new.in?(actions)
       <section param="content-body">
 <% if new_link -%>
 
-        <a action="new" to="&model" merge-params/>      
+        <a action="new" to="&model" param="new-link"/>
 <% end -%>
 
         <page-nav param="top-page-nav"/>
