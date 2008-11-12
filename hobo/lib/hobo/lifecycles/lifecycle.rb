@@ -206,6 +206,18 @@ module Hobo
       def preconditions_satisfied?
         self.class.preconditions.all? { |i| record.instance_eval(&i) }
       end
+      
+      def active_step_is?(name)
+        active_step && active_step.name == name.to_sym
+      end
+      
+      def method_missing(name, *args)
+        if name.to_s =~ /^(.*)_in_progress\?$/
+          active_step_is?($1)
+        else
+          super
+        end
+      end
 
     end
 
