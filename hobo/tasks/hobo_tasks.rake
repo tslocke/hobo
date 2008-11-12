@@ -32,6 +32,17 @@ namespace :hobo do
   task :generate_taglibs => :environment do
     Hobo::Dryml::DrymlGenerator.run
   end
+  
+  desc "Run the standard generators that the hobo command runs."
+  task :run_standard_generators do
+    exec <<-END
+      ruby script/generate hobo --add-routes && \
+      ruby script/generate hobo_rapid --import-tags && \
+      ruby script/generate hobo_user_model user && \
+      ruby script/generate hobo_user_controller user && \
+      ruby script/generate hobo_front_controller front --delete-index --add-routes
+    END
+  end
 
 end
 
