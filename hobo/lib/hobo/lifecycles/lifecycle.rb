@@ -24,24 +24,24 @@ module Hobo
       end
 
       def self.def_state(name, on_enter)
-        name = name.to_s
+        name = name.to_sym
         returning(Lifecycles::State.new(name, on_enter)) do |s|
           states[name] = s
-          class_eval "def #{name}_state?; state_name == '#{name}' end"
+          class_eval "def #{name}_state?; state_name == :#{name} end"
         end
       end
 
 
       def self.def_creator(name, who, on_create, options)
-        name = name.to_s
+        name = name.to_sym
         returning(Creator.new(self, name, who, on_create, options)) do |creator|
 
           class_eval %{
                        def self.#{name}(user, attributes=nil)
-                         create('#{name}', user, attributes)
+                         create(:#{name}, user, attributes)
                        end
                        def self.can_#{name}?(user, attributes=nil)
-                         can_create?('#{name}', user, attributes)
+                         can_create?(:#{name}, user, attributes)
                        end
                       }
 
@@ -53,10 +53,10 @@ module Hobo
 
           class_eval %{
                        def #{name}(user, attributes=nil)
-                         transition('#{name}', user, attributes)
+                         transition(:#{name}, user, attributes)
                        end
                        def can_#{name}?(user, attributes=nil)
-                         can_transition?('#{name}', user, attributes)
+                         can_transition?(:#{name}, user, attributes)
                        end
                       }
 
@@ -69,12 +69,12 @@ module Hobo
 
 
       def self.can_create?(name, user, attributes=nil)
-        creators[name.to_s].allowed?(user, attributes)
+        creators[name.to_sym].allowed?(user, attributes)
       end
 
 
       def self.create(name, user, attributes=nil)
-        creator = creators[name.to_s]
+        creator = creators[name.to_sym]
         creator.run!(user, attributes)
       end
 
@@ -124,7 +124,7 @@ module Hobo
 
 
       def state_name
-        record.read_attribute self.class.state_field
+        record.read_attribute(self.class.state_field).to_sym
       end
 
 
@@ -139,30 +139,30 @@ module Hobo
 
 
       def available_transitions_for(user, name=nil, attributes=nil)
+        name = name.to_sym if name
         matches = available_transitions
+        matches = matches.select { |t| t.name == name } if name
         matches = matches.select { |t| t.name == name.to_s } if name
         matches.select { |t| t.allowed?(record, user, attributes) }
       end
 
 
       def become(state_name, validate=true)
-        state_name = state_name.to_s
-        if self.state != state_name
-          record.write_attribute self.class.state_field, state_name
+        state_name = state_name.to_sym
+        record.write_attribute self.class.state_field, state_name.to_s
 
-          if state_name == "destroy"
-            record.destroy
+        if state_name == :destroy
+          record.destroy
+          true
+        else
+          s = self.class.states[state_name]
+          raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
+          if record.save(validate)
+            s.activate! record
+            self.active_step = nil # That's the end of this step
             true
           else
-            s = self.class.states[state_name]
-            raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
-            if record.save(validate)
-              s.activate! record
-              self.active_step = nil # That's the end of this step
-              true
-            else
-              false
-            end
+            false
           end
         end
       end

@@ -274,8 +274,7 @@ new_link = :new.in?(actions)
 
 <% end # of owner_actions.each_pair -%>
 
-<% if defined? model::Lifecycle -%>
-<% model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator| -%>
+<% creator_names.each do |creator| -%>
 <def tag="<%= creator.dasherize %>-page" polymorphic/>
 <def tag="<%= creator.dasherize %>-page" for="<%= model.name %>">
 
@@ -297,7 +296,7 @@ new_link = :new.in?(actions)
 </def>
 <% end -%>
 
-<% model::Lifecycle.transitions.where.publishable?.*.name.each do |transition| -%>
+<% transition_names.each do |transition| -%>
 <def tag="<%= transition.dasherize %>-page" polymorphic/>
 <def tag="<%= transition.dasherize %>-page" for="<%= model.name %>">
   <page title="<%= transition.titleize %>" merge>
@@ -318,6 +317,5 @@ new_link = :new.in?(actions)
 </def>
 
 <% end -%>
-<% end # of if defined? model::Lifecycle -%>
 
 <% end # of each_model do -%>

@@ -15,33 +15,31 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
   </form>
 </def>
 
-<% if defined? model::Lifecycle -%>
-<% model::Lifecycle.creators.values.where.publishable?.each do |creator| -%>
-<def tag="<%= creator.name.dasherize %>-form" polymorphic/>
-<def tag="<%= creator.name.dasherize %>-form" for="<%= model.name %>">
+<% creators.each do |creator| -%>
+<def tag="<%= creator.name.to_s.dasherize %>-form" polymorphic/>
+<def tag="<%= creator.name.to_s.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= creator.name %>">
     <error-messages param/>
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= creator.name.titleize %>" param/><or-cancel param="cancel"/>
+      <submit label="<%= creator.name.to_s.titleize %>" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
 <% end -%>
 
-<% model::Lifecycle.transitions.where.publishable?.each do |transition| -%>
-<def tag="<%= transition.name.dasherize %>-form" polymorphic/>
-<def tag="<%= transition.name.dasherize %>-form" for="<%= model.name %>">
+<% transitions.each do |transition| -%>
+<def tag="<%= transition.name.to_s.dasherize %>-form" polymorphic/>
+<def tag="<%= transition.name.to_s.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= transition.name %>">
     <error-messages param/>
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= transition.name.titleize %>" param/><or-cancel param="cancel"/>
+      <submit label="<%= transition.name.to_s.titleize %>" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
 <% end -%>
-<% end # of if defined? model::Lifecycle -%>
 
 <% end # of each_model do -%>

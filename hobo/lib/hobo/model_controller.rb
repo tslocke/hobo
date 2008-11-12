@@ -610,7 +610,7 @@ module Hobo
     # --- Lifecycle Actions --- #
 
     def do_creator_action(name, options={}, &b)
-      @creator = model::Lifecycle.creators[name.to_s]
+      @creator = model::Lifecycle.creators[name.to_sym]
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
@@ -625,7 +625,7 @@ module Hobo
     def creator_page_action(name)
       self.this = model.new
       this.exempt_from_edit_checks = true
-      @creator = model::Lifecycle.creators[name.to_s] or raise ArgumentError, "No such creator in lifecycle: #{name}"
+      @creator = model::Lifecycle.creators[name.to_sym] or raise ArgumentError, "No such creator in lifecycle: #{name}"
     end
 
 

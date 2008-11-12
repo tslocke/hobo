@@ -9,13 +9,14 @@ module Hobo
 
       def initialize(*args)
         super
+        self.name = name.to_sym
         start_states.each do |from|
-          state = lifecycle.states[from.to_s]
+          state = lifecycle.states[from]
           raise ArgumentError, "No such state '#{from}' in #{'name'} transition (#{lifecycle.model.name})" unless state
           state.transitions_out << self
         end
         unless end_state.to_s == "destroy"
-          state = lifecycle.states[end_state.to_s]
+          state = lifecycle.states[end_state]
           raise ArgumentError, "No such state '#{end_state}' in '#{name}' transition (#{lifecycle.model.name})" unless state
           state.transitions_in << self
         end
