@@ -35,7 +35,6 @@ module Hobo
       if included_in_save
         included_in_save.each_pair do |association, records|
           records.each do |record|
-            record.user_changes(acting_user) if acting_user
             record.save_without_validation # This means without transactions too
           end
         end

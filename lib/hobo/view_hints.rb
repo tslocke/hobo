@@ -1,6 +1,10 @@
 module Hobo
   
   class ViewHints
+    
+    def self.enable
+      ActiveSupport::Dependencies.load_paths |= ["#{RAILS_ROOT}/app/viewhints"]
+    end
   
     def self.setter(name, default=nil, &block)
       metaclass.send :define_method, name do |*args|
