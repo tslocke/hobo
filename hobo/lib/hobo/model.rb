@@ -2,7 +2,6 @@ module Hobo
 
   module Model
 
-    class PermissionDeniedError < RuntimeError; end
     class NoNameError < RuntimeError; end
 
     NAME_FIELD_GUESS      = %w(name title)
@@ -13,8 +12,6 @@ module Hobo
     def self.included(base)
       base.extend(ClassMethods)
 
-      included_in_class_callbacks(base)
-
       register_model(base)
 
       patch_will_paginate
@@ -23,13 +20,10 @@ module Hobo
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
 
-        attr_accessor :acting_user, :origin, :origin_attribute
-
-        bool_attr_accessor :exempt_from_edit_checks
-
+        include Hobo::Permissions
         include Hobo::Lifecycles::ModelExtensions
         include Hobo::FindFor
-        include Hobo::MassAssignment
+        include Hobo::AccessibleAssociations
       end
 
       class << base
@@ -49,10 +43,12 @@ module Hobo
       end
       
       base.fields # force hobofields to load
+
+      included_in_class_callbacks(base)
     end
 
     def self.patch_will_paginate
-      if defined?(WillPaginate) && !WillPaginate::Collection.respond_to?(:member_class)
+      if defined?(WillPaginate::Collection) && !WillPaginate::Collection.respond_to?(:member_class)
 
         WillPaginate::Collection.class_eval do
           attr_accessor :member_class, :origin, :origin_attribute
@@ -115,15 +111,23 @@ module Hobo
 
 
     def self.enable
+      require 'active_record/association_collection'
+      require 'active_record/association_proxy'
+      require 'active_record/association_reflection'
+
       ActiveRecord::Base.class_eval do
         def self.hobo_model
           include Hobo::Model
           fields # force hobofields to load
         end
-
+        def self.hobo_user_model
+          include Hobo::Model
+          include Hobo::User
+        end
         alias_method :has_hobo_method?, :respond_to_without_attributes?
+        
+        Hobo::Permissions.enable
       end
-            
     end
 
 
@@ -149,45 +153,6 @@ module Hobo
 
         #FIXME - this should be in Hobo::User
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
-      end
-
-
-      def user_find(user, *args)
-        record = find(*args)
-        yield(record) if block_given?
-        raise PermissionDeniedError unless Hobo.can_view?(user, record)
-        record
-      end
-
-
-      def user_new(user, attributes={})
-        record = new(attributes) {|r| r.acting_user = user; yield if block_given? }
-        allowed = record.user_changes(user)
-        record.acting_user = nil
-        allowed && record
-      end
-
-
-      def user_new!(user, attributes={})
-        user_new(user, attributes) or raise PermissionDeniedError
-      end
-
-
-      def user_create(user, attributes={})
-        record = new(attributes)
-        record.user_save_changes(user)
-        record
-      end
-
-
-      def user_can_create?(user, attributes={})
-        record = new(attributes)
-        record.user_changes(user)
-      end
-
-
-      def user_update(user, id, attributes={})
-        find(id).user_save_changes(user, attributes)
       end
 
 
@@ -453,73 +418,6 @@ module Hobo
     end
 
 
-    def with_acting_user(user)
-      old = acting_user
-      self.acting_user = user
-      result = yield
-      self.acting_user = old
-      result
-    end
-
-
-    def user_changes(user, changes={})
-      with_acting_user user do
-        if new_record?
-          self.attributes = changes
-          set_creator(user)
-          Hobo.can_create?(user, self)
-        else
-          original = duplicate
-          # 'duplicate' can cause these to be set, but they can conflict
-          # with the changes so we clear them
-          clear_aggregation_cache
-          clear_association_cache
-
-          self.attributes = changes
-
-          Hobo.can_update?(user, original, self)
-        end
-      end
-    end
-
-
-    def user_changes!(user, changes={})
-      user_changes(user, changes) or raise PermissionDeniedError
-    end
-
-
-    def user_can_create?(user, attributes={})
-      raise ArgumentError, "Called #user_can_create? on existing record" unless new_record?
-      user_changes(user, attributes)
-    end
-
-
-    def user_save_changes(user, changes={})
-      with_acting_user user do
-        user_changes!(user, changes)
-        save
-      end
-    end
-
-
-    def user_save(user)
-      user_save_changes(user)
-    end
-
-
-    def user_view(user, field=nil)
-      raise PermissionDeniedError, self.inspect unless Hobo.can_view?(user, self, field)
-    end
-
-
-    def user_destroy(user)
-      with_acting_user user do
-        raise PermissionDeniedError unless Hobo.can_delete?(user, self)
-        destroy
-      end
-    end
-
-
     def dependent_on
       self.class.dependent_on.map { |assoc| send(assoc) }
     end
@@ -622,13 +520,7 @@ module Hobo
 
 
     def convert_type_for_mass_assignment(field_type, value)
-      if field_type.is_a?(Class) && field_type < ActiveRecord::Base
-        convert_record_reference_for_mass_assignment(field_type, value)
-
-      elsif field_type.is_a?(ActiveRecord::Reflection::AssociationReflection)
-        convert_collection_for_mass_assignment(field_type, value)
-
-      elsif !field_type.is_a?(Class)
+      if !field_type.is_a?(Class)
         value
 
       elsif field_type <= Date
@@ -664,34 +556,6 @@ module Hobo
       end
     end
 
-
-    def convert_record_reference_for_mass_assignment(klass, value)
-      if value.is_a?(String)
-        if value.starts_with?('@')
-          value = value[1..-1] # get rid of the '@'
-          if value =~ /:/
-            Hobo::Model.find_by_typed_id(value[1..-1])
-          else
-            klass.find(value)
-          end
-        else
-          klass.named(value)
-        end
-      else
-        value
-      end
-    end
-
-
-    def convert_collection_for_mass_assignment(reflection, value)
-      # TODO: Integrate this stuff with the new mass-assignment stuff
-      if value.is_a?(Hash)
-        value
-      else
-        klass = reflection.klass
-        value.map { |x| convert_record_reference_for_mass_assignment(klass, x) unless x.blank? }.compact
-      end
-    end
 
   end
 

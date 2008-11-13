@@ -212,58 +212,111 @@ module Hobo
 
 
     def can_create?(object=this)
-      Hobo.can_create?(current_user, object)
+      if object.is_a?(Class) and object < ActiveRecord::Base
+        object = object.new
+      elsif (refl = object.try.proxy_reflection) && refl.macro == :has_many
+        if Hobo.simple_has_many_association?(object)
+          object = object.new
+          object.set_creator(current_user)
+        else
+          return false
+        end
+      end
+      object.creatable_by?(current_user)
     end
 
 
-    def can_update?(object, new)
-      Hobo.can_update?(current_user, object, new)
+    def can_update?(object=this)
+      object.updatable_by?(current_user)
     end
 
 
     def can_edit?(*args)
-      if args.empty?
-        if this.respond_to?(:updatable_by?) && !this_field_reflection
-          can_edit?(this, nil)
-        elsif this_parent && this_field
-          can_edit?(this_parent, this_field)
-        else
-          can_edit?(this, nil)
-        end
-      else
-        object, field = args.length == 2 ? args : [this, args.first]
+      object, field = if args.empty?
+                        if this.respond_to?(:editable_by?) && !this_field_reflection
+                          [this, nil]
+                        elsif this_parent && this_field
+                          [this_parent, this_field]
+                        else 
+                          [this, nil]
+                        end
+                      elsif args.length == 2
+                        args
+                      else
+                        [this, args.first]
+                      end
 
-        if !field && (origin = object.try.origin)
-          Hobo.can_edit?(current_user, origin, object.origin_attribute)
-        else
-          Hobo.can_edit?(current_user, object, field)
-        end
+      if !field && (origin = object.try.origin)
+        object, field = origin, object.origin_attribute
       end
+
+      object.editable_by?(current_user, field)
+    end
+    
+
+    def can_delete?(object=this)
+      object.destroyable_by?(current_user)
     end
 
 
-    def can_delete?(object=nil)
-      Hobo.can_delete?(current_user, object || this)
+    
+    def can_call?(*args)
+      method = args.last
+      object = args.length == 2 ? args.first : this
+
+      object.method_callable_by?(current_user, method)
     end
 
-
-    def can_view?(object=nil, field=nil)
-      if object.nil? && field.nil?
+    
+    # can_view? has special behaviour if it's passed a class or an
+    # association-proxy -- it instantiates the class, or creates a new
+    # instance "in" the association, and tests the permission of this
+    # object. This means the permission methods in models can't rely
+    # on the instance being properly initialised.  But it's important
+    # that it works like this because, in the case of an association
+    # proxy, we don't want to loose the information that the object
+    # belongs_to the proxy owner.
+    def can_view?(*args)
+      # TODO: Man does this need a big cleanup!
+      
+      if args.empty?
         if this_parent && this_field
-          object, field = this_parent, this_field
+          object = this_parent
+          field = this_field
         else
           object = this
         end
+      elsif args.first.is_a?(String, Symbol)
+        object = this
+        field  = args.first
+      else
+        object, field = args
       end
-
+      
+      if field
+        # Field can be a dot separated path
+        if field.is_a?(String) && (path = field.split(".")).length > 1
+          _, _, object = Hobo.get_field_path(object, path[0..-2])
+          field = path.last
+        end
+      elsif (origin = object.try.origin)
+        object, field = origin, object.origin_attribute
+      end
+      
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||=
-        if !field && (origin = object.try.origin)
-          Hobo.can_view?(current_user, origin, object.origin_attribute)
+        if object.viewable_by?(current_user, field)
+          # If possible, we also check if the current *value* of the field is viewable
+          if field && (v = object.send(field)) && v.respond_to?(:viewable_by?)
+            v.viewable_by?(current_user, nil)
+          else
+            true
+          end
         else
-          Hobo.can_view?(current_user, object, field)
+          false
         end
     end
+    
 
 
     def select_viewable(collection=this)

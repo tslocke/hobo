@@ -2,8 +2,8 @@ module Hobo
 
   module Scopes
 
-    def self.included_in_class(base)
-      base.extend(ClassMethods)
+    def self.included_in_class(klass)
+      klass.extend(ClassMethods)
     end
 
     module ClassMethods

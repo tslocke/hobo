@@ -37,20 +37,21 @@ class <%= class_name %> < ActiveRecord::Base
 
   # --- Permissions --- #
 
-  def creatable_by?(creator)
-    creator.administrator? || !administrator
+  def create_permitted?
+    acting_user.administrator? || !administrator
   end
 
-  def updatable_by?(updater, updated)
-    updater.administrator? ||
-      (updater == self && only_changed_fields?(updated, :password, :password_confirmation, :email_address))
+  def update_permitted?
+    acting_user.administrator? || (acting_user == self && only_changed?(:crypted_password, :email_address))
+    # Note: crypted_password has attr_protected so although it is permitted to change, it cannot be changed
+    # directly from a form submission.
   end
 
-  def deletable_by?(deleter)
-    deleter.administrator?
+  def destroy_permitted?
+    acting_user.administrator?
   end
 
-  def viewable_by?(viewer, field)
+  def view_permitted?(field)
     true
   end
 
