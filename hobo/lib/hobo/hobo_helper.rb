@@ -203,8 +203,6 @@ module Hobo
       case x
       when nil
         []
-      when Symbol
-        x.to_s
       when String
         x.strip.split(/\s*,\s*/)
       else
