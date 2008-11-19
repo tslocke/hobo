@@ -46,7 +46,8 @@ module Hobo
                    "#{RAILS_ROOT}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
                  end
 
-          filename = "#{base}/#{options[:src]}.dryml"
+          src = options[:src] || plugin
+          filename = "#{base}/#{src}.dryml"
           raise DrymlException, "No such taglib: #{base} #{options.inspect} #{filename}" unless File.exists?(filename)
           filename
         end
