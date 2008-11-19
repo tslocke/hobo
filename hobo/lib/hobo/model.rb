@@ -34,7 +34,7 @@ module Hobo
 
       class << base
         alias_method_chain :belongs_to,    :creator_metadata
-        alias_method_chain :belongs_to,    :target_is
+        alias_method_chain :belongs_to,    :test_methods
         alias_method_chain :attr_accessor, :creator_metadata
 
         alias_method_chain :has_one, :new_method
@@ -233,19 +233,25 @@ module Hobo
         belongs_to_without_creator_metadata(name, options, &block)
       end
 
-      def belongs_to_with_target_is(name, options={}, &block)
-        belongs_to_without_target_is(name, options, &block)
+      def belongs_to_with_test_methods(name, options={}, &block)
+        belongs_to_without_test_methods(name, options, &block)
         refl = reflections[name]
         if options[:polymorphic]
           class_eval %{
             def #{name}_is?(target)
               target.id == self.#{refl.primary_key_name} && target.class.name == self.#{refl.options[:foreign_type]}
             end
+            def #{name}_changed?
+              #{refl.primary_key_name}_changed? || #{refl.options[:foreign_type]}_changed?
+            end
           }
         else
           class_eval %{
             def #{name}_is?(target)
               target.id == self.#{refl.primary_key_name}
+            end
+            def #{name}_changed?
+              #{refl.primary_key_name}_changed?
             end
           }
         end
