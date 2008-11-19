@@ -124,9 +124,7 @@
 </def>
 
 <def tag="stylesheet" attrs="name">
-  <repeat with="&comma_split(name)">
-    <%= stylesheet_link_tag name, attributes %>
-  </repeat>
+  <%= stylesheet_link_tag *(comma_split(name) + [attributes]) %>
 </def>
 
 
