@@ -4,10 +4,9 @@
     <head param>
       <title param><%= strip_tags full_title %></title>
       <do param="stylesheets">
-        <stylesheet name="reset"/>
-        <stylesheet name="hobo-rapid"/>
+        <stylesheet name="reset, hobo-rapid"/>
         <theme-stylesheet/>
-        <stylesheet name="application"/>
+        <stylesheet name="application" param="app-stylesheet"/>
       </do>
 
       <do param="scripts">
