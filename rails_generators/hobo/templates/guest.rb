@@ -1,5 +1,9 @@
 class Guest < Hobo::Guest
 
+  def administrator?
+    false
+  end
+
   def can_update?(obj, field)
     false
   end
