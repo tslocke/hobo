@@ -102,7 +102,7 @@ module Hobo::Dryml
 
 
     def children_to_erb(nodes)
-      nodes.map{|x| node_to_erb(x)}.join
+      nodes.map { |x| node_to_erb(x) }.join
     end
 
 
