@@ -14,7 +14,8 @@
 </def>
 
 <def tag="nav-item">
-  <set body="&parameters.default"/>
+  <% body = parameters.default 
+     body = h(this.to_s) if body.blank? -%>
   <li class="#{'current' if (c = scope.current_navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
       merge-attrs="&attributes - attrs_for(:a)">
     <a merge-attrs="&attributes & attrs_for(:a)"><%= body %></a>
