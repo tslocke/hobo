@@ -16,14 +16,6 @@ module Hobo
       false
     end
 
-    def super_user?
-      false
-    end
-
-    def administrator?
-      false
-    end
-
     def login
       "guest"
     end
