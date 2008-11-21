@@ -18,6 +18,8 @@ module Hobo
         if defined? self::Lifecycle
           lifecycle = self::Lifecycle
         else
+          # First call
+          
           module_eval "class ::#{name}::Lifecycle < Hobo::Lifecycles::Lifecycle; end"
           lifecycle = self::Lifecycle
           lifecycle.init(self, options)
