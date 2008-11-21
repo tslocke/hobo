@@ -31,9 +31,9 @@ module Hobo
       end
 
 
-      def self.def_creator(name, who, on_create, options)
+      def self.def_creator(name, on_create, options)
         name = name.to_sym
-        returning(Creator.new(self, name, who, on_create, options)) do |creator|
+        returning(Creator.new(self, name, on_create, options)) do |creator|
 
           class_eval %{
                        def self.#{name}(user, attributes=nil)
@@ -47,11 +47,11 @@ module Hobo
        end
       end
 
-      def self.def_transition(name, who, start_state, end_states, on_transition, options)
-        returning(Transition.new(self, name.to_s, who, start_state, end_states, on_transition, options)) do |t|
+      def self.def_transition(name, start_state, end_states, on_transition, options)
+        returning(Transition.new(self, name.to_s, start_state, end_states, on_transition, options)) do |t|
 
           class_eval %{
-                       def #{name}(user, attributes=nil)
+                       def #{name}!(user, attributes=nil)
                          transition(:#{name}, user, attributes)
                        end
                        def can_#{name}?(user, attributes=nil)
@@ -65,6 +65,23 @@ module Hobo
       def self.state_names
         states.keys
       end
+      
+      def self.publishable_creators
+        creators.values.where.publishable?
+      end
+      
+      def self.publishable_transitions
+        transitions.where.publishable?
+      end
+      
+      def self.step_names 
+        (creators.keys | transitions.*.name).uniq
+      end
+      
+      
+      def self.creator(name)
+        creators[name.to_sym] or raise ArgumentError, "No such creator in lifecycle: #{name}"
+      end
 
 
       def self.can_create?(name, user, attributes=nil)
@@ -75,16 +92,6 @@ module Hobo
       def self.create(name, user, attributes=nil)
         creator = creators[name.to_sym]
         creator.run!(user, attributes)
-      end
-
-
-      def self.creator_names
-        creators.keys
-      end
-
-
-      def self.transition_names
-        transitions.*.name.uniq
       end
 
 
@@ -110,15 +117,14 @@ module Hobo
       end
 
 
-      def transition(name, user, attributes=nil)
-        transition = find_transition(name, user, attributes)
+      def transition(name, user, attributes)
+        transition = find_transition(name, user)
         transition.run!(record, user, attributes)
       end
 
 
-      def find_transition(name, user, attributes=nil)
-        available_transitions_for(user, name, attributes).first or
-          raise LifecycleError, "No #{name} transition available to #{user} on this #{record.class.name}"
+      def find_transition(name, user)
+        available_transitions_for(user, name).first
       end
 
 
@@ -137,12 +143,12 @@ module Hobo
       end
 
 
-      def available_transitions_for(user, name=nil, attributes=nil)
+      def available_transitions_for(user, name=nil)
         name = name.to_sym if name
         matches = available_transitions
         matches = matches.select { |t| t.name == name } if name
         record.with_acting_user(user) do
-          matches.select { |t| t.allowed?(record, attributes) }
+          matches.select { |t| t.can_run?(record) }
         end
       end
 
@@ -157,6 +163,7 @@ module Hobo
         else
           s = self.class.states[state_name]
           raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
+          
           if record.save(validate)
             s.activate! record
             self.active_step = nil # That's the end of this step
@@ -166,7 +173,7 @@ module Hobo
           end
         end
       end
-      
+            
       
       def key_timestamp_field
         record.class::Lifecycle.options[:key_timestamp_field]

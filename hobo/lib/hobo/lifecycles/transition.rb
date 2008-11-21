@@ -2,7 +2,7 @@ module Hobo
 
   module Lifecycles
 
-    class Transition < Struct.new(:lifecycle, :name, :who, :start_states, :end_state, :on_transition, :options)
+    class Transition < Struct.new(:lifecycle, :name, :start_states, :end_state, :on_transition, :options)
 
       include Actions
 
@@ -24,22 +24,27 @@ module Hobo
       end
 
 
-      def allowed?(record, attributes=nil)
-        prepare_and_check!(record, attributes) && true
-      end
-
-
       def extract_attributes(attributes)
         update_attributes = options.fetch(:update, [])
         attributes & update_attributes
       end
+        
+      
+      def change_state(record)
+        record.lifecycle.become(get_state(record, end_state))
+      end
 
 
       def run!(record, user, attributes)
+        current_state = record.lifecycle.state_name
+        unless start_states.include?(current_state)
+          raise Hobo::Lifecycles::LifecycleError "Transition #{record.class}##{name} cannot be run from the '#{current_state}' state"
+        end
         record.lifecycle.active_step = self
         record.with_acting_user(user) do
-          if prepare_and_check!(record, attributes)
-            if record.lifecycle.become end_state
+          prepare!(record, attributes)
+          if can_run?(record)
+            if change_state(record)
               fire_event(record, on_transition)
             end
           else
@@ -47,16 +52,6 @@ module Hobo
           end
         end
       end
-
-
-      def set_or_check_who_with_key!(record)
-        if who == :with_key
-          record.lifecycle.valid_key? or raise LifecycleKeyError
-        else
-          set_or_check_who_without_key!(record)
-        end
-      end
-      alias_method_chain :set_or_check_who!, :key
 
 
       def parameters

@@ -174,21 +174,23 @@ module Hobo
 
       def def_lifecycle_actions
         if model.has_lifecycle?
-          model::Lifecycle.creator_names.each do |creator|
-            def_auto_action creator do
-              creator_page_action creator
+          model::Lifecycle.publishable_creators.each do |creator|
+            name = creator.name
+            def_auto_action name do
+              creator_page_action name
             end
-            def_auto_action "do_#{creator}" do
-              do_creator_action creator
+            def_auto_action "do_#{name}" do
+              do_creator_action name
             end
           end
 
-          model::Lifecycle.transition_names.each do |transition|
-            def_auto_action transition do
-              transition_page_action transition
+          model::Lifecycle.publishable_transitions.each do |transition|
+            name = transition.name
+            def_auto_action name do
+              transition_page_action name
             end
-            def_auto_action "do_#{transition}" do
-              do_transition_action transition
+            def_auto_action "do_#{name}" do
+              do_transition_action name
             end
           end
         end
@@ -310,8 +312,8 @@ module Hobo
         # GET users/signup, and would show the form, while 'do_signup'
         # would be routed to POST /users/signup)
         if model.has_lifecycle?
-          (model::Lifecycle.creator_names.map { |c| [c, "do_#{c}"] } +
-           model::Lifecycle.transition_names.map { |t| [t, "do_#{t}"] }).flatten.*.to_sym
+          (model::Lifecycle.publishable_creators.map { |c| [c.name, "do_#{c.name}"] } +
+           model::Lifecycle.publishable_transitions.map { |t| [t.name, "do_#{t.name}"] }).flatten.*.to_sym
         else
           []
         end
@@ -609,8 +611,16 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
+    def creator_page_action(name)
+      self.this = model.new
+      this.exempt_from_edit_checks = true
+      @creator = model::Lifecycle.creator(name)
+      raise Hobo::Model::PermissionDeniedError unless @creator.allowed?(current_user)
+    end
+
+
     def do_creator_action(name, options={}, &b)
-      @creator = model::Lifecycle.creators[name.to_sym]
+      @creator = model::Lifecycle.creator(name)
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
@@ -622,26 +632,24 @@ module Hobo
     end
 
 
-    def creator_page_action(name)
-      self.this = model.new
-      this.exempt_from_edit_checks = true
-      @creator = model::Lifecycle.creators[name.to_sym] or raise ArgumentError, "No such creator in lifecycle: #{name}"
-    end
-
-
-    def prepare_for_transition(name, options={})
+    def prepare_transition(name)
       self.this = find_instance do |record|
         # The block allows us to perform actions on the records before the permission check
         record.exempt_from_edit_checks = true
         record.lifecycle.provided_key = params[:key]
       end
-      @transition = this.lifecycle.find_transition(name, current_user)
+      this.lifecycle.find_transition(name, current_user) or raise Hobo::Model::PermissionDeniedError
+    end
+
+
+    def transition_page_action(name)
+      @transition = prepare_transition(name)
     end
 
 
     def do_transition_action(name, *args, &b)
       options = args.extract_options!
-      prepare_for_transition(name)
+      @transition = prepare_transition(name)
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
@@ -651,11 +659,6 @@ module Hobo
         end
     end
 
-
-    def transition_page_action(name, *args)
-      options = args.extract_options!
-      prepare_for_transition(name, options)
-    end
 
     # --- Miscelaneous Actions --- #
 
