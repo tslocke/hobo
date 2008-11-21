@@ -45,6 +45,33 @@ module Hobo
       def self.has_lifecycle?
         defined?(self::Lifecycle)
       end
+      
+      
+      def self.validation_method_with_lifecycles(on)
+        if has_lifecycle? && self::Lifecycle.step_names.include?(on)
+          callback = :"validate_on_#{on}"
+          
+          # define these lifecycle validation callbacks on demand
+          define_callbacks callback unless respond_to? :callback
+          
+          :"validate_on_#{on}"
+        else
+          validation_method_without_lifecycles(on)
+        end
+      end
+      metaclass.alias_method_chain :validation_method, :lifecycles
+      
+      
+      def valid_with_lifecycles?
+        valid_without_lifecycles?
+        
+        if has_lifecycle? && (step = lifecycle.active_step) && respond_to?(cb = "validate_on_#{step.name}")
+          run_callbacks cb
+        end
+
+        errors.empty?
+      end
+      alias_method_chain :valid?, :lifecycles
 
 
       def lifecycle
