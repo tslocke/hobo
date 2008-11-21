@@ -34,7 +34,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
   
 
-  # --- Hobo Permissions --- #
+  # --- Permissions --- #
 
   def creatable_by?(creator)
     creator.administrator? || !administrator
