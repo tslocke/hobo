@@ -65,7 +65,7 @@ module Hobo
       def valid_with_lifecycles?
         valid_without_lifecycles?
         
-        if has_lifecycle? && (step = lifecycle.active_step) && respond_to?(cb = "validate_on_#{step.name}")
+        if self.class.has_lifecycle? && (step = lifecycle.active_step) && respond_to?(cb = "validate_on_#{step.name}")
           run_callbacks cb
         end
 
@@ -87,7 +87,9 @@ module Hobo
         @lifecycle = lifecycle
       end
 
-      def state(*names, options={}, &block)
+      def state(*args, &block)
+        options = args.extract_options!
+        names = args
         states = names.map {|name| @lifecycle.def_state(name, block) }
         if options[:default]
           raise ArgumentError, "you must define one state if you give the :default option" unless states.length == 1
@@ -95,12 +97,12 @@ module Hobo
         end
       end
 
-      def create(who, name, options={}, &block)
-        @lifecycle.def_creator(name, who, block, options)
+      def create(name, options={}, &block)
+        @lifecycle.def_creator(name, block, options)
       end
 
-      def transition(who, name, change, options={}, &block)
-        @lifecycle.def_transition(name, who,
+      def transition(name, change, options={}, &block)
+        @lifecycle.def_transition(name,
                                   Array(change.keys.first), change.values.first,
                                   block, options)
       end

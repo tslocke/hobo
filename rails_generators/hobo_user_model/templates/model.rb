@@ -20,16 +20,17 @@ class <%= class_name %> < ActiveRecord::Base
 
     state :active, :default => true
 
-    create :anybody, :signup, 
+    create :signup, :available_to => "Hobo::Guest",
            :params => [:username, :email_address, :password, :password_confirmation],
-           :become => :active, :if => proc {|r| r.acting_user.guest?}
+           :become => :active
 
-    transition :nobody, :request_password_reset, { :active => :active }, :new_key => true do
+    transition :request_password_reset, { :active => :active }, :new_key => true do
       <%= class_name %>Mailer.deliver_forgot_password(self, lifecycle.key)
     end
 
-    transition :with_key, :reset_password, { :active => :active }, 
+    transition :reset_password, { :active => :active }, :available_to => :key_holder,
                :update => [ :password, :password_confirmation ]
+               
 
   end
   
