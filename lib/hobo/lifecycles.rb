@@ -30,11 +30,15 @@ module Hobo
 
         default = lifecycle.default_state ? { :default => lifecycle.default_state.name } : {}
         declare_field(options[:state_field], :string, default)
+        never_show      options[:state_field]
+        attr_protected  options[:state_field]
 
-        declare_field(options[:key_timestamp_field], :datetime)
-
-        never_show      options[:state_field], options[:key_timestamp_field]
-        attr_protected  options[:state_field], options[:key_timestamp_field]
+        unless options[:key_timestamp_field] == false
+          declare_field(options[:key_timestamp_field], :datetime)
+          never_show      options[:key_timestamp_field]
+          attr_protected  options[:key_timestamp_field]
+        end
+        
       end
 
 
