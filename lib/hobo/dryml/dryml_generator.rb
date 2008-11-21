@@ -213,7 +213,7 @@ module Hobo
       end
       
       def transition_names
-        transitions.map { |t| t.name.to_s }
+        transitions.map { |t| t.name.to_s }.uniq
       end
       
       
