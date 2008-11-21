@@ -18,7 +18,7 @@ class <%= class_name %> < ActiveRecord::Base
 
   lifecycle do
 
-    initial_state :active
+    state :active, :default => true
 
     create :anybody, :signup, 
            :params => [:username, :email_address, :password, :password_confirmation],

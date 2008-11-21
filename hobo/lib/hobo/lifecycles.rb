@@ -28,7 +28,7 @@ module Hobo
         dsl = DeclarationDSL.new(lifecycle)
         dsl.instance_eval(&block)
 
-        default = lifecycle.initial_state ? { :default => lifecycle.initial_state.name } : {}
+        default = lifecycle.default_state ? { :default => lifecycle.default_state.name } : {}
         declare_field(options[:state_field], :string, default)
 
         declare_field(options[:key_timestamp_field], :datetime)
@@ -56,13 +56,12 @@ module Hobo
         @lifecycle = lifecycle
       end
 
-      def state(*names, &block)
-        names.map {|name| @lifecycle.def_state(name, block) }
-      end
-
-      def initial_state(name, &block)
-        s = @lifecycle.def_state(name, block)
-        @lifecycle.initial_state = s
+      def state(*names, options={}, &block)
+        states = names.map {|name| @lifecycle.def_state(name, block) }
+        if options[:default]
+          raise ArgumentError, "you must define one state if you give the :default option" unless states.length == 1
+          @lifecycle.default_state = states.first
+        end
       end
 
       def create(who, name, options={}, &block)
