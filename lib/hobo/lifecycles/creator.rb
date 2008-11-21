@@ -11,16 +11,6 @@ module Hobo
 
       include Actions
 
-      def check_preconditions(record)
-        record.lifecycle.preconditions_satisfied?
-      end
-
-
-      def prepare_and_check_with_preconditions!(record, attributes=nil)
-        prepare_and_check_without_preconditions!(record, attributes) && check_preconditions(record)
-      end
-      alias_method_chain :prepare_and_check!, :preconditions
-
 
       def allowed?(user, attributes=nil)
         record = lifecycle.model.new
