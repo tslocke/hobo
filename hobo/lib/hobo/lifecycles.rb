@@ -78,10 +78,6 @@ module Hobo
         @lifecycle.invariants << block
       end
 
-      def precondition(&block)
-        @lifecycle.preconditions << block
-      end
-
     end
 
   end

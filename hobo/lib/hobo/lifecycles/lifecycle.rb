@@ -14,13 +14,12 @@ module Hobo
         @states        = {}
         @creators      = {}
         @transitions   = []
-        @preconditions = []
         @invariants    = []
       end
 
       class << self
         attr_accessor :model, :options, :states, :default_state,
-                      :creators, :transitions, :invariants, :preconditions
+                      :creators, :transitions, :invariants
       end
 
       def self.def_state(name, on_enter)
@@ -203,10 +202,6 @@ module Hobo
       end
 
 
-      def preconditions_satisfied?
-        self.class.preconditions.all? { |i| record.instance_eval(&i) }
-      end
-      
       def active_step_is?(name)
         active_step && active_step.name == name.to_sym
       end
