@@ -19,7 +19,7 @@ module Hobo
       end
 
       class << self
-        attr_accessor :model, :options, :states, :initial_state,
+        attr_accessor :model, :options, :states, :default_state,
                       :creators, :transitions, :invariants, :preconditions
       end
 
