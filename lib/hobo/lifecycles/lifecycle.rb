@@ -40,7 +40,7 @@ module Hobo
                          create(:#{name}, user, attributes)
                        end
                        def self.can_#{name}?(user, attributes=nil)
-                         can_create?(:#{name}, user, attributes)
+                         can_create?(:#{name}, user)
                        end
                       }
 
@@ -55,7 +55,7 @@ module Hobo
                          transition(:#{name}, user, attributes)
                        end
                        def can_#{name}?(user, attributes=nil)
-                         can_transition?(:#{name}, user, attributes)
+                         can_transition?(:#{name}, user)
                        end
                       }
 
