@@ -84,8 +84,8 @@ module Hobo
       end
 
 
-      def self.can_create?(name, user, attributes=nil)
-        creators[name.to_sym].allowed?(user, attributes)
+      def self.can_create?(name, user)
+        creators[name.to_sym].allowed?(user)
       end
 
 
@@ -112,8 +112,8 @@ module Hobo
       end
 
 
-      def can_transition?(name, user, attributes=nil)
-        available_transitions_for(user, name, attributes).any?
+      def can_transition?(name, user)
+        available_transitions_for(user, name).any?
       end
 
 
