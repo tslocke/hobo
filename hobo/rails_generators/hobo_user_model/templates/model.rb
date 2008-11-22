@@ -20,7 +20,7 @@ class <%= class_name %> < ActiveRecord::Base
 
     state :active, :default => true
 
-    create :signup, :available_to => "Hobo::Guest",
+    create :signup, :available_to => "Guest",
            :params => [:username, :email_address, :password, :password_confirmation],
            :become => :active
 
