@@ -38,7 +38,7 @@ module Hobo
       def run!(record, user, attributes)
         current_state = record.lifecycle.state_name
         unless start_states.include?(current_state)
-          raise Hobo::Lifecycles::LifecycleError "Transition #{record.class}##{name} cannot be run from the '#{current_state}' state"
+          raise Hobo::Lifecycles::LifecycleError, "Transition #{record.class}##{name} cannot be run from the '#{current_state}' state"
         end
         record.lifecycle.active_step = self
         record.with_acting_user(user) do

@@ -28,7 +28,7 @@ module Hobo
         dsl = DeclarationDSL.new(lifecycle)
         dsl.instance_eval(&block)
 
-        default = lifecycle.default_state ? { :default => lifecycle.default_state.name } : {}
+        default = lifecycle.default_state ? { :default => lifecycle.default_state.name.to_s } : {}
         declare_field(options[:state_field], :string, default)
         never_show      options[:state_field]
         attr_protected  options[:state_field]

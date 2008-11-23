@@ -1,3 +1,10 @@
+# We need to be able to eval an expression outside of the Hobo module
+# so that, e.g. "Userd" doesn't eval to "Hobo::User"
+# (Ruby determines this constant lookup scope lexically)
+def __top_level_eval__(obj, expr)
+  obj.instance_eval(expr)
+end
+  
 module Hobo
 
   module Lifecycles
@@ -52,7 +59,7 @@ module Hobo
         when Symbol
           record.send(hook, *args)
         when String
-          eval(hook, record.instance_eval { binding })
+          __top_level_eval__(record, hook)
         when Proc
           if hook.arity == 1
             hook.call(record)
@@ -76,7 +83,7 @@ module Hobo
 
       def guard_ok?(record)
         if options[:if]
-          raise ArgumentError "do not provide both :if and :unless to lifecycle steps" if options[:unless]
+          raise ArgumentError, "do not provide both :if and :unless to lifecycle steps" if options[:unless]
           run_hook(record, options[:if])
         elsif options[:unless]
           !run_hook(record, options[:unless])
