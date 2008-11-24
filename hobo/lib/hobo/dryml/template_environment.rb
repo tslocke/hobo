@@ -1,7 +1,7 @@
 module Hobo::Dryml
 
   class TemplateEnvironment
-
+    
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
@@ -22,10 +22,9 @@ module Hobo::Dryml
       alias_method :delayed_alias_method_chain, :alias_method_chain
 
     end
+    
+    include ActionView::Helpers
 
-    for mod in ActionView::Helpers.constants.grep(/Helper$/).map {|m| ActionView::Helpers.const_get(m)}
-      include mod
-    end
 
     def initialize(view_name=nil, view=nil)
       unless view_name.nil? && view.nil?

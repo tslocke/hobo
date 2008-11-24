@@ -1,21 +1,27 @@
 module Hobo::Dryml
 
   class TemplateHandler < ActionView::TemplateHandler
-
+    
+    def compile(*args)
+      # Ignore - we handle compilation ourselves
+    end
+    
+    # Pre Rails 2.2
     def render(template)
-      renderer = Hobo::Dryml.page_renderer_for_template(@view, template)
+      renderer = Hobo::Dryml.page_renderer_for_template(@view, template.locals.keys, template)
       this = @view.instance_variable_set("@this", @view.controller.send(:dryml_context) || template.locals[:this])
       s = renderer.render_page(this, template.locals)
+      # Important to strip whitespace, or the browser hangs around for ages (FF2)
+      s.strip
+    end
+    
+    def render_for_rails22(template, view, local_assigns)
+      renderer = Hobo::Dryml.page_renderer_for_template(view, local_assigns.keys, template)
+      this = @view.instance_variable_set("@this", view.controller.send(:dryml_context) || local_assigns[:this])
+      s = renderer.render_page(this, local_assigns)
 
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
-      s = s.strip
-
-      # TODO: Temporary hack to get the dryml metadata comments in the right place
-      if RAILS_ENV == "development"
-        s.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
-      else
-        s
-      end
+      s.strip
     end
 
   end
@@ -73,3 +79,17 @@ module ActionController
 
   end
 end
+
+class ActionView::Template
+  
+  def render_with_dryml(view, local_assigns = {})
+    if handler == Hobo::Dryml::TemplateHandler
+      Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
+    else
+      render_without_dryml(view, local_assigns)
+    end
+  end
+  alias_method_chain :render, :dryml if Rails::VERSION::MAJOR >= 2 && Rails::VERSION::MINOR >= 2
+  
+end  
+    

@@ -62,7 +62,13 @@ module Hobo::Dryml
       # Strip off "_erbout = ''" from the beginning and "; _erbout"
       # from the end, because we do things differently around
       # here. (_erbout is defined as a method)
-      ERB.new(erb_src, nil, ActionView::Base.erb_trim_mode).src[("_erbout = '';").length..-("; _erbout".length)]
+      trim_mode = if defined?(ActionView::TemplateHandlers::ERB.erb_trim_mode)
+                    ActionView::TemplateHandlers::ERB.erb_trim_mode
+                  else
+                    ActionView::Base.erb_trim_mode
+                  end
+      
+      ERB.new(erb_src, nil, trim_mode).src[("_erbout = '';").length..-("; _erbout".length)]
     end
 
 
