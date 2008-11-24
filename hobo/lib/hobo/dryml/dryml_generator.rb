@@ -201,11 +201,11 @@ module Hobo
       
       
       def creators
-        defined?(model::Lifecycle) ? model::Lifecycle.creators.values.where.publishable? : []
+        defined?(model::Lifecycle) ? model::Lifecycle.publishable_creators : []
       end
       
       def transitions
-        defined?(model::Lifecycle) ? model::Lifecycle.transitions.where.publishable? : []
+        defined?(model::Lifecycle) ? model::Lifecycle.publishable_transitions : []
       end
             
       def creator_names
@@ -213,7 +213,7 @@ module Hobo
       end
       
       def transition_names
-        transitions.map { |t| t.name.to_s }
+        transitions.map { |t| t.name.to_s }.uniq
       end
       
       

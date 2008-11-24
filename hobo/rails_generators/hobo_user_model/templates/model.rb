@@ -18,23 +18,24 @@ class <%= class_name %> < ActiveRecord::Base
 
   lifecycle do
 
-    initial_state :active
+    state :active, :default => true
 
-    create :anybody, :signup, 
+    create :signup, :available_to => "Guest",
            :params => [:username, :email_address, :password, :password_confirmation],
-           :become => :active, :if => proc {|r| r.acting_user.guest?}
+           :become => :active
 
-    transition :nobody, :request_password_reset, { :active => :active }, :new_key => true do
+    transition :request_password_reset, { :active => :active }, :new_key => true do
       <%= class_name %>Mailer.deliver_forgot_password(self, lifecycle.key)
     end
 
-    transition :with_key, :reset_password, { :active => :active }, 
+    transition :reset_password, { :active => :active }, :available_to => :key_holder,
                :update => [ :password, :password_confirmation ]
+               
 
   end
   
 
-  # --- Hobo Permissions --- #
+  # --- Permissions --- #
 
   def creatable_by?(creator)
     creator.administrator? || !administrator

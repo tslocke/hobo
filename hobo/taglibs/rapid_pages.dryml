@@ -4,10 +4,9 @@
     <head param>
       <title param><%= strip_tags full_title %></title>
       <do param="stylesheets">
-        <stylesheet name="reset"/>
-        <stylesheet name="hobo-rapid"/>
+        <stylesheet name="reset, hobo-rapid"/>
         <theme-stylesheet/>
-        <stylesheet name="application"/>
+        <stylesheet name="application" param="app-stylesheet"/>
       </do>
 
       <do param="scripts">
@@ -124,9 +123,7 @@
 </def>
 
 <def tag="stylesheet" attrs="name">
-  <repeat with="&comma_split(name)">
-    <%= stylesheet_link_tag name, attributes %>
-  </repeat>
+  <%= stylesheet_link_tag *(comma_split(name) + [attributes]) %>
 </def>
 
 

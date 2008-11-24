@@ -115,7 +115,7 @@ module Hobo
       if request.post?
         user = model.find_by_email_address(params[:email_address])
         if user && (!block_given? || yield(user))
-          user.lifecycle.request_password_reset(:nobody)
+          user.lifecycle.request_password_reset!(:nobody)
         end
         render_tag :forgot_password_email_sent_page
       end
