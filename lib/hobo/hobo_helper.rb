@@ -31,7 +31,7 @@ module Hobo
 
 
     def base_url
-      request.relative_url_root
+      request.try.relative_url_root || ActionController::Base.relative_url_root
     end
 
 
