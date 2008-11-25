@@ -15,11 +15,6 @@ module Hobo
           raise ArgumentError, "No such state '#{from}' in #{'name'} transition (#{lifecycle.model.name})" unless state
           state.transitions_out << self
         end
-        unless end_state.to_s == "destroy"
-          state = lifecycle.states[end_state]
-          raise ArgumentError, "No such state '#{end_state}' in '#{name}' transition (#{lifecycle.model.name})" unless state
-          state.transitions_in << self
-        end
         lifecycle.transitions << self
       end
 
