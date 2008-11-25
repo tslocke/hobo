@@ -12,7 +12,7 @@ module Hobo
         self.name = name.to_sym
         start_states.each do |from|
           state = lifecycle.states[from]
-          raise ArgumentError, "No such state '#{from}' in #{'name'} transition (#{lifecycle.model.name})" unless state
+          raise ArgumentError, "No such state '#{from}' in #{name} transition (#{lifecycle.model.name})" unless state
           state.transitions_out << self
         end
         lifecycle.transitions << self
