@@ -2,13 +2,12 @@ module Hobo
 
   module Lifecycles
 
-    class State < Struct.new(:name, :on_enter, :transitions_in, :transitions_out)
+    class State < Struct.new(:name, :on_enter, :transitions_out)
 
       include Actions
 
       def initialize(*args)
         super
-        self.transitions_in  = []
         self.transitions_out = []
       end
 
