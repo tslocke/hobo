@@ -64,6 +64,8 @@ module Hobo
 
 
     def page_renderer(view, local_names=[], page=nil, filename=nil)
+      filename ||= view._pick_template(page + ".dryml")
+
       if RAILS_ENV == "development"
         clear_cache
         Taglib.clear_cache
