@@ -49,7 +49,7 @@ executed at various points in the ajax request cycle:
             hiddens = case fields
                       when '*', nil
                         # TODO: Need a better (i.e. extensible) way to eleminate certain fields
-                        this.class.column_names - ['type', 'created_at', 'updated_at'] - comma_split(skip)
+                        this.class.column_names - ['type', 'created_at', 'updated_at']
                       else
                         comma_split(fields)
                       end
@@ -61,6 +61,8 @@ executed at various points in the ajax request cycle:
                                        (this.new_record? && val == this.class.column(field).default)
             end.compact
           end
+  skip = comma_split skip
+  pairs.reject! { |p| p.first.in?(skip) }
   pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.join("\n")
 %></def>
 
