@@ -632,24 +632,26 @@ module Hobo
     end
 
 
-    def prepare_transition(name)
+    def prepare_transition(name, options)
+      key = options.delete(:key) || params[:key]
+      
       self.this = find_instance do |record|
         # The block allows us to perform actions on the records before the permission check
         record.exempt_from_edit_checks = true
-        record.lifecycle.provided_key = params[:key]
+        record.lifecycle.provided_key = key
       end
       this.lifecycle.find_transition(name, current_user) or raise Hobo::Model::PermissionDeniedError
     end
 
 
-    def transition_page_action(name)
-      @transition = prepare_transition(name)
+    def transition_page_action(name, options={})
+      @transition = prepare_transition(name, options)
     end
 
 
     def do_transition_action(name, *args, &b)
       options = args.extract_options!
-      @transition = prepare_transition(name)
+      @transition = prepare_transition(name, options)
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?

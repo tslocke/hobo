@@ -64,6 +64,8 @@ module Hobo
 
 
     def page_renderer(view, local_names=[], page=nil, filename=nil)
+      filename ||= view._pick_template(page + ".dryml")
+
       if RAILS_ENV == "development"
         clear_cache
         Taglib.clear_cache
@@ -83,8 +85,8 @@ module Hobo
         renderer_class = @renderer_classes[page]
 
         # do we need to recompile?
-        if (!renderer_class or                                          # nothing cached?
-            (local_names - renderer_class.compiled_local_names).any? or # any new local names?
+        if (!renderer_class ||                                          # nothing cached?
+            (local_names - renderer_class.compiled_local_names).any? || # any new local names?
             renderer_class.load_time < mtime)                           # cache out of date?
           renderer_class = make_renderer_class(File.read(filename), filename, local_names,
                                                DEFAULT_IMPORTS, included_taglibs)
