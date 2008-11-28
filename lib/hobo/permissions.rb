@@ -9,15 +9,28 @@ module Hobo
     def self.included(klass)
       klass.extend ClassMethods
       
+      create_with_callbacks  = find_aliased_name klass, :create_with_callbacks
+      update_with_callbacks  = find_aliased_name klass, :update_with_callbacks
+      destroy_with_callbacks = find_aliased_name klass, :destroy_with_callbacks
+      
       klass.class_eval do
-        alias_method_chain :create,  :hobo_permission_check
-        alias_method_chain :update,  :hobo_permission_check
-        alias_method_chain :destroy, :hobo_permission_check
+        alias_method create_with_callbacks,  :create_with_callbacks_with_hobo_permission_check
+        alias_method update_with_callbacks,  :update_with_callbacks_with_hobo_permission_check
+        alias_method destroy_with_callbacks, :destroy_with_callbacks_with_hobo_permission_check
 
         attr_accessor :acting_user, :origin, :origin_attribute
 
         bool_attr_accessor :exempt_from_edit_checks
       end
+    end
+    
+    def self.find_aliased_name(klass, method_name)
+      # The method +method_name+ will have been aliased. We jump through some hoops to figure out
+      # what it's new name is
+      method_name = method_name.to_s
+      method = klass.instance_method method_name
+      methods = klass.private_instance_methods + klass.instance_methods
+      new_name = methods.select {|m| klass.instance_method(m) == method }.find { |m| m != method_name }
     end
     
     module ClassMethods
@@ -68,20 +81,29 @@ module Hobo
     
     
     # --- Hook ActiveRecord CRUD actions --- #
-    
-    def create_with_hobo_permission_check(*args)
+        
+    def create_with_callbacks_with_hobo_permission_check(*args)
+      return false if callback(:before_create) == false
       raise PermissionDeniedError, "#{self.class.name}#create" if acting_user && !create_permitted?
-      create_without_hobo_permission_check(*args)
+      result = create_without_callbacks
+      callback(:after_create)
+      result
     end
 
-    def update_with_hobo_permission_check(*args)
+    def update_with_callbacks_with_hobo_permission_check(*args)
+      return false if callback(:before_update) == false
       raise PermissionDeniedError, "#{self.class.name}#update" if acting_user && !update_permitted?
-      update_without_hobo_permission_check(*args)
+      result = update_without_callbacks(*args)
+      callback(:after_update)
+      result
     end
 
-    def destroy_with_hobo_permission_check
+    def destroy_with_callbacks_with_hobo_permission_check
+      return false if callback(:before_destroy) == false
       raise PermissionDeniedError, "#{self.class.name}#.destroy" if acting_user && !destroy_permitted?
-      destroy_without_hobo_permission_check
+      result = destroy_without_callbacks
+      callback(:after_destroy)
+      result
     end
     
     # -------------------------------------- #
