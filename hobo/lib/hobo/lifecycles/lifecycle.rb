@@ -57,6 +57,9 @@ module Hobo
                        def can_#{name}?(user, attributes=nil)
                          can_transition?(:#{name}, user)
                        end
+                       def valid_for_#{name}?
+                         valid_for_transition?(:#{name})
+                       end
                       }
 
         end
@@ -125,6 +128,13 @@ module Hobo
 
       def find_transition(name, user)
         available_transitions_for(user, name).first
+      end
+      
+      
+      def valid_for_transition?(name)
+        record.valid?
+        run_callbacks(:"validate_on_#{name}")
+        errors.empty?
       end
 
 
