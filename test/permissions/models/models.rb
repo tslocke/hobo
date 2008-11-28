@@ -125,7 +125,7 @@ module Models
       has_many :requests
       
       lifecycle do
-        initial_state :active
+        state :active, :default => true
       end
     end
     
