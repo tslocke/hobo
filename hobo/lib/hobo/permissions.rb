@@ -21,6 +21,8 @@ module Hobo
         attr_accessor :acting_user, :origin, :origin_attribute
 
         bool_attr_accessor :exempt_from_edit_checks
+        
+        define_callbacks :after_user_new
       end
     end
     
@@ -48,6 +50,7 @@ module Hobo
           r.set_creator user
           yield r if block_given? 
           r.user_view(user)
+          r.send :callback, :after_user_new
         end
       end
 
