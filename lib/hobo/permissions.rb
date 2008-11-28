@@ -84,10 +84,20 @@ module Hobo
     
     
     # --- Hook ActiveRecord CRUD actions --- #
+    
+    
+    def permission_check_required?
+      # Lifecycle steps are exempt from permission checks
+      acting_user && !(self.class.has_lifecycle? && lifecyle.actve_step)
+    end
         
     def create_with_callbacks_with_hobo_permission_check(*args)
       return false if callback(:before_create) == false
-      raise PermissionDeniedError, "#{self.class.name}#create" if acting_user && !create_permitted?
+      
+      if permission_check_required?
+        create_permitted? or raise PermissionDeniedError, "#{self.class.name}#create"
+      end
+      
       result = create_without_callbacks
       callback(:after_create)
       result
@@ -95,7 +105,11 @@ module Hobo
 
     def update_with_callbacks_with_hobo_permission_check(*args)
       return false if callback(:before_update) == false
-      raise PermissionDeniedError, "#{self.class.name}#update" if acting_user && !update_permitted?
+      
+      if permission_check_required?
+        update_permitted? or raise PermissionDeniedError, "#{self.class.name}#update"
+      end
+      
       result = update_without_callbacks(*args)
       callback(:after_update)
       result
@@ -103,7 +117,11 @@ module Hobo
 
     def destroy_with_callbacks_with_hobo_permission_check
       return false if callback(:before_destroy) == false
-      raise PermissionDeniedError, "#{self.class.name}#.destroy" if acting_user && !destroy_permitted?
+      
+      if permission_check_required?
+        destroy_permitted? or raise PermissionDeniedError, "#{self.class.name}#.destroy"
+      end
+      
       result = destroy_without_callbacks
       callback(:after_destroy)
       result
