@@ -581,10 +581,8 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
    
-  options ||= begin
-    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-    this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
-  end
+  options ||= this_field_reflection.klass.all(:conditions => this.conditions).select {|x| can_view?(x)}
+
   select_options = options.map { |x| [x.to_s, x.id ] }
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
