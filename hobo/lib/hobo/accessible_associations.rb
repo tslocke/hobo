@@ -18,7 +18,7 @@ module Hobo
     def find_or_create_and_update(owner, association, association_name, record_hash_or_string)
       if record_hash_or_string.is_a?(String)
         # An ID (if it starts '@') or else a name
-        record = find_record(association.member_class, record_hash_or_string)
+        record = find_record(association, record_hash_or_string)
       
       elsif record_hash_or_string.is_a?(Hash)
         # A hash of attributes
@@ -54,16 +54,17 @@ module Hobo
     end
     
 
-    def find_record(klass, id_or_name)
-      if id_or_name.starts_with?('@')
-        id_or_name = id_or_name[1..-1] # get rid of the '@'
-        if id_or_name =~ /:/
-          Hobo::Model.find_by_typed_id(id_or_name[1..-1])
+    def find_record(association, id_or_name)
+      klass = association.member_class
+      if id_or_name =~ /^@(.*)/
+        id = $1
+        if id =~ /:/
+          Hobo::Model.find_by_typed_id(id)
         else
-          klass.find(id_or_name)
+          klass.find(id)
         end
       else
-        klass.named(id_or_name)
+        klass.named(id_or_name, :conditions => association.conditions)
       end
     end
   
