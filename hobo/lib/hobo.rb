@@ -10,7 +10,7 @@ end
 # Temporary hack so Hobo runs in Rails 2.1
 ActiveSupport::Dependencies = Dependencies unless defined? ActiveSupport::Dependencies
 
-ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__), "#{RAILS_ROOT}/app/viewhints"]
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -165,6 +165,8 @@ module Hobo
       if defined? HoboFields
         HoboFields.never_wrap(Hobo::Undefined)
       end      
+
+      ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
     end
 
   end
