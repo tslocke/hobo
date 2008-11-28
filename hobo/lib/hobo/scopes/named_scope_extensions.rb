@@ -6,8 +6,8 @@ module ActiveRecord
 
       include Hobo::Scopes::ApplyScopes
 
-      def respond_to?(method)
-        super || scopes.include?(method) || proxy_scope.respond_to?(method)
+      def respond_to?(method, include_private=false)
+        super || scopes.include?(method) || proxy_scope.respond_to?(method, include_private)
       end
       
       private
