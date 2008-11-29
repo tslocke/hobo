@@ -88,7 +88,7 @@ module Hobo
     
     def permission_check_required?
       # Lifecycle steps are exempt from permission checks
-      acting_user && !(self.class.has_lifecycle? && lifecyle.actve_step)
+      acting_user && !(self.class.has_lifecycle? && lifecyle.active_step)
     end
         
     def create_with_callbacks_with_hobo_permission_check(*args)
