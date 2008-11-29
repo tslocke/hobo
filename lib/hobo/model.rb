@@ -368,7 +368,7 @@ module Hobo
       end
 
 
-      def respond_to?(method)
+      def respond_to?(method, include_private=false)
         super || create_automatic_scope(method)
       end
 

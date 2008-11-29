@@ -639,10 +639,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled"><%
   prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
-  options ||= begin
-                conditions = ActiveRecord::Associations::HasManyThroughAssociation.new(this_parent, this_field_reflection).sql_conditions
-                this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
-              end
+  options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
                 
   values = this
   -%>

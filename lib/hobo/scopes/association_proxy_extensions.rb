@@ -38,6 +38,7 @@ module Hobo
       end
       alias_method_chain :conditions, :hobo_scopes
       alias_method :sql_conditions, :conditions
+      public :conditions, :sql_conditions
 
     end
 

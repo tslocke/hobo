@@ -64,8 +64,6 @@ module Hobo
 
 
     def page_renderer(view, local_names=[], page=nil, filename=nil)
-      filename ||= view._pick_template(page + ".dryml")
-
       if RAILS_ENV == "development"
         clear_cache
         Taglib.clear_cache
@@ -81,6 +79,8 @@ module Hobo
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
+        # Try both the Rails 2.2 and 2.1 APIs
+        filename ||= view._pick_template(page + ".dryml") || view.finder.pick_template(page, "dryml")
         mtime = File.mtime(filename)
         renderer_class = @renderer_classes[page]
 

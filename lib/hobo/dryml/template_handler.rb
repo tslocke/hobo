@@ -42,8 +42,6 @@ module ActionController
 
 
     def call_dryml_tag(tag, options={})
-      add_variables_to_assigns
-
       # TODO: Figure out what this bit is all about :-)
       if options[:with]
         @this = options[:with] unless options[:field]
