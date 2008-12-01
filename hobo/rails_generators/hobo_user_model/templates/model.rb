@@ -38,7 +38,7 @@ class <%= class_name %> < ActiveRecord::Base
   # --- Permissions --- #
 
   def create_permitted?
-    acting_user.administrator? || !administrator
+    false
   end
 
   def update_permitted?
