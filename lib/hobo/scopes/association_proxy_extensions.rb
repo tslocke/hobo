@@ -24,21 +24,21 @@ module Hobo
         unscoped_conditions = conditions_without_hobo_scopes
         combine_conditions(scope_conditions, unscoped_conditions)
       end
-
       alias_method_chain :conditions, :hobo_scopes
 
     end
 
     HasManyThroughAssociationExtensions = classy_module do
 
-      def sql_conditions_with_hobo_scopes
+      def conditions_with_hobo_scopes
         scope_conditions         = self.scope_conditions(@reflection)
         through_scope_conditions = self.scope_conditions(@reflection.through_reflection)
-        unscoped_conditions = sql_conditions_without_hobo_scopes
+        unscoped_conditions = conditions_without_hobo_scopes
         combine_conditions(scope_conditions, through_scope_conditions, unscoped_conditions)
       end
-
-      alias_method_chain :sql_conditions, :hobo_scopes
+      alias_method_chain :conditions, :hobo_scopes
+      alias_method :sql_conditions, :conditions
+      public :conditions, :sql_conditions
 
     end
 
