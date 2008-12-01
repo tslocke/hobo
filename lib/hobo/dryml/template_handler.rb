@@ -54,23 +54,23 @@ module ActionController
 
 
     # TODO: This is namespace polution, should be called render_dryml_tag
-    def render_tag(tag, options={}, render_options={})
-      text = call_dryml_tag(tag, options)
-      text && render({:text => text, :layout => false }.merge(render_options))
+    def render_tag(tag, attributes={}, options={})
+      text = call_dryml_tag(tag, attributes)
+      text && render({:text => text, :layout => false }.merge(options))
     end
 
 
     # DRYML fallback tags -- monkey patch this method to attempt to render a tag if there's no template
-    def render_for_file_with_dryml(template_path, *args)
-      if template_exists?(template_path)   ||   # A template is available in app/views
-          template_path =~ /^([a-z]:)?\//i ||   # an absolute path (e.g. an exception ERB template)
-          template_path =~ /^\.\/public\//        # A public asset
-        # Let Rails handle it normally                       
-        render_for_file_without_dryml(template_path, *args)
+    def render_for_file_with_dryml(template_path, status = nil, layout = nil, locals = {})
+      render_for_file_without_dryml(template_path, status, layout, locals)
+    rescue ActionView::MissingTemplate => ex
+      # Try to use a DRYML <page> tag instead
+      tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
+      text = call_dryml_tag(tag_name)
+      if text
+        render_for_text text, status 
       else
-        # The template was missing, try to use a DRYML <page> tag instead
-        tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
-        render_tag(tag_name) or raise ActionView::MissingTemplate, "Missing template #{template_path}.html.erb in view path #{RAILS_ROOT}/app/views"
+        raise ex
       end
     end
     alias_method_chain :render_for_file, :dryml
@@ -82,12 +82,33 @@ class ActionView::Template
   
   def render_with_dryml(view, local_assigns = {})
     if handler == Hobo::Dryml::TemplateHandler
-      Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
+      render_dryml(view, local_assigns)
     else
       render_without_dryml(view, local_assigns)
     end
   end
   alias_method_chain :render, :dryml if Rails::VERSION::MAJOR >= 2 && Rails::VERSION::MINOR >= 2
+  
+  # We've had to copy a bunch of logic from Renderable#render, because we need to prevent Rails
+  # from trying to compile our template. DRYML templates are each compiled as a class, not just a method,
+  # so the support for compiling templates that Rails provides is innadequate.
+  def render_dryml(view, local_assigns = {})
+    stack = view.instance_variable_get(:@_render_stack)
+    stack.push(self)
+
+    # This is only used for TestResponse to set rendered_template
+    unless is_a?(ActionView::InlineTemplate) || view.instance_variable_get(:@_first_render)
+      view.instance_variable_set(:@_first_render, self)
+    end
+
+    view.send(:_evaluate_assigns_and_ivars)
+    view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
+
+    result = Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
+
+    stack.pop
+    result
+  end
   
 end  
     

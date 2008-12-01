@@ -195,7 +195,7 @@ var Hobo = {
                         old = val
                         return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
                     },
-                    onFailure: function(resp) { 
+                    onFailure: function(_, resp) {
                         alert(resp.responseText); el.innerHTML = old
                     },
                     onEnterEditMode: function() {
