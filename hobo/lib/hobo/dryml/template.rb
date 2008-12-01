@@ -764,8 +764,8 @@ module Hobo::Dryml
     def maybe_make_part_call(el, call)
       part_name = el.attributes['part']
       if part_name
-        part_id = part_name && "<%= #{attribute_to_ruby(el.attributes['id'] || part_name)} %>"
-        "<div class='part-wrapper' id='#{part_id}'>" + part_element(el, call) + "</div>"
+        part_id = el.attributes['id'] || part_name
+        "<div class='part-wrapper' id='<%= #{attribute_to_ruby part_id} %>'>#{part_element(el, call)}</div>"
       else
         call
       end
@@ -782,9 +782,10 @@ module Hobo::Dryml
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}'", el) unless n =~ DRYML_NAME_RX
 
-        unless n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
-          ":#{ruby_name n} => #{attribute_to_ruby(v)}"
-        end
+        next if n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
+        next if el.attributes['part'] && n == 'id' # The id is rendered on the <div class="part-wrapper"> instead
+        
+        ":#{ruby_name n} => #{attribute_to_ruby(v)}"
       end.compact
 
       # if there's a ':' el.name is just the part after the ':'

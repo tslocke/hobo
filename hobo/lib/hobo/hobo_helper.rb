@@ -31,7 +31,8 @@ module Hobo
 
 
     def base_url
-      request.try.relative_url_root || ActionController::Base.relative_url_root
+      # Todo: get rid of relative_url_root when we drop Rails 2.1 support
+      request.try.relative_url_root || ActionController::Base.relative_url_root || ""
     end
 
 

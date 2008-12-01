@@ -514,11 +514,6 @@ module Hobo
     private
 
 
-    def parse_datetime(s)
-      defined?(Chronic) ? Chronic.parse(s) : Time.parse(s)
-    end
-
-
     def convert_type_for_mass_assignment(field_type, value)
       if !field_type.is_a?(Class)
         value
@@ -531,9 +526,6 @@ module Hobo
           else
             Date.new(*parts)
           end
-        elsif value.is_a? String
-          dt = parse_datetime(value)
-          dt && dt.to_date
         else
           value
         end
@@ -541,8 +533,6 @@ module Hobo
       elsif field_type <= Time || field_type <= ActiveSupport::TimeWithZone
         if value.is_a? Hash
           Time.local(*(%w{year month day hour minute}.map{|s| value[s].to_i}))
-        elsif value.is_a? String
-          parse_datetime(value)
         else
           value
         end

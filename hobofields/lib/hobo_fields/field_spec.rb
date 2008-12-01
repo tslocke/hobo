@@ -49,10 +49,10 @@ module HoboFields
     def different_to?(col_spec)
       sql_type != col_spec.type ||
         begin
-          check_cols = [:null, :default]
-          check_cols += [:precision, :scale] if sql_type == :decimal
-          check_cols << :limit if sql_type.in?([:string, :text, :binary, :integer])
-          check_cols.any? { |k| col_spec.send(k) != self.send(k) }
+          check_attributes = [:null, :default]
+          check_attributes += [:precision, :scale] if sql_type == :decimal
+          check_attributes << :limit if sql_type.in?([:string, :text, :binary, :integer])
+          check_attributes.any? { |k| col_spec.send(k) != self.send(k) }
         end
     end
 
