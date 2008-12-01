@@ -45,8 +45,8 @@ Echoe.new('hobo') do |p|
   p.version   = "0.8.3"
 
   p.dependencies = [
-    'hobosupport >=0.8.3',
-    'hobofields >=0.8.3',
+    'hobosupport =0.8.3',
+    'hobofields =0.8.3',
     'rails >=2.1',
     'mislav-will_paginate >=2.2.1']
     
