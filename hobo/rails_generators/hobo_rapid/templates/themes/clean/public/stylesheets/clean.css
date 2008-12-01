@@ -77,7 +77,8 @@ input.file_upload {
 	margin-top: 10px;
 }
 .button:hover {cursor: pointer;}
-.actions {height: 100%; overflow: hidden; font-size: 11px;}
+form .actions {height: 100%; overflow: hidden; font-size: 11px;}
+form .actions input { margin: 0; }
 
 .flash {
 	margin: 0 40px 10px; padding: 10px 30px; border-width: 2px 0;
@@ -187,7 +188,7 @@ input.file_upload {
 .login-page, .forgot-password-page {width: 470px; margin-top: 40px;}
 .login-page .content-header {padding-bottom: 0;}
 .login-page .field-list {width: 370px;}
-.login-page .actions {text-align: left; margin: 10px 0 10px 160px;}
+.login-page form .actions {text-align: left; margin: 0; padding: 10px 0 10px 160px;}
 .signup-page .field-list {width: 370px;}
 .signup-page .content-body, .signup-page .content-header { margin-left: 120px; margin-right: 120px;}
 .login-page .field-list td, .signup-page .field-list td {width: auto;}
