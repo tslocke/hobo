@@ -9,7 +9,7 @@ module HoboFields
 
     PERMITTED_ATTRIBUTES = %w(href title class style align name src label target)
 
-    class Helper; include ActionView::Helpers::SanitizeHelper; end
+    class Helper; include ActionView::Helpers::SanitizeHelper; extend ActionView::Helpers::SanitizeHelper::ClassMethods; end
         
     def self.sanitize(s)
       Helper.new.sanitize(s, :tags => PERMITTED_TAGS, :attributes => PERMITTED_ATTRIBUTES)

@@ -53,8 +53,9 @@ module Hobo
           
           # define these lifecycle validation callbacks on demand
           define_callbacks callback unless respond_to? :callback
+          define_method(callback) {}
           
-          :"validate_on_#{on}"
+          callback
         else
           validation_method_without_lifecycles(on)
         end
