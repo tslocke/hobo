@@ -3,7 +3,7 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_user_model # Don't put anything above this
 
   fields do
-    username :string, :unique, :name => true
+    name :string, :unique
     email_address :email_address, :unique, :login => true
     administrator :boolean, :default => false
     timestamps
