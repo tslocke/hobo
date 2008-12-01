@@ -79,6 +79,12 @@ module Hobo
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
+        # TODO: Drop finder.pick_template when we drop support for Rails 2.1
+        filename ||= if view.respond_to?(:_pick_template, true) 
+                       view._pick_template(page + ".dryml").filename
+                     else
+                       view.finder.pick_template(page, "dryml")
+                     end
         mtime = File.mtime(filename)
         renderer_class = @renderer_classes[page]
 
