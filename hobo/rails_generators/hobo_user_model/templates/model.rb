@@ -21,7 +21,7 @@ class <%= class_name %> < ActiveRecord::Base
     state :active, :default => true
 
     create :signup, :available_to => "Guest",
-           :params => [:username, :email_address, :password, :password_confirmation],
+           :params => [:name, :email_address, :password, :password_confirmation],
            :become => :active
 
     transition :request_password_reset, { :active => :active }, :new_key => true do
