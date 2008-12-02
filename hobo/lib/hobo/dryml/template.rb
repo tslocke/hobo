@@ -791,23 +791,31 @@ module Hobo::Dryml
       # if there's a ':' el.name is just the part after the ':'
       items << ":field => \"#{ruby_name el.name}\"" if field_shorthand_element?(el)
 
-      items = items.join(", ")
+      hash = "{#{items.join(", ")}}"
 
-      merge_attrs = attributes['merge-attrs'] || merge_attribute(el)
-      if merge_attrs
-        extra_attributes = if merge_attrs == "&true"
-                          "attributes"
-                        elsif is_code_attribute?(merge_attrs)
-                          merge_attrs[1..-1]
-                        else
-                          merge_attr_names = merge_attrs.split(/\s*,\s*/).*.gsub("-", "_")
-                          "all_attributes & #{merge_attr_names.inspect}"
-                        end
-        "merge_attrs({#{items}},(#{extra_attributes}) || {})"
+      if merge_attribute(el)
+        "merge_attrs(#{hash}, attributes)"
+      elsif el.attributes['merge-attrs']
+        merge_attrs = compile_merge_attrs(el)
+        "merge_attrs(#{hash}, #{merge_attrs} || {})"
       else
-        "{#{items}}"
+        hash
       end
     end
+    
+    
+    def compile_merge_attrs(el)
+      merge_attrs = el.attributes['merge-attrs']
+      if merge_attrs == "&true"
+        "attributes"
+      elsif is_code_attribute?(merge_attrs)
+        "(#{merge_attrs[1..-1]})"
+      else
+        merge_attr_names = merge_attrs.split(/\s*,\s*/).*.gsub("-", "_").*.to_sym
+        "(all_attributes & #{merge_attr_names.inspect})"
+      end
+    end
+    
 
     def static_tag_to_method_call(el)
       part = el.attributes["part"]
@@ -824,11 +832,9 @@ module Hobo::Dryml
 
       # Convert the attributes hash to a call to merge_attrs if
       # there's a merge-attrs attribute
-      attrs = if (merge_attrs = el.attributes['merge-attrs'])
-                dryml_exception("merge-attrs was given a string", el) unless is_code_attribute?(merge_attrs)
-
-                "merge_attrs({#{attrs * ', '}}, " +
-                  "((__merge_attrs__ = (#{merge_attrs[1..-1]})) == true ? attributes : __merge_attrs__))"
+      attrs = if el.attributes['merge-attrs']
+                merge_attrs = compile_merge_attrs(el)
+                "merge_attrs({#{attrs * ', '}}, #{merge_attrs} || {})"
               else
                 "{" + attrs.join(', ') + "}"
               end

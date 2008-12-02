@@ -495,7 +495,11 @@ inside such an element, and will automatically find the right element to remove 
 If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to
 display" when you delete the last item. Clever Tricks abound.
 
-All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
+Current limitation: There is no support for the ajax callbacks at this time.
+
+All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
+
+
 
 ### Attributes
 
@@ -583,7 +587,10 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
    
-  options ||= this_field_reflection.klass.all(:conditions => this.conditions).select {|x| can_view?(x)}
+  options ||= begin
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
+    this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+  end
 
   select_options = options.map { |x| [x.to_s, x.id ] }
   select_options = select_options.sort if sort
@@ -737,8 +744,8 @@ Use the `uri` option to specify a redirect location:
       <hidden-id-field/>
       <div class="input-many-item" param="default"/>
       <div class="buttons">
-        <button class="remove-item" unless="&this_parent.length == 1">-</button>
-        <button class="add-item" if="&last_item?">+</button>
+        <button class="remove-item" unless="&this_parent.length == 1" merge-attrs="disabled">-</button>
+        <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
       </div>
     </li>
     <li if="&empty">
@@ -746,7 +753,7 @@ Use the `uri` option to specify a redirect location:
         <div class="input-many-item" param="default"/>
       </fake-field-context>
       <div class="buttons">
-        <button class="add-item">+</button>
+        <button class="add-item" merge-attrs="disabled">+</button>
       </div>
     </li>
   </ul>
