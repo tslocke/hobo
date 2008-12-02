@@ -228,12 +228,13 @@ module Hobo
     
     def attribute_protected?(attribute)
       attribute = attribute.to_s
-      if attributes_protected_by_default.include? attribute
-        true 
-      elsif self.class.accessible_attributes
-        !self.class.accessible_attributes.include?(attribute)
+      
+      return true if attributes_protected_by_default.include? attribute
+      
+      if self.class.accessible_attributes
+        return true if !self.class.accessible_attributes.include?(attribute)
       elsif self.class.protected_attributes
-        self.class.protected_attributes.include?(attribute)
+        return true if self.class.protected_attributes.include?(attribute)
       end
       
       # Readonly attributes can be set on creation but not thereafter
