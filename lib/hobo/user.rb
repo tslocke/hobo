@@ -31,7 +31,8 @@ module Hobo
           remember_token_expires_at :datetime
         end
 
-        validates_confirmation_of :password, :if => :new_password_required?
+        validates_presence_of     :password_confirmation, :if => :new_password_required?
+        validates_confirmation_of :password,              :if => :new_password_required?
         password_validations
         validate :validate_current_password_when_changing_password
 
