@@ -309,31 +309,59 @@ class PermissionsTest < Test::Unit::TestCase
       
       # --- Actions on non-accesible has_many associations --- #
       
-      should_eventually "prevent creation of comments via a recip" do
-        
+      # When associations are not declared :accesssible => true, attemting to update them 
+      # causes a type-mismatch
+      
+      should "prevent creation of comments via a recipe" do
+        r = existing_recipe
+        assert_raises(ActiveRecord::AssociationTypeMismatch) do
+          r.user_update_attributes! @user, :comments => { '0' => { :body => "dodgy comment"} }
+        end
       end
       
-      should_eventually "precent update of comments via their recipe" do
-        
+      should "prevent update of comments via their recipe" do
+        r = existing_recipe
+        c = r.comments.create :body => "My nice comment"
+        assert_raises(ActiveRecord::AssociationTypeMismatch) do
+          r.user_update_attributes! @user, :comments => { '0' => { :id => c.id, :body => "dodgy comment"} }
+        end
       end
       
-      should_eventually "prevent deletion of comments via their recipe" do
-        
+      should "prevent deletion of comments via their recipe" do
+        r = existing_recipe
+        c = r.comments.create :body => "My nice comment"
+        assert_destroy_prevented(c) do
+          r.user_update_attributes! @user, :comments => { }
+        end        
       end
       
       
       # --- Actions on non-accessible belongs_to associations --- #
       
-      should_eventually "prevent creation of a recipe when creating a comment" do
-        
+      should "prevent creation of a recipe when creating a comment" do
+        count = Recipe.count
+        assert_raises(ActiveRecord::AssociationTypeMismatch) do 
+          Comment.user_create! @user, :body => "my comment", :recipe => { :name => "I created a recipe!" }
+        end
+        assert_equal(count, Recipe.count)
       end
       
-      should_eventually "prevent update of a recipe via one of its comments" do
-        
+      should "prevent update of a recipe via one of its comments" do
+        r = existing_recipe
+        c = r.comments.create :body => "My comment"
+        assert_raises(ActiveRecord::AssociationTypeMismatch) do
+          c.user_update_attributes! @user, :recipe => { :id => r.id, :name => "pwned!" }
+        end
+        assert_equal("existing recipe", r.name)
       end
       
-      should_eventually "prevent deletion of a recipe via one of its comments" do
-        
+      should "prevent deletion of a recipe via one of its comments" do
+        r = existing_recipe
+        c = r.comments.create :body => "My comment"
+        assert_raises(ActiveRecord::AssociationTypeMismatch) do
+          c.user_update_attributes! @user, :recipe => { }
+        end
+        assert Recipe.find(r.id)
       end
       
     end
