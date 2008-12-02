@@ -158,7 +158,7 @@ Provides a short hand way of displaying images in public/images
    end
    base = [base_url, subsite].compact.join("/")
    res << "urlBase = '#{base}'; hoboPagePath = '#{view_name}'"
-   if request_forgery_protection_token
+   if protect_against_forgery?
      res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
    end
    res
