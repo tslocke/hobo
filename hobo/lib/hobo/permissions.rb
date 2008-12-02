@@ -336,14 +336,14 @@ module Hobo
       
     # By default, attempt to derive edit permission from create/update permission
     def edit_permitted?(attribute)
-      Hobo::Permissions.unknowify_attribute(self, attribute) if attribute
+      Hobo::Permissions.unknownify_attribute(self, attribute) if attribute
       new_record? ? create_permitted? : update_permitted?
     rescue Hobo::UndefinedAccessError
       # The permission is dependent on the unknown value
       # so this attribute is not editable
       false
     ensure
-      Hobo::Permissions.remove_unknown_attribute(self, attribute) if attribute
+      Hobo::Permissions.deunknownify_attribute(self, attribute) if attribute
     end
   
   
@@ -351,6 +351,7 @@ module Hobo
     # attempts to access the attribute will result in a Hobo::UndefinedAccessError
     def self.unknownify_attribute(record, attr)
       record.metaclass.class_eval do
+        
         define_method attr do
           raise Hobo::UndefinedAccessError
         end
@@ -386,7 +387,7 @@ module Hobo
     # Best. Name. Ever
     def self.deunknownify_attribute(record, attr)
       [attr, "#{attr}_change", "#{attr}_was", "#{attr}_changed?", :changed?, :changed, :changes].each do |m|
-        metaclass.send :remove_method, m.to_sym
+        record.metaclass.send :remove_method, m.to_sym
       end
     end
   end
