@@ -495,7 +495,11 @@ inside such an element, and will automatically find the right element to remove 
 If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to
 display" when you delete the last item. Clever Tricks abound.
 
-All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
+Current limitation: There is no support for the ajax callbacks at this time.
+
+All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
+
+
 
 ### Attributes
 
