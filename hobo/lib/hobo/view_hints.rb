@@ -9,7 +9,7 @@ module Hobo
     def self.setter(name, default=nil, &block)
       metaclass.send :define_method, name do |*args|
         if args.empty?
-          instance_variable_get("@#{name}") || default
+          instance_variable_get("@#{name}") || (default.is_a?(Proc) ? instance_eval(&default) : default)
         else 
           arg = if block
                   block[*args] 
@@ -21,13 +21,13 @@ module Hobo
       end
     end
   
-    setter :model_name
+    setter :model_name,  proc { name.sub(/Hints$/, "") }
     
     setter :field_names, {}
     
     setter :field_help,  {}
     
-    setter :children,    [] do |*args|
+    setter :children,    proc { model.dependent_collections.sort_by(&:to_s) } do |*args|
       args
     end
     
@@ -35,10 +35,6 @@ module Hobo
     
     class << self
       
-      def model_name
-        name.sub(/Hints$/, "")
-      end
-
       def model
         model_name.constantize
       end
@@ -48,7 +44,7 @@ module Hobo
       end
     
       def primary_children
-        children.first || model.dependent_collections.sort_by(&:to_s).first
+        children.first
       end
       
       def secondary_children
