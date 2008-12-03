@@ -42,6 +42,8 @@ module ActionController
 
 
     def call_dryml_tag(tag, options={})
+      @template.send(:_evaluate_assigns_and_ivars)
+
       # TODO: Figure out what this bit is all about :-)
       if options[:with]
         @this = options[:with] unless options[:field]
@@ -66,6 +68,7 @@ module ActionController
     rescue ActionView::MissingTemplate => ex
       # Try to use a DRYML <page> tag instead
       tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
+
       text = call_dryml_tag(tag_name)
       if text
         render_for_text text, status 
@@ -87,7 +90,7 @@ class ActionView::Template
       render_without_dryml(view, local_assigns)
     end
   end
-  alias_method_chain :render, :dryml if Rails::VERSION::MAJOR >= 2 && Rails::VERSION::MINOR >= 2
+  alias_method_chain :render, :dryml
   
   # We've had to copy a bunch of logic from Renderable#render, because we need to prevent Rails
   # from trying to compile our template. DRYML templates are each compiled as a class, not just a method,
