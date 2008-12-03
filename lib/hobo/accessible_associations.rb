@@ -77,10 +77,9 @@ module Hobo
     # --- has_many mass assignment support --- #
     
     def self.has_many_with_accessible(name, options={}, &block)
-      accessible = options.delete(:accessible)
       has_many_without_accessible(name, options, &block)
       
-      if accessible
+      if options[:accessible]
         class_eval %{
           def #{name}_with_accessible=(array_or_hash)
             items = Hobo::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
@@ -99,10 +98,9 @@ module Hobo
     # --- belongs_to assignment support --- #
     
     def self.belongs_to_with_accessible(name, options={}, &block)
-      accessible = options.delete(:accessible)
       belongs_to_without_accessible(name, options, &block)
       
-      if accessible
+      if options[:accessible]
         class_eval %{
           def #{name}_with_accessible=(record_hash_or_string)
             record = Hobo::AccessibleAssociations.find_or_create_and_update(self, #{name}, :#{name}, record_hash_or_string) { self.class.reflections[:#{name}].klass.new }
@@ -113,6 +111,20 @@ module Hobo
       end
     end
     metaclass.alias_method_chain :belongs_to, :accessible
+    
+    
+    # Add :accessible to the valid keys so AR doesn't complain
+
+    def self.valid_keys_for_has_many_association_with_accessible
+      valid_keys_for_has_many_association_without_accessible + [:accessible]
+    end
+    metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
+
+    def self.valid_keys_for_belongs_to_association_with_accessible
+      valid_keys_for_belongs_to_association_without_accessible + [:accessible]
+    end
+    metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
+    
     
   end    
   
