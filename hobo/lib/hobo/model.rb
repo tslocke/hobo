@@ -333,15 +333,17 @@ module Hobo
               r.source_reflection  == join_to_self
           end
         else
-          # Find the :belongs_to that corresponds to a :has_many or vice versa
+          # Find the :belongs_to that corresponds to a :has_one / :has_many or vice versa
+
+          reverse_macros = case refl.macro
+                           when :has_many, :has_one
+                             [:belongs_to]
+                           when :belongs_to
+                             [:has_many, :has_one]
+                           end
           
-          reverse_macro = if refl.macro == :has_many
-                            :belongs_to
-                          elsif refl.macro == :belongs_to
-                            :has_many
-                          end
           refl.klass.reflections.values.find do |r|
-            r.macro == reverse_macro &&
+            r.macro.in?(reverse_macros) &&
               r.klass == self &&
               !r.options[:conditions] &&
               r.primary_key_name == refl.primary_key_name
