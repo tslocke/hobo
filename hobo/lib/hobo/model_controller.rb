@@ -443,7 +443,7 @@ module Hobo
       klass = refl.klass
       id = params["#{klass.name.underscore}_id"]
       owner = klass.find(id)
-      instance_variable_set("@#{owner.class.name.underscore}", owner)
+      instance_variable_set("@#{owner_association}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
     end
 
