@@ -206,6 +206,9 @@ module Hobo
       return false unless viewable_by?(user, attribute)
       
       if attribute
+        refl = self.class.reflections[attribute]
+        return false if refl && !refl.options[:accessible]
+        
         attribute = attribute.to_s.sub(/\?$/, '').to_sym
 
         # Try the attribute-specic edit-permission method if there is one
