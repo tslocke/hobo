@@ -426,17 +426,16 @@ module Hobo
     end
 
     def query_params
-      query = request.request_uri.match(/(?:\?([^?]+))/)._?[1]
+      query = request.request_uri =~ /\?([^?]+)/ && $1
+      result = HashWithIndifferentAccess.new 
       if query
-        params = query.split('&')
-        pairs = params.map do |param|
-          pair = param.split('=', 2)
-          pair.length == 1 ? pair + [''] : pair
+        query.gsub!('+', ' ')
+        query.split('&').each do |param|
+          name, val = param.split('=', 2)
+          result[URI.unescape(name)] = val ? URI.unescape(val) : ''
         end
-        HashWithIndifferentAccess[*pairs.flatten]
-      else
-        HashWithIndifferentAccess.new
       end
+      result
     end
 
     def linkable?(*args)
