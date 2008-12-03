@@ -173,14 +173,17 @@ module Hobo
 
     def owner_routes
       controller.owner_actions.each_pair do |owner, actions|
-        collection         = model.reverse_reflection(owner).name
+        collection_refl = model.reverse_reflection(owner)
+        raise HoboError, "Hob routing error -- can't find reverse association for #{model}##{owner} " +
+                         "(e.g. the :has_many that corresponds to a :belongs_to)" if collection_refl.nil?
+        collection         = collection_refl.name
         owner_class        = model.reflections[owner].klass.name.underscore
 
         owner = owner.to_s.singularize if model.reflections[owner].macro == :has_many
 
         collection_path = "#{owner_class.pluralize}/:#{owner_class}_id/#{collection}"
 
-        actions.each do |action| 
+        actions.each do |action|
           case action
           when :index
             linkable_route("#{plural}_for_#{owner}",          collection_path,          "index_for_#{owner}",
