@@ -40,7 +40,7 @@ module Hobo
       end
 
       def model
-        @model ||= model_name.constantize
+        model_name.constantize
       end
 
       def field_name(field)
