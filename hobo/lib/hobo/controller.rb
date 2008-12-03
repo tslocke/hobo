@@ -79,12 +79,7 @@ module Hobo
 
 
     def ajax_update_response(page_path, render_specs, results={})
-      if respond_to?(:add_variables_to_assigns, true)
-        # TODO: remove this when we drop Rails 2.1
-        add_variables_to_assigns
-      else
-        @template.send(:_evaluate_assigns_and_ivars)
-      end
+      @template.send(:_evaluate_assigns_and_ivars)
       renderer = Hobo::Dryml.page_renderer(@template, [], page_path) if page_path
 
       render :update do |page|
