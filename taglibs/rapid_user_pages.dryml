@@ -133,7 +133,7 @@
 
     <content: param>
       <header param="content-header">
-        <h2><name/></h2>
+        <h2 param="heading"><name/></h2>
       </header>
 
       <section param="content-body">
