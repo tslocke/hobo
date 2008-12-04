@@ -172,11 +172,3 @@
     %><do field="&name" param="default"/><%
   end
 %></def>
-
-
-<def tag="or-cancel">
-  <if test="&linkable?">or <a>Cancel</a></if>
-  <else>
-    <if test="&linkable?(this.class)">or <a to="&this.class">Cancel</a></if>
-  </else>
-</def>
