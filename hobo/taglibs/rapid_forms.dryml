@@ -142,7 +142,7 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
    end
    
   if action.nil? && (html_attrs[:action].nil? ||
-                     (lifecycle.nil? && new_record && !this.user_can_create?(current_user)) ||
+                     (lifecycle.nil? && new_record && !this.creatable_by?(current_user)) ||
                      (lifecycle.nil? && !new_record && !can_edit?))
     Hobo::Dryml.last_if = false
     ""
@@ -645,7 +645,7 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled"><%
-  prompt ||= "Add #{a_or_an(:word => this_field.titleize.singularize)}"
+  prompt ||= "Add #{this_field.titleize.singularize}"
   options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
                 
   values = this
@@ -660,15 +660,13 @@ To use this tag, the model of the items the user is chosing *must* have unique n
     </div>
     <div class="items">
       <set param-name="&param_name_for_this"/>
-      <repeat>
-        <div class="item" param="item">
-          <span><%= h this.to_s %></span>
-          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
-                 param="hidden"/>
-          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
-                 param="remove-button"/>
-        </div>
-      </repeat>
+      <div class="item" param="item" repeat>
+        <span><%= h this.to_s %></span>
+        <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
+               param="hidden"/>
+        <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
+               param="remove-button"/>
+      </div>
     </div>
     <select merge-attrs="&{:disabled => disabled}">
       <option value=""><prompt/></option>
@@ -774,14 +772,9 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
-
-
-
-
-
-
-
-
-
-
-
+<def tag="or-cancel">
+  <if test="&linkable?">or <a>Cancel</a></if>
+  <else>
+    <if test="&linkable?(this.class)">or <a to="&this.class">Cancel</a></if>
+  </else>
+</def>

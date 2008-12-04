@@ -577,7 +577,7 @@ new HoboBehavior("ul.input-many", {
       var self = this;
       var li = el.up('li')
       if (li.parentNode.childElements().length == 1) {
-          // It's the last one - dont't remove it, just clear it
+          // It's the last one - don't remove it, just clear it
           this.clearInputs(li)
       } else {      
           new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
@@ -589,17 +589,22 @@ new HoboBehavior("ul.input-many", {
   },
   
   clearInputs: function(item) {
-      $(item).select('input').each(function(input){ input.value="" })
+      $(item).select('input').each(function(input){
+          if (input.getAttribute('type').toLowerCase() == 'hidden') {
+              input.remove()
+          } else {
+              input.value = ""
+          }
+      })
   },
    
   updateButtons: function() {
       var removeButton = "<button class='remove-item'>-</button>"
-      var addButton = "<button class='add-item'>+</button>"
-      
-      
+      var addButton    = "<button class='add-item'>+</button>"
+
       var ul = this.element
       if (ul.childElements().length == 1) {
-          ul.down('li').down('div.buttons').innerHTML = addButton
+          ul.down('li').down('div.buttons').innerHTML = removeButton + ' ' + addButton
       } else {
           var add = ul.selectChildren('li').selectChildren('div.buttons').down('button.add-item')
           if (add) add.remove()

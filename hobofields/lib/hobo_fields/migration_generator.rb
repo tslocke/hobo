@@ -141,6 +141,8 @@ module HoboFields
     
     def always_ignore_tables
       sessions_table = CGI::Session::ActiveRecordStore::Session.table_name if
+        defined?(CGI::Session::ActiveRecordStore::Session) &&
+        defined?(ActionController::Base) &&
         ActionController::Base.session_store == CGI::Session::ActiveRecordStore
       ['schema_info', 'schema_migrations',  sessions_table].compact
     end

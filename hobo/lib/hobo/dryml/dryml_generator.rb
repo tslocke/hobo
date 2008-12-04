@@ -138,15 +138,6 @@ module Hobo
       end
 
       
-      def primary_collection_name(klass=model)
-        dependent_collection_names = klass.reflections.values.select do |refl|
-          refl.macro == :has_many && refl.options[:dependent]
-        end.*.name
-
-        (dependent_collection_names - through_collection_names(klass)).first
-      end
-
-
       def through_collection_names(klass=model)
         klass.reflections.values.select do |refl|
           refl.macro == :has_many && refl.options[:through]

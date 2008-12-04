@@ -31,7 +31,7 @@ module Hobo
 
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
 
-          rescue_from Hobo::Model::PermissionDeniedError,  :with => :permission_denied
+          rescue_from Hobo::PermissionDeniedError,         :with => :permission_denied
           rescue_from Hobo::Lifecycles::LifecycleKeyError, :with => :permission_denied
 
           alias_method_chain :render, :hobo_model
@@ -443,7 +443,7 @@ module Hobo
       klass = refl.klass
       id = params["#{klass.name.underscore}_id"]
       owner = klass.find(id)
-      instance_variable_set("@#{owner.class.name.underscore}", owner)
+      instance_variable_set("@#{owner_association}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
     end
 
@@ -475,7 +475,7 @@ module Hobo
 
 
     def hobo_new(record=nil, &b)
-      self.this = record || model.user_new!(current_user)
+      self.this = record || model.user_new(current_user)
       response_block(&b)
     end
     
@@ -490,7 +490,7 @@ module Hobo
     def hobo_create(*args, &b)
       options = args.extract_options!
       self.this = args.first || new_for_create
-      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
+      this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:new, &b)
     end
     
@@ -499,7 +499,7 @@ module Hobo
       options = args.extract_options!
       owner, association = find_owner_and_association(owner)
       self.this = args.first || association.new
-      this.user_save_changes(current_user, options[:attributes] || attribute_parameters || {})
+      this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:"new_for_#{owner}", &b)    
     end
 
@@ -512,7 +512,7 @@ module Hobo
     def new_for_create
       type_param = subtype_for_create
       create_model = type_param ? type_param.constantize : model
-      create_model.new
+      create_model.user_new(current_user)
     end
     
     
@@ -548,7 +548,7 @@ module Hobo
 
       self.this = args.first || find_instance
       changes = options[:attributes] || attribute_parameters or raise RuntimeError, "No update specified in params"
-      this.user_save_changes(current_user, changes)
+      this.user_update_attributes(current_user, changes)
 
       # Ensure current_user isn't out of date
       @current_user = @this if @this == current_user
@@ -677,7 +677,7 @@ module Hobo
       ordering = params["#{model.name.underscore}_ordering"]
       if ordering
         ordering.each_with_index do |id, position|
-          model.user_update(current_user, id, :position => position+1)
+          model.find(id).user_update_attributes(current_user, :position => position+1)
         end
         hobo_ajax_response || render(:nothing => true)
       else

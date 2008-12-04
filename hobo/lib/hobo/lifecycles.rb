@@ -9,7 +9,11 @@ module Hobo
     ModelExtensions = classy_module do
 
       attr_writer :lifecycle
-
+      
+      def self.has_lifecycle?
+        defined?(self::Lifecycle)
+      end
+      
       def self.lifecycle(*args, &block)
         options = args.extract_options!
         options = options.reverse_merge(:state_field => :state,
@@ -39,11 +43,6 @@ module Hobo
           attr_protected  options[:key_timestamp_field]
         end
         
-      end
-
-
-      def self.has_lifecycle?
-        defined?(self::Lifecycle)
       end
       
       

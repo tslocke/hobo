@@ -17,8 +17,6 @@ module Hobo
 
           include_taglib "rapid_user_pages", :plugin => "hobo"
 
-          show_action :account
-
           alias_method_chain :hobo_update, :account_flash
         end
         
@@ -31,7 +29,7 @@ module Hobo
 
       def available_auto_actions_with_user_actions
         available_auto_actions_without_user_actions + 
-          [:login, :signup, :logout, :forgot_password, :reset_password]
+          [:login, :signup, :logout, :forgot_password, :reset_password, :account]
       end
 
       
@@ -44,6 +42,7 @@ module Hobo
           def do_signup; hobo_do_signup                  end if include_action?(:do_signup)
           def forgot_password; hobo_forgot_password;     end if include_action?(:forgot_password)
           def do_reset_password; hobo_do_reset_password; end if include_action?(:do_reset_password)
+          show_action :account                               if include_action?(:account)
         end
       end
 
