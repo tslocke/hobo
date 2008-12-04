@@ -660,15 +660,13 @@ To use this tag, the model of the items the user is chosing *must* have unique n
     </div>
     <div class="items">
       <set param-name="&param_name_for_this"/>
-      <repeat>
-        <div class="item" param="item">
-          <span><%= h this.to_s %></span>
-          <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
-                 param="hidden"/>
-          <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
-                 param="remove-button"/>
-        </div>
-      </repeat>
+      <div class="item" param="item" repeat>
+        <span><%= h this.to_s %></span>
+        <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
+               param="hidden"/>
+        <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
+               param="remove-button"/>
+      </div>
     </div>
     <select merge-attrs="&{:disabled => disabled}">
       <option value=""><prompt/></option>
