@@ -10,20 +10,9 @@ module ActiveRecord
       end
 
 
-      def build_with_reverse_reflection(*args)
-        res = build_without_reverse_reflection(*args)
-        set_reverse_association(res) if hobo_association_collection?
-        res
-      end
-      alias_method_chain :build, :reverse_reflection
-
-
-      def new(attributes = {})
-        record = @reflection.klass.new(attributes)
-        if hobo_association_collection?
-          set_belongs_to_association_for(record)
-          set_reverse_association(record) unless proxy_reflection.options[:as]
-        end
+      def new_candidate(attributes = {})
+        record = new
+        @target.delete record
         record
       end
 

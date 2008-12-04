@@ -252,15 +252,15 @@ module Hobo
       return false if reflection.macro == :has_one || reflection.options[:polymorphic]
       
       return false unless reflection.options[:accessible]
-      
+            
       record = if (through = reflection.through_reflection)
                  # For edit permission on a has_many :through,
                  # the user needs create+destroy permission on the join model
-                 send(through_reflection.name).new
+                 send(through.name).new_candidate
                else
                  # For edit permission on a regular has_many,
                  # the user needs create/destroy permission on the member model
-                 send(reflection.name).new
+                 send(reflection.name).new_candidate
                end
       record.creatable_by?(user) && record.destroyable_by?(user)
     end
