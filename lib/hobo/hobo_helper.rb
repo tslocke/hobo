@@ -442,7 +442,7 @@ module Hobo
       target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
       action = args.first
 
-      if (origin = target.try.origin)
+      if target.respond_to?(:member_class) && (origin = target.try.origin)
         klass = origin.class
         action = if action == :new
                    "new_#{target.origin_attribute.to_s.singularize}"
