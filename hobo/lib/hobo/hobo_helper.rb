@@ -305,7 +305,9 @@ module Hobo
       
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||=
-        if object.viewable_by?(current_user, field)
+        if !object.respond_to?(:viewable_by)
+          true
+        elsif object.viewable_by?(current_user, field)
           # If possible, we also check if the current *value* of the field is viewable
           if field.is_a?(Symbol, String) && (v = object.send(field)) && v.respond_to?(:viewable_by?)
             v.viewable_by?(current_user, nil)
