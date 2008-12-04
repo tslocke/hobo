@@ -57,7 +57,7 @@ module Hobo
           def viewable_by?(user, field=nil)
             # view check on an example member record is not supported on associations with conditions
             return true if @reflection.options[:conditions]
-            new.viewable_by?(user, field)
+            new_candidate.viewable_by?(user, field)
           end
         
         end
