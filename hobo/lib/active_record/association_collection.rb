@@ -32,14 +32,6 @@ module ActiveRecord
         proxy_reflection.klass
       end
 
-
-      def proxy_respond_to_with_automatic_scopes?(method, include_priv = false)
-        proxy_respond_to_without_automatic_scopes?(method, include_priv) ||
-          (@reflection.klass.create_automatic_scope(method) if @reflection.klass.respond_to?(:create_automatic_scope))
-      end
-      alias_method_chain :proxy_respond_to?, :automatic_scopes
-
-
       private
 
         def set_reverse_association(object)
