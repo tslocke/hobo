@@ -612,11 +612,12 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def creator_page_action(name)
+    def creator_page_action(name, &b)
       self.this = model.new
       this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creator(name)
       raise Hobo::PermissionDeniedError unless @creator.allowed?(current_user)
+      response_block &b
     end
 
 
@@ -645,8 +646,9 @@ module Hobo
     end
 
 
-    def transition_page_action(name, options={})
+    def transition_page_action(name, options={}, &b)
       @transition = prepare_transition(name, options)
+      response_block &b
     end
 
 
