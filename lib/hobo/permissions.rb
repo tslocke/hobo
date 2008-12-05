@@ -280,7 +280,7 @@ module Hobo
         with_attribute_or_belongs_to_keys(attr) { |a, ftype| ftype ? [a, ftype] : a }
       end.flatten
       
-      attributes.all? { |attr| !attributes.include?(attr) }
+      attributes.all? { |attr| !changed.include?(attr) }
     end
 
     def any_changed?(*attributes)
