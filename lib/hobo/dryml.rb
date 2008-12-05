@@ -105,7 +105,7 @@ module Hobo
 
 
     def controller_taglibs(controller_class)
-      (controller_class.respond_to?(:included_taglibs) && controller_class.included_taglibs) || []
+      controller_class.try.included_taglibs || []
     end
 
 
