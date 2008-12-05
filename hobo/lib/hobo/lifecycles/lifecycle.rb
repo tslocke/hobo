@@ -134,9 +134,9 @@ module Hobo
       def valid_for_transition?(name)
         record.valid?
         callback = :"validate_on_#{name}"
-        run_callbacks callback
-        send callback
-        errors.empty?
+        record.run_callbacks callback
+        record.send callback
+        record.errors.empty?
       end
 
 
