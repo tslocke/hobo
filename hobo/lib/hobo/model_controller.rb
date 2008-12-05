@@ -385,7 +385,8 @@ module Hobo
         home_page
     end
     
-    
+
+    # TODO: Get rid of this joke of an idea that fails miserably if you open another browser window.
     def previous_page_path
       session[:previous_page_path]
     end
