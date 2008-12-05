@@ -111,7 +111,7 @@ module Hobo
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
           self.this = find_instance(opts) unless opts[:no_find]
-          raise Hobo::Model::PermissionDeniedError unless Hobo.can_call?(current_user, @this, method)
+          raise Hobo::PermissionDeniedError unless Hobo.can_call?(current_user, @this, method)
           if got_block
             instance_eval(&block)
           else
@@ -616,7 +616,7 @@ module Hobo
       self.this = model.new
       this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creator(name)
-      raise Hobo::Model::PermissionDeniedError unless @creator.allowed?(current_user)
+      raise Hobo::PermissionDeniedError unless @creator.allowed?(current_user)
     end
 
 
@@ -641,7 +641,7 @@ module Hobo
         record.exempt_from_edit_checks = true
         record.lifecycle.provided_key = key
       end
-      this.lifecycle.find_transition(name, current_user) or raise Hobo::Model::PermissionDeniedError
+      this.lifecycle.find_transition(name, current_user) or raise Hobo::PermissionDeniedError
     end
 
 

@@ -43,7 +43,7 @@ module Hobo
               fire_event(record, on_transition)
             end
           else
-            raise Hobo::Model::PermissionDeniedError
+            raise Hobo::PermissionDeniedError
           end
         end
       end
