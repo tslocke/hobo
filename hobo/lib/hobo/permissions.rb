@@ -373,7 +373,7 @@ module Hobo
           true
         end
       
-        def changed
+        define_method :changed do
           changed_attributes.keys | [attr]
         end
       
