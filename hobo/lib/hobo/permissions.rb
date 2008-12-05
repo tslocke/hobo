@@ -268,16 +268,16 @@ module Hobo
     # --- Permission Declaration Helpers --- #
     
     def only_changed?(*attributes)
-      attributes = attributes.map do |a|
-        with_attribute_or_belongs_to_keys { |a, ftype| ftype ? [a, ftype] : a }
+      attributes = attributes.map do |attr|
+        with_attribute_or_belongs_to_keys(attr) { |a, ftype| ftype ? [a, ftype] : a }
       end.flatten
       
       changed.all? { |attr| attributes.include?(attr) }
     end
     
     def none_changed?(*attributes)
-      attributes = attributes.map do |a|
-        with_attribute_or_belongs_to_keys { |a, ftype| ftype ? [a, ftype] : a }
+      attributes = attributes.map do |attr|
+        with_attribute_or_belongs_to_keys(attr) { |a, ftype| ftype ? [a, ftype] : a }
       end.flatten
       
       attributes.all? { |attr| !attributes.include?(attr) }
@@ -285,7 +285,7 @@ module Hobo
 
     def any_changed?(*attributes)
       attributes.any? do |attr|
-        with_attribute_or_belongs_to_keys do |a, ftype|
+        with_attribute_or_belongs_to_keys(attr) do |a, ftype|
           if ftype
             changed.include?(a) || changed.include?(ftype)
           else
@@ -298,7 +298,7 @@ module Hobo
     def all_changed?(*attributes)
       attributes = prepare_attributes_for_change_helpers(attributes)
       attributes.all? do |attr|
-        with_attribute_or_belongs_to_keys do |a, ftype|
+        with_attribute_or_belongs_to_keys(attr) do |a, ftype|
           if ftype
             changed.include?(a) || changed.include?(ftype)
           else
