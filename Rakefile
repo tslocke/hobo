@@ -2,8 +2,6 @@ require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
-load "tasks/generate_tag_reference.rb"
-
 desc "Default Task"
 task :default => [ :test ]
 
@@ -42,12 +40,12 @@ Echoe.new('hobo') do |p|
   p.project = "hobo"
 
   p.changelog = "CHANGES.txt"
-  p.version   = "0.8.3"
+  p.version   = "0.8.4"
 
   p.dependencies = [
-    'hobosupport =0.8.3',
-    'hobofields =0.8.3',
-    'rails >=2.2',
+    'hobosupport =0.8.4',
+    'hobofields =0.8.4',
+    'rails >=2.2.2',
     'mislav-will_paginate >=2.2.1']
     
   p.development_dependencies = []
