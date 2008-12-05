@@ -10,6 +10,10 @@ lib/hobo_fields/markdown_string.rb
 lib/hobo_fields/migration_generator.rb
 lib/hobo_fields/model_extensions.rb
 lib/hobo_fields/password_string.rb
+lib/hobo_fields/raw_html_string.rb
+lib/hobo_fields/raw_markdown_string.rb
+lib/hobo_fields/sanitize_html.rb
+lib/hobo_fields/serialized_object.rb
 lib/hobo_fields/text.rb
 lib/hobo_fields/textile_string.rb
 lib/hobo_fields.rb

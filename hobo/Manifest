@@ -9,12 +9,14 @@ lib/active_record/association_collection.rb
 lib/active_record/association_proxy.rb
 lib/active_record/association_reflection.rb
 lib/extensions/test_case.rb
+lib/hobo/accessible_associations.rb
 lib/hobo/authentication_support.rb
 lib/hobo/bundle.rb
 lib/hobo/composite_model.rb
 lib/hobo/controller.rb
 lib/hobo/dev_controller.rb
 lib/hobo/dryml/dryml_builder.rb
+lib/hobo/dryml/dryml_doc.rb
 lib/hobo/dryml/dryml_generator.rb
 lib/hobo/dryml/dryml_support_controller.rb
 lib/hobo/dryml/parser/attribute.rb
@@ -45,11 +47,12 @@ lib/hobo/lifecycles/lifecycle.rb
 lib/hobo/lifecycles/state.rb
 lib/hobo/lifecycles/transition.rb
 lib/hobo/lifecycles.rb
-lib/hobo/mass_assignment.rb
 lib/hobo/model.rb
 lib/hobo/model_controller.rb
 lib/hobo/model_router.rb
 lib/hobo/model_support.rb
+lib/hobo/permissions/associations.rb
+lib/hobo/permissions.rb
 lib/hobo/rapid_helper.rb
 lib/hobo/scopes/apply_scopes.rb
 lib/hobo/scopes/association_proxy_extensions.rb
@@ -61,6 +64,7 @@ lib/hobo/undefined.rb
 lib/hobo/undefined_access_error.rb
 lib/hobo/user.rb
 lib/hobo/user_controller.rb
+lib/hobo/view_hints.rb
 lib/hobo.rb
 LICENSE.txt
 Manifest
@@ -70,7 +74,6 @@ rails_generators/hobo/templates/application.dryml
 rails_generators/hobo/templates/dryml-support.js
 rails_generators/hobo/templates/guest.rb
 rails_generators/hobo/templates/initializer.rb
-rails_generators/hobo/templates/patch_routing.rb
 rails_generators/hobo_front_controller/hobo_front_controller_generator.rb
 rails_generators/hobo_front_controller/templates/controller.rb
 rails_generators/hobo_front_controller/templates/functional_test.rb
@@ -79,6 +82,7 @@ rails_generators/hobo_front_controller/templates/index.dryml
 rails_generators/hobo_front_controller/USAGE
 rails_generators/hobo_model/hobo_model_generator.rb
 rails_generators/hobo_model/templates/fixtures.yml
+rails_generators/hobo_model/templates/hints.rb
 rails_generators/hobo_model/templates/model.rb
 rails_generators/hobo_model/templates/unit_test.rb
 rails_generators/hobo_model/USAGE
@@ -127,6 +131,7 @@ script/destroy
 script/generate
 taglibs/core.dryml
 taglibs/rapid.dryml
+taglibs/rapid_core.dryml
 taglibs/rapid_document_tags.dryml
 taglibs/rapid_editing.dryml
 taglibs/rapid_forms.dryml
@@ -139,9 +144,12 @@ taglibs/rapid_support.dryml
 taglibs/rapid_user_pages.dryml
 tasks/environments.rake
 tasks/fix_dryml.rake
-tasks/generate_tag_reference.rb
+tasks/generate_tag_reference.rake
 tasks/hobo_tasks.rake
 test/generators/test_generator_helper.rb
 test/generators/test_helper.rb
 test/generators/test_hobo_model_controller_generator.rb
-uninstall.rb
+test/permissions/models/models.rb
+test/permissions/models/schema.rb
+test/permissions/models/test.sqlite3
+test/permissions/test_permissions.rb

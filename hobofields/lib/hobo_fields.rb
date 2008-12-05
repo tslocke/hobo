@@ -1,6 +1,6 @@
 require 'hobosupport'
 
-(defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : Dependencies).load_paths |= [ File.dirname(__FILE__) ]
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__) ]
 
 module Hobo
   # Empty class to represent the boolean type.
@@ -9,7 +9,7 @@ end
 
 module HoboFields
 
-  VERSION = "0.8.3"
+  VERSION = "0.8.4"
 
   extend self
 
