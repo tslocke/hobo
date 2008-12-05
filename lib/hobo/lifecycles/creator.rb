@@ -56,7 +56,7 @@ module Hobo
             end
             record
           else
-            raise Hobo::Model::PermissionDeniedError
+            raise Hobo::PermissionDeniedError
           end
         end
       end
