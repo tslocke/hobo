@@ -1,3 +1,333 @@
+=== Hobo 0.8.4 ===
+
+Rails 2.2 compatible. Rails 2.1 support dropped.
+
+  Removing the Rails routing patch (from the hobo generator) that is no longer needed.
+  Existing apps can delete this from config/initializers/patch_routing.rb
+
+BREAKING: New permission system
+
+  This is the major feature of this release. The big change is that we now use the dirty tracking features
+  of Active Record for update permission, rather than passing that weird 'new' object. We also use the
+  acting_user method throughout, rather than passing the user as an argument.
+  
+   See the docs online: http://cookbook.hobocentral.net/manual/permissions
+
+
+  Removing special Hobo semantics for association.new which was breaking the Rails API, and added
+  #new_candidate
+  
+    association.new_candidate instantiates the record but does not add it to the collection.
+  
+  Fix to linkable? helpers when context responds to origin but is not a collection
+  
+POSSIBLY BREAKING: Improved multi-model form support
+
+  has_many and belongs_to now support the :accessible => true option, which allows mass-asssignment of
+  attributes to work with sub-hashes that correspond to associations. Docs to follow!
+  
+BREAKING: Lifecycle improvements
+
+  The lifecycle DSL has been tidied up. Various changes to the semantics.
+  
+  Lifecycle validations are now supported (e.g. validates_presence_of :foo, :on => :my_transition)
+  
+  Also small improvements to the controller layer lifecycles support
+  
+  See: http://cookbook.hobocentral.net/manual/lifecycles
+  
+New ViewHints mechanism
+
+  Classes in app/viewhints are a place to declare things about your models that are view layer concerns.
+  For example, you can give the presenation name for a field if this should be different from the back-end
+  name. You can give "field help" for each field. You can specify which collections are the "children" of a
+  model from a UI point of view.  
+
+Rapid <select-many> -- removed use of <a-or-an> as it gets some words wrong (e.g. "an user")
+
+Rapid -- moved <or-cancel> to rapid_forms.dryml
+
+Model controller fix -- owner instance variable should be named after the association, not the class (e.g.
+@author, not @user)
+
+View hints fix -- inconsistent results due to class reloading problem in dev mode (was causing inconsistent
+Rapid pages to be generated)
+
+Hobo Models -- added support for 1-to-1 relationships to Hobo::Model.reverse_reflection
+
+  This puts us a step closer to better support for 1-to-1 relationships in various places, e.g. for owner
+  actions
+
+Improved error message when declaring auto_actions_for on an association that doesn't have the
+corresponding reverse-reflection
+
+Fixed query_params helper -- should URI decode the parameters
+
+Rapid -- simplified <filter-menu> (no need for a hidden tag)
+
+Rapid pages -- added <heading:> parameter to account page
+
+DRYML -- fix to merge-attrs="a, b, c"
+
+Rapid <input-many> -- added support for disable attribute
+
+Fix to <hobo-rapid-javascripts> when forgery protection is disabled
+
+User model - validates_presence_of password confirmation, in addition to validates_confirmation_of
+    
+  Fixes #310 - thanks to Jaub Suder
+
+BREAKING: Rapid page generators -- Renamed 'primary-content' parameter in <show-page> to 'description'
+
+User controller -- made account action follow the auto_actions declaration
+
+Changed hobo->hobofields->hobosupport gem dependency rules to require the exact version
+
+User model generator -- Hobo apps now have people log in with their email address by default, and the user
+has a 'name' field rather than 'username'. 
+
+  Note this will not effect existing apps
+
+Clean theme - fix to styling of login page in IE6
+
+Rapid javascripts -- fix to in-place-editor errors not showing up properly (#324). Thanks to Jakub Suder
+
+DRYML -- fixed duplicate ID bug with ajax parts (#326)
+
+POSSIBLY BREAKING: Models -- removed support for chronic parsing of times / dates.
+
+    Was wrong to hardwire this support in for every date/time field. Will be added back in as a rich type
+    at some point
+
+Scopes - Fixed association.conditions with scopes for has_many :through
+
+  Rapid <hidden-fields> -- now honours the 'skip' attribute under all circumstances
+
+Rapid <page> -- app-stylesheet param, to make it easier to add in custom stylesheets, but have them
+*before* application.css
+
+Rapid <stylesheet> -- call stylesheet_link_tag once only so that asset combining is supported
+
+DRYML -- allow <include plugin="foo"/> as a shorthand for <include src="foo" plugin="foo"/>
+
+Removed super_user? and adminstrator? from Hobo::Guest, and added administrator? to Guest generator
+
+    administrator? should not be present at all in core Hobo, it's just a default starting point
+
+Rapid <input for='boolean'> -- don't add the hidden field if the checkbox is disabled - thanks to Tola.
+
+Rapid <nav-item> -- Fix to 'current' CSS class when a body is not given
+
+Rapid pages -- fix to selecting current nav item
+
+Added hobo:run_standard_generators task (*NIX only)
+
+Guest - changed default #to_s and #login to use lower case
+
+Rapid <remote-method-button> -- allow method name to use dashes, and raise an error if there's no such web
+method
+
+DRYML -- never run DRYML generators in production mode. Instead run
+
+    rake hobo:generate_taglibs
+
+Rapid JavaScripts -- adding custom events to <select-many>
+
+Rapid JavaScript -- added option to specify { message: false } on ajaxRequest to disable the spinner
+
+Model Controller -- fix to re_render_form when in a subsite
+    
+hobo_model_controller generator -- adding support for generating subsite controllers
+
+HoboSupport -- adding remove and remove_all (plus mutating versions with a !) to string - better name for
+sub(x, '')
+
+DRYML -- added support for scope.even_odd to the attribute version of repeat (was only on the tag version)
+
+DRYML -- improved error message for mixed param / non-param tags
+
+Model controller -- fix to index actions on non-paginated formats (was passing will-paginate options to a
+regular find)
+
+Migration generator -- adding option: --force-drop-yes-i-really-mean-it-i-know-what-i-am-doing-dammit
+    
+    Not really, it's actually just --force-drop
+    
+    With this option it won't ask you "drop or rename?" it will just drop
+
+HoboFields -- fix to EnumString when values are not valid contant names
+
+Rapid -- added support for 'disabled' to <select-many>
+
+Enhanced ajax mechanism so that it can refresh form inputs (was previously not able to figure out the name
+attributes)
+
+Rapid -- adding support for 'disabled' attribute to <select-one>
+
+Rapid -- added a 'no-edit' attribute to <input> and <field-list>. Gives control over how
+non-editable fields are handled. 
+
+  - view: render the current value using the `<view>` tag
+  - disable: render the input as normal, but add HTML's `disabled` attribute
+  - skip: render nothing at all
+  - ignore: render the input normally. That is, don't even perform the edit check.
+
+
+Added <dev-user-changer> to the user 'simple pages' (login, signup...)
+
+User conrtroller -- redirect to home_page if a logged-in user visits the login page
+
+Model controller -- fix to lifecycle form inputs not showing up after a validation error
+
+Rapid -- changed rules for <delete-button> chosing whether to be in-place or not
+
+BREAKING (minor): removed 'type' attribute from <type-name>
+
+BREAKING (minor): Rapid -- renamed 'separator' attribute of <comma-list> to 'join'
+
+Rapid -- moved live-search and filter-menu tags into rapid_plus
+
+Rapid -- removed unused <belongs-to-view>. Renamed <has-many-view> to <collection-view>, made it
+polymorphic, and extracted the default definition as <links-for-collection>
+
+Rapid -- tweak to behaviour of <name>. Is now more sensible when called on a non-AR class
+
+Re-organisation and documentation for Rapid Document Tags
+
+BREAKING: Deleted <panel> tag. 
+
+Models - fix to overriding of not_found and permission_denied in applicatin controller. Also fix to bug in
+permission denied
+
+Models -- fix to preceding dashes in to_param (sometimes showed up in the URL)
+
+DRYML -- allow - instead of _ in repeat/if/unless, when not code attribute
+
+HoboSupport - re-org of the file layout
+
+HoboFields -- new rich type :serialized (HoboFields::SerializedObject)
+    
+    example usage:    foo :serialized, :class => Array
+    
+    Also some fixes to wrapping of rich types that were needed
+
+HoboFields -- adding 'declared' callback to rich types. Called whenever a field of that type is declared
+
+  See HoboFields::HtmlString for an example
+  
+HoboFields -- new types RawHtmlString and RawMarkdownString that are not sanitized. Plus fix to sanitizing
+
+DRYML -- new DrymlDoc facility. Starting point for a roll-your-own documentation generator
+
+  Used to generate the cookbook taglib API reference.
+
+hobo_front_controller generator -- use map.root for adding the root route
+
+Model controller -- can call #re_render_form without an arg (for when you know params[:page_path] is set)
+
+Support for non-numeric model IDs
+
+    Rails has no problems with these but Hobo was assuming integer IDs in a few places.
+
+Fix to default ApplicationController#home_page -- was broken when the app lives in a sub-directory
+
+Rapid -- allow '-' instead of '_' in <with-fields> (and therefore, <field-list> and <table field='...'>)
+
+Rapid -- made <select-many> submit IDs instead of names, so that it also works with models that don't have a
+unique name
+
+Cleanup of dom_id / typed_id.
+
+  We now use the term "typed id" throughout to refer to a string that includes a model name and an ID.
+
+  These now use ':' instead of '_' as the model-name/id separator, which has the benefit of allowing
+  non-integer keys
+
+HoboSupport -- adding String#safe_constantize. Returns nil (instead of raising a NameError) the constant
+does not exist and cannot be loaded by ActiveSupport
+
+BREAKING. Rapid pages -- separated out application.js from other JS includes and added a <custom-scripts:>
+parameter
+
+  Adding extra scripts using this new parameter will ensure application.js comes last and can thus override
+  behaviour of custom scripts.
+
+  This is a breaking change because apps that have customised the list of JS includes might not now have
+  the set of scripts they expect
+
+Rapid - adding polymorphic <collection-input> tag as a place to define the kind of input you want used for
+collections of a given model
+
+Rapid javascripts -- making non-ajax HTML Editor pluggable
+    
+  Plugins assign a function to Hobo.makeHtmlEditor. See hoboyui plugin for an example (github.com/tablatom)
+    
+Adding XSS protection to HoboFields rich types (Sanitizing)
+
+Rapid -- new tag <check-many>. Add remove items to a has_many :through by checking the ones you want. Obviously
+this is only suitable when the number of items in the target model is small. (e.g. blog post categories)
+
+Page generators -- better titles for collection previews in aside on a user's page
+
+Page generators -- improved collection heading on show-page for a user
+
+Fixes to "remember me"
+
+Card generator -- observe view-hints when putting a count on the card
+
+Rapid -- change to css classes on new-object forms (was 'new-post' now 'new post')
+
+Rapid -- workaround for the fact that Maruku defines a to_html method on String
+
+Page generators -- changed heading used on <edit-page>
+
+HoboSupport -- added Object#present? that is on it's way from edge Rails (will remove when Rails provides
+this)
+
+User pages:
+
+  Added editing of email address to user's account page
+  
+  Got rid of <change-password-form>
+
+Rapid plus -- added <preview-with-more> and <gravatar> tags
+
+Rapid -- removed unimplemented if-content attribute from base <card>
+
+Rapid -- fixed class name dash problem in <name-one>
+
+User model generator -- allow users to change their email address by default
+
+Automatic scopes
+
+  extended with_things and without_things automatic scopes so that they work without arguments.
+
+    e.g. Question.with_answers and Question.without_answers
+
+  Automatic scopes -- have 'recent' scope just do a 'limit x' if there is no created_at column (used to
+  blow up)
+
+Model Controller, allow :scope => :some_scope_name on index_action
+
+Made object_url handle a scoped class (gives the index url, e.g. /posts)
+
+Rapid generators -- fixed bug where some cards had title when they should not have
+
+Rapid generators -- smarter index-for-owner page when the owner is a user
+
+Rapid generators -- fixed wrongly named param in for new-for-ower pages
+
+User controller generator -- remove :new action by default
+
+DRYML - fixed problem where parameters where conflicting rather than merging
+
+Improvements to reset stylesheet - strong, em and code now render as expetced
+
+Moved all the tags defined in rapid.dryml into a new included file rapid_core.dryml to make it easier to
+include only parts of the tag library if required
+
+
+
 === Hobo 0.8.3 ===
 
 Hobo models -- improvements to logic for validating passwords. Closes #281
