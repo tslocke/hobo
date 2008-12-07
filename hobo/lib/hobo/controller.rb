@@ -122,7 +122,7 @@ module Hobo
     
     def tag_renderer
       @tag_renderer ||= begin
-        add_variables_to_assigns
+        @template.send(:_evaluate_assigns_and_ivars)
         Hobo::Dryml.empty_page_renderer(@template)
       end
     end    
@@ -135,7 +135,7 @@ module Hobo
     NO_SEARCH_RESULTS_HTML = "<p>Your search returned no matches.</p>"
     def site_search(query)
       results_hash = Hobo.find_by_search(query)
-      all_results = results_hash.values.flatten.select { |r| Hobo.can_view?(current_user, r, nil) }
+      all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
       if all_results.empty?
         render :text => NO_SEARCH_RESULTS_HTML
       else
