@@ -141,7 +141,8 @@ module Hobo
 
 
       def state_name
-        record.read_attribute(self.class.state_field).to_sym
+        name = record.read_attribute(self.class.state_field)
+        name.to_sym if name
       end
 
 
