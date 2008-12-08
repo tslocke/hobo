@@ -1,16 +1,12 @@
 class HoboGenerator < Rails::Generator::Base
 
   def manifest
+    if options[:add_gem]
+      add_to_file "config/environment.rb", "Rails::Initializer.run do |config|", "  config.gem 'hobo'\n"
+    end
+    
     if options[:add_routes]
-      routes_path = File.join(RAILS_ROOT, "config/routes.rb")
-
-      route = "  Hobo.add_routes(map)\n"
-      route_src = File.read(routes_path)
-      unless route_src.include?(route)
-        head = "ActionController::Routing::Routes.draw do |map|"
-        route_src.sub!(head, head + "\n\n" + route)
-        File.open(routes_path, 'w') {|f| f.write(route_src) }
-      end
+      add_to_file "config/routes.rb", "ActionController::Routing::Routes.draw do |map|", "\n  Hobo.add_routes(map)\n"
     end
 
     record do |m|
@@ -32,7 +28,7 @@ class HoboGenerator < Rails::Generator::Base
 
   protected
     def banner
-      "Usage: #{$0} #{spec.name} [--add-routes]"
+      "Usage: #{$0} #{spec.name} [--add-routes] [--add-gem]"
     end
 
     def add_options!(opt)
@@ -40,5 +36,17 @@ class HoboGenerator < Rails::Generator::Base
       opt.separator 'Options:'
       opt.on("--add-routes",
              "Add Hobo routes to config/routes.rb") { |v| options[:add_routes] = v }
+      opt.on("--add-gem",
+             "Edit environment.rb to require the hobo gem") { |v| options[:add_gem] = v }
     end
+    
+    def add_to_file(filename, after_line, new_line)
+      filename = File.join(RAILS_ROOT, filename)
+      src = File.read filename
+      unless src.include? new_line
+        src.sub!(after_line, after_line + "\n" + new_line)
+        File.open(filename, 'w') {|f| f.write(src) }
+      end
+    end
+
 end
