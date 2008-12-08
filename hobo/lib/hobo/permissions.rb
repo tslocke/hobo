@@ -184,8 +184,8 @@ module Hobo
     end
     
     def method_callable_by?(user, method)
-      permission_method = "#{method}_call_permitted?"
-      respond_to?(permission_method) && with_acting_user(current_user) { send(permission_method) }
+      permission_method = "#{method}_permitted?"
+      respond_to?(permission_method) && with_acting_user(user) { send(permission_method) }
     end
     
     def viewable_by?(user, attribute=nil)
