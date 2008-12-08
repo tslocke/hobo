@@ -74,7 +74,7 @@ Dir.chdir(app_path) do
   FileUtils.touch("public/stylesheets/application.css")
 
   puts "\nInitialising Hobo...\n"
-  command(gen, "hobo --add-routes")
+  command(gen, "hobo --add-gem --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
   command("#{gen} hobo_rapid --import-tags")
