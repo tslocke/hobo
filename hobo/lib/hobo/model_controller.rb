@@ -111,7 +111,7 @@ module Hobo
           # Make sure we have a copy of the options - it is being mutated somewhere
           opts = {}.merge(options)
           self.this = find_instance(opts) unless opts[:no_find]
-          raise Hobo::PermissionDeniedError unless Hobo.can_call?(current_user, @this, method)
+          raise Hobo::PermissionDeniedError unless @this.method_callable_by?(current_user, method)
           if got_block
             instance_eval(&block)
           else
