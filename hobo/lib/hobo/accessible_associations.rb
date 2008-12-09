@@ -9,31 +9,36 @@ module Hobo
 
       array = params_hash_to_array(array_or_hash)
       array.map! do |record_hash_or_string|
-        find_or_create_and_update(owner, association, association_name, record_hash_or_string) { association.build }
+        finder = association.member_class.scoped :conditions => association.conditions
+        find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
+          # The block is required to either locate find an existing record in the collection, or build a new one
+          if id
+            # TODO: We don't really want to find these one by one
+            association.find(id)
+          else
+            association.build
+          end
+        end
       end
       array.compact
     end
     
     
-    def find_or_create_and_update(owner, association, association_name, record_hash_or_string)
+    def find_or_create_and_update(owner, association_name, finder, record_hash_or_string)
       if record_hash_or_string.is_a?(String)
-        # An ID (if it starts '@') or else a name
-        record = find_record(association, record_hash_or_string)
+        # An ID or a name - the passed block will find the record
+        record = find_by_name_or_id(finder, record_hash_or_string)
       
       elsif record_hash_or_string.is_a?(Hash)
         # A hash of attributes
         hash = record_hash_or_string
 
         # Remove completely blank hashes
-        return nil if hash.values.join.blank?
+        return nil if hash.values.all?(&:blank?)
 
         id = hash.delete(:id)
 
-        record = if id
-                   association.find(id) # TODO: We don't really want to find these one by one
-                 else
-                   record = yield
-                 end
+        record = yield id
         record.attributes = hash
         owner.include_in_save(association_name, record) unless owner.new_record? && record.new_record?
         
@@ -43,7 +48,7 @@ module Hobo
       end
       record
     end
-    
+
     
     def params_hash_to_array(array_or_hash)
       if array_or_hash.is_a?(Hash)
@@ -54,17 +59,12 @@ module Hobo
     end
     
 
-    def find_record(association, id_or_name)
-      klass = association.member_class
+    def find_by_name_or_id(finder, id_or_name)
       if id_or_name =~ /^@(.*)/
         id = $1
-        if id =~ /:/
-          Hobo::Model.find_by_typed_id(id)
-        else
-          klass.find(id)
-        end
+        finder.find(id)
       else
-        klass.named(id_or_name, :conditions => association.conditions)
+        finder.named(id_or_name)
       end
     end
   
@@ -103,7 +103,18 @@ module Hobo
       if options[:accessible]
         class_eval %{
           def #{name}_with_accessible=(record_hash_or_string)
-            record = Hobo::AccessibleAssociations.find_or_create_and_update(self, #{name}, :#{name}, record_hash_or_string) { self.class.reflections[:#{name}].klass.new }
+            refl = self.class.reflections[:#{name}]
+            conditions = ActiveRecord::Associations::BelongsToAssociation.new(self, refl).conditions
+            finder = refl.klass.scoped(:conditions => conditions)
+            record = Hobo::AccessibleAssociations.find_or_create_and_update(self, :#{name}, finder, record_hash_or_string) do |id|
+              if id
+                raise ArgumentError, "attempted to update the wrong record in belongs_to association #{self}##{name}" unless 
+                  #{name} && id == self.#{name}.id
+                #{name}
+              else
+                refl.klass.new
+              end
+            end
             self.#{name}_without_accessible = record
           end
         }, __FILE__, __LINE__ - 5
