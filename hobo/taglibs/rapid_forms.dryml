@@ -773,8 +773,8 @@ Use the `uri` option to specify a redirect location:
 
 
 <def tag="or-cancel">
-  <if test="&linkable?">or <a>Cancel</a></if>
+  <if test="&linkable?">or <a merge-attrs>Cancel</a></if>
   <else>
-    <if test="&linkable?(this.class)">or <a to="&this.class">Cancel</a></if>
+    <if test="&linkable?(this.class)">or <a to="&this.class" merge-attrs>Cancel</a></if>
   </else>
 </def>
