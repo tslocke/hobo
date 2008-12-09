@@ -254,6 +254,18 @@ class PermissionsTest < Test::Unit::TestCase
         assert_equal("code.zip", @r.code_example.filename)        
       end
       
+      should "allow the code example related to a recipe to be changed" do
+        r = existing_recipe @user
+        c1 = CodeExample.create! :filename => "exmaple1.zip"
+        c2 = CodeExample.create! :filename => "exmaple2.zip"
+        r.code_example = c1
+        r.save
+        
+        r.user_update_attributes! @user, :code_example => "@#{c2.id}"
+        
+        assert_equal(c2, r.code_example)
+      end
+      
       context "on an existing recipe with a code example" do 
         setup do
           @ce = CodeExample.create! :filename => "exmaple.zip"
@@ -261,8 +273,11 @@ class PermissionsTest < Test::Unit::TestCase
         end
       
         should "allow update of the code-example" do
-          @r.user_update_attributes! @user, :code_example => { :filename => "changed.zip" }
+          # To update the exsting target of a belongs_to association, the id must be included in the hash
+          # It is an error to provide any id other than that of the existing target
+          @r.user_update_attributes! @user, :code_example => { :id => @ce.id, :filename => "changed.zip" }
           assert_equal("changed.zip", @r.code_example.filename)
+          assert_equal(@ce, @r.code_example)
         end
 
         should "allow removal of the code-example" do
