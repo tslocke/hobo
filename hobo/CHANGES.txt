@@ -1,3 +1,30 @@
+=== Hobo 0.8.5 ===
+
+New permission system
+
+  Various fixes
+  
+  Now runs permission checks *before* callbacks, not after
+    
+    In the switch to the new permissions system, we changed to running them after all callbacks. This turned
+    out to be wrong. Permissions should only be about what the user tried to change, not other changes
+    triggered by application logic
+
+  API change: Web method permissions should now be defined as foo_permitted? instead of foo_call_permitted?
+
+Updated hobo command and hobo generator to use the new config.gem style for apps that use the Hobo gem
+
+  The --add-gem option to script/generate hobo will add "config.gem 'hobo'" to environment.rb. The hobo command
+  does this automatically
+
+Lifecycles fix -- state_name would throw a nil error if there was no state (not returns nil)
+    
+  This was causing the :new_key option to fail on a create step
+
+Fixes to problems with live-search introduced with the Rails 2.2 upgrade
+
+
+
 === Hobo 0.8.4 ===
 
 Rails 2.2 compatible. Rails 2.1 support dropped.
