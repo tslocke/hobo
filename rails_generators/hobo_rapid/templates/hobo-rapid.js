@@ -746,7 +746,7 @@ Event.addBehavior({
 
     '.autocompleter' : AutocompleteBehavior(),
 
-    '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place.edit, big-integer.in-place-edit' :
+    '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place-edit, big-integer.in-place-edit' :
      function (ev) {
 
          var ipe = Hobo._makeInPlaceEditor(this)
