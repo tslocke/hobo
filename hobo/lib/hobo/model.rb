@@ -6,7 +6,7 @@ module Hobo
 
     NAME_FIELD_GUESS      = %w(name title)
     PRIMARY_CONTENT_GUESS = %w(description body content profile)
-    SEARCH_COLUMNS_GUESS  = %w(name title body content profile)
+    SEARCH_COLUMNS_GUESS  = %w(name title body description content profile)
 
 
     def self.included(base)
