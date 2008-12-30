@@ -54,21 +54,14 @@ module Hobo::Dryml
       ("def render_page(__page_this__, __local_assigns__); " +
             "#{locals} new_object_context(__page_this__) do " +
             src +
-           "; _erbout; end; end")
+           "; output_buffer; end; end")
     end
 
 
     def erb_process(erb_src)
-      # Strip off "_erbout = ''" from the beginning and "; _erbout"
-      # from the end, because we do things differently around
-      # here. (_erbout is defined as a method)
-      trim_mode = if defined?(ActionView::TemplateHandlers::ERB.erb_trim_mode)
-                    ActionView::TemplateHandlers::ERB.erb_trim_mode
-                  else
-                    ActionView::Base.erb_trim_mode
-                  end
-      
-      ERB.new(erb_src, nil, trim_mode).src[("_erbout = '';").length..-("; _erbout".length)]
+      trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
+      erb = ERB.new("<% __in_erb_template=true %>#{erb_src}", nil, trim_mode, "output_buffer")
+      erb.src[("output_buffer = '';").length..-("; output_buffer".length)]
     end
 
 
