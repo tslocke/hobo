@@ -13,12 +13,7 @@
       </section>
     </header>
 
-    <section class="content-body" repeat="&front_models">
-      <div class="model">
-        <h3><type-name plural/></h3>
-        <collection:recent/>
-        <p if="&can_create? && linkable?(:new)">Create a <a to="&this" action="new"/>.</p>
-      </div>
+    <section class="content-body">
     </section>
   </content:>
   
