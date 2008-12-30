@@ -38,6 +38,7 @@ module Hobo
     
     def enable
       ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+      DrymlGenerator.enable
     end
     
 

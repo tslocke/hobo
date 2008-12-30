@@ -1,6 +1,8 @@
 require 'set'
 require 'fileutils'
 
+require 'action_controller/dispatcher'
+
 module Hobo
   
   module Dryml
@@ -11,6 +13,18 @@ module Hobo
       OUTPUT    = "#{RAILS_ROOT}/app/views/taglibs/auto"
       
       HEADER = "<!-- AUTOMATICALLY GENERATED FILE - DO NOT EDIT -->\n\n"
+      
+      def self.enable
+        # Unfortunately the dispatcher callbacks don't give us the hook we need (after routes are reloaded) 
+        # so we have to alias_method_chain
+        ActionController::Dispatcher.class_eval do
+          def reload_application_with_dryml_generators
+            reload_application_without_dryml_generators
+            DrymlGenerator.run
+          end
+          alias_method_chain :reload_application, :dryml_generators
+        end
+      end
       
       def self.run
         return if RAILS_ENV == "production"

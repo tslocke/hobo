@@ -80,9 +80,6 @@ module Hobo
 
         add_developer_routes(map) if Hobo.developer_features?
 
-        # Run the DRYML generators
-        # TODO: This needs a proper home 
-        Hobo::Dryml::DrymlGenerator.run unless caller[-1] =~ /[\/\\]rake:\d+$/
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
         ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
