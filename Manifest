@@ -60,6 +60,7 @@ lib/hobo/scopes/automatic_scopes.rb
 lib/hobo/scopes/named_scope_extensions.rb
 lib/hobo/scopes.rb
 lib/hobo/static_tags
+lib/hobo/tasks/rails.rb
 lib/hobo/undefined.rb
 lib/hobo/undefined_access_error.rb
 lib/hobo/user.rb
@@ -143,8 +144,6 @@ taglibs/rapid_plus.dryml
 taglibs/rapid_support.dryml
 taglibs/rapid_user_pages.dryml
 tasks/environments.rake
-tasks/fix_dryml.rake
-tasks/generate_tag_reference.rake
 tasks/hobo_tasks.rake
 test/generators/test_generator_helper.rb
 test/generators/test_helper.rb
