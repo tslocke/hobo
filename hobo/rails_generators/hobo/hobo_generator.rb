@@ -3,6 +3,7 @@ class HoboGenerator < Rails::Generator::Base
   def manifest
     if options[:add_gem]
       add_to_file "config/environment.rb", "Rails::Initializer.run do |config|", "  config.gem 'hobo'\n"
+      add_to_file "Rakefile", "require 'tasks/rails'", "\nrequire 'hobo/tasks/rails'"
     end
     
     if options[:add_routes]
