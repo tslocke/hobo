@@ -193,7 +193,7 @@ module Hobo::Dryml
     def set_element(el)
       assigns = el.attributes.map do |name, value|
         next if name.in?(SPECIAL_ATTRIBUTES)
-        dryml_exception("invalid name in <set>", el) unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
+        dryml_exception("invalid name in <set> (remember to use '-' rather than '_')", el) unless name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
         "#{ruby_name name} = #{attribute_to_ruby(value)}; "
       end.join
       code = apply_control_attributes("begin; #{assigns}; end", el)
@@ -203,7 +203,7 @@ module Hobo::Dryml
 
     def set_scoped_element(el)
       variables = el.attributes.map do |name, value|
-        dryml_exception("invalid name in <set-scoped>", el) unless name =~ DRYML_NAME_RX
+        dryml_exception("invalid name in <set-scoped> (remember to use '-' rather than '_')", el) unless name =~ DRYML_NAME_RX
         ":#{ruby_name name} => #{attribute_to_ruby(value)} "
       end
       "<% scope.new_scope(#{variables * ', '}) { #{tag_newlines(el)} %>#{children_to_erb(el)}<% } %>"
