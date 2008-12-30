@@ -169,7 +169,7 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
       b
     end
      
-    auth_token = if method.nil? || method == 'get' || protect_against_forgery?
+    auth_token = if method.nil? || method == 'get' || !protect_against_forgery?
                    ''
                  else
                    element(:input, {:type => "hidden", 
