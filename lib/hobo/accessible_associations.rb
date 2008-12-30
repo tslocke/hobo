@@ -67,7 +67,13 @@ module Hobo
         finder.named(id_or_name)
       end
     end
-  
+
+    def finder_for_belongs_to(record, name)
+      refl = record.class.reflections[name]
+      conditions = ActiveRecord::Associations::BelongsToAssociation.new(record, refl).conditions
+      finder = refl.klass.scoped(:conditions => conditions)
+    end
+
   end
   
   classy_module(AccessibleAssociations) do
@@ -103,22 +109,34 @@ module Hobo
       if options[:accessible]
         class_eval %{
           def #{name}_with_accessible=(record_hash_or_string)
-            refl = self.class.reflections[:#{name}]
-            conditions = ActiveRecord::Associations::BelongsToAssociation.new(self, refl).conditions
-            finder = refl.klass.scoped(:conditions => conditions)
+            finder = Hobo::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
             record = Hobo::AccessibleAssociations.find_or_create_and_update(self, :#{name}, finder, record_hash_or_string) do |id|
               if id
                 raise ArgumentError, "attempted to update the wrong record in belongs_to association #{self}##{name}" unless 
                   #{name} && id == self.#{name}.id
                 #{name}
               else
-                refl.klass.new
+                finder.new
               end
             end
             self.#{name}_without_accessible = record
           end
-        }, __FILE__, __LINE__ - 5
+        }, __FILE__, __LINE__ - 15
         alias_method_chain :"#{name}=", :accessible
+      else
+        # Not accessible - but finding by name and ID is still supported
+        class_eval %{
+          def #{name}_with_finder=(record_or_string)
+            record = if record_or_string.is_a?(String)
+                       finder = Hobo::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
+                       Hobo::AccessibleAssociations.find_by_name_or_id(finder, record_or_string)
+                     else # it is a record
+                       record_or_string
+                     end
+            self.#{name}_without_finder = record
+          end
+        }, __FILE__, __LINE__ - 12
+        alias_method_chain :"#{name}=", :finder
       end
     end
     metaclass.alias_method_chain :belongs_to, :accessible
