@@ -240,24 +240,13 @@ module Hobo::Dryml
     end
 
 
-    def _erbout
-      @_erb_output
-    end
-
-
-    def _output(s)
-      @_erb_output.concat(s)
-    end
-
-
     def new_context
-      ctx = [ @_erb_output,
-              @_this, @_this_parent, @_this_field, @_this_type,
+      ctx = [ @_this, @_this_parent, @_this_field, @_this_type,
               @_form_field_path ]
-      @_erb_output = ""
       @_this_type = nil
-      res = yield
-      @_erb_output, @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
+      res = nil
+      @view.with_output_buffer { res = yield }
+      @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
       res.to_s
     end
 
@@ -508,7 +497,7 @@ module Hobo::Dryml
               params[:default] =
                 if general_parameters[:default]
                   proc do |default|
-                    overriding_default.call(proc { new_context { _output(general_parameters[:default].call(default)) } } )
+                    overriding_default.call(proc { new_context { concat(general_parameters[:default].call(default)) } } )
                   end
                 else
                   proc do |default|
@@ -598,8 +587,8 @@ module Hobo::Dryml
             else
               "<#{name}#{attr_string}>#{content}</#{name}>"
             end
-      if block && eval("defined? _erbout", block.binding) # in erb context
-        _output(res)
+      if block_called_from_erb? block
+        concat res
       else
         res
       end

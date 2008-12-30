@@ -367,7 +367,7 @@ module Hobo::Dryml
         # reproduce any line breaks in the start-tag so that line numbers are preserved
         tag_newlines(el) + "%>" +
         wrap_tag_method_body_with_metadata(children_to_erb(el)) +
-        "<% _erbout; end"
+        "<% output_buffer; end"
     end
 
 
@@ -576,7 +576,7 @@ module Hobo::Dryml
              end
 
       call = apply_control_attributes(call, el)
-      call = maybe_make_part_call(el, "<% _output(#{call}) %>")
+      call = maybe_make_part_call(el, "<% concat(#{call}) %>")
       wrap_tag_call_with_metadata(el, call)
     end
 
@@ -678,7 +678,7 @@ module Hobo::Dryml
     def before_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'before' parameters", el) if param_name
-      content = children_to_erb(el) + "<% _output(#{param_restore_local_name(name)}.call({}, {})) %>"
+      content = children_to_erb(el) + "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>"
       ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
 
@@ -686,7 +686,7 @@ module Hobo::Dryml
     def after_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'after' parameters", el) if param_name
-      content = "<% _output(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el)
+      content = "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el)
       ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
 
@@ -851,7 +851,7 @@ module Hobo::Dryml
         end
 
         output_tag = "element(:#{el.name}, #{attrs}, new_context { %>#{body}<% })"
-        "<% _output(" + apply_control_attributes(output_tag, el) + ") %>"
+        "<% concat(" + apply_control_attributes(output_tag, el) + ") %>"
       end
     end
 
