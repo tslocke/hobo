@@ -197,7 +197,7 @@ module Hobo
         hm = extras.include?(:has_many)
         klass.reflections.values.sort_by { |refl| refl.name.to_s }.map do |refl|
           fields << refl.name.to_s if bt && refl.macro == :belongs_to
-          fields << refl.name.to_s if hm && refl.macro == :has_many
+          fields << refl.name.to_s if hm && refl.macro == :has_many && refl.options[:accessible]
         end
 
         fields.reject! { |f| model.never_show? f }
