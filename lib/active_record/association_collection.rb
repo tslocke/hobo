@@ -13,6 +13,7 @@ module ActiveRecord
       def new_candidate(attributes = {})
         record = new
         @target.delete record
+        set_reverse_association(record) if hobo_association_collection?
         record
       end
 
