@@ -58,10 +58,16 @@ module Hobo::Dryml
     end
 
 
-    def erb_process(erb_src)
+    def erb_process(erb_src, method_def=false)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
-      erb = ERB.new("<% __in_erb_template=true %>#{erb_src}", nil, trim_mode, "output_buffer")
-      erb.src[("output_buffer = '';").length..-("; output_buffer".length)]
+      erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
+      src = erb.src[("output_buffer = '';").length..-("; output_buffer".length)]
+      
+      if method_def
+        src.sub /^\s*def.*?\(.*?\)/, '\0 __in_erb_template=true; '
+      else
+        "__in_erb_template=true; " + src
+      end
     end
 
 
@@ -76,7 +82,7 @@ module Hobo::Dryml
           @environment.class_eval(instruction[:src], template_path, instruction[:line_num])
 
         when :def
-          src = erb_process(instruction[:src])
+          src = erb_process(instruction[:src], true)
           @environment.class_eval(src, template_path, instruction[:line_num])
 
         when :render_page
