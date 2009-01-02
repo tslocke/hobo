@@ -18,6 +18,14 @@ module ActiveRecord
       end
 
 
+      def user_new_candidate(user, attributes = {})
+        record = user_new(user, attributes)
+        @target.delete record
+        set_reverse_association(record) if hobo_association_collection?
+        record
+      end
+
+
       def member_class
         proxy_reflection.klass
       end

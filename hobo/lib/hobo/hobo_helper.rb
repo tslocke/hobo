@@ -382,7 +382,11 @@ module Hobo
 
     def new_for_current_user(model_or_assoc=nil)
       model_or_assoc ||= this
-      model_or_assoc.user_new(current_user)
+      if model_or_assoc.respond_to?(:new_candidate)
+        model_or_assoc.user_new_candidate(current_user)
+      else
+        model_or_assoc.user_new(current_user)
+      end
     end
 
 
