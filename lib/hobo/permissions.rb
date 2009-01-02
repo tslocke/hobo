@@ -319,68 +319,78 @@ module Hobo
       
     # By default, attempt to derive edit permission from create/update permission
     def edit_permitted?(attribute)
-      if attribute
-        with_attribute_or_belongs_to_keys(attribute) do |attr, ftype|
-          unknownify_attribute(self, attr)
-          unknownify_attribute(self, ftype) if ftype
-        end
-      end
+      unknownify_attribute(attribute) if attribute
       new_record? ? create_permitted? : update_permitted?
     rescue Hobo::UndefinedAccessError
       # The permission is dependent on the unknown value
       # so this attribute is not editable
       false
     ensure
-      if attribute
-        with_attribute_or_belongs_to_keys(attribute) do |attr, ftype|
-          deunknownify_attribute(self, attr)
-          deunknownify_attribute(self, ftype) if ftype
-        end
-      end
+      deunknownify_attribute(attribute) if attribute
     end
   
   
     # Add some singleton methods to +record+ so give the effect that +attribute+ is unknown. That is,
     # attempts to access the attribute will result in a Hobo::UndefinedAccessError
-    def unknownify_attribute(record, attr)
-      record.metaclass.class_eval do
-        
+    def unknownify_attribute(attr)
+      metaclass.class_eval do
         define_method attr do
           raise Hobo::UndefinedAccessError
         end
-        
-        define_method "#{attr}_change" do
-          raise Hobo::UndefinedAccessError
-        end
-        
-        define_method "#{attr}_was" do
-          read_attribute attr
-        end
-        
-        define_method "#{attr}_changed?" do
-          true
-        end
-
-        def changed?
-          true
-        end
-      
-        define_method :changed do
-          changed_attributes.keys | [attr]
-        end
-      
-        def changes
-          raise Hobo::UndefinedAccessError
-        end
-        
       end
       
+      if (refl = self.class.reflections[attr.to_sym]) && refl.macro == :belongs_to
+        # A belongs_to -- also unknownify the underlying fields
+        unknownify_attribute refl.primary_key_name
+        unknownify_attribute refl.options[:foreign_type] if refl.options[:polymorphic]
+      else
+        # A regular field -- hack the dirty tracking methods
+        
+        metaclass.class_eval do
+        
+          define_method "#{attr}_change" do
+            raise Hobo::UndefinedAccessError
+          end
+        
+          define_method "#{attr}_was" do
+            read_attribute attr
+          end
+        
+          define_method "#{attr}_changed?" do
+            true
+          end
+
+          def changed?
+            true
+          end
+      
+          define_method :changed do
+            changed_attributes.keys | [attr]
+          end
+      
+          def changes
+            raise Hobo::UndefinedAccessError
+          end
+        
+        end
+      end
     end
     
     # Best. Name. Ever
-    def deunknownify_attribute(record, attr)
-      [attr, "#{attr}_change", "#{attr}_was", "#{attr}_changed?", :changed?, :changed, :changes].each do |m|
-        record.metaclass.send :remove_method, m.to_sym
+    def deunknownify_attribute(attr)
+      attr = attr.to_sym
+      
+      metaclass.send :remove_method, attr
+      
+      if (refl = self.class.reflections[attr]) && refl.macro == :belongs_to
+        # A belongs_to -- restore the underlying fields
+        deunknownify_attribute refl.primary_key_name
+        deunknownify_attribute refl.options[:foreign_type] if refl.options[:polymorphic]
+      else
+        # A regular field -- restore the dirty tracking methods
+        ["#{attr}_change", "#{attr}_was", "#{attr}_changed?", :changed?, :changed, :changes].each do |m|
+          metaclass.send :remove_method, m.to_sym
+        end
       end
     end
   end
