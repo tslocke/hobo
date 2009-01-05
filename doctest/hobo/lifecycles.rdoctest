@@ -1,0 +1,260 @@
+# Hobo Lifecycles
+
+In the REST style, which is popular with Rails coders, we view our objects a bit like documents: you can post them to a website, get them again later, make changes to them and delete them. Of course, these objects also have behaviour, which we typically implement by hooking functionality to the create / update / delete events (e.g. using callbacks such as `after_create` in ActiveRecord).
+
+This works great for many situations, but some objects are *not* best thought of as documents that we create and edit. In particular, web apps often contain objects that model some kind of *process*. A good example is *friendship* in a social app. Here's a description of how friendship might work:
+
+ * Any user can **request** friendship with another user
+ * The other user can **accept** or **reject** (or perhaps **ignore**) the request.
+ * The friendship is only **active** once it's been accepted
+ * An active friendship can be **cancelled** by either user.
+
+Not a create, update or delete in sight. Those bold words capture the way we think about the friendship much better. Of course we *could* implement friendship in a RESTful style, but we'd be doing just that -- *implementing* it, not *declaring* it. The life-cycle of the friendship would be hidden in our code, scattered across a bunch of callbacks, permission methods and state variables. Experience has shown this type of code to be tedious to write, *extremely* error prone and fragile when changing.
+
+Hobo lifecycles is a mechanism for declaring the life-cycle of a model in a natural manner. It's a bit like `acts_as_state_machine`, but Hobo-style :-)
+
+First the junk to get us started:
+
+    >> require 'rubygems'
+    >> require 'activerecord'
+    >> require 'hobofields'
+    >> Dependencies.load_paths << '.'
+    >> Dependencies.mechanism = :require
+	>> require 'hobo'
+	>> require 'hobo/model'
+    >> ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
+                                               :database => "lifecycle_doctest")
+
+
+A user model for our example:
+
+	>>
+	class User < ActiveRecord::Base
+	  hobo_model
+	  fields do
+	    name :string
+	  end
+	end
+
+Now the friendship. For now we'll just declare the *invite* part of the lifecycle. We first declare the *states* -- there's only one for now. We then declare the *invite* action. This is the action that first creates the friendship, so we declare it with `create`:
+
+	>>
+    class Friendship < ActiveRecord::Base
+      hobo_model
+      belongs_to :requester, :class_name => "User"
+      belongs_to :requestee, :class_name => "User"
+
+      lifecycle do
+	    state :requested
+        create :requester, :request, :params => [ :requestee ], :become => :requested
+      end
+    end
+
+Now let's get the DB ready:
+
+	>> require 'hobo_fields/migration_generator'
+	>> up, down = HoboFields::MigrationGenerator.run
+	>> ActiveRecord::Migration.class_eval up
+	>> User.delete_all
+	>> Friendship.delete_all
+
+We need some users to be friends:
+
+	>> tom = User.create(:name => "Tom")
+	>> bob = User.create(:name => "Bob")
+
+Tom is allowed to request friendship:
+
+	>> Friendship::Lifecycle.can_request?(tom)
+	=> true
+
+Tom does so:
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> f.requester.name
+	=> "Tom"
+	>> f.requestee.name
+	=> "Bob"
+	>> f.state
+	=> "requested"
+
+To continue modeling the friendship lifecycle, we add some *transitions*:
+
+	>>
+	class Friendship
+	  lifecycle do
+	    state :active
+		transition :requestee, :accept, { :requested => :active }
+		transition :requestee, :reject, { :requested => :destroy }
+      end
+    end
+
+Note:
+
+ * Part of the transition declaration is *who* that transition is for. These two were only for the `requestee`:
+
+ * `:destroy` is a special pseudo state: entering this state causes the record to be destroyed
+
+We can test which transitions are available:
+
+	>> f.lifecycle.available_transitions_for(tom).*.name
+	=> []
+	>> f.lifecycle.available_transitions_for(bob).*.name
+	=> ["accept", "reject"]
+	>> f.lifecycle.can_accept?(tom)
+	=> false
+	>> f.lifecycle.can_reject?(tom)
+	=> false
+	>> f.lifecycle.can_accept?(bob)
+	=> true
+	>> f.lifecycle.can_reject?(bob)
+	=> true
+
+Accept the friendship
+
+	>> f.lifecycle.accept(bob)
+	>> f.state
+	=> "active"
+
+And now there's nowhere to go:
+
+	>> f.lifecycle.available_transitions_for(tom).*.name
+	=> []
+	>> f.lifecycle.available_transitions_for(bob).*.name
+	=> []
+
+Cleanup
+
+	>> Friendship.delete_all
+
+Let's try a rejected friendship:
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> f.state
+	=> "requested"
+	>> f.lifecycle.can_reject?(bob)
+	=> true
+	>> Friendship.count
+	=> 1
+	>> f.lifecycle.reject(bob)
+	>> Friendship.count
+	=> 0
+
+Cleanup
+
+	>> User.delete_all
+	>> Friendship.delete_all
+	>> Friendship::Lifecycle.reset
+
+## A bigger example
+
+We'll run through the same example again, but we'll add some features
+
+Transitions and states can have actions associated with them. A common use might be to send an email. We'll simulate that with a global variable `$emails`
+
+	>> $emails = []
+
+We'll extend the lifecycle to allow:
+
+ * the requester to back out of the request
+
+ * the requestee to ignore the request
+
+ * either party to cancel the active friendship
+
+Here is the entire lifecycle
+
+	>>
+    class Friendship < ActiveRecord::Base
+      hobo_model
+      belongs_to :requester, :class_name => "User"
+      belongs_to :requestee, :class_name => "User"
+
+      lifecycle do
+	    state :requested, :active, :ignored
+
+        create :requester, :request, :params => [ :requestee ], :become => :requested do
+          $emails << "Dear #{requestee.name}, #{requester.name} wants to be friends with you"
+        end
+
+
+		transition :requestee, :accept, { :requested => :active } do
+          $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
+        end
+
+		transition :requestee, :reject, { :requested => :destroy } do
+          $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
+        end
+
+		transition :requestee, :ignore, { :requested => :ignored }
+
+		transition :requester, :retract, { :requested => :destroy } do
+          $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
+        end
+
+		transition [ :requester, :requestee ], :cancel, { :active => :destroy }
+		# TODO: send the email - for this we need the acting user to be passed to the block
+
+      end
+
+    end
+
+Check the simple accept still works, and sends emails
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> $emails.last
+	=> "Dear Bob, Tom wants to be friends with you"
+	>> f.lifecycle.accept(bob)
+	>> $emails.last
+	=> "Dear Tom, Bob is now your friend :-)"
+	>> f.lifecycle.active?
+	=> true
+
+Rejection:
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> f.lifecycle.reject(bob)
+	>> $emails.last
+	=> "Dear Tom, Bob blew you out :-("
+	>> f.state
+	=> "destroy"
+
+Retraction:
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> f.lifecycle.can_retract?(bob)
+	=> false
+	>> f.lifecycle.retract(tom)
+	>> $emails.last
+	=> "Dear Bob, Tom reconsidered"
+	>> f.lifecycle.active?
+
+Ignoring
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> $emails = []
+	>> f.lifecycle.ignore(bob)
+	>> $emails # Ignoring shouldn't send any email
+	=> []
+	>> f.state
+	=> "ignored"
+
+Requester cancels
+
+	>> f = Friendship::Lifecycle.request(tom, :requestee => bob)
+	>> f.lifecycle.can_cancel?(tom)
+	=> false
+	>> f.lifecycle.accept(bob)
+	>> f.lifecycle.cancel(tom)
+	>> f.state
+	=> "destroy"
+
+
+
+
+
+
+
+
+
+
