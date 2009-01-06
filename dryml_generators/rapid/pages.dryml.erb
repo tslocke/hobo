@@ -87,7 +87,9 @@ if collection
   end
 end
 
-aside_collections = model.view_hints.secondary_children unless model.view_hints.secondary_children.empty?
+unless model.view_hints.secondary_children.empty?
+  aside_collections = model.view_hints.secondary_children.map { |c| [model.reflections[c], model.reverse_reflection(c)] }
+end
 -%>
 <def tag="show-page" for="<%= model.name %>">
   <page merge title="<%= model_name :title %>">
@@ -96,7 +98,7 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
 
     <content: param>
 <% if aside_collections -%>
-      <section-group param="content-body">
+      <section-group>
         <section param="main-content">
 <% end -%>
           <header param="content-header">
@@ -132,15 +134,15 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
             <section param="collection-section">
               <h3 param="collection-heading"><%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %></h3>
               
-<% if sortable_collection?(collection) -%>
+<%   if sortable_collection?(collection) -%>
               <sortable-collection:<%= collection %> param="collection"/>
-<% else -%>
+<%   else -%>
               <collection:<%= collection %> param/>
-<% end -%>
-<% if add_link -%>
+<%   end -%>
+<%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
-<% elsif add_form -%>
+<%   elsif add_form -%>
 
               <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">Add <%= a_or_an collection.to_s.singularize.titleize %></h3>
@@ -149,7 +151,7 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
                   <submit: label="Add"/>
                 </form>
               </section>
-<% end -%>
+<%   end -%>
             </section>
 <% end # of main collection -%>
           </section>
@@ -157,14 +159,21 @@ aside_collections = model.view_hints.secondary_children unless model.view_hints.
         </section>
         
         <aside param>
-<% for collection in aside_collections -%>
-          <preview-with-more:<%= collection %>.recent param="preview-<%= collection %>">
-<% if is_user_model -%>
-            <heading:><Your with="&@<%= model_name.underscore %>"/> <%= collection.to_s.titleize %></heading:>
-<% end -%>
+<%   for refl, reverse_refl in aside_collections -%>
+<%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
+          <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
+<%       if is_user_model -%>
+            <heading:><Your with="&@<%= model_name.underscore %>"/> <%= refl.name.to_s.titleize %></heading:>
+<%       end -%>
             <more:>more</more:>
           </preview-with-more>
-<% end -%>
+<%     else -%>
+          <section param="<%= refl.name %>-collection-section">
+            <h3 param="<%= refl.name %>-collection"><%= refl.name.to_s.titleize %></h3>
+            <collection:<%= refl.name %>/>
+          </section>
+<%     end -%>
+<%   end -%>
         </aside>
       </section-group>
 <% end -%>
