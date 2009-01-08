@@ -41,10 +41,6 @@ module Hobo
     end
 
 
-    def typed_id(obj, attr=nil)
-      attr ? "#{obj.typed_id}:#{attr}" : obj.typed_id
-    end
-
     def find_by_search(query, search_targets=nil)
       search_targets ||=
         begin
@@ -186,7 +182,6 @@ module Hobo
 
   # Empty class to represent the boolean type.
   class Boolean; end
-
 
 end
 

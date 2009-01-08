@@ -460,46 +460,6 @@ module Hobo
     end
 
 
-    def duplicate
-      copy = self.class.new
-      copy.copy_instance_variables_from(self, ["@attributes_cache"])
-      copy.instance_variable_set("@attributes", @attributes.dup)
-      copy.instance_variable_set("@new_record", nil) unless new_record?
-
-      # Shallow copy of belongs_to associations
-      for refl in self.class.reflections.values
-        if refl.macro == :belongs_to and (target = self.send(refl.name))
-          bta = ActiveRecord::Associations::BelongsToAssociation.new(copy, refl)
-          bta.replace(target)
-          copy.instance_variable_set("@#{refl.name}", bta)
-        end
-      end
-      copy
-    end
-
-
-    def same_fields?(other, *fields)
-      return true if other.nil?
-
-      fields = fields.flatten
-      fields.all?{|f| self.send(f) == other.send(f)}
-    end
-
-
-    def only_changed_fields?(other, *changed_fields)
-      return true if other.nil?
-
-      changed_fields = changed_fields.flatten.*.to_s
-      all_cols = self.class.columns.*.name - []
-      all_cols.all?{|c| c.in?(changed_fields) || self.send(c) == other.send(c) }
-    end
-
-
-    def compose_with(object, use=nil)
-      CompositeModel.new_for([self, object])
-    end
-
-
     def typed_id
       "#{self.class.name.underscore}:#{self.id}" if id
     end

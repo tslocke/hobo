@@ -320,7 +320,6 @@ module Hobo
     end
     
 
-
     def select_viewable(collection=this)
       collection.select {|x| can_view?(x)}
     end
@@ -443,6 +442,7 @@ module Hobo
       result
     end
 
+
     def linkable?(*args)
       options = args.extract_options!
       target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
@@ -466,18 +466,13 @@ module Hobo
       Hobo::ModelRouter.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
     
+    
     def css_data(name, *args)
       "#{name.to_s.dasherize}::#{args * '::'}"
     end
-    
+        
 
-    # Convenience helper for the default app
-
-    # FIXME: this should interrogate the routes to find index methods, not the models
-    def front_models
-      Hobo::Model.all_models.select {|m| linkable?(m) }
-    end
-    
+    # --- ViewHint Helpers --- #
     
     def this_field_name
       this_parent.class.view_hints.field_name(this_field)
@@ -488,7 +483,7 @@ module Hobo
     end
 
 
-    # debugging support
+    # --- Debugging Helpers ---- #
 
     def abort_with(*args)
       raise args.map{|arg| PP.pp(arg, "")}.join("-------\n")

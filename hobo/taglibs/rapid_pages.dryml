@@ -158,17 +158,3 @@
     </div>
   </div>
 </def>
-
-
-<def tag="default-page-title"><%= t = this.to_s; ; "#{t.blank? ? '' : t + ' - '}#{app_name}" %></def>
-
-
-<def tag="with-primary-collection" attrs="name"><%
-  ivar = "@#{this.class.name.underscore}_#{name}"
-    
-  if (collection = instance_variable_get(ivar))
-    %><do with="&collection" param="default"/><%
-  else
-    %><do field="&name" param="default"/><%
-  end
-%></def>

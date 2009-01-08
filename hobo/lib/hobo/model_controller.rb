@@ -4,8 +4,6 @@ module Hobo
 
     include Hobo::Controller
 
-    VIEWLIB_DIR = "taglibs"
-
     DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
 
     WILL_PAGINATE_OPTIONS = [ :page, :per_page, :total_entries, :count, :finder ]
