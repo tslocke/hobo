@@ -586,7 +586,7 @@ To render either "Please select a recipe" or "Please select an event", according
 <def tag="comma-list" attrs="join"><%= this.join(join || ", ") %></def>
 
 
-<!-- Development mode only -- a menu to change the current_user -->
+<!-- Development mode only - a menu to change the current_user -->
 <def tag="dev-user-changer">
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"
