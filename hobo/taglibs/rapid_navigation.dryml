@@ -49,13 +49,3 @@
 <def tag="page-nav">
   <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :prev_label => "&laquo; Prev") %>
 </def>
-
-
-<def tag="dev-user-changer">
-  <set user="&Hobo::User.default_user_model"/>
-  <select-menu if="&user && RAILS_ENV == 'development'"
-               first-option="Guest" options="&user.all(:limit => 10).*.login"
-               onchange="location.href = '/dev/set_current_user?login=' + this.options[this.selectedIndex].value"
-               selected="#{current_user.login}"
-               class="dev-user-changer"/>
-</def>
