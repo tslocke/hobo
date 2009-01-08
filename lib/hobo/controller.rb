@@ -27,8 +27,6 @@ module Hobo
         Hobo::HoboHelper.add_to_controller(klass)
       end
 
-      attr_writer :request_host, :app_name # DEPRECIATED AFTER 0.9 - setting them should not be needed
-
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
       end

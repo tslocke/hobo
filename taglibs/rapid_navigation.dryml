@@ -51,43 +51,6 @@
 </def>
 
 
-<def tag="page-n-of-count">
-  Page <%= this.current_page %> of <%= this.page_count %>
-</def>
-
-
-<def tag="previous-page-link">
-  <a if="&this.try.previous_page"
-     href="&url_for(params.merge(:page => this.previous_page))">
-    <do param="default">&laquo; Previous page</do>
-  </a>
-</def>
-
-
-<def tag="next-page-link">
-  <a if="&this.try.next_page"
-     href="&url_for(params.merge(:page => this.next_page))">
-    <do param="default">Next page &raqou;</do>
-  </a>
-</def>
-
-
-<def tag="first-page-link">
-  <a if="&this.try.current_page && this.current_page != 1"
-     href="&url_for(params.merge(:page => 1))">
-    <do param="default">&laquo; First page</do>
-  </a>
-</def>
-
-
-<def tag="last-page-link">
-  <a if="&this.try.current_page && this.current_page != this.page_count"
-     href="&url_for(params.merge(:page => this.page_count))">
-    <do param="default">Last page &raquo;</do>
-  </a>
-</def>
-
-
 <def tag="dev-user-changer">
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"
