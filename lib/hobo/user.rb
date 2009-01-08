@@ -39,7 +39,6 @@ module Hobo
         # Virtual attributes for setting and changing the password
         attr_accessor :current_password, :password, :password_confirmation, :type => :password
 
-
         before_save :encrypt_password
 
         never_show *AUTHENTICATION_FIELDS
