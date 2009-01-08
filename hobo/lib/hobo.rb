@@ -159,9 +159,7 @@ module Hobo
 
       ActionController::Base.send(:include, Hobo::ControllerExtensions)
 
-      if defined? HoboFields
-        HoboFields.never_wrap(Hobo::Undefined)
-      end      
+      HoboFields.never_wrap(Hobo::Undefined) if defined? HoboFields
 
       ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
     end

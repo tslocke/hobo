@@ -7,7 +7,8 @@ module Hobo
     VIEWLIB_DIR = "taglibs"
 
     DONT_PAGINATE_FORMATS = [ Mime::CSV, Mime::YAML, Mime::JSON, Mime::XML, Mime::ATOM, Mime::RSS ]
-    WILL_PAGINATE_OPTIONS = [ :page, :per_page, :total_entries, :count, :finder]
+
+    WILL_PAGINATE_OPTIONS = [ :page, :per_page, :total_entries, :count, :finder ]
 
     READ_ONLY_ACTIONS  = [:index, :show]
     WRITE_ONLY_ACTIONS = [:create, :update, :destroy]

@@ -33,13 +33,13 @@ module Hobo
             #    result
             #  end
             #}
-            
+
             self.class.class_eval %{
               def #{name}
                 Hobo::FindFor::Finder.new(self, '#{name}', :#{collection_name}, :#{anchor_association_name})
               end
             }
-            
+
             return send(name, *args)
           end
         end

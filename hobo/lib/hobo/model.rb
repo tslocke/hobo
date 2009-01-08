@@ -412,7 +412,7 @@ module Hobo
     def to_param
       name_attr = self.class.name_attribute and name = send(name_attr)
       if name_attr && !name.blank? && id.is_a?(Fixnum)
-        readable = name.to_s.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/-+$/, '').gsub(/^-+/, '').split('-')[0..5].join('-')
+        readable = name.to_s.downcase.gsub(/[^a-z0-9]+/, '-').remove(/-+$/).remove(/^-+/).split('-')[0..5].join('-')
         @to_param ||= "#{id}-#{readable}"
       else
         id.to_s
@@ -430,6 +430,9 @@ module Hobo
       send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
     end
 
+
+    # We deliberately give these three methods unconventional (java-esque) names to avoid
+    # polluting the application namespace
 
     def set_creator(user)
       set_creator!(user) unless get_creator
@@ -452,8 +455,6 @@ module Hobo
     end
 
 
-    # We deliberately give this method an unconventional name to avoid
-    # polluting the application namespace too badly
     def get_creator
       self.class.creator_attribute && send(self.class.creator_attribute)
     end

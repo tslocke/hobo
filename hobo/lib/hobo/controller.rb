@@ -18,9 +18,9 @@ module Hobo
           before_filter :login_from_cookie 
           alias_method_chain :redirect_to, :object_url
           around_filter do |controller, action|
-            Thread.current['Hobo::current_controller'] = controller
+            Thread.current['Hobo.current_controller'] = controller
             action.call
-            Thread.current['Hobo::current_controller'] = nil  # should avoid memory-leakage
+            Thread.current['Hobo.current_controller'] = nil  # should avoid memory-leakage
           end
           @included_taglibs = []
         end
@@ -34,11 +34,11 @@ module Hobo
       end
 
       def request_host
-        @request_host || Thread.current['Hobo::current_controller'].request.host_with_port
+        Thread.current['Hobo.current_controller'].request.host_with_port
       end
 
       def app_name
-        @app_name || Thread.current['Hobo::current_controller'].send(:call_tag, :app_name)
+        Thread.current['Hobo.current_controller'].send(:call_tag, :app_name)
       end
 
     end
