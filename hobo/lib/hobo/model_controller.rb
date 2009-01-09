@@ -117,7 +117,7 @@ module Hobo
             @this.send(method)
           end
 
-          hobo_ajax_response || render(:nothing => true) unless performed?
+          hobo_ajax_response unless performed?
         end
       end
 
