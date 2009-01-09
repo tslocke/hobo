@@ -443,7 +443,7 @@ module Hobo
     def find_owner_and_association(owner_association)
       refl = model.reflections[owner_association]
       klass = refl.klass
-      id = params["#{klass.name.underscore}_id"]
+      id = params["#{owner_association}_id"]
       owner = klass.find(id)
       instance_variable_set("@#{owner_association}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
