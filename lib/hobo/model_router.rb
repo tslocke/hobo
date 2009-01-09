@@ -178,7 +178,7 @@ module Hobo
 
         owner = owner.to_s.singularize if model.reflections[owner].macro == :has_many
 
-        collection_path = "#{owner_class.pluralize}/:#{owner_class}_id/#{collection}"
+        collection_path = "#{owner_class.pluralize}/:#{owner}_id/#{collection}"
 
         actions.each do |action|
           case action
