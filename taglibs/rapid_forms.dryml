@@ -405,12 +405,13 @@ The menus default to the current time if the current value is nil.
  - titleize: Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
   
    -->
-<def tag="input" for="HoboFields::EnumString" attrs="labels, titleize"><%
+<def tag="input" for="HoboFields::EnumString" attrs="labels, titleize, first-option, first-value"><%
   labels ||= {}
   titleize = true if titleize.nil?
   options = this_type.values.map {|v| [labels.fetch(v.to_sym, titleize ? v.titleize : v), v] }
   %>
   <select name="#{param_name_for_this}" merge-attrs>
+    <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
     <%= options_for_select(options, this) %>
   </select>
 </def>
