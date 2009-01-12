@@ -562,14 +562,7 @@ The context should be a user object. If `this == current_user` the "you" form is
   <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
 </def>
 
-<!-- Renders "a book" or "an orange" according the the word passed in the attribute `word`
-
-### Usage
-
-To render either "Please select a recipe" or "Please select an event", according to the type of the `this`:
-
-    <a-or-an word="&type_name"/>
-
+<!-- Deprecated. It's harder than you think to do this (e.g. an umbrealla, an user)
 -->
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "an " : "a ") + word
@@ -586,7 +579,7 @@ To render either "Please select a recipe" or "Please select an event", according
 <def tag="comma-list" attrs="join"><%= this.join(join || ", ") %></def>
 
 
-<!-- Development mode only -- a menu to change the current_user -->
+<!-- Development mode only - a menu to change the current_user -->
 <def tag="dev-user-changer">
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"

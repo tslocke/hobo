@@ -96,7 +96,7 @@ module Hobo
           index_action "complete_#{name}", &block
         else
           index_action "complete_#{name}" do
-            hobo_completions name, model, options
+            hobo_completions field, model, options
           end
         end
       end
@@ -108,8 +108,8 @@ module Hobo
         got_block = block_given?
         define_method web_name do
           # Make sure we have a copy of the options - it is being mutated somewhere
-          opts = {}.merge(options)
-          self.this = find_instance(opts) unless opts[:no_find]
+          opts = options.dup
+          self.this = find_instance(opts)
           raise Hobo::PermissionDeniedError unless @this.method_callable_by?(current_user, method)
           if got_block
             instance_eval(&block)
@@ -117,7 +117,7 @@ module Hobo
             @this.send(method)
           end
 
-          hobo_ajax_response || render(:nothing => true) unless performed?
+          hobo_ajax_response unless performed?
         end
       end
 
@@ -409,10 +409,12 @@ module Hobo
 
     def response_block(&b)
       if b
-        if b.arity == 1
-          respond_to {|wants| yield(wants) }
-        else
-          yield
+        respond_to do |format|
+          if b.arity == 1
+            yield format
+          else
+            format.html { yield }
+          end
         end
         performed?
       end
@@ -441,7 +443,7 @@ module Hobo
     def find_owner_and_association(owner_association)
       refl = model.reflections[owner_association]
       klass = refl.klass
-      id = params["#{klass.name.underscore}_id"]
+      id = params["#{owner_association}_id"]
       owner = klass.find(id)
       instance_variable_set("@#{owner_association}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
