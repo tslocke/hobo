@@ -28,6 +28,6 @@
 </def>
 
 
-<def tag="field-names-where-true" attrs="fields"><%=
+<def tag="record-flags" attrs="fields"><%=
   comma_split(fields).select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
 %></def>
