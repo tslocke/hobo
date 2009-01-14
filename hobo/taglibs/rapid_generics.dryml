@@ -7,7 +7,7 @@
 
 
 <def tag="search-card" polymorphic>
-  <card/>
+  <card merge/>
 </def>
 
 
