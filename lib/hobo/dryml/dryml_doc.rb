@@ -13,6 +13,23 @@ module Hobo
         dryml_files.map { |f| taglib_class.new(directory, f) }
       end
       
+      CommentMethods = classy_module do
+        
+        def comment_intro
+          comment && comment =~ /(.*?)^#/m ? $1 : comment
+        end
+
+        
+        def comment_rest
+          comment && comment[comment_intro.length..-1]
+        end
+
+        %w(comment comment_intro comment_rest).each do |m|
+          class_eval "def #{m}_html; Maruku.new(#{m}).to_html.gsub(/&amp;/, '&'); end"
+        end
+        
+      end
+      
       class Taglib
         
         def initialize(home, filename)
@@ -28,10 +45,7 @@ module Hobo
           doc.restore_erb_scriptlets(first_node.to_s.strip) if first_node.is_a?(REXML::Comment)
         end
         
-        def comment_html
-          Maruku.new(comment).to_html
-        end
-        
+        include CommentMethods
            
         private   
              
@@ -78,23 +92,7 @@ module Hobo
           end
         end
         
-        
-        def comment_intro
-          comment && comment =~ /(.*?)^#/m ? $1 : comment
-        end
-
-        
-        def comment_rest
-          comment && comment[comment_intro.length..-1]
-        end
-
-        %w(comment comment_intro comment_rest).each do |m|
-          class_eval "def #{m}_html; Maruku.new(#{m}).to_html.gsub(/&amp;/, '&'); end"
-        end
-        
-        def comment_html
-          
-        end
+        include CommentMethods
         
         def no_doc?
           comment =~ /^nodoc\b/
