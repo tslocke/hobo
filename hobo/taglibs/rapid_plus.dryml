@@ -1,3 +1,10 @@
+<!-- Tags that define higher level interactive 'widgets' -->
+
+<!-- An enhanced version of Rapid's `<table>` that has support for column sorting, searching and pagination.
+  
+An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchable_sortable_table) of this tag is available in the [Agility Tutorial](/tutorials/agility)
+
+-->
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
   <% sort_columns['this'] ||= this.member_class.name_attribute %>
@@ -41,6 +48,24 @@
 </def>
 
 
+<!-- An enhanced version of Rapid's `<collection>` tag that supports drag-and-drop re-ordering. 
+  
+Each item in the collection has a `<div class="ordering-handle" param="handle">` added, which can be used to drag the item up and down.
+  
+### Attributes
+
+ - `sortable-options` - a hash of options to pass to the `sortable_elemnt` helper. Default are:
+
+        { :constraint => :vertical,
+          :overlap => :vertical,
+          :scroll => :window,
+          :handle => 'ordering-handle',
+          :complete => [visual_effect(:highlight, attributes[:id])] }
+          
+### Controller support 
+
+This tag assumes the controller has a `reorder` action. This action is added automatically by Hobo's model-controller if the model declares `acts_as_list`. See also [Drag and Drop Reordering](/manual/controllers#drag_and_drop_reordering) in the [Controllers and Routing](/manual/controllers) chapter of the manual.
+ -->
 <def tag="sortable-collection" attrs="sortable-options"><%
   singular_name = this.member_class.name.underscore
   attributes[:id] ||= "#{singular_name}_ordering"
@@ -67,6 +92,7 @@
 </def>
 
 
+<!-- Captures the common pattern of a list of "the first few" cards, along with a link to the rest. -->
 <def tag="preview-with-more" attrs="name">
   <% name ||= collection_name.pluralize -%>
   <section class="#{name.gsub(' ', '-').dasherize} preview-with-more" param="default">
@@ -77,12 +103,21 @@
 </def>
 
 
+<!-- Renders a gravatar (see [gravatar.com](http://gravatar.com)) image in side a link to `this`. Requires `this` to have an `email_address` field. Normally called with a user record in context.
+
+### Attributes 
+
+ - `size` - Size in pixels of the image. Defaults to 80.
+ - `rating` - The rating allowed. Defaults to 'g'. See [gravatar.com](http://gravatar.com) for information on ratings.
+
+ -->
 <def tag="gravatar" attrs="size, rating">
   <% size ||= 80; rating ||= 'g'; digest = Digest::MD5.hexdigest(this.email_address) -%>
   <a class="gravatar"><img class="gravatar" src="http://www.gravatar.com/avatar/#{digest}?s=#{size}&r=#{rating}" merge-attrs/></a>
 </def>
 
 
+<!-- Provides an ajax-powered *find-as-you-type* live search field which is hooked up to Hobo's site-side search feature. At the moment this tag is not very flexible. It is not easy to use if for anything other than Hobo's site-wide search. -->
 <def tag="live-search">
   <div class="search">
     <label for="search-field">Search</label><input type="search" class="live-search"/>
@@ -94,7 +129,16 @@
   </section>
 </def>
 
+<!-- A `<select>` menu intended to act as a filter for index pages.
+  
+See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status) in the [Agility Tutorial](/tutorials/agility) for an example.
 
+### Attributes
+
+ - `param-name` - the name of the HTTP parameter to use for the filter
+ - `options` - an array of options for the menu. 
+ - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+  -->
 <def tag="filter-menu" attrs="param-name, options, no-filter">
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu">
