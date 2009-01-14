@@ -49,7 +49,7 @@
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>
       <div class="ordering-handle" param="handle">&uarr;<br/>&darr;</div>
-      <card param/>
+      <do param="default"><card param/></do>
     </item:>
   </collection>
   <%= if Hobo::Dryml.last_if
