@@ -589,7 +589,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
    
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-    this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
   end
 
   select_options = options.map { |x| [x.to_s, x.id ] }
