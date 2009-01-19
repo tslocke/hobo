@@ -109,16 +109,16 @@ module HoboFields
     def self.declare_field(name, type, *args)
       options = args.extract_options!
       try.field_added(name, type, args, options)
-      add_validations_for_field(name, type, args, options)
+      add_validations_for_field(name, type, args)
       declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
       attr_order << name unless name.in?(attr_order)
     end
 
 
-    # Add field validations according to arguments and options in the
+    # Add field validations according to arguments in the
     # field declaration
-    def self.add_validations_for_field(name, type, args, options)
+    def self.add_validations_for_field(name, type, args)
       validates_presence_of   name if :required.in?(args)
       validates_uniqueness_of name if :unique.in?(args)
 

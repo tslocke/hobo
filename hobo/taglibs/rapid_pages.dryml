@@ -1,3 +1,16 @@
+<!-- Rapid-Pages provides tags for working with entire pages. It includes the main `<page>` tag which is the starting point for all pages in Rapid, various supporting tags for things such as stylesheet and javascript includes. Also defines the standard error pages for permission-denied and not-found.
+-->
+  
+<!-- The basic page structure for all the pages in a Hobo Rapid application. Providing the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
+  
+The easiest way to see what this tag does is to look at the source.
+  
+### Attributes
+
+ - `title` - the page title, will have ": `<app-name>`" appended
+ - `full-title` - the full page title. Set this if you do not want the app name suffix.
+  
+-->
 <def tag="page" attrs="title, full-title">
   <% full_title ||= "#{title} : #{app_name}" %>
   <html merge-attrs>
@@ -35,7 +48,7 @@
 </def>
 
 
-
+<!-- Renderes dynamically generated JavaScript required by `hobo-rapid.js`, including the information required to perform automatic part updates -->
 <def tag="page-scripts">
   <script type="text/javascript" param="default">
     <hobo-rapid-javascripts/>
@@ -44,12 +57,22 @@
 </def>
 
 
+<!-- nodoc. -->
 <def tag="index-page" polymorphic/>
+<!-- nodoc. -->
 <def tag="new-page"   polymorphic/>
+<!-- nodoc. -->
 <def tag="show-page"  polymorphic/>
+<!-- nodoc. -->
 <def tag="edit-page"  polymorphic/>
 
+<!-- The page rendered by default in the case of a permission-denied error
+  
+### Attributes
 
+ - `message` - The main message to display. Defaults to "That operation is not allowed"
+ 
+  -->
 <def tag="permission-denied-page" attrs="message">
   <% message ||= "That operation is not allowed" %>
   <page merge>
@@ -63,6 +86,13 @@
 </def>
 
 
+<!-- The page rendered by default in the case of a not-found error
+  
+### Attributes
+
+ - `message` - The main message to display. Defaults to "The page you were looking for could not be found"
+ 
+  -->
 <def tag="not-found-page" attrs="message">
   <% message ||= "The page you were looking for could not be found" %>
   <page merge>
@@ -76,6 +106,20 @@
 </def>
 
 
+<!-- Renders one of five HTML DOCTYPE declarations, according to the `version` attribute.
+  
+### Attributes
+ - 'version' - the doctype version, must be one of:
+ 
+   - HTML 4.01 STRICT
+   - HTML 4.01 TRANSITIONAL
+   - XHTML 1.0 STRICT
+   - XHTML 1.0 TRANSITIONAL
+   - XHTML 1.1
+  
+See the source for the actual output
+
+ -->
 <def tag="doctype" attrs="version"><%=
   case version.upcase
     when "HTML 4.01 STRICT"
@@ -96,6 +140,13 @@
   end
 %></def>
 
+
+<!-- Renders an `<html>` tag along with the DOCTYPE specified in the `doctype` attribute.
+  
+### Attributes
+ 
+ - `doctype` - the version of the DOCTYPE required. See the `version` attribute to `<doctype>`
+ -->
 <def tag="html" attrs="doctype">
   <% doctype ||= 'XHTML 1.0 TRANSITIONAL' -%>
   <doctype version="&doctype"/>
@@ -106,27 +157,51 @@
 </def>
 
 <!-- empty tags should be written as <br> in HTML and <br /> in XHTML -->
+<!-- nodoc. -->
 <def tag="empty-tag" attrs="tag-name"><%= element(tag_name, attributes, nil, true, true) %></def>
+<!-- nodoc. -->
 <def tag="base"><empty-tag tag-name="base" merge/></def>
+<!-- nodoc. -->
 <def tag="meta"><empty-tag tag-name="meta" merge/></def>
+<!-- nodoc. -->
 <def tag="link"><empty-tag tag-name="link" merge/></def>
+<!-- nodoc. -->
 <def tag="img"><empty-tag tag-name="img" merge/></def>
+<!-- nodoc. -->
 <def tag="br"><empty-tag tag-name="br" merge/></def>
+<!-- nodoc. -->
 <def tag="hr"><empty-tag tag-name="hr" merge/></def>
+<!-- nodoc. -->
 <def tag="frame"><empty-tag tag-name="frame" merge/></def>
+<!-- nodoc. -->
 <def tag="area"><empty-tag tag-name="area" merge/></def>
+<!-- nodoc. -->
 <def tag="param"><empty-tag tag-name="param" merge/></def>
+<!-- nodoc. -->
 <def tag="col"><empty-tag tag-name="col" merge/></def>
 
+
+<!-- Renders a conditional comment in order to have some content ignored by all browsers other than Internet Explorer
+  
+### Example 
+
+
+    <if-ie version="lt IE 7"> ... </if-ie>
+    
+ -->
 <def tag="if-ie" attrs="version">
   <%= "<!--[if #{version || 'IE'}]>" %><do param="default"/><%= "<![endif]-->" %>
 </def>
 
+<!-- Simple wrapper for the `stylesheet_link_tag` helper. The `name` attribute can be a comma-separated list of stylesheet names.
+ -->
 <def tag="stylesheet" attrs="name">
   <%= stylesheet_link_tag *(comma_split(name) + [attributes]) %>
 </def>
 
 
+<!-- Simple wrapper for the `javascript_include_tag` helper. The `name` attribute can be a comma-separated list of script file names.
+ -->
 <def tag="javascript" attrs="name">
   <if test="&name.is_a?(Symbol)">
     <%= javascript_include_tag name %>
@@ -139,18 +214,31 @@
 </def>
 
 
+<!-- Renders a Rails flash message wrapped in a `<div>` tag
+
+### Attributes
+
+ - `type` - which flash message to display. Defaults to `:notice`
+  
+### CSS Classes
+
+The flash is output in a `<div class="flash notice">`, where `notice` is the `type` specified.
+
+  -->
 <def tag="flash-message" attrs="type">
   <% type = type ? type.to_sym : :notice -%>
   <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
 </def>
 
 
+<!-- Renders `<flash-message>` for every flash type given in the `names` attribute (comma separated), or for all flash messages that have been set if `names` is not given -->
 <def tag="flash-messages" attrs="names"><%=
   scope.flash_rendered = true
   names = names.nil? ? flash.keys : comma_split(names)
   names.map { |name| flash_message :type => name }
 %></def>
 
+<!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`. The theme will style this as an ajax progress 'spinner' -->
 <def tag="ajax-progress">
   <div id="ajax-progress">
     <div>
