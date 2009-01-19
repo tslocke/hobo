@@ -719,11 +719,12 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
-<def tag="check-many">
+<def tag="check-many" attrs="no-edit, disabled">
   <% collection = this; param_name = param_name_for_this; options ||= this.member_class.find(:all) -%>
   <ul class="check-many">
+    <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked %>
     <li repeat="&options">
-      <input type="checkbox" name="#{param_name}[]" value="&h this.to_s" checked="&this.in?(collection)"/>
+      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" merge-attrs="no-edit, disable"/>
       <name/>
     </li>
   </ul>
