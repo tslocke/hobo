@@ -1,3 +1,6 @@
+<!-- Rapid Generics provides tags that provide generic renderings that can adapt to the model being renderd. At the moment this library provides cards and collections of cards. -->
+
+<!-- A 'card' is a representation of an sub-object *within* a page, such as a comment on a blog-post, or a single product in a list of produtcs. This definition is just the very basic framework which gives the basis for the automatic cards that get generated. See `app/views/taglibs/auto/rapid/cards.dryml` for the cards that have been generated for your specific application. -->
 <def tag="card" polymorphic>
   <div class="card" param="default" merge-attrs>
     <header param/>
@@ -6,11 +9,14 @@
 </def>
 
 
+<!-- A special card which is used by live-search to render the results. By default this just calls card, but you can define your own search cards with `<def tag='search-card' for="MyModel">` to customise search results for that model. -->
 <def tag="search-card" polymorphic>
-  <card/>
+  <card merge/>
 </def>
 
 
+<!-- Renders a message such as "No products to display". If the collection (`this`) is empty, `style="display:none"` is added. This means the message is still present and can be revealed with JavaScript if all items in the collection are removed with ajax remove buttons.
+  -->
 <def tag="empty-collection-message">
   <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
     No <collection-name lowercase/> to display
@@ -18,6 +24,10 @@
 </def>
 
 
+<!-- Repeats the body of the tag inside a `<ul>` list with one item for each object in the collection (`this`). If no body is given, renders a `<card>` inside the `<li>`.
+  
+The `<li>` tags are automatically given a 'model ID' CSS class, which means the ajax `<remove-button>` will automatically be able to remove items from the collection. Also adds 'even' and 'odd' CSS classes.
+ -->
 <def tag="collection">
   <ul class="collection #{collection_name :dasherize => true}" merge-attrs unless="empty?">
     <li param="item" class="#{scope.even_odd} #{model_id_class}" repeat="&select_viewable">
@@ -27,7 +37,7 @@
   <empty-collection-message param="empty-message"/>
 </def>
 
-
-<def tag="field-names-where-true" attrs="fields"><%=
+<!-- Renders a comma separated list of any fields passed in the `fields` attribute that are true (in the Ruby sense). For example, if a forum post had a boolean field `sticky`, this tag can be used to automatically label sticky posts "Sticky". Similarly, you could automatically add an "Administrator" label to the user's home page (this is seen in the default Hobo app).  -->
+<def tag="record-flags" attrs="fields"><%=
   comma_split(fields).select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
 %></def>

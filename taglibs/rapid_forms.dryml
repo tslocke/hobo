@@ -1,5 +1,7 @@
 <!-- Rapid Forms provides various tags that make it quick and easy to produce working new or edit forms. 
 
+### Overview
+
 The main tags are:
 
  - `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts 
@@ -583,6 +585,21 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 %></def>
 
 
+<!-- A `<select>` menu from which the user can choose the target record for a `belongs_to` association.
+
+This is the default input that Rapid uses for `belongs_to` associations. The menu is constructed using the `to_s` representation of the records.
+
+### Attributes
+
+ - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null). Defaults to false
+ - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
+ - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (limited to 100).
+ 
+### See Also
+
+For situations where there are too many target records to practically include in a menu, `<name-one>` provides an autocompleter which would be more suitable.
+
+  -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
@@ -590,7 +607,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
    
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-    this_field_reflection.klass.all(:conditions => conditions).select {|x| can_view?(x)}
+    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
   end
 
   select_options = options.map { |x| [x.to_s, x.id ] }
@@ -604,6 +621,23 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 </def>
 
 
+<!-- An `<input type="text">` with auto-completion. Allows the user to chose the target of a `belongs_to` association
+  by name.
+  
+### Attributes
+
+ - `complete-target`
+ - `completer`
+ 
+In the simple case no attributes are needed, e.g.: `<name-one:category/>`.
+
+The completions are provided by the server with a GET request. The `complete-target` and `completer` attributes can be used to customise the URL for the request. For example:
+
+ - If `completer` is a class, say `Product`: `/products/complete_name` (where `name` is the declared name attribute of `Product`)
+ - If `completer` is a record, say a `Product` with id `12`: `/products/complete_name?id=12`
+ - If `completer-name` is given, e.g. with `completer-name="new_product_names"`: `/products/complete_new_product_names`
+
+  -->
 <def tag="name-one" attrs="complete-target, completer"><%
   complete_target ||= this_field_reflection.klass
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
@@ -616,18 +650,31 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 </def>
 
 
+<!-- nodoc. -->
 <def tag="sti-type-input">
   <select name="#{param_name_for(form_field_path + ['type'])}">
     <%= options_for_select(this.class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
   </select>
 </def>
 
-      
+
+<!-- A `<select>` menu input. This tag differes from `<select-menu>` only in that it adds the correct `name` attribute for the current field, and `selected` default to `this`.
+  
+### Attributes
+ 
+ - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
+ - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
+ - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
+ - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+
+  -->
 <def tag="select-input">
   <select-menu name="#{param_name_for_this}" selected="&this" merge/>
 </def>
 
-      
+
+<!-- Renders a readable list of error messages following a form submission. Expects the errors to be in `this.errors`. Renders nothing if there are no errors.
+  -->
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
     <h2 param="heading">To proceed please correct the following:</h2>
@@ -677,6 +724,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
   </div>
 </def>
 
+
 <!--
 Used inside a form to specify where to redirect after successful submission. This works by inserting a hidden field called `after_submit` which is used by Hobo if present to perform a redirect after the form submission.
 
@@ -711,6 +759,16 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
+<!-- A simple wrapper around the `<select>` tag and `options_for_select` helper
+  
+  ### Attributes
+
+   - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
+   - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
+   - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
+   - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+
+ -->
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
   <select merge-attrs param="default">
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
@@ -719,23 +777,48 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
-<def tag="check-many" attrs="no-edit, disabled">
-  <% collection = this; param_name = param_name_for_this; options ||= this.member_class.find(:all) -%>
-  <ul class="check-many">
+<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The use can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+  -->
+<def tag="check-many"><% 
+  collection = this
+  param_name = param_name_for_this
+  options ||= begin
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
+    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
+  end
+  -%>
+  <ul class="check-many" param="default">
     <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked %>
-    <li repeat="&options">
-      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" merge-attrs="no-edit, disable"/>
-      <name/>
+    <li repeat="&options" param>
+      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)"/>
+      <name param/>
     </li>
   </ul>
 </def>
 
 
+<!-- Renders an `<input type='hidden'>` for the `id` field of the current context -->
 <def tag="hidden-id-field">
   <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
 </def>
 
 
+<!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
+  
+This tag is very different from tags like `<select-many>` and `<check-many>` in that:
+
+ - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
+ - Those tags work by themselves, while `<input-many>` is just a wrapper for other input fields.
+ 
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <input-many:products><field-list fields="name, price"/></input-many>
+    
+The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+  
+  -->
 <def tag="input-many">
   <set empty="&this.empty?"/>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
@@ -760,6 +843,8 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
+<!-- Renders a sub-section of a form with fields for every record in a `has_many` association. This is similar to `<input-many>` except there is no ability to add and remove items (i.e. no (+) and (-) buttons).
+  -->
 <def tag="input-all">
   <% association_fkey = this_field_reflection.primary_key_name -%>
   <ul class="input-all #{this_field.dasherize}">
@@ -773,7 +858,8 @@ Use the `uri` option to specify a redirect location:
   </ul>
 </def>
 
-
+<!-- Renders the common "or (Cancel)" for a form. Attributes are merged into the link (`<a>Cancel</a>`), making it easy to customise the destination of the cancel link. By default it will link to `this` or `this.class`.
+  -->
 <def tag="or-cancel">
   <if test="&linkable?">or <a merge-attrs>Cancel</a></if>
   <else>
