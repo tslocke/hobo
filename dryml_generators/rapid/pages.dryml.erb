@@ -89,6 +89,7 @@ end
 
 unless model.view_hints.secondary_children.empty?
   aside_collections = model.view_hints.secondary_children.map { |c| [model.reflections[c], model.reverse_reflection(c)] }
+  aside_collections.reject! { |refl, reverse| reverse.nil? }
 end
 -%>
 <def tag="show-page" for="<%= model.name %>">
