@@ -5,7 +5,7 @@
 </def>    
 
 
-<def tag="login-page" attrs="remember-me">
+<def tag="login-page">
   <% remember_me = true if remember_me.nil? %>
   <simple-page title="Log in" merge>
    
@@ -31,7 +31,7 @@
               </item-value>
             </labelled-item>
 
-            <labelled-item if="&remember_me">
+            <labelled-item param="remember-me">
               <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
               <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
             </labelled-item>
