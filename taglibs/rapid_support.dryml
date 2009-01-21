@@ -1,3 +1,24 @@
+<!-- Rapid Support is the home for some tags that are useful in defining other tags. -->
+
+
+<!-- Call with the context set to a record. Repeats the content of the tag with `this` and `this_field` set to the value and name of each of the record's fields in turn. E.g. this is useful for generating a form containing each of the fields. Tags like `<field-list>` and `<table>` forward their attributes to this tag and also have the features described here. For example, the `fields` attribute to `<field-list>` supports the same options as described here.
+  
+This tag is in need of a review - it's a bit funky.
+
+### Attributes
+
+ - `fields` - set to one of:
+    - A model class - equivalent to listing all of the regular 'content columns' of that model
+    - '`*`' - equivalent to listing all of the regular 'content columns' of the current record
+    - A comma separated list of field names.
+  Defaults to '`*`'
+ - `assocaitions` - set to `has_many` to select the associations `has_many` relationships used as the "fields". Do not also give the `fields` attribute.
+ - `skip` - comma separated list of field names to omit.
+ - `skip-associations` - set to `has-many` to omit all `has_many` associations.
+ - `include-timestamps` - whether or not to include the standard ActiveRecord timestamp fields such as `created_at` and `updated_at`. Defaults to false.
+ - `force-all` - by default fields are skipped if the current user does not have view permission. Set `force-all` to true to skip this permission check and include all the fields.
+  
+  -->
 <def tag="with-fields" attrs="fields, associations, skip, skip-associations, include-timestamps, force-all"><%
   fields.nil? || associations.nil? or raise ArgumentError, "with-fields -- specify either fields or associations but not both"
    
@@ -31,6 +52,22 @@
   end
 %></def>
 
+<!-- Call with the context set to a model class. Repeats the content of the tag with `this` set name of each of the model's fields in turn. E.g. this tag is used when generating the heading row in a `<table fields='...'/>`.
+  
+This tag is in need of a review - it's a bit funky.
+
+### Attributes
+
+ - `fields` - set to one of:
+    - A model class - equivalent to listing all of the regular 'content columns' of that model
+    - '`*`' - equivalent to listing all of the regular 'content columns' of the current record
+    - A comma separated list of field names.
+  Defaults to '`*`'
+ - `skip` - comma separated list of field names to omit.
+ - `skip-associations` - set to `has-many` to omit all `has_many` associations.
+ - `include-timestamps` - whether or not to include the standard ActiveRecord timestamp fields such as `created_at` and `updated_at`. Defaults to false.
+  
+  -->
 <def tag="with-field-names" attrs="fields, skip, skip-associations, include-timestamps"><%=
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.member_class
