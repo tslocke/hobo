@@ -1,8 +1,4 @@
-<!-- Navigation
-     Main nav bar, account nav bar (login, signup...), page nav
-  -->
-
-<!--- General Navigation -->
+<!-- Support for navigation links, account navigation (log in, out etc.) and pagination navigation. -->
 
 <!-- General purpose navigation bar. Renders a `<ul class="navigation">`. This tag is intended to be used in conunction with `<nav-item>`. The main feature of this pair of tags (over, say, just using a plain `<ul>` list), is that it's easy to have a 'current' CSS class added to the appropriate nav item (so you can highlight the page/section the user is)
   
@@ -51,7 +47,7 @@ Then in your pages you can call the tag like this
 </def>
 
 
-<!--- Account Navigation (log in / out / signup)
+<!-- Account Navigation (log in / out / signup)
   
 When logged in, this renders:
 

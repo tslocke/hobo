@@ -1,3 +1,6 @@
+<!-- Rapid User Pages contains tags that implement the basics of Hobo's user management: log in, sign up, forgot password etc. -->
+
+<!-- Some of the user pages use a simplified layout that does not feature things like the main nav and live-search. This tag defines that page -->
 <def tag="simple-page">
   <page without-live-search without-main-nav merge>
     <account-nav: replace><dev-user-changer/></account-nav:>
@@ -5,6 +8,7 @@
 </def>    
 
 
+<!-- Simple log-in page  -->
 <def tag="login-page">
   <% remember_me = true if remember_me.nil? %>
   <simple-page title="Log in" merge>
@@ -48,6 +52,8 @@
 </def>
 
 
+<!-- The page that initiates the forgotten password process. Contians a single text-input where the user can provide
+ their email address -->
 <def tag="forgot-password-page">
   <simple-page title="Forgotten Password" merge>
    
@@ -81,7 +87,9 @@
   </simple-page>
 </def>
 
-
+<!-- Second page in the forgotten password process. Informs the user that the email has been sent "If the e-mail address you
+entered is in our records". This is to avoid a privacy concern that the forgotten-password mechanism can be otherwise used to tell
+if a given email is associated with an account or not. -->
 <def tag="forgot-password-email-sent-page">
   <simple-page>
     <body: class="forgot-password-page" param/>
@@ -105,6 +113,7 @@
 </def>
 
 
+<!-- The page that is displayed on attempting to log in to an account that has been disabled. -->
 <def tag="account-disabled-page">
 
   <simple-page title="Account not available" merge>
@@ -125,6 +134,7 @@
 </def>
 
 
+<!-- Basic account page that provides the ability for the user to change their email address and password. -->
 <def tag="account-page">
 
   <page title="#{name} - Account" merge>
