@@ -4,7 +4,7 @@
       <stylesheet name="reset"/>
       <theme-stylesheet/>
       <theme-stylesheet name="rapid-ui"/>
-      <stylesheet name="application"/>
+      <stylesheet name="application" param="app-stylesheet"/>
     </stylesheets>
   </old-page>
 </extend>  
