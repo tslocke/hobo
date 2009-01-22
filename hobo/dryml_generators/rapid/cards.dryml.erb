@@ -1,9 +1,9 @@
 <% each_model do -%>
 <%
-name_attribute     = model.name_attribute
-content_attribute  = model.primary_content_attribute
-creator_attribute  = model.creator_attribute
-primary_collection = model.view_hints.primary_children
+name_attribute        = model.name_attribute
+description_attribute = model.primary_content_attribute
+creator_attribute     = model.creator_attribute
+primary_collection    = model.view_hints.primary_children
 
 if creator_attribute
   creator_refl = model.reflections[creator_attribute]
@@ -15,7 +15,7 @@ edit_link     = !show_link && linkable?(:edit)
 delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :delete)
 
 has_actions = edit_link || delete_button
-has_body    = (!show_link && content_attribute) || creator_link || creator_attribute || primary_collection
+has_body    = (!show_link && description_attribute) || creator_link || creator_attribute || primary_collection
 
 show_title = !show_link && (name_attribute || !has_body)
 -%>
@@ -40,8 +40,8 @@ show_title = !show_link && (name_attribute || !has_body)
 <% end -%>
 <% if has_body -%>
     <body: param>
-<% if !show_link && content_attribute -%>
-      <view:<%= content_attribute %> param="content"/>
+<% if !show_link && description_attribute -%>
+      <view:<%= description_attribute %> param="description"/>
 <% end -%>
 <% if creator_link -%>
       <a:<%= creator_attribute %> param="creator-link"/>
