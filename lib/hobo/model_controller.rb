@@ -422,7 +422,7 @@ module Hobo
 
 
     def request_requires_pagination?
-      request.format.not_in?(DONT_PAGINATE_FORMATS)
+      request.format.not_in?(DONT_PAGINATE_FORMATS) && model.view_hints.paginate?
     end
 
 
