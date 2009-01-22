@@ -365,7 +365,7 @@ module Hobo
           end
       
           define_method :changed do
-            changed_attributes.keys | [attr]
+            changed_attributes.keys | [attr.to_s]
           end
       
           def changes
