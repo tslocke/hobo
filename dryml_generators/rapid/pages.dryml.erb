@@ -1,7 +1,7 @@
 <!-- ====== Main Navigation ====== -->
 
 <def tag="main-nav">
-  <navigation class="main-nav" merge-attrs>
+  <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
 <% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
     <nav-item with="&<%= m.name %>"><%= m.name.titleize.pluralize %></nav-item>
@@ -16,6 +16,7 @@
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
 new_link = linkable?(:new)
+new_form = !new_link && linkable?(model, :create, :method => :post)
 -%>
 
 
@@ -36,11 +37,28 @@ new_link = linkable?(:new)
         <a action="new" to="&model" param="new-link"/>      
 <% end -%>
 
+<% if view_hints.paginate? -%>
         <page-nav param="top-page-nav"/>
-      
+
+<% end -%>
+<% if view_hints.sortable? -%>
+        <sortable-collection param="collection"/>
+<% else -%>
         <collection param/>
-      
+<% end -%>
+
+<% if view_hints.paginate? -%>
         <page-nav param="bottom-page-nav"/>
+
+<% end -%>
+
+<% if new_form -%>
+        <div param="new-form">
+          <h3 param="new-form-heading">New <%= model_name :title %></h3>
+          <form with="&new_for_current_user <%= model %>" param/>
+        </div>
+
+<% end -%>
       </section>
     </content:>
   </page>

@@ -69,7 +69,8 @@ This tag assumes the controller has a `reorder` action. This action is added aut
 <def tag="sortable-collection" attrs="sortable-options"><%
   singular_name = this.member_class.name.underscore
   attributes[:id] ||= "#{singular_name}_ordering"
-  reorder_url = send("reorder_#{singular_name.pluralize}_url")
+  route_method = subsite ? "#{subsite}_reorder_#{singular_name.pluralize}_url" : "reorder_#{singular_name.pluralize}_url"
+  reorder_url = send(route_method)
 %>
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>

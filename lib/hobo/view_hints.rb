@@ -7,16 +7,22 @@ module Hobo
     end
   
     def self.setter(name, default=nil, &block)
+      ivname = name.to_s.remove(/\?$/)
       metaclass.send :define_method, name do |*args|
         if args.empty?
-          instance_variable_get("@#{name}") || (default.is_a?(Proc) ? instance_eval(&default) : default)
+          val = instance_variable_get("@#{ivname}")
+          if val.nil?
+            val = default.is_a?(Proc) ? instance_eval(&default) : default
+            instance_variable_set("@#{ivname}", val)
+          end
+          val
         else 
           arg = if block
                   block[*args] 
                 else
                   args.first
                 end
-          instance_variable_set("@#{name}", arg)
+          instance_variable_set("@#{ivname}", arg)
         end
       end
     end
@@ -30,6 +36,13 @@ module Hobo
     setter :children,    proc { model.dependent_collections.sort_by(&:to_s) } do |*args|
       args
     end
+    
+    setter :paginate?,    proc { !sortable? }
+    
+    setter :sortable?,    proc { defined?(ActiveRecord::Acts::List::InstanceMethods) && 
+                                 model < ActiveRecord::Acts::List::InstanceMethods &&
+                                 model.new.try.scope_condition == "1 = 1" }
+
     
     # Accessors
     
