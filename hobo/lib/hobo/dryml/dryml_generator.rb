@@ -150,6 +150,11 @@ module Hobo
       def model_class
         model_name(:dashed)
       end
+      
+      
+      def view_hints
+        model.view_hints
+      end
 
       
       def through_collection_names(klass=model)
@@ -184,7 +189,7 @@ module Hobo
         end
       end
       
-      
+            
       def standard_fields(*args)
         klass = args.first.is_a?(Class) ? args.shift : model
         extras = args
