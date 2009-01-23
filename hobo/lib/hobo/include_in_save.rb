@@ -19,10 +19,13 @@ module Hobo
           added = false
           records.each do |record|
             # we want to call valid? on each one, but only add the error to self once
-            unless record.valid?
-              unless added
-                errors.add association, "..."
-                added = true
+            
+            record.with_acting_user(acting_user) do
+              unless record.valid?
+                unless added
+                  errors.add association, "..."
+                  added = true
+                end
               end
             end
           end
@@ -35,7 +38,8 @@ module Hobo
       if included_in_save
         included_in_save.each_pair do |association, records|
           records.each do |record|
-            record.save_without_validation # This means without transactions too
+            # save_without_validation means without transactions too
+            record.with_acting_user(acting_user) { record.save_without_validation }
           end
         end
       end
