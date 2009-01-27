@@ -827,12 +827,12 @@ The body of the tag will be repeated for each of the current records in the coll
       <hidden-id-field/>
       <div class="input-many-item" param="default"/>
       <div class="buttons">
-        <button class="remove-item" unless="&this_parent.length == 1" merge-attrs="disabled">-</button>
+        <button class="remove-item" merge-attrs="disabled">-</button>
         <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
       </div>
     </li>
     <li if="&empty">
-      <fake-field-context fake-field="0" context="&this.new">
+      <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
         <div class="input-many-item" param="default"/>
       </fake-field-context>
       <div class="buttons">
