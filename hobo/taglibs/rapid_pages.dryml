@@ -80,6 +80,12 @@ The easiest way to see what this tag does is to look at the source.
     <content: param>
       <header param="content-header">
         <h2 param="heading"><message/></h2>
+        <div class="debug" if="&Rails.env.development?">
+          <h3>Exception:</h3>
+          <pre><%= h @permission_error.pretty_inspect %></pre>
+          <h3>params:</h3>
+          <pre><%= h params.pretty_inspect %></pre>
+        </div>
       </header>
     </content:>
   </page>
