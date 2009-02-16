@@ -33,7 +33,7 @@ module Hobo
           # and record in question are Hobo models
           def nullify_keys(records)
             if (user = acting_user)
-              records.each { |r| r.user_changes!(user, @reflection.primary_key_name => nil) if r.is_a?(Hobo::Model) }
+              records.each { |r| r.user_update_attributes!(user, @reflection.primary_key_name => nil) if r.is_a?(Hobo::Model) }
             end
 
             # Normal ActiveRecord implementatin
