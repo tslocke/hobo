@@ -569,13 +569,16 @@ new HoboBehavior("ul.input-many", {
       this.updateButtons()
       this.updateInputNames()
       
+      ul.fire("rapid:add", { element: newItem })
+      ul.fire("rapid:change", { element: newItem })
+      
       new Effect.BlindDown(newItem, {duration: 0.3})
   },
   
   removeOne: function(ev, el) {
       Event.stop(ev)
       var self = this;
-      var li = el.up('li')
+      var ul = el.up('ul'), li = el.up('li')
       if (li.parentNode.childElements().length == 1) {
           // It's the last one - don't remove it, just clear it
           this.clearInputs(li)
@@ -586,11 +589,15 @@ new HoboBehavior("ul.input-many", {
               self.updateInputNames()
           } });
       }
+      ul.fire("rapid:remove")
+      ul.fire("rapid:change")
   },
+
   
   clearInputs: function(item) {
-      $(item).select('input').each(function(input){
-          if (input.getAttribute('type').toLowerCase() == 'hidden') {
+      $(item).select('input,select,textarea').each(function(input){
+          t = input.getAttribute('type')
+          if (t && t.match(/hidden/i)) {
               input.remove()
           } else {
               input.value = ""
