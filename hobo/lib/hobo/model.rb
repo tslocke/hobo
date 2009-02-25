@@ -86,7 +86,9 @@ module Hobo
       end
 
       # ...but only return the ones that registered themselves
-      @model_names.*.constantize
+      @model_names.map do |name|
+        name.safe_constantize || (@model_names.delete name; nil)
+      end.compact
     end
     
     
