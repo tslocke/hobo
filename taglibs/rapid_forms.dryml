@@ -779,7 +779,7 @@ Use the `uri` option to specify a redirect location:
 
 <!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The use can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
   -->
-<def tag="check-many"><% 
+<def tag="check-many" attrs="disabled"><% 
   collection = this
   param_name = param_name_for_this
   options ||= begin
@@ -787,10 +787,10 @@ Use the `uri` option to specify a redirect location:
     this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
   end
   -%>
-  <ul class="check-many" param="default">
+  <ul class="check-many" param="default" merge-attrs>
     <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked %>
     <li repeat="&options" param>
-      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)"/>
+      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
       <name param/>
     </li>
   </ul>
@@ -827,12 +827,12 @@ The body of the tag will be repeated for each of the current records in the coll
       <hidden-id-field/>
       <div class="input-many-item" param="default"/>
       <div class="buttons">
-        <button class="remove-item" unless="&this_parent.length == 1" merge-attrs="disabled">-</button>
+        <button class="remove-item" merge-attrs="disabled">-</button>
         <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
       </div>
     </li>
     <li if="&empty">
-      <fake-field-context fake-field="0" context="&this.new">
+      <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
         <div class="input-many-item" param="default"/>
       </fake-field-context>
       <div class="buttons">

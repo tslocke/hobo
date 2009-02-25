@@ -695,6 +695,7 @@ module Hobo
 
     def permission_denied(error)
       self.this = true # Otherwise this gets sent user_view
+      @permission_error = error
       if "permission_denied".in?(self.class.superclass.instance_methods)
         super
       else
