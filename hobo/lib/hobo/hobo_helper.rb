@@ -486,12 +486,12 @@ module Hobo
     # --- Debugging Helpers ---- #
 
     def abort_with(*args)
-      raise args.map{|arg| PP.pp(arg, "")}.join("-------\n")
+      raise args.*.pretty_inspect.join("-------\n")
     end
 
     def log_debug(*args)
       logger.debug("\n### DRYML Debug ###")
-      logger.debug(args.map {|a| PP.pp(a, "")}.join("-------\n"))
+      logger.debug(args.*.pretty_inspect.join("-------\n"))
       logger.debug("DRYML THIS = #{this.typed_id rescue this.inspect}")
       logger.debug("###################\n")
       args.first unless args.empty?

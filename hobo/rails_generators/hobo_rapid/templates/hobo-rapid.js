@@ -589,13 +589,15 @@ new HoboBehavior("ul.input-many", {
               self.updateInputNames()
           } });
       }
-      ul.fire("rapid:remove", { element: newItem })
-      ul.fire("rapid:change", { element: newItem })
+      ul.fire("rapid:remove")
+      ul.fire("rapid:change")
   },
+
   
   clearInputs: function(item) {
-      $(item).select('input').each(function(input){
-          if (input.getAttribute('type').toLowerCase() == 'hidden') {
+      $(item).select('input,select,textarea').each(function(input){
+          t = input.getAttribute('type')
+          if (t && t.match(/hidden/i)) {
               input.remove()
           } else {
               input.value = ""

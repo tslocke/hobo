@@ -113,7 +113,7 @@ module Hobo
             record = Hobo::AccessibleAssociations.find_or_create_and_update(self, :#{name}, finder, record_hash_or_string) do |id|
               if id
                 raise ArgumentError, "attempted to update the wrong record in belongs_to association #{self}##{name}" unless 
-                  #{name} && id == self.#{name}.id
+                  #{name} && id == self.#{name}.id.to_s
                 #{name}
               else
                 finder.new
