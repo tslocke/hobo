@@ -280,7 +280,7 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
                       if refl.options[:through]
                         collection_input(attrs)
                       else
-                        raise NotImplementedError, "An input for has-many associations has not been implemented yet"
+                        input_many(attrs)
                       end
                     end
                   else
@@ -819,7 +819,7 @@ Say you are creating a new `Category` in your online shop, and you want to creat
 The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
   
   -->
-<def tag="input-many">
+<def tag="input-many" polymorphic>
   <set empty="&this.empty?"/>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
