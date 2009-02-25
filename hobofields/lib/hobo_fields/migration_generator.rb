@@ -17,18 +17,14 @@ module HoboFields
       g.generate
     end
 
-    def initialize(*args)
-      options = args.extract_options!
-      @ambiguity_resolver = args.first
+    def initialize(ambiguity_resolver)
+      @ambiguity_resolver = ambiguity_resolver
       @drops = []
       @renames = nil
-      @force_drop = options[:force_drop]
     end
 
     attr_accessor :renames
     
-    def force_drop?; @force_drop end
-
 
     def load_rails_models
       if defined? RAILS_ROOT
@@ -80,11 +76,7 @@ module HoboFields
     # return a hash of table renames and modifies the passed arrays so
     # that renamed tables are no longer listed as to_create or to_drop
     def extract_table_renames!(to_create, to_drop)
-      if force_drop?
-        # no renames at all
-        {}
-        
-      elsif renames
+      if renames
         # A hash of table renames has been provided
 
         to_rename = {}
@@ -110,11 +102,7 @@ module HoboFields
 
 
     def extract_column_renames!(to_add, to_remove, table_name)
-      if force_drop?
-        # no renames at all
-        {}
-        
-      elsif renames
+      if renames
         to_rename = {}
         column_renames = renames._?[table_name.to_sym]
         if column_renames

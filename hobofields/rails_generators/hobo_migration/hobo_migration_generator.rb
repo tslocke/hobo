@@ -1,8 +1,6 @@
 require File.dirname(__FILE__) + '/../../lib/hobofields'
 class HoboMigrationGenerator < Rails::Generator::Base
 
-  default_options :force_drop => false
-
   def initialize(runtime_args, runtime_options = {})
     super
     @migration_name = runtime_args.first || begin
@@ -29,7 +27,7 @@ class HoboMigrationGenerator < Rails::Generator::Base
   def manifest
     return record {|m| } if migrations_pending?
 
-    generator = HoboFields::MigrationGenerator.new(self, :force_drop => options[:force_drop])
+    generator = HoboFields::MigrationGenerator.new(self)
     up, down = generator.generate
 
     if up.blank?
@@ -40,14 +38,14 @@ class HoboMigrationGenerator < Rails::Generator::Base
     puts "\n---------- Up Migration ----------", up, "----------------------------------"
     puts "\n---------- Down Migration --------", down, "----------------------------------"
 
-    action = input("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
+    action = options[:action] || input("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
 
     if action == 'c'
       # record nothing to keep the generator happy
       record {|m| }
     else
       puts "\nMigration filename:", "(you can type spaces instead of '_' -- every little helps)"
-      migration_name = input("Filename [#@migration_name]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
+      migration_name = input("Filename [#@migration_name]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_') unless options[:default_name]
       migration_name = @migration_name if migration_name.blank?
 
       at_exit { rake_migrate } if action == 'm'
@@ -68,6 +66,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
 
 
   def extract_renames!(to_create, to_drop, kind_str, name_prefix="")
+    return {} if options[:force_drop]
+    
     to_rename = {}
     rename_to_choices = to_create
     to_drop.dup.each do |t|
@@ -122,16 +122,17 @@ class HoboMigrationGenerator < Rails::Generator::Base
   
   protected
     def banner
-      "Usage: #{$0} #{spec.name} [<migration-name>] [--force-drop]"
+      "Usage: #{$0} #{spec.name} [<migration-name>]"
     end
 
     def add_options!(opt)
       opt.separator ''
       opt.separator 'Options:'
-      opt.on("--force-drop",
-             "Don't prompt to disambiguate drops from renames - drop everything") do |v|
-        options[:force_drop] = true
-      end
+      
+      opt.on("--force-drop",   "Don't prompt with 'drop or rename' - just drop everything") { |v| options[:force_drop] = true }
+      opt.on("--default-name", "Dont' prompt for a migration name - just pick one")         { |v| options[:default_name] = true }
+      opt.on("--generate",     "Dont' prompt for action - generate the migration")          { |v| options[:action] = 'g' }
+      opt.on("--migrate",      "Dont' prompt for action - generate and migrate")            { |v| options[:action] = 'm' }
     end
   
 
