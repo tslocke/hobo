@@ -672,7 +672,7 @@ module Hobo
       options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
       finder = finder.limit(options[:limit]) unless finder.send(:scope, :find, :limit)
       finder = finder.send(options[:query_scope], params[options[:param]])
-      items = finder.find(:all)
+      items = finder.find(:all).select { |r| r.viewable_by?(current_user) }
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
 
