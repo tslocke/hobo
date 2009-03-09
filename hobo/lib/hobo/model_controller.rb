@@ -471,7 +471,7 @@ module Hobo
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this = find_instance(options)
+      self.this ||= find_instance(options)
       response_block(&b)
     end
 
@@ -491,7 +491,7 @@ module Hobo
 
     def hobo_create(*args, &b)
       options = args.extract_options!
-      self.this = args.first || new_for_create
+      self.this ||= args.first || new_for_create
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:new, &b)
     end
@@ -500,7 +500,7 @@ module Hobo
     def hobo_create_for(owner, *args, &b)
       options = args.extract_options!
       owner, association = find_owner_and_association(owner)
-      self.this = args.first || association.new
+      self.this ||= args.first || association.new
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
       create_response(:"new_for_#{owner}", &b)    
     end
@@ -548,7 +548,7 @@ module Hobo
     def hobo_update(*args, &b)
       options = args.extract_options!
 
-      self.this = args.first || find_instance
+      self.this ||= args.first || find_instance
       changes = options[:attributes] || attribute_parameters or raise RuntimeError, "No update specified in params"
       this.user_update_attributes(current_user, changes)
 
@@ -595,7 +595,7 @@ module Hobo
 
     def hobo_destroy(*args, &b)
       options = args.extract_options!
-      self.this = args.first || find_instance
+      self.this ||= args.first || find_instance
       this.user_destroy(current_user)
       flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
       destroy_response(&b)
