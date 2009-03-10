@@ -11,7 +11,7 @@ class <%= class_name %> < ActiveRecord::Base
 
   # This gives admin rights to the first sign-up.
   # Just remove it if you don't want that
-  before_create { |user| user.administrator = true if count == 0 }
+  before_create { |user| user.administrator = true if RAILS_ENV != "test" && count == 0 }
   
   
   # --- Signup lifecycle --- #
