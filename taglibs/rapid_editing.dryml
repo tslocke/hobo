@@ -88,14 +88,14 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
    NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are the same.
 
   -->
-<def tag="select-one-editor" attrs="include-none, blank-message, sort, update"><%
+<def tag="select-one-editor" attrs="include-none, blank-message, sort, update, options"><%
   raise HoboError.new("Not allowed to edit") unless can_edit?
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
-  select_options = this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
+  options ||= this_field_reflection.klass.find(:all).select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }
-   select_options = select_options.sort if sort
-   select_options.insert(0, [blank_message, ""]) if this.nil? || include_none
+   options = options.sort if sort
+   options.insert(0, [blank_message, ""]) if this.nil? || include_none
    f = ajax_updater(object_url(this_parent, :method => :put),
                     update,
                     :method => "put",
@@ -104,7 +104,7 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
                       } })
     %>
   <select onchange="#{f}" merge-attrs>
-     <%= options_for_select(select_options, this ? this.id : "") %>
+     <%= options_for_select(options, this ? this.id : "") %>
   </select>
 </def>
 
