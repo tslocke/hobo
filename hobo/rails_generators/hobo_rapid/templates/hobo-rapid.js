@@ -610,15 +610,15 @@ new HoboBehavior("ul.input-many", {
       var addButton    = "<button class='add-item'>+</button>"
 
       var ul = this.element
-      if (ul.childElements().length == 1) {
-          ul.down('li').down('div.buttons').innerHTML = removeButton + ' ' + addButton
-      } else {
-          var add = ul.selectChildren('li').selectChildren('div.buttons').down('button.add-item')
-          if (add) add.remove()
-          ul.selectChildren('li:first-child').child('div.buttons').innerHTML = removeButton
-          ul.selectChildren('li:last-child').child('div.buttons').innerHTML = removeButton + ' ' + addButton
+      var children = ul.childElements();
+      // assumption: only get here after add or remove, so only second last button needs the "+" removed
+      if(children.length > 1) {
+          // cannot use .down() because that's a depth-first search.  Did I mention that I hate Prototype?
+          children[children.length-2].childElements().last().innerHTML = removeButton;
       }
-      
+      if(children.length > 0) {
+          children[children.length-1].childElements().last().innerHTML = removeButton + ' ' + addButton;
+      }
       Event.addBehavior.reload()
   },
   
