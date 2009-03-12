@@ -5,6 +5,6 @@
       <theme-stylesheet/>
       <theme-stylesheet name="rapid-ui"/>
       <stylesheet name="application" param="app-stylesheet"/>
-    </stylesheets>
+    </stylesheets:>
   </old-page>
 </extend>  
