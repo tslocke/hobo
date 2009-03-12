@@ -25,14 +25,13 @@ module Hobo
         ActionController::Dispatcher.class_eval do
           def reload_application_with_dryml_generators
             reload_application_without_dryml_generators
-            DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false
+            DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
           end
           alias_method_chain :reload_application, :dryml_generators
         end
       end
       
       def self.run
-        return if RAILS_ENV == "production"
         @generator ||= DrymlGenerator.new
         @generator.run
       end
