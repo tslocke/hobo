@@ -11,7 +11,6 @@ lib/active_record/association_reflection.rb
 lib/hobo/accessible_associations.rb
 lib/hobo/authentication_support.rb
 lib/hobo/bundle.rb
-lib/hobo/composite_model.rb
 lib/hobo/controller.rb
 lib/hobo/dev_controller.rb
 lib/hobo/dryml/dryml_builder.rb
@@ -49,7 +48,6 @@ lib/hobo/lifecycles.rb
 lib/hobo/model.rb
 lib/hobo/model_controller.rb
 lib/hobo/model_router.rb
-lib/hobo/model_support.rb
 lib/hobo/permissions/associations.rb
 lib/hobo/permissions.rb
 lib/hobo/rapid_helper.rb
