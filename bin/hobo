@@ -12,6 +12,7 @@ Options:
   --db-create                        # Run rake db:create:all
   --hobo-src <path to hobo src>
   -d | --database <database>         # e.g. mysql, sqlite
+  -r | --rails <version>             # rails version to use
 "
 
 
@@ -34,18 +35,11 @@ def command(*s)
   exit(1) unless ok
 end
 
-if ARGV.length == 0 || ARGV.include?("--help")
-  puts USAGE
-  exit 1
-end
-
-app_path = ARGV.pop
-
 user_model  = "user"
 create_db   = false
 
-until ARGV.empty?
-  case ARGV.shift
+while true
+  case arg_name = ARGV.shift
   when "--user-model"
     arg = ARGV.shift
     user_model = arg == "false" ? nil : arg
@@ -55,14 +49,25 @@ until ARGV.empty?
     hobo_src = "../" + ARGV.shift
   when "-d", "--database"
     database_type = ARGV.shift
-  else
+  when "-r", "--rails"
+    rails_version = ARGV.shift
+  when "--help"
     puts USAGE
-    exit 1
+    exit
+  else
+    app_path = arg_name
+    break
   end
+end
+
+if !ARGV.empty? || app_path.nil?
+  puts USAGE
+  exit 1
 end
 
 puts "\nGenerating Rails app...\n"
 opts = []
+opts << "_#{rails_version}_"  if rails_version
 opts << "-d #{database_type}" if database_type
 system("rails #{opts * ' '} #{app_path}")
 
