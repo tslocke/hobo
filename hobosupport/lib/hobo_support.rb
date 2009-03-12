@@ -5,14 +5,12 @@ module HoboSupport
 end
 
 
-# Some teeny fixes too diminutive to go elsewhere
+# Some teeny bit and bobs too diminutive to go elsewhere
 
 class Object
 
-  # Often nice to ask e.g. some_object.is_a?(Symbol, String)
-  alias_method :is_a_without_multiple_args?, :is_a?
-  def is_a?(*args)
-    args.any? {|a| is_a_without_multiple_args?(a) }
+  def is_one_of?(*args)
+    args.any? {|a| is_a?(a) }
   end
 
 end

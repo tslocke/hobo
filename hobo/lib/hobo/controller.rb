@@ -55,7 +55,7 @@ module Hobo
     protected
 
     def redirect_to_with_object_url(destination, *args)
-      if destination.is_a?(String, Hash, Symbol)
+      if destination.is_one_of?(String, Hash, Symbol)
         redirect_to_without_object_url(destination)
       else
         redirect_to_without_object_url(object_url(destination, *args))
