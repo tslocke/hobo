@@ -124,7 +124,7 @@ module Hobo
       elsif obj.is_a? Hobo::RawJs
         "#{name}=' + #{obj} + '"
       else
-        v = if obj.is_a?(ActiveRecord::Base) or obj.is_a?(Array)
+        v = if obj.is_one_of?(ActiveRecord::Base, Array)
               "@" + typed_id(obj)
             else
               obj.to_s.gsub("'"){"\\'"}
@@ -286,7 +286,7 @@ module Hobo
         else
           object = this
         end
-      elsif args.first.is_a?(String, Symbol)
+      elsif args.first.is_one_of?(String, Symbol)
         object = this
         field  = args.first
       else
@@ -309,7 +309,7 @@ module Hobo
           true
         elsif object.viewable_by?(current_user, field)
           # If possible, we also check if the current *value* of the field is viewable
-          if field.is_a?(Symbol, String) && (v = object.send(field)) && v.respond_to?(:viewable_by?)
+          if field.is_one_of?(Symbol, String) && (v = object.send(field)) && v.respond_to?(:viewable_by?)
             v.viewable_by?(current_user, nil)
           else
             true
@@ -350,7 +350,7 @@ module Hobo
 
 
     def param_name_for(path)
-      field_path = field_path.to_s.split(".") if field_path.is_a?(String, Symbol)
+      field_path = field_path.to_s.split(".") if field_path.is_one_of?(String, Symbol)
       attrs = path.rest.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
       "#{path.first}#{attrs}"
     end

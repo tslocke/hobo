@@ -6,7 +6,7 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
     >> require 'hobosupport'
     >> HoboSupport::VERSION
-    => "0.7.5"
+    => "0.8.5"
 
 ## Contents
 
@@ -19,24 +19,16 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
 ## Object extensions
 
-### `Object#is_a?`
+### `Object#is_one_of?`
 
-Extended to allow multiple types to be checked in one go
+Like `is_a?` but multiple types to be checked in one go
 
-    >> "foo".is_a?(String, Symbol)
+    >> "foo".is_one_of?(String, Symbol)
     => true
-    >> :foo.is_a?(String, Symbol)
+    >> :foo.is_one_of?(String, Symbol)
     => true
-    >> 1.is_a?(String, Symbol)
+    >> 1.is_one_of?(String, Symbol)
     => false
-
-Still works the old way
-
-    >> "foo".is_a?(String)
-    => true
-    >> :foo.is_a?(String)
-    => false
-
 
 ## Method call extensions
 

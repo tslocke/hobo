@@ -363,7 +363,7 @@ module Hobo::Dryml
 
 
     def call_tag_parameter_with_default_content(the_tag, attributes, default_content, overriding_content_proc)
-      if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+      if the_tag.is_one_of?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_content_proc
                  new_context { overriding_content_proc.call(proc { default_content._?.call(nil) }) }
                elsif default_content
@@ -440,7 +440,7 @@ module Hobo::Dryml
 
       default_content = parameters[:default]
 
-      if the_tag.is_a?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
+      if the_tag.is_one_of?(String, Symbol) && the_tag.to_s.in?(Hobo.static_tags)
         body = if overriding_default_content
                  new_context { overriding_default_content.call(proc { default_content.call(nil) if default_content }) }
                elsif default_content
@@ -459,7 +459,7 @@ module Hobo::Dryml
           parameters = parameters.merge(:default => d) 
         end
 
-        if the_tag.is_a?(String, Symbol)
+        if the_tag.is_one_of?(String, Symbol)
           # It's a defined DRYML tag
           send(the_tag, attributes, parameters)
         else
