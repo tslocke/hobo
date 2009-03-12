@@ -29,7 +29,7 @@ class <%= class_name %> < ActiveRecord::Base
     end
 
     transition :reset_password, { :active => :active }, :available_to => :key_holder,
-               :update => [ :password, :password_confirmation ]
+               :params => [ :password, :password_confirmation ]
 
   end
   
