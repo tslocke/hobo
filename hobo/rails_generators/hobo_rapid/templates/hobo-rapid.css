@@ -1,12 +1,12 @@
 /**** Default styling for Rapid ****/
 
 #ajax_progress {
-    color: grey;
+    color: gray;
     float: right;
     margin: 20px;
     position: fixed;
     background: white;
-    font-family: Tahoma "sans serif";
+    font-family: tahoma, sans-serif;
     display: none;
     z-index: 10;
 }
