@@ -107,7 +107,7 @@ form .actions input { margin: 0; }
 	padding: 8px 20px 8px 40px;
 	border: 1px solid #444;
 	background: black url(../images/spinner.gif) no-repeat 10px 8px;
-	
+	color: white;
 }
 
 .article {margin: 20px 0; border-top: 1px dotted #ccc;}
