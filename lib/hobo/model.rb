@@ -358,10 +358,7 @@ module Hobo
 
       def method_missing(name, *args, &block)
         name = name.to_s
-        if name =~ /\./
-          # FIXME: Do we need this now?
-          call_method_chain(name, args, &block)
-        elsif create_automatic_scope(name)
+        if create_automatic_scope(name)
           send(name.to_sym, *args, &block)
         else
           super(name.to_sym, *args, &block)
@@ -371,13 +368,6 @@ module Hobo
 
       def respond_to?(method, include_private=false)
         super || create_automatic_scope(method)
-      end
-
-
-      def call_method_chain(chain, args, &block)
-        parts = chain.split(".")
-        s = parts[0..-2].inject(self) { |m, scope| m.send(scope) }
-        s.send(parts.last, *args)
       end
 
 
