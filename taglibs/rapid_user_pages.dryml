@@ -37,7 +37,9 @@
 
             <labelled-item param="remember-me">
               <item-label class="field-label" param="remember-me-label">Remember me:</item-label>
-              <item-value><input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input"/></item-value>
+              <item-value>
+                <input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input" checked/>
+              </item-value>
             </labelled-item>
           </labelled-item-list>
           <div param="actions">

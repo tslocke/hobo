@@ -20,7 +20,7 @@ module Hobo
 
 
       def extract_attributes(attributes)
-        update_attributes = options.fetch(:update, [])
+        update_attributes = options.fetch(:params, [])
         attributes & update_attributes
       end
         
@@ -50,7 +50,7 @@ module Hobo
 
 
       def parameters
-        options[:update] || []
+        options[:params] || []
       end
 
 
