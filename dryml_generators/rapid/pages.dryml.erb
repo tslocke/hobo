@@ -122,7 +122,7 @@ end
 <% end -%>
           <header param="content-header">
 <% if  back_link -%>
-            <a:<%= back_link %> param="parent-link">&laquo; <name/></a>
+            <a:<%= back_link %> param="parent-link">&laquo; <name/></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading"><name/></h2>
 <% if boolean_fields -%>
@@ -160,7 +160,7 @@ end
 <%   end -%>
 <%   if add_link -%>
 
-              <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a>
+              <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">New <%= collection.to_s.singularize.titleize %></a:<%= collection %>>
 <%   elsif add_form -%>
 
               <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
@@ -185,7 +185,7 @@ end
             <heading:><Your with="&@<%= model_name.underscore %>"/> <%= refl.name.to_s.titleize %></heading:>
 <%       end -%>
             <more:>more</more:>
-          </preview-with-more>
+          </preview-with-more:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection"><%= refl.name.to_s.titleize %></h3>
