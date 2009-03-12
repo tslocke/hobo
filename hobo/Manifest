@@ -8,7 +8,6 @@ lib/action_view_extensions/helpers/tag_helper.rb
 lib/active_record/association_collection.rb
 lib/active_record/association_proxy.rb
 lib/active_record/association_reflection.rb
-lib/extensions/test_case.rb
 lib/hobo/accessible_associations.rb
 lib/hobo/authentication_support.rb
 lib/hobo/bundle.rb
