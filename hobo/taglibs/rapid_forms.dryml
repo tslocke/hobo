@@ -550,7 +550,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
 %></def>
 
 
-<!-- Provides either an ajax or non-ajax create button that will send a RESTful "POST" to the server to create a new resource.
+<!-- Provides an ajax create button that will send a RESTful "POST" to the server to create a new resource.
   
 All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
 
