@@ -129,11 +129,7 @@ module Hobo
 
 
     def add_routes
-      # Simple support for composite models, we might later need a CompositeModelController
-      if model < Hobo::CompositeModel
-        map.connect "#{plural}/:id", :controller => plural, :action => 'show', :requirements => ID_REQUIREMENT
-
-      elsif controller < Hobo::ModelController
+      if controller < Hobo::ModelController
         # index routes need to be first so the index names don't get
         # taken as IDs
         index_action_routes

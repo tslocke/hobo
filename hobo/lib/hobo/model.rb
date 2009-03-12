@@ -135,9 +135,6 @@ module Hobo
 
     module ClassMethods
 
-      # include methods also shared by CompositeModel
-      #include ModelSupport::ClassMethods
-
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
 
