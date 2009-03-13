@@ -212,10 +212,10 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
   -->
 <def tag="integer-select-editor" attrs="options, min, max, update, nil-option, message">
  <% options ||= (min.to_i..max.to_i).to_a %>
- <select class="number-editor-bhv #{model_id_class} #{'update:' + comma_split(update).join(':') unless update.blank?}"
+ <select class="integer editor #{'update:' + comma_split(update).join(':') unless update.blank?} #{model_id_class(this_parent, this_field)}"
           merge-attrs="&message ? attributes.merge(:hobo_message => message) : attributes">
    <if test="&this.nil?"><option value=""><%= nil_option || "Choose a value" %></option></if>
-   <%= options_for_select(options.*.to_s, this) %>
+   <%= options_for_select(options.*.to_s, this.to_s) %>
  </select>
 </def>
 
