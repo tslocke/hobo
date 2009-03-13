@@ -26,7 +26,6 @@ module Hobo
 
           helper_method :model, :current_user
           before_filter :set_no_cache_headers
-          after_filter  :remember_page_path
 
           rescue_from ActiveRecord::RecordNotFound, :with => :not_found
 
@@ -369,7 +368,7 @@ module Hobo
       after_submit = params[:after_submit]
 
       # The after_submit post parameter takes priority
-      (after_submit == "stay-here" ? :back : after_submit) ||
+      (after_submit == "stay-here" ? url_for_page_path : after_submit) ||
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
@@ -384,6 +383,11 @@ module Hobo
         home_page
     end
     
+    
+    def url_for_page_path
+      controller, view = Controller.controller_and_view_for(params[:page_path])
+      url_for :controller => controller, :action => view
+    end
 
     # TODO: Get rid of this joke of an idea that fails miserably if you open another browser window.
     def previous_page_path
@@ -762,13 +766,6 @@ module Hobo
       #headers["Cache-Control"] = "no-cache"
       headers["Cache-Control"] = "no-store"
       headers["Expires"] ='0'
-    end
-
-    def remember_page_path
-      if request.method == :get
-        session[:previous_page_path] = request.path
-        session[:previous_page_path] += "?#{request.query_string}" unless request.query_string.blank?
-      end
     end
 
     # --- end filters --- #
