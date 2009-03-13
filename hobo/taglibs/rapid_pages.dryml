@@ -34,8 +34,8 @@ The easiest way to see what this tag does is to look at the source.
       <set-scoped flash-rendered="&false">
         <ajax-progress param/>
         <header class="page-header" param>
-          <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
           <live-search param if="&defined_route? :site_search"/>
+          <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
           <account-nav if="&login_url(Hobo::User.default_user_model)" param/>
           <main-nav current="&title" param/>
         </header>
