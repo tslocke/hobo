@@ -142,7 +142,7 @@ module Hobo
       
       
       def model_name(*options)
-        name = model.name
+        name = model.view_hints.model_name
         name = name.pluralize                                 if :plural.in?(options)
         name = name.titleize                                  if :title.in?(options)
         name = name.titleize.downcase                         if :lowercase.in?(options)
