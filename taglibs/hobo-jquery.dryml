@@ -1,0 +1,51 @@
+<def tag="hjq-assets">
+  <javascript name="jquery-1.3.2.min.js" />
+  <javascript name="jquery-ui-1.7.custom.min.js" />
+  <script type="text/javascript">
+    jQuery.noConflict();
+  </script>
+  <javascript name="hobo-jquery.js" />
+  <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
+  <stylesheet name='hobo-jquery.css' />
+</def>
+
+<!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
+  
+This tag is very different from tags like `<select-many>` and `<check-many>` in that:
+
+ - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
+ - Those tags work by themselves, while `<input-many>` is just a wrapper for other input fields.
+ 
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <input-many:products><field-list fields="name, price"/></input-many>
+    
+The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+  
+  -->
+<def tag="hjq-input-many" polymorphic>
+  <tag-json class="input-many-json init-js" init="hjq.input_many.init" />
+  <set empty="&this.empty?"/>
+  <ul class="input-many-alt #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
+    <li class="input-many-template">
+      <fake-field-context fake-field="-1" context="&this.try.new_candidate || this.member_class.new">
+        <div class="input-many-item" param="default"/>
+      </fake-field-context>
+      <div class="buttons">
+        <button class="remove-item" merge-attrs="disabled">-</button>
+        <button class="add-item" merge-attrs="disabled">+</button>
+      </div>
+    </li>
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+      <error-messages without-heading class="sub-record"/>
+      <hidden-id-field/>
+      <div class="input-many-item" param="default"/>
+      <div class="buttons">
+        <button class="remove-item" merge-attrs="disabled">-</button>
+        <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
+      </div>
+    </li>
+  </ul>
+</def>

@@ -1,0 +1,79 @@
+<include src="core" plugin="hobo/hobo"/>
+<include src="rapid" plugin="hobo/hobo"/>
+
+<def tag="param-list" >
+  <ul if="&this.any?">
+    <% this.each {|param| %>
+      <li><%= param.first %>
+        <param-list with="&param.last"/>
+      </li>
+    <% } %>
+  </ul>
+</def>
+
+<def tag="tag-link" attrs="link, content">
+  <li>
+    <a href="##{link}">
+      <span>
+        <%= content %>
+      </span>
+    </a>
+  </li>
+</def>
+  
+
+<html>
+  <head>
+    <link type="text/css" href="stylesheets/themes/smoothness/ui.all.css" rel="stylesheet" />
+    <script type="text/javascript" src="javascripts/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery-ui-1.7.custom.min.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function(){
+        jQuery("#tabs-top").tabs();
+        jQuery(".taglib").tabs();
+        jQuery(".source").accordion({collapsible: true, active: false, autoHeight: false });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="tabs-top">
+      <ul>
+        <% this.each {|taglib| %>
+          <tag-link content="&taglib.name" link="#{taglib.name}-taglib"/>
+        <% } %>
+      </ul>
+      <!-- unfortunately, <repeat> is problematic here -->
+      <% this.each {|taglib| %>
+        <div class="taglib" id="#{taglib.name}-taglib">
+          <%= taglib.comment_html %>
+          <ul>
+            <% taglib.tag_defs.each {|tag| %>
+              <tag-link content="&tag.name" link="#{tag.name}-tag"/>
+            <% } %>
+          </ul>
+          <% taglib.tag_defs.each {|tag| %>
+            <div id="#{tag.name}-tag">
+          
+              <h2><%= tag.name %></h2>
+              
+              <%= tag.comment_intro_html %>
+          
+              <% if !tag.parameters.empty? %>
+                <h3>Parameters</h3>
+                <param-list with="&tag.parameters"/>
+              <% end %>
+          
+              <%= tag.comment_rest_html %>
+
+              <div class="source">
+                <h3><a href="#">Source</a></h3>
+                <pre><code><%= h tag.source %></code></pre>
+              </div>
+          
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </body>
+</html>
