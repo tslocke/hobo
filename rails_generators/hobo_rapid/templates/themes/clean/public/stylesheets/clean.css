@@ -136,9 +136,9 @@ form .actions input { margin: 0; }
  {border: none; color: white; background: none;}
 
 .page-header div.search {
-	position: absolute; top: 10px; right: 5px;
-	padding: 6px 30px 8px 15px; 
-}
+ 	float: right;
+ 	padding: 0 30px 8px 15px; 
+ }
 .page-header div.search label {
 	padding-right: 10px; 
 	font: bold 9px Arial, sans-serif; text-transform: uppercase; letter-spacing: 1.0pt;
