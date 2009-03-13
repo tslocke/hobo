@@ -49,8 +49,9 @@ module Hobo
     class << self
       
       def model
-        model_name.constantize
+        @model ||= name.sub(/Hints$/, "").constantize
       end
+        
 
       def field_name(field)
         field_names.fetch(field.to_sym, field.to_s.titleize)

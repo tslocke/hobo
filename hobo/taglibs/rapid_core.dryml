@@ -213,8 +213,9 @@ Provides a short hand way of displaying images in public/images
 -->
 <def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
-
-  name = dasherize ? type.name.underscore.dasherize : type.name.titleize
+  
+  name = type.respond_to?(:view_hints) ? type.view_hints.model_name : type.name
+  name = dasherize ? name.underscore.dasherize : name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
   name
