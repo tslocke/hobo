@@ -164,7 +164,8 @@ form .actions input { margin: 0; }
 }
 
 .account-nav {
-	position: absolute; top: -20px; right: 35px;
+    float:right;
+    margin: -42px 5px 0 0;
 	font-size: 11px;
 }
 .account-nav li {
