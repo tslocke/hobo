@@ -294,7 +294,7 @@ Or a new page if the context is a class:
 * If `action="new"` then `<a>` will check that the current user has permission to create the object
 * Several useful classes are added automatically to the output `<a>`.
 -->
-<def tag="a" attrs="action, to, params, query-params, href, format, subsite"><%=
+<def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
   content = parameters.default
    
   params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
@@ -315,7 +315,7 @@ Or a new page if the context is a class:
       new_record.set_creator(current_user)
       href = object_url(target, "new", params._?.merge(:subsite => subsite))
       
-      if href && can_create?(new_record)
+      if href && (force || can_create?(new_record))
         new_class_name = if target.respond_to?(:proxy_reflection)
                            target.proxy_reflection.klass.name
                          else
