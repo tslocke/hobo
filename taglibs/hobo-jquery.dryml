@@ -1,13 +1,101 @@
+<!--
+
+This is the jQuery plugin for Hobo.  This plugin provides the jQuery UI widgets in a Hobo friendly manner, provides useful tags and functions for jQuery javascript coding, and provides additional composite tags.
+
+To use, you need to add the assets to your page:
+
+    <extend tag="page">
+      <old-page merge>
+        <custom-scripts:>
+          <hjq-assets/>
+        </custom-scripts>
+      </old-page>
+    </extend>
+
+
+The jQuery UI tags support all of the [options that the corresponding jQuery UI widgets provide](http://docs.jquery.com/UI).  For example:
+
+    <hjq-datepicker dateFormat="yy-mm-dd" />
+
+Options that expect a type other than string can be provided by passing a ruby object:
+
+    <hjq-datepicker dayNamesMin="&['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa']" />
+
+Events are also supported.  Pass in a global function name:
+
+    <hjq-datepicker onSelect="hjq.log" />
+
+-->
+
+<!--
+This is Hobo jQuery's standard tag annotation method.   This annotation is automatically added to Hobo jQuery tags, but you may wish to use it in your own tag definitions.
+
+The current implementation uses HTML comments for annotation.  This may change in the future, if somebody can suggest a better mechanism.  [Here is a good discussion of the alternatives.](http://www.1729.com/blog/HtmlAnnotations.html)
+
+To use it, invoke this tag directly before the tag to annotate.  To get the annotations, call hjq.get_annotations with _this_ set to the element that has been annotated.  For example:
+
+    jQuery(this).find('.hjq-annotated').each(function() {
+      var annotations = hjq.get_annotations.call(this);
+      ...
+    });
+-->
+<def tag="annotate-tag">
+  <%= "<!-- json_annotation (#{attributes.to_json}); -->" %>
+</def>
+
+<!--
+These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wish to add this to your page definition:
+
+    <extend tag="page">
+      <old-page merge>
+        <custom-scripts:>
+          <hjq-assets/>
+        </custom-scripts>
+      </old-page>
+    </extend>
+-->
+
+
 <def tag="hjq-assets">
   <javascript name="jquery-1.3.2.min.js" />
   <javascript name="jquery-ui-1.7.custom.min.js" />
+  <javascript name="hobo-jquery.js" />
   <script type="text/javascript">
     jQuery.noConflict();
+    jQuery(document).ready(function() {
+      hjq.initialize.call(document);
+    });
   </script>
-  <javascript name="hobo-jquery.js" />
   <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
   <stylesheet name='hobo-jquery.css' />
 </def>
+
+
+<!--
+This is the jQuery-UI datepicker.
+
+It's probably easiest to add this to your application.dryml:
+
+    <def tag="input" for="Date">
+      <hjq-datepicker dateFormat="yy-mm-dd" merge />
+    </def>
+
+It's probably useful to set global options such as dateFormat in application.dryml and set local options such as yearRange in the tag invocation:
+
+    <input:birthdate yearRange="1900:#{Date.today.year}" />
+
+-->
+<def attrs="name, altField, altFormat, appendText, buttonImage, buttonImageOnly, buttonText, changeMonth, changeYear, closeText, constrainInput, currentText, dateFormat, dayNames, dayNamesMin, dayNamesShort, defaultDate, duration, firstDay, gotoCurrent, hideIfNoPrevNext, isRTL, maxDate, minDate, monthNames, monthNamesShort, navigationAsDateFormat, nextText, numberOfMonths, prevText, shortYearCutoff, showAnim, showButtonPanel, showCurrentAtPos, showMonthAfterYear, showOn, showOptions, showOtherMonths, stepMonths, yearRange, beforeShow, beforeShowDay, onChangeMonthYear, onClose, onSelect" tag="hjq-datepicker">
+ <% option_names=['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'] %>
+ <% event_names=['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'] %>
+ <% options = {}; option_names.each {|n| options[n]=all_attributes[n] if all_attributes.has_key?(n) }  %>
+ <% events = {}; event_names.each {|n| events[n]=all_attributes[n] if all_attributes.has_key?(n) } %>
+ <annotate-tag tag="hjq-datepicker" init="hjq.datepicker.init" options="&options" events="&events" />
+ <% add_classes!(attributes, "hjq-annotated"); %>
+ <%= text_field_tag(name, this, attributes) %>
+</def>
+
+
 
 <!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
   
@@ -25,16 +113,24 @@ Say you are creating a new `Category` in your online shop, and you want to creat
 The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
   
   -->
-<def tag="hjq-input-many" polymorphic>
-  <tag-json class="input-many-json init-js" init="hjq.input_many.init" />
+<def tag="hjq-input-many" attributess="minimum" polymorphic>
   <set empty="&this.empty?"/>
-  <ul class="input-many-alt #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
+  <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum" />
+  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated">
     <li class="input-many-template">
       <fake-field-context fake-field="-1" context="&this.try.new_candidate || this.member_class.new">
         <div class="input-many-item" param="default"/>
       </fake-field-context>
       <div class="buttons">
         <button class="remove-item" merge-attrs="disabled">-</button>
+        <button class="add-item" merge-attrs="disabled">+</button>
+      </div>
+    </li>
+    <li class="empty #{'hidden' unless this.empty?}">
+      <div param="empty-message">
+        No <%= this_field.pluralize %>.
+      </div>
+      <div class="buttons">
         <button class="add-item" merge-attrs="disabled">+</button>
       </div>
     </li>
