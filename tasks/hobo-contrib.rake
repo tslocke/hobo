@@ -3,14 +3,14 @@ namespace :hobo_jquery do
   task :update_assets => :environment do
     HOBO_JQUERY_HOME = File.dirname(__FILE__)+"/.."
     FileUtils.cp "#{HOBO_JQUERY_HOME}/public/javascripts/hobo-jquery.js", "#{RAILS_ROOT}/public/javascripts/hobo-jquery.js"
-    FileUtils.cp "#{HOBO_JQUERY_HOME}/public/stylesheets/hobo-jquery.css", "#{RAILS_ROOT}/public/stylesheets/hobo-jquery.js" 
+    FileUtils.cp "#{HOBO_JQUERY_HOME}/public/stylesheets/hobo-jquery.css", "#{RAILS_ROOT}/public/stylesheets/hobo-jquery.css" 
   end
 
   desc "Link the hobo-jquery assets"
   task :link_assets => :environment do
     HOBO_JQUERY_HOME = File.dirname(__FILE__)+"/.."
     FileUtils.ln_sf "#{HOBO_JQUERY_HOME}/public/javascripts/hobo-jquery.js", "#{RAILS_ROOT}/public/javascripts/hobo-jquery.js"
-    FileUtils.ln_sf "#{HOBO_JQUERY_HOME}/public/stylesheets/hobo-jquery.css", "#{RAILS_ROOT}/public/stylesheets/hobo-jquery.js" 
+    FileUtils.ln_sf "#{HOBO_JQUERY_HOME}/public/stylesheets/hobo-jquery.css", "#{RAILS_ROOT}/public/stylesheets/hobo-jquery.css" 
   end
 
   desc "Install JQuery and JQuery-UI"
