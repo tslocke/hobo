@@ -5,15 +5,15 @@ var hjq = (function() {
         /* calls all "init" functions with their this and their annotations */
         initialize: function() {
             jQuery(this).find('.hjq-annotated').each(function() {
-                var annotations = hjq.get_annotations.call(this);
+                var annotations = hjq.getAnnotations.call(this);
                 if(annotations.init) {
-                    hjq.function_by_name(annotations.init).call(this, annotations);
+                    hjq.functionByName(annotations.init).call(this, annotations);
                 };
             });
         },
 
         /* returns JSON annotations for *this* */
-        get_annotations: function() {
+        getAnnotations: function() {
             // Unforunately, jQuery does not traverse comment nodes, so we're using the DOM methods directly
             
             // previous is probably a textNode containing whitespace
@@ -26,15 +26,15 @@ var hjq = (function() {
         },
 
         /* given annotations, turns the values in the _events_ object into functions, merges them into _options_ and returns _options_ */
-        get_options: function(annotations) {
+        getOptions: function(annotations) {
             for(var key in annotations.events) {
-                annotations.options[key] = hjq.function_by_name(annotations.events[key]);
+                annotations.options[key] = hjq.functionByName(annotations.events[key]);
             }
             return annotations.options;
         },
             
         /* given a global function name, find the function */
-        function_by_name: function(name) {
+        functionByName: function(name) {
             var descend = window;  // find function by name on the root object
             jQuery.each(name.split("."), function() {
                 if(descend) descend = descend[this];
@@ -69,6 +69,7 @@ var hjq = (function() {
                 var clone = template.clone(true).removeClass("input-many-template");
                 // length-2 because ignore the template li and the empty li
                 var name_updater = hjq.input_many.getNameUpdater.call(top, top.children().length-2);
+                var params = hjq.getAnnotations.call(top.get(0));
 
                 // enable previously marked elements, and rename
                 clone.find(".input_many_template_input").each(function() {
@@ -91,6 +92,8 @@ var hjq = (function() {
                     me.children("div.buttons").replaceWith(buttons);
                 }
 
+                if(params['add_hook']) hjq.functionByName(params['add_hook']).call(me.get(0));
+
                 return false; // prevent bubbling
             },
 
@@ -98,8 +101,14 @@ var hjq = (function() {
                 var me = jQuery(this).parent().parent();
                 var top = me.parent();
                 var buttons = top.children("li.input-many-template").children("div.buttons").clone(true);
-                var params = hjq.get_annotations.call(top);
+                var params = hjq.getAnnotations.call(top.get(0));
 
+                if(params['remove_hook']) {
+                    if(!hjq.functionByName(params['remove_hook']).call(me.get(0))) {
+                        return false;
+                    }
+                }
+             
                 // reenable the buttons
                 buttons.find(".input_many_template_input").each(function() {
                     this.disabled = false;
@@ -142,9 +151,9 @@ var hjq = (function() {
                         // silly rails.  text_area_tag and text_field_tag use different conventions for the id.
                         if(name_prefix==this.id.slice(0, name_prefix.length)) {
                             this.id = this.id.replace(name_re, name_sub);
-                        } else {
+                        } /* else {
                             hjq.log("hjq.input_many.update_id: id_prefix "+id_prefix+" didn't match input "+this.id);
-                        }
+                        } */
                     }
                     return this;
                 };
@@ -155,7 +164,7 @@ var hjq = (function() {
         datepicker: {
             init: function (annotations) {
                 if(!this.disabled) {
-                    jQuery(this).datepicker(hjq.get_options(annotations));
+                    jQuery(this).datepicker(hjq.getOptions(annotations));
                 }
             },
         }

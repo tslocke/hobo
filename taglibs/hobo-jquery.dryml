@@ -21,7 +21,7 @@ Options that expect a type other than string can be provided by passing a ruby o
 
     <hjq-datepicker dayNamesMin="&['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa']" />
 
-Events are also supported.  Pass in a global function name:
+Events are also supported.  Pass in a global Javascript function name:
 
     <hjq-datepicker onSelect="hjq.log" />
 
@@ -32,10 +32,17 @@ This is Hobo jQuery's standard tag annotation method.   This annotation is autom
 
 The current implementation uses HTML comments for annotation.  This may change in the future, if somebody can suggest a better mechanism.  [Here is a good discussion of the alternatives.](http://www.1729.com/blog/HtmlAnnotations.html)
 
-To use it, invoke this tag directly before the tag to annotate.  To get the annotations, call hjq.get_annotations with _this_ set to the element that has been annotated.  For example:
+To use it, invoke this tag directly before the tag to annotate.  To get the annotations, call hjq.getAnnotations with _this_ set to the element that has been annotated.  For example:
+
+    <def tag="mytag">
+      <annotate-tag option_a="42"/>
+      <div class="hjq-annotated">
+        ...
+      </div>
+    </def>
 
     jQuery(this).find('.hjq-annotated').each(function() {
-      var annotations = hjq.get_annotations.call(this);
+      var annotations = hjq.getAnnotations.call(this);
       ...
     });
 -->
@@ -54,8 +61,6 @@ These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wis
       </old-page>
     </extend>
 -->
-
-
 <def tag="hjq-assets">
   <javascript name="jquery-1.3.2.min.js" />
   <javascript name="jquery-ui-1.7.custom.min.js" />
@@ -72,7 +77,7 @@ These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wis
 
 
 <!--
-This is the jQuery-UI datepicker.
+This is the [jQuery-UI datepicker](http://docs.jquery.com/UI/Datepicker).
 
 It's probably easiest to add this to your application.dryml:
 
@@ -98,50 +103,99 @@ It's probably useful to set global options such as dateFormat in application.dry
 
 
 <!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
-  
-This tag is very different from tags like `<select-many>` and `<check-many>` in that:
 
- - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
- - Those tags work by themselves, while `<input-many>` is just a wrapper for other input fields.
+This tag is similar to the standard Hobo `<input-many>` tag, but it includes several additional features.
+
+ - it supports 0 length associations
+ - it supports delayed initialization, required for some Javascript elements like the jQuery UI datepicker
+ - it allows the (+) and (-) buttons to be customized
+ - it provides a default for then `item` parameter
+ - it copies from a template rather than cloning the current item and clearing it
+ - the template may be overridden
+ - javascript hooks for (+) and (-)
+
+It also fixes the following buglets in input-many:
+ - id's of textareas and selects are adjusted properly
+ - the original input-many didn't clear textareas and select's.  We don't have a clear -> no buglet! :)
+
+Because this implementation contains more than one parameter, the default parameter from input-many has been renamed to `item`.
  
 ### Example
 
 Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
 
-    <input-many:products><field-list fields="name, price"/></input-many>
+    <hjq-input-many:products fields="name, price" />
     
-The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
-  
+You'll often want to provide the `item` parameter:
+
+    <hjq-input-many:products><item:><field-list fields="name, price" /></item:></hjq-input-many>
+
+### Attributes
+
+ - minimum: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
+
+ - fields: passed down to the `field-list` tag in the default `item`.
+
+ - template: the default values for new items.  Normally this funcationality is better provided by Model.new, but it's here if you need it.
+
+ - add_hook: a javascript function to call after an item has been added.  The context will be set to the new item.
+
+ - remove_hook: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
+
+### TODO
+
+ - slide effect
+
   -->
-<def tag="hjq-input-many" attributess="minimum" polymorphic>
+<def tag="hjq-input-many" attrs="minimum, fields, new-template, remove-hook" polymorphic >
   <set empty="&this.empty?"/>
-  <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum" />
+  <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum, add-hook, remove-hook" />
   <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated">
+    <% template ||= this.try.new_candidate || this.member_class.new %>
+    <% minimum ||= 0 ; minimum = minimum.to_i %>
     <li class="input-many-template">
-      <fake-field-context fake-field="-1" context="&this.try.new_candidate || this.member_class.new">
-        <div class="input-many-item" param="default"/>
+      <fake-field-context fake-field="-1" context="&template">
+        <hjq-input-many-item param="item" merge-attrs="fields" />
       </fake-field-context>
       <div class="buttons">
-        <button class="remove-item" merge-attrs="disabled">-</button>
-        <button class="add-item" merge-attrs="disabled">+</button>
+        <button param="remove-item">-</button>
+        <button param="add-item">+</button>
       </div>
     </li>
-    <li class="empty #{'hidden' unless this.empty?}">
+    <li class="empty #{'hidden' unless this.empty? and minimum==0}">
       <div param="empty-message">
         No <%= this_field.pluralize %>.
       </div>
       <div class="buttons">
-        <button class="add-item" merge-attrs="disabled">+</button>
+        <button param="add-item">+</button>
+      </div>
+    </li>
+    <li if="&(this.empty? && minimum>0)">
+      <fake-field-context fake-field="0" context="&template">
+        <hjq-input-many-item param="item" merge-attrs="fields" />
+      </fake-field-context>
+      <div class="buttons">
+        <button param="add-item">+</button>
       </div>
     </li>
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
-      <div class="input-many-item" param="default"/>
+      <hjq-input-many-item param="item" merge-attrs="fields" />
       <div class="buttons">
-        <button class="remove-item" merge-attrs="disabled">-</button>
-        <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
+        <button param="remove-item">-</button>
+        <button param="add-item" if="&last_item?">+</button>
       </div>
     </li>
   </ul>
+</def>
+
+<!--
+    This is the default item used by `<hjq-input-many>`.  Redefine or extend if desired.
+-->
+<def tag="hjq-input-many-item" attrs="fields">
+  <card param="default">
+    <header: replace />
+    <body:><field-list merge-attrs="fields" /></body:>
+  </card>
 </def>

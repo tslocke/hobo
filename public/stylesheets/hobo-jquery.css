@@ -1,0 +1,9 @@
+
+// stolen from clean.css
+
+ul.hjq-input-many {list-style-type: none;}
+
+ul.hjq-input-many > li { overflow:hidden; zoom:1;}
+ul.hjq-input-many .item {float:left;}
+ul.hjq-input-many div.buttons {float:left; margin-left:10px;}
+
