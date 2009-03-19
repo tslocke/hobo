@@ -136,11 +136,11 @@ You'll often want to provide the `item` parameter:
 
  - fields: passed down to the `field-list` tag in the default `item`.
 
- - template: the default values for new items.  Normally this funcationality is better provided by Model.new, but it's here if you need it.
+ - template: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
 
- - add_hook: a javascript function to call after an item has been added.  The context will be set to the new item.
+ - add-hook: a javascript function to call after an item has been added.  The context will be set to the new item.
 
- - remove_hook: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
+ - remove-hook: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
 
 ### TODO
 
