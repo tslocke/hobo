@@ -108,7 +108,7 @@ This tag is similar to the standard Hobo `<input-many>` tag, but it includes sev
  - it supports 0 length associations
  - it supports delayed initialization, required for some Javascript elements like the jQuery UI datepicker
  - it allows the (+) and (-) buttons to be customized
- - it provides a default for then `item` parameter
+ - it provides a default for the `item` parameter
  - it copies from a template rather than cloning the current item and clearing it
  - the template may be overridden
  - javascript hooks for (+) and (-)
@@ -129,6 +129,8 @@ Say you are creating a new `Category` in your online shop, and you want to creat
 You'll often want to provide the `item` parameter:
 
     <hjq-input-many:products><item:><field-list fields="name, price" /></item:></hjq-input-many>
+
+A fully worked up example of nested hjq-input-many's may be found in [agility/jquery-test](http://github.com/tablatom/agility/blob/jquery-test/app/views/projects/nested_has_many_test.dryml)
 
 ### Attributes
 
