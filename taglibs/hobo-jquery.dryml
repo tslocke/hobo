@@ -21,7 +21,7 @@ Events are also supported.  Pass in a global Javascript function name:
 <!--
 This is Hobo jQuery's standard tag annotation method.   This annotation is automatically added to Hobo jQuery tags, but you may wish to use it in your own tag definitions.
 
-The current implementation uses HTML comments for annotation.  This may change in the future, if somebody can suggest a better mechanism.  [Here is a good discussion of the alternatives.](http://www.1729.com/blog/HtmlAnnotations.html)
+The current implementation uses HTML comments for annotation.  This may change in the future, if somebody can suggest a better mechanism.  [Here is a good discussion of the alternatives.](http://www.1729.com/blog/HtmlAnnotations.html).  Two more possibilities are http://www.w3.org/TR/xhtml-rdfa-primer and http://ejohn.org/blog/html-5-data-attributes/.
 
 To use it, invoke this tag directly before the tag to annotate.  To get the annotations, call hjq.getAnnotations with _this_ set to the element that has been annotated.  For example:
 
@@ -42,7 +42,7 @@ To use it, invoke this tag directly before the tag to annotate.  To get the anno
 </def>
 
 <!--
-These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wish to add this to your page definition:
+These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will probably wish to add this to your page definition:
 
     <extend tag="page">
       <old-page merge>
@@ -53,8 +53,18 @@ These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wis
     </extend>
 -->
 <def tag="hjq-assets">
+  <jquery-assets/>
+  <hobo-jquery-assets/>
+</def>
+
+<def tag="jquery-assets">
+  <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
   <javascript name="jquery-1.3.2.min.js" />
   <javascript name="jquery-ui-1.7.custom.min.js" />
+</def>
+
+<def tag="hobo-jquery-assets">
+  <stylesheet name='hobo-jquery.css' />
   <javascript name="hobo-jquery.js" />
   <script type="text/javascript">
     jQuery.noConflict();
@@ -62,8 +72,6 @@ These are the Hobo jQuery assets required by Hobo jQuery.  You will probably wis
       hjq.initialize.call(document);
     });
   </script>
-  <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
-  <stylesheet name='hobo-jquery.css' />
 </def>
 
 
@@ -106,7 +114,8 @@ This tag is similar to the standard Hobo `<input-many>` tag, but it includes sev
  - javascript hooks for (+) and (-)
 
 It also fixes the following buglets in input-many:
- - id's of textareas and selects are adjusted properly
+ - id's of textareas and selects and other non-input's are adjusted properly
+ - classdata for inner elements updated
  - the original input-many didn't clear textareas and select's.  We don't have a clear -> no buglet! :)
 
 Because this implementation contains more than one parameter, the default parameter from input-many has been renamed to `item`.
@@ -139,43 +148,55 @@ You'll often want to provide the `item` parameter:
 
   -->
 <def tag="hjq-input-many" attrs="minimum, fields, new-template, remove-hook" polymorphic >
+<%
+# helper function to create id's on buttons to facilitate testing
+def underize(s)
+  s.gsub(/\[/,"_").gsub(/\]/,"")
+end
+%>
   <set empty="&this.empty?"/>
   <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum, add-hook, remove-hook" />
   <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated">
     <% template ||= this.try.new_candidate || this.member_class.new %>
     <% minimum ||= 0 ; minimum = minimum.to_i %>
-    <li class="input-many-template">
+    <fake-field-context fake-field="-1" context="&template">
+      <li class="input-many-template" id="#{param_name_for_this}">
+        <hjq-input-many-item param="item" merge-attrs="fields" />
+        <div class="buttons">
+          <button param="remove-item" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>
+    <li class="empty #{'hidden' unless this.empty? and minimum==0}" id="#{param_name_for_this}[-1]_empty">
+      <!-- HACK way to signal an empty collection to the controller -->
+      <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
+        <div param="empty-message">
+          No <%= this.class.class_name.humanize.downcase.pluralize %>.
+        </div>
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </fake-field-context>      
+    </li>
+    <fake-field-context fake-field="0" context="&template">
+      <li if="&(this_parent.empty? && minimum>0)" id="#{param_name_for_this}">
         <hjq-input-many-item param="item" merge-attrs="fields" />
-      </fake-field-context>
-      <div class="buttons">
-        <button param="remove-item">-</button>
-        <button param="add-item">+</button>
-      </div>
-    </li>
-    <li class="empty #{'hidden' unless this.empty? and minimum==0}">
-      <div param="empty-message">
-        No <%= this_field.pluralize %>.
-      </div>
-      <div class="buttons">
-        <button param="add-item">+</button>
-      </div>
-    </li>
-    <li if="&(this.empty? && minimum>0)">
-      <fake-field-context fake-field="0" context="&template">
-        <hjq-input-many-item param="item" merge-attrs="fields" />
-      </fake-field-context>
-      <div class="buttons">
-        <button param="add-item">+</button>
-      </div>
-    </li>
-    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>       
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}" id="#{param_name_for_this}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <hjq-input-many-item param="item" merge-attrs="fields" />
       <div class="buttons">
-        <button param="remove-item">-</button>
-        <button param="add-item" if="&last_item?">+</button>
+        <button param="remove-item" class="#{'hidden' if this_parent.length<=minimum}" id="#{underize param_name_for_this}_remove">-</button>
+        <button param="add-item" class="#{'hidden' if not last_item?}" id="#{underize param_name_for_this}_add">+</button>
       </div>
     </li>
   </ul>

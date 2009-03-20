@@ -71,27 +71,34 @@ var hjq = (function() {
                 var name_updater = hjq.input_many.getNameUpdater.call(top, top.children().length-2);
                 var params = hjq.getAnnotations.call(top.get(0));
 
-                // enable previously marked elements, and rename
+                // enable previously marked elements
                 clone.find(".input_many_template_input").each(function() {
                     this.disabled = false;
                     jQuery(this).removeClass("input_many_template_input");
-                    name_updater.call(this);
                 });
 
+                // update id & name
+                clone.find("*").each(function() {
+                    name_updater.call(this);
+                });
+                name_updater.call(clone.get(0));
+
+                // do the add
                 clone.insertAfter(me);
 
                 // initialize subelements
                 hjq.initialize.call(me.next().get(0));
 
+                // visibility
                 if(me.hasClass("empty")) {
                     me.addClass("hidden");
+                    me.find("input.empty-input").attr("disabled", true);
                 } else {
                     // now that we've added an element after us, we should only have a '-' button
-                    var buttons = clone.children("div.buttons").clone(true);
-                    buttons.children("button.add-item").remove();
-                    me.children("div.buttons").replaceWith(buttons);
+                    me.children("div.buttons").children("button.remove-item").removeClass("hidden");
+                    me.children("div.buttons").children("button.add-item").addClass("hidden");
                 }
-
+                
                 if(params['add_hook']) hjq.functionByName(params['add_hook']).call(me.get(0));
 
                 return false; // prevent bubbling
@@ -100,7 +107,6 @@ var hjq = (function() {
             removeOne: function() {
                 var me = jQuery(this).parent().parent();
                 var top = me.parent();
-                var buttons = top.children("li.input-many-template").children("div.buttons").clone(true);
                 var params = hjq.getAnnotations.call(top.get(0));
 
                 if(params['remove_hook']) {
@@ -108,25 +114,32 @@ var hjq = (function() {
                         return false;
                     }
                 }
-             
-                // reenable the buttons
-                buttons.find(".input_many_template_input").each(function() {
-                    this.disabled = false;
-                    jQuery(this).removeClass("input_many_template_input");
-                });                
 
+                // rename everybody from me onwards
+                var i=hjq.input_many.getIndex.call(me.get(0))
+                var n=me.next();
+                for(; n.length>0; i+=1, n=n.next()) {
+                    var name_updater = hjq.input_many.getNameUpdater.call(top, i);
+                    n.find("*").each(function() {
+                        name_updater.call(this);
+                    });
+                    name_updater.call(n.get(0));
+                }                
+             
                 me.remove();
 
                 var last=top.children("li:last");
                 if(last.hasClass("empty")) {
                     last.removeClass("hidden");
+                    last.find("input.empty-input").removeAttr("disabled");
                 } else {
                     // if we've reached the minimum, we don't want to add the '-' button
                     if(top.children().length-2 <= (params['minimum']||0)) {
-                        buttons.children("button.remove-item").remove();
+                        last.children("div.buttons").children("button.remove-item").addClass("hidden");
+                    } else {
+                        last.children("div.buttons").children("button.remove-item").removeClass("hidden");
                     }
-                    // put + and - buttons on the last element, since they may have been removed
-                    last.children("div.buttons").replaceWith(buttons);
+                    last.children("div.buttons").children("button.add-item").removeClass("hidden");
                 }
 
                 return false; //prevent bubbling
@@ -140,6 +153,8 @@ var hjq = (function() {
                 var name_sub = name_prefix + '[' + new_index.toString() + ']';
                 var id_re = RegExp("^" + RegExp.escape(id_prefix)+ "_\-?[0-9]+");
                 var id_sub = id_prefix + '_' + new_index.toString();
+                var class_re = RegExp(RegExp.escape(name_prefix)+ "\[\-?[0-9]+\]");
+                var class_sub = name_sub;
 
                 return function() {
                     if(this.name) {
@@ -155,9 +170,18 @@ var hjq = (function() {
                             hjq.log("hjq.input_many.update_id: id_prefix "+id_prefix+" didn't match input "+this.id);
                         } */
                     }
+                    if (class_re.test(this.className)) {
+                        this.className = this.className.replace(class_re, class_sub);
+                    }
                     return this;
                 };
+            },
+
+            // given this==an input-many item, get the submit index
+            getIndex: function() {
+                return Number(this.id.match(/\[([0-9])+\]$/)[1]);
             }
+
         },
 
 
