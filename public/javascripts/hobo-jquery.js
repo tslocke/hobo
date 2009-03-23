@@ -41,8 +41,25 @@ var hjq = (function() {
             });
             return descend;
         },
-            
 
+        /* Given a function name or javascript fragment, return a function.
+           the arguments will be passed through, but "this" will be set to "context"  */
+        wrapCallback: function(script, context) {
+            if(!script) return null;
+            var f=hjq.functionByName(script);
+            if(f) return (function() { return f.apply(context, arguments); });
+            return (function() { 
+                return (function() { return eval(script) }).apply(context, arguments); 
+            });
+        },
+
+        /* Given a function name or javascript fragment, run it */
+        applyCallback: function(script, context /* arguments... */) {
+            if(!script) return null;
+            return hjq.wrapCallback(script, context).apply(null, Array.prototype.slice.call(arguments, 2));
+        },
+
+        /* log to console, if available */
         log: function(s) {
             if(console && console.log) console.log(s);
         },
@@ -99,7 +116,7 @@ var hjq = (function() {
                     me.children("div.buttons").children("button.add-item").addClass("hidden");
                 }
                 
-                if(params['add_hook']) hjq.functionByName(params['add_hook']).call(me.get(0));
+                hjq.applyCallback(params.add_hook, me.get(0));
 
                 return false; // prevent bubbling
             },
@@ -109,8 +126,8 @@ var hjq = (function() {
                 var top = me.parent();
                 var params = hjq.getAnnotations.call(top.get(0));
 
-                if(params['remove_hook']) {
-                    if(!hjq.functionByName(params['remove_hook']).call(me.get(0))) {
+                if(params.remove_hook) {
+                    if(!hjq.applyCallback(params.remove_hook, me.get(0))) {
                         return false;
                     }
                 }
@@ -184,7 +201,59 @@ var hjq = (function() {
 
         },
 
+        formlet: {
+            // call with this==the submit button to submit the formlet
+            submit: function() {
+                var formlet = jQuery(jQuery(this).parents(".formlet").get(0));
+                var annotations = hjq.getAnnotations.call(formlet.get(0));
 
+                var options = annotations.ajax_options;
+                var attrs = annotations.ajax_attrs;
+
+                if(attrs.before) {
+                    if(!hjq.applyCallback(attrs.before, formlet.get(0))) {
+                        return false;
+                    }
+                }
+
+                if(attrs.confirm) {
+                    if(!confirm(attrs.confirm)) {
+                        return false;
+                    }
+                }
+
+                options.data = formlet.find(":input").fieldSerialize();
+                options.dataType = 'script';
+
+                // we tell our controller which parts to return by sending it a "render" array.
+                for(i=0; i<attrs.update.length; i++) {
+                    var id = attrs.update[i];
+                    if(id=="self") {
+                        for(var el=jQuery(this); el.length && !hoboParts[el.attr("id")]; el=el.parent());
+                        id = ( el.length ? el.attr("id") : undefined) ; 
+                    }                    
+                    if(id) {
+                        options.data += "&" + encodeURIComponent("render["+i+"][part_context]") + "=" + encodeURIComponent(hoboParts[id]);
+                        options.data += "&" + encodeURIComponent("render["+i+"][id]") + "=" + id;
+                    }
+                }
+
+                Hobo.showSpinner(attrs.message || "Saving...", attrs.spinner_next_to);
+
+                options.success = hjq.wrapCallback(attrs.success, formlet.get(0));
+                options.error = hjq.wrapCallback(attrs.error, formlet.get(0));
+                options.complete = function() {
+                    Hobo.hideSpinner();
+                    hjq.applyCallback(attrs.complete, formlet.get(0), arguments);
+                };
+                
+                jQuery.ajax(options);
+
+                //prevent bubbling
+                return false;
+            }
+        },
+                
         datepicker: {
             init: function (annotations) {
                 if(!this.disabled) {

@@ -61,6 +61,7 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
   <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
   <javascript name="jquery-1.3.2.min.js" />
   <javascript name="jquery-ui-1.7.custom.min.js" />
+  <javascript name="jquery.form.js" />
 </def>
 
 <def tag="hobo-jquery-assets">
@@ -212,4 +213,146 @@ end
     <header: replace />
     <body:><field-list merge-attrs="fields" /></body:>
   </card>
+</def>
+
+<!--
+`<formlet>` works like an AJAX `<form>` without actually being an AJAX `<form>`.  This is usefully in scenarios where forms aren't allowed or are problematic, like inside of another form.
+
+### Attributes
+
+ - standard Hobo HTML attributes (id, part, et cetera).  All supported.
+
+ - standard Hobo AJAX attributes:  (see http://cookbook.hobocentral.net/api_taglibs/rapid_forms)
+   
+   - update: (optional).  The DOM ID's of parts to update.  Note that you get an AJAX formlet whether this is provided or not.
+
+   - message: the spinner message
+
+   - spinner_next_to: DOM id of an element to position the ajax progress spinner next to.
+
+   - before, success, error, complete: These callbacks are slightly different from the standard form callbacks.  They are called with "this" set to the formlet.  Also, you may pass in a function name rather than a javascript fragment.  If the before callback returns false, it will cancel the submission.
+
+   - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
+
+   - not supported: type, script, form, params, confirm, reset_form, refocus_form, result_update.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
+
+ - standard Hobo Form attributes (all supported):
+
+   - hidden-fields
+
+   - action
+
+   - method
+
+   - web-method
+
+   - lifecycle
+
+   - owner
+-->
+<def tag="formlet" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner">
+<%
+#FIXME: code very similar to <form>.  refactor out common code.
+
+  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+
+  ajax_options = {}
+
+  new_record = this.try.new_record?
+
+  method = if method.nil?
+             (action || web_method || new_record) ? "post" : "put"
+           else
+             method.downcase
+           end
+
+  ajax_options[:url] ||= begin
+     target = if owner
+                collection_name = this.class.reverse_reflection(owner).name
+                this.send(owner).send(collection_name)
+              else
+                this
+              end
+     action = web_method || lifecycle
+     object_url(target, action, :method => "post")
+  end
+
+  if action.nil? && (ajax_options[:url].nil? ||
+                     (lifecycle.nil? && new_record && !this.creatable_by?(current_user)) ||
+                     (lifecycle.nil? && !new_record && !can_edit?))
+    Hobo::Dryml.last_if = false
+    logger.info("blank!!!")
+    ""
+  else
+    if method == "put"
+      # browsers don't support put -- use post and add the Rails _method hack
+      http_method_hidden = hidden_field_tag("_method", "PUT") 
+      ajax_options[:type] = "post"
+    else
+      ajax_options[:type] = method
+    end
+
+    ajax_attrs[:update] = if update 
+                            update.split(/,\s*/) 
+                          else
+                            []
+                          end
+
+    hiddens = nil
+    body = with_form_context do
+      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
+      b = parameters.default
+      hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
+      b
+    end
+
+    auth_token = if method.nil? || method == 'get' || !protect_against_forgery?
+                   ''
+                 else
+                   element(:input, {:type => "hidden", 
+                           :name => request_forgery_protection_token.to_s,
+                           :value => form_authenticity_token}, nil, true, true)
+                 end
+     
+    unless method == "get"
+      page_path = if (request.post? || request.put?) && params[:page_path]
+                    params[:page_path]
+                  else
+                    view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action])
+                  end
+      page_path_hidden = hidden_field_tag("page_path", page_path) 
+    end
+
+    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].join)
+     
+    body = [hiddens_div, body].join
+
+    if action.nil? # don't add automatic css classes if the action was specified
+      if web_method
+        add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
+      else
+        add_classes!(html_attrs, "#{'new ' if new_record}#{type_id.dasherize}")
+      end
+    end
+
+    Hobo::Dryml.last_if = true
+  end
+
+  add_classes!(html_attrs, "formlet")
+%>
+<annotate-tag tag="formlet" ajax-attrs="&ajax_attrs" ajax-options="&ajax_options" />
+  <%= element("div", html_attrs, body) %>
+</def>
+
+<!--
+Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` isn't a form.
+-->
+<def tag="formlet-submit" attrs="label, image, method">
+  <% label ||= 'submit' %>
+  <if test='&image'>
+    <input class='image-button formlet-submit-button' type='image' src='&image' merge-attrs />
+  </if>
+  <else>
+    <input class='button formlet-submit-button' type='button' value='#{label}' onClick='hjq.formlet.submit.call(this)' merge-attrs />
+  </else>
 </def>
