@@ -230,7 +230,7 @@ end
 
    - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
 
-   - not supported: type, script, form, params, confirm, reset_form, refocus_form, result_update.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
+   - not supported: type, script, form, params, confirm, reset-form, refocus-form, result-update.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
 
  - standard Hobo Form attributes (all supported):
 
