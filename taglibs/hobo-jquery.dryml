@@ -77,7 +77,7 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
 
 
 <!--
-This is the [jQuery-UI datepicker](http://docs.jquery.com/UI/Datepicker).
+This is the [jQuery-UI datepicker](http://docs.jquery.com/UI/Datepicker).  All options and events are supported.
 
 It's probably easiest to add this to your application.dryml:
 
@@ -90,14 +90,14 @@ It's probably useful to set global options such as dateFormat in application.dry
     <input:birthdate yearRange="1900:#{Date.today.year}" />
 
 -->
-<def attrs="name, altField, altFormat, appendText, buttonImage, buttonImageOnly, buttonText, changeMonth, changeYear, closeText, constrainInput, currentText, dateFormat, dayNames, dayNamesMin, dayNamesShort, defaultDate, duration, firstDay, gotoCurrent, hideIfNoPrevNext, isRTL, maxDate, minDate, monthNames, monthNamesShort, navigationAsDateFormat, nextText, numberOfMonths, prevText, shortYearCutoff, showAnim, showButtonPanel, showCurrentAtPos, showMonthAfterYear, showOn, showOptions, showOtherMonths, stepMonths, yearRange, beforeShow, beforeShowDay, onChangeMonthYear, onClose, onSelect" tag="hjq-datepicker">
- <% option_names=['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'] %>
- <% event_names=['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'] %>
- <% options = {}; option_names.each {|n| options[n]=all_attributes[n] if all_attributes.has_key?(n) }  %>
- <% events = {}; event_names.each {|n| events[n]=all_attributes[n] if all_attributes.has_key?(n) } %>
+<def attrs="name" tag="hjq-datepicker">
+<%
+  options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
+  events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
+%>
  <annotate-tag tag="hjq-datepicker" init="hjq.datepicker.init" options="&options" events="&events" />
- <% add_classes!(attributes, "hjq-annotated"); %>
- <%= text_field_tag(name, this, attributes) %>
+ <% html_attrs = add_classes(html_attrs, "hjq-annotated"); %>
+ <%= text_field_tag(name, this, html_attrs) %>
 </def>
 
 
