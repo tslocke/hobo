@@ -1,4 +1,39 @@
 
+
+// we add our own hide and show to jQuery so that we get consistent behaviour and so we can plug our tests in.
+jQuery.fn.hjq_hide = function(options, callback) {
+    var settings = jQuery.extend({
+        effect: 'blind', speed: 500
+    }, options);
+    var cb = callback;
+    if(callback && hjq.hideComplete) {
+        cb = (function() {
+            callback.apply(this, arguments); 
+            hjq.hideComplete.apply(this, arguments); 
+        });
+    } else if (hjq.hideComplete) {
+        cb = hjq.hideComplete;
+    }        
+    return this.hide(settings.effect, settings, settings.speed, cb);
+};
+
+jQuery.fn.hjq_show = function(options, callback) {
+    var settings = jQuery.extend({
+        effect: 'blind', speed: 500, callback: undefined,
+    }, options);
+    var cb = callback;
+    if(callback && hjq.showComplete) {
+        cb = (function() {
+            settings.callback.apply(this, arguments); 
+            hjq.showComplete.apply(this, arguments); 
+        });
+    } else if (hjq.showComplete) {
+        cb = hjq.showComplete;
+    }
+    return this.show(settings.effect, settings, settings.speed, cb);
+};
+    
+
 var hjq = (function() {
     return {
 
@@ -64,6 +99,20 @@ var hjq = (function() {
             if(console && console.log) console.log(s);
         },
 
+        hideComplete: undefined,
+
+        bindHideCallback: function(f) {
+            /* FIXME: I suppose we should properly chain here....*/
+            hjq.hideComplete = f;
+        },
+
+        showComplete: undefined,
+
+        bindShowCallback: function(f) {
+            /* FIXME:chain */
+            hjq.showComplete = f;
+        },
+
         input_many: {
             init: function (annotations) {
                 var me = jQuery(this);
@@ -100,8 +149,8 @@ var hjq = (function() {
                 });
                 name_updater.call(clone.get(0));
 
-                // do the add
-                clone.insertAfter(me);
+                // do the add with anim
+                clone.css("display", "none").insertAfter(me).hjq_show();
 
                 // initialize subelements
                 hjq.initialize.call(me.next().get(0));
@@ -142,22 +191,28 @@ var hjq = (function() {
                     });
                     name_updater.call(n.get(0));
                 }                
-             
-                me.remove();
 
+                // adjust +/- buttons on the button element as appropriate
                 var last=top.children("li:last");
+                if(last.get(0)==me.get(0)) {
+                    last = last.prev();
+                }
+
                 if(last.hasClass("empty")) {
                     last.removeClass("hidden");
                     last.find("input.empty-input").removeAttr("disabled");
                 } else {
                     // if we've reached the minimum, we don't want to add the '-' button
-                    if(top.children().length-2 <= (params['minimum']||0)) {
+                    if(top.children().length-3 <= (params['minimum']||0)) {
                         last.children("div.buttons").children("button.remove-item").addClass("hidden");
                     } else {
                         last.children("div.buttons").children("button.remove-item").removeClass("hidden");
                     }
                     last.children("div.buttons").children("button.add-item").removeClass("hidden");
                 }
+
+                // remove with animation
+                me.hjq_hide({}, function() { jQuery(this).remove(); });
 
                 return false; //prevent bubbling
             },

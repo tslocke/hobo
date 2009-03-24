@@ -145,10 +145,6 @@ A fully worked up example of nested hjq-input-many's may be found in [agility/jq
 
  - remove-hook: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
 
-### TODO
-
- - slide effect
-
   -->
 <def tag="hjq-input-many" attrs="minimum, fields, new-template, remove-hook" polymorphic >
 <%
