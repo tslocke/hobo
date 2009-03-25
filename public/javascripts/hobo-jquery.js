@@ -1,4 +1,24 @@
+// our monkey patches to Function, properly namespaced.
 
+/* bind the context and return a lambda */
+Function.prototype.hjq_bind = function(context) {
+    var that=this;
+    return function() {
+        return that.apply(context, arguments);
+    }
+};
+
+/* return a lambda that calls "this" and then calls "f".  Depending on the return value of the lambda is probably a bad idea. */
+Function.prototype.hjq_chain = function(f) {
+    var that=this;
+    return function() {
+        var r=that.apply(this, arguments);
+        if(f) {
+            r=f.apply(this, arguments);
+        }
+        return r;
+    }
+};
 
 // we add our own hide and show to jQuery so that we get consistent behaviour and so we can plug our tests in.
 jQuery.fn.hjq_hide = function(options, callback) {
@@ -42,7 +62,7 @@ var hjq = (function() {
             jQuery(this).find('.hjq-annotated').each(function() {
                 var annotations = hjq.getAnnotations.call(this);
                 if(annotations.init) {
-                    hjq.functionByName(annotations.init).call(this, annotations);
+                    hjq.util.createFunction(annotations.init).call(this, annotations);
                 };
             });
         },
@@ -63,41 +83,13 @@ var hjq = (function() {
         /* given annotations, turns the values in the _events_ object into functions, merges them into _options_ and returns _options_ */
         getOptions: function(annotations) {
             for(var key in annotations.events) {
-                annotations.options[key] = hjq.functionByName(annotations.events[key]);
+                annotations.options[key] = hjq.util.createFunction(annotations.events[key]);
             }
             return annotations.options;
         },
-            
-        /* given a global function name, find the function */
-        functionByName: function(name) {
-            var descend = window;  // find function by name on the root object
-            jQuery.each(name.split("."), function() {
-                if(descend) descend = descend[this];
-            });
-            return descend;
-        },
 
-        /* Given a function name or javascript fragment, return a function.
-           the arguments will be passed through, but "this" will be set to "context"  */
-        wrapCallback: function(script, context) {
-            if(!script) return null;
-            var f=hjq.functionByName(script);
-            if(f) return (function() { return f.apply(context, arguments); });
-            return (function() { 
-                return (function() { return eval(script) }).apply(context, arguments); 
-            });
-        },
 
-        /* Given a function name or javascript fragment, run it */
-        applyCallback: function(script, context /* arguments... */) {
-            if(!script) return null;
-            return hjq.wrapCallback(script, context).apply(null, Array.prototype.slice.call(arguments, 2));
-        },
-
-        /* log to console, if available */
-        log: function(s) {
-            if(console && console.log) console.log(s);
-        },
+        /* hooks for debugging & testing */
 
         hideComplete: undefined,
 
@@ -111,6 +103,31 @@ var hjq = (function() {
         bindShowCallback: function(f) {
             /* FIXME:chain */
             hjq.showComplete = f;
+        },
+
+        /* these are functions I shouldn't be writing myself -- should be in a library somewhere! */
+        util: {
+            /* given a global function name, find the function */
+            functionByName: function(name) {
+                var descend = window;  // find function by name on the root object
+                jQuery.each(name.split("."), function() {
+                    if(descend) descend = descend[this];
+                });
+                return descend;
+            },
+            
+	    /* Given a function name or javascript fragment, return a function */
+	    createFunction: function(script) {
+                if(!script) return function() {};
+                var f=hjq.util.functionByName(script);
+                if(f) return f;
+	        return function() { return eval(script); };
+	    },
+	    
+            /* log to console, if available */
+            log: function(s) {
+                if(console && console.log) console.log(s);
+            },
         },
 
         input_many: {
@@ -165,7 +182,7 @@ var hjq = (function() {
                     me.children("div.buttons").children("button.add-item").addClass("hidden");
                 }
                 
-                hjq.applyCallback(params.add_hook, me.get(0));
+                hjq.util.createFunction(params.add_hook).call(me.get(0));
 
                 return false; // prevent bubbling
             },
@@ -176,7 +193,7 @@ var hjq = (function() {
                 var params = hjq.getAnnotations.call(top.get(0));
 
                 if(params.remove_hook) {
-                    if(!hjq.applyCallback(params.remove_hook, me.get(0))) {
+                    if(!hjq.util.createFunction(params.remove_hook).call(me.get(0))) {
                         return false;
                     }
                 }
@@ -239,7 +256,7 @@ var hjq = (function() {
                         if(name_prefix==this.id.slice(0, name_prefix.length)) {
                             this.id = this.id.replace(name_re, name_sub);
                         } /* else {
-                            hjq.log("hjq.input_many.update_id: id_prefix "+id_prefix+" didn't match input "+this.id);
+                            hjq.util.log("hjq.input_many.update_id: id_prefix "+id_prefix+" didn't match input "+this.id);
                         } */
                     }
                     if (class_re.test(this.className)) {
@@ -257,16 +274,18 @@ var hjq = (function() {
         },
 
         formlet: {
-            // call with this==the submit button to submit the formlet
-            submit: function() {
-                var formlet = jQuery(jQuery(this).parents(".formlet").get(0));
+            // call with this==the formlet or a child of the formlet to submit the formlet
+            submit: function(extra_callbacks) {
+                var formlet = jQuery(jQuery(this).closest(".formlet").get(0));
                 var annotations = hjq.getAnnotations.call(formlet.get(0));
 
                 var options = annotations.ajax_options;
                 var attrs = annotations.ajax_attrs;
 
+                if(!extra_callbacks) extra_callbacks = {};
+
                 if(attrs.before) {
-                    if(!hjq.applyCallback(attrs.before, formlet.get(0))) {
+                    if(!hjq.util.createFunction(attrs.before).call(formlet.get(0))) {
                         return false;
                     }
                 }
@@ -295,13 +314,10 @@ var hjq = (function() {
 
                 Hobo.showSpinner(attrs.message || "Saving...", attrs.spinner_next_to);
 
-                options.success = hjq.wrapCallback(attrs.success, formlet.get(0));
-                options.error = hjq.wrapCallback(attrs.error, formlet.get(0));
-                options.complete = function() {
-                    Hobo.hideSpinner();
-                    hjq.applyCallback(attrs.complete, formlet.get(0), arguments);
-                };
-                
+                options.success = hjq.util.createFunction(attrs.success).hjq_chain(extra_callbacks.success).hjq_bind(formlet.get(0));
+                options.error = hjq.util.createFunction(attrs.error).hjq_chain(extra_callbacks.error).hjq_bind(formlet.get(0));
+                options.complete = Hobo.hideSpinner.hjq_chain(hjq.util.createFunction(attrs.complete)).hjq_chain(extra_callbacks.complete).hjq_bind(formlet.get(0));
+
                 jQuery.ajax(options);
 
                 //prevent bubbling
@@ -310,12 +326,58 @@ var hjq = (function() {
         },
                 
         datepicker: {
-            init: function (annotations) {
+            init: function(annotations) {
                 if(!this.disabled) {
                     jQuery(this).datepicker(hjq.getOptions(annotations));
                 }
             },
-        }
+        },
+
+        dialog: {
+            init: function(annotations) {                
+                var options=hjq.getOptions(annotations);
+                if(!options.position) {
+                    var pos = jQuery(this).prev().position();
+                    options.position = [pos.left, pos.top];
+                }
+		if(annotations.buttons) {
+                    options.buttons = {};
+		    for(var i=0; i<annotations.buttons.length; i++) {
+			options.buttons[annotations.buttons[i][0]] = hjq.util.createFunction(annotations.buttons[i][1])
+		    }
+		}
+                jQuery(this).dialog(options);
+            },
+
+            /* useful in the "buttons" option */
+            close: function() {
+                jQuery(this).dialog('close');
+            },
+
+            /* useful in the "buttons" option.  Will submit any enclosed formlets. */
+            submit_formlet: function(extra_options, extra_attrs) {
+                jQuery(this).find(".formlet").each(function() {
+                    hjq.formlet.submit.call(this, extra_options, extra_attrs);
+                });
+            },
+
+            /* useful in the "buttons" option.  Submits any enclosed formlets,  */
+            submit_formlet_and_close: function() {
+                var dialog = jQuery(this);
+                hjq.dialog.submit_formlet.call(this, {success: function() {hjq.dialog.close.call(dialog);}});
+            },
+        },
+
+        dialog_opener: {
+            click: function(button, selector) {
+                var dialog = jQuery(selector);
+                if(dialog.dialog('isOpen')) {
+                    dialog.dialog('close');
+                } else {
+                    dialog.dialog('open');
+                }
+            },
+        },
     };
 })();
 
