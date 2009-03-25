@@ -1,6 +1,0 @@
-[submodule "jquery/form"]
-	path = jquery/form
-	url = git://github.com/malsup/form.git
-[submodule "documentation"]
-	path = documentation
-	url = git://github.com/bryanlarsen/hobo-jquery.git

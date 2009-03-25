@@ -61,7 +61,6 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
   <stylesheet name='smoothness/jquery-ui-1.7.custom.css' />
   <javascript name="jquery-1.3.2.min.js" />
   <javascript name="jquery-ui-1.7.custom.min.js" />
-  <javascript name="jquery.form.js" />
 </def>
 
 <def tag="hobo-jquery-assets">

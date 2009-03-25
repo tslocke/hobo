@@ -19,7 +19,6 @@ namespace :hobo_jquery do
   task :install_jquery => :environment do
     HOBO_JQUERY_HOME = File.dirname(__FILE__)+"/.."
     FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/javascripts/*", "#{RAILS_ROOT}/public/javascripts/"
-    FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/form/jquery.form.js", "#{RAILS_ROOT}/public/javascripts/"
     FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/stylesheets/*", "#{RAILS_ROOT}/public/stylesheets/"
   end
 
@@ -29,7 +28,6 @@ namespace :hobo_jquery do
     PLUGIN_NAME = File.basename(File.dirname(File.dirname(__FILE__)))
     Dir.chdir("#{RAILS_ROOT}/public/javascripts")
     Dir["#{HOBO_JQUERY_HOME}/jquery/javascripts/*"].each {|f| FileUtils.ln_sf "../../vendor/plugins/#{PLUGIN_NAME}/jquery/javascripts/#{File.basename f}", "."}
-    FileUtils.ln_sf "../../vendor/plugins/#{PLUGIN_NAME}/jquery/form/jquery.form.js", "."
     Dir.chdir("#{RAILS_ROOT}/public/stylesheets")
     Dir["#{HOBO_JQUERY_HOME}/jquery/stylesheets/*"].each {|f| FileUtils.ln_sf "../../vendor/plugins/#{PLUGIN_NAME}/jquery/stylesheets/#{File.basename f}", "."}
   end
