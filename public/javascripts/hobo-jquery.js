@@ -326,12 +326,58 @@ var hjq = (function() {
         },
                 
         datepicker: {
-            init: function (annotations) {
+            init: function(annotations) {
                 if(!this.disabled) {
                     jQuery(this).datepicker(hjq.getOptions(annotations));
                 }
             },
-        }
+        },
+
+        dialog: {
+            init: function(annotations) {                
+                var options=hjq.getOptions(annotations);
+                if(!options.position) {
+                    var pos = jQuery(this).prev().position();
+                    options.position = [pos.left, pos.top];
+                }
+		if(annotations.buttons) {
+                    options.buttons = {};
+		    for(var i=0; i<annotations.buttons.length; i++) {
+			options.buttons[annotations.buttons[i][0]] = hjq.util.createFunction(annotations.buttons[i][1])
+		    }
+		}
+                jQuery(this).dialog(options);
+            },
+
+            /* useful in the "buttons" option */
+            close: function() {
+                jQuery(this).dialog('close');
+            },
+
+            /* useful in the "buttons" option.  Will submit any enclosed formlets. */
+            submit_formlet: function(extra_options, extra_attrs) {
+                jQuery(this).find(".formlet").each(function() {
+                    hjq.formlet.submit.call(this, extra_options, extra_attrs);
+                });
+            },
+
+            /* useful in the "buttons" option.  Submits any enclosed formlets,  */
+            submit_formlet_and_close: function() {
+                var dialog = jQuery(this);
+                hjq.dialog.submit_formlet.call(this, {success: function() {hjq.dialog.close.call(dialog);}});
+            },
+        },
+
+        dialog_opener: {
+            click: function(button, selector) {
+                var dialog = jQuery(selector);
+                if(dialog.dialog('isOpen')) {
+                    dialog.dialog('close');
+                } else {
+                    dialog.dialog('open');
+                }
+            },
+        },
     };
 })();
 

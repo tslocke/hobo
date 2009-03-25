@@ -352,3 +352,95 @@ Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` 
     <input class='button formlet-submit-button' type='button' value='#{label}' onClick='hjq.formlet.submit.call(this)' merge-attrs />
   </else>
 </def>
+
+
+<!--
+The JQuery UI [dialog](http://jqueryui.com/demos/dialog/).  All options and methods are supported.
+
+The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to "&false".  To display the dialog set autoOpen to "&true", use a `<hjq-dialog-open-button>`, use the [jQuery dialog open method](http://jqueryui.com/demos/dialog/#method-open), or use an `<hjq-dialog-and-button>` instead.
+
+The default for [positon](http://jqueryui.com/demos/dialog/#option-position) is also set so that the dialog appears where it is defined.
+
+The [positon](http://jqueryui.com/demos/dialog/#option-buttons) has been changed slightly.  Instead of an Hash, it expects a list of pairs.  (Unlike Javascript Objects, Ruby Hash's do not preserve order).  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
+
+    <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
+    <hjq-dialog buttons="&buttons" />
+
+or
+
+    <hjq-dialog id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' />
+
+or
+
+    <hjq-dialog id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' />
+
+Because Ruby Hash's do not preserve order, you may use a list of pairs instead of a Hash.
+
+The following functions are predefined for use in dialog buttons:
+
+ * hjq.dialog.close:  close the dialog box
+ * hjq.dialog.submit_formlet:  submits all formlets inside the dialog
+ * hjq.dialog.submit_formlet_and_close: Submits any enclosed formlets, then closes the dialog.  Warning: hijacks the "success" formlet option. */
+-->
+<def tag="hjq-dialog" attrs="buttons">
+<% #FIXME: dry these names
+ options, attrs = attributes.partition_hash(["autoOpen", "bgiframe", "closeOnEscape", "dialogClass", "draggable", "height", "hide", "maxHeight", "maxWidth", "minWidth", "modal", "position", "resizable", "show", "stack", "title", "width", "zIndex"])
+ events, html_attrs = attrs.partition_hash(["beforeclose", "open", "focus", "dragStart", "drag", "dragStop", "resizeStart", "resize", "resizeStop", "close"])
+ options["autoOpen"]=false unless options.has_key?("autoOpen")
+%>
+ <span class="hjq-dialog-position"></span>
+ <annotate-tag tag="hjq-dialog" init="hjq.dialog.init" options="&options" events="&events" buttons="&buttons" />
+ <% html_attrs = add_classes(html_attrs, "hjq-annotated hidden"); %>
+ <div merge-attrs="&html_attrs" param="default" />
+</def>
+
+<!--
+When pressed, will open a `<hjq-dialog>`.
+
+### Attributes
+ * dialog (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
+ * all `<button>` attributes except for onclick
+
+### Example
+    <hjq-dialog id="hello-dialog">Hello!</hjq-dialog>
+    <hjq-dialog-open-button dialog="#hello-dialog">Press Me!</hjq-dialog-open-button>
+-->
+<def tag="hjq-dialog-open-button" attrs="dialog">
+  <button onclick="hjq.dialog_opener.click(this, jQuery('#{dialog}')); return false;" param="default" class="hjq-dialog-open-button" merge />
+</def>
+
+<!--
+Defines an `<hjq-dialog>` and a `<hjq-dialog-open-button>` and links the two together.
+
+### Attributes
+ * id (optional): the DOM id to use for the dialog
+-->
+<def tag="hjq-dialog-and-button">
+  <% # we can't use jQuery traversal functions since the dialog will move around in the DOM %>
+  <% attributes["id"]="hjq-dialog-#{(rand*1000000000).to_i}" unless attributes.has_key?("id") %>
+  <hjq-dialog param merge />
+  <hjq-dialog-open-button dialog="##{attributes['id']}" param />
+</def>
+
+<!--
+Defines a `<select-one>` and a button that brings up an `<hjq-dialog>` containing a form allowing you to enter a new element
+
+Because the select-one is a part, it cannot be parameterized.  However, you can adjust its definition by overriding the polymorphic input for the type:
+
+    <def tag="input" for="StoryStatus">
+      <select-one include-none="&false" />
+    </def>
+-->
+<def tag="select-one-or-new-dialog">
+  <% dialog_id="hjq-dialog-#{typed_id.gsub(':', '-')}" %>
+  <% part_id = "select-one-#{typed_id.gsub(':', '-')}" %>
+  <input part="select-one-or-new-dialog-select" id="&part_id"/>
+  <hjq-dialog-open-button dialog="##{dialog_id}" param>
+    New <% this_field.humanize %>
+  </hjq-dialog-open-button>
+  <hjq-dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submit_formlet_and_close"]]' title="New #{this_field.humanize}" id="&dialog_id" >
+    <formlet with="&this_type.new" update="&part_id" success="jQuery('##{part_id} select').val(jQuery('##{part_id} option:last').val())">
+      <field-list />
+    </formlet>
+  </hjq-dialog>
+</def>  
