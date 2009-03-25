@@ -31,6 +31,10 @@ To use, you need to include hobo-jquery and add the assets to your page.  In you
       </old-page>
     </extend>
 
+To install local documentation:
+
+    git submodule update --init
+
 ## Documentation
 
 [Auto generated documentation](http://bryanlarsen.github.com/hobo-jquery/documentation.html).
