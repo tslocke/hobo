@@ -102,7 +102,7 @@ module Hobo
       !logged_in? and
           cookie = cookies[:auth_token] and
           (token, model_name = cookie.split) and
-          user_model = model_name.safe_constantize and
+          user_model = model_name._?.safe_constantize and
           user = user_model.find_by_remember_token(token) and
           user.remember_token? and
           user
