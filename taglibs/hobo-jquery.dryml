@@ -379,7 +379,7 @@ The following functions are predefined for use in dialog buttons:
 
  * hjq.dialog.close:  close the dialog box
  * hjq.dialog.submit\_formlet:  submits all formlets inside the dialog
- * hjq.dialog.submit\_formlet\_and\_close: Submits any enclosed formlets, then closes the dialog.  Warning: hijacks the "success" formlet option. */
+ * hjq.dialog.submit\_formlet\_and\_close: Submits any enclosed formlets, then closes the dialog.  Warning: hijacks the "success" formlet option.
 -->
 <def tag="hjq-dialog" attrs="buttons">
 <% #FIXME: dry these names
