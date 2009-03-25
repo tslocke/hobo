@@ -296,7 +296,7 @@ var hjq = (function() {
                     }
                 }
 
-                options.data = formlet.find(":input").fieldSerialize();
+                options.data = formlet.find(":input").serialize();
                 options.dataType = 'script';
 
                 // we tell our controller which parts to return by sending it a "render" array.
