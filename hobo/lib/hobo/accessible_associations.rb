@@ -53,6 +53,13 @@ module Hobo
     def params_hash_to_array(array_or_hash)
       if array_or_hash.is_a?(Hash)
         array = array_or_hash.get(*array_or_hash.keys.sort_by(&:to_i))
+      elsif array_or_hash.is_a?(String)
+        # Due to the way that rails works, there's no good way to tell
+        # the difference between an empty array and a params hash that
+        # just isn't making any updates to the array.  So we're
+        # hacking this in: if you pash an empty string where an array
+        # is expected, we assume you wanted an empty array.
+        []
       else
         array_or_hash
       end
