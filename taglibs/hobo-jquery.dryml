@@ -14,7 +14,7 @@ Options that expect a type other than string can be provided by passing a ruby o
 
 Events are also supported.  Pass in a global Javascript function name:
 
-    <hjq-datepicker onSelect="hjq.log" />
+    <hjq-datepicker onSelect="hjq.util.log" />
 
 -->
 
@@ -134,15 +134,15 @@ A fully worked up example of nested hjq-input-many's may be found in [agility/jq
 
 ### Attributes
 
- - minimum: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
+ - `minimum`: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
 
- - fields: passed down to the `field-list` tag in the default `item`.
+ - `fields`: passed down to the `field-list` tag in the default `item`.
 
- - template: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
+ - `template`: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
 
- - add-hook: a javascript function to call after an item has been added.  The context will be set to the new item.
+ - `add-hook`: a javascript function to call after an item has been added.  The context will be set to the new item.
 
- - remove-hook: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
+ - `remove-hook`: a javascript function to call before an item is removed.  The context will be set to the item.  If the hook returns false, the remove is cancelled.
 
   -->
 <def tag="hjq-input-many" attrs="minimum, fields, new-template, remove-hook" polymorphic >
@@ -217,33 +217,33 @@ end
 
  - standard Hobo HTML attributes (id, part, et cetera).  All supported.
 
- - standard Hobo AJAX attributes:  (see http://cookbook.hobocentral.net/api_taglibs/rapid_forms)
+ - standard Hobo AJAX attributes:  (see [the cookbook](http://cookbook.hobocentral.net/api_taglibs/rapid_forms) )
    
-   - update: (optional).  The DOM ID's of parts to update.  Note that you get an AJAX formlet whether this is provided or not.
+   - `update`: (optional).  The DOM ID's of parts to update.  Note that you get an AJAX formlet whether this is provided or not.
 
-   - message: the spinner message
+   - `message`: the spinner message
 
-   - spinner_next_to: DOM id of an element to position the ajax progress spinner next to.
+   - `spinner-next-to`: DOM id of an element to position the ajax progress spinner next to.
 
-   - before, success, error, complete: These callbacks are slightly different from the standard form callbacks.  They are called with "this" set to the formlet.  Also, you may pass in a function name rather than a javascript fragment.  If the before callback returns false, it will cancel the submission.
+   - `before`, `success`, `error`, `complete`: These callbacks are slightly different from the standard form callbacks.  They are called with "this" set to the formlet.  Also, you may pass in a function name rather than a javascript fragment.  If the before callback returns false, it will cancel the submission.
 
-   - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
+   - `confirm`: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
 
-   - not supported: type, script, form, params, confirm, reset-form, refocus-form, result-update.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
+   - not supported: `type, script, params, reset-form, refocus-form, result-update`.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
 
  - standard Hobo Form attributes (all supported):
 
-   - hidden-fields
+   - `hidden-fields`
 
-   - action
+   - `action`
 
-   - method
+   - `method`
 
-   - web-method
+   - `web-method`
 
-   - lifecycle
+   - `lifecycle`
 
-   - owner
+   - `owner`
 -->
 <def tag="formlet" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner">
 <%
@@ -356,11 +356,11 @@ Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` 
 <!--
 The JQuery UI [dialog](http://jqueryui.com/demos/dialog/).  All options and methods are supported.
 
-The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to "&false".  To display the dialog set autoOpen to "&true", use a `<hjq-dialog-open-button>`, use the [jQuery dialog open method](http://jqueryui.com/demos/dialog/#method-open), or use an `<hjq-dialog-and-button>` instead.
+The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to `"&false"`.  To display the dialog set autoOpen to `"&true"`, use a `<hjq-dialog-open-button>`, use the [jQuery dialog open method](http://jqueryui.com/demos/dialog/#method-open), or use an `<hjq-dialog-and-button>` instead.
 
-The default for [positon](http://jqueryui.com/demos/dialog/#option-position) is also set so that the dialog appears where it is defined.
+The default for [position](http://jqueryui.com/demos/dialog/#option-position) is also set so that the dialog appears where it is defined.
 
-The [positon](http://jqueryui.com/demos/dialog/#option-buttons) has been changed slightly.  Instead of an Hash, it expects a list of pairs.  (Unlike Javascript Objects, Ruby Hash's do not preserve order).  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
+The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Instead of an Hash, it expects a list of pairs.  (Unlike Javascript Objects, Ruby Hash's do not preserve order).  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
 
     <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
     <hjq-dialog buttons="&buttons" />
@@ -377,9 +377,9 @@ Because Ruby Hash's do not preserve order, you may use a list of pairs instead o
 
 The following functions are predefined for use in dialog buttons:
 
- * hjq.dialog.close:  close the dialog box
- * hjq.dialog.submit\_formlet:  submits all formlets inside the dialog
- * hjq.dialog.submit\_formlet\_and\_close: Submits any enclosed formlets, then closes the dialog.  Warning: hijacks the "success" formlet option.
+ * `hjq.dialog.close`:  close the dialog box
+ * `hjq.dialog.submit_formlet`:  submits all formlets inside the dialog
+ * `hjq.dialog.submit_formlet_and_close`: submits any enclosed formlets, then closes the dialog.
 -->
 <def tag="hjq-dialog" attrs="buttons">
 <% #FIXME: dry these names
@@ -397,8 +397,8 @@ The following functions are predefined for use in dialog buttons:
 When pressed, will open a `<hjq-dialog>`.
 
 ### Attributes
- * dialog (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
- * all `<button>` attributes except for onclick
+ * `dialog` (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
+ * supports all `<button>` attributes except for `onclick`
 
 ### Example
     <hjq-dialog id="hello-dialog">Hello!</hjq-dialog>
@@ -412,7 +412,7 @@ When pressed, will open a `<hjq-dialog>`.
 Defines an `<hjq-dialog>` and a `<hjq-dialog-open-button>` and links the two together.
 
 ### Attributes
- * id (optional): the DOM id to use for the dialog
+ * `id` (optional): the DOM id to use for the dialog
 -->
 <def tag="hjq-dialog-and-button">
   <% # we can't use jQuery traversal functions since the dialog will move around in the DOM %>
@@ -424,7 +424,7 @@ Defines an `<hjq-dialog>` and a `<hjq-dialog-open-button>` and links the two tog
 <!--
 Defines a `<select-one>` and a button that brings up an `<hjq-dialog>` containing a form allowing you to enter a new element
 
-Because the select-one is a part, it cannot be parameterized.  However, you can adjust its definition by overriding the polymorphic input for the type:
+Because the select-one is a part, it cannot be parameterized.  However, you can adjust its definition by defining the polymorphic input for the type:
 
     <def tag="input" for="StoryStatus">
       <select-one include-none="&false" />
