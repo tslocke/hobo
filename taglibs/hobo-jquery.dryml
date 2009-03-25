@@ -262,7 +262,7 @@ end
              method.downcase
            end
 
-  ajax_options[:url] ||= begin
+  ajax_options[:url] = action || begin
      target = if owner
                 collection_name = this.class.reverse_reflection(owner).name
                 this.send(owner).send(collection_name)
