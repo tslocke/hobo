@@ -242,11 +242,11 @@ module Hobo::Dryml
 
     def new_context
       ctx = [ @_this, @_this_parent, @_this_field, @_this_type,
-              @_form_field_path ]
+              @_form_field_path, @_form_field_paths_by_object ]
       @_this_type = nil
       res = nil
       @view.with_output_buffer { res = yield }
-      @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path = ctx
+      @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path, @_form_field_paths_by_object = ctx
       res.to_s
     end
 
