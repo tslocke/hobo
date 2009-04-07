@@ -59,6 +59,8 @@ module HoboFields
 
 
   def can_wrap?(type, val)
+    col_type = type::COLUMN_TYPE
+    return false if val.blank? && (col_type == :integer || col_type == :float || col_type == :decimal)
     klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
     arity = type.instance_method(:initialize).arity
     (arity == 1 || arity == -1) && !@never_wrap_types.any? { |c| klass <= c }
