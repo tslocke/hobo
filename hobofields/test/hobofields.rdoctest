@@ -1,3 +1,5 @@
+-*- indent-tabs-mode:nil; -*-
+
 # HoboFields
 
 ## Introduction
@@ -14,7 +16,7 @@ It still has all the benefits of writing your own migrations, for example if you
 
 First off, if you're using the migration generator outside of Hobo, do remember the `--skip-migration` option when generating your models:
 
-	$ ./script/generate model blog_post --skip-migration
+        $ ./script/generate model blog_post --skip-migration
 
 Now edit your model as follows:
 
@@ -30,22 +32,22 @@ Now edit your model as follows:
 
 Then, simply run
 
-	$ ./script/genearte hobo_migration
+        $ ./script/genearte hobo_migration
 
 And voila
 
-	---------- Up Migration ----------
-	create_table :blog_posts do |t|
-	  t.string   :title
-	  t.text     :body
-	  t.datetime :created_at
-	  t.datetime :updated_at
-	end
-	----------------------------------
+        ---------- Up Migration ----------
+        create_table :blog_posts do |t|
+          t.string   :title
+          t.text     :body
+          t.datetime :created_at
+          t.datetime :updated_at
+        end
+        ----------------------------------
 
-	---------- Down Migration --------
-	drop_table :blog_posts
-	----------------------------------
+        ---------- Down Migration --------
+        drop_table :blog_posts
+        ----------------------------------
 {: .ruby}
 
 The migration generator has created a migration to change from the schema that is currently in your database, to the schema that your models need. That's really all there is to it. You are now free to simply hack away on your app and run the migration generator every time the database needs to play catch-up.
@@ -56,7 +58,7 @@ Note that the migration generator is interactive -- it can't tell the difference
 
 The simplest and recommended way to install HoboFeilds is as a gem:
 
-	$ gem install hobofields
+        $ gem install hobofields
 
 The source lives on GitHub as part of the main Hobo repo:
 
@@ -64,7 +66,7 @@ The source lives on GitHub as part of the main Hobo repo:
 
 The simplest way to install HoboFields as a plugin is to use the subversion mirror:
 
-	svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
+        svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
 
 ## Rich Types
 

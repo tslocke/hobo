@@ -17,7 +17,7 @@ module HoboFields
       g.generate
     end
 
-    def initialize(ambiguity_resolver)
+    def initialize(ambiguity_resolver={})
       @ambiguity_resolver = ambiguity_resolver
       @drops = []
       @renames = nil
