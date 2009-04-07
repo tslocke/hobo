@@ -1,19 +1,20 @@
+-*- indent-tabs-mode:nil; -*-
+
 # HoboFields - Migration Generator
 
 Note that these doctests are good tests but not such good docs. The migration generator doesn't really fit well with the doctest concept of a single IRB session. As you'll see, there's a lot of jumping-through-hoops and doing stuff that no normal user of the migration generator would ever do.
 
 Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
 
-    >> require 'rubygems'
-    >> require 'activesupport'
-    >> Dependencies.load_paths << '.'
-    >> Dependencies.mechanism = :require
+    doctest_require: 'rubygems'
+    doctest_require: 'activesupport'
 
 And we'll require:
 
-    >> require 'activerecord'
-    >> require 'action_controller'
-    >> require 'hobofields'
+    doctest_require: 'activerecord'
+    doctest_require: 'action_controller'
+    doctest_require: '../../hobosupport/lib/hobo_support'
+    doctest_require: '../lib/hobofields'
 
 We also need to get ActiveRecord set up with a database connection
 
@@ -62,17 +63,17 @@ The migration generator only takes into account classes that use HoboFields, i.e
 Here we see a simple `create_table` migration along with the `drop_table` down migration
 
     >>
-    class Advert < ActiveRecord::Base
-      fields do
-        name :string
-      end
-    end
+     class Advert < ActiveRecord::Base
+       fields do
+         name :string
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    =>""
-    create_table :adverts do |t|
-      t.string :name
-    end
+    => 
+     "create_table :adverts do |t|
+       t.string :name
+     end"
     >> down
     => "drop_table :adverts"
 
@@ -85,13 +86,13 @@ Normally we would run the generated migration with `rake db:create`. We can achi
 We'll define a method to make that easier next time
 
     >>
-    def migrate(renames={})
-      up, down = HoboFields::MigrationGenerator.run(renames)
-      puts up
-      ActiveRecord::Migration.class_eval(up)
-      ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
-      [up, down]
-    end
+     def migrate(renames={})
+       up, down = HoboFields::MigrationGenerator.run(renames)
+       puts up
+       ActiveRecord::Migration.class_eval(up)
+       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       [up, down]
+     end
 
 We'll have a look at the migration generator in more detail later, first we'll have a look at the extra features HoboFields has added to the model.
 
@@ -101,22 +102,22 @@ We'll have a look at the migration generator in more detail later, first we'll h
 If we add a new field to the model, the migration generator will add it to the database.
 
     >>
-    class Advert
-      fields do
-        name :string
-        body :text
-        published_at :datetime
-      end
-    end
+     class Advert
+       fields do
+         name :string
+         body :text
+         published_at :datetime
+       end
+     end
     >> up, down = migrate
     >> up
-    =>""
-    add_column :adverts, :body, :text
-    add_column :adverts, :published_at, :datetime
+    =>
+     "add_column :adverts, :body, :text
+     add_column :adverts, :published_at, :datetime"
     >> down
-    =>""
-    remove_column :adverts, :body
-    remove_column :adverts, :published_at
+    =>
+     "remove_column :adverts, :body
+     remove_column :adverts, :published_at"
     >>
 
 ### Remove fields
@@ -124,12 +125,12 @@ If we add a new field to the model, the migration generator will add it to the d
 If we remove a field from the model, the migration generator removes the database column. Note that we have to explicitly clear the known fields to achieve this in rdoctest -- in a Rails context you would simply edit the file
 
     >> Advert.field_specs.clear # not normally needed
-    class Advert < ActiveRecord::Base
-      fields do
-        name :string
-        body :text
-      end
-    end
+     class Advert < ActiveRecord::Base
+       fields do
+         name :string
+         body :text
+       end
+     end
     >> up, down = migrate
     >> up
     => "remove_column :adverts, :published_at"
@@ -141,18 +142,18 @@ If we remove a field from the model, the migration generator removes the databas
 Here we rename the `name` field to `title`. By default the generator sees this as removing `name` and adding `title`.
 
     >> Advert.field_specs.clear # not normally needed
-    class Advert < ActiveRecord::Base
-      fields do
-        title :string
-        body :text
-      end
-    end
+     class Advert < ActiveRecord::Base
+       fields do
+         title :string
+         body :text
+       end
+     end
     >> # Just generate - don't run the migration:
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    =>""
-    add_column :adverts, :title, :string
-    remove_column :adverts, :name
+    =>
+     "add_column :adverts, :title, :string
+     remove_column :adverts, :name"
     >> down
     =>""
     remove_column :adverts, :title
@@ -176,13 +177,13 @@ Let's apply that change to the database
 
     >> Advert.attr_type :title
     => String
-    >>
-    class Advert
-      fields do
-        title :text
-        body :text
-      end
-    end
+    >>    
+     class Advert
+       fields do
+         title :text
+         body :text
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
     => "change_column :adverts, :title, :text, :limit => nil"
@@ -193,12 +194,12 @@ Let's apply that change to the database
 ### Add a default
 
     >>
-    class Advert
-      fields do
-        title :string, :default => "Untitled"
-        body :text
-      end
-    end
+     class Advert
+       fields do
+         title :string, :default => "Untitled"
+         body :text
+       end
+     end
     >> up, down = migrate
     >> up
     => 'change_column :adverts, :title, :string, :default => "Untitled", :limit => 255'
@@ -209,24 +210,24 @@ Let's apply that change to the database
 ### Limits
 
     >>
-    class Advert
-      fields do
-        price :integer, :limit => 4
-      end
-    end
+     class Advert
+       fields do
+         price :integer, :limit => 4
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    "add_column :advert, :integer, :limit => 4"
+    => "add_column :adverts, :price, :integer, :limit => 4"
 
 
 Note that limit on a decimal column is ignored (use :scale and :precision)
     
     >>
-    class Advert
-      fields do
-        price :decimal, :limit => 4
-      end
-    end
+     class Advert
+       fields do
+         price :decimal, :limit => 4
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
     => "add_column :adverts, :price, :decimal"
@@ -240,62 +241,62 @@ Cleanup
 
 HoboFields extends the `belongs_to` macro so that it also declares the foreign-key field.
 
-	>>
-	class Advert
-	  belongs_to :category
-	end
-	>> up, down = HoboFields::MigrationGenerator.run
-	>> up
-	=> 'add_column :adverts, :category_id, :integer'
-	>> down
-	=> 'remove_column :adverts, :category_id'
+        >>
+         class Advert
+           belongs_to :category
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        => 'add_column :adverts, :category_id, :integer'
+        >> down
+        => 'remove_column :adverts, :category_id'
 
 Cleanup:
 
-	>> Advert.field_specs.delete(:category_id)
+        >> Advert.field_specs.delete(:category_id)
 
 If you specify a custom foreign key, the migration generator observes that:
 
-	>>
-	class Advert
-	  belongs_to :category, :foreign_key => "c_id"
-	end
-	>> up, down = HoboFields::MigrationGenerator.run
-	>> up
-	=> 'add_column :adverts, :c_id, :integer'
-	>> down
-	=> 'remove_column :adverts, :c_id'
+        >>
+         class Advert
+           belongs_to :category, :foreign_key => "c_id"
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        => 'add_column :adverts, :c_id, :integer'
+        >> down
+        => 'remove_column :adverts, :c_id'
 
 Cleanup:
 
-	>> Advert.field_specs.delete(:c_id)
+        >> Advert.field_specs.delete(:c_id)
 
 
 ### Timestamps
 
 `updated_at` and `created_at` can be declared with the shorthand `timestamps`
 
-	>>
-	class Advert
-	  fields do
-	    timestamps
-	  end
-	end
-	>> up, down = HoboFields::MigrationGenerator.run
-	>> up
-	=>""
-	add_column :adverts, :created_at, :datetime
-	add_column :adverts, :updated_at, :datetime
-	>> down
-	=>""
-	remove_column :adverts, :created_at
-	remove_column :adverts, :updated_at
-	>>
+        >>
+         class Advert
+           fields do
+             timestamps
+           end
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        =>
+         "add_column :adverts, :created_at, :datetime
+         add_column :adverts, :updated_at, :datetime"
+        >> down
+        =>
+         "remove_column :adverts, :created_at
+         remove_column :adverts, :updated_at"
+        >>
 
 Cleanup:
 
-	>> Advert.field_specs.delete(:updated_at)
-	>> Advert.field_specs.delete(:created_at)
+        >> Advert.field_specs.delete(:updated_at)
+        >> Advert.field_specs.delete(:created_at)
 
 
 ### Rename a table
@@ -303,13 +304,13 @@ Cleanup:
 The migration generator respects the `set_table_name` declaration, although as before, we need to explicitly tell the generator that we want a rename rather than a create and a drop.
 
     >>
-    class Advert
-      set_table_name "ads"
-      fields do
-        title :string, :default => "Untitled"
-        body :text
-      end
-    end
+     class Advert
+       set_table_name "ads"
+       fields do
+         title :string, :default => "Untitled"
+         body :text
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
     >> up
     => "rename_table :adverts, :ads"
@@ -334,25 +335,24 @@ Dropping tables is where the automatic down-migration really comes in handy:
     >> up
     => "drop_table :adverts"
     >> down
-    =>""
-    create_table "adverts", :force => true do |t|
-      t.text   "body"
-      t.string "title", :default => "Untitled"
-    end
-	>>
+    =>
+     "create_table "adverts", :force => true do |t|
+       t.text   "body"
+       t.string "title", :default => "Untitled"
+     end"
 
 ### Rename a table
 
 As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement'. Remember 'Advert' is being ignored so it's as if we renamed the definition in our models directory.
 
     >>
-    class Advertisement < ActiveRecord::Base
-      fields do
-        title :string, :default => "Untitled"
-        body :text
-      end
-    end
-	>> up, down = HoboFields::MigrationGenerator.run(:adverts => :advertisements)
+     class Advertisement < ActiveRecord::Base
+       fields do
+         title :string, :default => "Untitled"
+         body :text
+       end
+     end
+    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :advertisements)
     >> up
     => "rename_table :adverts, :advertisements"
     >> down
@@ -368,18 +368,18 @@ Now that we've seen the renaming we'll switch the 'ignore' setting to ignore tha
 
 Adding a subclass should introduce the 'type' column and no other changes
 
-	>>
-	class FancyAdvert < Advert
-	end
-    >> up, down = HoboFields::MigrationGenerator.run
-    >> up
-	=> "add_column :adverts, :type, :string"
-	>> down
-	=> "remove_column :adverts, :type"
+        >>
+         class FancyAdvert < Advert
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        => "add_column :adverts, :type, :string"
+        >> down
+        => "remove_column :adverts, :type"
 
 Cleanup
 
-	>> Advert.field_specs.delete(:type)
+        >> Advert.field_specs.delete(:type)
 
 
 ## Coping with multiple changes
@@ -400,40 +400,40 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
     >> Advert.field_specs.clear
     >>
-    class Advert
-      fields do
-        name :string, :default => "No Name"
-        body :text
-      end
-    end
+     class Advert
+       fields do
+         name :string, :default => "No Name"
+         body :text
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run(:adverts => {:title => :name})
     >> up
-    =>""
-    rename_column :adverts, :title, :name
-    change_column :adverts, :name, :string, :default => "No Name", :limit => 255
+    =>
+     "rename_column :adverts, :title, :name
+     change_column :adverts, :name, :string, :default => "No Name", :limit => 255"
     >> down
-    =>""
-    rename_column :adverts, :name, :title
-    change_column :adverts, :title, :string, :default => "Untitled"
+    =>
+     'rename_column :adverts, :name, :title
+     change_column :adverts, :title, :string, :default => "Untitled"'
     >>
 
 
 ### Rename a table and add a column
 
     >> HoboFields::MigrationGenerator.ignore_models << :advert
-    class Ad < ActiveRecord::Base
-      fields do
-        title      :string, :default => "Untitled"
-        body       :text
-        created_at :datetime
-      end
-    end
+     class Ad < ActiveRecord::Base
+       fields do
+         title      :string, :default => "Untitled"
+         body       :text
+         created_at :datetime
+       end
+     end
     >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
     >> up
-    =>""
-    rename_table :adverts, :ads
+    =>
+    "rename_table :adverts, :ads
 
-    add_column :ads, :created_at, :datetime
+    add_column :ads, :created_at, :datetime"
     >>
     
 
