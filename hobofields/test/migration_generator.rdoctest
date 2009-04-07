@@ -415,12 +415,13 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     =>
      'rename_column :adverts, :name, :title
      change_column :adverts, :title, :string, :default => "Untitled"'
-    >>
 
 
 ### Rename a table and add a column
 
     >> HoboFields::MigrationGenerator.ignore_models << :advert
+    >> HoboFields::MigrationGenerator.ignore_models << :fancy_advert
+    >>
      class Ad < ActiveRecord::Base
        fields do
          title      :string, :default => "Untitled"
@@ -431,9 +432,9 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
     >> up
     =>
-    "rename_table :adverts, :ads
+     "rename_table :adverts, :ads
 
-    add_column :ads, :created_at, :datetime"
+     add_column :ads, :created_at, :datetime"
     >>
     
 
