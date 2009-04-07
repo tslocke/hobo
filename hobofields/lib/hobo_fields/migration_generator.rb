@@ -138,8 +138,13 @@ module HoboFields
 
     def generate
       models, db_tables = models_and_tables
-      models_by_table_name = models.index_by {|m| m.table_name}
-      model_table_names = models.*.table_name
+      models_by_table_name = {}
+      models.each do |m|
+        if m.inheritance_base? or !models_by_table_name.has_key?(m.table_name)
+          models_by_table_name[m.table_name] = m
+        end
+      end
+      model_table_names = models_by_table_name.keys
 
       to_create = model_table_names - db_tables
       to_drop = db_tables - model_table_names - always_ignore_tables

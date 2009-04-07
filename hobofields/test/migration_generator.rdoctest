@@ -212,13 +212,12 @@ Let's apply that change to the database
     >>
      class Advert
        fields do
-         price :integer, :limit => 4
+         price :integer, :limit => 2
        end
      end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => "add_column :adverts, :price, :integer, :limit => 4"
-
+    => "add_column :adverts, :price, :integer, :limit => 2"
 
 Note that limit on a decimal column is ignored (use :scale and :precision)
     
@@ -415,12 +414,13 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     =>
      'rename_column :adverts, :name, :title
      change_column :adverts, :title, :string, :default => "Untitled"'
-    >>
 
 
 ### Rename a table and add a column
 
     >> HoboFields::MigrationGenerator.ignore_models << :advert
+    >> HoboFields::MigrationGenerator.ignore_models << :fancy_advert
+    >>
      class Ad < ActiveRecord::Base
        fields do
          title      :string, :default => "Untitled"
@@ -431,9 +431,9 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
     >> up
     =>
-    "rename_table :adverts, :ads
+     "rename_table :adverts, :ads
 
-    add_column :ads, :created_at, :datetime"
+     add_column :ads, :created_at, :datetime"
     >>
     
 

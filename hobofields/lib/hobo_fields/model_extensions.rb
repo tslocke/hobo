@@ -15,8 +15,13 @@ module HoboFields
     # and speeds things up a little.
     inheriting_cattr_reader :field_specs => HashWithIndifferentAccess.new
 
+    # is true if is the base for STI
+    def self.inheritance_base?
+      @is_inheritance_base
+    end
 
     def self.inherited(klass)
+      @is_inheritance_base = true
       fields do |f|
         f.field(inheritance_column, :string)
       end
