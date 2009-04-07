@@ -1,5 +1,12 @@
 require 'echoe'
 
+namespace "test" do
+  desc "Run the doctests"
+  task :doctest do |t|
+    system "rubydoctest test/*.rdoctest"
+  end
+end
+
 Echoe.new('hobofields') do |p|
   p.author  = "Tom Locke"
   p.email   = "tom@tomlocke.com"
@@ -13,3 +20,4 @@ Echoe.new('hobofields') do |p|
   p.dependencies = ['hobosupport =0.8.5', 'rails >=2.2.2']
   p.development_dependencies = []
 end
+
