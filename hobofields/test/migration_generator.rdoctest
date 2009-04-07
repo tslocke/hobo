@@ -212,13 +212,12 @@ Let's apply that change to the database
     >>
      class Advert
        fields do
-         price :integer, :limit => 4
+         price :integer, :limit => 2
        end
      end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => "add_column :adverts, :price, :integer, :limit => 4"
-
+    => "add_column :adverts, :price, :integer, :limit => 2"
 
 Note that limit on a decimal column is ignored (use :scale and :precision)
     
