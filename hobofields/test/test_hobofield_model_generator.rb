@@ -1,6 +1,7 @@
-require File.join(File.dirname(__FILE__), "test_generator_helper.rb")
-
+require 'rubygems'
 require 'rails_generator'
+
+require File.join(File.dirname(__FILE__), "test_generator_helper.rb")
 
 class TestHobofieldModelGenerator < Test::Unit::TestCase
   include RubiGen::GeneratorTestHelper
