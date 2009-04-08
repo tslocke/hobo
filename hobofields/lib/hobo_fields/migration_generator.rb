@@ -140,7 +140,11 @@ module HoboFields
       models, db_tables = models_and_tables
       models_by_table_name = {}
       models.each do |m|
-        if m.inheritance_base? or !models_by_table_name.has_key?(m.table_name)
+        if !models_by_table_name.has_key?(m.table_name)
+          models_by_table_name[m.table_name] = m
+        elsif m.superclass==models_by_table_name[m.table_name].superclass.superclass
+          # we need to ensure that models_by_table_name contains the
+          # base class in an STI hierarchy
           models_by_table_name[m.table_name] = m
         end
       end
