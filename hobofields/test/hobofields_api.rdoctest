@@ -13,6 +13,7 @@ In order for the API examples to run we need a connection to a database. You can
     doctest_require: '../../hobosupport/lib/hobo_support'
     doctest_require: '../lib/hobo_fields'
     >> mysql_database = "hobofields_doctest"
+    >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
@@ -246,4 +247,4 @@ To have them validated use `validate_virtual_field`:
 
 ## Cleanup
 
-    >> system  "mysqladmin --force drop #{mysql_database}"
+    >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"

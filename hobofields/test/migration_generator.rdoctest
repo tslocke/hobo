@@ -19,6 +19,7 @@ And we'll require:
 We also need to get ActiveRecord set up with a database connection
 
     >> mysql_database = "hobofields_doctest"
+    >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
@@ -440,4 +441,4 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
 ## Cleanup
 
-    >> system  "mysqladmin --force drop #{mysql_database}"
+    >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
