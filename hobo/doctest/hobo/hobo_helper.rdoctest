@@ -2,37 +2,38 @@
 
 Various view helpers
 
-	>> require 'rubygems'
-    >> require 'hobosupport'
-    >> Dependencies.load_paths << '.'
-    >> Dependencies.mechanism = :require
-
-	>> require 'mocha'
-	>> self.class.send(:include, Mocha::AutoVerify)
+        doctest_require: 'rubygems'
+        doctest_require: 'active_support'
+        doctest_require: 'mocha'
+        doctest_require: '../../../hobosupport/lib/hobosupport'
+        doctest_require: '../../../hobofields/lib/hobofields'
+        doctest_require: '../../lib/hobo'
 
 Create a mock view layer:
 
-	>> class View
-	     extend Hobo::HoboHelper
-	     class << self
-	       protected_instance_methods.each {|m| public m }
+        >> 
+         class View
+           extend Hobo::HoboHelper
+           class << self
+             protected_instance_methods.each {|m| public m }
 
-           def params; {} ;end
-           def subsite; "" ;end
-           def base_url; "" ;end
-	     end
-       end
-	>> RAILS_ROOT = "test-app"
+             def params; {} ;end
+             def subsite; "" ;end
+             def base_url; "" ;end
+           end
+         end
+        >> RAILS_ROOT = "test-app"
 
 Useful stuff
 
-	>> def init_mocha; $stubba = Mocha::Central.new; end
-	>> class Thing
-		 class Mocks; extend Mocha::AutoVerify; end
-	     def self.mock(hash)
-	       Mocks.mock(hash.update(:class => self))
-	     end
-	   end
+        >> def init_mocha; $stubba = Mocha::Central.new; end
+        >>
+         class Thing
+           class Mocks; extend Mocha::AutoVerify; end
+             def self.mock(hash)
+             Mocks.mock(hash.update(:class => self))
+           end
+         end
 
 
 ## `object_url`
@@ -43,34 +44,34 @@ Note that `object_url` doesn't perform "reverse routing". It knows nothing about
 
 Something to link to:
 
-	>> init_mocha
-	>> thing = Thing.mock(:to_url_path => "things/1")
+        >> init_mocha
+        >> thing = Thing.mock(:to_url_path => "things/1")
 
 ### Simple 'show' URLs
 
-	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(true)
-	>> View.object_url(thing)
-	=> "/things/1"
+        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(true)
+        >> View.object_url(thing)
+        => "/things/1"
 
 Returns nil if ModelRouter says it's not linkable
 
-	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(false)
-	>> View.object_url(thing)
-	=> nil
+        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(false)
+        >> View.object_url(thing)
+        => nil
 
 A URL to the 'edit' page:
 
-	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
-	>> View.object_url(thing, :edit)
-	=> "/things/1/edit"
+        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
+        >> View.object_url(thing, :edit)
+        => "/things/1/edit"
 
 
 ### POST URLs for creating new items in collections:
 
-	>> collection = mock(:origin => thing, :origin_attribute => "parts")
-	>> Hobo::ModelRouter.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
-	>> View.object_url(collection, :method => :post)
-	=> "/things/1/parts"
+        >> collection = mock(:origin => thing, :origin_attribute => "parts")
+        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
+        >> View.object_url(collection, :method => :post)
+        => "/things/1/parts"
 
 
 
