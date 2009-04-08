@@ -1,5 +1,13 @@
 require 'echoe'
 
+namespace "test" do
+  desc "Run the doctests"
+  task :doctest do |t|
+    system "rubydoctest test/*.rdoctest"
+    system "rubydoctest test/hobosupport/*.rdoctest"
+  end
+end
+
 Echoe.new('hobosupport') do |p|
   p.author  = "Tom Locke"
   p.email   = "tom@tomlocke.com"

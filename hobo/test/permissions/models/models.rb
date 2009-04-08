@@ -19,23 +19,23 @@ module Models
   HOME = File.dirname(__FILE__)
   
   def model(name, &b)
-    klass = Object.const_set(name, Class.new(ActiveRecord::Base))
+    klass = Object.const_get(name)
     klass.hobo_model
     klass.class_eval(&b)
     klass.delete_all rescue nil
   end
   
   def user_model(name, &b)
-    klass = Object.const_set(name, Class.new(ActiveRecord::Base))
+    klass = Object.const_get(name)
     klass.hobo_user_model
     klass.class_eval(&b)
     klass.delete_all rescue nil
   end
   
   def create_database_sqlite3
-    ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
-                                            :database => "#{HOME}/test.sqlite3",
-                                            :timeout  => 5000)
+    ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
+                                            :database => "/tmp/hobo_permissions_test.sqlite3",
+                                            :timeout => 5000)
   end
   
   def init
@@ -47,6 +47,10 @@ module Models
   
   def make_models
 
+    [:Response, :Comment, :Request, :Recipe, :Collaboratorship, :Image, :CodeExample, :User].each do |m|
+      Object.const_set(m, Class.new(ActiveRecord::Base))
+    end
+      
     model :Response do
       fields do 
         body :string
@@ -112,6 +116,9 @@ module Models
       fields do
         filename :string
       end
+      has_one :recipe
+      def update_permitted?;  recipe.user == acting_user end      
+      def create_permitted?;  true end
     end
 
     user_model :User do
