@@ -116,6 +116,9 @@ module Models
       fields do
         filename :string
       end
+      has_one :recipe
+      def update_permitted?;  recipe.user == acting_user end      
+      def create_permitted?;  true end
     end
 
     user_model :User do
