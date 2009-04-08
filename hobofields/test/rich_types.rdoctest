@@ -9,6 +9,7 @@ This doctest describes the rich types bundles with HoboFields, and the process b
         doctest_require: 'activerecord'
         doctest_require: 'actionpack'
         doctest_require: 'action_view'
+        doctest_require: 'action_controller'
         doctest_require: '../../hobosupport/lib/hobo_support'
         doctest_require: '../lib/hobofields'
 
