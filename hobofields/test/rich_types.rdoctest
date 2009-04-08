@@ -4,14 +4,16 @@
 
 This doctest describes the rich types bundles with HoboFields, and the process by which you can create and register your own types.
 
-        doctest_require: 'rubygems'
-        doctest_require: 'activesupport'
-        doctest_require: 'activerecord'
-        doctest_require: 'actionpack'
-        doctest_require: 'action_view'
-        doctest_require: 'action_controller'
-        doctest_require: '../../hobosupport/lib/hobo_support'
-        doctest_require: '../lib/hobofields'
+        >> require 'rubygems'
+        >> require 'activesupport'
+        >> require 'activerecord'
+        >> require 'actionpack'
+        >> require 'action_view'
+        >> require 'action_controller'
+        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+        >> require 'hobosupport'
+        >> require 'hobofields'
 
 
 ## `to_html` method

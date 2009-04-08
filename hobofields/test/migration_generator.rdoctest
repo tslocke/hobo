@@ -6,15 +6,16 @@ Note that these doctests are good tests but not such good docs. The migration ge
 
 Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
 
-    doctest_require: 'rubygems'
-    doctest_require: 'activesupport'
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> require 'activerecord'
 
 And we'll require:
 
-    doctest_require: 'activerecord'
-    doctest_require: 'action_controller'
-    doctest_require: '../../hobosupport/lib/hobo_support'
-    doctest_require: '../lib/hobofields'
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+    >> require 'hobosupport'
+    >> require 'hobofields'
 
 We also need to get ActiveRecord set up with a database connection
 
