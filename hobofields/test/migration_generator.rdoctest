@@ -365,10 +365,12 @@ Now that we've seen the renaming we'll switch the 'ignore' setting to ignore tha
 
 ### Adding an STI subclass
 
-Adding a subclass should introduce the 'type' column and no other changes
+Adding a subclass or two should introduce the 'type' column and no other changes
 
         >>
          class FancyAdvert < Advert
+         end
+         class SuperFancyAdvert < FancyAdvert
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
@@ -418,8 +420,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
 ### Rename a table and add a column
 
-    >> HoboFields::MigrationGenerator.ignore_models << :advert
-    >> HoboFields::MigrationGenerator.ignore_models << :fancy_advert
+    >> HoboFields::MigrationGenerator.ignore_models += [:advert, :fancy_advert, :super_fancy_advert]
     >>
      class Ad < ActiveRecord::Base
        fields do
