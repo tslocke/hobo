@@ -1,6 +1,6 @@
 # HoboSupport - Module extensions
 
-    >> require 'hobosupport'
+    doctest_require: '../../lib/hobosupport'
 
 ## `Module#included_in_class_callbacks`
 
@@ -13,30 +13,30 @@ When a module is included in a class, it gets a callback on the `included` metho
 (Note we're using the metaid extensions here too)
 
     >>
-    module M2
-      def self.included_in_class(klass)
-        klass.metaclass_eval do
-          def name_with_shouting; name_without_shouting.upcase; end
-          alias_method_chain :name, :shouting
-        end
-      end
-    end
+     module M2
+       def self.included_in_class(klass)
+         klass.metaclass_eval do
+           def name_with_shouting; name_without_shouting.upcase; end
+           alias_method_chain :name, :shouting
+         end
+       end
+     end 
 
-    module M1
-      def self.included(base)
-        included_in_class_callbacks(base)
-      end
-      include M2
-    end
+     module M1
+       def self.included(base)
+         included_in_class_callbacks(base)
+       end
+       include M2
+     end
 
-    class C
-      def self.name
-        "my name is C"
-      end
-      include M1
-    end
+     class C
+       def self.name
+         "my name is C"
+       end
+       include M1
+     end
 
-    C.name
+     C.name
     => "MY NAME IS C"
 
 
@@ -45,11 +45,11 @@ When a module is included in a class, it gets a callback on the `included` metho
 Declares a reader for an instance variable on the class. The attribute is looked up on the superclass if not defined on the receiving class. In other words, the superclass defines a default that subclasses can override. The declaration can also give a default, as shown here.
 
     >>
-    class A
-      inheriting_cattr_reader :nickname => "Andy"
-    end
+     class A
+       inheriting_cattr_reader :nickname => "Andy"
+     end
 
-    class B < A; end
+     class B < A; end
 
 `B` has the same nickname as its superclass `A`
 
@@ -72,17 +72,17 @@ Now we change the nickname of `B`. `A` retains it's existing nickname.
 In Ruby we use modules to factor out features that are shared by more than one class. By including the module, a class gets the module's features, just as if they were defined inside the class. This mechanism is very simple if the shared features are all instance methods, but starts to get complicated when we want to share class-level features. For example, to create a module that adds class-methods to the including class, Ruby programmers often use the ClassMethods sub-module idiom:
 
     >>
-    module M
-      def self.included(base)
-        base.send(:extend, ClassMethods)
-      end
+     module M
+       def self.included(base)
+         base.send(:extend, ClassMethods)
+       end 
 
-      module ClassMethods
-        def foo; 123; end
-      end
-    end
+       module ClassMethods
+         def foo; 123; end
+       end
+     end
 
-    class C; include M; end
+     class C; include M; end
 
     >> C.foo
     => 123
@@ -92,11 +92,11 @@ It's a shame that such a basic capability isn't more declarative.
 `classy_module` provides a mechanism for creating a module that, when included, will `class_eval` it's entire body (the block passed to `classy_module`). This means we can write shared class features exactly as we would write them if they were inside the class:
 
     >>
-    MyClassyModule = classy_module do
+     MyClassyModule = classy_module do
 
-      def self.foo; 123; end
+       def self.foo; 123; end
 
-    end
+     end
 
     >> MyClassyModule.class
     => Module
