@@ -4,7 +4,7 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
 [Hobo]: http://hobocentral.net
 
-    >> require 'hobosupport'
+    doctest_require: '../lib/hobosupport'
     >> HoboSupport::VERSION
     => "0.8.5"
 
