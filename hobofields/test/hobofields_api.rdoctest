@@ -6,12 +6,14 @@
 
 In order for the API examples to run we need a connection to a database. You can ignore this if you're just looking for documentation.
 
-    doctest_require: 'rubygems'
-    doctest_require: 'activesupport'
-    doctest_require: 'activerecord'
-    doctest_require: 'action_controller'
-    doctest_require: '../../hobosupport/lib/hobo_support'
-    doctest_require: '../lib/hobo_fields'
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> require 'activerecord'
+    >> require 'action_controller'
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+    >> require 'hobosupport'
+    >> require 'hobofields'
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
