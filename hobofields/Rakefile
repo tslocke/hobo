@@ -5,6 +5,13 @@ namespace "test" do
   task :doctest do |t|
     system "rubydoctest test/*.rdoctest"
   end
+
+  desc "Run the unit tests"
+  task :unit do |t|
+    Dir["test/test_*.rb"].each do |f|
+	system "ruby #{f}"
+    end
+  end
 end
 
 Echoe.new('hobofields') do |p|
