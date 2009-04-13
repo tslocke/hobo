@@ -96,21 +96,15 @@ class ActionView::Template
   # from trying to compile our template. DRYML templates are each compiled as a class, not just a method,
   # so the support for compiling templates that Rails provides is innadequate.
   def render_dryml(view, local_assigns = {})
-    stack = view.instance_variable_get(:@_render_stack)
-    stack.push(self)
 
-    # This is only used for TestResponse to set rendered_template
-    unless is_a?(ActionView::InlineTemplate) || view.instance_variable_get(:@_first_render)
-      view.instance_variable_set(:@_first_render, self)
+    compile(local_assigns)
+
+    view.with_template self do
+      view.send(:_evaluate_assigns_and_ivars)
+      view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
+
+      Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)      
     end
-
-    view.send(:_evaluate_assigns_and_ivars)
-    view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
-
-    result = Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
-
-    stack.pop
-    result
   end
   
 end  
