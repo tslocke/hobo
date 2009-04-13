@@ -73,7 +73,7 @@ module Hobo
           return
         end
 
-        require "#{RAILS_ROOT}/app/controllers/application" unless Object.const_defined? :ApplicationController
+        require "#{RAILS_ROOT}/app/controllers/application_controller" unless Object.const_defined? :ApplicationController
 
         # Add non-subsite, and all subsite routes
         [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
