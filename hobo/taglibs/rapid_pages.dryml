@@ -58,7 +58,7 @@ The easiest way to see what this tag does is to look at the source.
 
 
 <!-- nodoc. -->
-<def tag="index-page" polymorphic/>
+<def tag="index-page-content" polymorphic/>
 <!-- nodoc. -->
 <def tag="new-page"   polymorphic/>
 <!-- nodoc. -->
