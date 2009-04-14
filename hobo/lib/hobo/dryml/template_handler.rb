@@ -63,21 +63,24 @@ module ActionController
 
 
     # DRYML fallback tags -- monkey patch this method to attempt to render a tag if there's no template
-    def render_for_file_with_dryml(template_path, status = nil, layout = nil, locals = {})
-      render_for_file_without_dryml(template_path, status, layout, locals)
-    rescue ActionView::MissingTemplate => ex
-      # Try to use a DRYML <page> tag instead
-      tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
+    def render_for_file_with_dryml(template, status = nil, layout = nil, locals = {})
+      # if we're passed a MissingTemplateWrapper, see if there's a
+      # dryml tag that will render the page
+      if template.respond_to? :original_template_path
+        tag_name = @dryml_fallback_tag || "#{File.basename(template.original_template_path).dasherize}-page"
 
-      text = call_dryml_tag(tag_name)
-      if text
-        render_for_text text, status 
+        text = call_dryml_tag(tag_name)
+        if text
+          render_for_text text, status 
+        else
+          template.raise_wrapped_exception
+        end
       else
-        raise ex
+        render_for_file_without_dryml(template, status, layout, locals)
       end
     end
     alias_method_chain :render_for_file, :dryml
-
+      
   end
 end
 
@@ -107,5 +110,39 @@ class ActionView::Template
     end
   end
   
-end  
+end
+
+class MissingTemplateWrapper
+  attr_reader :original_template_path
+  
+  def initialize(exception, path)
+    @exception = exception
+    @original_template_path = path
+  end
+
+  def method_missing(*args)
+    raise @exception
+  end
+
+  def render
+    raise @exception
+  end
+end
+  
     
+module ActionView
+  class PathSet < Array
+    def find_template_with_dryml(original_template_path, format = nil, html_fallback = true)
+      begin
+        Rails.logger.info "find_template_with_dryml: #{original_template_path} #{format} #{html_fallback}"
+        find_template_without_dryml(original_template_path, format, html_fallback)
+      rescue ActionView::MissingTemplate => ex
+        # instead of throwing the exception right away, hand back a
+        # time bomb instead.  It'll blow if mishandled...
+        return MissingTemplateWrapper.new(ex, original_template_path)
+      end
+    end
+    alias_method_chain :find_template, :dryml    
+  end
+end
+        
