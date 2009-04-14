@@ -15,8 +15,14 @@ class Object
     self
   end
 
-  def try
-    CallIfAvailable.new(self)
+  def try(*args, &block)
+    if args.length==0
+      # Hobo style try
+      CallIfAvailable.new(self)
+    else
+      # activesupport 2.3 style try
+      self.send(*args, &block)
+    end
   end
 
 end
@@ -26,6 +32,18 @@ class NilClass
   def _?()
     SafeNil.instance
   end
+
+  
+  def try(*args)
+    if args.length==0
+      # Hobo style try
+      CallIfAvailable.new(self)
+    else
+      # activesupport 2.3 style try
+      nil
+    end
+  end
+  
 end
 
 
