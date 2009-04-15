@@ -9,6 +9,18 @@ require 'delegate'
 require 'singleton'
 require 'blankslate'
 
+module HoboSupport
+  def self.hobo_try(this, *args, &block)
+    if args.length==0
+      # Hobo style try
+      CallIfAvailable.new(this)
+    else
+      # activesupport 2.3 style try
+      this.send(*args, &block)
+    end
+  end
+end
+
 class Object
 
   def _?()
@@ -16,13 +28,7 @@ class Object
   end
 
   def try(*args, &block)
-    if args.length==0
-      # Hobo style try
-      CallIfAvailable.new(self)
-    else
-      # activesupport 2.3 style try
-      self.send(*args, &block)
-    end
+    HoboSupport.hobo_try(self, *args, &block)
   end
 
 end
@@ -81,4 +87,14 @@ class CallIfAvailable < BlankSlate
 
 end
 
+module ActiveRecord
+  module Associations
+    class AssociationProxy
 
+      # we need to make sure we don't trigger AssociationCollections' method_missing
+      def try(*args, &block)
+        HoboSupport.hobo_try(self, *args, &block)
+      end
+    end
+  end
+end
