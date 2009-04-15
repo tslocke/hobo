@@ -80,7 +80,7 @@ module Hobo
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
-        filename ||= view._pick_template(page + ".dryml").filename
+        filename ||= view.view_paths.find_template(page + ".dryml").filename
         mtime = File.mtime(filename)
         renderer_class = @renderer_classes[page]
 
