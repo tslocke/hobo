@@ -78,7 +78,14 @@ end
 if run_rails
   puts "\nGenerating Rails app...\n"
   opts = []
-  opts << "_#{rails_version}_"  if rails_version
+  if rails_version
+    opts << "_#{rails_version}_"
+  else
+    if `rails -v`.split[1].split(".").slice(0,2)!=['2', '4']
+      puts "Rails 2.3 required!"
+      exit 2
+    end
+  end
   opts << "-d #{database_type}" if database_type
   system("rails #{opts * ' '} #{app_path}")
 end
