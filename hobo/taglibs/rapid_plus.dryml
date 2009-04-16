@@ -2,7 +2,7 @@
 
 <!-- An enhanced version of Rapid's `<table>` that has support for column sorting, searching and pagination.
   
-This tag calls <table merge-params>, so the parameters for <table> are also available.
+This tag calls `<table merge-params>`, so the parameters for `<table>` are also available.
 
 An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchable_sortable_table) of this tag is available in the [Agility Tutorial](/tutorials/agility)
 
