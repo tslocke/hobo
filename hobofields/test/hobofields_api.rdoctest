@@ -6,20 +6,31 @@
 
 In order for the API examples to run we need a connection to a database. You can ignore this if you're just looking for documentation.
 
+Our test requires rails:
+
     >> require 'rubygems'
     >> require 'activesupport'
     >> require 'activerecord'
     >> require 'action_controller'
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-    >> require 'hobosupport'
-    >> require 'hobofields'
+
+We need a database connection for this test:
+
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
                                                :host => "localhost")
+
+Some load path manipulation you shouldn't need:
+
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+
+Require the module we're testing:
+
+    >> require 'hobosupport'
+    >> require 'hobofields'
 
 ## Example Models
 
