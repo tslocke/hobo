@@ -146,7 +146,8 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu">
     <div>
-      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]"
+      <% selected = options.detect {|o| o.to_s==params[param_name.gsub('-', '_')] } %>
+      <select-menu name="&param_name" options="&options" selected="&selected"
                    first-option="&no_filter" merge-params/>
     </div>
   </form>
