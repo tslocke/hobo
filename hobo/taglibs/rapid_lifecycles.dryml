@@ -11,7 +11,7 @@
 All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also supported. 
   -->
 <def tag="transition-button" attrs="transition, update, label"><%= 
-    transition = transition.name unless transition.is_a?(String)
+    transition = transition.name.to_s unless transition.is_a?(String)
     ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
     url = object_url(this, transition, :method => :put)
