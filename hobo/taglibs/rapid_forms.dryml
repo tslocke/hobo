@@ -771,8 +771,9 @@ Use the `uri` option to specify a redirect location:
  -->
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
   <select merge-attrs param="default">
+    <% selected=this if selected.nil? %>
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
-    <do param="options"><% options_for_select(options, selected.to_s) %></do>
+    <do param="options"><% options_for_select(options, selected) %></do>
   </select>
 </def>
 
