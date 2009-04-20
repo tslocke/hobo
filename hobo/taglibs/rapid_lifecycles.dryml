@@ -16,7 +16,7 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 
     url = object_url(this, transition, :method => :put)
     add_classes!(html_attributes, "transition-button #{transition}-button")
-    label ||= transition.titleize
+    label ||= transition.to_s.titleize
     if update || !ajax_attributes.empty?
       ajax_attributes[:message] ||= label
       func = ajax_updater(url, update, ajax_attributes)
