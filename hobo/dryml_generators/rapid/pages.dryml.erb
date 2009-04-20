@@ -20,33 +20,48 @@ new_form = !new_link && linkable?(model, :create, :method => :post)
 -%>
 
 
-<def tag="index-page-content" for="<%= model.name %>">
+<def tag="index-page" for="<%= model.name %>">
+  <page merge title="<%= model_name :title, :plural %>">
+    <body: class="index-page <%= model_class %>" param/>
+    
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading"><%= model_name :title, :plural %></h2>
+
+        <p param="count" if>There <count prefix="are"/></p>
+      </header>
+      
+      <section param="content-body">
 <% if new_link -%>
-  <a action="new" to="&model" param="new-link"/>      
+
+        <a action="new" to="&model" param="new-link"/>      
 <% end -%>
 
 <% if view_hints.paginate? -%>
-  <page-nav param="top-page-nav"/>
+        <page-nav param="top-page-nav"/>
 
 <% end -%>
 <% if view_hints.sortable? -%>
-  <sortable-collection param="collection"/>
+        <sortable-collection param="collection"/>
 <% else -%>
-  <collection param/>
+        <collection param/>
 <% end -%>
 
 <% if view_hints.paginate? -%>
-  <page-nav param="bottom-page-nav"/>
+        <page-nav param="bottom-page-nav"/>
 
 <% end -%>
 
 <% if new_form -%>
-  <div param="new-form">
-    <h3 param="new-form-heading">New <%= model_name :title %></h3>
-    <form with="&new_for_current_user <%= model %>" param/>
-  </div>
+        <div param="new-form">
+          <h3 param="new-form-heading">New <%= model_name :title %></h3>
+          <form with="&new_for_current_user <%= model %>" param/>
+        </div>
 
 <% end -%>
+      </section>
+    </content:>
+  </page>
 </def>
 
 
