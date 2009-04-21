@@ -203,8 +203,10 @@ Let's apply that change to the database
        end
      end
     >> up, down = migrate
-    >> up
-    => 'change_column :adverts, :title, :string, :default => "Untitled", :limit => 255'
+    >> up.split(',').slice(0,3).join(',')
+    => 'change_column :adverts, :title, :string'
+    >> up.split(',').slice(3,2).sort.join(',')
+    => ' :default => "Untitled", :limit => 255'
     >> down
     => "change_column :adverts, :title, :string"
     
