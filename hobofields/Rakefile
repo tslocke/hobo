@@ -3,13 +3,13 @@ require 'echoe'
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    system "rubydoctest test/*.rdoctest"
+    exit(1) if !system("rubydoctest test/*.rdoctest")
   end
 
   desc "Run the unit tests"
   task :unit do |t|
     Dir["test/test_*.rb"].each do |f|
-	system "ruby #{f}"
+      exit(1) if !system("ruby #{f}")
     end
   end
 end
