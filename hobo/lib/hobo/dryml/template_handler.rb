@@ -161,7 +161,11 @@ module ActionView
         return MissingTemplateWrapper.new(ex, original_template_path)
       end
     end
-    alias_method_chain :find_template, :dryml    
+
+    if instance_methods.include? "find_template"
+      # only rails 2.3 has this function
+      alias_method_chain :find_template, :dryml
+    end
   end
 end
         
