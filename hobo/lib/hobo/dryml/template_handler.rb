@@ -60,23 +60,37 @@ module ActionController
       text = call_dryml_tag(tag, attributes)
       text && render({:text => text, :layout => false }.merge(options))
     end
-
-
+    
     # DRYML fallback tags -- monkey patch this method to attempt to render a tag if there's no template
     def render_for_file_with_dryml(template, status = nil, layout = nil, locals = {})
+      # in rails 2.2, "template" is actually "template_path"
+      
       # if we're passed a MissingTemplateWrapper, see if there's a
       # dryml tag that will render the page
       if template.respond_to? :original_template_path
+        # this is the Rails 2.3 path
         tag_name = @dryml_fallback_tag || "#{File.basename(template.original_template_path).dasherize}-page"
-
+        
         text = call_dryml_tag(tag_name)
         if text
-          render_for_text text, status 
+          return render_for_text text, status 
         else
           template.raise_wrapped_exception
         end
       else
-        render_for_file_without_dryml(template, status, layout, locals)
+        begin
+          result = render_for_file_without_dryml(template, status, layout, locals)
+        rescue ActionView::MissingTemplate => ex
+          # this is the Rails 2.2 path
+          tag_name = @dryml_fallback_tag || "#{File.basename(template).dasherize}-page"
+          
+          text = call_dryml_tag(tag_name)
+          if text
+            return render_for_text text, status 
+          else
+            raise ex
+          end
+        end
       end
     end
     alias_method_chain :render_for_file, :dryml
@@ -131,6 +145,7 @@ class ActionView::Template
   
 end
 
+# this is only used in Rails 2.3
 class MissingTemplateWrapper
   attr_reader :original_template_path
   
@@ -151,6 +166,7 @@ end
     
 module ActionView
   class PathSet < Array
+    # this is only used by Rails 2.3
     def find_template_with_dryml(original_template_path, format = nil, html_fallback = true)
       begin
         Rails.logger.info "find_template_with_dryml: #{original_template_path} #{format} #{html_fallback}"
