@@ -91,7 +91,7 @@ module Hobo
 
       # Generate the HMAC keyed message digest. Uses SHA1 by default.
       def generate_digest(data, session)
-        secret = self.class.secret || ActionController::Base.session_options[:secret]
+        secret = self.class.secret || ActionController::Base.session_options[:secret] || ActionController::Base.cached_session_options.first[:secret]
         key = secret.respond_to?(:call) ? secret.call(session) : secret
         OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new(self.class.digest), key, data)
       end
