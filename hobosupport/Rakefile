@@ -3,8 +3,7 @@ require 'echoe'
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    system "rubydoctest test/*.rdoctest"
-    system "rubydoctest test/hobosupport/*.rdoctest"
+    exit(1) if !system("rubydoctest test/*.rdoctest test/hobosupport/*.rdoctest")
   end
 end
 

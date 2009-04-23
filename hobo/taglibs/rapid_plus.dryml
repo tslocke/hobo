@@ -142,11 +142,12 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
  - `options` - an array of options for the menu. 
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
   -->
-<def tag="filter-menu" attrs="param-name, options, no-filter">
+<def tag="filter-menu" attrs="param-name, options, no-filter, id">
   <% no_filter ||= "All" %>
-  <form action="&request.request_uri" method="get" class="filter-menu">
+  <form action="&request.request_uri" method="get" class="filter-menu" merge-attrs="id">
     <div>
-      <select-menu name="&param_name" options="&options" selected="&params[param_name.gsub('-', '_')]"
+      <% selected = options.detect {|o| o.to_s==params[param_name.gsub('-', '_')] } %>
+      <select-menu name="&param_name" options="&options" selected="&selected"
                    first-option="&no_filter" merge-params/>
     </div>
   </form>
