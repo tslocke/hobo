@@ -26,8 +26,8 @@ module HoboFields
   }
 
   ALIAS_TYPES = {
-    Fixnum => :integer,
-    Bignum => :integer
+    Fixnum => "integer",
+    Bignum => "integer"
   }
 
   # Provide a lookup for these rather than loading them all preemptively
