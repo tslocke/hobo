@@ -365,7 +365,7 @@ The menus default to the current time if the current value is nil.
 ### Attributes
 
  - order: The order of the year, month and date menus. A comma separated string or an array. Default: "year, month,
-   day, hour, minute, second"
+   day, hour, minute"
  
 Any other attributes are passed through to the `select_datetime` helper.
  
@@ -373,8 +373,13 @@ The menus default to the current time if the current value is nil.
 
   -->
 <def tag="input" for="datetime" attrs="order">
-  <% order = order.nil? ? [:year, :month, :day, :hour, :minute, :second] : comma_split(order).*.to_sym -%>
-  <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+  <% if ! order.nil?
+       order = comma_split(order).*.to_sym 
+       attributes.merge!(:order => order)
+       require 'ruby-debug'
+       debugger
+     end -%>
+  <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this)) %>
 </def>
 
 <!-- An `<input type='text'>` input. -->
