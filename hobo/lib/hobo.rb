@@ -86,10 +86,14 @@ module Hobo
     def get_field(object, field)
       return nil if object.nil?
       field_str = field.to_s
-      if field_str =~ /^\d+$/
-        object[field.to_i]
-      else
-        object.send(field)
+      begin
+        return object.send(field)
+      rescue NoMethodError => ex
+        if field_str =~ /^\d+$/
+          return object[field.to_i]
+        else
+          return object[field]
+        end
       end
     end
 
