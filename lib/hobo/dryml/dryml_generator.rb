@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'set'
 require 'fileutils'
 
@@ -23,11 +24,24 @@ module Hobo
         # Unfortunately the dispatcher callbacks don't give us the hook we need (after routes are reloaded) 
         # so we have to alias_method_chain
         ActionController::Dispatcher.class_eval do
-          def reload_application_with_dryml_generators
-            reload_application_without_dryml_generators
-            DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
+
+          if respond_to? :reload_application
+            #Rails 2.3
+            class << self
+              def reload_application_with_dryml_generators
+                reload_application_without_dryml_generators
+                DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
+              end
+              alias_method_chain :reload_application, :dryml_generators
+            end
+          else            
+            #Rails <= 2.2
+            def reload_application_with_dryml_generators
+              reload_application_without_dryml_generators
+              DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
+            end
+            alias_method_chain :reload_application, :dryml_generators
           end
-          alias_method_chain :reload_application, :dryml_generators
         end
       end
       
