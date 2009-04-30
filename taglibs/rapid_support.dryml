@@ -90,7 +90,7 @@ This tag is in need of a review - it's a bit funky.
   field_names -= comma_split(skip) if skip
   scope.new_scope :field_name => nil, :field_path => nil do
     field_names.map do |n|
-      scope.field_name = n == "this" ? this.member_class.name : n.to_s.gsub("." , "_") 
+      scope.field_name = n == "this" ? this.member_class.try.name : n.to_s.gsub("." , "_") 
       scope.field_path = n
       parameters.default
     end
