@@ -13,6 +13,7 @@ Options:
   --hobo-src <path to hobo src>
   -d | --database <database>         # e.g. mysql, sqlite
   -r | --rails <version>             # rails version to use
+  -n | --no-rails                    # don't run 'rails'.  Assumes app-path=='.'
 "
 
 
@@ -37,6 +38,9 @@ end
 
 user_model  = "user"
 create_db   = false
+run_rails   = true
+
+puts ARGV
 
 while true
   case arg_name = ARGV.shift
@@ -51,6 +55,8 @@ while true
     database_type = ARGV.shift
   when "-r", "--rails"
     rails_version = ARGV.shift
+  when "-n", "--no-rails"
+    run_rails = false
   when "--help"
     puts USAGE
     exit
@@ -60,17 +66,29 @@ while true
   end
 end
 
+if run_rails==false && app_path.nil?
+  app_path = '.'
+end
+
 if !ARGV.empty? || app_path.nil?
   puts USAGE
   exit 1
 end
 
-puts "\nGenerating Rails app...\n"
-opts = []
-opts << "_#{rails_version}_"  if rails_version
-opts << "-d #{database_type}" if database_type
-system("rails #{opts * ' '} #{app_path}")
-
+if run_rails
+  puts "\nGenerating Rails app...\n"
+  opts = []
+  if rails_version
+    opts << "_#{rails_version}_"
+#  else
+#    if `rails -v`.split[1].split(".").slice(0,2)!=['2', '3']
+#      puts "Rails 2.3 required!"
+#      exit 2
+#    end
+  end
+  opts << "-d #{database_type}" if database_type
+  system("rails #{opts * ' '} #{app_path}")
+end
 
 Dir.chdir(app_path) do
   gen = "ruby #{File.join('script', 'generate')}"

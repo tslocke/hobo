@@ -4,14 +4,32 @@
 
 This doctest describes the rich types bundles with HoboFields, and the process by which you can create and register your own types.
 
+Our test requires rails:
+
         >> require 'rubygems'
         >> require 'activesupport'
         >> require 'activerecord'
         >> require 'actionpack'
         >> require 'action_view'
         >> require 'action_controller'
+
+ActiveRecord 2.3.2 doesn't work very well without a connection, even
+though we don't need it for this test:
+
+        >> mysql_database = "hobofields_doctest"
+        >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+        >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
+        >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+                                                   :database => mysql_database,
+                                                   :host => "localhost")
+
+Some load path manipulation you shouldn't need:
+
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+
+Finally we can require hobofields: 
+
         >> require 'hobosupport'
         >> require 'hobofields'
 
@@ -201,6 +219,9 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
         >> Article.attr_type :status
         => Article::Status
 
+## Cleanup
+
+        >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
 
 
 

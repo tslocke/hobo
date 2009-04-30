@@ -6,11 +6,6 @@ $:.unshift "#{HOBO_HOME}/hobo/lib"
 require 'rubygems'
 require 'sqlite3'
 require 'activerecord'
-require 'hobosupport'
-require 'hobofields'
-require 'hobo'
-
-Hobo::Model.enable
 
 module Models
   
@@ -39,7 +34,7 @@ module Models
   end
   
   def init
-    create_database_sqlite3
+    Hobo::Model.enable
     make_models
     up, down = HoboFields::MigrationGenerator.run
     ActiveRecord::Migration.class_eval(up)
@@ -139,3 +134,13 @@ module Models
   end
   
 end
+
+# activerecord 2.3.2 is buggy.  It requires a connection before we can
+# load hobo.  see https://gist.github.com/90542/0417ee6e71f0bed287824d47163c0e34ff4dc321
+# otherwise, this line should be in Models.init
+Models.create_database_sqlite3
+require 'hobosupport'
+require 'hobofields'
+require 'hobo'
+
+

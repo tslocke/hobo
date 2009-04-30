@@ -60,24 +60,41 @@ module ActionController
       text = call_dryml_tag(tag, attributes)
       text && render({:text => text, :layout => false }.merge(options))
     end
-
-
+    
     # DRYML fallback tags -- monkey patch this method to attempt to render a tag if there's no template
-    def render_for_file_with_dryml(template_path, status = nil, layout = nil, locals = {})
-      render_for_file_without_dryml(template_path, status, layout, locals)
-    rescue ActionView::MissingTemplate => ex
-      # Try to use a DRYML <page> tag instead
-      tag_name = @dryml_fallback_tag || "#{File.basename(template_path).dasherize}-page"
-
-      text = call_dryml_tag(tag_name)
-      if text
-        render_for_text text, status 
+    def render_for_file_with_dryml(template, status = nil, layout = nil, locals = {})
+      # in rails 2.2, "template" is actually "template_path"
+      
+      # if we're passed a MissingTemplateWrapper, see if there's a
+      # dryml tag that will render the page
+      if template.respond_to? :original_template_path
+        # this is the Rails 2.3 path
+        tag_name = @dryml_fallback_tag || "#{File.basename(template.original_template_path).dasherize}-page"
+        
+        text = call_dryml_tag(tag_name)
+        if text
+          return render_for_text text, status 
+        else
+          template.raise_wrapped_exception
+        end
       else
-        raise ex
+        begin
+          result = render_for_file_without_dryml(template, status, layout, locals)
+        rescue ActionView::MissingTemplate => ex
+          # this is the Rails 2.2 path
+          tag_name = @dryml_fallback_tag || "#{File.basename(template).dasherize}-page"
+          
+          text = call_dryml_tag(tag_name)
+          if text
+            return render_for_text text, status 
+          else
+            raise ex
+          end
+        end
       end
     end
     alias_method_chain :render_for_file, :dryml
-
+      
   end
 end
 
@@ -96,22 +113,75 @@ class ActionView::Template
   # from trying to compile our template. DRYML templates are each compiled as a class, not just a method,
   # so the support for compiling templates that Rails provides is innadequate.
   def render_dryml(view, local_assigns = {})
-    stack = view.instance_variable_get(:@_render_stack)
-    stack.push(self)
+    if view.instance_variable_defined?(:@_render_stack)
+      # Rails 2.2
+      stack = view.instance_variable_get(:@_render_stack)
+      stack.push(self)
+ 
+      # This is only used for TestResponse to set rendered_template
+      unless is_a?(ActionView::InlineTemplate) || view.instance_variable_get(:@_first_render)
+        view.instance_variable_set(:@_first_render, self)
+      end
 
-    # This is only used for TestResponse to set rendered_template
-    unless is_a?(ActionView::InlineTemplate) || view.instance_variable_get(:@_first_render)
-      view.instance_variable_set(:@_first_render, self)
+      view.send(:_evaluate_assigns_and_ivars)
+      view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
+ 
+      result = Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
+ 
+      stack.pop
+      result
+    else
+      # Rails 2.3      
+      compile(local_assigns)
+
+      view.with_template self do
+        view.send(:_evaluate_assigns_and_ivars)
+        view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
+        
+        Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)      
+      end
     end
-
-    view.send(:_evaluate_assigns_and_ivars)
-    view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
-
-    result = Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
-
-    stack.pop
-    result
   end
   
-end  
+end
+
+# this is only used in Rails 2.3
+class MissingTemplateWrapper
+  attr_reader :original_template_path
+  
+  def initialize(exception, path)
+    @exception = exception
+    @original_template_path = path
+  end
+
+  def method_missing(*args)
+    raise @exception
+  end
+
+  def render
+    raise @exception
+  end
+end
+  
     
+module ActionView
+  class PathSet < Array
+    # this is only used by Rails 2.3
+    def find_template_with_dryml(original_template_path, format = nil, html_fallback = true)
+      begin
+        Rails.logger.info "find_template_with_dryml: #{original_template_path} #{format} #{html_fallback}"
+        find_template_without_dryml(original_template_path, format, html_fallback)
+      rescue ActionView::MissingTemplate => ex
+        # instead of throwing the exception right away, hand back a
+        # time bomb instead.  It'll blow if mishandled...
+        return MissingTemplateWrapper.new(ex, original_template_path)
+      end
+    end
+
+    if instance_methods.include? "find_template"
+      # only rails 2.3 has this function
+      alias_method_chain :find_template, :dryml
+    end
+  end
+end
+        

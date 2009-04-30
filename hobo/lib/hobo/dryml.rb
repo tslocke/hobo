@@ -79,8 +79,14 @@ module Hobo
         @tag_page_renderer_classes[controller_class.name] ||=
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
-      else
-        filename ||= view._pick_template(page + ".dryml").filename
+      else        
+        filename ||= if view.view_paths.respond_to? :find_template
+                       # Rails 2.3
+                       view.view_paths.find_template(page + ".dryml").filename
+                     else
+                       # Rails 2.2
+                       view._pick_template(page + ".dryml").filename
+                     end
         mtime = File.mtime(filename)
         renderer_class = @renderer_classes[page]
 

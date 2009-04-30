@@ -728,6 +728,7 @@ AutocompleteBehavior = Behavior.create({
 
 
 
+Event.addBehavior.reassignAfterAjax = true;
 Event.addBehavior({
     
     'div.section-group' : function() {

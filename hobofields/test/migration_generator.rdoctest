@@ -10,13 +10,6 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
     >> require 'activesupport'
     >> require 'activerecord'
 
-And we'll require:
-
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-    >> require 'hobosupport'
-    >> require 'hobofields'
-
 We also need to get ActiveRecord set up with a database connection
 
     >> mysql_database = "hobofields_doctest"
@@ -25,6 +18,16 @@ We also need to get ActiveRecord set up with a database connection
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
                                                :host => "localhost")
+
+Some load path manipulation you shouldn't need:
+
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+
+And we'll require:
+
+    >> require 'hobosupport'
+    >> require 'hobofields'
 
 OK we're ready to get going.
 
