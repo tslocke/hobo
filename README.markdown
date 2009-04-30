@@ -17,7 +17,7 @@ Link jQuery, jQuery-UI, and hobo-jQuery assets into your public directory:
     rake hobo_jquery:link_jquery
     rake hobo_jquery:link_assets
 
-If you're on Windows, you can use the update\_jquery and update\_assets tasks instead.
+If you're on Windows, you can use the install\_jquery and update\_assets tasks instead.
 
 To use, you need to include hobo-jquery and add the assets to your page.  In your application.dryml:
 
