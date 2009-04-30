@@ -87,7 +87,7 @@ module Hobo
       return nil if object.nil?
       field_str = field.to_s
       begin
-        return object.send(field)
+        return object.send(field_str)
       rescue NoMethodError => ex
         if field_str =~ /^\d+$/
           return object[field.to_i]
