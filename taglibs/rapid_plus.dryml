@@ -9,7 +9,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
 -->
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
-  <% sort_columns['this'] ||= this.member_class.name_attribute %>
+  <% sort_columns['this'] ||= this.member_class.try.name_attribute %>
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
