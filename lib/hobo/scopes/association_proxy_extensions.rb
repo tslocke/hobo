@@ -30,16 +30,15 @@ module Hobo
 
     HasManyThroughAssociationExtensions = classy_module do
 
-      def conditions_with_hobo_scopes
+      def build_conditions_with_hobo_scopes
         scope_conditions         = self.scope_conditions(@reflection)
         through_scope_conditions = self.scope_conditions(@reflection.through_reflection)
-        unscoped_conditions = conditions_without_hobo_scopes
+        unscoped_conditions = build_conditions_without_hobo_scopes
         combine_conditions(scope_conditions, through_scope_conditions, unscoped_conditions)
       end
-      alias_method_chain :conditions, :hobo_scopes
-      alias_method :sql_conditions, :conditions
-      public :conditions, :sql_conditions
-
+      alias_method_chain :build_conditions, :hobo_scopes
+      public :conditions
+      
     end
     
     AssociationCollectionExtensions = classy_module do
