@@ -98,7 +98,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">
           <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-            <th param="#{scope.field_name}-heading"><%= this.member_class.view_hints.field_name(scope.field_name) %></th>
+            <th param="#{scope.field_name}-heading"><%= this.member_class.try.view_hints.try.field_name(scope.field_name) if scope %></th>
           </with-field-names>
           <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
