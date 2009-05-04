@@ -56,6 +56,10 @@ a:hover {
 }
 h1 a, h2 a, h3 a {border: none; background: none;}
 
+pre, code {
+    font-family:  "Courier New", Courier, monospace;
+}
+
 input.text, input.string, input.email-address, input.password, input.search, input.integer, input.float, textarea {
 	border-top:1px solid #7c7c7c;
 	border-left:1px solid #c3c3c3;
