@@ -3,7 +3,7 @@
 <!-- Some of the user pages use a simplified layout that does not feature things like the main nav and live-search. This tag defines that page -->
 <def tag="simple-page">
   <page without-live-search without-main-nav merge>
-    <account-nav: replace><dev-user-changer/></account-nav:>
+    <account-nav: replace />
   </page>
 </def>    
 

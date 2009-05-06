@@ -81,7 +81,7 @@ input.file_upload {
 	margin-top: 10px;
 }
 .button:hover {cursor: pointer;}
-form .actions {height: 100%; overflow: hidden; font-size: 11px;}
+form .actions {_zoom: 1; overflow: hidden; font-size: 11px;}
 form .actions input { margin: 0; }
 
 .flash {
@@ -125,10 +125,9 @@ form .actions input { margin: 0; }
 .content-body {padding: 15px 0;}
 .content-footer {padding-bottom: 20px;}
 
-/* z-index a workaround for internet explorer bug.  Hobo Lighthouse Bug #376 */
-.page-header {position: relative; margin-top: 25px; padding: 20px 0 0; z-index: 1;}
+.page-header {margin-top: 25px; padding: 0 0 0;}
 .page-header h1 {
-	margin: 0; padding: 0 30px 30px; 
+	margin: 0; padding: 20px 30px 30px; 
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
 }
 .page-header ul {zoom: 1; overflow: hidden;}
@@ -170,7 +169,7 @@ form .actions input { margin: 0; }
 
 .account-nav {
     float:right;
-    margin: -42px 5px 0 0;
+    margin: -22px 5px 0 0;
 	font-size: 11px;
 }
 .account-nav li {
@@ -202,7 +201,7 @@ form .actions input { margin: 0; }
 .login-page .content-header { position: relative; }
 .login-page .forgot-password {font-size: 11px; margin-left: 160px;}
 
-.edit-page .content-header {overflow: hidden; height: 100%;}
+.edit-page .content-header {overflow: hidden; _zoom: 1;}
 .edit-page .content-header h1 {float: left;}
 .edit-page .content-header .delete-button {float: right; margin-top: 25px;}
 form .actions {margin: 30px 0; width: 100%; text-align: center;}
@@ -227,7 +226,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 /* styling of generic elements */
 .creator {font-weight: bold;}
 .card {
-	overflow: hidden;
+	overflow: hidden; _zoom: 1;
 	margin: 10px 0;	padding: 12px; border: 1px solid #e8e8e8;
 	background: #f5f5f5;
 	position: relative;
@@ -263,7 +262,7 @@ ul.collection > li { margin-left: 0; list-style: none;}
 	padding: 15px 0; margin-bottom: 20px; border-bottom: 1px dotted #888;
 }
 
-.table-plus .header {height: 100%; overflow: hidden;}
+.table-plus .header {_zoom: 1; overflow: hidden;}
 .table-plus .header a {float: left; margin-right: 20px;}
 .table-plus div.search {float: right;}
 .table-plus div.search span {color: #444;}
@@ -290,7 +289,7 @@ ul.collection > li { margin-left: 0; list-style: none;}
 div.select-many {border-top: 1px dotted #999;}
 div.select-many .items {margin-bottom: 10px;}
 div.select-many .item {
-	overflow:hidden; height: 100%; font-weight: bold;
+	overflow:hidden; _zoom: 1; font-weight: bold;
 	border-bottom: 1px dotted #999; padding: 5px 10px; /*margin: 5px 25px 5px 0;*/
 }
 div.select-many .item span { float: left; }

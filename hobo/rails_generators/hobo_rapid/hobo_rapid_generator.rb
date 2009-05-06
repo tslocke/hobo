@@ -13,6 +13,7 @@ class HoboRapidGenerator < Hobo::Generator
       m.file "hobo-rapid.js",      "public/javascripts/hobo-rapid.js"
       m.file "lowpro.js",          "public/javascripts/lowpro.js"
       m.file "IE7.js",             "public/javascripts/IE7.js"
+      m.file "ie7-recalc.js",      "public/javascripts/ie7-recalc.js"
       m.file "blank.gif",          "public/javascripts/blank.gif"
       m.file "reset.css",          "public/stylesheets/reset.css"
       m.file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
