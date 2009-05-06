@@ -92,7 +92,9 @@ module Hobo
           flash[:notice] << " You must activate your account before you can log in. Please check your email." unless this.account_active?
         end
         response_block(&b) or if valid?
-                                self.current_user = this if this.account_active?
+                                if this.account_active?
+                                  self.current_user = this if this.account_active?
+                                end
                                 redirect_back_or_default(home_page)
                               end
       end
