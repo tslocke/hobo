@@ -169,7 +169,6 @@ module ActionView
     # this is only used by Rails 2.3
     def find_template_with_dryml(original_template_path, format = nil, html_fallback = true)
       begin
-        Rails.logger.info "find_template_with_dryml: #{original_template_path} #{format} #{html_fallback}"
         find_template_without_dryml(original_template_path, format, html_fallback)
       rescue ActionView::MissingTemplate => ex
         # instead of throwing the exception right away, hand back a
