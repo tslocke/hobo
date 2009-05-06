@@ -64,9 +64,9 @@ This is a simple tag - just look at the source if you need to know more detail.
 
   -->
 <def tag="account-nav">
-  <dev-user-changer/>
   <do with="&current_user">
     <ul class="navigation account-nav" param>
+      <li if="&RAILS_ENV == 'development'"><dev-user-changer/></li>
       <if test="&logged_in?">
         <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
         <li class='nav-item' param="account"><a action="account">Account</a></li>
