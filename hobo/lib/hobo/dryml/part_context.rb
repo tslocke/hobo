@@ -77,8 +77,10 @@ module Hobo
         
         part_name, this_id, locals, form_field_path = context
 
-        RAILS_DEFAULT_LOGGER.info "Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}"
-        RAILS_DEFAULT_LOGGER.info "         : form_field_path = #{form_field_path.inspect}" if form_field_path
+        if RAILS_DEFAULT_LOGGER
+          RAILS_DEFAULT_LOGGER.info "Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}"
+          RAILS_DEFAULT_LOGGER.info "         : form_field_path = #{form_field_path.inspect}" if form_field_path
+        end
         
         self.part_name             = part_name
         self.this_id               = this_id

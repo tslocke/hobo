@@ -7,9 +7,12 @@ module Hobo
       def create_automatic_scope(name)
         ScopeBuilder.new(self, name).create_scope
       rescue ActiveRecord::StatementInvalid => e
-        # Problem with the database? Don't try to create automatic scopes
-        ActiveRecord::Base.logger.warn "!! Database exception during hobo auto-scope creation -- continuing automatic scopes"
-        ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        # Problem with the database? Don't try to create automatic
+        # scopes
+        if ActiveRecord::Base.logger
+          ActiveRecord::Base.logger.warn "!! Database exception during hobo auto-scope creation -- continuing automatic scopes"
+          ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        end
         false
       end
 

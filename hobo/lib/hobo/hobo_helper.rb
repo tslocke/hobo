@@ -490,6 +490,7 @@ module Hobo
     end
 
     def log_debug(*args)
+      return if not logger
       logger.debug("\n### DRYML Debug ###")
       logger.debug(args.*.pretty_inspect.join("-------\n"))
       logger.debug("DRYML THIS = #{this.typed_id rescue this.inspect}")
