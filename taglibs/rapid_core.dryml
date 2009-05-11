@@ -411,7 +411,7 @@ Assuming the context is a blog post...
             the_view = if_blank if if_blank && the_view.blank?
 
             truncate = 30 if truncate == true
-            the_view = self.truncate(the_view, truncate.to_i) if truncate
+            the_view = self.truncate(the_view, :length => truncate.to_i) if truncate
             the_view = the_view.strip
             
             if no_wrapper
