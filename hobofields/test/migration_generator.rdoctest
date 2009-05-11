@@ -443,7 +443,24 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
      add_column :ads, :created_at, :datetime"
     >>
-    
+
+## Legacy Keys
+
+HoboFields has some support for legacy keys.
+
+    >> Advert.field_specs.clear
+    >>
+     class Advert
+       fields do
+         name :string, :default => "No Name"
+         body :text
+       end
+       set_primary_key "advert_id"
+     end
+    >> up, down = HoboFields::MigrationGenerator.run(:adverts => {:id => :advert_id})
+    >> up
+    =>
+     "rename_column :adverts, :id, :advert_id
 
 ## Cleanup
 
