@@ -528,7 +528,7 @@ The label can be customised using the `label` attribute, e.g.
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= Hobo.current_theme -%>
   <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
-        media="all" rel="Stylesheet" type="text/css" />
+        media="all" rel="Stylesheet" type="text/css" merge/>
 </def>
 
 <!-- Convenience tag to help with the common situation where you need to address the current user as "you", and refer to other users by name
