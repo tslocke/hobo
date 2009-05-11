@@ -445,10 +445,10 @@ Forms). If any ajax attributes are given, the button becomes an ajax button, if 
  - label: the label on the button
  
  -->
-<def tag="remote-method-button" attrs="method, update, label, confirm"><%= 
+<def tag="remote-method-button" attrs="method, update, label, confirm, url"><%= 
   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-  url = object_url(this, method.to_s.gsub('-', '_'), :method => :post)
+  url ||= object_url(this, method.to_s.gsub('-', '_'), :method => :post)
   raise ArgumentError, "no such web method '#{method}' on #{this.typed_id}" unless url
   
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
