@@ -199,7 +199,7 @@ module Hobo
           end
 
          # active (a lifecycle state)
-        elsif @klass.has_lifecycle? && name.in?(@klass::Lifecycle.state_names)
+        elsif @klass.has_lifecycle? && name.to_sym.in?(@klass::Lifecycle.state_names)
 
           if @klass::Lifecycle.state_names.length == 1
             # nothing to check for - create a dummy scope
