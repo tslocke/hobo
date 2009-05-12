@@ -1,17 +1,8 @@
--*- indent-tabs-mode:nil; -*-
-
-# Hobo Scopes
+Hobo Scopes
+{: .document-title}
 
 Hobo scopes are an extension of the *named scope* and *dynamic finder*
-functionality introduced in Rails 2.1, 2.2 and 2.3.  The advantages of
-Hobo Scopes are:
-
- - no definition required.  Hobo scopes do not have to be declared.
-   They are defined on your model the first time they are used.
-
- - wider breadth.  There are a large number and variety of hobo scopes
-   that may be used without dropping into SQL or providing custom
-   condition hashes.
+functionality introduced in Rails 2.1, 2.2 and 2.3.
 
 Most of these scopes work by calling `named_scope` the first time they
 are invoked.  They should work at the same speed as a named scope on
@@ -21,24 +12,32 @@ However, this does substantially slow down `method_missing` on your
 model's class.  If `ActiveRecord::Base.method_missing` is used often,
 you may wish to disable this module.  (FIXME: how to do that)
 
-## Rubydoctest
+Contents
+{: .contents-heading}
+
+- contents
+{:toc}
 
 This document was created using the tool
 [rubydoctest](http://github.com/tablatom/rubydoctest).  This means
 that this file serves as both documentation and test.  As a side
 effect, it also ensures that errors do not creep into the sample code
 in this documentation.
+{.hidden}
 
 The idea behind rubydoctest is that you should be able to recreate
 everything in this document from an irb console.  It is recommended
-that you skip down to the [fixture definition](fixture_definition).
+that you skip down to the [fixture definitions](#fixture_definition).
 Nobody but the computer needs to read the rest of this section.
+{.hidden}
 
 To test Hobo scopes, we're going to need a connection to the database
 and some sample data.  This takes a few lines of code to set up when
 starting from a blank irb session.
+{.hidden}
 
 First off we need to configure ActiveSupport for auto-loading
+{.hidden}
 
     >> require 'rubygems'
     >> require 'activesupport'
@@ -46,8 +45,10 @@ First off we need to configure ActiveSupport for auto-loading
     >> require 'actionpack'
     >> require 'action_view'
     >> require 'action_controller'
+{.hidden}
 
 We also need to get ActiveRecord set up with a database connection
+{.hidden}
 
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
@@ -55,21 +56,26 @@ We also need to get ActiveRecord set up with a database connection
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
                                                :host => "localhost")
+{.hidden}
 
 Some load path manipulation:
+{.hidden}
 
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
+{.hidden}
 
 And we'll require hobo:
+{.hidden}
 
     >> require 'hobosupport'
     >> require 'hobofields'
     >> require 'hobo'
     >> Hobo::Model.enable
+{.hidden}
 
-OK, let's set up a few models:
+Let's set up a few models for our testing:
  
     >>
      class Person < ActiveRecord::Base
@@ -99,39 +105,37 @@ OK, let's set up a few models:
      end
 
 Generate a migration and run it:
+{.hidden}
 
-   >> ActiveRecord::Migration.class_eval(HoboFields::MigrationGenerator.run[0])
-   >> Person.columns.*.name
-   => ["id", "name", "born_at", "code", "male", "created_at", "updated_at", "state"]
+    >> ActiveRecord::Migration.class_eval(HoboFields::MigrationGenerator.run[0])
+    >> Person.columns.*.name
+    => ["id", "name", "born_at", "code", "male", "created_at", "updated_at", "state"]
+{.hidden}
 
-<a name="fixture_definition"></a>
+And create a couple of fixtures:
 
-Let's create a couple of fixtures:
+    >> 
+     Bryan = Person.new(:name => "Bryan", :code => 17, 
+        :born_at => Date.new(1973,4,8), :male => true)
+    >> Bryan.state = "active"
+    >> Bryan.save!
+    >> 
+     Bethany = Person.new(:name => "Bethany", :code => 42, 
+        :born_at => Date.new(1975,5,13), :male => false)
+    >> Bethany.state = "inactive"
+    >> Bethany.save!
+    >> Friendship.new(:person => Bryan, :friend => Bethany).save!
 
-   >> 
-    Bryan = Person.new(:name => "Bryan", :code => 17, 
-       :born_at => Date.new(1973,4,8), :male => true)
-   >> Bryan.state = "active"
-   >> Bryan.save!
-   >> 
-    Bethany = Person.new(:name => "Bethany", :code => 42, 
-       :born_at => Date.new(1975,5,13), :male => false)
-   >> Bethany.state = "inactive"
-   >> Bethany.save!
-   >> Friendship.new(:person => Bryan, :friend => Bethany).save!
+Hack the `created_at` column to get predictable sorting.
 
-Hack the `created_at` column:
+    >> Bethany.created_at = Date.new(2000)
+    >> Bethany.save!
 
-   >> Bethany.created_at = Date.new(2000)
-   >> Bethany.save!
+We're ready to get going.
 
-OK we're ready to get going.
+# Simple Scopes
 
-<a name="simple_scopes"></a>
-
-## Simple Scopes
-
-### \_is
+## \_is
 
 Most Hobo scopes work by appending an appropriate query string to the
 field name.  In this case, the hobo scope function name is the name of
@@ -148,44 +152,46 @@ It works the same as a dynamic finder:
     >> Person.code_is(99).length
     => 0
 
-### \_is\_not
+## \_is\_not
 
 But the Hobo scope form allows us to supply several variations
 
     >> Person.name_is_not("Bryan").*.name
     => ["Bethany"]
 
-### \_contains
+## \_contains
 
     >> Person.name_contains("y").*.name
     => ["Bryan", "Bethany"]
 
-### \_does\_not\_contain
+## \_does\_not\_contain
 
     >> Person.name_does_not_contain("B").*.name
     => []
 
-### \_starts
+## \_starts
 
     >> Person.name_starts("B").*.name
     => ["Bryan", "Bethany"]
 
-### \_does_not_start
+## \_does\_not\_start
 
     >> Person.name_does_not_start("B").length
     => 0
 
-### \_ends
+## \_ends
 
     >> Person.name_ends("y").*.name
     => ["Bethany"]
 
-### \_does\_not\_end
+## \_does\_not\_end
 
     >> Person.name_does_not_end("y").*.name
     => ["Bryan"]
 
-## Boolean scopes
+# Boolean scopes
+
+## \_
 
 If you use the name of the column by itself, the column is of type
 boolean, and no function is already defined on the model class with
@@ -195,7 +201,7 @@ the boolean column set to `true`
     >> Person.male.*.name
     => ["Bryan"]
 
-### not\_
+## not\_
 
 You can also search for boolean records that are not `true`.  This
 includes all records that are set to `false` or `NULL`.
@@ -203,27 +209,27 @@ includes all records that are set to `false` or `NULL`.
     >> Person.not_male.*.name
     => ["Bethany"]
 
-## Date scopes
+# Date scopes
 
 Date scopes work only with columns that have a name ending in "_at".
 The "_at" is omitted when using these finders.
 
-### \_before
+## \_before
 
     >> Person.born_before(Date.new(1974)).*.name
     => ["Bryan"]
 
-### \_after
+## \_after
 
     >> Person.born_after(Date.new(1974)).*.name
     => ["Bethany"]
 
-### \_between
+## \_between
 
     >> Person.born_between(Date.new(1974), Date.today).*.name
     => ["Bethany"]
 
-## Lifecycle scopes
+# Lifecycle scopes
 
 If you have a [lifecycle](/manual/lifecycles) defined, each state name
 can be used as a dynamic finder.
@@ -231,7 +237,7 @@ can be used as a dynamic finder.
     >> Person.active.*.name
     => ["Bryan"]
 
-## Key scopes
+# Key scopes
 
 This isn't very useful:
 
@@ -243,35 +249,35 @@ But this is:
     >> Person.is_not(Bryan).*.name
     => ["Bethany"]
 
-## Static scopes
+# Static scopes
 
 These scopes do not contain the column name.
 
-### by_most_recent
+## by\_most\_recent
 
 Sorting on the `created_at` column:
 
     >> Person.by_most_recent.*.name
     => ["Bryan", "Bethany"]
 
-### recent
+## recent
 
 Gives the N most recent items:
 
     >> Person.recent(1).*.name
     => ["Bryan"]
 
-### limit
+## limit
 
     >> Person.limit(1).*.name
     => ["Bryan"]
 
-### order_by
+## order\_by
 
     >> Person.order_by(:code).*.name
     => ["Bryan", "Bethany"]
 
-### include
+## include
 
 Adding the include function to your query chain has the same effect as
 the `:include` option to the `find` method.  
@@ -279,16 +285,16 @@ the `:include` option to the `find` method.
     >> Person.include(:friends).*.name
     => ["Bryan", "Bethany"]
 
-### search
+## search
 
 Search for text in the specified column(s).
 
     >> Person.search("B", :name).*.name
     => ["Bryan", "Bethany"]
 
-## Association Scopes
+# Association Scopes
 
-### with\_
+## with\_
 
 Find the records that contain the specified record in an association
 
@@ -302,7 +308,7 @@ You can also specify multiple records with the plural form
     >> Person.with_friends(Bethany, nil).*.name
     => ["Bryan"]
 
-### without\_
+## without\_
 
     >> Person.without_friend(Bethany).*.name
     => ["Bethany"]
@@ -310,19 +316,19 @@ You can also specify multiple records with the plural form
     => ["Bethany"]
 
 
-### \_is
+## \_is
 
 You can use \_is on a `:has_one` or a `:belongs_to` relationship:
 
     >> Friendship.person_is(Bryan).*.friend.*.name
     => ["Bethany"]
 
-### \_is\_not
+## \_is\_not
 
     >> Friendship.person_is_not(Bryan)
     => []
 
-## Scoping Associations
+# Scoping Associations
 
 When defining an association, you can add a scope:
 
@@ -337,13 +343,15 @@ When defining an association, you can add a scope:
     >> Bryan.active_friends.*.name
     => []
 
-## Chaining
+# Chaining
 
 Like named scopes, Hobo scopes can be chained:
 
     >> Bryan.inactive_friends.inactive.*.name
     => ["Bethany"]
 
-## Cleanup
+Clean up our test database:
+{.hidden}
 
     >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+{.hidden}
