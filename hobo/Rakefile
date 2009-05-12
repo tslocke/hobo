@@ -15,6 +15,13 @@ Rake::TestTask.new(:test) { |t|
   t.verbose = true
 }
 
+namespace "test" do
+  desc "Run the doctests"
+  task :doctest do |t|
+    # note, tests in doctest/hobo/ are out of date
+    exit(1) if !system("rubydoctest doctest/*.rdoctest")
+  end
+end
 
 # --- RDoc --- #
 
