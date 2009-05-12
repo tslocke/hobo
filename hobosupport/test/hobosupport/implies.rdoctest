@@ -1,6 +1,7 @@
 # HoboSupport - implies
 
     doctest_require: '../../lib/hobosupport'
+{.hidden}
 
 The implies operator comes from Eiffel. Often comes in handy in Hobo's model-permission methods.
 

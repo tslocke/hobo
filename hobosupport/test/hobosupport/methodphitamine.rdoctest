@@ -1,6 +1,7 @@
 # HoboSupport - Methodphitamine
 
     doctest_require: '../../lib/hobosupport'
+{.hidden}
 
 ## `Kernel#it` and `Kernel#its`
 

@@ -1,5 +1,3 @@
--*- indent-tabs-mode:nil; -*-
-
 # HoboFields
 
 ## Introduction
@@ -56,7 +54,7 @@ Note that the migration generator is interactive -- it can't tell the difference
 
 ## Installing
 
-The simplest and recommended way to install HoboFeilds is as a gem:
+The simplest and recommended way to install HoboFields is as a gem:
 
         $ gem install hobofields
 
@@ -74,23 +72,25 @@ In addition to the migration generator, HoboFields provides a Rich-Type mechanis
 
 Read more:
 
- - [HoboFields Rich Types](/hobofields/rich_types)
+ - [HoboFields Rich Types](/manual/hobofields/rich_types)
 
 ## API
 
 HoboFields provides various API methods. Read more:
 
- - [HoboFields API](/hobofields/hobofields_api)
+ - [HoboFields API](/manual/hobofields/hobofields_api)
 
 ## Migration Generator Details
 
 The migration generator doctests provide a lot more detail. They're not really that great as documentation because doctests run in a single irb session, and that doesn't fit well with the concept of a generator. Skip these unless you're really keen to see the details of the migration generator in action
 
- - [Migration Generator Details](/hobofields/migration_generator)
+ - [Migration Generator Details](/manual/hobofields/migration_generator)
 
 ## About Doctests
 
 HoboFields is documented and tested using *doctests*. This is an idea that comes from Python that we've been experimenting with for Hobo. Whenever you see code-blocks that start "`>>`", read them as IRB sessions. The `rdoctest` tool extracts these and runs them to verify they behave as advertised.
 
 Doctests are a great way to get both documentation and tests from the same source. We're still experimenting with exactly how this all works though, so if the docs seem strange in places, please bear with us!
+
+You may download rubydoctest via [github](http://www.github.com/tablatom/rubydoctest)
 

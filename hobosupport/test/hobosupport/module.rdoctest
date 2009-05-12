@@ -1,6 +1,7 @@
 # HoboSupport - Module extensions
 
     doctest_require: '../../lib/hobosupport'
+{.hidden}
 
 ## `Module#included_in_class_callbacks`
 

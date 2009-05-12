@@ -1,16 +1,18 @@
--*- indent-tabs-mode:nil; -*-
-
 # HoboFields - Migration Generator
 
 Note that these doctests are good tests but not such good docs. The migration generator doesn't really fit well with the doctest concept of a single IRB session. As you'll see, there's a lot of jumping-through-hoops and doing stuff that no normal user of the migration generator would ever do.
+{.hidden}
 
 Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
+{.hidden}
 
     >> require 'rubygems'
     >> require 'activesupport'
     >> require 'activerecord'
+{.hidden}
 
 We also need to get ActiveRecord set up with a database connection
+{.hidden}
 
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
@@ -18,19 +20,20 @@ We also need to get ActiveRecord set up with a database connection
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
                                                :host => "localhost")
+{.hidden}
 
 Some load path manipulation you shouldn't need:
+{.hidden}
 
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+{.hidden}
 
 And we'll require:
+{.hidden}
 
     >> require 'hobosupport'
     >> require 'hobofields'
-
-OK we're ready to get going.
-
 
 ## The migration generator -- introduction
 
@@ -462,6 +465,8 @@ HoboFields has some support for legacy keys.
     =>
      "rename_column :adverts, :id, :advert_id
 
-## Cleanup
+Cleanup
+{.hidden}
 
     >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+{.hidden}
