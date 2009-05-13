@@ -19,7 +19,6 @@ module HoboFields
     :datetime      => (defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : Time),
     :time          => Time,
     :integer       => Integer,
-    :big_integer   => BigDecimal,
     :decimal       => BigDecimal,
     :float         => Float,
     :string        => String
