@@ -58,9 +58,6 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
 <!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='text'>` -->
 <def tag="editor" for="float"><%= in_place_editor attributes %></def>
 
-<!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='text'>` -->
-<def tag="editor" for="big_integer"><%= in_place_editor attributes %></def>
-
 <!-- Raises an error - passwords cannot be edited in place -->
 <def tag="editor" for="password"><% raise HoboError, "passwords cannot be edited in place" %></def>
 

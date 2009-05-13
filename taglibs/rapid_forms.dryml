@@ -397,11 +397,6 @@ The menus default to the current time if the current value is nil.
   <%= text_field_tag(name, this, attributes) %>
 </def>
 
-<!-- An `<input type='text'>` input. -->
-<def tag="input" for="big_integer" attrs="name">
-  <%= text_field_tag(name, this, attributes) %>
-</def>
-
 <!-- A `<select>` menu containing the values of an 'enum string'.
   
 ### Attributes
