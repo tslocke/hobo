@@ -143,7 +143,7 @@ module Hobo
 
     def type_id(type=nil)
       type ||= (this.is_a?(Class) && this) || this_type || this.class
-      HoboFields.to_name(type).to_s || type.name.underscore.gsub("/", "__")
+      HoboFields.to_name(type) || type.name.underscore.gsub("/", "__")
     end
 
 
