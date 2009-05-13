@@ -1,3 +1,44 @@
+=== Hobo 0.8.6 ===
+
+Hobo 0.8.6 includes Rails 2.3 support.  Rails 2.2 support has been
+maintained.   Rails 2.1 support was dropped in 0.8.5.
+
+Significant effort was put into unit and integration tests in this
+release.  Unit tests may be run via `rake test_all`.  Integration
+tests live in agility: http://github.com/tablatom/agility/tree/master.
+
+Some small changes were made to item orders to fix bugs with IE6.
+This may require updates in custom stylesheets.
+
+Previously, the lifecycle transitions had a parameter called :params
+in the documentation and :update in the code.  The code has been
+updated to match the documentation.
+
+Support for `big_integer` in HoboFields has been dropped.  It appears
+that this has never worked correctly.
+
+input-many is now a polymorphic tag and the default tag for has_many
+inputs.
+
+The 'content' parameter has been renamed to 'description' for
+generated cards.
+
+input-many and sortable-collection have been improved.
+
+Many tags have had parameters and attributes added to improve
+customization.
+
+Many bugs have been fixed.  See the [lighthouse](
+http://hobo.lighthouseapp.com) or the [git commit
+history](http://github.com/tablatom/hobo/commits/master/) for more
+details.
+
+0.8.6 is a release candidate for Hobo 1.0.  At this point we do not
+believe that there are any outstanding bugs on Hobo that do not have
+workarounds.   The
+[lighthouse](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/bins/8323)
+shows the remaining tickets scheduled for 1.0
+
 === Hobo 0.8.5 ===
 
 New permission system
