@@ -1,3 +1,7 @@
+=== Hobo 0.8.7 ===
+
+I forgot to refresh the Manifest, so this is a brown paper bag release.
+
 === Hobo 0.8.6 ===
 
 Hobo 0.8.6 includes Rails 2.3 support.  Rails 2.2 support has been
