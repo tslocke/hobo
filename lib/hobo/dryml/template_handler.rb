@@ -73,7 +73,7 @@ module ActionController
         
         text = call_dryml_tag(tag_name)
         if text
-          return render_for_text text, status 
+          return render_for_text(text, status)
         else
           template.raise_wrapped_exception
         end
@@ -86,7 +86,7 @@ module ActionController
           
           text = call_dryml_tag(tag_name)
           if text
-            return render_for_text text, status 
+            return render_for_text(text, status)
           else
             raise ex
           end
