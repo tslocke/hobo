@@ -253,7 +253,9 @@ module Hobo
             def_scope do |*args|
               field, asc = args
               type = klass.attr_type(field)
-              if type.respond_to?(:table_name) && (name = type.name_attribute)
+              if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
+                colspec = "#{field}" # don't prepend the table name 
+              elsif type.respond_to?(:table_name) && (name = type.name_attribute)
                 include = field
                 colspec = "#{type.table_name}.#{name}"
               else
