@@ -76,7 +76,7 @@ This tag assumes the controller has a `reorder` action. This action is added aut
 %>
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>
-      <div class="ordering-handle" param="handle">&uarr;<br/>&darr;</div>
+      <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
       <do param="default"><card param/></do>
     </item:>
   </collection>
