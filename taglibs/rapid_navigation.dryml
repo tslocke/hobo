@@ -41,8 +41,8 @@ Then in your pages you can call the tag like this
   <% body = parameters.default 
      body = h(this.to_s) if body.blank? -%>
   <li class="#{'current' if (c = scope.current_navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
-      merge-attrs="&attributes - attrs_for(:a)">
-    <a merge-attrs="&attributes & attrs_for(:a)"><%= body %></a>
+      merge-attrs="&attributes - (attrs_for(:a)+['target'])">
+    <a merge-attrs="&attributes & (attrs_for(:a)+['target'])"><%= body %></a>
   </li>
 </def>
 
