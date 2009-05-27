@@ -109,6 +109,7 @@ The full set of available symbolic names is
 
  * `:integer`
  * `:float`
+ * `:decimal`
  * `:string`
  * `:text`
  * `:boolean`

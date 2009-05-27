@@ -52,8 +52,11 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
 <!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='text'>` -->
 <def tag="editor" for="date"><%= in_place_editor attributes %></def>
 
-<!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='text'>` -->
+<!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='integer'>` -->
 <def tag="editor" for="integer"><%= in_place_editor attributes %></def>
+
+<!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='BigDecimal'>` -->
+<def tag="editor" for="BigDecimal"><%= in_place_editor attributes %></def>
 
 <!-- Provides a simple Scriptaculous in-place-editor that uses an `<input type='text'>` -->
 <def tag="editor" for="float"><%= in_place_editor attributes %></def>
