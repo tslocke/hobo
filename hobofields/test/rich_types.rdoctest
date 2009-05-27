@@ -56,9 +56,9 @@ This class defines the methods `to_html` to customize the way the type is render
         # Loud text always renderd in caps.
         # It's rude to shout too much so it's not allowed to be
         # longer than 100 characters
-        class LoudText < String
+        class LoudText < DelegateClass(String)
 
-      COLUMN_TYPE = :string
+          COLUMN_TYPE = :string
 
           HoboFields.register_type(:loud, self)
 
@@ -74,6 +74,13 @@ This class defines the methods `to_html` to customize the way the type is render
 
 That's all there is to it. Defining `to_html` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
 
+We use `DelegateClass` so that we can act like a string without actually being a string.
+
+You can use `LoudText` in your model with
+
+    fields do
+      shout :loud
+    end
 
 ## Bundled types
 
