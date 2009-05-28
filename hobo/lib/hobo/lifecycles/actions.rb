@@ -37,9 +37,9 @@ module Hobo
         else
           refl = record.class.reflections[who]
           if refl && refl.macro == :has_many
-            send(who).include?(user)
+            record.send(who).include?(user)
           elsif refl && refl.macro == :belongs_to
-            send("#{who}_is?", user)
+            record.send("#{who}_is?", user)
           else
             value = run_hook(record, who)
             if value.is_a?(Class)
