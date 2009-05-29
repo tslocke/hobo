@@ -2,6 +2,9 @@ module HoboSupport
 
   VERSION = "0.8.7"
 
+  rvsplit = RAILS_GEM_VERSION.split('.')
+  RAILS_AT_LEAST_23 = (rvsplit[0].to_i>2 or ((rvsplit[0].to_i==2) and (rvsplit[1].to_i>=3)))
+
 end
 
 

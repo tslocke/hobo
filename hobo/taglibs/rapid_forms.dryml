@@ -317,7 +317,11 @@ edit collections a `Category` model in your application:
 
 <!-- A checkbox plus a hidden-field. The hidden field trick comes from Rails - it means that when the checkbox is not checked, the parameter name is still submitted, with a '0' value (the value is '1' when the checkbox is checked) -->
 <def tag="input" for="boolean" attrs="name">
-  <%= check_box_tag(name, '1', this, attributes) %><%= hidden_field_tag(name, '0') unless attributes[:disabled] %>
+  <%= unless attributes[:disabled]
+        cb_tag = check_box_tag(name, '1', this, attributes)
+        cb_hidden_tag = hidden_field_tag(name, '0')
+        HoboSupport::RAILS_AT_LEAST_23 ? cb_hidden_tag + cb_tag : cb_tag + cb_hidden_tag
+      end %>
 </def>
   
 <!-- A password input - `<input type='password'>` -->
