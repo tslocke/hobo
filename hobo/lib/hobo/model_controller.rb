@@ -401,6 +401,8 @@ module Hobo
       if o
         url = if o.is_a?(Symbol)
                 object_url(this, o)
+              elsif o.is_a?(String) || o.is_a?(Hash)
+                o
               else
                 object_url(*Array(o))
               end
