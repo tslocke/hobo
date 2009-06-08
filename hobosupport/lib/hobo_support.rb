@@ -2,8 +2,9 @@ module HoboSupport
 
   VERSION = "0.8.7"
 
-  rvsplit = Rails::VERSION::STRING.split('.')
-  RAILS_AT_LEAST_23 = (rvsplit[0].to_i>2 or ((rvsplit[0].to_i==2) and (rvsplit[1].to_i>=3)))
+  RAILS_VERSION_FLOAT = Object.const_defined?(:Rails) ? Rails::VERSION::STRING.match(/^\d+\.\d+/)[0].to_f : 0
+  
+  RAILS_AT_LEAST_23 = (RAILS_VERSION_FLOAT >= 2.3)
 
 end
 
