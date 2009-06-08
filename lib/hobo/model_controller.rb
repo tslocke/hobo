@@ -631,10 +631,18 @@ module Hobo
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit options
+          respond_to do |wants|
+            wants.html { redirect_after_submit(options) }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
+          end
         else
           this.exempt_from_edit_checks = true
-          re_render_form(name)
+          respond_to do |wants|
+            wants.html { re_render_form(name) }
+            wants.js   { render(:status => 500,
+                                :text => ("Couldn't do creator #{name}.\n" +
+                                          this.errors.full_messages.join("\n"))) }
+          end
         end
     end
 
@@ -663,9 +671,17 @@ module Hobo
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit options
+          respond_to do |wants|
+            wants.html { redirect_after_submit(options) }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
+          end
         else
-          re_render_form(name)
+          respond_to do |wants|
+            wants.html { re_render_form(name) }
+            wants.js   { render(:status => 500,
+                                :text => ("Couldn't do transition #{name}.\n" +
+                                          this.errors.full_messages.join("\n"))) }
+          end
         end
     end
 
