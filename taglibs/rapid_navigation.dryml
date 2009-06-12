@@ -37,10 +37,12 @@ Then in your pages you can call the tag like this
 
 
 <!-- Renders a single item in a `<navigation>` menu. See [`<navigation`>](/api_tag_defs/navigation). -->
-<def tag="nav-item">
+<def tag="nav-item" attrs="name">
   <% body = parameters.default 
-     body = h(this.to_s) if body.blank? -%>
-  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
+     body = h(this.to_s) if body.blank?
+     name ||= body.gsub(/<.*?>/, '').strip
+     -%>
+  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == name.downcase}"
       merge-attrs="&attributes - (attrs_for(:a)+['target'])">
     <a merge-attrs="&attributes & (attrs_for(:a)+['target'])"><%= body %></a>
   </li>
