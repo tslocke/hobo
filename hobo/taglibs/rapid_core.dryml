@@ -438,7 +438,7 @@ Assuming the context is a blog post...
             else
               wrapper = if inline
                           :span
-                        elsif block || this.is_a?(HoboFields::Text)
+                        elsif block || this_type <= HoboFields::Text
                           :div
                         else
                           :span
