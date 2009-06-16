@@ -787,9 +787,15 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
-<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The use can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The user can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+
+  ### Attributes
+
+   - `options` - an array of models that may be added to the collection
+   - `disabled` - if true, sets the disabled flag on all check boxes.
+
   -->
-<def tag="check-many" attrs="disabled"><% 
+<def tag="check-many" attrs="options, disabled"><% 
   collection = this
   param_name = param_name_for_this
   options ||= begin
