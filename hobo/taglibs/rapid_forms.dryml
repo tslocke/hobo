@@ -826,7 +826,6 @@ Use the `uri` option to specify a redirect location:
 This tag is very different from tags like `<select-many>` and `<check-many>` in that:
 
  - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
- - Those tags work by themselves, while `<input-many>` is just a wrapper for other input fields.
  
 ### Example
 
@@ -835,15 +834,21 @@ Say you are creating a new `Category` in your online shop, and you want to creat
     <input-many:products><field-list fields="name, price"/></input-many>
     
 The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+
+### Attributes
+
+ - fields:  If you do not specify any content for the input-many, a `<field-list>` is rendered.   This attribute is passed through to the `<field-list>`
   
   -->
-<def tag="input-many" polymorphic>
+<def tag="input-many" attrs="fields" polymorphic>
   <set empty="&this.empty?"/>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
-      <div class="input-many-item" param="default"/>
+      <div class="input-many-item" param="default">
+        <field-list merge-attrs="fields" />
+      </div>
       <div class="buttons">
         <button class="remove-item" merge-attrs="disabled">-</button>
         <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
