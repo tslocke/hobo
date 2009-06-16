@@ -602,21 +602,23 @@ This is the default input that Rapid uses for `belongs_to` associations. The men
 
  - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null). Defaults to false
  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
- - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (limited to 100).
+ - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
+ - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
  
 ### See Also
 
 For situations where there are too many target records to practically include in a menu, `<name-one>` provides an autocompleter which would be more suitable.
 
   -->
-<def tag="select-one" attrs="include-none, blank-message, options, sort"><%
+<def tag="select-one" attrs="include-none, blank-message, options, sort, limit"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
+  limit ||= 100
    
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
+    this_field_reflection.klass.all(:conditions => conditions, :limit => limit).select {|x| can_view?(x)}
   end
 
   select_options = options.map { |x| [x.to_s, x.id ] }
