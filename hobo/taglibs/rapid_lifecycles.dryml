@@ -14,6 +14,7 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
     transition = transition.name unless transition.is_a?(String)
     ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
+    html_attributes[:method] = :put
     url = object_url(this, transition, :method => :put)
     add_classes!(html_attributes, "transition-button #{transition}-button")
     label ||= transition.to_s.titleize
