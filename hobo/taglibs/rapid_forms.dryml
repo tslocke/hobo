@@ -410,10 +410,11 @@ The menus default to the current time if the current value is nil.
   
 ### Attributes
 
- - labels: A hash that gives custom labels for the values of the enum.
+ - `labels` - A hash that gives custom labels for the values of the enum.
    Any values that do not have corresponding keys in this hash will get `value.titleize` as the label.
-   
- - titleize: Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
+ - `titleize` - Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
   
    -->
 <def tag="input" for="HoboFields::EnumString" attrs="labels, titleize, first-option, first-value"><%
@@ -675,8 +676,8 @@ The completions are provided by the server with a GET request. The `complete-tar
  
  - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
  - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
- - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
- - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
 
   -->
 <def tag="select-input">
@@ -772,12 +773,12 @@ Use the `uri` option to specify a redirect location:
 
 <!-- A simple wrapper around the `<select>` tag and `options_for_select` helper
   
-  ### Attributes
+### Attributes
 
-   - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
-   - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
-   - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
-   - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+ - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
+ - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
 
  -->
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
@@ -791,10 +792,10 @@ Use the `uri` option to specify a redirect location:
 
 <!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The user can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
 
-  ### Attributes
+### Attributes
 
-   - `options` - an array of models that may be added to the collection
-   - `disabled` - if true, sets the disabled flag on all check boxes.
+ - `options` - an array of models that may be added to the collection
+ - `disabled` - if true, sets the disabled flag on all check boxes.
 
   -->
 <def tag="check-many" attrs="options, disabled"><% 
