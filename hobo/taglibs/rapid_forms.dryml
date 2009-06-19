@@ -856,7 +856,9 @@ The body of the tag will be repeated for each of the current records in the coll
     </li>
     <li if="&empty">
       <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
-        <div class="input-many-item" param="default"/>
+        <div class="input-many-item" param="default">
+          <field-list merge-attrs="fields"/>
+        </div>
       </fake-field-context>
       <div class="buttons">
         <button class="add-item" merge-attrs="disabled">+</button>
