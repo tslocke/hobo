@@ -410,10 +410,11 @@ The menus default to the current time if the current value is nil.
   
 ### Attributes
 
- - labels: A hash that gives custom labels for the values of the enum.
+ - `labels` - A hash that gives custom labels for the values of the enum.
    Any values that do not have corresponding keys in this hash will get `value.titleize` as the label.
-   
- - titleize: Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
+ - `titleize` - Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
   
    -->
 <def tag="input" for="HoboFields::EnumString" attrs="labels, titleize, first-option, first-value"><%
@@ -602,21 +603,23 @@ This is the default input that Rapid uses for `belongs_to` associations. The men
 
  - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null). Defaults to false
  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
- - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (limited to 100).
+ - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
+ - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
  
 ### See Also
 
 For situations where there are too many target records to practically include in a menu, `<name-one>` provides an autocompleter which would be more suitable.
 
   -->
-<def tag="select-one" attrs="include-none, blank-message, options, sort"><%
+<def tag="select-one" attrs="include-none, blank-message, options, sort, limit"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
+  limit ||= 100
    
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
-    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
+    this_field_reflection.klass.all(:conditions => conditions, :limit => limit).select {|x| can_view?(x)}
   end
 
   select_options = options.map { |x| [x.to_s, x.id ] }
@@ -673,8 +676,8 @@ The completions are provided by the server with a GET request. The `complete-tar
  
  - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
  - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
- - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
- - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
 
   -->
 <def tag="select-input">
@@ -770,12 +773,12 @@ Use the `uri` option to specify a redirect location:
 
 <!-- A simple wrapper around the `<select>` tag and `options_for_select` helper
   
-  ### Attributes
+### Attributes
 
-   - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
-   - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
-   - first-option - A string to be used for an extra option in the first position. E.g. "Please choose..."
-   - first-value - the value to be used with the `first-option`. Typcially not used, meaning the option has a blank value.
+ - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
+ - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
 
  -->
 <def tag="select-menu" attrs="options, selected, first-option, first-value">
@@ -787,9 +790,15 @@ Use the `uri` option to specify a redirect location:
 </def>
 
 
-<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The use can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The user can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+
+### Attributes
+
+ - `options` - an array of models that may be added to the collection
+ - `disabled` - if true, sets the disabled flag on all check boxes.
+
   -->
-<def tag="check-many" attrs="disabled"><% 
+<def tag="check-many" attrs="options, disabled"><% 
   collection = this
   param_name = param_name_for_this
   options ||= begin
@@ -818,7 +827,6 @@ Use the `uri` option to specify a redirect location:
 This tag is very different from tags like `<select-many>` and `<check-many>` in that:
 
  - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
- - Those tags work by themselves, while `<input-many>` is just a wrapper for other input fields.
  
 ### Example
 
@@ -827,15 +835,21 @@ Say you are creating a new `Category` in your online shop, and you want to creat
     <input-many:products><field-list fields="name, price"/></input-many>
     
 The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+
+### Attributes
+
+ - fields:  If you do not specify any content for the input-many, a `<field-list>` is rendered.   This attribute is passed through to the `<field-list>`
   
   -->
-<def tag="input-many" polymorphic>
+<def tag="input-many" attrs="fields" polymorphic>
   <set empty="&this.empty?"/>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
-      <div class="input-many-item" param="default"/>
+      <div class="input-many-item" param="default">
+        <field-list merge-attrs="fields" />
+      </div>
       <div class="buttons">
         <button class="remove-item" merge-attrs="disabled">-</button>
         <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
@@ -843,7 +857,9 @@ The body of the tag will be repeated for each of the current records in the coll
     </li>
     <li if="&empty">
       <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
-        <div class="input-many-item" param="default"/>
+        <div class="input-many-item" param="default">
+          <field-list merge-attrs="fields"/>
+        </div>
       </fake-field-context>
       <div class="buttons">
         <button class="add-item" merge-attrs="disabled">+</button>
