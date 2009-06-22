@@ -4,7 +4,7 @@ class <%= class_name %> < ActiveRecord::Base
 
   fields do
     name :string, :unique
-    email_address :email_address, :unique, :login => true
+    email_address :email_address, :login => true
     administrator :boolean, :default => false
     timestamps
   end
