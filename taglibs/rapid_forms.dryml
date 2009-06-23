@@ -692,7 +692,7 @@ The completions are provided by the server with a GET request. The `complete-tar
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
       <% this.errors.each do |attr, message|; next if message == "..." -%>
-        <li param><%= attr.titleize %> <%= message %></li>
+        <li param><%= this.class.human_attribute_name(attr) %> <%= message %></li>
       <% end -%>
     </ul>
   </section>

@@ -134,6 +134,8 @@ module Hobo
 
 
     module ClassMethods
+      require 'active_record/viewhints_validations_interceptor'
+      include Hobo::ViewHintsValidationsInterceptor
 
       attr_accessor :creator_attribute
       attr_writer :name_attribute, :primary_content_attribute
