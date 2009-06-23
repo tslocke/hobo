@@ -29,7 +29,7 @@ module Hobo
 
       def available_auto_actions_with_user_actions
         available_auto_actions_without_user_actions + 
-          [:login, :signup, :logout, :forgot_password, :reset_password, :account]
+          [:login, :logout, :forgot_password, :reset_password, :account]
       end
 
       
@@ -39,6 +39,7 @@ module Hobo
         class_eval do
           def login; hobo_login;                         end if include_action?(:login)
           def logout; hobo_logout;                       end if include_action?(:logout)
+          def signup; hobo_signup;                       end if include_action?(:signup)
           def do_signup; hobo_do_signup                  end if include_action?(:do_signup)
           def forgot_password; hobo_forgot_password;     end if include_action?(:forgot_password)
           def do_reset_password; hobo_do_reset_password; end if include_action?(:do_reset_password)
@@ -84,6 +85,13 @@ module Hobo
       end
     end
 
+    def hobo_signup(&b)
+      if logged_in?
+        redirect_back_or_default(home_page)
+      else
+        creator_page_action(:signup, &b)
+      end
+    end
 
     def hobo_do_signup(&b)
       do_creator_action(:signup) do
