@@ -1,16 +1,5 @@
-/* Graphite */
-/*html, body {color: #222; background: #222;}
-.page-header {color: white; background: #444;}
-.page-header .main-nav a {background: #666;}
-.page-header .main-nav a:hover {background: #222;}
-.content {background: white;}
-.button {color: white; background: #666;}
-.button:hover {background-color: #222;}
-.add-to-collection {background: #f5f5f5;}
-*/
-/* Cubicle Blue */
-html, body {color: #193440; background: #193440;}
-.page-header {color: white; background: #3F606E;}
+html, body {color: #193440; background: url(../images/300-ACD3E6-fff.png) repeat-x #fff; }
+.page-header {color: white; background: url(../images/100-3B5F87-ACD3E6.png) repeat-x #3F606E;}
 .page-header .navigation.main-nav a {background: #5B8BA0;}
 .page-header .navigation.main-nav li.current a {background: #FCFFF4; color: #222;}
 .page-header .navigation.main-nav a:hover {background: #193440;}
@@ -306,7 +295,8 @@ div.select-many .item .remove-item { float: right; }
 
 .front-page .welcome-message {
 	padding: 10px 20px 20px; border: 1px solid #e8e8e8; 
-	color: #222; background: #eee;
+	color: #222;
+	background: url(../images/50-ACD3E6-fff.png) repeat-x #fff;
 }
 .front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
