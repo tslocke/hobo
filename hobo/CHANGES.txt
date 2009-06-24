@@ -1,3 +1,60 @@
+=== Hobo 0.8.8 ===
+
+Hobo 0.8.8 comes with some slight changes to the colour scheme for the
+"clean" theme.   To apply these enhancements, you may need to run
+`rake hobo:run_standard_generators`.
+
+Significant bug fixes:
+
+ - [Bug 422](https://hobo.lighthouseapp.com/projects/8324/tickets/422): Because of it's switch to Rack, Rails 2.3 changed the interaction
+  between checkboxes and their accompanying hidden field.  This caused
+  us to always return "false" for a checkbox, even if it was checked.
+
+ - [Bug 425](https://hobo.lighthouseapp.com/projects/8324/tickets/425):  Hobo 0.8.6 removed support for the non-working
+  big_decimal.  However, this shared some code with decimal, so we
+  removed a little bit too much code.   This restores the missing
+  editor and input for the decimal type.
+
+Minor bug fixes:
+
+- [Bug 413](https://hobo.lighthouseapp.com/projects/8324/tickets/413): add target attribute to `<nav-item>` links
+
+- [Bug 420](https://hobo.lighthouseapp.com/projects/8324/tickets/420): `acts_as_list` controls visible to Guest
+
+- [Bug 446](https://hobo.lighthouseapp.com/projects/8324/tickets/446): `<transition-button>` not working
+
+- Migration generator fix - would occasionally suggest a default
+  migration name that already exists
+
+Minor enhancements:
+
+- [Bug 434](https://hobo.lighthouseapp.com/projects/8324/tickets/434): allow String or Hash to be passed in a :redirect optione
+
+- `key_timeout` option added to lifecycles
+
+- [Bug 437](https://hobo.lighthouseapp.com/projects/8324/tickets/437): 'options' attribute added to `<check-many>`
+
+- [Bug 424](https://hobo.lighthouseapp.com/projects/8324/tickets/424): 'limit' option added to `<select-one>`
+
+- [Bug 440](https://hobo.lighthouseapp.com/projects/8324/tickets/440): support blank Time and DateTime inputs
+
+- [Bug 423](https://hobo.lighthouseapp.com/projects/8324/tickets/423): default content for input-many
+
+- [Bug 379](https://hobo.lighthouseapp.com/projects/8324/tickets/379): multiple warning messages on email validation
+
+- [Bug 404](https://hobo.lighthouseapp.com/projects/8324/tickets/404): Extension to Hobo::Model class to check ViewHints for error
+  validations
+
+- [Bug 415](https://hobo.lighthouseapp.com/projects/8324/tickets/415): Visiting sign-up page when logged in gives permission
+  denied 
+
+-  Rapid navigation - added name attribute to `<nav-item>` to make it easier to select the current nav item in some cases (e.g. dynamic nav item text) 
+
+-  Rapid forms -- added url attribute to `<remote-method-button>`
+
+-  HoboSupport - `Enumerable.build_hash` can now be used without a block to build a hash directly from a list of pairs 
+
+ 
 === Hobo 0.8.7 ===
 
 I forgot to refresh the Manifest, so this is a brown paper bag release.
