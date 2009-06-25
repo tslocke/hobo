@@ -851,8 +851,8 @@ The body of the tag will be repeated for each of the current records in the coll
         <field-list merge-attrs="fields" />
       </div>
       <div class="buttons">
-        <button class="remove-item" merge-attrs="disabled">-</button>
-        <button class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
+        <button type="button" class="remove-item" merge-attrs="disabled">-</button>
+        <button type="button" class="add-item" if="&last_item?" merge-attrs="disabled">+</button>
       </div>
     </li>
     <li if="&empty">
@@ -862,7 +862,7 @@ The body of the tag will be repeated for each of the current records in the coll
         </div>
       </fake-field-context>
       <div class="buttons">
-        <button class="add-item" merge-attrs="disabled">+</button>
+        <button type="button" class="add-item" merge-attrs="disabled">+</button>
       </div>
     </li>
   </ul>
