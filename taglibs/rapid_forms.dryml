@@ -704,9 +704,10 @@ An input for `has_many :through` associations that lets the user chose the items
   
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
-<def tag="select-many" attrs="options, targets, remove-label, prompt, disabled"><%
+<def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
   prompt ||= "Add #{this_field.titleize.singularize}"
   options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
+  name ||= param_name_for_this
                 
   values = this
   -%>
@@ -714,15 +715,14 @@ To use this tag, the model of the items the user is chosing *must* have unique n
     <div style="display:none" class="item-proto">
       <div class="item" param="proto-item">
         <span></span>
-        <input type="hidden" name="#{param_name_for_this}[]" param="proto-hidden"/>
+        <input type="hidden" name="#{name}[]" param="proto-hidden"/>
         <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" param="proto-remove-button"/>
       </div>
     </div>
     <div class="items">
-      <set param-name="&param_name_for_this"/>
       <div class="item" param="item" repeat>
         <span><%= h this.to_s %></span>
-        <input type="hidden" name="#{param_name}[]" value="@#{h this.id}" disabled="&disabled"
+        <input type="hidden" name="#{name}[]" value="@#{h this.id}" disabled="&disabled"
                param="hidden"/>
         <input type="button" class="remove-item" value="#{remove_label || 'Remove'}" disabled="&disabled"
                param="remove-button"/>
