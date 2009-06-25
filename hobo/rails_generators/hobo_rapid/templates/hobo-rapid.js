@@ -628,9 +628,11 @@ new HoboBehavior("ul.input-many", {
       
       this.element.selectChildren('li').each(function(li, index) {
           li.select('*[name]').each(function(control) {
-              var changeId = control.id == control.name
-              control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
-              if (changeId) control.id = control.name
+              if(control.name) {
+                  var changeId = control.id == control.name;
+                  control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']');
+                  if (changeId) control.id = control.name;
+              }
           })
       })
   }
