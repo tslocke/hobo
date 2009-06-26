@@ -1,7 +1,15 @@
 html, body {color: #193440; background: url(../images/300-ACD3E6-fff.png) repeat-x #fff; }
-.page-header {color: white; background: url(../images/100-3B5F87-ACD3E6.png) repeat-x #3F606E;}
-.page-header .navigation.main-nav a {background: #5B8BA0;}
-.page-header .navigation.main-nav li.current a {background: #FCFFF4; color: #222;}
+.page-header {color: white; background: url(../images/101-3B5F87-ACD3E6.png) repeat-x #3F606E;}
+.page-header .navigation.main-nav a {
+  background: url(../images/30-10131B-242E42.png) repeat-x #242E42;
+}
+.page-header .navigation.main-nav li.current a {
+  color: #222;
+  background: url(../images/30-DBE1E5-FCFEF5.png) repeat-x #FCFEF5;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+}
 .page-header .navigation.main-nav a:hover {background: #193440;}
 .section.content {background: #FCFFF5;}
 .button {color: white; background: #5B8BA0;}
