@@ -18,8 +18,8 @@ namespace :hobo_jquery do
   desc "Install JQuery and JQuery-UI"
   task :install_jquery => :environment do
     HOBO_JQUERY_HOME = File.dirname(__FILE__)+"/.."
-    FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/javascripts/*", "#{RAILS_ROOT}/public/javascripts/"
-    FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/stylesheets/*", "#{RAILS_ROOT}/public/stylesheets/"
+    FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/javascripts/.", "#{RAILS_ROOT}/public/javascripts/"
+    FileUtils.cp_r "#{HOBO_JQUERY_HOME}/jquery/stylesheets/.", "#{RAILS_ROOT}/public/stylesheets/"
   end
 
   desc "Link JQuery and JQuery-UI"
