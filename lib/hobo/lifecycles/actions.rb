@@ -1,5 +1,5 @@
 # We need to be able to eval an expression outside of the Hobo module
-# so that, e.g. "Userd" doesn't eval to "Hobo::User"
+# so that, e.g. "User" doesn't eval to "Hobo::User"
 # (Ruby determines this constant lookup scope lexically)
 def __top_level_eval__(obj, expr)
   obj.instance_eval(expr)
