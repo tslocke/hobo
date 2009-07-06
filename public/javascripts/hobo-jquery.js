@@ -38,10 +38,10 @@ jQuery.fn.hjq_hide = function(options, callback) {
 };
 
 jQuery.fn.hjq_show = function(options, callback) {
-    var settings = jQuery.extend({
-        effect: 'blind', speed: 500, callback: undefined,
-    }, options);
     var cb = callback;
+    var settings = jQuery.extend({
+        effect: 'blind', speed: 500, callback: undefined
+    }, options);
     if(callback && hjq.showComplete) {
         cb = (function() {
             settings.callback.apply(this, arguments); 
@@ -52,7 +52,14 @@ jQuery.fn.hjq_show = function(options, callback) {
     }
     return this.show(settings.effect, settings, settings.speed, cb);
 };
-    
+
+// Our monkey patches to Prototype
+
+// the Hobo part mechanism uses Element.update to do it's work
+Element.update = Element.update.hjq_chain(function(id, content) {
+    if(!id.nodeType) id="#"+id;  // assume it's a string
+    hjq.initialize.apply(jQuery(id));
+});
 
 var hjq = (function() {
     return {
@@ -123,11 +130,22 @@ var hjq = (function() {
                 if(f) return f;
 	        return function() { return eval(script); };
 	    },
+
+            /* Iterates through this and arguments until either a jQuery or an element is found, and returns it, jQuerified */
+            jQuerifyFirstElement: function() {
+                if(this.nodeType==1) return jQuery(this);
+                if(this.jquery) return this;
+                for(var i=0; i<arguments.length; i++) {
+                    if(arguments[i].nodeType==1) return jQuery(arguments[i]);
+                    if(arguments[i].jquery) return arguments[i];
+                }
+                return [];
+            },
 	    
             /* log to console, if available */
             log: function(s) {
                 if(console && console.log) console.log(s);
-            },
+            }
         },
 
         input_many: {
@@ -330,7 +348,7 @@ var hjq = (function() {
                 if(!this.disabled) {
                     jQuery(this).datepicker(hjq.getOptions(annotations));
                 }
-            },
+            }
         },
 
         dialog: {
@@ -349,9 +367,11 @@ var hjq = (function() {
                 jQuery(this).dialog(options);
             },
 
-            /* useful in the "buttons" option */
+            /* useful in the "buttons" option.  Dialog is an optional parameter -- if not set, 'this' is closed instead. */
             close: function() {
-                jQuery(this).dialog('close');
+                var jq=hjq.util.jQuerifyFirstElement.apply(this, arguments);
+                if(!jq.hasClass("hjq-dialog")) jq=jq.parents(".hjq-dialog");
+                jq.dialog('close');
             },
 
             /* useful in the "buttons" option.  Will submit any enclosed formlets. */
@@ -361,11 +381,25 @@ var hjq = (function() {
                 });
             },
 
-            /* useful in the "buttons" option.  Submits any enclosed formlets,  */
+            /* useful in the "buttons" option.  Will submit all enclosed forms, whether AJAX or not */
+            submit_form: function() {
+                jQuery(this).find("form").each(function() {
+                    if(jQuery(this).attr("onsubmit")) {
+                        eval("onsubmit_func = function() {\n"+jQuery(this).attr("onsubmit")+"\n}");
+                        onsubmit_func.apply(this);
+                    } else {
+                        this.submit();
+                    }
+                });
+            },
+
+            /* calls submit_form, and then closes the dialog box.   */
+
+            /* useful in the "buttons" option.  Submits any enclosed formlets, and closes them */
             submit_formlet_and_close: function() {
                 var dialog = jQuery(this);
                 hjq.dialog.submit_formlet.call(this, {success: function() {hjq.dialog.close.call(dialog);}});
-            },
+            }
         },
 
         dialog_opener: {
@@ -376,8 +410,8 @@ var hjq = (function() {
                 } else {
                     dialog.dialog('open');
                 }
-            },
-        },
+            }
+        }
     };
 })();
 

@@ -389,7 +389,7 @@ The following functions are predefined for use in dialog buttons:
 %>
  <span class="hjq-dialog-position"></span>
  <annotate-tag tag="hjq-dialog" init="hjq.dialog.init" options="&options" events="&events" buttons="&buttons" />
- <% html_attrs = add_classes(html_attrs, "hjq-annotated hidden"); %>
+ <% html_attrs = add_classes(html_attrs, "hjq-annotated hidden hjq-dialog"); %>
  <div merge-attrs="&html_attrs" param="default" />
 </def>
 
