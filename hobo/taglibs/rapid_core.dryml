@@ -433,7 +433,7 @@ Assuming the context is a blog post...
 %></def>
 
 <!-- `<view>` calls this tag when called for a `has_many` collection. By default calls `<links-for-collection/>` -->
-<def tag="collection-view" polymorphic><links-for-collection mergge-attrs/></def>
+<def tag="collection-view" polymorphic><links-for-collection merge-attrs/></def>
 
 <!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
 <def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
