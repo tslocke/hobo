@@ -619,7 +619,7 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def creator_page_action(name, &b)
+    def creator_page_action(name, options={}, &b)
       self.this = model.new
       this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creator(name)
