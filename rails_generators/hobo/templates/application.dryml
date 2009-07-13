@@ -1,3 +1,1 @@
 <def tag="app-name"><%= File.basename(Dir.chdir(RAILS_ROOT) { Dir.getwd }).strip.titleize %></def>
-
-

@@ -39,7 +39,7 @@ class HoboSubsiteGenerator < Rails::Generator::NamedBase
         end
         puts "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml"
         FileUtils.mv('app/views/taglibs/application.dryml', 'app/views/taglibs/front_site.dryml')
-        m.template "application.dryml", File.join('app/views/taglibs/application.dryml')  
+        m.template "application.dryml", File.join('app/views/taglibs/application.dryml')
       end
       
       m.directory File.join('app', 'controllers', file_name)

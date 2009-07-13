@@ -26,7 +26,7 @@ class HoboGenerator < Rails::Generator::Base
       m.file "initializer.rb",        File.join("config/initializers/hobo.rb")
     end
   end
-
+  
   protected
     def banner
       "Usage: #{$0} #{spec.name} [--add-routes] [--add-gem]"
