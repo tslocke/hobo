@@ -13,7 +13,8 @@ module Hobo
           end
           
           filter_parameter_logging "password"
-          skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password_page, :reset_password]
+          skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password, :do_reset_password,
+                                                        :accept_invitation, :do_accept_invitation]
 
           include_taglib "rapid_user_pages", :plugin => "hobo"
 
