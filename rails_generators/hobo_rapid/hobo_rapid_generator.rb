@@ -19,6 +19,12 @@ class HoboRapidGenerator < Hobo::Generator
       m.file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
       create_all(m, "themes/clean/public", "public/hobothemes/clean")
       create_all(m, "themes/clean/views", "app/views/taglibs/themes/clean")
+      
+      if with_admin_site?
+        options = ["--make-front-site", "admin"]
+        options.unshift "--invite-only" if invite_only?
+        m.dependency 'hobo_admin_site', options
+      end
     end
   end
 
@@ -34,6 +40,18 @@ class HoboRapidGenerator < Hobo::Generator
 <set-theme name="clean"/>
 )
 
+    if with_admin_site?
+      tag += %(
+<extend tag="page">
+  <old-page merge>
+    <footer:>
+      <a href="&admin_users_url" if="&current_user.administrator?">Admin</a>
+    </footer:>
+  </old-page>
+</extend>
+) 
+    end
+
     src = File.read(path)
     return if src.include?(tag)
 
@@ -47,9 +65,17 @@ class HoboRapidGenerator < Hobo::Generator
   end
 
 
+  def with_admin_site?
+    options[:admin]
+  end
+  
+  def invite_only?
+    options[:admin] == :invite_only
+  end
+
   protected
     def banner
-      "Usage: #{$0} #{spec.name} [--import-tags]"
+      "Usage: #{$0} #{spec.name} [--import-tags] [--admin | --invite-only]"
     end
 
     def add_options!(opt)
@@ -59,5 +85,9 @@ class HoboRapidGenerator < Hobo::Generator
              "Modify taglibs/application.dryml to import hobo-rapid and theme tags ") do |v|
         options[:import_tags] = true
       end
+      opt.on("--admin",
+             "Generate an admin subsite") { |v| options[:admin] = true }
+      opt.on("--invite-only",
+             "Generate an admin subsite with features for an invite only app") { |v| options[:admin] = :invite_only }
     end
 end
