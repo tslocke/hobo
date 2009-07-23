@@ -499,7 +499,7 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || new_for_create
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:new, &b)
+      create_response(:new, options, &b)
     end
     
     
@@ -508,7 +508,7 @@ module Hobo
       owner, association = find_owner_and_association(owner)
       self.this ||= args.first || association.new
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:"new_for_#{owner}", &b)    
+      create_response(:"new_for_#{owner}", options, &b)    
     end
 
 
