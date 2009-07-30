@@ -293,12 +293,13 @@ var hjq = (function() {
 
         formlet: {
             // call with this==the formlet or a child of the formlet to submit the formlet
-            submit: function(extra_callbacks) {
+            submit: function(extra_callbacks, extra_options) {
                 var formlet = jQuery(jQuery(this).closest(".formlet").get(0));
                 var annotations = hjq.getAnnotations.call(formlet.get(0));
 
                 var options = annotations.ajax_options;
                 var attrs = annotations.ajax_attrs;
+                jQuery.extend(options, extra_options);
 
                 if(!extra_callbacks) extra_callbacks = {};
 
@@ -314,7 +315,12 @@ var hjq = (function() {
                     }
                 }
 
-                options.data = formlet.find(":input").serialize();
+                // make sure we don't serialize any nested forms
+                var clone = formlet.clone();
+                clone.find("form").remove();
+                clone.find(".formlet").remove();
+
+                options.data = clone.find(":input").serialize();
                 options.dataType = 'script';
 
                 // we tell our controller which parts to return by sending it a "render" array.
