@@ -18,7 +18,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 <% creators.each do |creator| -%>
 <def tag="<%= creator.name.to_s.dasherize %>-form" polymorphic/>
 <def tag="<%= creator.name.to_s.dasherize %>-form" for="<%= model.name %>">
-  <form lifecycle="<%= creator.name %>">
+  <form lifecycle="<%= creator.name %>" merge param="default">
     <error-messages param/>
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
     <div param="actions">
@@ -31,7 +31,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
 <% transitions.each do |transition| -%>
 <def tag="<%= transition.name.to_s.dasherize %>-form" polymorphic/>
 <def tag="<%= transition.name.to_s.dasherize %>-form" for="<%= model.name %>">
-  <form lifecycle="<%= transition.name %>">
+  <form lifecycle="<%= transition.name %>" merge param="default">
     <error-messages param/>
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
