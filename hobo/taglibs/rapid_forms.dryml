@@ -605,13 +605,14 @@ This is the default input that Rapid uses for `belongs_to` associations. The men
  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
  - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
  - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
+ - `text_method` - The method to call on each record to get the text for the option.  Multiple methods are supported ie "institution.name"
  
 ### See Also
 
 For situations where there are too many target records to practically include in a menu, `<name-one>` provides an autocompleter which would be more suitable.
 
   -->
-<def tag="select-one" attrs="include-none, blank-message, options, sort, limit"><%
+<def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
@@ -622,7 +623,14 @@ For situations where there are too many target records to practically include in
     this_field_reflection.klass.all(:conditions => conditions, :limit => limit).select {|x| can_view?(x)}
   end
 
-  select_options = options.map { |x| [x.to_s, x.id ] }
+  if text_method.nil?
+    select_options = options.map { |x| [x.to_s, x.id] }
+  else
+    select_options = options.map do |x| 
+      [ text_method.split(".").inject(x) { |v, method| v.send(method) },
+           x.id ]
+    end
+  end
   select_options = select_options.sort if sort
   select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
