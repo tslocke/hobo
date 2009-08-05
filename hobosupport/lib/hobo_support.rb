@@ -1,6 +1,6 @@
 module HoboSupport
 
-  VERSION = "0.8.7"
+  VERSION = "0.8.8"
 
   RAILS_VERSION_FLOAT = Object.const_defined?(:Rails) ? Rails::VERSION::STRING.match(/^\d+\.\d+/)[0].to_f : 0
   

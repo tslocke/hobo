@@ -45,7 +45,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
     <do param="empty-message" if="empty?">No <collection-name lowercase/> to display</do>
 
    
-    <page-nav param if="&this.respond_to? :page_count"/>
+    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
   </div>
 </def>
 

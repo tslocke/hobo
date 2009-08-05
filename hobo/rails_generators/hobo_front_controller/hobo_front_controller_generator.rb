@@ -62,10 +62,14 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     return unless File.exists?(index_path)
     File.unlink(index_path)
   end
+  
+  def invite_only?
+    options[:invite_only]
+  end
 
   protected
     def banner
-      "Usage: #{$0} #{spec.name} <controller-name> [--add-routes] [--delete-index]"
+      "Usage: #{$0} #{spec.name} <controller-name> [--add-routes] [--delete-index] [--invite-only]"
     end
 
     def add_options!(opt)
@@ -75,6 +79,8 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
              "Modify config/routes.rb to support the front controller") { |v| options[:add_routes] = true }
       opt.on("--delete-index",
              "Delete public/index.html") { |v| options[:delete_index] = true }
+      opt.on("--invite-only",
+             "Add features for an invite only website") { |v| options[:invite_only] = true }
     end
 
 end

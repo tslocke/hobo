@@ -17,7 +17,7 @@ module Enumerable
   def build_hash
     res = {}
     each do |x|
-      pair = yield x
+      pair = block_given? ? yield(x) : x
       res[pair.first] = pair.last if pair
     end
     res

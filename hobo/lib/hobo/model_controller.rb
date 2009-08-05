@@ -499,7 +499,7 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || new_for_create
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:new, &b)
+      create_response(:new, options, &b)
     end
     
     
@@ -508,7 +508,7 @@ module Hobo
       owner, association = find_owner_and_association(owner)
       self.this ||= args.first || association.new
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:"new_for_#{owner}", &b)    
+      create_response(:"new_for_#{owner}", options, &b)    
     end
 
 
@@ -622,8 +622,8 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def creator_page_action(name, &b)
-      self.this = model.new
+    def creator_page_action(name, options={}, &b)
+      self.this ||= model.new
       this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creator(name)
       raise Hobo::PermissionDeniedError unless @creator.allowed?(current_user)
