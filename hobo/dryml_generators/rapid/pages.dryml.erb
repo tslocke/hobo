@@ -250,7 +250,7 @@ new_link = :new.in?(actions)
         <div param="back-to">Back to <a with="&@<%= owner %>"/></div>
 <% end -%>
 <% if owner_is_user %>
-        <h2 param="heading"><Your with="&current_user"/> <%= model_name :title, :plural %></h2>
+        <h2 param="heading"><Your with="&@<%= owner %>"/> <%= model_name :title, :plural %></h2>
 <% else -%>
         <h2 param="heading"><%= model_name :title, :plural %></h2>
         <h3 param="subheading">For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
