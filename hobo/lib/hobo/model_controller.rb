@@ -529,10 +529,13 @@ module Hobo
         t
     end
     
+    def flash_notice(message)
+      flash[:notice] = message unless request.xhr?
+    end
 
 
     def create_response(new_action, options={}, &b)
-      flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid?
+      flash_notice "The #{@this.class.name.titleize.downcase} was created successfully" if valid?
 
       response_block(&b) or
         if valid?
@@ -567,7 +570,7 @@ module Hobo
 
 
     def update_response(in_place_edit_field=nil, options={}, &b)
-      flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
+      flash_notice "Changes to the #{@this.class.name.titleize.downcase} were saved" if valid?
 
       response_block(&b) or
         if valid?
@@ -603,7 +606,7 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
-      flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
+      flash_notice "The #{model.name.titleize.downcase} was deleted"
       destroy_response(&b)
     end
 
@@ -717,6 +720,7 @@ module Hobo
 
     def permission_denied(error)
       self.this = true # Otherwise this gets sent user_view
+      logger.info "Hobo: Permission Denied!"
       @permission_error = error
       if "permission_denied".in?(self.class.superclass.instance_methods)
         super
