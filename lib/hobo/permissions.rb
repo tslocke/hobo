@@ -330,7 +330,7 @@ module Hobo
     end
   
   
-    # Add some singleton methods to +record+ so give the effect that +attribute+ is unknown. That is,
+    # Add some singleton methods to +record+ to give the effect that +attribute+ is unknown. That is,
     # attempts to access the attribute will result in a Hobo::UndefinedAccessError
     def unknownify_attribute(attr)
       metaclass.class_eval do
