@@ -19,7 +19,7 @@
             <submit: label="Register Administrator"/>
           </form>
 <% else -%>
-          <do with="&User.new"><% this.exempt_from_edit_checks = true %>
+          <do with="&User.new"><%% this.exempt_from_edit_checks = true %>
             <signup-form/>
           </do>
 <% end -%>
