@@ -2,6 +2,8 @@
 
 require 'fileutils'
 require 'pathname'
+require 'activesupport'
+
 Signal.trap("INT") { puts; exit }
 
 hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
@@ -121,7 +123,7 @@ Dir.chdir(app_path) do
   end
 end
 
-if invite_ony
+if invite_ony.present?
   puts %(
 Invite-only website
   If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
