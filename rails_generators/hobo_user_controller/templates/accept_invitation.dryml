@@ -1,0 +1,5 @@
+<accept-invitation-page>
+  <after-heading:>
+    <p>Welcome to <app-name/>, <name/>. To accept your invitation, please choose your password.</p>
+  </after-heading:>
+</accept-invitation-page>

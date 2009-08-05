@@ -343,6 +343,36 @@ When defining an association, you can add a scope:
     >> Bryan.active_friends.*.name
     => []
 
+or several scopes:
+
+    >> 
+     class Person
+       has_many :inactive_female_friends, :class_name => "Person", :through => :friendships, :source => :friend, :scope => [:inactive, :not_male]
+       has_many :active_female_friends, :class_name => "Person", :through => :friendships, :source => :friend, :scope => [:active, :not_male]
+       has_many :inactive_male_friends, :class_name => "Person", :through => :friendships, :source => :friend, :scope => [:inactive, :male]
+     end
+
+    >> Bryan.inactive_female_friends.*.name
+    => ["Bethany"]
+    >> Bryan.active_female_friends.*.name
+    => []
+    >> Bryan.inactive_male_friends.*.name
+    => []
+
+You can parameterize the scopes:
+
+    >> 
+     class Person
+       has_many :y_friends, :class_name => "Person", :through => :friendships, :source => :friend, :scope => { :name_contains => 'y' }
+       has_many :z_friends, :class_name => "Person", :through => :friendships, :source => :friend, :scope => { :name_contains => 'z' }
+     end
+
+    >> Bryan.y_friends.*.name
+    => ["Bethany"]
+    >> Bryan.z_friends.*.name
+    => []
+    
+
 # Chaining
 
 Like named scopes, Hobo scopes can be chained:

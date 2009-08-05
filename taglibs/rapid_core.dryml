@@ -293,6 +293,25 @@ Or a new page if the context is a class:
         <a with="&BlogPost"/> -> <a href="/blog_posts">Blog Posts</a>`
 * If `action="new"` then `<a>` will check that the current user has permission to create the object
 * Several useful classes are added automatically to the output `<a>`.
+
+### Attributes
+
+* action:  If "new", triggers the special behaviour listed above.  Otherwise, contains the action to be performed on the context.   If neither `action` nor `method` are specified, the action will be "index" or "show", as appropriate.
+
+* to:  Use this item as the target instead of the current context.
+
+* params, query-params:  These are appended to the target as a query string after a "?".
+
+* href, name:  If either of these attributes are present, the smart features of this tag are turned off.
+
+* format: this adds ".#{format}" to the end of the url
+
+* subsite: routes the URL using the subsite
+
+* force: overrides the permission check if `action` is "new"
+
+* method: "get", "put", "post" or "delete".  "get" is the default
+
 -->
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
   content = parameters.default
@@ -411,7 +430,7 @@ Assuming the context is a blog post...
             the_view = if_blank if if_blank && the_view.blank?
 
             truncate = 30 if truncate == true
-            the_view = self.truncate(the_view, truncate.to_i) if truncate
+            the_view = self.truncate(the_view, :length => truncate.to_i) if truncate
             the_view = the_view.strip
             
             if no_wrapper
@@ -433,7 +452,7 @@ Assuming the context is a blog post...
 %></def>
 
 <!-- `<view>` calls this tag when called for a `has_many` collection. By default calls `<links-for-collection/>` -->
-<def tag="collection-view" polymorphic><links-for-collection mergge-attrs/></def>
+<def tag="collection-view" polymorphic><links-for-collection merge-attrs/></def>
 
 <!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
 <def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>

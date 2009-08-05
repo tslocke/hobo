@@ -1,0 +1,32 @@
+<!-- Tag definitions for the <%= subsite_name %> subsite -->
+  
+<% if options[:rapid] -%>
+<include src="rapid" plugin="hobo"/>
+
+<include src="taglibs/auto/<%= file_name %>/rapid/cards"/>
+<include src="taglibs/auto/<%= file_name %>/rapid/pages"/>
+<include src="taglibs/auto/<%= file_name %>/rapid/forms"/>
+
+<set-theme name="clean"/>
+<% end -%>
+
+<def tag="app-name"><%= app_name %></def>
+
+<extend tag="page">
+  <old-page merge>
+    <append-stylesheets:>
+      <stylesheet name="admin"/>
+    </append-stylesheets:>
+    <footer:>
+      <a href="#{base_url}/">View Site</a>
+    </footer:>
+  </old-page>
+</extend>
+<% if invite_only? -%>
+
+<extend tag="card" for="User">
+  <old-card merge>
+    <append-header:><%%= h this.state.titleize %></append-header:>
+  </old-card>
+</extend>
+<% end -%>
