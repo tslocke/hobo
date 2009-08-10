@@ -178,21 +178,21 @@ module Hobo
           def_scope :conditions => ["#{column_sql(col)} <> ?", true]
 
         # published_before(time)
-        elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_(at|date)")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_(at|date|on)")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time|
             { :conditions => ["#{column_sql(col)} < ?", time] }
           end
 
         # published_after(time)
-        elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_(at|date)")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_(at|date|on)")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time|
             { :conditions => ["#{column_sql(col)} > ?", time] }
           end
 
         # published_between(time1, time2)
-        elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_(at|date)")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_(at|date|on)")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time1, time2|
             { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} <= ?", time1, time2] }
