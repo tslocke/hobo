@@ -293,6 +293,25 @@ Or a new page if the context is a class:
         <a with="&BlogPost"/> -> <a href="/blog_posts">Blog Posts</a>`
 * If `action="new"` then `<a>` will check that the current user has permission to create the object
 * Several useful classes are added automatically to the output `<a>`.
+
+### Attributes
+
+* action:  If "new", triggers the special behaviour listed above.  Otherwise, contains the action to be performed on the context.   If neither `action` nor `method` are specified, the action will be "index" or "show", as appropriate.
+
+* to:  Use this item as the target instead of the current context.
+
+* params, query-params:  These are appended to the target as a query string after a "?".
+
+* href, name:  If either of these attributes are present, the smart features of this tag are turned off.
+
+* format: this adds ".#{format}" to the end of the url
+
+* subsite: routes the URL using the subsite
+
+* force: overrides the permission check if `action` is "new"
+
+* method: "get", "put", "post" or "delete".  "get" is the default
+
 -->
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
   content = parameters.default
@@ -419,7 +438,7 @@ Assuming the context is a blog post...
             else
               wrapper = if inline
                           :span
-                        elsif block || this.is_a?(HoboFields::Text)
+                        elsif block || this_type <= HoboFields::Text
                           :div
                         else
                           :span
