@@ -607,7 +607,7 @@ module Hobo
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
       flash_notice "The #{model.name.titleize.downcase} was deleted"
-      destroy_response(&b)
+      destroy_response(options, &b)
     end
 
 
