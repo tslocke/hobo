@@ -7,9 +7,15 @@ module Hobo
     AssociationProxyExtensions = classy_module do
 
       def scope_conditions(reflection)
-        scope_name = reflection.options[:scope] and
-          target_class = reflection.klass and
+        scope_name = reflection.options[:scope]
+        return nil if scope_name.nil?
+        target_class = reflection.klass
+        return nil if target_class.nil?
+        if scope_name.respond_to? :map
+          combine_conditions(*(scope_name.map {|scope| target_class.send(*scope).scope(:find)[:conditions]}))
+        else
           target_class.send(scope_name).scope(:find)[:conditions]
+        end
       end
 
 
