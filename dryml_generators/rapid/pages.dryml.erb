@@ -55,7 +55,7 @@ new_form = !new_link && linkable?(model, :create, :method => :post)
 <% if new_form -%>
         <div param="new-form">
           <h3 param="new-form-heading">New <%= model_name :title %></h3>
-          <form with="&new_for_current_user <%= model %>" param/>
+          <form with="&@invalid_record || new_for_current_user(<%= model %>)" param/>
         </div>
 
 <% end -%>
