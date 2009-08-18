@@ -641,21 +641,52 @@ For situations where there are too many target records to practically include in
 </def>
 
 
-<!-- An `<input type="text">` with auto-completion. Allows the user to chose the target of a `belongs_to` association
-  by name.
-  
-### Attributes
+<!-- An `<input type="text">` with auto-completion. Allows the user to chose the target of a `belongs_to` association by name.
 
- - `complete-target`
- - `completer`
- 
-In the simple case no attributes are needed, e.g.: `<name-one:category/>`.
+This tag relies on an autocompleter being defined in a controller.  A simple example:
 
-The completions are provided by the server with a GET request. The `complete-target` and `completer` attributes can be used to customise the URL for the request. For example:
+    <form with="&ProjectMembership.new">
+      <name-one:user>
+    </form>
 
- - If `completer` is a class, say `Product`: `/products/complete_name` (where `name` is the declared name attribute of `Product`)
- - If `completer` is a record, say a `Product` with id `12`: `/products/complete_name?id=12`
- - If `completer-name` is given, e.g. with `completer-name="new_product_names"`: `/products/complete_new_product_names`
+    class ProjectMembership < ActiveRecord::Base
+      hobo_model
+      belongs_to :user
+    end
+
+    class User < ActiveRecord::Base
+      hobo_user_model
+      has_many :project_memberships, :accessible => true, :dependent => :destroy
+    end
+
+    class UsersController < ApplicationController
+      autocomplete
+    end
+
+The route used by the autocompleter looks something like `/users/complete_name`.  The first part of this route is specified by the `complete-target` attribute, and the second part is specified by the `completer` attribute.
+
+`complete-target` specifies the controller for the route.  It can be specified by either supplying a model class or a model.  If a model is supplied, the id of the model is passed as a parameter to the controller.  (`?id=7`, for example)  The default for this attribute is the class of the context.   In other words, the class that contains the `has_many / has_one`, not the class with the `belongs_to`.
+
+`completer` specifies the action for the route.   `name-one` prepends `complete_` to the value given here.  This should be exactly the same as the first parameter to `autocomplete` in your controller.   As an example:  `autocomplete :email_address` would correspond to `completer="email_address"`.  The default for this attribute is the name field for the model being searched, which is usually `name`, but not always.
+
+The query string is passed to the controller in the `query` parameter.  (`?query=hello` for example).
+
+For more information on how to customize the controller, see the [controller manual](http://cookbook.hobocentral.net/manual/controllers#autocompleters)
+
+Here's a more complex example.  This used to be a part of [agility](http://cookbook.hobocentral.net/tutorials/agility) until it was simplified.
+
+    class ProjectsController < ApplicationController
+      autocomplete :new_member_name do
+        project = find_instance
+        hobo_completions :name, User.without_project(project).is_not(project.owner)
+      end
+    end
+
+Note that this was added to the projects controller, rather than the users controller as in the first example.  You can read this as: create an auto-complete action called ’new_member_name’ that finds users that are not already members of the project, and not the owner of the project, and completes the :name field.
+
+    <name-one:user complete-target="&@project" completer="new_member_name"/>
+
+We're using an object as the complete-target rather than a class.   This allows the `find_instance` in our controller action to function.
 
   -->
 <def tag="name-one" attrs="complete-target, completer"><%
