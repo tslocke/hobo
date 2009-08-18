@@ -361,7 +361,6 @@ module Hobo
 
         # Hack fix for Bug 477.  See also bug 489.
         if view=="index"
-          require 'ruby-debug' ; debugger
           params['action'] = 'index'
           self.action_name = 'index'
           index
