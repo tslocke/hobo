@@ -355,9 +355,18 @@ module Hobo
 
     def re_render_form(default_action=nil)
       if params[:page_path]
+        @invalid_record = this        
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        render :template => "#{controller}/#{view}"
+
+        # Hack fix for Bug 477.  See also bug 489.
+        if view=="index"
+          params['action'] = 'index'
+          self.action_name = 'index'
+          index
+        else
+          render :template => "#{controller}/#{view}"
+        end
       else
         render :action => default_action
       end
@@ -607,7 +616,7 @@ module Hobo
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
       flash_notice "The #{model.name.titleize.downcase} was deleted"
-      destroy_response(&b)
+      destroy_response(options, &b)
     end
 
 
