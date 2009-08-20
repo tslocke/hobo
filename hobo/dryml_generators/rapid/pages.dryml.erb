@@ -188,8 +188,8 @@ end
           </preview-with-more:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
-            <h3 param="<%= refl.name %>-collection"><%= refl.name.to_s.titleize %></h3>
-            <collection:<%= refl.name %>/>
+            <h3 param="<%= refl.name %>-collection-heading"><%= refl.name.to_s.titleize %></h3>
+            <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
           </section>
 <%     end -%>
 <%   end -%>
