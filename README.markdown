@@ -35,6 +35,13 @@ To install local documentation:
 
     git submodule update --init
 
+## Notes
+
+Hobo Jquery calls
+[jQuery.noConflict()](http://docs.jquery.com/Core/jQuery.noConflict) 
+to avoid conflicts with prototype.  `$` is still bound to
+prototype.js.  To use jQuery, use `jQuery` instead of `$`.
+
 ## Documentation
 
 [Auto generated documentation](http://bryanlarsen.github.com/hobo-jquery/documentation.html).
