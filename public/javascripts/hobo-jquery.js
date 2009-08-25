@@ -190,6 +190,9 @@ var hjq = (function() {
                 // initialize subelements
                 hjq.initialize.call(me.next().get(0));
 
+                // and reinitialize low-pro too
+                Event.addBehavior.reload();
+
                 // visibility
                 if(me.hasClass("empty")) {
                     me.addClass("hidden");
