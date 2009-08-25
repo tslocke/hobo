@@ -171,7 +171,7 @@ end
       <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          No <%= this.class.class_name.humanize.downcase.pluralize %>.
+          No <%= this.class.class_name.titleize.downcase.pluralize %>.
         </div>
         <div class="buttons">
           <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
