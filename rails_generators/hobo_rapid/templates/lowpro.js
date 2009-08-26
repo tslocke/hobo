@@ -127,7 +127,7 @@ Object.extend(Event.addBehavior, {
       var observer = rules[selector];
       var sels = selector.split(',');
       sels.each(function(sel) {
-        var parts = sel.split(/:(?=[a-z]+$)/), css = parts[0], event = parts[1];
+        var match = sel.match(/^([^:]*)(?::(.*)$)?/), css = match[1], event = match[2];
         $$(css).each(function(element) {
           if (event) {
             var wrappedObserver = Event.addBehavior._wrapObserver(observer);
