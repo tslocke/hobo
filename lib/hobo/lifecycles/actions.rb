@@ -124,7 +124,11 @@ module Hobo
       def get_state(record, state)
         case state
         when Proc
-          state.call(record)
+          if state.arity == 1
+            state.call(record)
+          else
+            record.instance_eval(&state)
+          end
         when String
           eval(state, record.instance_eval { binding })
         else
