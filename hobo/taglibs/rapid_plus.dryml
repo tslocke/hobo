@@ -29,7 +29,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
              sort_url = url_for(params.merge(:sort => sort) - [:page])
-             col_heading_name = this.member_class.try.view_hints.try.field_name(scope.field_name) %>
+             col_heading_name = this.member_class.try.view_hints.try.field_name(scope.field_name) || scope.field_name.titleize %>
                           
           <th param="#{scope.field-name}-heading">
             <a href="&sort_url" class="column-sort" 
