@@ -8,7 +8,7 @@ module HoboFields
     @ignore_tables = []
 
     class << self
-      attr_accessor :ignore_models, :ignore_tables
+      attr_accessor :ignore_models, :ignore_tables, :disable_indexing
     end
 
     def self.run(renames={})
