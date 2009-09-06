@@ -14,12 +14,14 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
 We also need to get ActiveRecord set up with a database connection
 {.hidden}
 
+    >> mysql_user = 'root'; mysql_password = ''
+    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
     >> mysql_database = "hobofields_doctest"
-    >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
+    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
-                                               :host => "localhost")
+                                               :host => "localhost", :user => mysql_user, :password => mysql_password)
 {.hidden}
 
 Some load path manipulation you shouldn't need:
@@ -332,27 +334,18 @@ Set the table name back to what it should be and confirm we're in sync:
     >> HoboFields::MigrationGenerator.run
     => ["", ""]
 
-### Drop a table
-
-If you delete a model, the migration generator will create a `drop_table` migration. Unfortunately there's no way to fully remove the Advert class we've defined from the doctest session, but we can tell the migration generator to ignore it.
-
-    >> HoboFields::MigrationGenerator.ignore_models = [ :advert ]
-
-Dropping tables is where the automatic down-migration really comes in handy:
-
-    >> up, down = HoboFields::MigrationGenerator.run
-    >> up
-    => "drop_table :adverts"
-    >> down
-    =>
-     "create_table "adverts", :force => true do |t|
-       t.text   "body"
-       t.string "title", :default => "Untitled"
-     end"
-
 ### Rename a table
 
-As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement'. Remember 'Advert' is being ignored so it's as if we renamed the definition in our models directory.
+As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement', and tell ActiveRecord to forget about the Advert class. This requires code that shouldn't be shown to impressionable children.
+
+{.hidden}
+    >>
+     def nuke_model_class(klass)
+      ActiveRecord::Base.instance_eval { class_variable_get('@@subclasses')[klass.superclass].delete(klass) }
+      Object.instance_eval { remove_const klass.name.to_sym }
+     end
+    >> nuke_model_class(Advert)
+{.hidden}
 
     >>
      class Advertisement < ActiveRecord::Base
@@ -367,9 +360,25 @@ As with renaming columns, we have to tell the migration generator about the rena
     >> down
     => "rename_table :advertisements, :adverts"
 
-Now that we've seen the renaming we'll switch the 'ignore' setting to ignore that 'Advertisements' class.
+### Drop a table
 
-    >> HoboFields::MigrationGenerator.ignore_models = [ :advertisement ]
+{.hidden}
+    >> nuke_model_class(Advertisement)
+{.hidden}
+
+If you delete a model, the migration generator will create a `drop_table` migration.
+
+Dropping tables is where the automatic down-migration really comes in handy:
+
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    => "drop_table :adverts"
+    >> down
+    =>
+     "create_table "adverts", :force => true do |t|
+       t.text   "body"
+       t.string "title", :default => "Untitled"
+     end"
 
 ## STI
 
@@ -378,6 +387,12 @@ Now that we've seen the renaming we'll switch the 'ignore' setting to ignore tha
 Adding a subclass or two should introduce the 'type' column and no other changes
 
         >>
+         class Advert < ActiveRecord::Base
+           fields do
+             body :text
+             title :string, :default => "Untitled"
+           end
+         end
          class FancyAdvert < Advert
          end
          class SuperFancyAdvert < FancyAdvert
@@ -391,7 +406,10 @@ Adding a subclass or two should introduce the 'type' column and no other changes
 Cleanup
 
         >> Advert.field_specs.delete(:type)
-
+{.hidden}
+        >> nuke_model_class(SuperFancyAdvert)
+        >> nuke_model_class(FancyAdvert)
+{.hidden}
 
 ## Coping with multiple changes
 
@@ -430,7 +448,9 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
 ### Rename a table and add a column
 
-    >> HoboFields::MigrationGenerator.ignore_models += [:advert, :fancy_advert, :super_fancy_advert]
+{.hidden}
+    >> nuke_model_class(Advert)
+{.hidden}
     >>
      class Ad < ActiveRecord::Base
        fields do
@@ -446,6 +466,15 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
      add_column :ads, :created_at, :datetime"
     >>
+{.hidden}
+    >>
+     class Advert < ActiveRecord::Base
+       fields do
+         body :text
+         title :string, :default => "Untitled"
+       end
+     end
+{.hidden}
 
 ## Legacy Keys
 
@@ -468,5 +497,5 @@ HoboFields has some support for legacy keys.
 Cleanup
 {.hidden}
 
-    >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+    >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
 {.hidden}

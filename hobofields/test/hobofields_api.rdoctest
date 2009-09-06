@@ -16,12 +16,14 @@ Our test requires rails:
 We need a database connection for this test:
 {.hidden}
 
+    >> mysql_user = 'root'; mysql_password = ''
+    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
     >> mysql_database = "hobofields_doctest"
-    >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
+    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
-                                               :host => "localhost")
+                                               :host => "localhost", :user => mysql_user, :password => mysql_password)
 {.hidden}
 
 Some load path manipulation you shouldn't need:
@@ -266,5 +268,5 @@ To have them validated use `validate_virtual_field`:
 Cleanup
 {.hidden}
 
-    >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+    >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
 {.hidden}
