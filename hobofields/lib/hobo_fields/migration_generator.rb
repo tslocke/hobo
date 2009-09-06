@@ -210,7 +210,11 @@ module HoboFields
       primary_key_option = ", :primary_key => :#{model.primary_key}" if model.primary_key != "id"
       (["create_table :#{model.table_name}#{primary_key_option} do |t|"] +
        model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f, longest_field_name)} +
-       ["end"]) * "\n"
+       ["end"] + (MigrationGenerator.disable_indexing ? [] : create_indexes(model))) * "\n"
+    end
+
+    def create_indexes(model)
+      model.index_specs.map { |i| i.to_add_statement(model.table_name) }
     end
 
     def create_field(field_spec, field_name_width)
@@ -286,10 +290,36 @@ module HoboFields
         end
       end.compact
 
-      [(renames + adds + removes + changes) * "\n",
-       (undo_renames + undo_adds + undo_removes + undo_changes) * "\n"]
+      index_changes, undo_index_changes = change_indexes(model, current_table_name)
+
+      [(renames + adds + removes + changes + index_changes) * "\n",
+       (undo_renames + undo_adds + undo_removes + undo_changes + undo_index_changes) * "\n"]
     end
 
+    def change_indexes(model, old_table_name)
+      return [[],[]] if MigrationGenerator.disable_indexing
+      new_table_name = model.table_name
+      existing_indexes = IndexSpec.for_model(model, old_table_name)
+      model_indexes = model.index_specs
+      add_indexes = model_indexes - existing_indexes
+      drop_indexes = existing_indexes - model_indexes
+      undo_add_indexes = []
+      undo_drop_indexes = []
+      add_indexes.map! do |i|
+        undo_add_indexes << drop_index(old_table_name, i.name)
+        i.to_add_statement(new_table_name)
+      end
+      drop_indexes.map! do |i|
+        undo_drop_indexes << i.to_add_statement(old_table_name)
+        drop_index(new_table_name, i.name)
+      end
+      # the order is important here - adding a :unique, for instance needs to remove then add
+      [drop_indexes + add_indexes, undo_add_indexes + undo_drop_indexes]
+    end
+
+    def drop_index(table, name)
+      "remove_index :#{table}, :name => :#{name}"
+    end
 
     def format_options(options, type, changing=false)
       options.map do |k, v|

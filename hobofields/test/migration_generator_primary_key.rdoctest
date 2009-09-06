@@ -31,6 +31,9 @@ And we'll require:
     >> require 'hobosupport'
     >> require 'hobofields'
 
+    >> HoboFields::MigrationGenerator.disable_indexing = true
+{.hidden}
+
 OK we're ready to get going.
 
 We'll define a method to make that easier next time

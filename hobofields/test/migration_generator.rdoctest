@@ -37,6 +37,9 @@ And we'll require:
     >> require 'hobosupport'
     >> require 'hobofields'
 
+    >> HoboFields::MigrationGenerator.disable_indexing = true
+{.hidden}
+
 ## The migration generator -- introduction
 
 The migration generator works by:
@@ -338,7 +341,6 @@ Set the table name back to what it should be and confirm we're in sync:
 
 As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement', and tell ActiveRecord to forget about the Advert class. This requires code that shouldn't be shown to impressionable children.
 
-{.hidden}
     >>
      def nuke_model_class(klass)
       ActiveRecord::Base.instance_eval { class_variable_get('@@subclasses')[klass.superclass].delete(klass) }
@@ -362,7 +364,6 @@ As with renaming columns, we have to tell the migration generator about the rena
 
 ### Drop a table
 
-{.hidden}
     >> nuke_model_class(Advertisement)
 {.hidden}
 
@@ -406,7 +407,7 @@ Adding a subclass or two should introduce the 'type' column and no other changes
 Cleanup
 
         >> Advert.field_specs.delete(:type)
-{.hidden}
+
         >> nuke_model_class(SuperFancyAdvert)
         >> nuke_model_class(FancyAdvert)
 {.hidden}
@@ -448,7 +449,6 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
 ### Rename a table and add a column
 
-{.hidden}
     >> nuke_model_class(Advert)
 {.hidden}
     >>
@@ -465,8 +465,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
      "rename_table :adverts, :ads
 
      add_column :ads, :created_at, :datetime"
-    >>
-{.hidden}
+
     >>
      class Advert < ActiveRecord::Base
        fields do
@@ -495,7 +494,6 @@ HoboFields has some support for legacy keys.
      "rename_column :adverts, :id, :advert_id
 
 Cleanup
-{.hidden}
 
     >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
 {.hidden}
