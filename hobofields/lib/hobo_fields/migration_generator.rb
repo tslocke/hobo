@@ -67,9 +67,11 @@ module HoboFields
     # that generation needs to take into account
     def models_and_tables
       ignore_model_names = MigrationGenerator.ignore_models.map &it.to_s.underscore
-      models = table_model_classes.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
-      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s
-      [models, db_tables]
+      all_models = table_model_classes
+      hobo_models = all_models.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
+      non_hobo_models = all_models - hobo_models
+      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s - non_hobo_models.*.table_name
+      [hobo_models, db_tables]
     end
 
 
@@ -128,6 +130,7 @@ module HoboFields
     
     
     def always_ignore_tables
+      # TODO: figure out how to do this in a sane way and be compatible with 2.2 and 2.3 - class has moved
       sessions_table = CGI::Session::ActiveRecordStore::Session.table_name if
         defined?(CGI::Session::ActiveRecordStore::Session) &&
         defined?(ActionController::Base) &&
