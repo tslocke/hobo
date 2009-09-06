@@ -63,6 +63,13 @@ module HoboFields
     end
     def native_types; self.class.native_types; end
 
+    # list habtm join tables
+    def habtm_tables
+      ActiveRecord::Base.send(:subclasses).map do |c|
+        c.reflect_on_all_associations(:has_and_belongs_to_many).map { |a| a.options[:join_table] }
+      end.flatten.compact.*.to_s
+    end
+
     # Returns an array of model classes and an array of table names
     # that generation needs to take into account
     def models_and_tables
@@ -70,7 +77,7 @@ module HoboFields
       all_models = table_model_classes
       hobo_models = all_models.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
       non_hobo_models = all_models - hobo_models
-      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s - non_hobo_models.*.table_name
+      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s - non_hobo_models.*.table_name - habtm_tables
       [hobo_models, db_tables]
     end
 
