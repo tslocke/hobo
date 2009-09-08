@@ -41,6 +41,16 @@ module Hobo
       DrymlGenerator.enable
     end
     
+    
+    def precompile_taglibs
+      Dir.chdir(RAILS_ROOT) do
+        taglibs = Dir["vendor/plugins/**/taglibs/**/*.dryml"] + Dir["app/views/taglibs/**/*.dryml"]
+        taglibs.each do |f|
+          Hobo::Dryml::Taglib.get(:template_dir => File.dirname(f), :src => File.basename(f).remove(".dryml"))
+        end
+      end
+    end
+    
 
     def clear_cache
       @renderer_classes = {}
