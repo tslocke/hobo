@@ -85,5 +85,5 @@ This is a simple tag - just look at the source if you need to know more detail.
 
 <!--- A simple wrapper around the `will_paginate` helper. All options to `will_paginate` are available as attributes -->
 <def tag="page-nav">
-  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :prev_label => "&laquo; Prev") %>
+  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :previous_label => "&laquo; Prev") %>
 </def>
