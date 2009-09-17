@@ -111,7 +111,7 @@ module Hobo
           self.this = find_instance(opts)
           raise Hobo::PermissionDeniedError unless @this.method_callable_by?(current_user, method)
           if got_block
-            instance_eval(&block)
+            this.with_acting_user(current_user) { instance_eval(&block) }
           else
             @this.send(method)
           end
