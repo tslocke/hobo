@@ -9,7 +9,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
 -->
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
-  <% sort_columns['this'] ||= this.member_class.name_attribute %>
+  <% sort_columns['this'] ||= this.member_class.try.name_attribute %>
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
@@ -28,11 +28,12 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
-             sort_url = url_for(params.merge(:sort => sort) - [:page]) %>
+             sort_url = url_for(params.merge(:sort => sort) - [:page])
+             col_heading_name = this.member_class.try.view_hints.try.field_name(scope.field_name) || scope.field_name.titleize %>
                           
           <th param="#{scope.field-name}-heading">
             <a href="&sort_url" class="column-sort" 
-               param="#{scope.field-name}-heading-link"><%= scope.field_name.titleize %></a>
+               param="#{scope.field-name}-heading-link"><%= col_heading_name %></a>
             <if test="&col == sort_field">
               <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
               <do param="down-arrow" if="&sort_direction == 'asc'">&darr;</do>
@@ -45,7 +46,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
     <do param="empty-message" if="empty?">No <collection-name lowercase/> to display</do>
 
    
-    <page-nav param if="&this.respond_to? :page_count"/>
+    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
   </div>
 </def>
 
@@ -76,7 +77,7 @@ This tag assumes the controller has a `reorder` action. This action is added aut
 %>
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>
-      <div class="ordering-handle" param="handle">&uarr;<br/>&darr;</div>
+      <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
       <do param="default"><card param/></do>
     </item:>
   </collection>

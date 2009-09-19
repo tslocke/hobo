@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'fileutils'
+require 'pathname'
+require 'activesupport'
+
 Signal.trap("INT") { puts; exit }
 
 hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
@@ -14,6 +17,7 @@ Options:
   -d | --database <database>         # e.g. mysql, sqlite
   -r | --rails <version>             # rails version to use
   -n | --no-rails                    # don't run 'rails'.  Assumes app-path=='.'
+  --invite-only                      # add features for an invite-ony website (admin site, no signup)
 "
 
 
@@ -36,11 +40,10 @@ def command(*s)
   exit(1) unless ok
 end
 
-user_model  = "user"
-create_db   = false
-run_rails   = true
-
-puts ARGV
+user_model = "user"
+create_db  = false
+run_rails  = true
+invite_ony = ""
 
 while true
   case arg_name = ARGV.shift
@@ -50,13 +53,16 @@ while true
   when "--db-create"
     create_db = true
   when "--hobo-src"
-    hobo_src = "../" + ARGV.shift
+    hobo_src = ARGV.shift
+    hobo_src = "../" + hobo_src unless Pathname.new(hobo_src).absolute?
   when "-d", "--database"
     database_type = ARGV.shift
   when "-r", "--rails"
     rails_version = ARGV.shift
   when "-n", "--no-rails"
     run_rails = false
+  when "--invite-only"
+    invite_ony = "--invite-only"
   when "--help"
     puts USAGE
     exit
@@ -100,16 +106,16 @@ Dir.chdir(app_path) do
   command(gen, "hobo --add-gem --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
-  command("#{gen} hobo_rapid --import-tags")
+  command("#{gen} hobo_rapid --import-tags #{invite_ony}")
 
   if user_model
     puts "\nCreating #{user_model} model and controller...\n"
-    command("#{gen} hobo_user_model #{user_model}")
-    command("#{gen} hobo_user_controller #{user_model}")
+    command("#{gen} hobo_user_model #{user_model} #{invite_ony}")
+    command("#{gen} hobo_user_controller #{user_model} #{invite_ony}")
   end
 
   puts "\nCreating standard pages...\n"
-  command("#{gen} hobo_front_controller front --delete-index --add-routes")
+  command("#{gen} hobo_front_controller front --delete-index --add-routes #{invite_ony}")
 
   if create_db
     puts "\nCreating databases"
@@ -117,3 +123,17 @@ Dir.chdir(app_path) do
   end
 end
 
+if invite_ony.present?
+  puts %(
+Invite-only website
+  If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
+  to the relevant controllers, e.g. to prevent all access to the site, add
+  
+    include Hobo::AuthenticationSupport
+    before_filter :login_required
+  
+  to application_controller.rb (note that the include statement is not required for hobo_controllers)
+  
+  NOTE: You might want to sign up as the administrator before adding this!
+)
+end

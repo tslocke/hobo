@@ -1,10 +1,9 @@
--*- indent-tabs-mode:nil; -*-
-
 # HoboFields -- Rich Types
 
 This doctest describes the rich types bundles with HoboFields, and the process by which you can create and register your own types.
 
 Our test requires rails:
+{.hidden}
 
         >> require 'rubygems'
         >> require 'activesupport'
@@ -12,9 +11,11 @@ Our test requires rails:
         >> require 'actionpack'
         >> require 'action_view'
         >> require 'action_controller'
+{.hidden}
 
 ActiveRecord 2.3.2 doesn't work very well without a connection, even
 though we don't need it for this test:
+{.hidden}
 
         >> mysql_database = "hobofields_doctest"
         >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
@@ -22,13 +23,17 @@ though we don't need it for this test:
         >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                    :database => mysql_database,
                                                    :host => "localhost")
+{.hidden}
 
 Some load path manipulation you shouldn't need:
+{.hidden}
 
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+{.hidden}
 
 Finally we can require hobofields: 
+{.hidden}
 
         >> require 'hobosupport'
         >> require 'hobofields'
@@ -51,9 +56,9 @@ This class defines the methods `to_html` to customize the way the type is render
         # Loud text always renderd in caps.
         # It's rude to shout too much so it's not allowed to be
         # longer than 100 characters
-        class LoudText < String
+        class LoudText < DelegateClass(String)
 
-      COLUMN_TYPE = :string
+          COLUMN_TYPE = :string
 
           HoboFields.register_type(:loud, self)
 
@@ -69,10 +74,17 @@ This class defines the methods `to_html` to customize the way the type is render
 
 That's all there is to it. Defining `to_html` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
 
+We use `DelegateClass` so that we can act like a string without actually being a string.
+
+You can use `LoudText` in your model with
+
+    fields do
+      shout :loud
+    end
 
 ## Bundled types
 
-Here we'll give a quick overview of the bundles types. Remember that, along with the specific features the type provides (e.g. validation), the simple fact that the type exists is also useful in the other layers of Hobo. For example `HoboFields::PasswordString` doesn't add any features to `String`, but the fact that a specific type exists for passwords means that the view layer can automatically render an `<input type="password">`.
+Here we'll give a quick overview of the bundled types. Remember that along with the specific features the type provides (e.g. validation), the simple fact that the type exists is also useful in the other layers of Hobo. For example `HoboFields::PasswordString` doesn't add any features to `String`, but the fact that a specific type exists for passwords means that the view layer can automatically render an `<input type="password">`.
 
 
 ### `HoboFields::EmailAddress`
@@ -220,9 +232,10 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
         => Article::Status
 
 ## Cleanup
+{.hidden}
 
         >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
-
+{.hidden}
 
 
 

@@ -8,23 +8,20 @@ module Enumerable
     not_found
   end
 
-  def map_with_index
-    res = []
+  def map_with_index(res=[])
     each_with_index {|x, i| res << yield(x, i)}
     res
   end
 
-  def build_hash
-    res = {}
+  def build_hash(res={})
     each do |x|
-      pair = yield x
+      pair = block_given? ? yield(x) : x
       res[pair.first] = pair.last if pair
     end
     res
   end
 
-  def map_hash
-    res = {}
+  def map_hash(res={})
     each do |x|
       v = yield x
       res[x] = v

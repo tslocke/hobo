@@ -32,6 +32,7 @@ div.completions_popup {
     border:1px solid #888;
     margin:0px;
     padding:0px;
+    z-index:100;
 }
 div.completions_popup ul {
     list-style-type:none;

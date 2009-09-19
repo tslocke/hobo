@@ -7,9 +7,12 @@ module Hobo
       def create_automatic_scope(name)
         ScopeBuilder.new(self, name).create_scope
       rescue ActiveRecord::StatementInvalid => e
-        # Problem with the database? Don't try to create automatic scopes
-        ActiveRecord::Base.logger.warn "!! Database exception during hobo auto-scope creation -- continuing automatic scopes"
-        ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        # Problem with the database? Don't try to create automatic
+        # scopes
+        if ActiveRecord::Base.logger
+          ActiveRecord::Base.logger.warn "!! Database exception during hobo auto-scope creation -- continuing automatic scopes"
+          ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        end
         false
       end
 
@@ -175,28 +178,28 @@ module Hobo
           def_scope :conditions => ["#{column_sql(col)} <> ?", true]
 
         # published_before(time)
-        elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time|
             { :conditions => ["#{column_sql(col)} < ?", time] }
           end
 
         # published_after(time)
-        elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time|
             { :conditions => ["#{column_sql(col)} > ?", time] }
           end
 
         # published_between(time1, time2)
-        elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_at")) && col.type.in?([:date, :datetime, :time, :timestamp])
+        elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
 
           def_scope do |time1, time2|
             { :conditions => ["#{column_sql(col)} >= ? AND #{column_sql(col)} <= ?", time1, time2] }
           end
 
          # active (a lifecycle state)
-        elsif @klass.has_lifecycle? && name.in?(@klass::Lifecycle.state_names)
+        elsif @klass.has_lifecycle? && name.to_sym.in?(@klass::Lifecycle.state_names)
 
           if @klass::Lifecycle.state_names.length == 1
             # nothing to check for - create a dummy scope
@@ -250,7 +253,9 @@ module Hobo
             def_scope do |*args|
               field, asc = args
               type = klass.attr_type(field)
-              if type.respond_to?(:table_name) && (name = type.name_attribute)
+              if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
+                colspec = "#{field}" # don't prepend the table name 
+              elsif type.respond_to?(:table_name) && (name = type.name_attribute)
                 include = field
                 colspec = "#{type.table_name}.#{name}"
               else

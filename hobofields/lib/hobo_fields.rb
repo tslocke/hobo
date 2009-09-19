@@ -9,7 +9,7 @@ end
 
 module HoboFields
 
-  VERSION = "0.8.5"
+  VERSION = "0.8.8"
 
   extend self
 
@@ -19,7 +19,6 @@ module HoboFields
     :datetime      => (defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : Time),
     :time          => Time,
     :integer       => Integer,
-    :big_integer   => BigDecimal,
     :decimal       => BigDecimal,
     :float         => Float,
     :string        => String

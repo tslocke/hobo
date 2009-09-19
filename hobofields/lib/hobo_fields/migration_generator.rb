@@ -197,7 +197,8 @@ module HoboFields
 
     def create_table(model)
       longest_field_name = model.field_specs.values.map { |f| f.sql_type.to_s.length }.max
-      (["create_table :#{model.table_name} do |t|"] +
+      primary_key_option = ", :primary_key => :#{model.primary_key}" if model.primary_key != "id"
+      (["create_table :#{model.table_name}#{primary_key_option} do |t|"] +
        model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f, longest_field_name)} +
        ["end"]) * "\n"
     end
@@ -210,15 +211,19 @@ module HoboFields
     def change_table(model, current_table_name)
       new_table_name = model.table_name
 
-      db_columns = model.connection.columns(current_table_name).index_by{|c|c.name} - [model.primary_key]
+      db_columns = model.connection.columns(current_table_name).index_by{|c|c.name}
+      key_missing = db_columns[model.primary_key].nil?
+      db_columns -= [model.primary_key]
+      
       model_column_names = model.field_specs.keys.*.to_s
       db_column_names = db_columns.keys.*.to_s
 
       to_add = model_column_names - db_column_names
+      to_add += [model.primary_key] if key_missing
       to_remove = db_column_names - model_column_names - [model.primary_key.to_sym]
 
       to_rename = extract_column_renames!(to_add, to_remove, new_table_name)
-
+      
       db_column_names -= to_rename.keys
       db_column_names |= to_rename.values
       to_change = db_column_names & model_column_names

@@ -108,6 +108,7 @@ module HoboFields
     def self.declare_field(name, type, *args)
       options = args.extract_options!
       try.field_added(name, type, args, options)
+      add_formatting_for_field(name, type, args)
       add_validations_for_field(name, type, args)
       declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
@@ -126,6 +127,16 @@ module HoboFields
         self.validate do |record|
           v = record.send(name)._?.validate
           record.errors.add(name, v) if v.is_a?(String)
+        end
+      end
+    end
+
+
+    def self.add_formatting_for_field(name, type, args)
+      type_class = HoboFields.to_class(type)
+      if type_class && "format".in?(type_class.instance_methods)
+        self.before_validation do |record|
+          record.send("#{name}=", record.send(name)._?.format)
         end
       end
     end

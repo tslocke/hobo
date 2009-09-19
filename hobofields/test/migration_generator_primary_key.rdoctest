@@ -1,0 +1,94 @@
+-*- indent-tabs-mode:nil; -*-
+
+# HoboFields - Migration Generator
+
+Note that these doctests are good tests but not such good docs. The migration generator doesn't really fit well with the doctest concept of a single IRB session. As you'll see, there's a lot of jumping-through-hoops and doing stuff that no normal user of the migration generator would ever do.
+
+Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
+
+    >> require 'rubygems'
+    >> require 'activesupport'
+    >> require 'activerecord'
+
+We also need to get ActiveRecord set up with a database connection
+
+    >> mysql_database = "hobofields_doctest"
+    >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+    >> system("mysqladmin create #{mysql_database}") or raise "could not create database"
+    >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+                                               :database => mysql_database,
+                                               :host => "localhost")
+
+Some load path manipulation you shouldn't need:
+
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+
+And we'll require:
+
+    >> require 'hobosupport'
+    >> require 'hobofields'
+
+OK we're ready to get going.
+
+We'll define a method to make that easier next time
+
+    >>
+     def migrate(renames={})
+       up, down = HoboFields::MigrationGenerator.run(renames)
+       puts up
+       ActiveRecord::Migration.class_eval(up)
+       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       [up, down]
+     end
+
+## Alternate Primary Keys
+
+### create
+
+   >>
+    class Foo < ActiveRecord::Base
+      fields do
+      end
+      set_primary_key "foo_id"
+    end
+   >> up, down = HoboFields::MigrationGenerator.run
+   >> up
+   =>  
+     "create_table :foos, :primary_key => :foo_id do |t|
+     end"
+   >> migrate
+  
+### migrate from
+
+   >>
+    class Foo < ActiveRecord::Base
+      set_primary_key "id"
+    end
+   >> up, down = HoboFields::MigrationGenerator.run({:foos => {:foo_id => :id}})
+   >> up
+
+   => "rename_column :foos, :foo_id, :id"
+   >> migrate({:foos => {:foo_id => :id}})
+
+### migrate to
+
+   >>
+    class Foo < ActiveRecord::Base
+      set_primary_key "foo_id"
+    end
+   >> up, down = HoboFields::MigrationGenerator.run({:foos => {:id => :foo_id}})
+   >> up
+
+   => "rename_column :foos, :id, :foo_id"
+   >> migrate({:foos => {:id => :foo_id}})
+
+### ensure it doesn't cause further migrations
+
+   >> up, down = HoboFields::MigrationGenerator.run
+   >> up
+   => ""
+
+## Cleanup
+
+   >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"

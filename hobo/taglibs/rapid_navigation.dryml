@@ -37,12 +37,14 @@ Then in your pages you can call the tag like this
 
 
 <!-- Renders a single item in a `<navigation>` menu. See [`<navigation`>](/api_tag_defs/navigation). -->
-<def tag="nav-item">
+<def tag="nav-item" attrs="name">
   <% body = parameters.default 
-     body = h(this.to_s) if body.blank? -%>
-  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == body.downcase.gsub(/<.*?>/, '').strip}"
-      merge-attrs="&attributes - attrs_for(:a)">
-    <a merge-attrs="&attributes & attrs_for(:a)"><%= body %></a>
+     body = h(this.to_s) if body.blank?
+     name ||= body.gsub(/<.*?>/, '').strip
+     -%>
+  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == name.downcase}"
+      merge-attrs="&attributes - (attrs_for(:a)+['target'])">
+    <a merge-attrs="&attributes & (attrs_for(:a)+['target'])"><%= body %></a>
   </li>
 </def>
 
@@ -64,9 +66,9 @@ This is a simple tag - just look at the source if you need to know more detail.
 
   -->
 <def tag="account-nav">
-  <dev-user-changer/>
   <do with="&current_user">
     <ul class="navigation account-nav" param>
+      <li if="&RAILS_ENV == 'development'" param="dev-user-changer"><dev-user-changer/></li>
       <if test="&logged_in?">
         <li class='nav-item' param="logged-in-as"><a to="&current_user">Logged in as <name/></a></li>
         <li class='nav-item' param="account"><a action="account">Account</a></li>
@@ -83,5 +85,5 @@ This is a simple tag - just look at the source if you need to know more detail.
 
 <!--- A simple wrapper around the `will_paginate` helper. All options to `will_paginate` are available as attributes -->
 <def tag="page-nav">
-  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :prev_label => "&laquo; Prev") %>
+  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :previous_label => "&laquo; Prev") %>
 </def>

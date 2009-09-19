@@ -10,6 +10,22 @@
         <ul>
           <li>To customise this page: edit app/views/front/index.dryml</li>
         </ul>
+    
+        <%% if User.count == 0 -%>
+          <h3 style="margin-top: 20px;">There are no user accounts - please provide the details of the site administrator</h3>
+<% if invite_only? %>
+          <form with="&this || User.new" without-cancel>
+            <field-list: fields="name, email_address, password, password_confirmation"/>
+            <submit: label="Register Administrator"/>
+          </form>
+<% else -%>
+          <do with="&User.new"><%% this.exempt_from_edit_checks = true %>
+            <signup-form/>
+          </do>
+<% end -%>
+        <%% end -%>
+        
+      
       </section>
     </header>
 

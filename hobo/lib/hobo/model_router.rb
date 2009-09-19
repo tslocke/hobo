@@ -86,8 +86,10 @@ module Hobo
 
       rescue ActiveRecord::StatementInvalid => e
         # Database problem? Just continue without routes
-        ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
-        ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        if ActiveRecord::Base.logger
+          ActiveRecord::Base.logger.warn "!! Database exception during Hobo routing -- continuing without routes"
+          ActiveRecord::Base.logger.warn "!! #{e.to_s}"
+        end
       end
 
 

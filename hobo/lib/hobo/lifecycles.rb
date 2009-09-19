@@ -17,7 +17,8 @@ module Hobo
       def self.lifecycle(*args, &block)
         options = args.extract_options!
         options = options.reverse_merge(:state_field => :state,
-                                        :key_timestamp_field => :key_timestamp)
+                                        :key_timestamp_field => :key_timestamp,
+                                        :key_timeout => 999.years)
 
         if defined? self::Lifecycle
           lifecycle = self::Lifecycle

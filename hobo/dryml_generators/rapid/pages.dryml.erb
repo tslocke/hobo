@@ -55,7 +55,7 @@ new_form = !new_link && linkable?(model, :create, :method => :post)
 <% if new_form -%>
         <div param="new-form">
           <h3 param="new-form-heading">New <%= model_name :title %></h3>
-          <form with="&new_for_current_user <%= model %>" param/>
+          <form with="&@invalid_record || new_for_current_user(<%= model %>)" param/>
         </div>
 
 <% end -%>
@@ -188,8 +188,8 @@ end
           </preview-with-more:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
-            <h3 param="<%= refl.name %>-collection"><%= refl.name.to_s.titleize %></h3>
-            <collection:<%= refl.name %>/>
+            <h3 param="<%= refl.name %>-collection-heading"><%= refl.name.to_s.titleize %></h3>
+            <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
           </section>
 <%     end -%>
 <%   end -%>
@@ -250,7 +250,7 @@ new_link = :new.in?(actions)
         <div param="back-to">Back to <a with="&@<%= owner %>"/></div>
 <% end -%>
 <% if owner_is_user %>
-        <h2 param="heading"><Your with="&current_user"/> <%= model_name :title, :plural %></h2>
+        <h2 param="heading"><Your with="&@<%= owner %>"/> <%= model_name :title, :plural %></h2>
 <% else -%>
         <h2 param="heading"><%= model_name :title, :plural %></h2>
         <h3 param="subheading">For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
