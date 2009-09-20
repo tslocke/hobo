@@ -1,14 +1,10 @@
 module HoboSupport
 
-<<<<<<< HEAD:hobosupport/lib/hobo_support.rb
-  VERSION = "0.8.7"
-=======
   VERSION = "0.8.8"
 
   RAILS_VERSION_FLOAT = Object.const_defined?(:Rails) ? Rails::VERSION::STRING.match(/^\d+\.\d+/)[0].to_f : 0
   
   RAILS_AT_LEAST_23 = (RAILS_VERSION_FLOAT >= 2.3)
->>>>>>> origin/master:hobosupport/lib/hobo_support.rb
 
 end
 
