@@ -61,22 +61,14 @@ For more samples search the code for ht() or &lt;trans&gt;&lt;/trans&gt; section
 
 
 ### View-hints
-This system will look up the view-hints directly from the keys you add (typically in app.*.yml). In the app.en.yml file I have:
+This system will look up the view-hints directly from the keys you add (typically in app.*.yml). Sample section from an app.en.yml file:
 <pre>
 <code>
-"no":
-  users:
-    index:
-      title: "Users"
-      heading: "Users"
-    collection:
-      count:
-        zero: "No users"
-        one: "{{count}} user"
-        other: "{{count}} users"
-    hints:
-      name: "This is the name shown to the users in the application. It should contain the user's full name."
-      email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
+en:
+ users:
+  hints:
+   name: "This is the name shown to the users in the application. It should contain the user's full name."
+   email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
 </code>
 </pre>
 
