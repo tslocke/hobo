@@ -163,7 +163,7 @@ module Hobo
 
 
     def validate_current_password_when_changing_password
-      changing_password? && !authenticated?(current_password) and errors.add :current_password, "is not correct"
+      changing_password? && !authenticated?(current_password) and errors.add :current_password, ht(:hobo.messages.current_password_is_not_correct, :default["is not correct"])
     end
 
   end
