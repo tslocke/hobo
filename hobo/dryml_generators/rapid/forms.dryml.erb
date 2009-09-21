@@ -4,13 +4,14 @@ form_fields = standard_fields :belongs_to, :has_many
 
 cancel_to_show_page  = linkable?(:show)
 cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
+model_key = model_name.pluralize.underscore
 -%>
 <def tag="form" for="<%= model.name %>">
   <form merge param="default">
     <error-messages param/>
     <field-list fields="<%= form_fields * ', ' %>" param/>
     <div param="actions">
-      <submit label="Save" param/><or-cancel param="cancel"/>
+      <submit label="#{ht '<%= model_key %>.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
@@ -22,7 +23,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
     <error-messages param/>
     <field-list fields="<%= creator.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= creator.name.to_s.titleize %>" param/><or-cancel param="cancel"/>
+      <submit label="#{ht '<%= model_key %>.actions.<%= creator.name.to_s %>', :default=>['<%= creator.name.to_s.titleize %>']}" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>
@@ -36,7 +37,7 @@ cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="<%= transition.name.to_s.titleize %>" param/><or-cancel param="cancel"/>
+      <submit label="#{ht '<%= model_key %>.actions.<%= transition.name.to_s %>', :default=>['<%= transition.name.to_s.titleize %>']}" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>

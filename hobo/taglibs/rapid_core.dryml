@@ -112,7 +112,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
                 <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
-                <a param="edit-link" action="edit" if="&can_edit?">Edit</a>
+                <a param="edit-link" action="edit" if="&can_edit?"><trans key="hobo.action.edit">Edit</trans></a>
                 <delete-button param/>
               </td>
             </if>

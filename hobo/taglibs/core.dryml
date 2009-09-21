@@ -102,3 +102,32 @@ collection is considered blank)
   new_field_context(fake_field, context) { res << parameters.default }
   res
 %></def>
+
+<!-- Localization: Tag uses the I18n.translate method 
+
+### Usage
+
+    <trans key="foo.bar"/> 
+      -> translate "foo.bar", :default=>:"hobo.bar"
+    
+    <trans key="foo.bar">Fallback</trans> 
+        -> translate "foo.bar", :default=>[:"hobo.bar", "Fallback"]
+        
+    
+### Attributes
+
+  -key: Key for translation lookup
+  -*: Pass other attributes to be interpolated in the strings
+-->
+<def tag="trans" attrs="key"><%= 
+  
+  ## add the tag content (parameters.default) as a fallback
+  if attributes[:default].blank?
+    attributes[:default] = []
+  elsif attributes[:default].class != Array
+    attributes[:default] = [attributes[:default]]
+  end
+  attributes[:default] << parameters.default unless parameters.default.blank?
+  
+  ht(key, attributes)  
+%></def>
