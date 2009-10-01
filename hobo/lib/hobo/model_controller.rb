@@ -360,7 +360,7 @@ module Hobo
         view = default_action if view == Dryml::EMPTY_PAGE
 
         # Hack fix for Bug 477.  See also bug 489.
-        if view=="index"
+        if self.class.name == "#{controller.camelize}Controller" && view == "index"
           params['action'] = 'index'
           self.action_name = 'index'
           index
