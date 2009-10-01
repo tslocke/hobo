@@ -162,9 +162,10 @@ module Hobo
       # TODO: Calls to respond_to? in here can cause the full collection hiding behind a scoped collection to get loaded
       res = []
       empty = true
-      scope.new_scope(:repeat_collection => enum, :even_odd => 'odd') do
+      scope.new_scope(:repeat_collection => enum, :even_odd => 'odd', :repeat_item => nil) do
         if enum.respond_to?(:each_pair)
           enum.each_pair do |key, value|
+            scope.repeat_item = value
             empty = false;
             self.this_key = key;
             new_object_context(value) { res << yield }
@@ -173,6 +174,7 @@ module Hobo
         else
           index = 0
           enum.each do |e|
+            scope.repeat_item = e
             empty = false;
             if enum == this
               new_field_context(index, e) { res << yield }
