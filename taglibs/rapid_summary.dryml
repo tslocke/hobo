@@ -1,0 +1,260 @@
+<!-- These are a collection of tags that allow a application outline or summary to be created -->
+
+<!-- Rails.version -->
+<def tag="rails-version">
+  <%= Rails.version -%>
+</def>
+
+<!-- returns "vendor" or "gem" -->
+<def tag="rails-location">
+  <%= Rails.vendor_rails? ? "vendor" : "gem" -%>
+</def>
+
+<!-- RAILS_ROOT -->
+<def tag="rails-root">
+  <%= RAILS_ROOT -%>
+</def>
+
+<!-- RAILS_ENV -->
+<def tag="rails-env">
+  <%= RAILS_ENV -%>
+</def>
+
+<!-- the git branch currently in use -->
+<def tag="git-branch">
+  <%= File.basename(`git symbolic-ref HEAD`) -%>
+</def>
+
+<!-- the git version currently in use -->
+<def tag="git-version" attrs="dir">
+  <% dir=RAILS_ROOT if dir.blank? -%>
+  <%= `cd '#{dir}'; git rev-list HEAD^..HEAD --abbrev-commit --abbrev=7` -%>
+</def>
+
+<!-- returns 'clean' if there are no modified files, 'modified' otherwise. -->
+<def tag="git-clean" attrs="dir">
+  <% dir=RAILS_ROOT if dir.blank? -%>
+  <%= `cd '#{dir}'; git ls-files -m`.blank? ? "clean" : "modified"  -%>
+</def>
+
+<!-- the time & date of the last commit -->
+<def tag="git-last-commit-time">
+  <%= `git log HEAD^..HEAD --pretty=format:%cD` -%>
+</def>
+
+<!-- Hobo::VERSION -->
+<def tag="hobo-version">
+  <%= Hobo::VERSION -%>
+</def>
+
+<!-- repeats on Rails.configuration.gems, including dependent gems -->
+<def tag="with-gems">
+  <% gems = ActiveSupport::OrderedHash.new -%>
+  <% Rails.configuration.gems.each do |gem|
+       gems[name] ||= gem
+       gem.dependencies.each do |dep|
+         gems[dep] ||= dep
+       end
+     end -%>
+  <repeat with="&gems">
+    <do param="default"/>
+  </repeat>
+</def>
+
+<!-- inside `<with-gems>`, returns the gem name -->
+<def tag="gem-name">
+  <%= this.name -%>
+</def>
+
+<def tag="gem-version-requirement">
+  <%= this.requirements.map{|l| l.first+l.second.to_s}.join(",") -%>
+</def>
+
+<!-- inside `<with-gems>`, returns the version required -->
+<def tag="gem-version-required">
+  <gem-version-requirement:version-requirements />
+</def>  
+
+<!-- inside `<with-gems>`, returns the version -->
+<def tag="gem-version">
+  <%= this.specification.version.to_s -%>
+</def>
+
+<!-- inside `<with-gems>`, returns 'frozen', 'installed' or 'missing' -->
+<def tag="gem-frozen">
+  <%= this.frozen? ? "frozen" : (this.installed? ? "installed" : "missing") -%>
+</def>
+
+<!-- inside `<with-gems>`, returns the gem dependencies -->
+<def tag="gem-dependencies">
+  <repeat with="&this.dependencies">
+    <%= this.name -%><gem-version-requirement:requirement />
+  </repeat>
+</def>
+
+<!-- repeats on the plugins used by the application -->
+<def tag="with-plugins">
+  <%  fi = Hobo::FakeInitializer.new(Rails.configuration)
+      plugins = Rails.configuration.plugin_loader.new(fi).plugins %>
+  <repeat with="&plugins">
+    <do param="default" />
+  </repeat>
+</def>
+
+<!-- within `<with-plugins>`, returns the plugin name -->
+<def tag="plugin-name">
+  <%= this.name -%>
+</def>
+
+<!-- within `<with-plugins>`, returns the plugin location (directory) -->
+<def tag="plugin-location">
+  <%= this.directory -%>
+</def>
+
+<def tag="plugin-git-clean">
+  <git-clean dir="&this.directory"/>
+</def>
+
+<def tag="plugin-git-version">
+  <git-version dir="&this.directory"/>
+</def>
+
+<!-- within `<with-plugins>`, try and determine the method that was used to install the plugin.   Returns "braid", "symlink", "git-submodule" or "other" -->
+<def tag="plugin-method">
+  <%= 
+      braids = File.open("#{RAILS_ROOT}/.braids") {|f| YAML::load(f) } rescue {}
+      if !braids[this.directory.gsub(RAILS_ROOT+"/", "")].nil?
+        "braid"
+      elsif File.lstat(this.directory).symlink?
+        "symlink"
+      elsif File.exist?(this.directory+"/.git")
+        "git-submodule"
+      else
+        "other"
+      end
+   -%>
+</def>
+
+<!-- within `<with-plugins>`, determine if the plugin has been modified, returning "clean" or "modified".   Returns a blank string if this information is not available.   Uses `<plugin-git-clean>` or `<plugin-braid-clean>` to do the heavy lifting. -->
+<def tag="plugin-clean">
+  <% method = plugin_method.strip -%>
+  <plugin-git-clean if="&method=='git-submodule'"/>
+  <plugin-braid-clean if="&method=='braid'"/>
+</def>
+
+<!-- within `<with-plugins>`, returns the plugin version.   Returns a blank string if this information is not available.   Uses `<plugin-git-version>` or `<plugin-braid-version>` to do the heavy lifting. -->
+<def tag="plugin-version">
+  <% method = plugin_method.strip -%>
+  <plugin-git-version if="&method=='git-submodule'"/>
+  <plugin-braid-version if="&method=='braid'"/>
+</def>
+
+<def tag="plugin-braid-clean">
+  <%= diff=`braid diff #{this.directory.gsub(RAILS_ROOT+"/", "")}`
+      diff.strip.empty? ? "clean" : "modified" -%>
+</def>
+
+<def tag="plugin-braid-version">
+  <%=  braids = File.open("#{RAILS_ROOT}/.braids") {|f| YAML::load(f) } rescue {}
+       b=braids[this.directory.gsub(RAILS_ROOT+"/", "")]
+       b['revision'][0...7] if b -%>
+</def>
+
+<!-- repeats on the available execution environments, which are usually 'development', 'test' and 'production' -->
+<def tag="with-environments">
+  <repeat with="&Rails.configuration.database_configuration.keys">
+    <do param="default" />
+  </repeat>
+</def>
+
+<def tag="environment-name">
+  <%= this -%>
+</def>
+
+<!-- Given an environment name in the context, return the database adapter -->
+<def tag="database-type">
+  <%= Rails.configuration.database_configuration[this]['adapter'] -%>
+</def>
+
+<!-- Given an environment name in the context, return the database name -->
+<def tag="database-name">
+  <%= Rails.configuration.database_configuration[this]['database'] -%>
+</def>
+
+<!-- repeats on available models.  Does not return models defined in libraries or plugins.  -->
+<def tag="with-models">
+  <%  # stolen from railroad/model_diagram.rb
+
+    files = Dir.glob("app/models/**/*.rb")
+    models = files.map do |file|
+      model_name =  (model_path = file.gsub(/^(app\/models\/)([\w_\/\\]+)\.rb/, '\2')).camelize
+      # Hack to skip all xxx_related.rb files
+      next if /_related/i =~ model_name
+
+      begin
+        model_name.constantize
+      rescue LoadError
+        oldlen = model_path.length
+        model_path.gsub!(/.*[\/\\]/, '')
+        model_name = model_path.camelize
+        if oldlen > model_path.length
+          retry
+        end
+        next
+      rescue NameError
+        next
+      end
+    end
+   -%>
+  <repeat with="&models">
+    <do param="default" />
+  </repeat>
+</def>
+
+<def tag="model-name">
+  <%= this.to_s -%>
+</def>
+
+<!-- given a model, repeats on the database columns -->
+<def tag="with-model-columns">
+  <repeat with="&this.try.content_columns">
+    <do param="default" />
+  </repeat>
+</def>
+
+<!-- given a column, returns the type -->
+<def tag="model-column-type">
+  <%= this.type.to_s -%>
+</def>
+
+<!-- given a column, return the name -->
+<def tag="model-column-name">
+  <%= this.name -%>
+</def>
+
+<!-- given a model, repeats on the associations -->
+<def tag="with-model-associations">
+  <repeat with="&this.try.reflect_on_all_associations">
+    <do param="default" />
+  </repeat>
+</def>
+
+<!-- given an association, return the name -->
+<def tag="model-association-name">
+  <%= this.name.to_s -%>
+</def>
+
+<!-- given an association, return the macro type (has_many, etc.) -->
+<def tag="model-association-macro">
+  <%= if this.macro.to_s=='has_many' && this.options[:through]
+        'has_many :through'
+      else
+        this.macro.to_s
+      end -%>
+</def>
+
+<!-- given an association, return the name --> 
+<def tag="model-association-class-name">
+  <%= (this.class_name.respond_to? 'underscore') ? this.class_name.underscore.singularize.camelize : this.class_name -%>
+</def>
+

@@ -1,0 +1,82 @@
+<page>
+  <content:>
+    <h2>Application Summary</h2>
+
+    <table class="app-summary">
+      <tr> <th></th><th></th></tr>
+      <tr> <td>Application Name</td>           <td><app-name/></td>         </tr>
+      <tr> <td>Application Location</td>       <td><rails-root/></td>     </tr>
+      <tr> <td>Rails Version</td>              <td><rails-version/></td>    </tr>
+      <tr> <td>Rails Location</td>             <td><rails-location/></td>     </tr>
+      <tr> <td>Mode</td>                       <td><rails-env/></td> </tr>
+      <tr> <td>Git Version</td>                <td><git-version/></td> </tr>
+      <tr> <td>Git Date</td>                   <td><git-last-commit-time/></td> </tr>
+      <tr> <td>Git Branch</td>                 <td><git-branch/></td> </tr>
+      <tr> <td>Git Clean?</td>                 <td><git-clean/></td></tr>
+    </table>
+
+    <h3>Gems</h3>
+    <table class="app-summary">
+      <with-gems>
+        <tr><th></th><th>Required</th><th>Installed</th><th>Status</th><th>Dependencies</th></tr>
+        <tr>
+          <td><gem-name/></td>
+          <td><gem-version-required/></td>
+          <td><gem-version/></td>          
+          <td><gem-frozen/></td>
+          <td><gem-dependencies/></td>
+        </tr>
+      </with-gems>
+    </table>
+
+    <h3>Plugins</h3>
+    <table class="app-summary">
+      <with-plugins>
+        <tr if="&first_item?"><th></th><th>Location</th><th>Method</th><th>Clean?</th><th>Version</th></tr>
+        <tr>
+          <td><plugin-name/></td>
+          <td><plugin-location/></td>
+          <td><plugin-method/></td>
+          <td><plugin-clean/></td>
+          <td><plugin-version/></td>
+        </tr>
+      </with-plugins>
+    </table>
+
+    <h3>Environments</h3>
+    <table class="app-summary">
+      <tr><th></th><th colspan='2'>database</th></tr>
+      <with-environments>
+        <tr>
+          <td><environment-name /></td>
+          <td><database-type /></td>
+          <td><database-name /></td>
+        </tr>
+      </with-environments>
+    </table>
+
+    <h2>Models</h2>
+    <with-models>
+      <h3><model-name /></h3>
+      <table class="app-summary">
+        <with-model-columns>
+          <tr if="&first_item?"><th>Column</th><th>Type</th></tr>
+          <tr>
+            <td><model-column-name/></td>
+            <td><model-column-type/></td>
+          </tr>
+        </with-model-columns>
+      </table>
+      <table class="app-summary">
+        <with-model-associations>
+          <tr if="&first_item?"><th>Association</th><th>Macro</th><th>Class</th></tr>
+          <tr>
+            <td><model-association-name/></td>
+            <td><model-association-macro/></td>
+            <td><model-association-class-name/></td>
+          </tr>
+        </with-model-associations>
+      </table>
+    </with-models>
+  </content:>
+</page>
