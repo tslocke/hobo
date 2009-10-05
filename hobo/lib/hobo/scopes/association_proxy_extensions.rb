@@ -7,9 +7,15 @@ module Hobo
     AssociationProxyExtensions = classy_module do
 
       def scope_conditions(reflection)
-        scope_name = reflection.options[:scope] and
-          target_class = reflection.klass and
+        scope_name = reflection.options[:scope]
+        return nil if scope_name.nil?
+        target_class = reflection.klass
+        return nil if target_class.nil?
+        if scope_name.respond_to? :map
+          combine_conditions(*(scope_name.map {|scope| target_class.send(*scope).scope(:find)[:conditions]}))
+        else
           target_class.send(scope_name).scope(:find)[:conditions]
+        end
       end
 
 
@@ -30,16 +36,15 @@ module Hobo
 
     HasManyThroughAssociationExtensions = classy_module do
 
-      def conditions_with_hobo_scopes
+      def build_conditions_with_hobo_scopes
         scope_conditions         = self.scope_conditions(@reflection)
         through_scope_conditions = self.scope_conditions(@reflection.through_reflection)
-        unscoped_conditions = conditions_without_hobo_scopes
+        unscoped_conditions = build_conditions_without_hobo_scopes
         combine_conditions(scope_conditions, through_scope_conditions, unscoped_conditions)
       end
-      alias_method_chain :conditions, :hobo_scopes
-      alias_method :sql_conditions, :conditions
-      public :conditions, :sql_conditions
-
+      alias_method_chain :build_conditions, :hobo_scopes
+      public :conditions
+      
     end
     
     AssociationCollectionExtensions = classy_module do

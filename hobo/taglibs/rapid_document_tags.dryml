@@ -19,7 +19,7 @@
 -->
 <def tag="section" attrs="empty, with-flash-messages">
   <set body="&parameters.default" flash="&with_flash_messages && !scope.flash_rendered"/>
-  <div class="section #{'with-flash' if flash}" merge-attrs if="&!body.blank? || empty">
+  <div class="section #{'with-flash' if flash}" merge-attrs if="&!body.blank? || empty || flash">
     <flash-messages if="&flash"/>
     <%= body %>
   </div>

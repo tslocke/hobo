@@ -95,10 +95,10 @@ module Hobo
       if options[:accessible]
         class_eval %{
           def #{name}_with_accessible=(array_or_hash)
-            items = Hobo::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
-            self.#{name}_without_accessible = items
+            __items = Hobo::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
+            self.#{name}_without_accessible = __items
             # ensure the loaded array contains any changed records
-            self.#{name}.proxy_target[0..-1] = items
+            self.#{name}.proxy_target[0..-1] = __items
           end
         }, __FILE__, __LINE__ - 7
         alias_method_chain :"#{name}=", :accessible

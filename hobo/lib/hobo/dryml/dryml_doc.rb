@@ -32,8 +32,8 @@ module Hobo
       
       class Taglib
         
-        def initialize(home, filename)
-          @name = filename.sub(/.dryml$/, '')[home.length+1..-1]
+        def initialize(home, filename, name=nil)
+          @name = name || filename.sub(/.dryml$/, '')[home.length+1..-1]
           @doc = Hobo::Dryml::Parser::Document.new(File.read(filename), filename)
           parse_tag_defs
         end

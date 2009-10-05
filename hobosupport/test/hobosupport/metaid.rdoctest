@@ -1,6 +1,7 @@
 # HoboSupport - Metaid
 
     doctest_require: '../../lib/hobosupport'
+{.hidden}
 
 Why the Luck Stiff's essential meta-programming additions to Object. These are probably distributed elsewhere, but they're small enough to throw them in to HoboSupport and remove an external dependency.
 

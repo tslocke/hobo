@@ -628,9 +628,11 @@ new HoboBehavior("ul.input-many", {
       
       this.element.selectChildren('li').each(function(li, index) {
           li.select('*[name]').each(function(control) {
-              var changeId = control.id == control.name
-              control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']')
-              if (changeId) control.id = control.name
+              if(control.name) {
+                  var changeId = control.id == control.name;
+                  control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']');
+                  if (changeId) control.id = control.name;
+              }
           })
       })
   }
@@ -728,6 +730,7 @@ AutocompleteBehavior = Behavior.create({
 
 
 
+Event.addBehavior.reassignAfterAjax = true;
 Event.addBehavior({
     
     'div.section-group' : function() {
@@ -754,7 +757,7 @@ Event.addBehavior({
 
     '.autocompleter' : AutocompleteBehavior(),
 
-    '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place-edit, big-integer.in-place-edit' :
+    '.string.in-place-edit, .datetime.in-place-edit, .date.in-place-edit, .integer.in-place-edit, .float.in-place-edit, .decimal.in-place-edit' :
      function (ev) {
 
          var ipe = Hobo._makeInPlaceEditor(this)

@@ -16,7 +16,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "0.8.5"
+  VERSION = "0.8.8"
   
   class PermissionDeniedError < RuntimeError; end
 
@@ -86,10 +86,14 @@ module Hobo
     def get_field(object, field)
       return nil if object.nil?
       field_str = field.to_s
-      if field_str =~ /^\d+$/
-        object[field.to_i]
-      else
-        object.send(field)
+      begin
+        return object.send(field_str)
+      rescue NoMethodError => ex
+        if field_str =~ /^\d+$/
+          return object[field.to_i]
+        else
+          return object[field]
+        end
       end
     end
 
@@ -205,11 +209,13 @@ end
 
 module ::Enumerable
   def group_by_with_metadata(&block)
-    group_by_without_metadata(&block).each do |k,v|
+    r=group_by_without_metadata(&block)
+    r.each do |k,v|
       v.origin = origin
       v.origin_attribute = origin_attribute
       v.member_class = member_class
     end
+    r
   end
   alias_method_chain :group_by, :metadata
 end

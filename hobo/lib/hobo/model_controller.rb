@@ -111,7 +111,7 @@ module Hobo
           self.this = find_instance(opts)
           raise Hobo::PermissionDeniedError unless @this.method_callable_by?(current_user, method)
           if got_block
-            instance_eval(&block)
+            this.with_acting_user(current_user) { instance_eval(&block) }
           else
             @this.send(method)
           end
@@ -355,9 +355,18 @@ module Hobo
 
     def re_render_form(default_action=nil)
       if params[:page_path]
+        @invalid_record = this        
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
-        render :template => "#{controller}/#{view}"
+
+        # Hack fix for Bug 477.  See also bug 489.
+        if self.class.name == "#{controller.camelize}Controller" && view == "index"
+          params['action'] = 'index'
+          self.action_name = 'index'
+          index
+        else
+          render :template => "#{controller}/#{view}"
+        end
       else
         render :action => default_action
       end
@@ -401,6 +410,8 @@ module Hobo
       if o
         url = if o.is_a?(Symbol)
                 object_url(this, o)
+              elsif o.is_a?(String) || o.is_a?(Hash)
+                o
               else
                 object_url(*Array(o))
               end
@@ -497,7 +508,7 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || new_for_create
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:new, &b)
+      create_response(:new, options, &b)
     end
     
     
@@ -506,7 +517,7 @@ module Hobo
       owner, association = find_owner_and_association(owner)
       self.this ||= args.first || association.new
       this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
-      create_response(:"new_for_#{owner}", &b)    
+      create_response(:"new_for_#{owner}", options, &b)    
     end
 
 
@@ -527,10 +538,13 @@ module Hobo
         t
     end
     
+    def flash_notice(message)
+      flash[:notice] = message unless request.xhr?
+    end
 
 
     def create_response(new_action, options={}, &b)
-      flash[:notice] = "The #{@this.class.name.titleize.downcase} was created successfully" if !request.xhr? && valid?
+      flash_notice "The #{@this.class.name.titleize.downcase} was created successfully" if valid?
 
       response_block(&b) or
         if valid?
@@ -565,7 +579,7 @@ module Hobo
 
 
     def update_response(in_place_edit_field=nil, options={}, &b)
-      flash[:notice] = "Changes to the #{@this.class.name.titleize.downcase} were saved" if !request.xhr? && valid?
+      flash_notice "Changes to the #{@this.class.name.titleize.downcase} were saved" if valid?
 
       response_block(&b) or
         if valid?
@@ -601,8 +615,8 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
-      flash[:notice] = "The #{model.name.titleize.downcase} was deleted" unless request.xhr?
-      destroy_response(&b)
+      flash_notice "The #{model.name.titleize.downcase} was deleted"
+      destroy_response(options, &b)
     end
 
 
@@ -617,8 +631,8 @@ module Hobo
 
     # --- Lifecycle Actions --- #
 
-    def creator_page_action(name, &b)
-      self.this = model.new
+    def creator_page_action(name, options={}, &b)
+      self.this ||= model.new
       this.exempt_from_edit_checks = true
       @creator = model::Lifecycle.creator(name)
       raise Hobo::PermissionDeniedError unless @creator.allowed?(current_user)
@@ -631,10 +645,18 @@ module Hobo
       self.this = @creator.run!(current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit options
+          respond_to do |wants|
+            wants.html { redirect_after_submit(options) }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
+          end
         else
           this.exempt_from_edit_checks = true
-          re_render_form(name)
+          respond_to do |wants|
+            wants.html { re_render_form(name) }
+            wants.js   { render(:status => 500,
+                                :text => ("Couldn't do creator #{name}.\n" +
+                                          this.errors.full_messages.join("\n"))) }
+          end
         end
     end
 
@@ -663,9 +685,17 @@ module Hobo
       @transition.run!(this, current_user, attribute_parameters)
       response_block(&b) or
         if valid?
-          redirect_after_submit options
+          respond_to do |wants|
+            wants.html { redirect_after_submit(options) }
+            wants.js   { hobo_ajax_response || render(:nothing => true) }
+          end
         else
-          re_render_form(name)
+          respond_to do |wants|
+            wants.html { re_render_form(name) }
+            wants.js   { render(:status => 500,
+                                :text => ("Couldn't do transition #{name}.\n" +
+                                          this.errors.full_messages.join("\n"))) }
+          end
         end
     end
 
@@ -675,8 +705,17 @@ module Hobo
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
       finder = finder.limit(options[:limit]) unless finder.send(:scope, :find, :limit)
-      finder = finder.send(options[:query_scope], params[options[:param]])
-      items = finder.find(:all).select { |r| r.viewable_by?(current_user) }
+
+      begin
+        finder = finder.send(options[:query_scope], params[options[:param]])
+        items = finder.find(:all).select { |r| r.viewable_by?(current_user) }
+      rescue TypeError  # must be a list of methods instead
+        items = []
+        options[:query_scope].each do |qscope|
+          finder2 = finder.send(qscope, params[options[:param]])
+          items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
+        end
+      end       
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
 
@@ -699,6 +738,7 @@ module Hobo
 
     def permission_denied(error)
       self.this = true # Otherwise this gets sent user_view
+      logger.info "Hobo: Permission Denied!"
       @permission_error = error
       if "permission_denied".in?(self.class.superclass.instance_methods)
         super

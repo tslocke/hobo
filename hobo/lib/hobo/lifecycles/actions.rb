@@ -1,5 +1,5 @@
 # We need to be able to eval an expression outside of the Hobo module
-# so that, e.g. "Userd" doesn't eval to "Hobo::User"
+# so that, e.g. "User" doesn't eval to "Hobo::User"
 # (Ruby determines this constant lookup scope lexically)
 def __top_level_eval__(obj, expr)
   obj.instance_eval(expr)
@@ -37,9 +37,9 @@ module Hobo
         else
           refl = record.class.reflections[who]
           if refl && refl.macro == :has_many
-            send(who).include?(user)
+            record.send(who).include?(user)
           elsif refl && refl.macro == :belongs_to
-            send("#{who}_is?", user)
+            record.send("#{who}_is?", user)
           else
             value = run_hook(record, who)
             if value.is_a?(Class)
@@ -124,7 +124,11 @@ module Hobo
       def get_state(record, state)
         case state
         when Proc
-          state.call(record)
+          if state.arity == 1
+            state.call(record)
+          else
+            record.instance_eval(&state)
+          end
         when String
           eval(state, record.instance_eval { binding })
         else

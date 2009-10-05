@@ -1,19 +1,20 @@
--*- indent-tabs-mode:nil; -*-
 
 # HoboFields API
 
-## Connect to the Database
-
 In order for the API examples to run we need a connection to a database. You can ignore this if you're just looking for documentation.
+{.hidden}
 
 Our test requires rails:
+{.hidden}
 
     >> require 'rubygems'
     >> require 'activesupport'
     >> require 'activerecord'
     >> require 'action_controller'
+{.hidden}
 
 We need a database connection for this test:
+{.hidden}
 
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin --force drop #{mysql_database} 2> /dev/null"
@@ -21,13 +22,17 @@ We need a database connection for this test:
     >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                                :database => mysql_database,
                                                :host => "localhost")
+{.hidden}
 
 Some load path manipulation you shouldn't need:
+{.hidden}
 
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+{.hidden}
 
 Require the module we're testing:
+{.hidden}
 
     >> require 'hobosupport'
     >> require 'hobofields'
@@ -103,8 +108,8 @@ If you provide a class it must define the `COLUMN_TYPE` constant. This instructs
 The full set of available symbolic names is
 
  * `:integer`
- * `:big_integer`
  * `:float`
+ * `:decimal`
  * `:string`
  * `:text`
  * `:boolean`
@@ -114,7 +119,7 @@ The full set of available symbolic names is
  * `:textile`
  * `:markdown`
  * `:password`
- * `:email_addresss`
+ * `:email_address`
 
 You can add your own types too. More on that later.
 
@@ -258,6 +263,8 @@ To have them validated use `validate_virtual_field`:
         >> a.valid?
         => false
 
-## Cleanup
+Cleanup
+{.hidden}
 
     >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
+{.hidden}

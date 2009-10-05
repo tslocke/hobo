@@ -73,7 +73,7 @@ module ActionController
         
         text = call_dryml_tag(tag_name)
         if text
-          return render_for_text text, status 
+          return render_for_text(text, status)
         else
           template.raise_wrapped_exception
         end
@@ -86,7 +86,7 @@ module ActionController
           
           text = call_dryml_tag(tag_name)
           if text
-            return render_for_text text, status 
+            return render_for_text(text, status)
           else
             raise ex
           end
@@ -169,7 +169,6 @@ module ActionView
     # this is only used by Rails 2.3
     def find_template_with_dryml(original_template_path, format = nil, html_fallback = true)
       begin
-        Rails.logger.info "find_template_with_dryml: #{original_template_path} #{format} #{html_fallback}"
         find_template_without_dryml(original_template_path, format, html_fallback)
       rescue ActionView::MissingTemplate => ex
         # instead of throwing the exception right away, hand back a

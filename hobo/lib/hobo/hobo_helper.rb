@@ -162,9 +162,10 @@ module Hobo
       # TODO: Calls to respond_to? in here can cause the full collection hiding behind a scoped collection to get loaded
       res = []
       empty = true
-      scope.new_scope(:repeat_collection => enum, :even_odd => 'odd') do
+      scope.new_scope(:repeat_collection => enum, :even_odd => 'odd', :repeat_item => nil) do
         if enum.respond_to?(:each_pair)
           enum.each_pair do |key, value|
+            scope.repeat_item = value
             empty = false;
             self.this_key = key;
             new_object_context(value) { res << yield }
@@ -173,6 +174,7 @@ module Hobo
         else
           index = 0
           enum.each do |e|
+            scope.repeat_item = e
             empty = false;
             if enum == this
               new_field_context(index, e) { res << yield }
@@ -474,12 +476,12 @@ module Hobo
 
     # --- ViewHint Helpers --- #
     
-    def this_field_name
-      this_parent.class.view_hints.field_name(this_field)
+    def this_field_name     
+      this_parent.class.try.view_hints.try.field_name(this_field) || this_field
     end
 
     def this_field_help
-      this_parent.class.view_hints.field_help[this_field.to_sym]
+      this_parent.class.try.view_hints.try.field_help[this_field.to_sym]
     end
 
 
@@ -490,6 +492,7 @@ module Hobo
     end
 
     def log_debug(*args)
+      return if not logger
       logger.debug("\n### DRYML Debug ###")
       logger.debug(args.*.pretty_inspect.join("-------\n"))
       logger.debug("DRYML THIS = #{this.typed_id rescue this.inspect}")

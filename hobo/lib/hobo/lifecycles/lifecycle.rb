@@ -102,6 +102,10 @@ module Hobo
         options[:state_field]
       end
 
+      def self.key_timeout
+        options[:key_timeout]
+      end
+
 
       # --- Instance Features --- #
 
@@ -192,6 +196,9 @@ module Hobo
         record.class::Lifecycle.options[:key_timestamp_field]
       end
 
+      def key_timeout
+        record.class::Lifecycle.options[:key_timeout]
+      end
 
       def generate_key
         if Time.zone.nil?
@@ -212,10 +219,14 @@ module Hobo
         end
       end
 
-      def valid_key?
-        provided_key && provided_key == key
+      def key_expired?
+        timestamp = record.read_attribute(key_timestamp_field)
+        timestamp.nil? || (timestamp.getutc + key_timeout < Time.now.utc)
       end
 
+      def valid_key?
+        provided_key && provided_key == key && !key_expired?
+      end
 
       def invariants_satisfied?
         self.class.invariants.all? { |i| record.instance_eval(&i) }

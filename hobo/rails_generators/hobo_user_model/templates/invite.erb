@@ -1,0 +1,9 @@
+<%%= @user %>,
+
+You have been invited to join <%%= @app_name %>. If you wish to accept, please click on the following link
+
+  <%%= user_accept_invitation_url :host => @host, :id => @user, :key => @key %>
+
+Thank you,
+
+The <%%= @app_name %> team.
