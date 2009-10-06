@@ -35,7 +35,7 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 For example, you could use this on a `Friendship` card: the person invited to have friendship would automatically see 'Accept' and 'Decline' buttons, while the person initiating the invite would see 'Retract'.
   -->  
 <def tag="transition-buttons">
-  <div class="transitions">
+  <div merge-attrs class="transitions">
     <% this.lifecycle.available_transitions_for(current_user).each do |t| %>
       <transition-button transition="&t"/>
     <% end %>
