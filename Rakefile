@@ -2,6 +2,12 @@ require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
+require 'activerecord'
+ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
+require '../hobosupport/lib/hobosupport'
+require '../hobofields/lib/hobofields'
+require 'lib/hobo'
+
 desc "Default Task"
 task :default => [ :test ]
 
@@ -35,28 +41,27 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
 end
 
 
-# --- Packaging and Rubyforge --- #
+# --- Packaging and Rubyforge & gemcutter & github--- #
 
-require 'echoe'
-
-Echoe.new('hobo') do |p|
-  p.author  = "Tom Locke"
-  p.email   = "tom@tomlocke.com"
-  p.summary = "The web app builder for Rails"
-  p.url     = "http://hobocentral.net/"
-  p.project = "hobo"
-
-  p.changelog = "CHANGES.txt"
-  p.version   = "0.8.8"
-
-  p.dependencies = [
-    'hobosupport =0.8.8',
-    'hobofields =0.8.8',
-    'rails >=2.2.2',
-    'mislav-will_paginate >=2.2.1']
-    
-  p.development_dependencies = []
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.version      = Hobo::VERSION
+    gemspec.name         = "hobo"
+    gemspec.email        = "tom@tomlocke.com"
+    gemspec.summary      = "The web app builder for Rails"
+    gemspec.homepage     = "http://hobocentral.net/"
+    gemspec.authors      = ["Tom Locke"]
+    gemspec.rubyforge_project = "hobo"
+    gemspec.add_dependency("rails", [">= 2.2.2"])
+    gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
+    gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
+    gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])    
+  end
+  Jeweler::GemcutterTasks.new
+  Jeweler::RubyforgeTasks.new do |rubyforge|
+    rubyforge.doc_task = "rdoc"
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
-
-
-
