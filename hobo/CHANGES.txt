@@ -1,3 +1,32 @@
+=== Hobo 0.8.9 ===
+
+Enhancements:
+
+ -
+    [precompile_taglibs](http://groups.google.com/group/hobousers/browse_thread/thread/29694e75f60c0870/6b05f75f2f7e91f5)
+    allows you to precompile taglibs during application startup rather
+    than on demand.
+
+ - `--invite-only` options added ti generator
+
+Major bug fixes:
+
+ - [Bug
+   461](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/461-hobo-is-not-compatible-with-firefox-35):
+   Firefox 3.5 problems were caused by lowpro.  For existing projects,
+   you will have to update your copy of [public/javascripts/lowpro.js](http://github.com/tablatom/hobo/raw/master/hobo/rails_generators/hobo_rapid/templates/lowpro.js)
+
+ - [Bug
+   477](http://groups.google.com/group/hobousers/browse_thread/thread/5a15288f9703a8a4/58a8dee62b237d29)
+   caused problems when the user submitted a form from the index page.
+
+ - "collection" was renamed to "collection-heading" in the Rapid
+   generated show-page.
+
+Minor bug fixes and enhancements:
+
+See the [github log](http://github.com/bryanlarsen/hobo/commits/v0.8.5)
+
 === Hobo 0.8.8 ===
 
 Hobo 0.8.8 comes with some slight changes to the colour scheme for the
