@@ -1,4 +1,6 @@
-require 'echoe'
+require 'activerecord'
+ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
+require 'lib/hobosupport'
 
 namespace "test" do
   desc "Run the doctests"
@@ -7,15 +9,37 @@ namespace "test" do
   end
 end
 
-Echoe.new('hobosupport') do |p|
-  p.author  = "Tom Locke"
-  p.email   = "tom@tomlocke.com"
-  p.summary = "Core Ruby extensions from the Hobo project"
-  p.url     = "http://hobocentral.net/hobosupport"
-  p.project = "hobo"
+# Echoe.new('hobosupport') do |p|
+#   p.author  = "Tom Locke"
+#   p.email   = "tom@tomlocke.com"
+#   p.summary = "Core Ruby extensions from the Hobo project"
+#   p.url     = "http://hobocentral.net/hobosupport"
+#   p.project = "hobo"
   
-  p.changelog = "CHANGES.txt"
-  p.version   = "0.8.8"
+#   p.changelog = "CHANGES.txt"
+#   p.version   = "0.8.8"
   
-  p.development_dependencies = []
+#   p.development_dependencies = []
+# end
+
+
+# --- build gem via Jeweller --- #
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.version      = HoboSupport::VERSION
+    gemspec.name         = "hobo"
+    gemspec.email        = "tom@tomlocke.com"
+    gemspec.summary      = "Core Ruby extensions from the Hobo project"
+    gemspec.homepage     = "http://hobocentral.net/"
+    gemspec.authors      = ["Tom Locke"]
+    gemspec.rubyforge_project = "hobosupport"
+  end
+  Jeweler::GemcutterTasks.new
+  Jeweler::RubyforgeTasks.new do |rubyforge|
+    rubyforge.doc_task = "rdoc"
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
