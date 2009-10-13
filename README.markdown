@@ -54,7 +54,7 @@ ht("users.index.title", :default=>"Index of Users")
  4. It will then run a new i18n-translation attempt at the "hobo.index.title" key, and will pass on the model=>"user" for interpolation in the result.
 
 All standard translations are scoped with hobo (see below). If you want specific translations for specific models, just copy/add another scope with the name of the model. For example you can have a specific heading for a "customer" index page by giving the following translation key:
-
+<pre>
 <code>
 ...
  customer:
@@ -63,7 +63,7 @@ All standard translations are scoped with hobo (see below). If you want specific
     heading: "My special customer index heading"
 ...
 </code>
-
+</pre>
 For more samples search the code for ht() or &lt;ht&gt;&lt;/ht&gt; sections.
 
 
