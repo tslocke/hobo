@@ -19,7 +19,7 @@ Usage
 
 </code>
 
- * The main idea of the translate tag is to replace the wrapped content with the translated string identified by the key. By using the content of the key as a default value its possible to leave the templates mostly as they are. Just wrap the strings that shall be translated with the <ht> tag.
+ * The main idea of the translate tag is to replace the wrapped content with the translated string identified by the key. By using the content of the key as a default value its possible to leave the templates mostly as they are. Just wrap the strings that shall be translated with the &lt;ht&gt; tag.
 
  * If you don't provide a translation file/keys everything should keep as is.
 
@@ -51,13 +51,20 @@ ht("users.index.title", :default=>"Index of Users")
 
  3. It will then replace the first part of the key from "**users**.index.title" to "**hobo**.index.title".
 
- 4. It will then run a new i-18n-translation attempt at the "hobo.index.title" key, and will pass on the model=>"user" for interpolation in the result.
+ 4. It will then run a new i18n-translation attempt at the "hobo.index.title" key, and will pass on the model=>"user" for interpolation in the result.
 
 All standard translations are scoped with hobo (see below). If you want specific translations for specific models, just copy/add another scope with the name of the model. For example you can have a specific heading for a "customer" index page by giving the following translation key:
 
-<code>customer.page.index.heading = "My special customer index heading"</code>
+<code>
+...
+ customer:
+  page:
+   index:
+    heading: "My special customer index heading"
+...
+</code>
 
-For more samples search the code for ht() or &lt;trans&gt;&lt;/trans&gt; sections.
+For more samples search the code for ht() or &lt;ht&gt;&lt;/ht&gt; sections.
 
 
 ### View-hints
@@ -72,14 +79,14 @@ en:
 </code>
 </pre>
 
-### Locale files [github.com/Spiralis/hobo-i18n-locales](http://github.com/Spiralis/hobo-i18n-locales)
+### Locale files [http://github.com/Spiralis/hobo-i18n-locales](http://github.com/Spiralis/hobo-i18n-locales)
 A separate git-repository has been set up to contain the locale-files for different languages. There is a specific hobo.&lt;locale&gt;.yml for each locale. These are standard hobo keys. In addition to this you probably also have a rails.&lt;locale&gt;.yml file to handle Rails-i18n keys (check Sven Fuchs [rails-i18n-repository](http://github.com/svenfuchs/rails-i18n/tree/master/rails/locale/) for your locales). Finally - you should have one (or more) app.&lt;locale&gt;.yml files where you keep your customisations. 
 
 
 ### Locale tools
   * harvester (TO-DO)
 
-    Typical locale key-harvesters will fail in Hobo projects. They normally search through the files looking for constant keys. Hobo-translation-keys however, often need to be  evaluated run-time. Instead the harvester should be built into the ht method. The harvester would each time a translation-lookup is done check the key for existence (and log the passed interpolation values). Some heuristics could be applied on the key itself to better understand where the key should be saved. If not to be saved in the hobo.<locale>.yml-file then it will add it to the app.<current-locale>.yml-file. 
+    Typical locale key-harvesters will fail in Hobo projects. They normally search through the files looking for constant keys. Hobo-translation-keys however, often need to be  evaluated run-time. Instead the harvester should be built into the ht method. The harvester would each time a translation-lookup is done check the key for existence (and log the passed interpolation values). Some heuristics could be applied on the key itself to better understand where the key should be saved. If not to be saved in the hobo.&lt;locale&gt;.yml-file then it will add it to the app.&lt;current-locale&gt;.yml-file. 
 
   * translation (TO-DO)
 
