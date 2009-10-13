@@ -57,10 +57,10 @@ All standard translations are scoped with hobo (see below). If you want specific
 <pre>
 <code>
 ...
-  customer:
-    page:
-      index:
-        heading: "My special customer index heading"
+ customer:
+  page:
+   index:
+    heading: "My special customer index heading"
 ...
 </code>
 </pre>
@@ -72,10 +72,10 @@ This system will look up the view-hints directly from the keys you add (i.e. in 
 <pre>
 <code>
 en:
-  users:
-    hints:
-      name: "This is the name shown to the users in the application. It should contain the user's full name."
-      email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
+ users:
+  hints:
+   name: "This is the name shown to the users in the application. It should contain the user's full name."
+   email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
 </code>
 </pre>
 
