@@ -3,7 +3,7 @@ This is a Hobo fork of git://github.com/tablatom/hobo.git, merged with soey's gr
 
 
 ## Main Features
-The i18n support is granted via a translation tag (&lt;ht&gt;) for hobo's dryml-files which actually uses the ht() helper method (lib/hobo/hobo_helper.rb). ht() uses the RoR 2.2+ I18n translate methods internally.
+The i18n support is granted via a translation tag &lt;ht&gt; for hobo's dryml-files which actually uses the ht() helper method (lib/hobo/hobo_helper.rb). ht() uses the RoR 2.2+ I18n translate methods internally.
 
 
 ### View-code (dryml): &lt;ht&gt;&lt;/ht&gt;
@@ -55,32 +55,33 @@ ht("users.index.title", :default=>"Index of Users")
 
 All standard translations are scoped with hobo (see below). If you want specific translations for specific models, just copy/add another scope with the name of the model. For example you can have a specific heading for a "customer" index page by giving the following translation key:
 <pre>
-<code>
 ...
- customer:
-  page:
-   index:
-    heading: "My special customer index heading"
+  customer:
+    page:
+      index:
+        heading: "My special customer index heading"
 ...
-</code>
 </pre>
 For more samples search the code for ht() or &lt;ht&gt;&lt;/ht&gt; sections.
 
 
 ### View-hints
-This system will look up the view-hints directly from the keys you add (typically in app.*.yml). Sample section from an app.en.yml file:
+This system will look up the view-hints directly from the keys you add (i.e. in app.*.yml). Sample section from a typical app.en.yml file:
 <pre>
-<code>
 en:
- users:
-  hints:
-   name: "This is the name shown to the users in the application. It should contain the user's full name."
-   email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
-</code>
+  users:
+    hints:
+      name: "This is the name shown to the users in the application. It should contain the user's full name."
+      email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
 </pre>
 
 ### Locale files [http://github.com/Spiralis/hobo-i18n-locales](http://github.com/Spiralis/hobo-i18n-locales)
-A separate git-repository has been set up to contain the locale-files for different languages. There is a specific hobo.&lt;locale&gt;.yml for each locale. These are standard hobo keys. In addition to this you probably also have a rails.&lt;locale&gt;.yml file to handle Rails-i18n keys (check Sven Fuchs [rails-i18n-repository](http://github.com/svenfuchs/rails-i18n/tree/master/rails/locale/) for your locales). Finally - you should have one (or more) app.&lt;locale&gt;.yml files where you keep your customisations. 
+
+ 1. A separate git-repository has been set up to contain the locale-files for different languages. There is a specific hobo.&lt;locale&gt;.yml for each locale. These are standard hobo keys. 
+
+ 2. In addition to this you probably also have a rails.&lt;locale&gt;.yml file to handle Rails-i18n keys (check Sven Fuchs [rails-i18n-repository](http://github.com/svenfuchs/rails-i18n/tree/master/rails/locale/) for your locales). 
+
+ 3. Finally - you should have an app.&lt;locale&gt;.yml files where you keep your customizations. You might have other locale-files and you may also use other conventions. It's all up to you. 
 
 
 ### Locale tools
@@ -95,7 +96,7 @@ A separate git-repository has been set up to contain the locale-files for differ
 
 ## Issues
 
- - There are more conventions added by rails. Mainly the [lazy lookup/automatic skin scoping](http://guides.rubyonrails.org/i18n.html) -> 4.1.4. This would lead to other scoping conventions. Maybe this should be considered later.
+ - There are more conventions added by rails. Mainly the [lazy lookup/automatic skin scoping](http://guides.rubyonrails.org/i18n.html) (section 4.1.4). This would lead to other scoping conventions. Maybe this should be considered later.
 
  - Automatic inflections are no real use. (Just stay with the english defaults in most cases ;)) or use specific translation keys.
 
