@@ -3,23 +3,23 @@ This is a Hobo fork of git://github.com/tablatom/hobo.git, merged with soey's gr
 
 
 ## Main Features
-The i18n support is granted via a translation tag for hobo's dryml-files (see: hobo/rapid/core.dryml) and the ht() helper method (lib/hobo/hobo_helper.rb). They both use the RoR 2.2+ I18n translate methods internally.
+The i18n support is granted via a translation tag (&lt;ht&gt;) for hobo's dryml-files which actually uses the ht() helper method (lib/hobo/hobo_helper.rb). ht() uses the RoR 2.2+ I18n translate methods internally.
 
 
-### View-code (dryml): &lt;trans&gt;&lt;/trans&gt;
+### View-code (dryml): &lt;ht&gt;&lt;/ht&gt;
 
 Usage
 <code>
 
-    <trans key="foo.bar"/> 
+    <ht key="foo.bar"/> 
     # -> ht("foo.bar", :default=>:"hobo.bar")
     
-    <trans key="foo.bar">Fallback</trans> 
+    <ht key="foo.bar">Fallback</ht> 
     # -> ht("foo.bar", :default=>[:"hobo.bar", "Fallback"])
 
 </code>
 
- * The main idea of the translate tag is to replace the wrapped content with the translated string identified by the key. By using the content of the key as a default value its possible to leave the templates mostly as they are. Just wrap the strings that shall be translated with the <trans> tag.
+ * The main idea of the translate tag is to replace the wrapped content with the translated string identified by the key. By using the content of the key as a default value its possible to leave the templates mostly as they are. Just wrap the strings that shall be translated with the <ht> tag.
 
  * If you don't provide a translation file/keys everything should keep as is.
 
@@ -91,7 +91,5 @@ A separate git-repository as been set up to contain the locale-files for differe
  - There are more conventions added by rails. Mainly the lazy lookup/automatic skin scoping http://guides.rubyonrails.org/i18n.html -> 4.1.4. This would lead to other scoping conventions. Maybe this should be considered later.
 
  - Automatic inflections are no real use. (Just stay with the english defaults in most cases ;)) or use specific translation keys.
-
- - <def tag="t"> didn't work :( Maybe someone else can dig into this.
 
  - No tests yet
