@@ -1,8 +1,11 @@
 require 'rubygems'
 require 'activerecord'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
-require '../hobosupport/lib/hobosupport'
-require 'lib/hobofields'
+
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/lib')
+require 'hobosupport'
+require 'hobofields'
 
 namespace "test" do
   desc "Run the doctests"
@@ -27,6 +30,7 @@ begin
     gemspec.summary      = "Rich field types and migration generator for Rails"
     gemspec.homepage     = "http://hobocentral.net/"
     gemspec.authors      = ["Tom Locke"]
+    gemspec.files        = FileList["**"]
     gemspec.rubyforge_project = "hobofields"
     gemspec.add_dependency("rails", [">= 2.2.2"])
     gemspec.add_dependency("hobosupport", ["= #{HoboFields::VERSION}"])    
