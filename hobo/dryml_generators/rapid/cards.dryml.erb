@@ -32,7 +32,7 @@ model_key = model.name.pluralize.underscore
       <div param="actions">
 <% if edit_link -%>
         <a action="edit" if="&can_edit?" param="edit-link">
-          <trans key="<%= model_key %>.actions.edit">Edit</trans>
+          <ht key="<%= model_key %>.actions.edit">Edit</ht>
         </a>
 <% end -%>
 <% if delete_button -%>
@@ -53,9 +53,9 @@ model_key = model.name.pluralize.underscore
       <view:<%= creator_attribute %> param="creator"/>
 <% end -%>
 <% if primary_collection -%>
-      <trans key="<%= primary_collection.to_s.pluralize.underscore %>.collection.count" count="&this.<%= primary_collection %>.size">
+      <ht key="<%= primary_collection.to_s.pluralize.underscore %>.collection.count" count="&this.<%= primary_collection %>.size">
          <count:<%= primary_collection%> param/>
-      </trans>
+      </ht>
 <% end -%>
     </body:>
 <% end -%>

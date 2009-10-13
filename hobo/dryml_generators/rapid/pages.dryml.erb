@@ -26,22 +26,22 @@ model_key = model_name.pluralize.underscore
     <content: param>
       <header param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.index.heading">
+          <ht key="<%= model_key %>.index.heading">
             <%= model_name :title, :plural %>
-          </trans>
+          </ht>
         </h2>
 
         <p param="count" if>
-          <trans key="<%= model_key %>.collection.count" count="&this.size">
+          <ht key="<%= model_key %>.collection.count" count="&this.size">
             There <count prefix="are"/>
-          </trans>
+          </ht>
         </p>
       </header>
       
       <section param="content-body">
 <% if new_link -%>
         <a action="new" to="&model" param="new-link">
-          <trans key="<%= model_key %>.actions.new">New <%=model_name :title %></trans>
+          <ht key="<%= model_key %>.actions.new">New <%=model_name :title %></ht>
         </a>      
 <% end -%>
 
@@ -63,7 +63,7 @@ model_key = model_name.pluralize.underscore
 <% if new_form -%>
         <div param="new-form">
           <h3 param="new-form-heading">
-            <trans key="<%= model_key %>.form.new.heading">New <%= model_name :title %></trans>
+            <ht key="<%= model_key %>.form.new.heading">New <%= model_name :title %></ht>
           </h3>
           <form with="&@invalid_record || new_for_current_user(<%= model %>)" param/>
         </div>
@@ -82,9 +82,9 @@ model_key = model_name.pluralize.underscore
     <content: param>
       <section param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.new.heading">
+          <ht key="<%= model_key %>.new.heading">
             New <%= model_name :title %>
-          </trans>
+          </ht>
         </h2>
       </section>
       
@@ -136,12 +136,12 @@ end
 <% end -%>
           <header param="content-header">
 <% if back_link -%>
-            <a:<%= back_link %> param="parent-link">&laquo; <trans key="<%= model_key %>.actions.back" to="<%= back_link %>"><name/></trans></a:<%= back_link %>>
+            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back" to="<%= back_link %>"><name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
-              <trans key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
                 <name/>
-              </trans>
+              </ht>
             </h2>
 <% if boolean_fields -%>
 
@@ -157,9 +157,9 @@ end
 <% if edit_link -%>
 
             <a action="edit" if="&can_edit?" param="edit-link">
-              <trans key="<%= model_key %>.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
                 Edit <%= model_name :title %>
-              </trans>
+              </ht>
             </a>
 <% end -%>
           </header>
@@ -174,9 +174,9 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <trans key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
+                <ht key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
                   <%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %>
-                </trans>
+                </ht>
               </h3>
               
 <%   if sortable_collection?(collection) -%>
@@ -187,17 +187,17 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)" param="new-link">
-                <trans key="<%= collection.to_s.pluralize %>.actions.new">
+                <ht key="<%= collection.to_s.pluralize %>.actions.new">
                   New <%= collection.to_s.singularize.titleize %>
-                </trans>
+                </ht>
               </a:<%= collection %>>
 <%   elsif add_form -%>
 
               <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <trans key="<%= collection.to_s.pluralize %>.collection.add_form_heading" model="#{collection.to_s.singularize.titleize}" a_or_an="#{ht 'hobo.<%=a_or_an %>', default=>['<%= a_or_an %>']}">
+                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading" model="#{collection.to_s.singularize.titleize}" a_or_an="#{ht 'hobo.<%=a_or_an %>', default=>['<%= a_or_an %>']}">
                     Add <%= a_or_an collection.to_s.singularize.titleize %>
-                  </trans>
+                  </ht>
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model_name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
                   <field-list: skip="<%= owner %>"/>
@@ -217,21 +217,21 @@ end
           <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
 <%       if is_user_model -%>
             <heading:>
-              <trans key="hobo.undefined">  
+              <ht key="hobo.undefined">  
                 <Your with="&@<%= model_name.underscore %>"/> <%= refl.name.to_s.titleize %>
-              </trans>
+              </ht>
             </heading:>
 <%       end -%>
             <more:>
-              <trans key="hobo.actions.more">more</trans>
+              <ht key="hobo.actions.more">more</ht>
             </more:>
           </preview-with-more:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
-              <trans key="<%= refl.name.to_s.pluralize %>.collection.heading.other" >
+              <ht key="<%= refl.name.to_s.pluralize %>.collection.heading.other" >
                 <%= refl.name.to_s.titleize %>
-              </trans>
+              </ht>
             </h3>
             <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
           </section>
@@ -257,9 +257,9 @@ name_attribute = model.name_attribute
     <content:>
       <section param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
+          <ht key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
             Edit <type-name/>
-          </trans>
+          </ht>
         </h2>
         <delete-button label="#{ht '<%= model_key %>.actions.delete', :default=>['Remove This <%= model_name :title %>']}" param/>
       </section>
@@ -295,39 +295,39 @@ new_link = :new.in?(actions)
       <header param="content-header">
 <% if linkable_owner -%>
         <div param="back-to">
-          <trans key="hobo.actions.back">Back to</trans> <a with="&@<%= owner %>"/> 
+          <ht key="hobo.actions.back">Back to</ht> <a with="&@<%= owner %>"/> 
         </div>
 <% end -%>
 <% if owner_is_user %>
         <h2 param="heading">
-          <trans key="<%= model_key %>.index_for_owner.heading.your">
+          <ht key="<%= model_key %>.index_for_owner.heading.your">
             <Your with="&@<%= owner %>"/> <%= model_name :title, :plural %>
-          </trans>
+          </ht>
         </h2>
 <% else -%>
         <h2 param="heading">
-          <trans key="<%= model_key %>.index_for_owner.heading.other">
+          <ht key="<%= model_key %>.index_for_owner.heading.other">
             <%= model_name :title, :plural %>
-          </trans>
+          </ht>
         </h2>
         <h3 param="subheading">
-          <trans key="<%= model_key %>.index_for_owner.subheading">
+          <ht key="<%= model_key %>.index_for_owner.subheading">
             For:
-          </trans>
+          </ht>
           <<%= owner_tag %> with="&@<%= owner %>"/>
         </h3>
 <% end -%>
         <p param="count" if>
-          <trans key="<%= model_key %>.collection.count" count="&this.size">
+          <ht key="<%= model_key %>.collection.count" count="&this.size">
             There <count prefix="are"/>
-          </trans>
+          </ht>
         </p>
       </header>
       
       <section param="content-body">
 <% if new_link -%>
         <a action="new" to="&model" param="new-link">
-          <trans key="<%= model_key %>.actions.new" >New <%=model_name :title %></trans>
+          <ht key="<%= model_key %>.actions.new" >New <%=model_name :title %></ht>
         </a>
 
 <% end -%>
@@ -353,14 +353,14 @@ new_link = :new.in?(actions)
     <content: param>
       <header param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.new_for_owner.heading">
+          <ht key="<%= model_key %>.new_for_owner.heading">
             New <%= collection_name.singularize.titleize %>
-          </trans>
+          </ht>
         </h2>
         <h3 param="subheading">
-          <trans key="<%= model_key %>.new_for_owner.subheading">
+          <ht key="<%= model_key %>.new_for_owner.subheading">
             For:
-          </trans>
+          </ht>
           <<%= owner_tag %> with="&@<%= owner %>"/>
         </h3>
       </header>
@@ -389,9 +389,9 @@ new_link = :new.in?(actions)
     <content: param>
       <header param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.<%= creator.underscore %>.heading">
+          <ht key="<%= model_key %>.<%= creator.underscore %>.heading">
             <%= creator.titleize %>
-          </trans>
+          </ht>
         </h2>
       </header>
 
@@ -414,9 +414,9 @@ new_link = :new.in?(actions)
     <content:>
       <header param="content-header">
         <h2 param="heading">
-          <trans key="<%= model_key %>.<%= transition.underscore %>.heading">
+          <ht key="<%= model_key %>.<%= transition.underscore %>.heading">
             <%= transition.titleize %>
-          </trans>
+          </ht>
         </h2>
       </header>
       

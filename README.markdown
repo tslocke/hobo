@@ -1,5 +1,5 @@
 # Welcome to the Hobo-i18n
-This is a I18n fork of git://github.com/tablatom/hobo.git
+This is a Hobo fork of git://github.com/tablatom/hobo.git, merged with soey's great I18n extensions. After that I have maintained it myself.
 
 
 ## Main Features
