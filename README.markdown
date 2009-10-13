@@ -55,12 +55,14 @@ ht("users.index.title", :default=>"Index of Users")
 
 All standard translations are scoped with hobo (see below). If you want specific translations for specific models, just copy/add another scope with the name of the model. For example you can have a specific heading for a "customer" index page by giving the following translation key:
 <pre>
+<code>
 ...
   customer:
     page:
       index:
         heading: "My special customer index heading"
 ...
+</code>
 </pre>
 For more samples search the code for ht() or &lt;ht&gt;&lt;/ht&gt; sections.
 
@@ -68,11 +70,13 @@ For more samples search the code for ht() or &lt;ht&gt;&lt;/ht&gt; sections.
 ### View-hints
 This system will look up the view-hints directly from the keys you add (i.e. in app.*.yml). Sample section from a typical app.en.yml file:
 <pre>
+<code>
 en:
   users:
     hints:
       name: "This is the name shown to the users in the application. It should contain the user's full name."
       email_address: "The email-address here is used as a user-id as well as a means of communicating with the user via email. Make sure the user has allowed mail from the host of this application." 
+</code>
 </pre>
 
 ### Locale files [http://github.com/Spiralis/hobo-i18n-locales](http://github.com/Spiralis/hobo-i18n-locales)
