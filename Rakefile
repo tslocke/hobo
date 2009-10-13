@@ -54,7 +54,6 @@ begin
     gemspec.homepage     = "http://hobocentral.net/"
     gemspec.authors      = ["Tom Locke"]
     gemspec.rubyforge_project = "hobo"
-    gemspec.files        = FileList["**"]
     gemspec.add_dependency("rails", [">= 2.2.2"])
     gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
     gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
