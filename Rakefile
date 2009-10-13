@@ -4,9 +4,10 @@ require 'rake/testtask'
 
 require 'activerecord'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
-require '../hobosupport/lib/hobosupport'
-require '../hobofields/lib/hobofields'
-require 'lib/hobo'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/lib')
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/lib')
+require 'hobo'
 
 desc "Default Task"
 task :default => [ :test ]
@@ -53,6 +54,7 @@ begin
     gemspec.homepage     = "http://hobocentral.net/"
     gemspec.authors      = ["Tom Locke"]
     gemspec.rubyforge_project = "hobo"
+    gemspec.files        = FileList["**"]
     gemspec.add_dependency("rails", [">= 2.2.2"])
     gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
     gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
