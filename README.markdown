@@ -72,8 +72,8 @@ en:
 </code>
 </pre>
 
-### Locale files
-A separate git-repository as been set up to contain the locale-files for different languages. There is a specific hobo.<locale>.yml for each locale. These are standard hobo keys. In addition to this you probably also have a rails.<locale>.yml file to handle Rails-i18n keys (check Svend Fuchs Rails-I18n-repository for your locales). Finally - you should have one or more app.<locale>.yml files where you keep your customisations.  
+### Locale files [github.com/Spiralis/hobo-i18n-locales](http://github.com/Spiralis/hobo-i18n-locales)
+A separate git-repository has been set up to contain the locale-files for different languages. There is a specific hobo.&lt;locale&gt;.yml for each locale. These are standard hobo keys. In addition to this you probably also have a rails.&lt;locale&gt;.yml file to handle Rails-i18n keys (check Sven Fuchs [rails-i18n-repository](http://github.com/svenfuchs/rails-i18n/tree/master/rails/locale/) for your locales). Finally - you should have one (or more) app.&lt;locale&gt;.yml files where you keep your customisations. 
 
 
 ### Locale tools
@@ -88,7 +88,7 @@ A separate git-repository as been set up to contain the locale-files for differe
 
 ## Issues
 
- - There are more conventions added by rails. Mainly the lazy lookup/automatic skin scoping http://guides.rubyonrails.org/i18n.html -> 4.1.4. This would lead to other scoping conventions. Maybe this should be considered later.
+ - There are more conventions added by rails. Mainly the [lazy lookup/automatic skin scoping](http://guides.rubyonrails.org/i18n.html) -> 4.1.4. This would lead to other scoping conventions. Maybe this should be considered later.
 
  - Automatic inflections are no real use. (Just stay with the english defaults in most cases ;)) or use specific translation keys.
 
