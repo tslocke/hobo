@@ -17,26 +17,26 @@
     
     <content: param>
       <header param="content-header">
-        <h2 param="heading"><trans key="hobo.login.heading">Log In</trans></h2>
+        <h2 param="heading"><ht key="hobo.login.heading">Log In</ht></h2>
       </header>
       
       <section param="content-body">      
         <form action="&request.request_uri" class="login" param>
           <labelled-item-list param>
             <labelled-item>
-              <item-label param="login-label"><trans key="hobo.login.email"><%= model.login_attribute.to_s.titleize %></trans></item-label>
+              <item-label param="login-label"><ht key="hobo.login.email"><%= model.login_attribute.to_s.titleize %></ht></item-label>
               <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
             </labelled-item>
 
             <labelled-item>
-              <item-label param="password-label"><trans key="hobo.login.password">Password</trans></item-label>
+              <item-label param="password-label"><ht key="hobo.login.password">Password</ht></item-label>
               <item-value>
                 <input type="password" name="password" id="password" class="string" param="password-input"/>
               </item-value>
             </labelled-item>
 
             <labelled-item param="remember-me">
-              <item-label class="field-label" param="remember-me-label"><trans key="hobo.login.remember_me">Remember me:</trans></item-label>
+              <item-label class="field-label" param="remember-me-label"><ht key="hobo.login.remember_me">Remember me:</ht></item-label>
               <item-value>
                 <input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input" checked/>
               </item-value>
@@ -44,10 +44,10 @@
           </labelled-item-list>
           <div param="actions">
             <submit label="#{ht 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
-            <trans key="hobo.support.or">or</trans> <a param="signup" href="&signup_url"><trans key="hobo.login.signup">Sign up</trans></a></if>
+            <ht key="hobo.support.or">or</ht> <a param="signup" href="&signup_url"><ht key="hobo.login.signup">Sign up</ht></a></if>
           </div>
         </form>
-        <a href="&forgot_password_url" param="forgot-password" if="&forgot_password_url"><trans key="hobo.login.forgot_password">Forgot your password?</trans></a>
+        <a href="&forgot_password_url" param="forgot-password" if="&forgot_password_url"><ht key="hobo.login.forgot_password">Forgot your password?</ht></a>
       </section>
     </content:>
   </simple-page>
@@ -63,17 +63,17 @@
     
     <content: param>
       <header param="content-header">
-        <h2 param="heading"><trans key="hobo.forgot_password.heading">Forgotten Password</trans></h2>
-        <p><trans key="hobo.forgot_password.text">Enter the email address you signed up with. If we have it in
+        <h2 param="heading"><ht key="hobo.forgot_password.heading">Forgotten Password</ht></h2>
+        <p><ht key="hobo.forgot_password.text">Enter the email address you signed up with. If we have it in
         our records we'll send you an email allowing you to choose a new
-        password.</trans></p>
+        password.</ht></p>
       </header>
 
       <section param="content-body">
         <form action="" class="forgot-password" param>
           <labelled-item-list param>
             <labelled-item>
-              <item-label param="email-address-label"><trans key="hobo.forgot_password.email">Email Address</trans></item-label>
+              <item-label param="email-address-label"><ht key="hobo.forgot_password.email">Email Address</ht></item-label>
               <item-value>
                 <input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" />
               </item-value>
@@ -98,18 +98,18 @@ if a given email is associated with an account or not. -->
     
     <content: param>
       <header param="content-header">
-        <h2 param><trans key="hobo.forgot_password_sent.heading">Forgotten Password - Sent</trans></h2>
+        <h2 param><ht key="hobo.forgot_password_sent.heading">Forgotten Password - Sent</ht></h2>
       </header>
 
       <section param="content-body">
         <p param="message">
-        	<trans key="hobo.forgot_password_sent.text" email="#{params[:email_address]}">
+        	<ht key="hobo.forgot_password_sent.text" email="#{params[:email_address]}">
         	If the e-mail address you entered, <%= h params[:email_address] %>,
           is in our records, you will
         receive an e-mail from us with instructions for resetting your
         password. If you don't receive this e-mail, please check your
-        junk mail folder.</trans></p>
-        <p><a href="#{base_url}/"><trans key="hobo.actions.back">Back to</trans> <app-name/></a></p>
+        junk mail folder.</ht></p>
+        <p><a href="#{base_url}/"><ht key="hobo.actions.back">Back to</ht> <app-name/></a></p>
       </section>
     </content:>
         
