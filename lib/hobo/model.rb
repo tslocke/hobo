@@ -490,7 +490,7 @@ module Hobo
           if parts[0..2].include?(0)
             nil
           else
-            Time.local(*parts)
+            Time.zone ? Time.zone.local(*parts) : Time.local(*parts)
           end
         else
           value

@@ -342,7 +342,7 @@ The menus default to the current date if the current value is nil.
   -->
 <def tag="input" for="date" attrs="order">
   <% order = order.nil? ? [:year, :month, :day] : comma_split(order).*.to_sym -%>
-  <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+  <%= select_date(this || current_time, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
 </def>
 
 
@@ -360,7 +360,7 @@ The menus default to the current time if the current value is nil.
   -->
 <def tag="input" for="time" attrs="order">
   <% order = order.nil? ? [:year, :month, :day, :hour, :minute, :second] : comma_split(order).*.to_sym -%>
-  <%= select_date(this || Time.now, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
+  <%= select_date(this || current_time, attributes.merge(:prefix => param_name_for_this, :order => order)) %>
 </def>
 
 
@@ -383,7 +383,7 @@ The menus default to the current time if the current value is nil.
        require 'ruby-debug'
        debugger
      end -%>
-  <%= select_datetime(this || Time.now, attributes.merge(:prefix => param_name_for_this)) %>
+  <%= select_datetime(this || current_time, attributes.merge(:prefix => param_name_for_this)) %>
 </def>
 
 <!-- An `<input type='text'>` input. -->
