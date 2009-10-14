@@ -23,6 +23,11 @@ Major bug fixes:
  - "collection" was renamed to "collection-heading" in the Rapid
    generated show-page.
 
+ - [Bug
+   473](https://hobo.lighthouseapp.com/projects/8324/tickets/473-use-timezonenow-instead-of-timenow#ticket-473-5):
+   Hobo now uses any time zone's configured for the application rather
+   than using the server's time zone.
+
 Minor bug fixes and enhancements:
 
 See the [github log](http://github.com/bryanlarsen/hobo/commits/v0.8.5)
