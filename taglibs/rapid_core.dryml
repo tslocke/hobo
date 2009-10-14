@@ -533,11 +533,11 @@ The label can be customised using the `label` attribute, e.g.
     main = label.blank? ? c : pluralize(c, label)
    
     if prefix.in? %w(are is)
-      p = c == 1 ? "is" : "are"
-      p + ' ' + main.to_s
-    else
-      main
+      prefix = c == 1 ? "is" : "are"
     end
+
+    (prefix ? "#{prefix} #{main}" : main.to_s)
+
   end
 %></span></def>
 
