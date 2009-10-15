@@ -1,3 +1,8 @@
+=== Hobo 0.8.10 ==
+
+This is a brown paper bag release.   The fix for Bug 473 was not
+properly tested.   Thanks Iain Beeston for quickly sending us a patch.
+
 === Hobo 0.8.9 ===
 
 Enhancements:
