@@ -147,6 +147,6 @@ module Hobo::RapidHelper
   end
 
   def current_time
-    Time.now ? Time.zone.now : Time.now
+    Time.zone ? Time.zone.now : Time.now
   end
 end
