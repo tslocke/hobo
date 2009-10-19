@@ -12,7 +12,7 @@ This tag is in need of a review - it's a bit funky.
     - '`*`' - equivalent to listing all of the regular 'content columns' of the current record
     - A comma separated list of field names.
   Defaults to '`*`'
- - `assocaitions` - set to `has_many` to select the associations `has_many` relationships used as the "fields". Do not also give the `fields` attribute.
+ - `associations` - set to `has_many` to select the associations `has_many` relationships used as the "fields". Do not also give the `fields` attribute.
  - `skip` - comma separated list of field names to omit.
  - `skip-associations` - set to `has-many` to omit all `has_many` associations.
  - `include-timestamps` - whether or not to include the standard ActiveRecord timestamp fields such as `created_at` and `updated_at`. Defaults to false.

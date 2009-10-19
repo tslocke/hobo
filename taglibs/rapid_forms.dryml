@@ -867,7 +867,7 @@ Use the `uri` option to specify a redirect location:
   
 This tag is very different from tags like `<select-many>` and `<check-many>` in that:
 
- - Those tags are used to *chose existing records* to include in the assocaition, while `<input-many>` is used to actually create or edit the records in the association.
+ - Those tags are used to *chose existing records* to include in the association, while `<input-many>` is used to actually create or edit the records in the association.
  
 ### Example
 
