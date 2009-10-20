@@ -880,9 +880,11 @@ The body of the tag will be repeated for each of the current records in the coll
 ### Attributes
 
  - fields:  If you do not specify any content for the input-many, a `<field-list>` is rendered.   This attribute is passed through to the `<field-list>`
+
+ - skip:  Passed through to the `<field-list>`.  If not specified, it defaults to the parent association.
   
   -->
-<def tag="input-many" attrs="fields" polymorphic>
+<def tag="input-many" attrs="fields,skip" polymorphic>
   <set empty="&this.empty?"/>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
     <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
@@ -897,9 +899,10 @@ The body of the tag will be repeated for each of the current records in the coll
       </div>
     </li>
     <li if="&empty">
+      <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.name.to_s %>           
       <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
         <div class="input-many-item" param="default">
-          <field-list merge-attrs="fields"/>
+          <field-list merge-attrs="fields" skip="&skip"/>
         </div>
       </fake-field-context>
       <div class="buttons">
