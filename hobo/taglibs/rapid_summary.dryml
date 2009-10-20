@@ -20,6 +20,17 @@
   <%= RAILS_ENV -%>
 </def>
 
+<!-- Which change management system is in use:  "git" "subversion" "other" -->
+<def tag="cms-method">
+  <%= if File.exist?("#{RAILS_ROOT}/.git")
+        "git"
+      elsif File.exist?("#{RAILS_ROOT}/.svn")
+        "subversion"
+      else
+        "other"
+      end -%>
+</def>
+
 <!-- the git branch currently in use -->
 <def tag="git-branch">
   <%= File.basename(`git symbolic-ref HEAD`) -%>
@@ -40,6 +51,30 @@
 <!-- the time & date of the last commit -->
 <def tag="git-last-commit-time">
   <%= `git log HEAD^..HEAD --pretty=format:%cD` -%>
+</def>
+
+<!-- calls `git-clean` or `svn-clean` as appropriate.  `svn-clean` not yet written. -->
+<def tag="cms-clean">
+  <% method = cms_method.strip -%>
+  <git-clean if="&method=='git'"/>
+</def>
+
+<!-- calls `git-last-commit-time` or `svn-last-commit-time` as appropriate.  `svn-last-commit-time` not yet written. -->
+<def tag="cms-last-commit-time">
+  <% method = cms_method.strip -%>
+  <git-last-commit-time if="&method=='git'"/>
+</def>
+
+<!-- calls `git-version` or `svn-version` as appropriate.  `svn-version` not yet written. -->
+<def tag="cms-version">
+  <% method = cms_method.strip -%>
+  <git-version if="&method=='git'"/>
+</def>
+
+<!-- calls `git-branch` or `svn-branch` as appropriate.  `svn-branch` not yet written. -->
+<def tag="cms-branch">
+  <% method = cms_method.strip -%>
+  <git-branch if="&method=='git'"/>
 </def>
 
 <!-- Hobo::VERSION -->
@@ -206,13 +241,18 @@
       end
     end
    -%>
-  <repeat with="&models">
+  <repeat with="&models.sort_by {|m| m.to_s}">
     <do param="default" />
   </repeat>
 </def>
 
 <def tag="model-name">
   <%= this.to_s -%>
+</def>
+
+<!-- given a model, returns the table name -->
+<def tag="model-table-name">
+  <%= this.try.table_name -%>
 </def>
 
 <!-- given a model, repeats on the database columns -->
