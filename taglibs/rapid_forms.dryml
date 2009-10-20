@@ -601,7 +601,7 @@ This is the default input that Rapid uses for `belongs_to` associations. The men
 
 ### Attributes
 
- - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null). Defaults to false
+ - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null).   If this value is not supplied, the default is "true" if the current value is nil; otherwise the default is "false".  One implication of this is that the default may change when the form is re-rendered due to a validation failure.  Setting this value explicitly is recommended.
  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
  - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
  - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
