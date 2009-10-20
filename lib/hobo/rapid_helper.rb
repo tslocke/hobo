@@ -146,4 +146,7 @@ module Hobo::RapidHelper
     fields
   end
 
+  def current_time
+    Time.zone ? Time.zone.now : Time.now
+  end
 end
