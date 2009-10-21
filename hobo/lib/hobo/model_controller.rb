@@ -383,13 +383,18 @@ module Hobo
         (!destroyed && object_url(@this)) ||
 
         # Then the show page of the 'owning' object if there is one
-        (@this.class.default_dependent_on && object_url(@this.send(@this.class.default_dependent_on))) ||
+        object_url(owning_object) ||
 
         # Last try - the index page for this model
         object_url(@this.class) ||
 
         # Give up
         home_page
+    end
+
+    def owning_object
+      method = @this.class.dependent_on.detect {|m| !@this.send(m).nil?}
+      method ? @this.send(method) : nil
     end
     
     
