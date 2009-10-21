@@ -12,7 +12,7 @@
 
 
 <% each_controller do -%>
-  
+
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
 new_link = linkable?(:new)
@@ -23,18 +23,18 @@ new_form = !new_link && linkable?(model, :create, :method => :post)
 <def tag="index-page" for="<%= model.name %>">
   <page merge title="<%= model_name :title, :plural %>">
     <body: class="index-page <%= model_class %>" param/>
-    
+
     <content: param>
       <header param="content-header">
         <h2 param="heading"><%= model_name :title, :plural %></h2>
 
         <p param="count" if>There <count prefix="are"/></p>
       </header>
-      
+
       <section param="content-body">
 <% if new_link -%>
 
-        <a action="new" to="&model" param="new-link"/>      
+        <a action="new" to="&model" param="new-link"/>
 <% end -%>
 
 <% if view_hints.paginate? -%>
@@ -68,12 +68,12 @@ new_form = !new_link && linkable?(model, :create, :method => :post)
 <def tag="new-page" for="<%= model.name %>">
   <page merge title="New <%= model_name :title %>">
     <body: class="new-page <%= model_class %>" param/>
-    
+
     <content: param>
       <section param="content-header">
         <h2 param="heading">New <%= model_name :title %></h2>
       </section>
-      
+
       <section param="content-body">
         <form param>
           <submit: label="Create <%= model_name :title %>"/>
@@ -132,7 +132,7 @@ end
 <% if creator_link -%>
 
             <a:<%= model.creator_attribute %> param="creator-link"/>
-<% elsif creator -%>        
+<% elsif creator -%>
 
             <view:get-creator param="creator-name"/>
 <% end -%>
@@ -141,7 +141,7 @@ end
             <a action="edit" if="&can_edit?" param="edit-link">Edit <%= model_name :title %></a>
 <% end -%>
           </header>
-    
+
           <section param="content-body"<%= ' with-flash-messages' if aside_collections %>>
 <% if main_content -%>
             <view:<%= main_content %> param="description"/>
@@ -152,7 +152,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading"><%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %></h3>
-              
+
 <%   if sortable_collection?(collection) -%>
               <sortable-collection:<%= collection %> param="collection"/>
 <%   else -%>
@@ -176,7 +176,7 @@ end
           </section>
 <% if aside_collections -%>
         </section>
-        
+
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
@@ -197,7 +197,7 @@ end
       </section-group>
 <% end -%>
     </content:>
-    
+
   </page>
 </def>
 
@@ -220,7 +220,7 @@ name_attribute = model.name_attribute
         <form param/>
       </section>
     </content:>
-    
+
   </page>
 </def>
 
@@ -243,7 +243,7 @@ new_link = :new.in?(actions)
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
   <page merge title="<%= model_name :title, :plural %> for #{name :with => @<%= owner %>, :no_wrapper => true}">
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
-    
+
     <content: param>
       <header param="content-header">
 <% if linkable_owner -%>
@@ -257,7 +257,7 @@ new_link = :new.in?(actions)
 <% end -%>
         <p param="count" if>There <count prefix="are"/></p>
       </header>
-      
+
       <section param="content-body">
 <% if new_link -%>
 
@@ -265,9 +265,9 @@ new_link = :new.in?(actions)
 <% end -%>
 
         <page-nav param="top-page-nav"/>
-      
+
         <collection param/>
-      
+
         <page-nav param="bottom-page-nav"/>
       </section>
     </content:>
@@ -280,15 +280,15 @@ new_link = :new.in?(actions)
 <def tag="new-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="new-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
   <page merge title="New <%= model_name :title %> for #{name :with => @<%= owner %>}">
-    
+
     <body: class="new-for-owner-page <% owner.dasherize %> <%= model_class %>" param/>
-    
+
     <content: param>
       <header param="content-header">
         <h2 param="heading">New <%= collection_name.singularize.titleize %></h2>
         <h3 param="subheading">For: <<%= owner_tag %> with="&@<%= owner %>"/></h3>
       </header>
-      
+
       <section param="content-body">
         <form owner="<%= owner %>" method="post" param>
           <field-list: skip="<%= owner %>"/>
@@ -328,19 +328,19 @@ new_link = :new.in?(actions)
 <def tag="<%= transition.dasherize %>-page" polymorphic/>
 <def tag="<%= transition.dasherize %>-page" for="<%= model.name %>">
   <page title="<%= transition.titleize %>" merge>
-    
+
     <body: class="lifecycle-transition-page <%= transition.dasherize -%>-page" param/>
-    
+
     <content:>
       <header param="content-header">
         <h2 param="heading"><%= transition.titleize %></h2>
       </header>
-      
+
       <section param="content-body">
         <<%= transition.dasherize %>-form param="form"/>
       </section>
     </content:>
-    
+
   </page>
 </def>
 
