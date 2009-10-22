@@ -85,6 +85,7 @@ module Hobo
         @models_loaded = true
       end
 
+      @model_names ||= Set.new
       # ...but only return the ones that registered themselves
       @model_names.map do |name|
         name.safe_constantize || (@model_names.delete name; nil)
