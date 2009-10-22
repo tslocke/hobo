@@ -46,8 +46,16 @@ class HoboFrontControllerGenerator < Rails::Generator::NamedBase
     routes_path = File.join(RAILS_ROOT, "config/routes.rb")
     name = full_class_path
 
-    route = ("  map.site_search  'search', :controller => '#{name}', :action => 'search'\n" +
-             "  map.root :controller => '#{name}', :action => 'index'")
+    root = class_nesting_depth>0 ? class_nesting.underscore : "root"
+
+    route = "  map.site_search  'search', :controller => '#{name}', :action => 'search'\n"
+    if class_nesting_depth == 0
+      route+= "  map.root :controller => '#{name}', :action => 'index'"
+    elsif class_nesting_depth == 1
+      route+= "  map.#{class_nesting.underscore} '/#{class_nesting.underscore}', :controller => '#{name}', :action => 'index'"
+    else
+      assert false, "no support for class_nesting_depth>1"      
+    end
 
     route_src = File.read(routes_path)
     return if route_src.include?(route)
