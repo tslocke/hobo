@@ -5,7 +5,7 @@ module HoboFields
     COLUMN_TYPE = :string
 
     def validate
-      "is not valid" unless valid? || blank?
+      I18n.t("activerecord.errors.messages.invalid") unless valid? || blank?
     end
 
     def valid?
