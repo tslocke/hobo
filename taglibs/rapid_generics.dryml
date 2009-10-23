@@ -19,7 +19,9 @@
   -->
 <def tag="empty-collection-message">
   <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
-    No <collection-name lowercase/> to display
+    <ht key="#{type_name.downcase.sub(' ', '_').pluralize}.collection.empty_message">
+      No <collection-name lowercase/> to display
+    </ht>
   </div>
 </def>
 
