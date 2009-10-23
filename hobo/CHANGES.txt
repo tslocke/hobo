@@ -1,4 +1,23 @@
+=== Upgrading to a new version of Hobo ===
+
+Once you have installed a new version of Hobo, you may wish to run
+
+    rake hobo:run_standard_generators
+
+This will run all of the standard generators, and pull in any bug
+fixes or enhancements to generated code.  Note that this is quite
+likely to cause conflicts, so it is highly recommended that you have
+your code backed up and in a change control system such as git or
+subversion.
+
 === Hobo Edge ===
+
+Major enhancements:
+
+  - New projects now have a summary page on /front/summary that
+    provides application information to the administrator.  Current
+    projects may add this action by running the
+    `hobo_front_controller` generator.
 
 Major bug fixes:
 
