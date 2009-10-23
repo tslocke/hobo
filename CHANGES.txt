@@ -6,6 +6,13 @@ Major bug fixes:
    480](https://hobo.lighthouseapp.com/projects/8324/tickets/480-find_owner_and_association-method-for-has_many-associations)
    Owner actions now work with has_many associations
 
+Minor Enhancements:
+
+ - Aside collections now have a new-link at the bottom (inside the
+   preview-with-more)
+   [#421](https://hobo.lighthouseapp.com/projects/8324/tickets/421-auto_actions_for-doesnt-create-add-button-in-sidebar)
+
+
 === Hobo 0.8.10 ===
 
 This is a brown paper bag release.   The fix for Bug 473 was not
