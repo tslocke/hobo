@@ -12,6 +12,9 @@ Minor Enhancements:
    preview-with-more)
    [#421](https://hobo.lighthouseapp.com/projects/8324/tickets/421-auto_actions_for-doesnt-create-add-button-in-sidebar)
 
+ - the manual now includes a Generators section, and a subsite
+   tutorial has been added.
+
 
 === Hobo 0.8.10 ===
 
