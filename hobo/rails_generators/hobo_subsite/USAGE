@@ -1,0 +1,16 @@
+Description:
+
+    Creates a subsite, a namespaced section of your application.
+
+    The subsite will use app/views/taglibs/<subsite_name>_site.dryml
+    instead of app/views/taglibs/appplication.dryml.  This allows you
+    to easily set different themes and choose different CSS files for
+    the subsite.
+
+    Controllers for the subsite are created in
+    app/controllers/<subsite_name>/ and views are also in their own
+    subdirectory.   This allows you to have two different controllers
+    and two different sets of views for the same model.
+
+    The difference between hobo_admin_site and hobo_subsite is that
+    hobo_admin_site limits the subsite to use by administrators only.

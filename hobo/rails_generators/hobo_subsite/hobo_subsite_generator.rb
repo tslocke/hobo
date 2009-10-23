@@ -53,7 +53,7 @@ class HoboSubsiteGenerator < Rails::Generator::NamedBase
 
   protected
     def banner
-      "Usage: #{$0} #{spec.name} [--make-front-site | --no-front-site]"
+      "Usage: #{$0} #{spec.name} <subsite_name> [--make-front-site | --no-front-site]"
     end
 
 

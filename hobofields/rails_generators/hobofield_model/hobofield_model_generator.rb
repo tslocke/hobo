@@ -33,6 +33,6 @@ class HobofieldModelGenerator < Rails::Generator::NamedBase
       opt.on("--skip-timestamps",
              "Don't add timestamps to the migration file for this model") { |v| options[:skip_timestamps] = v }
       opt.on("--skip-fixture",
-             "Don't generation a fixture file for this model") { |v| options[:skip_fixture] = v}
+             "Don't generate a fixture file for this model") { |v| options[:skip_fixture] = v}
     end
 end

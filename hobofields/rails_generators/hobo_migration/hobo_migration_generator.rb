@@ -133,8 +133,8 @@ class HoboMigrationGenerator < Rails::Generator::Base
       
       opt.on("--force-drop",   "Don't prompt with 'drop or rename' - just drop everything") { |v| options[:force_drop] = true }
       opt.on("--default-name", "Dont' prompt for a migration name - just pick one")         { |v| options[:default_name] = true }
-      opt.on("--generate",     "Dont' prompt for action - generate the migration")          { |v| options[:action] = 'g' }
-      opt.on("--migrate",      "Dont' prompt for action - generate and migrate")            { |v| options[:action] = 'm' }
+      opt.on("--generate",     "Don't prompt for action - generate the migration")          { |v| options[:action] = 'g' }
+      opt.on("--migrate",      "Don't prompt for action - generate and migrate")            { |v| options[:action] = 'm' }
     end
   
 
