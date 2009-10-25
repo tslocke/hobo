@@ -196,13 +196,13 @@ end
 
               <section param="add-to-collection" if="&can_create?(@<%= model_name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading" model="#{collection.to_s.singularize.titleize}" a_or_an="#{ht 'hobo.<%=a_or_an %>', default=>['<%= a_or_an %>']}">
+                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading">
                     Add <%= a_or_an collection.to_s.singularize.titleize %>
                   </ht>
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model_name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
                   <field-list: skip="<%= owner %>"/>
-                  <submit: label="#{ht '<%= collection.to_s.pluralize %>.actions.add', default=>['Add']}"/>
+                  <submit: label="#{ht '<%= collection.to_s.pluralize %>.actions.add', :default=>['Add'] }"/>
                 </form>
               </section>
 <%   end -%>
