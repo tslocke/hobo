@@ -100,7 +100,7 @@ Provides validation of correct email address format.
         >> !!bad.valid?
         => false
         >> bad.validate
-        => "is not valid"
+        => "is invalid"
 
 ### `HoboFields::HtmlString`
 
