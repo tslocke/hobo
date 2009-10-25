@@ -30,7 +30,7 @@ Now edit your model as follows:
 
 Then, simply run
 
-        $ ./script/genearte hobo_migration
+        $ ./script/generate hobo_migration
 
 And voila
 
