@@ -14,6 +14,12 @@ subversion.
 
 Major enhancements:
 
+  - Internationalization!  Through the hard work of soey and Spiralis,
+    we now have internationalization support in Hobo.   The manual
+    page is on the
+    [cookbook](http://cookbook.hobocentral.net/manual/i18n).   Locales
+    are available on [github](http://github.com/Spiralis/hobo-i18n-locales).
+
   - New projects now have a summary page on /front/summary that
     provides application information to the administrator.  Current
     projects may add this action by running the
