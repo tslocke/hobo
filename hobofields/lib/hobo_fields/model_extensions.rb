@@ -15,6 +15,9 @@ module HoboFields
     # and speeds things up a little.
     inheriting_cattr_reader :field_specs => HashWithIndifferentAccess.new
 
+    # index_specs holds IndexSpec objects for all the declared indexes.
+    inheriting_cattr_reader :index_specs => []
+
     def self.inherited(klass)
       fields do |f|
         f.field(inheritance_column, :string)
@@ -22,9 +25,8 @@ module HoboFields
       super
     end
 
-
-    def self.field_specs
-      @field_specs ||= HashWithIndifferentAccess.new
+    def self.index(fields, options = {})
+      index_specs << IndexSpec.new(self, fields, options)
     end
 
 
@@ -72,7 +74,12 @@ module HoboFields
         refl = reflections[name.to_sym]
         fkey = refl.primary_key_name
         declare_field(fkey.to_sym, :integer, column_options)
-        declare_polymorphic_type_field(name, column_options) if refl.options[:polymorphic]
+        if refl.options[:polymorphic]
+          declare_polymorphic_type_field(name, column_options)
+          index(["#{name}_type", fkey])
+        else
+          index(fkey)
+        end
       end
     end
     class << self
@@ -110,6 +117,7 @@ module HoboFields
       try.field_added(name, type, args, options)
       add_formatting_for_field(name, type, args)
       add_validations_for_field(name, type, args)
+      add_index_for_field(name, args, options)
       declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
       field_specs[name] = FieldSpec.new(self, name, type, options)
       attr_order << name unless name.in?(attr_order)
@@ -131,7 +139,6 @@ module HoboFields
       end
     end
 
-
     def self.add_formatting_for_field(name, type, args)
       type_class = HoboFields.to_class(type)
       if type_class && "format".in?(type_class.instance_methods)
@@ -139,6 +146,16 @@ module HoboFields
           record.send("#{name}=", record.send(name)._?.format)
         end
       end
+    end
+
+    def self.add_index_for_field(name, args, options)
+      to_name = options.delete(:index)
+      return unless to_name
+      index_opts = {}
+      index_opts[:unique] = :unique.in?(args) || options.delete(:unique)
+      # support :index => true declaration
+      index_opts[:name] = to_name unless to_name == true
+      index(name, index_opts)
     end
 
 

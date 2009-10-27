@@ -32,7 +32,9 @@ module HoboFields
   # Provide a lookup for these rather than loading them all preemptively
   
   STANDARD_TYPES = {
+    :raw_html      => "RawHtmlString",
     :html          => "HtmlString",
+    :raw_markdown  => "RawMarkdownString",
     :markdown      => "MarkdownString",
     :textile       => "TextileString",
     :password      => "PasswordString",

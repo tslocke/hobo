@@ -28,6 +28,7 @@ module HoboFields
         c = Class.new(EnumString) do
           values.each do |v|
             const_name = v.upcase.gsub(/[^a-z0-9_]/i, '_').gsub(/_+/, '_')
+            const_name = "V" + const_name if const_name =~ /^[0-9_]/
             const_set(const_name, self.new(v)) unless const_defined?(const_name)
 
             method_name = "is_#{v.underscore}?"
