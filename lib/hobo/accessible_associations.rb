@@ -26,6 +26,8 @@ module Hobo
     
     def find_or_create_and_update(owner, association_name, finder, record_hash_or_string)
       if record_hash_or_string.is_a?(String)
+        return nil if record_hash_or_string.blank?
+
         # An ID or a name - the passed block will find the record
         record = find_by_name_or_id(finder, record_hash_or_string)
       
