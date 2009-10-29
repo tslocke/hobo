@@ -17,6 +17,24 @@ class Array
     self
   end
 
+  # useful function from Rails 2.3
+  if !respond_to? :wrap
+    def self.wrap(object)
+      case object
+      when nil
+        []
+      when self
+        object
+      else
+        if object.respond_to?(:to_ary)
+          object.to_ary
+        else
+          [object]
+        end
+      end
+    end
+  end
+
 end
 
 
