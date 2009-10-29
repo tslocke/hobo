@@ -18,7 +18,14 @@ Major enhancements:
     we now have internationalization support in Hobo.   The manual
     page is on the
     [cookbook](http://cookbook.hobocentral.net/manual/i18n).   Locales
-    are available on [github](http://github.com/Spiralis/hobo-i18n-locales).
+    are available on
+    [github](http://github.com/Spiralis/hobo-i18n-locales).
+
+  - Index generation:  Matt Jones' automatic index generation code has
+    been merged.  The default Rails index names are very long, so this
+    is unlikely to work well on Oracle, which has a 30 character
+    limit.  Testing against Postgres, Oracle, SQL Server and JDBC has
+    been extremely limited.
 
   - New projects now have a summary page on /front/summary that
     provides application information to the administrator.  Current
@@ -39,6 +46,19 @@ Minor Enhancements:
 
  - the manual now includes a Generators section, and a subsite
    tutorial has been added.
+
+ - [Bug
+   386](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/386)
+   and [Bug
+   501](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/501)
+   have been fixed, reducing the number of extraneous migrations that
+   the hobo_migration generator creates.  These are actually Rails
+   and/or database bugs we're working around.  For instance, MySQL
+   does not allow default values for text columns, so Rails silently
+   ignores them.  SQLite does not allow scale or precision settings on
+   decimal fields.  These types of bugs are good reasons why you
+   should use the same type of database for development, testing and
+   production.
 
 
 === Hobo 0.8.10 ===
