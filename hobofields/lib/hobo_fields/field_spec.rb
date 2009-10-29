@@ -67,7 +67,7 @@ module HoboFields
           return col_spec.type.in?(synonyms)
         end
       end
-      t = col_spec.type
+      t == col_spec.type
     end
       
 
