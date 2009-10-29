@@ -9,6 +9,8 @@ class <%= class_name %> < ActiveRecord::Base
     timestamps
   end
 
+  validates_presence_of :name
+
   # This gives admin rights to the first sign-up.
   # Just remove it if you don't want that
   before_create { |user| user.administrator = true if !Rails.env.test? && count == 0 }
