@@ -64,7 +64,7 @@ module HoboFields
         begin
           check_attributes = [:null, :default]
           check_attributes += [:precision, :scale] if sql_type == :decimal && !col_spec.is_a?(ActiveRecord::ConnectionAdapters::SQLiteColumn)  # remove when rails fixes https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/2872
-          check_attributes -= [:default] if (sql_type == :string || sql_type == :text) && default=="" && col_spec.default.nil? && col_spec.is_a?(ActiveRecord::ConnectionAdapters::MysqlColumn)
+          check_attributes -= [:default] if sql_type == :text && col_spec.is_a?(ActiveRecord::ConnectionAdapters::MysqlColumn)
           check_attributes << :limit if sql_type.in?([:string, :text, :binary, :integer])
           check_attributes.any? do |k|
             if k==:default && sql_type==:datetime
