@@ -37,9 +37,6 @@ And we'll require:
     >> require 'hobosupport'
     >> require 'hobofields'
 
-    >> HoboFields::MigrationGenerator.disable_indexing = true
-{.hidden}
-
 ## The migration generator -- introduction
 
 The migration generator works by:
@@ -247,13 +244,16 @@ Note that limit on a decimal column is ignored (use :scale and :precision)
     => "add_column :adverts, :price, :decimal"
 
 Cleanup
+{.hidden}
 
     >> Advert.field_specs.delete :price
+{.hidden}
     
 
 ### Foreign Keys
 
-HoboFields extends the `belongs_to` macro so that it also declares the foreign-key field.
+HoboFields extends the `belongs_to` macro so that it also declares the
+foreign-key field.  It also generates an index on the field.
 
         >>
          class Advert
@@ -261,13 +261,20 @@ HoboFields extends the `belongs_to` macro so that it also declares the foreign-k
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => 'add_column :adverts, :category_id, :integer'
+        => 
+         "add_column :adverts, :category_id, :integer
+         add_index :adverts, [:category_id]"
         >> down
-        => 'remove_column :adverts, :category_id'
+        => 
+         "remove_column :adverts, :category_id
+         remove_index :adverts, :name => :index_adverts_on_category_id"
 
 Cleanup:
+{.hidden}
 
         >> Advert.field_specs.delete(:category_id)
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["category_id"]}
+{.hidden}
 
 If you specify a custom foreign key, the migration generator observes that:
 
@@ -277,14 +284,52 @@ If you specify a custom foreign key, the migration generator observes that:
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => 'add_column :adverts, :c_id, :integer'
-        >> down
-        => 'remove_column :adverts, :c_id'
+        => 
+         "add_column :adverts, :c_id, :integer
+         add_index :adverts, [:c_id]"
 
 Cleanup:
+{.hidden}
 
         >> Advert.field_specs.delete(:c_id)
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["c_id"]}
+{.hidden}
 
+You can avoid generating the index by specifying `:index => false`
+
+        >>
+         class Advert
+           belongs_to :category, :index => false
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        => "add_column :adverts, :category_id, :integer"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.field_specs.delete(:category_id)
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["category_id"]}
+{.hidden}
+
+You can specify the index name with :index
+
+        >>
+         class Advert
+           belongs_to :category, :index => 'my_index'
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up
+        => 
+         "add_column :adverts, :category_id, :integer
+         add_index :adverts, [:category_id], :name => 'my_index'"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.field_specs.delete(:category_id)
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["category_id"]}
+{.hidden}
 
 ### Timestamps
 
@@ -308,10 +353,115 @@ Cleanup:
         >>
 
 Cleanup:
+{.hidden}
 
         >> Advert.field_specs.delete(:updated_at)
         >> Advert.field_specs.delete(:created_at)
+{.hidden}
 
+### Indices
+
+You can add an index to a field definition
+
+        >>
+         class Advert
+           fields do
+             title :string, :index => true
+           end
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => 'add_index :adverts, [:title]'
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title"]}
+{.hidden}
+
+You can ask for a unique index
+
+        >>
+         class Advert
+           fields do
+             title :string, :index => true, :unique => true
+           end
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => 'add_index :adverts, [:title], :unique => true'
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title"]}
+{.hidden}
+
+You can specify the name for the index
+
+        >>
+         class Advert
+           fields do
+             title :string, :index => 'my_index'
+           end
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => "add_index :adverts, [:title], :name => 'my_index'"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title"]}
+{.hidden}
+
+You can ask for an index outside of the fields block
+
+        >>
+         class Advert
+           index :title
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => "add_index :adverts, [:title]"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title"]}
+{.hidden}
+
+The available options for the index function are `:unique` and `:name`
+
+        >>
+         class Advert
+           index :title, :unique => true, :name => 'my_index'
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => "add_index :adverts, [:title], :unique => true, :name => 'my_index'"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title"]}
+{.hidden}
+
+You can create an index on more than one field
+
+        >>
+         class Advert
+           index [:title, :category_id]
+         end
+        >> up, down = HoboFields::MigrationGenerator.run
+        >> up.split("\n")[1]
+        => "add_index :adverts, [:title, :category_id]"
+
+Cleanup:
+{.hidden}
+
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["title", "category_id"]}
+{.hidden}
 
 ### Rename a table
 
@@ -451,6 +601,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
 
     >> nuke_model_class(Advert)
 {.hidden}
+
     >>
      class Ad < ActiveRecord::Base
        fields do
@@ -494,6 +645,7 @@ HoboFields has some support for legacy keys.
      "rename_column :adverts, :id, :advert_id
 
 Cleanup
+{.hidden}
 
     >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
 {.hidden}
