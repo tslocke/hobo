@@ -1,5 +1,6 @@
 <page>
   <content:>
+    <div class="content-body">
     <h2>Application Summary</h2>
 
     <table class="app-summary">
@@ -9,11 +10,20 @@
       <tr> <td>Rails Version</td>              <td><rails-version/></td>    </tr>
       <tr> <td>Rails Location</td>             <td><rails-location/></td>     </tr>
       <tr> <td>Mode</td>                       <td><rails-env/></td> </tr>
-      <tr> <td>Git Version</td>                <td><git-version/></td> </tr>
-      <tr> <td>Git Date</td>                   <td><git-last-commit-time/></td> </tr>
-      <tr> <td>Git Branch</td>                 <td><git-branch/></td> </tr>
-      <tr> <td>Git Clean?</td>                 <td><git-clean/></td></tr>
     </table>
+
+    <h3>Change Control</h3>
+    <table class="app-summary">      
+      <tr> <th></th><th></th></tr>
+      <tr> <td>Method</td>                 <td><cms-method/></td> </tr>
+      <if test="&cms_method.strip=='git'">
+        <tr> <td>Version</td>                <td><cms-version/></td> </tr>
+        <tr> <td>Date</td>                   <td><cms-last-commit-time/></td> </tr>
+        <tr> <td>Branch</td>                 <td><cms-branch/></td> </tr>
+        <tr> <td>Clean?</td>                 <td><cms-clean/></td></tr>
+      </if>
+    </table>
+
 
     <h3>Gems</h3>
     <table class="app-summary">
@@ -56,8 +66,18 @@
     </table>
 
     <h2>Models</h2>
+    <table class="app-summary">
+      <tr><th>Class</th><th>Table</th></tr>
+      <with-models>
+        <tr>
+          <td><model-name/></td>
+          <td><model-table-name/></td>
+        </tr>
+      </with-models>
+    </table>        
+    
     <with-models>
-      <h3><model-name /></h3>
+      <h3 if="&this.try.table_name"><model-name /></h3>
       <table class="app-summary">
         <with-model-columns>
           <tr if="&first_item?"><th>Column</th><th>Type</th></tr>
@@ -78,5 +98,6 @@
         </with-model-associations>
       </table>
     </with-models>
+    </div>
   </content:>
 </page>
