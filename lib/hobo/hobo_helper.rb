@@ -192,12 +192,20 @@ module Hobo
     
     
     def first_item?
-      this == scope.repeat_collection.first
+      if scope.repeat_collection.respond_to? :each_pair
+        this == scope.repeat_collection.first.try.last
+      else
+        this == scope.repeat_collection.first
+      end
     end
     
     
     def last_item?
-      this == scope.repeat_collection.last
+      if scope.repeat_collection.respond_to? :each_pair
+        this == scope.repeat_collection.last.try.last
+      else
+        this == scope.repeat_collection.last
+      end
     end
 
 
