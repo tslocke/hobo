@@ -32,7 +32,7 @@ Several of the tags in this taglib support the following set of ajax attributes:
 The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script
 executed at various points in the ajax request cycle:
  
- - before: script to run befofre the request
+ - before: script to run before the request
  
  - success: script to run on successful completion of the request
  
