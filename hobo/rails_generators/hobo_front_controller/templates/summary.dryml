@@ -28,7 +28,7 @@
     <h3>Gems</h3>
     <table class="app-summary">
       <with-gems>
-        <tr><th></th><th>Required</th><th>Installed</th><th>Status</th><th>Dependencies</th></tr>
+        <tr if="&first_item?"><th></th><th>Required</th><th>Installed</th><th>Status</th><th>Dependencies</th></tr>
         <tr>
           <td><gem-name/></td>
           <td><gem-version-required/></td>
