@@ -113,5 +113,9 @@ end
 if defined? ActiveSupport
   class ActiveSupport::OrderedHash
     alias each_pair each
+
+    def first
+      empty? ? nil : [keys.first, values.first]
+    end
   end
 end
