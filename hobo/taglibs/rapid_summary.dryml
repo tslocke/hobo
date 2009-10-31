@@ -39,18 +39,18 @@
 <!-- the git version currently in use -->
 <def tag="git-version" attrs="dir">
   <% dir=RAILS_ROOT if dir.blank? -%>
-  <%= `cd '#{dir}'; git rev-list HEAD^..HEAD --abbrev-commit --abbrev=7` -%>
+  <%= Dir.chdir(dir) {`git rev-list "HEAD^..HEAD" --abbrev-commit --abbrev=7`} -%>
 </def>
 
 <!-- returns 'clean' if there are no modified files, 'modified' otherwise. -->
 <def tag="git-clean" attrs="dir">
   <% dir=RAILS_ROOT if dir.blank? -%>
-  <%= `cd '#{dir}'; git ls-files -m`.blank? ? "clean" : "modified"  -%>
+  <%= Dir.chdir(dir) {`git ls-files -m`}.blank? ? "clean" : "modified"  -%>
 </def>
 
 <!-- the time & date of the last commit -->
 <def tag="git-last-commit-time">
-  <%= `git log HEAD^..HEAD --pretty=format:%cD` -%>
+  <%= `git log "HEAD^..HEAD" --pretty=format:%cD` -%>
 </def>
 
 <!-- calls `git-clean` or `svn-clean` as appropriate.  `svn-clean` not yet written. -->
