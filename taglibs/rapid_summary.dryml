@@ -295,6 +295,6 @@
 
 <!-- given an association, return the name --> 
 <def tag="model-association-class-name">
-  <%= (this.class_name.respond_to? 'underscore') ? this.class_name.underscore.singularize.camelize : this.class_name -%>
+  <%= (this.class_name.try.respond_to? 'underscore') ? this.class_name.underscore.singularize.camelize : this.try.class_name -%>
 </def>
 
