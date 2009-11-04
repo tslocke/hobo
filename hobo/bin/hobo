@@ -17,7 +17,7 @@ Options:
   -d | --database <database>         # e.g. mysql, sqlite
   -r | --rails <version>             # rails version to use
   -n | --no-rails                    # don't run 'rails'.  Assumes app-path=='.'
-  --invite-only                      # add features for an invite-ony website (admin site, no signup)
+  --invite-only                      # add features for an invite-only website (admin site, no signup)
 "
 
 
