@@ -8,7 +8,7 @@
 # All of the above for has-many through related records
 # All of the above for belongs-to related records
 # 
-# a permitted user can't create/update/delete any of the obove related records without :accessible
+# a permitted user can't create/update/delete any of the above related records without :accessible
 
 
 require 'test/unit'
