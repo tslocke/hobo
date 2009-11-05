@@ -126,7 +126,7 @@ module Hobo
 
       def transition(name, user, attributes)
         transition = find_transition(name, user)
-        transition.run!(record, user, attributes)
+        transition.run!(record, user, attributes) unless transition.nil?
       end
 
 
