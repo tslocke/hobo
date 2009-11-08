@@ -20,7 +20,9 @@ module Hobo
                                         :key_timestamp_field => :key_timestamp,
                                         :key_timeout => 999.years)
 
-        if defined? self::Lifecycle
+        # use const_defined so that subclasses can define lifecycles
+        # TODO: figure out how to merge with parent, if desired
+        if self.const_defined?(:Lifecycle)
           lifecycle = self::Lifecycle
         else
           # First call
@@ -76,7 +78,16 @@ module Hobo
 
 
       def lifecycle
-        @lifecycle ||= self.class::Lifecycle.new(self)
+        @lifecycle ||=  if defined? self.class::Lifecycle
+                          self.class::Lifecycle.new(self)
+                        else
+                          # search through superclasses
+                          current = self.class.superclass
+                          until (defined?(current::Lifecycle) || current.nil? || !current.respond_to?(:lifecycle)) do
+                            current = current.superclass
+                          end
+                          current.class::Lifecycle.new(self) if defined? current::Lifecycle
+                        end
       end
 
     end
