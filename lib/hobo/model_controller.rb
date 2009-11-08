@@ -774,17 +774,6 @@ module Hobo
     end
 
 
-    def not_found(error)
-      if "not_found_response".in?(self.class.superclass.instance_methods)
-        super
-      elsif render_tag("not-found-page", {}, :status => 404)
-        # cool
-      else
-        render(:text => ht(:"hobo.messages.not_found", :default=>["The page you requested cannot be found."]) , :status => 404)
-      end
-    end
-
-
     def this
       @this ||= (instance_variable_get("@#{model.name.underscore}") ||
                  instance_variable_get("@#{model.name.underscore.pluralize}"))
