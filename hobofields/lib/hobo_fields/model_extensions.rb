@@ -54,8 +54,9 @@ module HoboFields
         type = HoboFields.to_class(type)
         attrs.each do |attr|
           declare_attr_type attr, type, options
+          type_wrapper = attr_type(attr)
           define_method "#{attr}=" do |val|
-            if !val.is_a?(type) && HoboFields.can_wrap?(type, val)
+            if type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values) && !val.is_a?(type) && HoboFields.can_wrap?(type, val)
               val = type.new(val.to_s)
             end
             instance_variable_set("@#{attr}", val)
