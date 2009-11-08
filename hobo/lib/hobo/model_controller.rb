@@ -491,7 +491,7 @@ module Hobo
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this ||= find_instance(options)
+      self.this ||= args.first || find_instance(options)
       response_block(&b)
     end
 
