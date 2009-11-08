@@ -383,20 +383,22 @@ module Hobo
         end
       end
     end
-    
+
     # Best. Name. Ever
-    def deunknownify_attribute(attr)
+    def deunknownify_attribute(attr, remove_globals = true)
       attr = attr.to_sym
-      
+
       metaclass.send :remove_method, attr
-      
+
       if (refl = self.class.reflections[attr]) && refl.macro == :belongs_to
         # A belongs_to -- restore the underlying fields
         deunknownify_attribute refl.primary_key_name
-        deunknownify_attribute refl.options[:foreign_type] if refl.options[:polymorphic]
+        deunknownify_attribute(refl.options[:foreign_type], false) if refl.options[:polymorphic]
       else
         # A regular field -- restore the dirty tracking methods
-        ["#{attr}_change", "#{attr}_was", "#{attr}_changed?", :changed?, :changed, :changes].each do |m|
+        # if remove_globals is false, skip the top-level methods, as we have already removed them
+        to_remove = remove_globals ? [:changed?, :changed, :changes] : []
+        (["#{attr}_change", "#{attr}_was", "#{attr}_changed?"] + to_remove).each do |m|
           metaclass.send :remove_method, m.to_sym
         end
       end
