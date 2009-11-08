@@ -15,26 +15,40 @@ class Module
   end
 
   # Creates a class attribute reader that will delegate to the superclass
-  # if not defined on self
+  # if not defined on self. Default values can be a Proc object that takes the class as a parameter.
   def inheriting_cattr_reader(*names)
     names_with_defaults = (names.pop if names.last.is_a?(Hash)) || {}
 
-    names_with_defaults.each do |name, default|
-      instance_variable_set("@#{name}", default) unless instance_variable_get("@#{name}") != nil || superclass.respond_to?(name)
-    end
-
     (names + names_with_defaults.keys).each do |name|
-      class_eval %{
-        def self.#{name}
-          if defined? @#{name}
-            @#{name}
-          elsif superclass.respond_to?('#{name}')
-            superclass.#{name}
+      ivar_name = "@#{name}"
+      block = names_with_defaults[name]
+      self.send(self.class == Module ? :define_method : :meta_def, name) do
+        if instance_variable_defined? ivar_name
+          instance_variable_get(ivar_name)
+        else
+          superclass.respond_to?(name) && superclass.send(name) ||
+          block && begin
+            result = block.is_a?(Proc) ? block.call(self) : block
+            instance_variable_set(ivar_name, result) if result
           end
         end
-      }
+      end
     end
   end
+
+  def inheriting_cattr_accessor(*names)
+    names_with_defaults = (names.pop if names.last.is_a?(Hash)) || {}
+
+    names_with_defaults.keys.each do |name|
+      attr_writer name
+      inheriting_cattr_reader names_with_defaults.slice(name)
+    end
+    names.each do |name|
+      attr_writer name
+      inheriting_cattr_reader name
+    end
+  end
+
 
   # creates a #foo= and #foo? pair, with optional default values, e.g.
   # bool_attr_accessor :happy => true
