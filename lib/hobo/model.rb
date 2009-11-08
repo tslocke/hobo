@@ -433,14 +433,18 @@ module Hobo
       attr = self.class.creator_attribute
       return unless attr
 
-      # Is creator a string field or an association?
-      if self.class.attr_type(attr)._? <= String
+      attr_type = self.class.creator_type
+
+      # Is creator an instance, a string field or an association?
+      if !attr_type.is_a?(Class)
+        # attr_type is an instance - typically AssociationReflection for a polymorphic association
+        self.send("#{attr}=", user)
+      elsif self.class.attr_type(attr)._? <= String
         # Set it to the name of the current user
         self.send("#{attr}=", user.to_s) unless user.guest?
       else
         # Assume user is a user object, but don't set if we've got a type mismatch
-        t = self.class.creator_type
-        self.send("#{attr}=", user) if t.nil? || user.is_a?(t)
+        self.send("#{attr}=", user) if attr_type.nil? || user.is_a?(attr_type)
       end
     end
 
