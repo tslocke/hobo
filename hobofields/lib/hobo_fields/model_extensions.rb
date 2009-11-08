@@ -131,7 +131,7 @@ module HoboFields
     # field declaration
     def self.add_validations_for_field(name, type, args)
       validates_presence_of   name if :required.in?(args)
-      validates_uniqueness_of name if :unique.in?(args)
+      validates_uniqueness_of name, :allow_nil => !:required.in?(args) if :unique.in?(args)
 
       type_class = HoboFields.to_class(type)
       if type_class && "validate".in?(type_class.public_instance_methods)
