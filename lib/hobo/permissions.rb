@@ -190,7 +190,7 @@ module Hobo
       if attribute
         attribute = attribute.to_s.sub(/\?$/, '').to_sym
 
-        # Try the attribute-specic edit-permission method if there is one
+        # Try the attribute-specific edit-permission method if there is one
         if has_hobo_method?(meth = "#{attribute}_edit_permitted?")
           with_acting_user(user) { send(meth) } 
         end
