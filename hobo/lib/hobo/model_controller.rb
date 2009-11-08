@@ -809,7 +809,8 @@ module Hobo
     def render_with_hobo_model(*args, &block)
       options = args.extract_options!
       self.this = options[:object] if options[:object]
-      this.user_view(current_user) if this && this.respond_to?(:user_view)
+      # this causes more problems than it solves, and Tom says it's not supposed to be here
+      # this.user_view(current_user) if this && this.respond_to?(:user_view)
       render_without_hobo_model(*args + [options], &block)
     end
 
