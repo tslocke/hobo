@@ -675,12 +675,13 @@ module Hobo
 
     def prepare_transition(name, options)
       key = options.delete(:key) || params[:key]
-      
-      self.this = find_instance do |record|
-        # The block allows us to perform actions on the records before the permission check
-        record.exempt_from_edit_checks = true
-        record.lifecycle.provided_key = key
-      end
+
+      # we don't use find_instance here, as it fails for key_holder transitions on objects that Guest can't view
+      record = model.find(params[:id])
+      record.exempt_from_edit_checks = true
+      record.lifecycle.provided_key = key
+      self.this = record
+
       this.lifecycle.find_transition(name, current_user) or raise Hobo::PermissionDeniedError
     end
 
