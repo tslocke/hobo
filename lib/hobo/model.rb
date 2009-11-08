@@ -344,7 +344,7 @@ module Hobo
           
           refl.klass.reflections.values.find do |r|
             r.macro.in?(reverse_macros) &&
-              r.klass == self &&
+              r.klass >= self &&
               !r.options[:conditions] &&
               r.primary_key_name == refl.primary_key_name
           end
