@@ -75,7 +75,15 @@ module Hobo
       def viewable_by?(user, attribute=nil)
         new.viewable_by?(user, attribute)
       end
-      
+
+      def read_only(*names)
+        names.each do |name|
+          define_method("#{name}_edit_permitted?") do 
+            false
+          end
+        end
+      end
+
     end
     
     
@@ -192,7 +200,7 @@ module Hobo
 
         # Try the attribute-specific edit-permission method if there is one
         if has_hobo_method?(meth = "#{attribute}_edit_permitted?")
-          with_acting_user(user) { send(meth) } 
+          return with_acting_user(user) { send(meth) } 
         end
       
         # No setter = no edit permission
