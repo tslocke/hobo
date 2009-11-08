@@ -108,9 +108,10 @@ module Hobo
 
     def render_tags(objects, tag, options={})
       for_type = options.delete(:for_type)
+      base_tag = tag
 
       results = objects.map do |o|
-        tag = tag_renderer.find_polymorphic_tag(tag, o.class) if for_type
+        tag = tag_renderer.find_polymorphic_tag(base_tag, o.class) if for_type
         tag_renderer.send(tag, options.merge(:with => o))
       end.join
 
