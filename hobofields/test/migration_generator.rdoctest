@@ -14,14 +14,17 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
 We also need to get ActiveRecord set up with a database connection
 {.hidden}
 
+    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
     >> mysql_user = 'root'; mysql_password = ''
     >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
     >> mysql_database = "hobofields_doctest"
     >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
                                                :database => mysql_database,
-                                               :host => "localhost", :user => mysql_user, :password => mysql_password)
+                                               :host => "localhost", 
+                                               :username => mysql_user, 
+                                               :password => mysql_password)
 {.hidden}
 
 Some load path manipulation you shouldn't need:

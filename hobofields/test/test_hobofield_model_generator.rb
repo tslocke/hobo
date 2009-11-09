@@ -1,6 +1,9 @@
 require 'rubygems'
 require 'rails_generator'
 
+# we get a SystemStackError on JRuby
+exit(0) if defined? JRUBY_VERSION
+
 require File.join(File.dirname(__FILE__), "test_generator_helper.rb")
 
 class TestHobofieldModelGenerator < Test::Unit::TestCase

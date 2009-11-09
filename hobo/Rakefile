@@ -9,6 +9,9 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/l
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/lib')
 require 'hobo'
 
+RUBY = ENV['RUBY'] || (defined?(JRUBY_VERSION) ? 'jruby' : 'ruby')
+RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} `which rubydoctest`"
+
 desc "Default Task"
 task :default => [ :test ]
 
@@ -26,7 +29,7 @@ namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
     # note, tests in doctest/hobo/ are out of date
-    exit(1) if !system("rubydoctest doctest/*.rdoctest")
+    exit(1) if !system("#{RUBYDOCTEST} doctest/*.rdoctest")
   end
 end
 
