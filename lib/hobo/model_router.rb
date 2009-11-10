@@ -227,14 +227,14 @@ module Hobo
     def lifecycle_routes
       model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator|
         linkable_route("do_#{singular}_#{creator}", "#{plural}/#{creator}", "do_#{creator}",
-                       :conditions => { :method => :post }, :format => false, :linkable_action => creator)
-        linkable_route("#{singular}_#{creator}",    "#{plural}/#{creator}", creator,  :conditions => { :method => :get },  :format => false)
+                       :conditions => { :method => :post }, :linkable_action => creator)
+        linkable_route("#{singular}_#{creator}",    "#{plural}/#{creator}", creator,  :conditions => { :method => :get })
       end
       model::Lifecycle.transitions.where.publishable?.*.name.each do |transition|
         linkable_route("do_#{singular}_#{transition}", "#{plural}/:id/#{transition}", "do_#{transition}",
-                       :conditions => { :method => :put }, :format => false, :linkable_action => transition)
+                       :conditions => { :method => :put }, :linkable_action => transition)
         linkable_route("#{singular}_#{transition}", "#{plural}/:id/#{transition}", transition,
-                       :conditions => { :method => :get }, :format => false)
+                       :conditions => { :method => :get })
       end
     end
 
@@ -252,9 +252,13 @@ module Hobo
         options.reverse_merge!(:controller => route_with_subsite(plural))
         name = name_with_subsite(name)
         route = route_with_subsite(route)
-        format_route = options.delete(:format) != false
-        map.named_route(name, route, options)
-        map.named_route("formatted_#{name}", "#{route}.:format", options) if format_route
+        if HoboSupport::RAILS_AT_LEAST_23
+          map.named_route(name, "#{route}.:format", options)
+        else
+          # kick it old-skool
+          map.named_route(name, route, options)
+          map.named_route("formatted_#{name}", "#{route}.:format", options)
+        end
         true
       else
         false
