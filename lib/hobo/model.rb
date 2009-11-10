@@ -138,8 +138,18 @@ module Hobo
       require 'active_record/viewhints_validations_interceptor'
       include Hobo::ViewHintsValidationsInterceptor
 
+      # TODO: should this be an inheriting_cattr_accessor as well? Probably.
       attr_accessor :creator_attribute
-      attr_writer :name_attribute, :primary_content_attribute
+      inheriting_cattr_accessor :name_attribute => Proc.new { |c|
+        names = c.columns.*.name + c.public_instance_methods
+        NAME_FIELD_GUESS.detect {|f| f.in? names }
+      }
+
+      inheriting_cattr_accessor :primary_content_attribute => Proc.new { |c|
+        names = c.columns.*.name + c.public_instance_methods
+        PRIMARY_CONTENT_GUESS.detect {|f| f.in? names }
+      }
+
 
       def named(*args)
         raise NoNameError, "Model #{name} has no name attribute" unless name_attribute
@@ -157,21 +167,6 @@ module Hobo
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
       end
 
-
-      def name_attribute
-        @name_attribute ||= begin
-                              names = columns.*.name + public_instance_methods
-                              NAME_FIELD_GUESS.detect {|f| f.in? names }
-                            end
-      end
-
-
-      def primary_content_attribute
-        @primary_content_attribute ||= begin
-                                         names = columns.*.name + public_instance_methods
-                                         PRIMARY_CONTENT_GUESS.detect {|f| f.in? names }
-                                       end
-      end
 
       def dependent_collections
         reflections.values.select do |refl|
@@ -204,6 +199,9 @@ module Hobo
         belongs_to_without_test_methods(name, options, &block)
         refl = reflections[name]
         if options[:polymorphic]
+          # TODO: the class lookup in _is? below is incomplete; a polymorphic association to an STI base class
+          #       will fail to match an object of a derived type
+          #       (ie X belongs_to Y (polymorphic), Z is a subclass of Y; @x.y_is?(some_z) will never pass)
           class_eval %{
             def #{name}_is?(target)
               target.class.name == self.#{refl.options[:foreign_type]} && target.id == self.#{refl.primary_key_name}
@@ -215,7 +213,7 @@ module Hobo
         else
           class_eval %{
             def #{name}_is?(target)
-              target.class == ::#{refl.klass.name} && target.id == self.#{refl.primary_key_name}
+              target.class <= ::#{refl.klass.name} && target.id == self.#{refl.primary_key_name}
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed?
@@ -346,7 +344,7 @@ module Hobo
           
           refl.klass.reflections.values.find do |r|
             r.macro.in?(reverse_macros) &&
-              r.klass == self &&
+              r.klass >= self &&
               !r.options[:conditions] &&
               r.primary_key_name == refl.primary_key_name
           end
@@ -435,14 +433,18 @@ module Hobo
       attr = self.class.creator_attribute
       return unless attr
 
-      # Is creator a string field or an association?
-      if self.class.attr_type(attr)._? <= String
+      attr_type = self.class.creator_type
+
+      # Is creator an instance, a string field or an association?
+      if !attr_type.is_a?(Class)
+        # attr_type is an instance - typically AssociationReflection for a polymorphic association
+        self.send("#{attr}=", user)
+      elsif self.class.attr_type(attr)._? <= String
         # Set it to the name of the current user
         self.send("#{attr}=", user.to_s) unless user.guest?
       else
         # Assume user is a user object, but don't set if we've got a type mismatch
-        t = self.class.creator_type
-        self.send("#{attr}=", user) if t.nil? || user.is_a?(t)
+        self.send("#{attr}=", user) if attr_type.nil? || user.is_a?(attr_type)
       end
     end
 
