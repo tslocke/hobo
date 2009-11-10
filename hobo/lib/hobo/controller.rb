@@ -23,6 +23,7 @@ module Hobo
             Thread.current['Hobo.current_controller'] = nil  # should avoid memory-leakage
           end
           @included_taglibs = []
+          rescue_from ActionController::RoutingError, :with => :not_found
         end
         Hobo::HoboHelper.add_to_controller(klass)
       end
@@ -108,9 +109,10 @@ module Hobo
 
     def render_tags(objects, tag, options={})
       for_type = options.delete(:for_type)
+      base_tag = tag
 
       results = objects.map do |o|
-        tag = tag_renderer.find_polymorphic_tag(tag, o.class) if for_type
+        tag = tag_renderer.find_polymorphic_tag(base_tag, o.class) if for_type
         tag_renderer.send(tag, options.merge(:with => o))
       end.join
 
@@ -154,8 +156,14 @@ module Hobo
       request.env['HTTP_CACHE_CONTROL'] =~ /max-age=\s*0/
     end
 
-    def not_found
-
+    def not_found(error)
+      if "not_found_response".in?(self.class.superclass.instance_methods)
+        super
+      elsif render_tag("not-found-page", {}, :status => 404)
+        # cool
+      else
+        render(:text => ht(:"hobo.messages.not_found", :default=>["The page you requested cannot be found."]) , :status => 404)
+      end
     end
 
   end

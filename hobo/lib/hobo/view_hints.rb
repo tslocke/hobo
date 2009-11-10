@@ -18,7 +18,7 @@ module Hobo
           val
         else 
           arg = if block
-                  block[*args] 
+                  instance_exec(*args, &block)
                 else
                   args.first
                 end
@@ -43,9 +43,16 @@ module Hobo
                                  model < ActiveRecord::Acts::List::InstanceMethods &&
                                  model.new.try.scope_condition == "1 = 1" }
 
-    
+    setter :inline_booleans, [] do |*args|
+     if args[0] == true
+       model.columns.select { |c| c.type == :boolean }.*.name
+     else
+       args.*.to_s
+     end
+    end
+
     # Accessors
-    
+
     class << self
       
       def model

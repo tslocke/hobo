@@ -84,7 +84,7 @@ module Hobo
           end
 
 
-          def create!(attrs = nil)
+          def create(attrs = nil)
             klass = @reflection.klass
             user = acting_user if klass < Hobo::Model
             klass.transaction do
