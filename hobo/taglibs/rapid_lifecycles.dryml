@@ -10,15 +10,20 @@
 
 All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also supported. 
   -->
-<def tag="transition-button" attrs="transition, update, label"><%= 
-    transition = transition.name unless transition.is_a?(String)
+<def tag="transition-button" attrs="transition, update, label"><%=
+    if transition.is_a?(String)
+      transition = this.lifecycle.find_transition(transition, current_user)
+    end
+    transition_name = transition.name
+    has_params = !transition.options[:params].blank?
     ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
 
-    html_attributes[:method] = :put
-    url = object_url(this, transition, :method => :put)
-    add_classes!(html_attributes, "transition-button #{transition}-button")
-    label ||= transition.to_s.titleize
-    if update || !ajax_attributes.empty?
+    html_attributes[:method] ||= has_params ? :get : :put
+    add_classes!(html_attributes, "transition-button #{transition_name}-button")
+    label ||= transition_name.to_s.titleize
+    url = object_url(this, transition_name, :method => html_attributes[:method])
+
+    if (update || !ajax_attributes.empty?) && !has_params
       ajax_attributes[:message] ||= label
       func = ajax_updater(url, update, ajax_attributes)
       html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
@@ -28,10 +33,10 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
     end
   %>
 </def>
-  
+
 
 <!-- Renders a div containing transition buttons for every transition available to the current user.
-  
+
 For example, you could use this on a `Friendship` card: the person invited to have friendship would automatically see 'Accept' and 'Decline' buttons, while the person initiating the invite would see 'Retract'.
   -->  
 <def tag="transition-buttons">

@@ -491,7 +491,7 @@ module Hobo
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this ||= find_instance(options)
+      self.this ||= args.first || find_instance(options)
       response_block(&b)
     end
 
@@ -675,12 +675,13 @@ module Hobo
 
     def prepare_transition(name, options)
       key = options.delete(:key) || params[:key]
-      
-      self.this = find_instance do |record|
-        # The block allows us to perform actions on the records before the permission check
-        record.exempt_from_edit_checks = true
-        record.lifecycle.provided_key = key
-      end
+
+      # we don't use find_instance here, as it fails for key_holder transitions on objects that Guest can't view
+      record = model.find(params[:id])
+      record.exempt_from_edit_checks = true
+      record.lifecycle.provided_key = key
+      self.this = record
+
       this.lifecycle.find_transition(name, current_user) or raise Hobo::PermissionDeniedError
     end
 
@@ -773,17 +774,6 @@ module Hobo
     end
 
 
-    def not_found(error)
-      if "not_found_response".in?(self.class.superclass.instance_methods)
-        super
-      elsif render_tag("not-found-page", {}, :status => 404)
-        # cool
-      else
-        render(:text => ht(:"hobo.messages.not_found", :default=>["The page you requested cannot be found."]) , :status => 404)
-      end
-    end
-
-
     def this
       @this ||= (instance_variable_get("@#{model.name.underscore}") ||
                  instance_variable_get("@#{model.name.underscore.pluralize}"))
@@ -808,7 +798,8 @@ module Hobo
     def render_with_hobo_model(*args, &block)
       options = args.extract_options!
       self.this = options[:object] if options[:object]
-      this.user_view(current_user) if this && this.respond_to?(:user_view)
+      # this causes more problems than it solves, and Tom says it's not supposed to be here
+      # this.user_view(current_user) if this && this.respond_to?(:user_view)
       render_without_hobo_model(*args + [options], &block)
     end
 

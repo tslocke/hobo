@@ -54,8 +54,9 @@ module HoboFields
         type = HoboFields.to_class(type)
         attrs.each do |attr|
           declare_attr_type attr, type, options
+          type_wrapper = attr_type(attr)
           define_method "#{attr}=" do |val|
-            if !val.is_a?(type) && HoboFields.can_wrap?(type, val)
+            if type_wrapper.not_in?(HoboFields::PLAIN_TYPES.values) && !val.is_a?(type) && HoboFields.can_wrap?(type, val)
               val = type.new(val.to_s)
             end
             instance_variable_set("@#{attr}", val)
@@ -131,7 +132,7 @@ module HoboFields
     # field declaration
     def self.add_validations_for_field(name, type, args)
       validates_presence_of   name if :required.in?(args)
-      validates_uniqueness_of name if :unique.in?(args)
+      validates_uniqueness_of name, :allow_nil => !:required.in?(args) if :unique.in?(args)
 
       type_class = HoboFields.to_class(type)
       if type_class && "validate".in?(type_class.public_instance_methods)

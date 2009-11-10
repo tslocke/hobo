@@ -45,7 +45,7 @@ module Hobo
 
 
     def subsite
-      params[:controller].match(/([^\/]+)\//)._?[1]
+      params[:controller]._?.match(/([^\/]+)\//)._?[1]
     end
 
 
