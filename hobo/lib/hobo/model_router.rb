@@ -251,7 +251,14 @@ module Hobo
       if controller.public_instance_methods.include?(options[:action].to_s)
         options.reverse_merge!(:controller => route_with_subsite(plural))
         name = name_with_subsite(name)
-        map.named_route(name, "#{route_with_subsite(route)}.:format", options)
+        route = route_with_subsite(route)
+        if HoboSupport::RAILS_AT_LEAST_23
+          map.named_route(name, "#{route}.:format", options)
+        else
+          # kick it old-skool
+          map.named_route(name, route, options)
+          map.named_route("formatted_#{name}", "#{route}.:format", options)
+        end
         true
       else
         false
