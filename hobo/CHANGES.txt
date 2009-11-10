@@ -33,11 +33,39 @@ Major enhancements:
     projects may add this action by running the
     `hobo_front_controller` generator.
 
+  - STI derived classes can add additional fields to their parent class with the fields block.
+    Note that the "can't generate a migration for STI base and derived classes all at once" issue still applies.
+    In general, STI handling should now work much better.
+
+  - [Bug 464](https://hobo.lighthouseapp.com/projects/8324/tickets/464-transition-buttons-should-have-a-option-to-link-to-forms-instead-for-transitions-that-take-parameters)
+    The transition-buttons tag now generates buttons that link to the transition page for transitions that require parameters.
+
 Major bug fixes:
 
  - [Bug
    480](https://hobo.lighthouseapp.com/projects/8324/tickets/480-find_owner_and_association-method-for-has_many-associations)
    Owner actions now work with has_many associations
+
+ - [Bug 516](https://hobo.lighthouseapp.com/projects/8324/tickets/516-association-name-as-parameter-in-lifecycle-step-almost-works)
+   Specifying a belongs_to association as a lifecycle param works; it appears as a select-one on the generated page.
+
+ - [Bug 515](https://hobo.lighthouseapp.com/projects/8324/tickets/515-virtual-boolean-field-uninitialized-constant-hobobooleancolumn_type)
+   Virtual :boolean fields declared with attr_accessor now work
+
+ - [Bug 484](https://hobo.lighthouseapp.com/projects/8324/tickets/484-transition-actions-with-key-fail-if-model-isnt-visible-to-guests)
+   Transition actions that require a key no longer check if the model is visible to Guest
+
+ - [Bug 485](https://hobo.lighthouseapp.com/projects/8324/tickets/485-make-lifecycles-on-sti-subclasses-behave)
+   Lifecycle support on STI models works now. Note that derived classes DO NOT inherit any of the parent lifecycle implementation.
+
+ - [Bug 387](https://hobo.lighthouseapp.com/projects/8324/tickets/387-inheritance-sti-models-name-not-propagating)
+   STI derived classes now inherit settings like name_attribute correctly.
+
+ - [Bug 533](https://hobo.lighthouseapp.com/projects/8324/tickets/533-remove-id-from-hidden-field-for-check-box)
+   The hidden field generated with a checkbox input shouldn't have an ID.
+
+ - [Bug 526](https://hobo.lighthouseapp.com/projects/8324/tickets/526-routing-error-does-not-render-not-found-page)
+   Routing errors now render not-found-page, rather than the default Rails routing error message.
 
 Minor Enhancements:
 
@@ -61,6 +89,18 @@ Minor Enhancements:
    should use the same type of database for development, testing and
    production.
 
+ - there is now a read_only declaration that works much like never_show, but only disallows editing. Note that it doesn't
+   prevent mass assignment (use attr_protected/attr_accessible) or other code-level changes, only editing via Rapid forms.
+
+ - A new view_hint, 'inline_booleans', controls whether boolean attributes are displayed in the header (default behavior
+   of Rapid show pages) or inline with the rest of the field-list. You can either pass a list of field names, or 'true'
+   (without quotes) to make all booleans inline.
+
+ - hobo_show now accepts a model instance as a first parameter. This restores symmetry with the other hobo_* actions.
+
+ - on Rails 2.3 and above, routes will be generated with the optional .:format suffix, and the formatted_* routes are skipped.
+
+ - non-required fields that are marked :unique will now allow nil values.
 
 === Hobo 0.8.10 ===
 
