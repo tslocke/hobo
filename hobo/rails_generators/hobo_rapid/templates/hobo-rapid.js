@@ -655,10 +655,8 @@ SelectManyInput = Behavior.create({
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             this.itemAdded(newItem, selected)
-            selected.disabled = true
-            selected.addClassName("hidden")
-            optgroup = select.down("optgroup[label="+selected.text+"]")
-            optgroup.removeClassName("hidden")
+            var optgroup = new Element("optgroup", {class:"disabled-option", alt:selected.value, label:selected.text})
+            selected.replace(optgroup)
             select.value = ""
             Event.addBehavior.reload()
             this.element.fire("rapid:add", { element: newItem })
@@ -681,11 +679,10 @@ SelectManyInput = Behavior.create({
                                  element.fire("rapid:change", { element: el })
                                  } } ) 
         var label = el.down('span').innerHTML
-        var option = $A(element.getElementsByTagName('option')).find(function(o) { return o.innerHTML == label })
-        option.disabled = false
-        option.removeClassName("hidden")
-        optgroup = element.down("optgroup[label="+label+"]")
-        optgroup.addClassName("hidden")    
+        var optgroup = element.down("optgroup[label="+label+"]")
+        var option = new Element("option", {value:optgroup.readAttribute("alt")})
+        option.innerHTML = optgroup.readAttribute("label")
+        optgroup.replace(option)
     },
 
     itemAdded: function(item, option) {
