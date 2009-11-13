@@ -93,3 +93,8 @@ select.dev-user-changer:hover { opacity: 1; }
 .part-wrapper {
     display: inline;  /* don't mess up layout when wrapping something */
 }
+
+optgroup.disabled-option {
+    color: #ccc;
+    height: 1em;
+}
