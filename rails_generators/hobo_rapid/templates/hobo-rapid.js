@@ -655,7 +655,8 @@ SelectManyInput = Behavior.create({
             this.element.down('.items').appendChild(newItem);
             newItem.down('span').innerHTML = selected.innerHTML
             this.itemAdded(newItem, selected)
-            var optgroup = new Element("optgroup", {class:"disabled-option", alt:selected.value, label:selected.text})
+            var optgroup = new Element("optgroup", {alt:selected.value, label:selected.text})
+            optgroup.addClassName("disabled-option")
             selected.replace(optgroup)
             select.value = ""
             Event.addBehavior.reload()
