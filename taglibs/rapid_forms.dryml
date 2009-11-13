@@ -772,11 +772,9 @@ To use this tag, the model of the items the user is chosing *must* have unique n
       <option value=""><prompt/></option>
       <repeat with="&options">
         <if test="&this.in?(values)">
-          <optgroup class="disabled-option" label="#{h this.to_s}">&nbsp;</optgroup>
-          <option value="@#{this.id}" class="hidden" disabled><%= h this.to_s%></option>
+          <optgroup class="disabled-option" label="#{h this.to_s}" alt="@#{this.id}">&nbsp;</optgroup>
         </if>
         <else>
-          <optgroup class="disabled-option hidden" label="#{h this.to_s}">&nbsp;</optgroup>
           <option value="@#{this.id}"><%= h this.to_s %></option>
         </else>
       </repeat>
