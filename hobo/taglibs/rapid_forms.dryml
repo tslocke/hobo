@@ -770,8 +770,14 @@ To use this tag, the model of the items the user is chosing *must* have unique n
     </div>
     <select merge-attrs="&{:disabled => disabled}">
       <option value=""><prompt/></option>
-      <option repeat="&options.sort_by {|x| x.to_s.downcase}" value="@#{this.id}"
-              merge-attrs="&{:disabled => 'true'} if this.in?(values)"><%= h this.to_s %></option>
+      <repeat with="&options">
+        <if test="&this.in?(values)">
+          <optgroup class="disabled-option" label="#{h this.to_s}" alt="@#{this.id}">&nbsp;</optgroup>
+        </if>
+        <else>
+          <option value="@#{this.id}"><%= h this.to_s %></option>
+        </else>
+      </repeat>
     </select>
   </div>
 </def>
