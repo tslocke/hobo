@@ -89,9 +89,6 @@ Minor Enhancements:
    should use the same type of database for development, testing and
    production.
 
- - there is now a read_only declaration that works much like never_show, but only disallows editing. Note that it doesn't
-   prevent mass assignment (use attr_protected/attr_accessible) or other code-level changes, only editing via Rapid forms.
-
  - A new view_hint, 'inline_booleans', controls whether boolean attributes are displayed in the header (default behavior
    of Rapid show pages) or inline with the rest of the field-list. You can either pass a list of field names, or 'true'
    (without quotes) to make all booleans inline.
