@@ -493,6 +493,7 @@ Set the table name back to what it should be and confirm we're in sync:
 ### Rename a table
 
 As with renaming columns, we have to tell the migration generator about the rename. Here we create a new class 'Advertisement', and tell ActiveRecord to forget about the Advert class. This requires code that shouldn't be shown to impressionable children.
+{.hidden}
 
     >>
      def nuke_model_class(klass)
@@ -553,17 +554,23 @@ Adding a subclass or two should introduce the 'type' column and no other changes
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => "add_column :adverts, :type, :string"
+        =>
+         "add_column :adverts, :type, :string
+         add_index :adverts, [:type]"
         >> down
-        => "remove_column :adverts, :type"
+        => 
+         "remove_column :adverts, :type
+         remove_index :adverts, :name => :index_adverts_on_type"
 
 Cleanup
+{.hidden}
 
         >> Advert.field_specs.delete(:type)
-
         >> nuke_model_class(SuperFancyAdvert)
         >> nuke_model_class(FancyAdvert)
+        >> Advert.index_specs.delete_if {|spec| spec.fields==["type"]}
 {.hidden}
+
 
 ## Coping with multiple changes
 

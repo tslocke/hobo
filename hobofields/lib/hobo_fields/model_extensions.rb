@@ -22,7 +22,7 @@ module HoboFields
       fields do |f|
         f.field(inheritance_column, :string)
       end
-      index(inheritance_column)
+      index(inheritance_column) unless index_specs.*.fields.include?([inheritance_column])
       super
     end
 
