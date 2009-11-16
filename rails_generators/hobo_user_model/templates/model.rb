@@ -16,7 +16,10 @@ class <%= class_name %> < ActiveRecord::Base
   before_create { |user| user.administrator = true if !Rails.env.test? && count == 0 }
 
 <% if invite_only? -%>
-  validates_confirmation_of :password,              :if => "User.count == 0"
+  def new_password_required_with_invite_only?
+    new_password_required_without_invite_only? || User.count==0
+  end
+  alias_method_chain :new_password_required?, :invite_only
 <% end -%>
   
   # --- Signup lifecycle --- #

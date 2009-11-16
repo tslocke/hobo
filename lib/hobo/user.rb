@@ -37,6 +37,10 @@ module Hobo
         validate :validate_current_password_when_changing_password
 
         # Virtual attributes for setting and changing the password
+        # note that :password_confirmation= is also defined by
+        # validates_confirmation_of, so this line must follow any
+        # validates_confirmation_of statements.
+        # https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/530
         attr_accessor :current_password, :password, :password_confirmation, :type => :password
 
         before_save :encrypt_password
