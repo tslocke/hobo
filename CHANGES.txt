@@ -43,6 +43,12 @@ Major enhancements:
     The transition-buttons tag now generates buttons that link to the
     transition page for transitions that require parameters.  
 
+  - [Bug 532](https://hobo.lighthouseapp.com/projects/8324/tickets/532)
+    In previous versions, you had to add the new HTML5 tags to
+    RAILS_ROOT/config/dryml_static_tags.txt.  This version whitelists
+    all HTML5 tags except for aside, section, header and footer, which
+    conflict with existing Rapid tags.
+
 Major bug fixes:
 
  - [Bug 530](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/530) 
