@@ -33,14 +33,22 @@ Major enhancements:
     projects may add this action by running the
     `hobo_front_controller` generator.
 
-  - STI derived classes can add additional fields to their parent class with the fields block.
-    Note that the "can't generate a migration for STI base and derived classes all at once" issue still applies.
-    In general, STI handling should now work much better.
+  - STI derived classes can add additional fields to their parent
+    class with the fields block.  Note that the "can't generate a
+    migration for STI base and derived classes all at once" issue
+    still applies.  In general, STI handling should now work much
+    better.
 
   - [Bug 464](https://hobo.lighthouseapp.com/projects/8324/tickets/464-transition-buttons-should-have-a-option-to-link-to-forms-instead-for-transitions-that-take-parameters)
-    The transition-buttons tag now generates buttons that link to the transition page for transitions that require parameters.
+    The transition-buttons tag now generates buttons that link to the
+    transition page for transitions that require parameters.  
 
 Major bug fixes:
+
+ - [Bug 530](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/530) 
+   is a critical bug for invite-only projects.  To incorporate the
+   fix, you must rerun your generators or follow the instructions in
+   the [commit](http://github.com/tablatom/hobo/commit/17247eac8a78f8b36dcc3b9684a3e4ec8da32a23)
 
  - [Bug
    480](https://hobo.lighthouseapp.com/projects/8324/tickets/480-find_owner_and_association-method-for-has_many-associations)
