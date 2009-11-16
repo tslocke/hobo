@@ -76,14 +76,6 @@ module Hobo
         new.viewable_by?(user, attribute)
       end
 
-      def read_only(*names)
-        names.each do |name|
-          define_method("#{name}_edit_permitted?") do 
-            false
-          end
-        end
-      end
-
     end
     
     
