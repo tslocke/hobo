@@ -613,7 +613,7 @@ For situations where there are too many target records to practically include in
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
-  blank_message ||= ht("#{this_type.name.underscore}.message.no", :default=>"(No #{this_type.name.to_s.titleize})") 
+  blank_message ||= ht("#{this_type.name.underscore}.message.no", :default=>"(No #{this_type.view_hints.model_name})")
   limit ||= 100
    
   options ||= begin
