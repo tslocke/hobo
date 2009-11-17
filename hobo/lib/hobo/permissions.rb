@@ -123,8 +123,8 @@ module Hobo
       result
     end
     
-    def user_save(user)
-      with_acting_user(user) { save }
+    def user_save(user, validate = true)
+      with_acting_user(user) { save(validate) }
     end
         
     def user_save!(user)

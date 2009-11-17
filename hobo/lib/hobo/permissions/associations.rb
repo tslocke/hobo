@@ -45,12 +45,20 @@ module Hobo
           end
 
 
-          def insert_record(record)
-            set_belongs_to_association_for(record)
+          def insert_record(record, force = false, validate = true)
+            insert_record_without_user_save(record, force, validate)
             if (user = acting_user) && record.is_a?(Hobo::Model)
-              record.user_save(user)
+              if force
+                record.user_save!(user)
+              else
+                record.user_save(user, validate)
+              end
             else
-              record.save
+               if force 
+                 record.save!
+               else
+                 record.save(validate)
+               end
             end
           end
           
@@ -99,13 +107,13 @@ module Hobo
           end
         
         
-          def insert_record(record, force=true)
+          def insert_record(record, force=true, validate=true)
             user = acting_user if record.is_a?(Hobo::Model)
             if record.new_record?
               if force
                 user ? record.user_save!(user) : record.save!
               else
-                return false unless (user ? record.user_save(user) : record.save)
+                return false unless (user ? record.user_save(user, validate) : record.save(validate))
               end
             end
             klass = @reflection.through_reflection.klass
