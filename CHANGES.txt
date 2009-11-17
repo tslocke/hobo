@@ -10,7 +10,7 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
-=== Hobo Edge ===
+=== Hobo 0.9.0 ===
 
 Major enhancements:
 
@@ -111,7 +111,16 @@ Minor Enhancements:
 
  - on Rails 2.3 and above, routes will be generated with the optional .:format suffix, and the formatted_* routes are skipped.
 
- - non-required fields that are marked :unique will now allow nil values.
+ - non-required fields that are marked :unique will now allow nil
+   values.
+
+Minor Bug Fixes 
+
+ - [Bug 540](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/540)
+   Hobo::Permissions::Associations::HasManyThroughAssociations#create!
+   did not save as the "!" implied.
+
+See the [github log](http://github.com/bryanlarsen/hobo/commits/v0.9.0)
 
 === Hobo 0.8.10 ===
 
@@ -150,7 +159,7 @@ Major bug fixes:
 
 Minor bug fixes and enhancements:
 
-See the [github log](http://github.com/bryanlarsen/hobo/commits/v0.8.5)
+See the [github log](http://github.com/bryanlarsen/hobo/commits/v0.8.9)
 
 === Hobo 0.8.8 ===
 
