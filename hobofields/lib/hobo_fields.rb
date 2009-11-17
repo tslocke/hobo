@@ -9,7 +9,7 @@ end
 
 module HoboFields
 
-  VERSION = "0.8.11pre"
+  VERSION = "0.9.0"
 
   extend self
 
