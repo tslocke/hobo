@@ -47,25 +47,21 @@ end
 
 # --- Packaging and Rubyforge & gemcutter & github--- #
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.version      = Hobo::VERSION
-    gemspec.name         = "hobo"
-    gemspec.email        = "tom@tomlocke.com"
-    gemspec.summary      = "The web app builder for Rails"
-    gemspec.homepage     = "http://hobocentral.net/"
-    gemspec.authors      = ["Tom Locke"]
-    gemspec.rubyforge_project = "hobo"
-    gemspec.add_dependency("rails", [">= 2.2.2"])
-    gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
-    gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
-    gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])    
-  end
-  Jeweler::GemcutterTasks.new
-  Jeweler::RubyforgeTasks.new do |rubyforge|
-    rubyforge.doc_task = false
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+require 'jeweler'
+Jeweler::Tasks.new do |gemspec|
+  gemspec.version      = Hobo::VERSION
+  gemspec.name         = "hobo"
+  gemspec.email        = "tom@tomlocke.com"
+  gemspec.summary      = "The web app builder for Rails"
+  gemspec.homepage     = "http://hobocentral.net/"
+  gemspec.authors      = ["Tom Locke"]
+  gemspec.rubyforge_project = "hobo"
+  gemspec.add_dependency("rails", [">= 2.2.2"])
+  gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
+  gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
+  gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])    
+end
+Jeweler::GemcutterTasks.new
+Jeweler::RubyforgeTasks.new do |rubyforge|
+  rubyforge.doc_task = false
 end
