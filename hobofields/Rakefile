@@ -24,23 +24,19 @@ namespace "test" do
   end
 end
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.version      = HoboFields::VERSION
-    gemspec.name         = "hobofields"
-    gemspec.email        = "tom@tomlocke.com"
-    gemspec.summary      = "Rich field types and migration generator for Rails"
-    gemspec.homepage     = "http://hobocentral.net/"
-    gemspec.authors      = ["Tom Locke"]
-    gemspec.rubyforge_project = "hobo"
-    gemspec.add_dependency("rails", [">= 2.2.2"])
-    gemspec.add_dependency("hobosupport", ["= #{HoboFields::VERSION}"])    
-  end
-  Jeweler::GemcutterTasks.new
-  Jeweler::RubyforgeTasks.new do |rubyforge|
-    rubyforge.doc_task = false
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+require 'jeweler'
+Jeweler::Tasks.new do |gemspec|
+  gemspec.version      = HoboFields::VERSION
+  gemspec.name         = "hobofields"
+  gemspec.email        = "tom@tomlocke.com"
+  gemspec.summary      = "Rich field types and migration generator for Rails"
+  gemspec.homepage     = "http://hobocentral.net/"
+  gemspec.authors      = ["Tom Locke"]
+  gemspec.rubyforge_project = "hobo"
+  gemspec.add_dependency("rails", [">= 2.2.2"])
+  gemspec.add_dependency("hobosupport", ["= #{HoboFields::VERSION}"])    
+end
+Jeweler::GemcutterTasks.new
+Jeweler::RubyforgeTasks.new do |rubyforge|
+  rubyforge.doc_task = false
 end
