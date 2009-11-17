@@ -192,7 +192,7 @@ module Hobo
 
         # Try the attribute-specic edit-permission method if there is one
         if has_hobo_method?(meth = "#{attribute}_edit_permitted?")
-          with_acting_user(user) { send(meth) } 
+          return with_acting_user(user) { send(meth) } 
         end
       
         # No setter = no edit permission
