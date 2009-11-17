@@ -10,12 +10,12 @@
   <%= Rails.vendor_rails? ? "vendor" : "gem" -%>
 </def>
 
-<!-- RAILS_ROOT -->
+<!-- `RAILS_ROOT` -->
 <def tag="rails-root">
   <%= RAILS_ROOT -%>
 </def>
 
-<!-- RAILS_ENV -->
+<!-- `RAILS_ENV` -->
 <def tag="rails-env">
   <%= RAILS_ENV -%>
 </def>
@@ -284,7 +284,7 @@
   <%= this.name.to_s -%>
 </def>
 
-<!-- given an association, return the macro type (has_many, etc.) -->
+<!-- given an association, return the macro type (`has_many`, etc.) -->
 <def tag="model-association-macro">
   <%= if this.macro.to_s=='has_many' && this.options[:through]
         'has_many :through'
