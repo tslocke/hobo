@@ -13,7 +13,12 @@ module Hobo
         alias_method_chain :create, :hobo_permission_check
         alias_method_chain :update, :hobo_permission_check
         alias_method_chain :destroy, :hobo_permission_check
-
+        class << self
+          alias_method_chain :has_many, :hobo_permission_check
+          alias_method_chain :has_one, :hobo_permission_check
+          alias_method_chain :belongs_to, :hobo_permission_check
+        end                  
+        
         attr_accessor :acting_user, :origin, :origin_attribute
 
         bool_attr_accessor :exempt_from_edit_checks
@@ -75,7 +80,52 @@ module Hobo
       def viewable_by?(user, attribute=nil)
         new.viewable_by?(user, attribute)
       end
+      
+      #  ensure active_user gets passed down to :dependent => destroy
+      #  associations  (Ticket #528)
 
+      def has_many_with_hobo_permission_check(association_id, options = {}, &extension)
+        has_many_without_hobo_permission_check(association_id, options, &extension)
+        reflection = reflections[association_id]
+        if reflection.options[:dependent]==:destroy
+          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_many
+          method_name =  "has_many_dependent_destroy_for_#{reflection.name}".to_sym
+          define_method(method_name) do
+            send(reflection.name).each { |r| r.is_a?(Hobo::Model) ? r.user_destroy(acting_user) : r.destroy }
+          end
+        end        
+      end       
+      
+      def has_one_with_hobo_permission_check(association_id, options = {}, &extension)
+        has_one_without_hobo_permission_check(association_id, options, &extension)
+        reflection = reflections[association_id]
+        if reflection.options[:dependent]==:destroy
+          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_many
+          method_name =  "has_one_dependent_destroy_for_#{reflection.name}".to_sym
+          define_method(method_name) do            
+            association = send(reflection.name)
+            unless association.nil?
+              association.is_a?(Hobo::Model) ? association.user_destroy(active_user) : association.destroy
+            end
+          end
+        end        
+      end       
+     
+      def belongs_to_with_hobo_permission_check(association_id, options = {}, &extension)
+        belongs_to_without_hobo_permission_check(association_id, options, &extension)
+        reflection = reflections[association_id]
+        if reflection.options[:dependent]==:destroy
+          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_many
+          method_name =  "belongs_to_dependent_destroy_for_#{reflection.name}".to_sym
+          define_method(method_name) do            
+            association = send(reflection.name)
+            unless association.nil?
+              association.is_a?(Hobo::Model) ? association.user_destroy(active_user) : association.destroy
+            end
+          end
+        end        
+      end       
+       
     end
     
     
