@@ -10,6 +10,21 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo Edge ===
+
+Major enhancements:
+
+Major bug fixes:
+
+  - [#537](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/537)
+    The `._?.` "smart dot" now returns 'nil' rather than calling its
+    trailing function more often than it used to, more closely
+    matching its documentation.
+
+Minor enhancements:
+
+Minor bug fixes:
+
 === Hobo 0.9.0 ===
 
 Major enhancements:

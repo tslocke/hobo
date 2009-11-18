@@ -34,15 +34,21 @@ Like `is_a?` but multiple types to be checked in one go
 
 ## Method call extensions
 
+We have the "." operator to call methods on objects. These extensions introduce two "special dots". 
+
 ### `Object#_?`
 
-We have the "." operator to call methods on objects. These extensions introduce two "special dots". "`._?.`" only calls the method if the receiver is not `nil`.
+"`._?.`" only calls the method if the receiver is not `nil`.  Otherwise it returns nil.
 
     >> "foo"._?.length
     => 3
     >> nil._?.length
     => nil
 
+`to_s`, `to_yaml` and `to_json` and a few system functions that start with an underscore are the only exceptions -- they call their corresponding functions on nil.
+
+    >> nil._?.to_s
+    => ""
 
 ### `Object#try`
 
@@ -53,4 +59,14 @@ We have the "." operator to call methods on objects. These extensions introduce 
     >> :foo.try.length
     => nil
 
+### What's the difference?
 
+`_?` is generally used when nil is an expected response.  `try` is
+generally used when interfaces may be different.  For instance, you
+may use `try` to call a Rails 2.3 function that doesn't exist on Rails
+2.2.  nil responds to some functions that may surprise you.
+
+    >> nil.try.to_i
+    => 0
+    >> nil._?.to_i
+    => nil
