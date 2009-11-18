@@ -1,7 +1,7 @@
 class HoboModelControllerGenerator < Rails::Generator::NamedBase
 
   def initialize(args, options)
-    args[0] = args[0].pluralize
+    args[0] = args[0].pluralize if args[0] && args[0]!='--help'
     super(args, options)
   end
   
