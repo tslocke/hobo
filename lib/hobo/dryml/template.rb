@@ -33,11 +33,10 @@ module Hobo::Dryml
       end
     end
 
-    def initialize(src, environment, template_path, bundle=nil)
+    def initialize(src, environment, template_path)
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path.sub(%r(^#{Regexp.escape(RAILS_ROOT)}/), "")
-      @bundle = bundle
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
@@ -45,7 +44,7 @@ module Hobo::Dryml
       @last_element = nil
     end
 
-    attr_reader :tags, :template_path, :bundle
+    attr_reader :tags, :template_path
 
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
@@ -178,7 +177,7 @@ module Hobo::Dryml
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       options = {}
-      %w(src module plugin bundle as).each do |attr|
+      %w(src module plugin as).each do |attr|
         options[attr.to_sym] = el.attributes[attr] if el.attributes[attr]
       end
       @builder.add_build_instruction(:include, options)
@@ -261,8 +260,6 @@ module Hobo::Dryml
                       klass = HoboFields.to_class(for_type) or 
                         dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el)
                       klass.name
-                    elsif for_type =~ /^_.*_$/
-                      rename_class(for_type)
                     else
                       for_type
                     end.underscore.gsub('/', '__')
@@ -992,10 +989,6 @@ module Hobo::Dryml
       @gensym_counter ||= 0
       @gensym_counter += 1
       "#{name}_#{@gensym_counter}"
-    end
-
-    def rename_class(name)
-      @bundle && name.starts_with?("_") ? @bundle.send(name) : name
     end
 
     def include_source_metadata

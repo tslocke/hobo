@@ -118,9 +118,6 @@ module Hobo::Dryml
         template_dir = File.dirname(template_path)
         options = options.merge(:template_dir => template_dir)
 
-        # Pass on the current bundle, if there is one, to the sub-taglib
-        options[:bundle] = template.bundle.name unless template.bundle.nil? || options[:bundle] || options[:plugin]
-
         taglib = Taglib.get(options)
         taglib.import_into(@environment, options[:as])
       end
