@@ -16,6 +16,11 @@ subversion.
 
 === Hobo Edge ===
 
+Deletions:
+
+  - The bundles feature of Hobo which never really worked and was
+    never documented has been removed from this release.
+
 Major enhancements:
 
   - `rake hobo:run_invite_only_generators` was added as an alternative
