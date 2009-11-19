@@ -21,7 +21,8 @@ class HoboRapidGenerator < Hobo::Generator
       create_all(m, "themes/clean/views", "app/views/taglibs/themes/clean")
       
       if with_admin_site?
-        options = ["--make-front-site", "admin"]
+        options = ["admin"]
+        options.unshift "--make-front-site" unless File.exist?('app/views/taglibs/front_site.dryml')
         options.unshift "--invite-only" if invite_only?
         m.dependency 'hobo_admin_site', options
       end
