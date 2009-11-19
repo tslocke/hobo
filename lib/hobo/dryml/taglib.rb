@@ -14,8 +14,7 @@ module Hobo
           if taglib
             taglib.reload
           else
-            bundle = options[:bundle] && Bundle.bundles[options[:bundle]]
-            taglib = Taglib.new(src_file, bundle)
+            taglib = Taglib.new(src_file)
             @cache[src_file] = taglib
           end
           taglib
@@ -33,9 +32,6 @@ module Hobo
                    "#{HOBO_ROOT}/taglibs"
                  elsif plugin
                    "#{RAILS_ROOT}/vendor/plugins/#{plugin}/taglibs"
-                 elsif (bundle_name = options[:bundle])
-                   bundle = Bundle.bundles[bundle_name] or raise ArgumentError, "No such bundle: #{options[:bundle]}"
-                   "#{RAILS_ROOT}/vendor/plugins/#{bundle.plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{RAILS_ROOT}/app/views"
                  elsif options[:template_dir] =~ /^#{HOBO_ROOT}/
@@ -52,9 +48,8 @@ module Hobo
 
       end
 
-      def initialize(src_file, bundle)
+      def initialize(src_file)
         @src_file = src_file
-        @bundle = bundle
         load
       end
 
@@ -92,7 +87,7 @@ module Hobo
           end
 
         end
-        template = Template.new(File.read(@src_file), @module, @src_file, @bundle)
+        template = Template.new(File.read(@src_file), @module, @src_file)
         template.compile([], [])
         @last_load_time = File.mtime(@src_file)
       end
