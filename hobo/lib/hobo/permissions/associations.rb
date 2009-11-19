@@ -46,7 +46,7 @@ module Hobo
 
 
           def insert_record(record, force = false, validate = true)
-            insert_record_without_user_save(record, force, validate)
+            set_belongs_to_association_for(record)
             if (user = acting_user) && record.is_a?(Hobo::Model)
               if force
                 record.user_save!(user)
