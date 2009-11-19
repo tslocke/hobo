@@ -43,7 +43,7 @@ end
 user_model = "user"
 create_db  = false
 run_rails  = true
-invite_ony = ""
+invite_only = ""
 
 while true
   case arg_name = ARGV.shift
@@ -62,7 +62,7 @@ while true
   when "-n", "--no-rails"
     run_rails = false
   when "--invite-only"
-    invite_ony = "--invite-only"
+    invite_only = "--invite-only"
   when "--help"
     puts USAGE
     exit
@@ -106,16 +106,16 @@ Dir.chdir(app_path) do
   command(gen, "hobo --add-gem --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
-  command("#{gen} hobo_rapid --import-tags #{invite_ony}")
+  command("#{gen} hobo_rapid --import-tags #{invite_only}")
 
   if user_model
     puts "\nCreating #{user_model} model and controller...\n"
-    command("#{gen} hobo_user_model #{user_model} #{invite_ony}")
-    command("#{gen} hobo_user_controller #{user_model} #{invite_ony}")
+    command("#{gen} hobo_user_model #{user_model} #{invite_only}")
+    command("#{gen} hobo_user_controller #{user_model} #{invite_only}")
   end
 
   puts "\nCreating standard pages...\n"
-  command("#{gen} hobo_front_controller front --delete-index --add-routes #{invite_ony}")
+  command("#{gen} hobo_front_controller front --delete-index --add-routes #{invite_only}")
 
   if create_db
     puts "\nCreating databases"
@@ -123,7 +123,7 @@ Dir.chdir(app_path) do
   end
 end
 
-if invite_ony.present?
+if invite_only.present?
   puts %(
 Invite-only website
   If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
