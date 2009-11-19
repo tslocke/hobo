@@ -44,5 +44,15 @@ namespace :hobo do
     END
   end
 
+  desc "Run the standard generators that the hobo command runs with the --invite-only option."
+  task :run_invite_only_generators do
+    exec <<-END
+      ruby script/generate hobo --add-routes && \
+      ruby script/generate hobo_rapid --import-tags --invite-only && \
+      ruby script/generate hobo_user_model user --invite-only && \
+      ruby script/generate hobo_user_controller user --invite-only && \
+      ruby script/generate hobo_front_controller front --delete-index --add-routes --invite-only 
+    END
+  end
 end
 

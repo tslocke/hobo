@@ -4,6 +4,10 @@ Once you have installed a new version of Hobo, you may wish to run
 
     rake hobo:run_standard_generators
 
+or
+
+    rake hobo:run_invite_only_generators
+
 This will run all of the standard generators, and pull in any bug
 fixes or enhancements to generated code.  Note that this is quite
 likely to cause conflicts, so it is highly recommended that you have
@@ -13,6 +17,10 @@ subversion.
 === Hobo Edge ===
 
 Major enhancements:
+
+  - `rake hobo:run_invite_only_generators` was added as an alternative
+    to `rake hobo:run_standard_generators` for those who created their
+    application with the `--invite-only` flag
 
 Major bug fixes:
 
