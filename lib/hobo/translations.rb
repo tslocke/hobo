@@ -28,7 +28,7 @@ module Hobo
     #       The output should be: Mitt Program
     # 
     # Otherwise with features as the ht method, step 1, 2 and 3 above. 
-    def ht(key, options={})
+    def self.ht(key, options={})
       
       # Check if called as a tag, i.e. like this <ht></ht>
       if (key.class == Hash)
@@ -72,6 +72,16 @@ module Hobo
     
       Rails.logger.info "..translate(#{key}, #{options.inspect}) to #{I18n.locale}"
       I18n.translate(key.to_sym, options)+(key_prefix ? key_prefix:"")
+    end
+
+    # if somebody includes us, give them ht as an instance method
+    def self.included(base)
+      translation_class = self
+      base.class_eval do
+        define_method :ht do |*args|
+          translation_class.ht(*args)
+        end
+      end
     end
   end
 end
