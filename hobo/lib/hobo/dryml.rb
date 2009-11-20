@@ -24,9 +24,9 @@ module Hobo
     CORE_TAGLIB        = { :src => "core", :plugin => "hobo" }
 
     DEFAULT_IMPORTS = (if defined?(ApplicationHelper)
-                         [Hobo::HoboHelper, ApplicationHelper]
+                         [Hobo::HoboHelper, Hobo::Translations, ApplicationHelper]
                        else
-                         [Hobo::HoboHelper]
+                         [Hobo::HoboHelper, Hobo::Translations]
                        end)
 
     @renderer_classes = {}
