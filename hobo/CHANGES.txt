@@ -27,6 +27,13 @@ Major enhancements:
     to `rake hobo:run_standard_generators` for those who created their
     application with the `--invite-only` flag
 
+  - Translations (ie, the ht functions) has now been moved into its
+    own module.  To access the translation functions from elsewhere
+    use `Hobo::Translations.ht`.  Alternatively, including the
+    Hobo::Translations module into your class will give you `ht` as a
+    local instance method.  (This is one of the things the
+    `hobo_controller` declaration does.)
+
 Major bug fixes:
 
   - [#537](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/537)
