@@ -25,6 +25,7 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 
     if (update || !ajax_attributes.empty?) && !has_params
       ajax_attributes[:message] ||= label
+      ajax_attributes[:method] = html_attributes[:method]
       func = ajax_updater(url, update, ajax_attributes)
       html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
       element(:input, html_attributes, nil, true, true)
