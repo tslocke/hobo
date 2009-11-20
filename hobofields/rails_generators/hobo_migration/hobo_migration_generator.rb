@@ -53,7 +53,9 @@ class HoboMigrationGenerator < Rails::Generator::Base
       at_exit { rake_migrate } if action == 'm'
 
       up.gsub!("\n", "\n    ")
+      up.gsub!(/ +\n/, "\n")
       down.gsub!("\n", "\n    ")
+      down.gsub!(/ +\n/, "\n")
 
       record do |m|
         m.migration_template 'migration.rb', 'db/migrate',
