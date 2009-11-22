@@ -13,17 +13,19 @@
 
  - tag: The name of a tag to use inside the `<td>` to display the value. Defaults to `view`
  
- - show-non-editable: By default, if `tag` is set to `input`, fields for which the current user does not have edit permission
-   will be skipped (the entire row is skipped). Set this attribute to keep them. (Note that `<input>` automatically degrades
-   to `<view>` if the user does not have edit permission.)
-     
+ - no-edit: Controls the behavior of `<input>` tags when the user doesn't have edit permission for a field.
+   - view: render the current value using the `<view>` tag
+   - disable: render the input as normal, but add HTML's `disabled` attribute
+   - skip: render nothing at all. This will omit the entire row (including the label)
+   - ignore: render the input normally. That is, don't even perform the edit check.
+
 -->
 <def tag="field-list" attrs="tag, no-edit">
   <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
     <% field_name = this_field_name 
-       input_attrs = {:no_edit => no_edit} if tag == "input" && no_edit == "disable"
+       input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
       <labelled-item unless="&tag == 'input' && no_edit == 'skip' && !can_edit?">
         <item-label param="#{this_field.to_s.sub('?', '')}-label" unless="&field_name.blank?">
