@@ -330,6 +330,7 @@ module Hobo
           refl.klass.reflections.values.find do |r|
             r.macro == :has_many &&
               !r.options[:conditions] &&
+              !r.options[:scope] &&
               r.through_reflection == other_to_join && 
               r.source_reflection  == join_to_self
           end
@@ -347,6 +348,7 @@ module Hobo
             r.macro.in?(reverse_macros) &&
               r.klass >= self &&
               !r.options[:conditions] &&
+              !r.options[:scope] &&
               r.primary_key_name == refl.primary_key_name
           end
         end
