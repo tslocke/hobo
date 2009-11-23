@@ -511,8 +511,13 @@ module Hobo
 
     def hobo_create(*args, &b)
       options = args.extract_options!
-      self.this ||= args.first || new_for_create
-      this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
+      attributes = options[:attributes] || attribute_parameters || {}      
+      if self.this ||= args.first
+        this.user_update_attributes(current_user, attributes)
+      else
+        self.this = new_for_create(attributes)
+        this.save
+      end
       create_response(:new, options, &b)
     end
     
@@ -520,8 +525,13 @@ module Hobo
     def hobo_create_for(owner, *args, &b)
       options = args.extract_options!
       owner, association = find_owner_and_association(owner)
-      self.this ||= args.first || association.new
-      this.user_update_attributes(current_user, options[:attributes] || attribute_parameters || {})
+      attributes = options[:attributes] || attribute_parameters || {}
+      if self.this ||= args.first
+        this.user_update_attributes(current_user, attributes)
+      else
+        self.this = association.new(attributes)
+        this.save
+      end
       create_response(:"new_for_#{owner}", options, &b)    
     end
 
@@ -531,10 +541,10 @@ module Hobo
     end
 
 
-    def new_for_create
+    def new_for_create(attributes = {})
       type_param = subtype_for_create
       create_model = type_param ? type_param.constantize : model
-      create_model.user_new(current_user)
+      create_model.user_new(current_user, attributes)
     end
     
     
