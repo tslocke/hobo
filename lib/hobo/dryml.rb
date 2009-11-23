@@ -38,7 +38,11 @@ module Hobo
     
     def enable
       ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
-      ActionView::Template.exempt_from_layout('dryml')
+      if ActionView::Template.respond_to? :exempt_from_layout
+        ActionView::Template.exempt_from_layout('dryml')
+      elsif
+        ActionView::Base.exempt_from_layout('dryml')
+      end
       DrymlGenerator.enable
     end
     
