@@ -159,7 +159,7 @@ module Hobo
         state ? state.transitions_out : []
       end
 
-
+      # see also publishable_transitions_for
       def available_transitions_for(user, name=nil)
         name = name.to_sym if name
         matches = available_transitions
@@ -169,6 +169,10 @@ module Hobo
         end
       end
 
+      def publishable_transitions_for(user)
+        available_transitions_for(user).select {|t| t.publishable_by(user, t.available_to, record)}
+      end
+        
 
       def become(state_name, validate=true)
         state_name = state_name.to_sym
@@ -180,7 +184,7 @@ module Hobo
         else
           s = self.class.states[state_name]
           raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
-          
+
           if record.save(validate)
             s.activate! record
             self.active_step = nil # That's the end of this step
