@@ -15,11 +15,8 @@ module Hobo
         return true if available_to.nil? # available_to not specified (these steps are not published)
         acting_user_is?(available_to, record)
       end
-      
-      
-      def acting_user_is?(who, record)
-        user = record.acting_user
 
+      def publishable_by(user, who, record)                    
         case who
         when :all
           true
@@ -32,7 +29,7 @@ module Hobo
 
         when Array
           # recursively apply the same test to every item in the array
-          who.detect { |w| acting_user_is?(w, record) }
+          who.detect { |w| publishable_by(user, w, record) }
 
         else
           refl = record.class.reflections[who]
@@ -53,6 +50,9 @@ module Hobo
         end
       end
 
+      def acting_user_is?(who, record)
+        publishable_by(record.acting_user, who, record)
+      end
 
       def run_hook(record, hook, *args)
         case hook
