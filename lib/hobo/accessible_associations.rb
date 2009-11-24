@@ -42,8 +42,15 @@ module Hobo
 
         record = yield id
         record.attributes = hash
-        owner.include_in_save(association_name, record) unless owner.new_record? && record.new_record?
-        
+        if owner.new_record? && record.new_record?
+          # work around
+          # https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/3510-has_many-build-does-not-set-reverse-reflection
+          # https://hobo.lighthouseapp.com/projects/8324/tickets/447-validation-problems-with-has_many-accessible-true
+          method = "#{owner.class.reverse_reflection(association_name).name}=".to_sym
+          record.send(method, owner) if record.respond_to? method
+        else
+          owner.include_in_save(association_name, record)
+        end        
       else
         # It's already a record
         record = record_hash_or_string
