@@ -193,6 +193,7 @@ var Hobo = {
                     onLeaveHover: null,
                     callback: function(form, val) {
                         old = val
+                        el.setAttribute("hobo-edit-text", val)
                         return (Hobo.fieldSetParam(el, val) + "&" + updateParams)
                     },
                     onFailure: function(_, resp) {
@@ -200,6 +201,10 @@ var Hobo = {
                     },
                     onEnterEditMode: function() {
                         var blank_message = el.getAttribute("hobo-blank-message")
+                        var editable_text = el.getAttribute("hobo-edit-text")
+                        if (editable_text) {
+                            el.innerHTML = editable_text
+                        }
                         if (el.innerHTML.gsub("&nbsp;", " ") == blank_message) {
                             el.innerHTML = "" 
                         } else {
@@ -785,6 +790,10 @@ Event.addBehavior({
                 rows: 2, handleLineBreaks: false, okButton: true, cancelLink: true, okText: "Save", submitOnBlur: false
             }
             var ipe = Hobo._makeInPlaceEditor(this, options) 
+            ipe.getText = function() {
+                // Be careful!  we're not calling unescapeHTML() here!
+                return this.element.innerHTML
+            }
         }
     },
 

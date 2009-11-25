@@ -34,6 +34,15 @@ Major enhancements:
     local instance method.  (This is one of the things the
     `hobo_controller` declaration does.)
 
+  - [#409](https://hobo.lighthouseapp.com/projects/8324/tickets/409)
+    The `<editor>` tag has been modified to display the `to_s`
+    representation of the object while in edit mode.  The `to_html`
+    representation is still used in view mode.  The editor tag for
+    HTML columns has been modified to remove the heavy sanitizing that
+    was previously performed.  If you have HTML columns in your model,
+    it is highly recommended that you sanitize user input before
+    storing to the database.
+
 Major bug fixes:
 
   - [#537](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/537)
