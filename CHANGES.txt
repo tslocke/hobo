@@ -41,7 +41,24 @@ Major bug fixes:
     trailing function more often than it used to, more closely
     matching its documentation.
 
+  - [#457](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/457)
+    ie7-recalc.js has been updated to improve compatibility with IE6.
+    Please update the copy inside of your application, either by
+    running `rake hobo:run_standard_generators` or by copying the file
+    directly from
+    http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/ie7-recalc.js
+
+  - [#512](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/512)
+    Hobo now has better compatibility with non-DRYML templates
+
 Minor enhancements:
+
+  - [#554](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/554)
+    The transition-buttons tag no longer displays transitions that are
+    not `:available_to` the user.
+
+  - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/536)
+    documentation for field-list more closely matches reality
 
 Minor bug fixes:
 
