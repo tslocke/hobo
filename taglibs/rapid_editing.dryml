@@ -45,7 +45,7 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
   A JavaScript hook is available in order to replace the simple textarea with a rich-text editor.
   For an example, see the [hoboyui](http://github.com/tablatom/hoboyui) plugin
 
-This tag does not sanitize HTML.  It's highly recommended that you do so before saving anything the user enters.
+This tag does not sanitize HTML; this is provided by HtmlString before saving to the database.
  -->
 <def tag="editor" for="html"><%= in_place_editor(attributes, this) %></def>
 
