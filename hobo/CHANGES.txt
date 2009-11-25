@@ -39,9 +39,8 @@ Major enhancements:
     representation of the object while in edit mode.  The `to_html`
     representation is still used in view mode.  The editor tag for
     HTML columns has been modified to remove the heavy sanitizing that
-    was previously performed.  If you have HTML columns in your model,
-    it is highly recommended that you sanitize user input before
-    storing to the database.
+    was previously performed.  HtmlString will sanitize before saving
+    to the database.
 
 Major bug fixes:
 
