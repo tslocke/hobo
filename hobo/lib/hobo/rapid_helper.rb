@@ -92,13 +92,16 @@ module Hobo::RapidHelper
 
 
 
-  def in_place_editor(attributes)
+  def in_place_editor(attributes, this=nil)
     blank_message = attributes.delete(:blank_message) || "(click to edit)"
 
     attributes = add_classes(attributes, "in-place-edit", model_id_class(this_parent, this_field))
     attributes.update(:hobo_blank_message => blank_message,
                       :if_blank => blank_message,
                       :no_wrapper => false)
+    
+    edit_text = this._?.to_s
+    attributes.update(:hobo_edit_text => edit_text) unless edit_text.nil?
 
     update = attributes.delete(:update)
     attributes[:hobo_update] = update if update
