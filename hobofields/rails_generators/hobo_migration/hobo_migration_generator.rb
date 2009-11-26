@@ -75,27 +75,40 @@ class HoboMigrationGenerator < Rails::Generator::Base
     to_rename = {}
     rename_to_choices = to_create
     to_drop.dup.each do |t|
-      if rename_to_choices.empty?
-        puts "\nCONFIRM DROP! #{kind_str} #{name_prefix}#{t}"
-        resp = input("Enter 'drop #{t}' to confirm:")
-        if resp.strip != "drop " + t.to_s
-          to_drop.delete(t)
-        end
-      else
-        puts "\nDROP or RENAME?: #{kind_str} #{name_prefix}#{t}"
-        puts "Rename choices: #{to_create * ', '}"
-        resp = input("Enter either 'drop #{t}' or one of the rename choices:")
-        resp.strip!
-
-        if resp == "drop " + t
-          # Leave things as they are
+      while true
+        if rename_to_choices.empty?
+          puts "\nCONFIRM DROP! #{kind_str} #{name_prefix}#{t}"
+          resp = input("Enter 'drop #{t}' to confirm or press enter to keep:")
+          if resp.strip == "drop " + t.to_s
+            break
+          elsif resp.strip.empty?
+            to_drop.delete(t)
+            break
+          else
+            next
+          end
         else
-          resp.gsub!(' ', '_')
-          to_drop.delete(t)
-          if resp.in?(rename_to_choices)
-            to_rename[t] = resp
-            to_create.delete(resp)
-            rename_to_choices.delete(resp)
+          puts "\nDROP, RENAME or KEEP?: #{kind_str} #{name_prefix}#{t}"
+          puts "Rename choices: #{to_create * ', '}"
+          resp = input("Enter either 'drop #{t}' or one of the rename choices or press enter to keep:")
+          resp.strip!
+
+          if resp == "drop " + t
+            # Leave things as they are
+            break
+          else
+            resp.gsub!(' ', '_')
+            to_drop.delete(t)
+            if resp.in?(rename_to_choices)
+              to_rename[t] = resp
+              to_create.delete(resp)
+              rename_to_choices.delete(resp)
+              break
+            elsif resp.empty?
+              break
+            else
+              next
+            end
           end
         end
       end
