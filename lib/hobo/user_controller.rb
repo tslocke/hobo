@@ -98,12 +98,9 @@ module Hobo
       do_creator_action(:signup) do
         if valid?
           flash[:notice] = ht(:"users.messages.signup.success", :default=>["Thanks for signing up!"])
-          flash[:notice] << ht(:"users.messages.signup.must_activate", :default=>[" You must activate your account before you can log in. Please check your email."]) unless this.account_active?
         end
         response_block(&b) or if valid?
-                                if this.account_active?
-                                  self.current_user = this if this.account_active?
-                                end
+                                self.current_user = this if this.account_active?
                                 redirect_back_or_default(home_page)
                               end
       end
