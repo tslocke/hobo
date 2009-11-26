@@ -21,6 +21,11 @@ Deletions:
   - The bundles feature of Hobo which never really worked and was
     never documented has been removed from this release.
 
+  - The message "You must activate your account before you can log
+    in. Please check your email." which used to be added to the flash
+    message when a user has signed up has been removed from
+    `hobo_do_signup`.
+
 Major enhancements:
 
   - `rake hobo:run_invite_only_generators` was added as an alternative
@@ -40,7 +45,11 @@ Major enhancements:
     representation is still used in view mode.  The editor tag for
     HTML columns has been modified to remove the heavy sanitizing that
     was previously performed.  HtmlString will sanitize before saving
-    to the database.
+    to the database.  You need to update your hobo-rapid.js for this
+    fix.  Run `rake hobo:run_standard_generators` or copy the file
+    directly from
+    http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js
+  
 
 Major bug fixes:
 
