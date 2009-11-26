@@ -94,7 +94,7 @@ module Hobo
   
   classy_module(AccessibleAssociations) do
     
-    include IncludeInSave
+    include Hobo::IncludeInSave
     
     # --- has_many mass assignment support --- #
     
