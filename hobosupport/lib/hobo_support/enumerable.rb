@@ -35,7 +35,7 @@ module Enumerable
 
   class MultiSender
 
-    undef_method(*(instance_methods - %w*__id__ __send__*))
+    undef_method(*(instance_methods.map{|m| m.to_s} - %w*__id__ __send__ object_id*))
 
     def initialize(enumerable, method)
       @enumerable = enumerable

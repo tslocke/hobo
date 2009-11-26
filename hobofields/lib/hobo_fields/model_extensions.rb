@@ -27,7 +27,7 @@ module HoboFields
     end
 
     def self.index(fields, options = {})
-      index_specs << IndexSpec.new(self, fields, options)
+      index_specs << HoboFields::IndexSpec.new(self, fields, options)
     end
 
 
@@ -124,7 +124,7 @@ module HoboFields
       add_validations_for_field(name, type, args)
       add_index_for_field(name, args, options)
       declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
-      field_specs[name] = FieldSpec.new(self, name, type, options)
+      field_specs[name] = HoboFields::FieldSpec.new(self, name, type, options)
       attr_order << name unless name.in?(attr_order)
     end
 

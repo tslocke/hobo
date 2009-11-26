@@ -8,7 +8,7 @@ module HoboFields
       include HoboFields::ModelExtensions unless HoboFields::ModelExtensions.in?(included_modules)
 
       if b
-        dsl = FieldDeclarationDsl.new(self)
+        dsl = HoboFields::FieldDeclarationDsl.new(self)
         if b.arity == 1
           yield dsl
         else

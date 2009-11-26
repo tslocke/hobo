@@ -32,7 +32,7 @@ module Hobo
           lifecycle.init(self, options)
         end
 
-        dsl = DeclarationDSL.new(lifecycle)
+        dsl = Hobo::Lifecycles::DeclarationDSL.new(lifecycle)
         dsl.instance_eval(&block)
 
         default = lifecycle.default_state ? { :default => lifecycle.default_state.name.to_s } : {}

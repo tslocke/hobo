@@ -56,7 +56,7 @@ end
 class SafeNil
   include Singleton
 
-  DONT_REDEFINE_METHODS = "__id__", "__send__"
+  DONT_REDEFINE_METHODS = "__id__", "__send__", "object_id"
 
   NIL_RESPONSE_METHODS = ["to_s", "to_json", "to_yaml", "__id__", "__is_a__", "__metaclass__", "__send__"]
 
@@ -68,7 +68,7 @@ class SafeNil
       end"
   end
 
-  (instance_methods - NIL_RESPONSE_METHODS - DONT_REDEFINE_METHODS).each do |method|
+  (instance_methods.map{|m| m.to_s} - NIL_RESPONSE_METHODS - DONT_REDEFINE_METHODS).each do |method|
     # can't use define_method with a block
     eval "
       def #{method}(*args, &b)
