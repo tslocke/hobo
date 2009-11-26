@@ -259,7 +259,7 @@ module Hobo
       
       def auto_actions_for(owner, actions)
         name = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner
-        
+
         owner_actions[owner] ||= []
         Array(actions).each do |action|
           case action
@@ -461,14 +461,17 @@ module Hobo
     
     
     def find_owner_and_association(owner_association)
+      owner_name = name_of_auto_action_for(owner_association)
       refl = model.reflections[owner_association]
-      owner_name = refl.macro == :has_many ? owner_association.to_s.singularize : owner_association
       id = params["#{owner_name}_id"]
       owner = refl.klass.find(id)
       instance_variable_set("@#{owner_association}", owner)
       [owner, owner.send(model.reverse_reflection(owner_association).name)]
     end
 
+    def name_of_auto_action_for(owner_association)
+      model.reflections[owner_association].macro == :has_many ? owner_association.to_s.singularize : owner_association
+    end
 
     # --- Action implementations --- #
 
@@ -522,9 +525,9 @@ module Hobo
     end
     
     
-    def hobo_create_for(owner, *args, &b)
+    def hobo_create_for(owner_association, *args, &b)
       options = args.extract_options!
-      owner, association = find_owner_and_association(owner)
+      owner, association = find_owner_and_association(owner_association)
       attributes = options[:attributes] || attribute_parameters || {}
       if self.this ||= args.first
         this.user_update_attributes(current_user, attributes)
@@ -532,7 +535,7 @@ module Hobo
         self.this = association.new(attributes)
         this.save
       end
-      create_response(:"new_for_#{owner}", options, &b)    
+      create_response(:"new_for_#{name_of_auto_action_for(owner_association)}", options, &b)    
     end
 
 
