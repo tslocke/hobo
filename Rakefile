@@ -57,7 +57,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.authors      = ["Tom Locke"]
   gemspec.rubyforge_project = "hobo"
   gemspec.add_dependency("rails", [">= 2.2.2"])
-  gemspec.add_dependency("mislav-will_paginate", [">= 2.2.1"])
+  gemspec.add_dependency("will_paginate", [">= 2.3.11"])
   gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
   gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])    
 end
