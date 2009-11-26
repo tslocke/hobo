@@ -3,6 +3,9 @@
 require 'fileutils'
 require 'pathname'
 require 'activesupport'
+require 'rbconfig'
+
+RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 
 Signal.trap("INT") { puts; exit }
 
@@ -22,8 +25,6 @@ Options:
 
 
 ### Nasty stuff needed for Windows :-( ###
-require 'rbconfig'
-
 if Config::CONFIG["arch"] =~ /win32/
   require "win32/registry"
   def system(command)
@@ -93,12 +94,12 @@ if run_rails
 #    end
   end
   opts << "-d #{database_type}" if database_type
-  system("rails #{opts * ' '} #{app_path}")
+  system("#{RUBY} -S rails #{opts * ' '} #{app_path}")
 end
 
 Dir.chdir(app_path) do
-  gen = "ruby #{File.join('script', 'generate')}"
-  plugin = "ruby #{File.join('script', 'plugin')}"
+  gen = "#{RUBY} #{File.join('script', 'generate')}"
+  plugin = "#{RUBY} #{File.join('script', 'plugin')}"
 
   FileUtils.touch("public/stylesheets/application.css")
 
@@ -119,7 +120,7 @@ Dir.chdir(app_path) do
 
   if create_db
     puts "\nCreating databases"
-    command("rake db:create:all")
+    command("#{RUBY} -S rake db:create:all")
   end
 end
 
