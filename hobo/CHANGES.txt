@@ -26,6 +26,17 @@ Deletions:
     message when a user has signed up has been removed from
     `hobo_do_signup`.
 
+  - Github no longer updates its gem repository.  The canonical source
+    for Mislav's will\_paginate, which is a Hobo dependency is now
+    gemcutter.org.  To add gemcutter.org to your gem source list:
+
+      $ gem install gemcutter
+      $ gem tumble
+
+   Note that `gem tumble` is a toggle, so if you've already added
+   `gemcutter` to your sources list, the above commands will have
+   removed it!  Simply run `gem tumble` again to add it back in.
+
 Major enhancements:
 
   - `rake hobo:run_invite_only_generators` was added as an alternative
