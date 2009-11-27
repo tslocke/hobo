@@ -60,7 +60,11 @@ Major enhancements:
     fix.  Run `rake hobo:run_standard_generators` or copy the file
     directly from
     http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js
-  
+
+  - [#296](https://hobo.lighthouseapp.com/projects/8324/tickets/296)
+    The migration generator now fully understands HABTM join tables. Note that
+    the "decorated join table" functionality that was deprecated in Rails 2.3
+    is NOT supported.
 
 Major bug fixes:
 
