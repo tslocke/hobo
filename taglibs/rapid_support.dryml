@@ -93,7 +93,7 @@ This tag is in need of a review - it's a bit funky.
       scope.field_name = n == "this" ? this.member_class.try.name : n.to_s.gsub("." , "_") 
       scope.field_path = n
       parameters.default
-    end
+    end.join
   end
 %>
 </def>
