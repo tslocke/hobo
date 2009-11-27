@@ -49,7 +49,9 @@ module HoboFields
       options = attrs.extract_options!
       type = options.delete(:type)
       attrs << options unless options.empty?
+      public
       attr_accessor_without_rich_types(*attrs)
+      private
 
       if type
         type = HoboFields.to_class(type)
@@ -136,7 +138,7 @@ module HoboFields
       validates_uniqueness_of name, :allow_nil => !:required.in?(args) if :unique.in?(args)
 
       type_class = HoboFields.to_class(type)
-      if type_class && "validate".in?(type_class.public_instance_methods)
+      if type_class && type_class.public_method_defined?("validate")
         self.validate do |record|
           v = record.send(name)._?.validate
           record.errors.add(name, v) if v.is_a?(String)

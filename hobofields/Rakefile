@@ -2,7 +2,7 @@ require 'rubygems'
 require 'activerecord'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
 
-RUBY = ENV['RUBY'] || (defined?(JRUBY_VERSION) ? 'jruby' : 'ruby')
+RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} `which rubydoctest`"
 
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')

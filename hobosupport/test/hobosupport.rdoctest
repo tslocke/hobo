@@ -54,9 +54,9 @@ We have the "." operator to call methods on objects. These extensions introduce 
 
 "`.try`" only calls the method if the receiver responds to that method.
 
-    >> "foo".try.length
-    => 3
-    >> :foo.try.length
+    >> "foo".try.reverse
+    => "oof"
+    >> :foo.try.reverse
     => nil
 
 ### What's the difference?

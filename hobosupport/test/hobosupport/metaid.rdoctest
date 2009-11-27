@@ -7,14 +7,14 @@ Why the Luck Stiff's essential meta-programming additions to Object. These are p
 
 ## `Object#metaclass`
 
-Returns the "metaclass" (bad name) or "singleton class" of a given ruby Object
+Returns the "metaclass", "eigenclass" or "singleton class" of a given ruby Object
 
     >> o = Object.new
     >> def o.foo; ;123; end
     >> o.foo
     => 123
-    >> o.metaclass.instance_methods.grep "foo"
-    => ["foo"]
+    >> o.metaclass.method_defined?(:foo)
+    => true
 
 ## `Object#meta_eval`
 

@@ -228,7 +228,7 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
          class Article < ActiveRecord::Base
            Status = HoboFields::EnumString.for(:draft, :approved, :published)
            fields do
-             status Status
+             status Article::Status
            end
          end
         >> Article.attr_type :status
