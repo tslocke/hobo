@@ -245,7 +245,7 @@ The flash is output in a `<div class="flash notice">`, where `notice` is the `ty
 <def tag="flash-messages" attrs="names"><%=
   scope.flash_rendered = true
   names = names.nil? ? flash.keys : comma_split(names)
-  names.map { |name| flash_message :type => name }
+  names.map { |name| flash_message :type => name }.join
 %></def>
 
 <!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`. The theme will style this as an ajax progress 'spinner' -->

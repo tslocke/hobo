@@ -105,13 +105,13 @@ module Hobo
                Array(path)
              end
 
-      field, parent = nil
+      parent = nil
       path.each do |field|
         return nil if object.nil?
         parent = object
         object = get_field(parent, field)
       end
-      [parent, field, object]
+      [parent, path.last, object]
     end
 
 

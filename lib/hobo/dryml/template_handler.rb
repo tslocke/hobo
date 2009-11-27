@@ -17,7 +17,8 @@ module Hobo::Dryml
     
     def render_for_rails22(template, view, local_assigns)
       renderer = Hobo::Dryml.page_renderer_for_template(view, local_assigns.keys, template)
-      this = @view.instance_variable_set("@this", view.controller.send(:dryml_context) || local_assigns[:this])
+      this = view.controller.send(:dryml_context) || local_assigns[:this]
+      @view._?.instance_variable_set("@this", this)
       s = renderer.render_page(this, local_assigns)
 
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
