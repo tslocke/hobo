@@ -65,6 +65,9 @@ class Hash
     keys.each { |k| delete(k) if self[k].nil? }
   end
 
+  # Ruby 1.9.1 complains about the use of index and recommends key
+  # but Ruby 1.8 doesn't have key.  Add it.
+  alias_method(:key, :index) unless method_defined?(:key)
 
 end
 

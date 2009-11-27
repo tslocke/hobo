@@ -235,7 +235,7 @@ module HoboFields
       undo_changes = []
       to_change.each do |t|
         model = models_by_table_name[t]
-        table = (to_rename.respond_to?(:key) ? to_rename.key(t) : to_rename.index(t)) || model.table_name
+        table = to_rename.key(t) || model.table_name
         if table.in?(db_tables)
           change, undo = change_table(model, table)
           changes << change
