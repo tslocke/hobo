@@ -61,7 +61,7 @@ module Hobo::Dryml
     def erb_process(erb_src, method_def=false)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
       erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
-      src = erb.src[("output_buffer = '';").length..-("; output_buffer".length)]
+      src = erb.src.split(';')[1..-2].join(';')
       
       if method_def
         src.sub /^\s*def.*?\(.*?\)/, '\0 __in_erb_template=true; '

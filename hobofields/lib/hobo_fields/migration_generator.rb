@@ -73,7 +73,7 @@ module HoboFields
     # Returns an array of model classes and an array of table names
     # that generation needs to take into account
     def models_and_tables
-      ignore_model_names = MigrationGenerator.ignore_models.map &it.to_s.underscore
+      ignore_model_names = MigrationGenerator.ignore_models.*.to_s.*.underscore
       all_models = table_model_classes
       hobo_models = all_models.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
       non_hobo_models = all_models - hobo_models

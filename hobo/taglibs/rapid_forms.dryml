@@ -680,7 +680,7 @@ Here's a more complex example.  This used to be a part of [agility](http://cookb
       end
     end
 
-Note that this was added to the projects controller, rather than the users controller as in the first example.  You can read this as: create an auto-complete action called ’new_member_name’ that finds users that are not already members of the project, and not the owner of the project, and completes the :name field.
+Note that this was added to the projects controller, rather than the users controller as in the first example.  You can read this as: create an auto-complete action called `new_member_name` that finds users that are not already members of the project, and not the owner of the project, and completes the :name field.
 
     <name-one:user complete-target="&@project" completer="new_member_name"/>
 
