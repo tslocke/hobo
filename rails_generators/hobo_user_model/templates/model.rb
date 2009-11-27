@@ -3,13 +3,11 @@ class <%= class_name %> < ActiveRecord::Base
   hobo_user_model # Don't put anything above this
 
   fields do
-    name :string, :unique
+    name          :string, :required, :unique
     email_address :email_address, :login => true
     administrator :boolean, :default => false
     timestamps
   end
-
-  validates_presence_of :name
 
   # This gives admin rights to the first sign-up.
   # Just remove it if you don't want that
