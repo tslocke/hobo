@@ -39,9 +39,7 @@ Deletions:
 
 Major enhancements:
 
-  - `rake hobo:run_invite_only_generators` was added as an alternative
-    to `rake hobo:run_standard_generators` for those who created their
-    application with the `--invite-only` flag
+  - Hobo now supports Ruby 1.9.1.
 
   - Translations (ie, the ht functions) has now been moved into its
     own module.  To access the translation functions from elsewhere
@@ -49,6 +47,10 @@ Major enhancements:
     Hobo::Translations module into your class will give you `ht` as a
     local instance method.  (This is one of the things the
     `hobo_controller` declaration does.)
+
+  - `rake hobo:run_invite_only_generators` was added as an alternative
+    to `rake hobo:run_standard_generators` for those who created their
+    application with the `--invite-only` flag
 
   - [#409](https://hobo.lighthouseapp.com/projects/8324/tickets/409)
     The `<editor>` tag has been modified to display the `to_s`
