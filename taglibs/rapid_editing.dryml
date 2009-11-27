@@ -28,7 +28,8 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
 
 <!-- Not implemented - you just get links to the items in the collection -->
 <def tag="has-many-editor">
-  <% #TODO: Implement %>
+  <% #TODO: Implement 
+  %>
   <a merge-attrs/>
 </def>
   

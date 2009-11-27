@@ -853,7 +853,8 @@ Use the `uri` option to specify a redirect location:
   end
   -%>
   <ul class="check-many" param="default" merge-attrs>
-    <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked %>
+    <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked 
+    %>
     <li repeat="&options" param>
       <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
       <name param/>
