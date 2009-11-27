@@ -166,7 +166,7 @@ module Hobo
 
 
       def def_auto_action(name, &block)
-        define_method name, &block if name.not_in?(instance_methods) && include_action?(name)
+        define_method name, &block if !method_defined?(name) && include_action?(name)
       end
 
 
@@ -296,7 +296,7 @@ module Hobo
 
 
       def available_auto_write_actions
-        if "position_column".in?(model.instance_methods)
+        if model.method_defined?("position_column")
           WRITE_ONLY_ACTIONS + [:reorder]
         else
           WRITE_ONLY_ACTIONS
@@ -768,7 +768,7 @@ module Hobo
       self.this = true # Otherwise this gets sent user_view
       logger.info "Hobo: Permission Denied!"
       @permission_error = error
-      if "permission_denied".in?(self.class.superclass.instance_methods)
+      if self.class.superclass.method_defined?("permission_denied")
         super
       else
         respond_to do |wants|

@@ -178,7 +178,7 @@ module ActionView
       end
     end
 
-    if instance_methods.include? "find_template"
+    if method_defined? "find_template"
       # only rails 2.3 has this function
       alias_method_chain :find_template, :dryml
     end

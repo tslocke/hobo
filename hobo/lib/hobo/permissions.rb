@@ -30,9 +30,9 @@ module Hobo
     def self.find_aliased_name(klass, method_name)
       # The method +method_name+ will have been aliased. We jump through some hoops to figure out
       # what it's new name is
-      method_name = method_name.to_s
+      method_name = method_name.to_sym
       method = klass.instance_method method_name
-      methods = klass.private_instance_methods + klass.instance_methods
+      methods = (klass.private_instance_methods + klass.instance_methods).*.to_sym
       new_name = methods.select {|m| klass.instance_method(m) == method }.find { |m| m != method_name }
     end
     

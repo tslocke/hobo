@@ -142,12 +142,12 @@ module Hobo
       # TODO: should this be an inheriting_cattr_accessor as well? Probably.
       attr_accessor :creator_attribute
       inheriting_cattr_accessor :name_attribute => Proc.new { |c|
-        names = c.columns.*.name + c.public_instance_methods
+        names = c.columns.*.name + c.public_instance_methods.*.to_s
         NAME_FIELD_GUESS.detect {|f| f.in? names }
       }
 
       inheriting_cattr_accessor :primary_content_attribute => Proc.new { |c|
-        names = c.columns.*.name + c.public_instance_methods
+        names = c.columns.*.name + c.public_instance_methods.*.to_s
         PRIMARY_CONTENT_GUESS.detect {|f| f.in? names }
       }
 
