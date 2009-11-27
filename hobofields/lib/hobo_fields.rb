@@ -60,7 +60,7 @@ module HoboFields
 
 
   def to_name(type)
-    field_types.index(type) || ALIAS_TYPES[type]
+    field_types.key(type) || ALIAS_TYPES[type]
   end
 
 
