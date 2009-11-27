@@ -9,8 +9,9 @@ module HoboFields
       self.model = model
       self.name = name.to_sym
       self.type = type.is_a?(String) ? type.to_sym : type
+      position = options.delete(:position)
       self.options = options
-      self.position = model.field_specs.length
+      self.position = position || model.field_specs.length
     end
 
     attr_accessor :model, :name, :type, :position, :options

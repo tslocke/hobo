@@ -2,6 +2,42 @@ module HoboFields
 
   class MigrationGeneratorError < RuntimeError; end
 
+  class HabtmModelShim < Struct.new(:join_table, :foreign_keys, :connection)
+
+    def self.from_reflection(refl)
+      result = self.new
+      result.join_table = refl.options[:join_table].to_s
+      result.foreign_keys = [refl.primary_key_name.to_s, refl.association_foreign_key.to_s].sort
+      # this may fail in weird ways if HABTM is running across two DB connections (assuming that's even supported)
+      # figure that anybody who sets THAT up can deal with their own migrations...
+      result.connection = refl.active_record.connection
+      result
+    end
+
+    def table_name
+      self.join_table
+    end
+
+    def field_specs
+      i = 0
+      foreign_keys.inject({}) do |h, v|
+        # some trickery to avoid an infinite loop when FieldSpec#initialize tries to call model.field_specs
+        h[v] = FieldSpec.new(self, v, :integer, :position => i)
+        i += 1
+        h
+      end
+    end
+
+    def primary_key
+      false
+    end
+
+    def index_specs
+      []
+    end
+
+  end
+
   class MigrationGenerator
 
     @ignore_models = []
@@ -65,9 +101,13 @@ module HoboFields
 
     # list habtm join tables
     def habtm_tables
+      reflections = Hash.new { |h, k| h[k] = Array.new }
       ActiveRecord::Base.send(:subclasses).map do |c|
-        c.reflect_on_all_associations(:has_and_belongs_to_many).map { |a| a.options[:join_table] }
-      end.flatten.compact.*.to_s
+        c.reflect_on_all_associations(:has_and_belongs_to_many).each do |a|
+          reflections[a.options[:join_table].to_s] << a
+        end
+      end
+      reflections
     end
 
     # Returns an array of model classes and an array of table names
@@ -77,7 +117,7 @@ module HoboFields
       all_models = table_model_classes
       hobo_models = all_models.select { |m| m < HoboFields::ModelExtensions && m.name.underscore.not_in?(ignore_model_names) }
       non_hobo_models = all_models - hobo_models
-      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s - non_hobo_models.*.table_name - habtm_tables
+      db_tables = connection.tables - MigrationGenerator.ignore_tables.*.to_s - non_hobo_models.*.table_name
       [hobo_models, db_tables]
     end
 
@@ -158,6 +198,10 @@ module HoboFields
           models_by_table_name[m.table_name] = m
         end
       end
+      # generate shims for HABTM models
+      habtm_tables.each do |name, refls|
+        models_by_table_name[name] = HabtmModelShim.from_reflection(refls.first)
+      end
       model_table_names = models_by_table_name.keys
 
       to_create = model_table_names - db_tables
@@ -207,7 +251,13 @@ module HoboFields
 
     def create_table(model)
       longest_field_name = model.field_specs.values.map { |f| f.sql_type.to_s.length }.max
-      primary_key_option = ", :primary_key => :#{model.primary_key}" if model.primary_key != "id"
+      if model.primary_key != "id"
+        if model.primary_key
+          primary_key_option = ", :primary_key => :#{model.primary_key}"
+        else
+          primary_key_option = ", :id => false"
+        end
+      end
       (["create_table :#{model.table_name}#{primary_key_option} do |t|"] +
        model.field_specs.values.sort_by{|f| f.position}.map {|f| create_field(f, longest_field_name)} +
        ["end"] + (MigrationGenerator.disable_indexing ? [] : create_indexes(model))) * "\n"
@@ -226,15 +276,16 @@ module HoboFields
       new_table_name = model.table_name
 
       db_columns = model.connection.columns(current_table_name).index_by{|c|c.name}
-      key_missing = db_columns[model.primary_key].nil?
+      key_missing = db_columns[model.primary_key].nil? && model.primary_key
       db_columns -= [model.primary_key]
       
       model_column_names = model.field_specs.keys.*.to_s
       db_column_names = db_columns.keys.*.to_s
 
       to_add = model_column_names - db_column_names
-      to_add += [model.primary_key] if key_missing
-      to_remove = db_column_names - model_column_names - [model.primary_key.to_sym]
+      to_add += [model.primary_key] if key_missing && model.primary_key
+      to_remove = db_column_names - model_column_names
+      to_remove = to_remove - [model.primary_key.to_sym] if model.primary_key
 
       to_rename = extract_column_renames!(to_add, to_remove, new_table_name)
       
@@ -297,7 +348,7 @@ module HoboFields
     end
 
     def change_indexes(model, old_table_name)
-      return [[],[]] if MigrationGenerator.disable_indexing
+      return [[],[]] if MigrationGenerator.disable_indexing || model.is_a?(HabtmModelShim)
       new_table_name = model.table_name
       existing_indexes = IndexSpec.for_model(model, old_table_name)
       model_indexes = model.index_specs
