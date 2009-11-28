@@ -36,14 +36,14 @@ module Hobo
 
         def inherited(klass)
           super
-          fields do
+          fields(false) do
             Hobo.register_model(klass)
             field(klass.inheritance_column, :string)
           end
         end
       end
       
-      base.fields # force hobofields to load
+      base.fields(false) # force hobofields to load
 
       included_in_class_callbacks(base)
     end
@@ -122,7 +122,7 @@ module Hobo
       ActiveRecord::Base.class_eval do
         def self.hobo_model
           include Hobo::Model
-          fields # force hobofields to load
+          fields(false) # force hobofields to load
         end
         def self.hobo_user_model
           include Hobo::Model

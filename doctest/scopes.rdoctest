@@ -107,6 +107,7 @@ Let's set up a few models for our testing:
     >>
      class Friendship < ActiveRecord::Base
        hobo_model
+       fields
        belongs_to :person
        belongs_to :friend, :class_name => "Person"
      end
