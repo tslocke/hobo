@@ -70,6 +70,9 @@ The migration generator only takes into account classes that use HoboFields, i.e
     >> HoboFields::MigrationGenerator.run
     => ["", ""]
 
+You can also tell HoboFields to ignore additional tables.  You can place this command in your environment.rb or elsewhere:
+
+    >> HoboFields::MigrationGenerator.ignore_tables = ["green_fishes"]
 
 ### Create the table
 

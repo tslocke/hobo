@@ -2,6 +2,9 @@ module HoboFields
 
   ModelExtensions = classy_module do
 
+    # ignore the model in the migration until somebody sets
+    # @include_in_migration via the fields declaration
+    inheriting_cattr_reader :include_in_migration => false
 
     # attr_types holds the type class for any attribute reader (i.e. getter
     # method) that returns rich-types

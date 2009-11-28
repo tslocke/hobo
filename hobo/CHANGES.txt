@@ -27,7 +27,7 @@ Deletions:
     `hobo_do_signup`.
 
   - Github no longer updates its gem repository.  The canonical source
-    for Mislav's will\_paginate, which is a Hobo dependency is now
+    for Mislav's will\_paginate, a Hobo dependency, is now
     gemcutter.org.  To add gemcutter.org to your gem source list:
 
       $ gem install gemcutter
@@ -35,7 +35,17 @@ Deletions:
 
    Note that `gem tumble` is a toggle, so if you've already added
    `gemcutter` to your sources list, the above commands will have
-   removed it!  Simply run `gem tumble` again to add it back in.
+   removed it!  Simply run `gem tumble` again to add it back in.  In
+   fact, sometimes the first command does the tumble automatically, so
+   it's worth double checking.
+
+  - The fix for
+    [#556](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/556)
+    means that the migration generator now ignores all models that have
+    a `hobo_model` declaration but not a `fields` declaration.  If you
+    have any models that do not have a fields declaration (join
+    tables, for example), you may wish to add a blank fields
+    declaration.
 
 Major enhancements:
 
