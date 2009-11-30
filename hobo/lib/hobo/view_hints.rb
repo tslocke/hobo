@@ -26,9 +26,7 @@ module Hobo
         end
       end
     end
-  
-    setter :model_name,  proc { Hobo::Translations.ht("#{name.sub(/Hints$/, '').tableize}.model_name", :default => name.sub(/Hints$/, "").titleize) }
-    
+
     setter :field_names, {}
     
     setter :field_help,  {}
@@ -54,14 +52,27 @@ module Hobo
     # Accessors
 
     class << self
+
+      def _name
+        @_name ||= name.sub(/Hints$/, '')
+      end
+      
+      def model_name(new_name=nil)
+        if new_name.nil?
+          @model_name ||= Hobo::Translations.ht("#{_name.tableize}.model_name", :default => _name.titleize)
+        else
+          @model_name = Hobo::Translations.ht("#{_name.tableize}.model_name", :default => new_name)
+        end
+      end
+          
       
       def model
-        @model ||= name.sub(/Hints$/, "").constantize
+        @model ||= _name.constantize
       end
         
 
       def field_name(field)
-        field_names.fetch(field.to_sym, field.to_s.titleize)
+        Hobo::Translations.ht("#{_name.tableize}.#{field}", :default => field_names.fetch(field.to_sym, field.to_s.titleize))
       end
     
       def primary_children
