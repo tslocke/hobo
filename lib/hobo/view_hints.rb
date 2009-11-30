@@ -27,7 +27,7 @@ module Hobo
       end
     end
   
-    setter :model_name,  proc { Hobo::Translations.ht("#{name.sub(/Hints$/, '').tableize}.model", :default => name.sub(/Hints$/, "").titleize) }
+    setter :model_name,  proc { Hobo::Translations.ht("#{name.sub(/Hints$/, '').tableize}.model_name", :default => name.sub(/Hints$/, "").titleize) }
     
     setter :field_names, {}
     
