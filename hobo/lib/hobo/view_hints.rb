@@ -27,7 +27,7 @@ module Hobo
       end
     end
   
-    setter :model_name,  proc { name.sub(/Hints$/, "") }
+    setter :model_name,  proc { name.sub(/Hints$/, "").titleize }
     
     setter :field_names, {}
     
