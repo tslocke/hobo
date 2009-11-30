@@ -104,6 +104,10 @@ Minor enhancements:
   - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/536)
     documentation for field-list more closely matches reality
 
+  - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/543)
+    i18n has been silenced.  It's messages can be made to reappear on
+    the log via HOBO_VERBOSE_TRANSLATIONS.
+
 Minor bug fixes:
 
 === Hobo 0.9.0 ===

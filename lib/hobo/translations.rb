@@ -70,7 +70,8 @@ module Hobo
     
       key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
     
-      Rails.logger.info "..translate(#{key}, #{options.inspect}) to #{I18n.locale}"
+      Rails.logger.info "..translate(#{key}, #{options.inspect}) to #{I18n.locale}" if defined?(HOBO_VERBOSE_TRANSLATIONS)
+      
       I18n.translate(key.to_sym, options)+(key_prefix ? key_prefix:"")
     end
 
