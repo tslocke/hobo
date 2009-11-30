@@ -76,7 +76,7 @@ module HoboFields
     # ActiveRecord::Base, excluding anything in the CGI module
     def table_model_classes
       load_rails_models
-      ActiveRecord::Base.send(:subclasses).where.descends_from_active_record?.reject {|c| c.name.starts_with?("CGI::") }
+      ActiveRecord::Base.send(:subclasses).reject {|c| (c.base_class != c) || c.name.starts_with?("CGI::") }
     end
 
 

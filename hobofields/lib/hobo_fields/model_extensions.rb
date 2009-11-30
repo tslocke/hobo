@@ -25,12 +25,13 @@ module HoboFields
       fields do |f|
         f.field(inheritance_column, :string)
       end
-      index(inheritance_column) unless index_specs.*.fields.include?([inheritance_column])
+      index(inheritance_column)
       super
     end
 
     def self.index(fields, options = {})
-      index_specs << HoboFields::IndexSpec.new(self, fields, options)
+      # don't double-index fields
+      index_specs << HoboFields::IndexSpec.new(self, fields, options) unless index_specs.*.fields.include?(Array.wrap(fields).*.to_s)
     end
 
 
