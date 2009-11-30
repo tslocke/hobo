@@ -485,15 +485,13 @@ module Hobo
     # --- ViewHint Helpers --- #
     
     def this_field_name
-      key = "#{this_parent.class.try.name.underscore}.#{this_field.to_s}"
-      default = this_parent.class.try.view_hints.try.field_name(this_field) || this_field
-      I18n.t(key, :default => default, :scope => [:activerecord, :attributes], :count => 1)
+      this_parent.class.try.view_hints.try.field_name(this_field)
     end
 
     def this_field_help
-      key = "#{this_parent.class.try.name.pluralize.underscore}.hints.#{this_field.to_s}"
+      key = "#{this_parent.class.try.name.tableize}.hints.#{this_field.to_s}"
       default = this_parent.class.try.view_hints.try.field_help[this_field.to_sym] || ""
-      I18n.t(key,:default=>default)
+      Hobo::Translations.ht(key, :default=>default)
     end
 
 
