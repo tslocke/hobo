@@ -485,7 +485,7 @@ module Hobo
     # --- ViewHint Helpers --- #
     
     def this_field_name
-      this_parent.class.try.view_hints.try.field_name(this_field)
+      this_parent.class.try.view_hints.try.field_name(this_field) || this_field
     end
 
     def this_field_help
