@@ -41,7 +41,6 @@ Finally we can require hobofields:
         >> require 'hobosupport'
         >> require 'hobofields'
 
-
 ## `to_html` method
 
 The rich types provide a `to_html` method. If you are using the full Hobo stack you don't need to be aware of this unless you're defining your own rich types -- the `<view>` tag uses `to_html` to render a rich type. If you are not using DRYML and Rapid, you can simply call `to_html` in your views, e.g.
@@ -163,7 +162,7 @@ Provides validation of correct email address format.
 
 `HoboFields::EnumString` is not a rich type that you use directly. It's a "type generator", rather like Ruby's `Struct`. It's used for the common situation in database driven apps that you want an enumerated type, but it's not worth going to the extra bother of a separate table enumerating the values. For example you could create a type to represent the status of an article:
 
-        >> ArticleStatus = HoboFields::EnumString.for(:draft, :approved, :published)
+        >> ArticleStatus = HoboFields::EnumString.for('', :draft, :approved, :published)
         => ArticleStatus
 
 Note that, like all dynamically created classes in Ruby, the class is anonymous until assigned to a constant:
@@ -208,6 +207,13 @@ Note that every enum you create is a subclass of HoboFields::EnumString:
         >> a.is_a?(HoboFields::EnumString)
         => true
 
+EnumString's have a `validate` function defined to fit in with the
+ActiveRecord validation framework.
+
+       >> a.validate
+       => nil
+       >> ArticleStatus.new("junked").validate
+       => "must be one of '', draft, approved, published"
 
 ### Using EnumString in your models
 
@@ -233,6 +239,40 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
          end
         >> Article.attr_type :status
         => Article::Status
+
+### Translating EnumString's
+
+Named EnumString's may be translated.   Here is an example fr.yml:
+
+    fr:
+      article/statuses:
+        draft: "esquisse"
+        approved: "approuvé"
+        published: "publiés"
+
+Alternatively, the translations may be supplied in ruby:
+
+    >> Article::Status.translated_values = { "draft"=>"esquisse", "approved"=>"approuvé", "published"=>"publiés" }
+
+EnumString's can be created with the translated values.  Internally,
+they always store the native version.
+
+    >> a=Article::Status.new("esquisse")
+    => "draft"
+    >> a.is_draft?
+    => true
+
+The translated value is available via `to_html`:
+
+    >> Article::Status::PUBLISHED.to_html
+    => "publiés"
+
+Translations only work with named EnumString's.  The recommended way of naming the EnumString is to assign it to a constant, but if you do not wish to do this, you can supply the name in an option:
+
+    >> HoboFields::EnumString.for('one', 'two', 'three', :name => "Count").inspect
+    => "Count"
+
+`tableize` will be called on your name to provide the translation key.
 
 ## Cleanup
 {.hidden}

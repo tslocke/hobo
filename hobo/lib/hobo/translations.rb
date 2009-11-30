@@ -43,7 +43,7 @@ module Hobo
         options[:default] = (defaults.class == Proc) ? [defaults.call(options)] : (options[:default].blank? ? [] : [options[:default]])
       else
         # Not called as a tag. Prepare options[:default].
-        if options[:default].blank?
+        if options[:default].nil?
           options[:default]=[]
         elsif options[:default].class != Array
           options[:default] = [options[:default]]
