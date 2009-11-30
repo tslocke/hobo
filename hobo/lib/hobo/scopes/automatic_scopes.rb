@@ -347,7 +347,15 @@ module Hobo
 
 
       def def_scope(options={}, &block)
-        @klass.named_scope(name.to_sym, block || options)
+        _name = name.to_sym
+        @klass.named_scope(_name, block || options)
+        # this is tricky; ordinarily, we'd worry about subclasses that haven't yet been loaded.
+        # HOWEVER, they will pick up the scope setting via read_inheritable_attribute when they do
+        # load, so only the currently existing subclasses need to be fixed up.
+        _scope = @klass.scopes[_name]
+        @klass.send(:subclasses).each do |k|
+          k.scopes[_name] = _scope
+        end
       end
 
 
