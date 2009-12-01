@@ -53,7 +53,15 @@ Deletions:
 
 Major enhancements:
 
-  - Hobo now supports Ruby 1.9.1.
+  - Hobo now supports Ruby 1.9.1.  Problems have been encountered with
+    Ruby 1.9.1 and Rails 2.3.4.  Rails 2.3.3 and 2.3.5 work fine.
+
+  - Hobo has been tested against the new Rails 2.3.5.  JRuby users may
+    encounter this bug:
+    https://rails.lighthouseapp.com/projects/8994/tickets/3497.
+
+  - Rails 2.2 is still supported for this release.   Support for 2.2
+    may be dropped post-1.0.
 
   - Translations (ie, the ht functions) has now been moved into its
     own module.  To access the translation functions from elsewhere
