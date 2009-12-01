@@ -473,6 +473,8 @@ Cleanup:
         >> Advert.index_specs.delete_if {|spec| spec.fields==["title", "category_id"]}
 {.hidden}
 
+Finally, you can specify that the migration generator should completely ignore an index by passing its name to ignore_index in the model. This is helpful for preserving indices that can't be automatically generated, such as prefix indices in MySQL.
+
 ### Rename a table
 
 The migration generator respects the `set_table_name` declaration, although as before, we need to explicitly tell the generator that we want a rename rather than a create and a drop.
