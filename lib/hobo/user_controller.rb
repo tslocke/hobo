@@ -54,7 +54,13 @@ module Hobo
     private
 
     def hobo_login(options={})
-      (redirect_to home_page; return) if logged_in?
+      if logged_in?
+        respond_to do |wants|
+          wants.html { redirect_to home_page }
+          wants.js { hobo_ajax_response }
+        end
+        return
+      end
 
       login_attr = model.login_attribute.to_s.titleize.downcase
       options.reverse_merge!(:success_notice => ht(:"users.messages.login.success", :default=>["You have logged in."]),
@@ -73,14 +79,24 @@ module Hobo
           if !user.account_active?
             # account not activate - cancel this login
             self.current_user = old_user
-            render :action => :account_disabled unless performed?
+            unless performed?
+              respond_to do |wants|
+                wants.html {render :action => :account_disabled}
+                wants.js {hobo_ajax_response}
+              end
+            end
           else
             if params[:remember_me].present?
               current_user.remember_me
               create_auth_cookie
             end
             flash[:notice] ||= options[:success_notice]
-            redirect_back_or_default(options[:redirect_to] || home_page) unless performed?
+            unless performed?
+              respond_to do |wants|
+                wants.html {redirect_back_or_default(options[:redirect_to] || home_page) }
+                wants.js {hobo_ajax_response}
+              end
+            end
           end
         end
       end
@@ -101,7 +117,10 @@ module Hobo
         end
         response_block(&b) or if valid?
                                 self.current_user = this if this.account_active?
-                                redirect_back_or_default(home_page)
+                                respond_to do |wants|
+                                  wants.html { redirect_back_or_default(home_page) }
+                                  wants.js { hobo_ajax_response }
+                                end
                               end
       end
     end
@@ -124,7 +143,10 @@ module Hobo
         if user && (!block_given? || yield(user))
           user.lifecycle.request_password_reset!(:nobody)
         end
-        render_tag :forgot_password_email_sent_page
+        respond_to do |wants|
+          wants.html { render_tag :forgot_password_email_sent_page }
+          wants.js { hobo_ajax_response}
+        end
       end
     end
 
@@ -134,7 +156,10 @@ module Hobo
         response_block(&b) or if valid?
                                 self.current_user = this
                                 flash[:notice] = ht(:"users.messages.reset_password", :default=>["Your password has been reset"])
-                                redirect_to home_page
+                                respond_to do |wants|
+                                  wants.html { redirect_to(home_page) }
+                                  wants.js { hobo_ajax_response }
+                                end
                               end
       end
     end
