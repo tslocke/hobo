@@ -20,7 +20,7 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 
     html_attributes[:method] ||= has_params ? :get : :put
     add_classes!(html_attributes, "transition-button #{transition_name}-button")
-    label ||= transition_name.to_s.titleize
+    label = ht("#{this.class.name.tableize}.actions.#{transition_name}", :default => (label || transition_name.to_s.titleize))
     url = object_url(this, transition_name, :method => html_attributes[:method])
 
     if (update || !ajax_attributes.empty?) && !has_params
