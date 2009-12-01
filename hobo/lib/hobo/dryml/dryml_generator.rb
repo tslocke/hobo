@@ -159,11 +159,10 @@ module Hobo
       
       
       def model_name(*options)
-        name = model.view_hints.model_name
-        name = name.pluralize                                 if :plural.in?(options)
-        name = name.titleize                                  if :title.in?(options)
+        name = :plural.in?(options) ? model.view_hints.model_name_plural : model.view_hints.model_name
         name = name.titleize.downcase                         if :lowercase.in?(options)
         name = name.underscore.gsub('_', '-').gsub('/', '--') if :dashed.in?(options)
+        name = name.camelize                                  if :camel.in?(options)
         name
       end
       

@@ -78,8 +78,15 @@ module Hobo
           @model_name = Hobo::Translations.ht("#{_name.tableize}.model_name", :default => new_name)
         end
       end
+                
+      def model_name_plural(new_name=nil)
+        if new_name.nil?
+          @model_name_plural ||= Hobo::Translations.ht("#{_name.tableize}.model_name_plural", :default => model_name.pluralize)
+        else
+          @model_name_plural = Hobo::Translations.ht("#{_name.tableize}.model_name_plural", :default => new_name)
+        end
+      end
           
-      
       def model
         @model ||= _name.constantize
       end
