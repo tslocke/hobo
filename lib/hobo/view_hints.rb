@@ -34,14 +34,20 @@ module Hobo
     setter :children,    [] do |*args|
       # Setting children also gives a default parent using the reverse association
       child_model = model.reflections[args.first].klass
-      unless child_model.view_hints.parent
+      if child_model.view_hints.parent.nil? and !child_model.view_hints.parent_defined
         parent = model.reverse_reflection(args.first)
-        child_model.view_hints.parent(parent.name) 
+        child_model.view_hints.parent(parent.name, :undefined => true) 
       end
       args
     end
     
-    setter :parent,       nil
+    setter :parent,         nil do |*args|
+      options = args.extract_options!
+      parent_defined(true) unless options[:undefined]
+      args.first
+    end
+
+    setter :parent_defined, nil
     
     setter :paginate?,    proc { !sortable? }
     
