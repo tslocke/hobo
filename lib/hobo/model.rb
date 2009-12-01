@@ -169,25 +169,6 @@ module Hobo
       end
 
 
-      def dependent_collections
-        reflections.values.select do |refl|
-          refl.macro == :has_many && refl.options[:dependent]
-        end.*.name
-      end
-
-
-      def dependent_on
-        reflections.values.select do |refl|
-          refl.macro == :belongs_to && (rev = reverse_reflection(refl.name) and rev.options[:dependent])
-        end.*.name
-      end
-
-
-      def default_dependent_on
-        dependent_on.first
-      end
-
-
       private
 
 
@@ -409,11 +390,6 @@ module Hobo
       else
         id.to_s
       end
-    end
-
-
-    def dependent_on
-      self.class.dependent_on.map { |assoc| send(assoc) }
     end
 
 

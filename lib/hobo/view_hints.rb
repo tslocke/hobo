@@ -32,8 +32,16 @@ module Hobo
     setter :field_help,  {}
     
     setter :children,    [] do |*args|
+      # Setting children also gives a default parent using the reverse association
+      child_model = model.reflections[args.first].klass
+      unless child_model.view_hints.parent
+        parent = model.reverse_reflection(args.first)
+        child_model.view_hints.parent(parent.name) 
+      end
       args
     end
+    
+    setter :parent,       nil
     
     setter :paginate?,    proc { !sortable? }
     

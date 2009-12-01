@@ -75,6 +75,9 @@ module Hobo
       
       
       def run
+        # Ensure all view hints loaded before running
+        Hobo::Model.all_models.*.view_hints
+        
         [nil, *Hobo.subsites].each { |s| run_for_subsite(s) }
       end
       
