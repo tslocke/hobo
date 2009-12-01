@@ -44,8 +44,7 @@ Major enhancements:
     Ruby 1.9.1 and Rails 2.3.4.  Rails 2.3.3 and 2.3.5 work fine.
 
   - Hobo has been tested against the new Rails 2.3.5.  JRuby users may
-    encounter this bug:
-    https://rails.lighthouseapp.com/projects/8994/tickets/3497.
+    encounter [Rails bug 3497](https://rails.lighthouseapp.com/projects/8994/tickets/3497)
 
   - Rails 2.2 is still supported for this release.   Support for 2.2
     may be dropped post-1.0.
@@ -69,8 +68,7 @@ Major enhancements:
     was previously performed.  HtmlString will sanitize before saving
     to the database.  You need to update your hobo-rapid.js for this
     fix.  Run `rake hobo:run_standard_generators` or copy the file
-    directly from
-    http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js
+    directly from [github](http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js)
 
   - [#296](https://hobo.lighthouseapp.com/projects/8324/tickets/296)
     The migration generator now fully understands HABTM join tables. Note that
@@ -78,7 +76,7 @@ Major enhancements:
     is NOT supported.
 
   - [#475](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/475)
-    User-defined rich types are now loaded from RAILS_ROOT/app/rich_types, if it exists.
+    User-defined rich types are now loaded from `RAILS_ROOT/app/rich_types`, if it exists.
 
   - EnumString's can now be translated.  The
     [manual](http://cookbook.hobocentral.net/manual/hobofields/rich_types)
@@ -102,8 +100,7 @@ Major bug fixes:
     ie7-recalc.js has been updated to improve compatibility with IE6.
     Please update the copy inside of your application, either by
     running `rake hobo:run_standard_generators` or by copying the file
-    directly from
-    http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/ie7-recalc.js
+    directly from [github](http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/ie7-recalc.js)
 
   - [#512](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/512)
     Hobo now has better compatibility with non-DRYML templates
@@ -119,7 +116,7 @@ Minor enhancements:
 
   - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/543)
     i18n has been silenced.  It's messages can be made to reappear on
-    the log via HOBO_VERBOSE_TRANSLATIONS.
+    the log via `HOBO_VERBOSE_TRANSLATIONS`.
 
   - [#555](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/555)
     Specifying ignore_index :foo will ignore the index named 'foo' on the model
@@ -127,7 +124,7 @@ Minor enhancements:
     automatically (with a prefix length on MySQL, for instance) or existing
     indexes in legacy tables.
 
-Minor bug fixes:
+See also the [git log](http://github.com/tablatom/hobo/commits/v0.9.100)
 
 === Hobo 0.9.0 ===
 
