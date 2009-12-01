@@ -20,6 +20,7 @@ module HoboFields
 
     # index_specs holds IndexSpec objects for all the declared indexes.
     inheriting_cattr_reader :index_specs => []
+    inheriting_cattr_reader :ignore_indexes => []
 
     def self.inherited(klass)
       fields do |f|
@@ -34,6 +35,11 @@ module HoboFields
       index_specs << HoboFields::IndexSpec.new(self, fields, options) unless index_specs.*.fields.include?(Array.wrap(fields).*.to_s)
     end
 
+    # tell the migration generator to ignore the named index. Useful for existing indexes, or for indexes
+    # that can't be automatically generated (for example: an prefix index in MySQL)
+    def self.ignore_index(index_name)
+      ignore_indexes << index_name.to_s
+    end
 
     private
 
