@@ -87,7 +87,11 @@ Major enhancements:
     has been updated with the details.
 
   - ViewHint's can now be translated.  Well, they mostly could in 0.9,
-    but it has been cleaned up and [documented with ViewHints](http://cookbook.hobocentral.net/manual/viewhints).
+    but it has been cleaned up and [documented with
+    ViewHints](http://cookbook.hobocentral.net/manual/viewhints).
+
+  - Lifecycle states can now be translated. The key is
+    `#{table_name}.states.#{state}`  Transitions use the key `#{table_name}.actions.#{transition}`
 
 Major bug fixes:
 

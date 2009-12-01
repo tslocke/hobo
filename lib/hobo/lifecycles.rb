@@ -30,13 +30,17 @@ module Hobo
           module_eval "class ::#{name}::Lifecycle < Hobo::Lifecycles::Lifecycle; end"
           lifecycle = self::Lifecycle
           lifecycle.init(self, options)
+
+          module_eval "class ::#{name}::LifecycleStateField < HoboFields::LifecycleState; end"
+          state_field_class = self::LifecycleStateField
+          state_field_class.table_name = name.tableize
         end
 
         dsl = Hobo::Lifecycles::DeclarationDSL.new(lifecycle)
         dsl.instance_eval(&block)
 
         default = lifecycle.default_state ? { :default => lifecycle.default_state.name.to_s } : {}
-        declare_field(options[:state_field], :string, default)
+        declare_field(options[:state_field], state_field_class, default)
         unless options[:index] == false
           index_options = { :name => options[:index] } unless options[:index] == true
           index(options[:state_field], index_options || {})
