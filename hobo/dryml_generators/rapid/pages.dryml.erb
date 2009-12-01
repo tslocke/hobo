@@ -100,7 +100,7 @@ model_key = model_name.pluralize.underscore
 
 
 <%
-back_link      = model.dependent_on.detect { |x| !(model.reflections[x].klass < Hobo::User) }
+back_link      = model.view_hints.parent
 boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans
 creator        = model.creator_attribute
 creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
