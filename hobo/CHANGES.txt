@@ -82,6 +82,9 @@ Major enhancements:
     the "decorated join table" functionality that was deprecated in Rails 2.3
     is NOT supported.
 
+  - [#475](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/475)
+    User-defined rich types are now loaded from RAILS_ROOT/app/rich_types, if it exists.
+
   - EnumString's can now be translated.  The
     [manual](http://cookbook.hobocentral.net/manual/hobofields/rich_types)
     has been updated with the details.

@@ -100,6 +100,15 @@ module HoboFields
     # Add the fields do declaration to ActiveRecord::Base
     ActiveRecord::Base.send(:include, HoboFields::FieldsDeclaration)
 
+    # automatically load other rich types from app/rich_types/*.rb
+    # don't assume we're in a Rails app
+    if defined?(::Rails)
+      Dir[File.join(::Rails.root, 'app', 'rich_types', '*.rb')].each do |f|
+        # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
+        require f
+      end
+    end
+
     # Monkey patch ActiveRecord so that the attribute read & write methods
     # automatically wrap richly-typed fields.
     ActiveRecord::AttributeMethods::ClassMethods.class_eval do
