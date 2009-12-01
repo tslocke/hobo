@@ -174,8 +174,8 @@ module HoboFields
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities in table #{table_name}"
       end
     end
-    
-    
+
+
     def always_ignore_tables
       # TODO: figure out how to do this in a sane way and be compatible with 2.2 and 2.3 - class has moved
       sessions_table = CGI::Session::ActiveRecordStore::Session.table_name if
@@ -233,18 +233,22 @@ module HoboFields
 
       changes = []
       undo_changes = []
+      index_changes = []
+      undo_index_changes = []
       to_change.each do |t|
         model = models_by_table_name[t]
         table = to_rename.key(t) || model.table_name
         if table.in?(db_tables)
-          change, undo = change_table(model, table)
+          change, undo, index_change, undo_index = change_table(model, table)
           changes << change
           undo_changes << undo
+          index_changes << index_change
+          undo_index_changes << undo_index
         end
       end
 
-      up   = [renames, drops, creates, changes].flatten.reject(&:blank?) * "\n\n"
-      down = [undo_changes, undo_renames, undo_drops, undo_creates].flatten.reject(&:blank?) * "\n\n"
+      up   = [renames, drops, creates, changes, index_changes].flatten.reject(&:blank?) * "\n\n"
+      down = [undo_changes, undo_renames, undo_drops, undo_creates, undo_index_changes].flatten.reject(&:blank?) * "\n\n"
 
       [up, down]
     end
@@ -343,8 +347,10 @@ module HoboFields
 
       index_changes, undo_index_changes = change_indexes(model, current_table_name)
 
-      [(renames + adds + removes + changes + index_changes) * "\n",
-       (undo_renames + undo_adds + undo_removes + undo_changes + undo_index_changes) * "\n"]
+      [(renames + adds + removes + changes) * "\n",
+       (undo_renames + undo_adds + undo_removes + undo_changes) * "\n",
+       index_changes * "\n",
+       undo_index_changes * "\n"]
     end
 
     def change_indexes(model, old_table_name)
