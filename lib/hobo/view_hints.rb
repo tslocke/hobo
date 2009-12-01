@@ -31,7 +31,7 @@ module Hobo
     
     setter :field_help,  {}
     
-    setter :children,    proc { model.dependent_collections.sort_by(&:to_s) } do |*args|
+    setter :children,    [] do |*args|
       args
     end
     

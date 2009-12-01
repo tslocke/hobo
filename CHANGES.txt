@@ -18,6 +18,10 @@ subversion.
 
 Deletions:
 
+  - Children must now be specified in the viewhints.   Hobo no longer
+    uses the presence of :dependent => :destroy to determine the
+    primary child association.
+
   - The bundles feature of Hobo which never really worked and was
     never documented has been removed from this release.
 
@@ -77,6 +81,13 @@ Major enhancements:
     The migration generator now fully understands HABTM join tables. Note that
     the "decorated join table" functionality that was deprecated in Rails 2.3
     is NOT supported.
+
+  - EnumString's can now be translated.  The
+    [manual](http://cookbook.hobocentral.net/manual/hobofields/rich_types)
+    has been updated with the details.
+
+  - ViewHint's can now be translated.  Well, they mostly could in 0.9,
+    but it has been cleaned up and [documented with ViewHints](http://cookbook.hobocentral.net/manual/viewhints).
 
 Major bug fixes:
 
