@@ -19,7 +19,7 @@
   -->
 <def tag="empty-collection-message">
   <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
-    <ht key="#{type_name.downcase.sub(' ', '_').pluralize}.collection.empty_message">
+    <ht key="#{this.member_class.name.tableize}.collection.empty_message">
       No <collection-name lowercase/> to display
     </ht>
   </div>
