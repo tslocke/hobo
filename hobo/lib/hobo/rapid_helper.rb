@@ -125,15 +125,6 @@ module Hobo::RapidHelper
   end
 
 
-  def primary_collection_name(object=this)
-    dependent_collection_names = object.class.reflections.values.select do |refl|
-      refl.macro == :has_many && refl.options[:dependent]
-    end.*.name
-
-    (dependent_collection_names - through_collection_names(object)).first
-  end
-
-
   def non_through_collections(object=this)
     names = object.class.reflections.values.select do |refl|
       refl.macro == :has_many
