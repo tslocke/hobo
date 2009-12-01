@@ -16,8 +16,8 @@ module HoboFields
     def self.for_model(model, old_table_name=nil)
       t = old_table_name || model.table_name
       model.connection.indexes(t).map do |i|
-        self.new(model, i.columns, :name => i.name, :unique => i.unique, :table_name => old_table_name)
-      end
+        self.new(model, i.columns, :name => i.name, :unique => i.unique, :table_name => old_table_name) unless model.ignore_indexes.include?(i.name)
+      end.compact
     end
 
     def default_name?
