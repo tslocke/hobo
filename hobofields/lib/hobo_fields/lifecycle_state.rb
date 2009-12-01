@@ -2,7 +2,6 @@ module HoboFields
   class LifecycleState < String
     
     COLUMN_TYPE = :string
-    HoboFields.register_type(:lifecycle_state, self)
 
     class << self
       attr_accessor :table_name
