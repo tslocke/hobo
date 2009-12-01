@@ -269,10 +269,12 @@ foreign-key field.  It also generates an index on the field.
         >> up
         => 
          "add_column :adverts, :category_id, :integer
+
          add_index :adverts, [:category_id]"
         >> down
         => 
          "remove_column :adverts, :category_id
+
          remove_index :adverts, :name => :index_adverts_on_category_id"
 
 Cleanup:
@@ -292,6 +294,7 @@ If you specify a custom foreign key, the migration generator observes that:
         >> up
         => 
          "add_column :adverts, :c_id, :integer
+
          add_index :adverts, [:c_id]"
 
 Cleanup:
@@ -328,6 +331,7 @@ You can specify the index name with :index
         >> up
         => 
          "add_column :adverts, :category_id, :integer
+
          add_index :adverts, [:category_id], :name => 'my_index'"
 
 Cleanup:
@@ -376,7 +380,7 @@ You can add an index to a field definition
            end
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => 'add_index :adverts, [:title]'
 
 Cleanup:
@@ -394,7 +398,7 @@ You can ask for a unique index
            end
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => 'add_index :adverts, [:title], :unique => true'
 
 Cleanup:
@@ -412,7 +416,7 @@ You can specify the name for the index
            end
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => "add_index :adverts, [:title], :name => 'my_index'"
 
 Cleanup:
@@ -428,7 +432,7 @@ You can ask for an index outside of the fields block
            index :title
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => "add_index :adverts, [:title]"
 
 Cleanup:
@@ -444,7 +448,7 @@ The available options for the index function are `:unique` and `:name`
            index :title, :unique => true, :name => 'my_index'
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => "add_index :adverts, [:title], :unique => true, :name => 'my_index'"
 
 Cleanup:
@@ -460,7 +464,7 @@ You can create an index on more than one field
            index [:title, :category_id]
          end
         >> up, down = HoboFields::MigrationGenerator.run
-        >> up.split("\n")[1]
+        >> up.split("\n")[2]
         => "add_index :adverts, [:title, :category_id]"
 
 Cleanup:
@@ -559,10 +563,12 @@ Adding a subclass or two should introduce the 'type' column and no other changes
         >> up
         =>
          "add_column :adverts, :type, :string
+
          add_index :adverts, [:type]"
         >> down
         => 
          "remove_column :adverts, :type
+
          remove_index :adverts, :name => :index_adverts_on_type"
 
 Cleanup
