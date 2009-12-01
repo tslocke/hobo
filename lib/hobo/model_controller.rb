@@ -393,7 +393,7 @@ module Hobo
     end
 
     def owning_object
-      method = @this.class.dependent_on.detect {|m| !@this.send(m).nil?}
+      method = @this.class.view_hints.parent
       method ? @this.send(method) : nil
     end
     
