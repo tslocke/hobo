@@ -4,7 +4,7 @@
   <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
 <% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
-    <nav-item with="&<%= m.name %>"><ht key="#{model.name.tableize}.nav_item"><%= m.view_hints.model_name_plural %></ht></nav-item>
+    <nav-item with="&<%= m.name %>"><ht key="#{m.name.tableize}.nav_item"><%= m.view_hints.model_name_plural %></ht></nav-item>
 <% end -%>
   </navigation>
 </def>
