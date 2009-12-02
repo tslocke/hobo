@@ -111,8 +111,6 @@ form .actions input { margin: 0; }
 	color: white;
 }
 
-.article {margin: 20px 0; border-top: 1px dotted #ccc;}
-
 .field-list th {width: 120px; white-space: nowrap;}
 .field-list td {width: auto;}
 .field-list .input-help { color: #888;}
