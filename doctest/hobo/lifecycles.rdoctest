@@ -16,7 +16,7 @@ Hobo lifecycles is a mechanism for declaring the life-cycle of a model in a natu
 First the junk to get us started:
 
     doctest_require: 'rubygems'
-    doctest_require: 'activerecord'
+    doctest_require: 'active_record'
     >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
     >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
     >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobofields/lib'
