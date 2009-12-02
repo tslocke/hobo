@@ -6,9 +6,9 @@ Our test requires rails:
 {.hidden}
 
         >> require 'rubygems'
-        >> require 'activesupport'
-        >> require 'activerecord'
-        >> require 'actionpack'
+        >> require 'active_support'
+        >> require 'active_record'
+        >> require 'action_pack'
         >> require 'action_view'
         >> require 'action_controller'
 {.hidden}

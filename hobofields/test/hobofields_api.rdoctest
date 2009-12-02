@@ -8,8 +8,8 @@ Our test requires rails:
 {.hidden}
 
     >> require 'rubygems'
-    >> require 'activesupport'
-    >> require 'activerecord'
+    >> require 'active_support'
+    >> require 'active_record'
     >> require 'action_controller'
 {.hidden}
 

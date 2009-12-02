@@ -2,7 +2,7 @@
 
 require 'fileutils'
 require 'pathname'
-require 'activesupport'
+require 'active_support'
 require 'rbconfig'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')

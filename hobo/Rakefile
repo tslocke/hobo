@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
-require 'activerecord'
+require 'active_record'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/lib')
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')

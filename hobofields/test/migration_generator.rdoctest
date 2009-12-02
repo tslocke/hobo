@@ -7,8 +7,8 @@ Firstly, in order to test the migration generator outside of a full Rails stack,
 {.hidden}
 
     >> require 'rubygems'
-    >> require 'activesupport'
-    >> require 'activerecord'
+    >> require 'active_support'
+    >> require 'active_record'
 {.hidden}
 
 We also need to get ActiveRecord set up with a database connection

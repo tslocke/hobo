@@ -7,8 +7,8 @@ Note that these doctests are good tests but not such good docs. The migration ge
 Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
 
     >> require 'rubygems'
-    >> require 'activesupport'
-    >> require 'activerecord'
+    >> require 'active_support'
+    >> require 'active_record'
 
 We also need to get ActiveRecord set up with a database connection
 
