@@ -5,7 +5,7 @@ $:.unshift "#{HOBO_HOME}/hobo/lib"
 
 require 'rubygems'
 require 'sqlite3'
-require 'activerecord'
+require 'active_record'
 
 module Models
   
