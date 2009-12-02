@@ -1,4 +1,4 @@
-require 'activesupport'
+require 'active_support'
 
 require 'hobo_support'
 require "hobo_support/fixes"
