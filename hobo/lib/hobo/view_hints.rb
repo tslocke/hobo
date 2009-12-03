@@ -36,7 +36,7 @@ module Hobo
       child_model = model.reflections[args.first].klass
       if child_model.view_hints.parent.nil? and !child_model.view_hints.parent_defined
         parent = model.reverse_reflection(args.first)
-        child_model.view_hints.parent(parent.name, :undefined => true) 
+        child_model.view_hints.parent(parent.name, :undefined => true) if parent
       end
       args
     end
