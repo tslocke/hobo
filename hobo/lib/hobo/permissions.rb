@@ -100,12 +100,12 @@ module Hobo
         has_one_without_hobo_permission_check(association_id, options, &extension)
         reflection = reflections[association_id]
         if reflection.options[:dependent]==:destroy
-          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_many
+          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_one
           method_name =  "has_one_dependent_destroy_for_#{reflection.name}".to_sym
           define_method(method_name) do            
             association = send(reflection.name)
             unless association.nil?
-              association.is_a?(Hobo::Model) ? association.user_destroy(active_user) : association.destroy
+              association.is_a?(Hobo::Model) ? association.user_destroy(acting_user) : association.destroy
             end
           end
         end        
@@ -115,12 +115,12 @@ module Hobo
         belongs_to_without_hobo_permission_check(association_id, options, &extension)
         reflection = reflections[association_id]
         if reflection.options[:dependent]==:destroy
-          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_has_many
+          #overriding dynamic method created in ActiveRecord::Associations#configure_dependency_for_belongs_to
           method_name =  "belongs_to_dependent_destroy_for_#{reflection.name}".to_sym
           define_method(method_name) do            
             association = send(reflection.name)
             unless association.nil?
-              association.is_a?(Hobo::Model) ? association.user_destroy(active_user) : association.destroy
+              association.is_a?(Hobo::Model) ? association.user_destroy(acting_user) : association.destroy
             end
           end
         end        
