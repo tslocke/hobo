@@ -45,7 +45,6 @@ module Hobo
           index_options = { :name => options[:index] } unless options[:index] == true
           index(options[:state_field], index_options || {})
         end
-        never_show      options[:state_field]
         attr_protected  options[:state_field]
 
         unless options[:key_timestamp_field] == false
