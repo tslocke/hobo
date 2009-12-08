@@ -19,6 +19,14 @@
    - skip: render nothing at all. This will omit the entire row (including the label)
    - ignore: render the input normally. That is, don't even perform the edit check.
 
+### Example
+
+    <field-list fields="first-name, last-name, city">
+      <first-name-label:>Given Name</first-name-label:>
+      <last-name-label:>Family Name</last-name-label:>
+      <city-view:><name-one/></city-view:>
+    </field-list>
+
 -->
 <def tag="field-list" attrs="tag, no-edit">
   <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" %>
