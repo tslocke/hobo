@@ -291,7 +291,7 @@ var Hobo = {
 
     removeButton: function(el, url, updates, options) {
         if (options.fade == null) { options.fade = true; }
-        if (options.confirm == null) { options.fade = "Are you sure?"; }
+        if (options.confirm == null) { options.confirm = "Are you sure?"; }
 
         if (options.confirm == false || confirm(options.confirm)) {
             var objEl = Hobo.objectElementFor(el)
