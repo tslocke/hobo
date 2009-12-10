@@ -52,7 +52,7 @@ module Hobo
             record.send(method, owner) if record.respond_to? method
           end
         else
-          owner.include_in_save(association_name, record)
+          owner.include_in_save(association_name, record) unless owner.class.reflections[association_name].options[:through]
         end        
       else
         # It's already a record
