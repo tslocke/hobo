@@ -16,15 +16,22 @@ subversion.
 
 === Hobo 0.9.103 (AKA 1.0.RC2) ===
 
-Warning:  if you are on Rails 2.3.5 and are running Hobo as a plugin,
+
+### Warning
+
+If you are on Rails 2.3.5 and are running Hobo as a plugin,
 please check out bug
 [#574](https://hobo.lighthouseapp.com/projects/8324/tickets/574-rails-235-b0rks-our-rake-tasks-running-on-edge-hobo)
 for a workaround you need to apply to your Rakefile.
+
+### Bugs
 
 This release fixes a couple of serious bugs:
 [565](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/565)
 and
 [567](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/567).
+
+### Input-Many & has-many :through
 
 The `<input-many>` tag in Rapid has been replaced with a version
 ported from the `<hjq-input-many>` tag in Hobo-JQuery.  This brings
