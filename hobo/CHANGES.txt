@@ -14,7 +14,39 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
-=== Hobo 0.9.101 (AKA 1.0.BROWN_PAPER_BAG) ===
+=== Hobo 0.9.103 (AKA 1.0.RC2) ===
+
+This release fixes a couple of serious bugs:
+[565](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/565)
+and
+[567](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/567).
+
+The `<input-many>` tag in Rapid has been replaced with a version
+ported from the `<hjq-input-many>` tag in Hobo-JQuery.  This brings
+the following enhancements:
+
+ - it supports 0 length associations
+ - input-many's may be nested inside of other input-many's
+ - it allows the (+) and (-) buttons to be customized
+ - it provides a default for the `item` parameter
+ - it copies from a template rather than cloning the current item and clearing it
+ - the template may be overridden
+ - id's of textareas and selects and other non-input's are adjusted properly
+ - classdata for inner elements updated
+
+The new `<input-many>` tag differs from `<hjq-input-many>` in that:
+
+ - it's written in prototype.js rather than in jquery
+ - it doesn't have the delayed initialization feature
+ - the name of the main parameter is `default` rather than `item`
+ - hjq-input-many allows you to provide javascript callbacks.
+   input-many fires rapid:add, rapid:change and rapid:remove events
+   that can be hooked.
+
+You will have to ensure that your hobo-rapid.js and clean.css files
+are updated in your application.
+
+=== Hobo 0.9.101/0.9.102 (AKA 1.0.BROWN_PAPER_BAG) ===
 
 Yes, that was embarrassing.  How the test suite failed to catch that
 one is mind blowing.
