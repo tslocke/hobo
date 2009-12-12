@@ -12,7 +12,7 @@ namespace "test" do
   end
 end
 
-# --- build gem via Jeweller --- #
+# --- build gem via Jeweler --- #
 
 require 'jeweler'
 Jeweler::Tasks.new do |gemspec|
