@@ -874,7 +874,7 @@ Use the `uri` option to specify a redirect location:
   
 This tag is very different from tags like `<select-many>` and `<check-many>` in that:
 
- - Those tags are used to *chose existing records* to include in the association, while `<input-many>` is used to actually create or edit the records in the association.
+ - Those tags are used to *choose existing records* to include in the association, while `<input-many>` is used to actually create or edit the records in the association.
  
 ### Example
 
@@ -890,35 +890,89 @@ The body of the tag will be repeated for each of the current records in the coll
 
  - skip:  Passed through to the `<field-list>`.  If not specified, it defaults to the parent association.
   
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <hjq-input-many:products fields="name, price" />
+    
+You'll often want to provide the `item` parameter:
+
+    <hjq-input-many:products><item:><field-list fields="name, price" /></item:></hjq-input-many>
+
+A fully worked up example of nested hjq-input-many's may be found in [agility/jquery-test](http://github.com/tablatom/agility/blob/jquery-test/app/views/projects/nested_has_many_test.dryml)
+
+### Attributes
+
+ - `minimum`: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
+
+ - `fields`, `skip`: passed down to the `field-list` tag in the default `item`.
+
+ - `template`: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
+
   -->
-<def tag="input-many" attrs="fields,skip" polymorphic>
+<def tag="input-many" attrs="minimum, fields, skip, template, add-hook, remove-hook" polymorphic >
+<%
+# helper function to create id's on buttons to facilitate testing
+def underize(s)
+  s.gsub(/\[/,"_").gsub(/\]/,"")
+end
+%>
   <set empty="&this.empty?"/>
+  <% template ||= this.try.new_candidate || this.member_class.new %>
+  <% minimum ||= 0 ; minimum = minimum.to_i %>
   <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection %>           
-  <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this}">
-    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+  <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} #{css_data(:minimum, minimum)} #{css_data(:add_hook, add_hook) if add_hook} #{css_data(:remove_hook, remove_hook) if remove_hook}">
+    <fake-field-context fake-field="-1" context="&template">
+      <li class="input-many-li input-many-template" id="#{param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
+        <div class="buttons">
+          <button param="remove-item" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>
+    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{param_name_for_this}[-1]_empty">
+      <!-- HACK way to signal an empty collection to the controller -->
+      <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
+      <fake-field-context fake-field="-1" context="&template">
+        <div param="empty-message">
+          <ht key="#{this.class.class_name.tableize}.collection.empty_message">          
+            No <%= this.class.class_name.titleize.downcase.pluralize %>.
+          </ht>
+        </div>
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </fake-field-context>      
+    </li>
+    <fake-field-context fake-field="0" context="&template">
+      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>       
+    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{param_name_for_this}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <div class="input-many-item" param="default">
-        <field-list merge-attrs="fields" skip="&skip"/>
+        <field-list param merge-attrs="fields" skip="&skip" />
       </div>
       <div class="buttons">
-        <button type="button" class="remove-item" merge-attrs="disabled" param="remove-item">-</button>
-        <button type="button" class="add-item" if="&last_item?" merge-attrs="disabled" param="add-item">+</button>
-      </div>
-    </li>
-    <li if="&empty">
-      <fake-field-context fake-field="0" context="&this.try.new_candidate || this.member_class.new">
-        <div class="input-many-item" param="default">
-          <field-list merge-attrs="fields" skip="&skip"/>
-        </div>
-      </fake-field-context>
-      <div class="buttons">
-        <button type="button" class="add-item" merge-attrs="disabled" param="add-item">+</button>
+        <button param="remove-item" class="#{'hidden' if this_parent.length<=minimum}" id="#{underize param_name_for_this}_remove">-</button>
+        <button param="add-item" class="#{'hidden' if not last_item?}" id="#{underize param_name_for_this}_add">+</button>
       </div>
     </li>
   </ul>
 </def>
-
 
 <!-- Renders a sub-section of a form with fields for every record in a `has_many` association. This is similar to `<input-many>` except there is no ability to add and remove items (i.e. no (+) and (-) buttons).
   -->
