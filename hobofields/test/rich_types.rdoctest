@@ -68,15 +68,22 @@ This class defines the methods `to_html` to customize the way the type is render
             "is too long (you shouldn't shout that much)" if length > 100
           end
 
+          def format
+            # make sure we have enough exclamation marks
+            self =~ /!!!$/ ? self + "!!!" : self
+          end
+
           def to_html(xmldoctype = true)
             upcase
           end
 
         end
 
-That's all there is to it. Defining `to_html` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
+That's all there is to it. Defining `to_html`, `format` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
 
 We use `DelegateClass` so that we can act like a string without actually being a string.
+
+The format function is added as a before\_validation hook.  Ensure that multiple invocations of your format function is safe -- shout.format.format should return the same as shout.format.
 
 You can use `LoudText` in your model with
 

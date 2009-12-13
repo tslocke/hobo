@@ -291,7 +291,7 @@ var Hobo = {
 
     removeButton: function(el, url, updates, options) {
         if (options.fade == null) { options.fade = true; }
-        if (options.confirm == null) { options.fade = "Are you sure?"; }
+        if (options.confirm == null) { options.confirm = "Are you sure?"; }
 
         if (options.confirm == false || confirm(options.confirm)) {
             var objEl = Hobo.objectElementFor(el)
@@ -481,6 +481,14 @@ Element.findContaining = function(el, tag) {
     return null;
 }
 
+Element.prototype.childWithClass = function(klass) {
+    var ret=null;
+    this.childElements().each(function(el2) {
+        if(ret==null && el2.hasClassName(klass)) ret=el2;
+    });
+    return ret;
+}
+
 // Add an afterEnterEditMode hook to in-place-editor
 origEnterEditMode = Ajax.InPlaceEditor.prototype.enterEditMode
 Ajax.InPlaceEditor.prototype.enterEditMode = function(evt) {
@@ -519,6 +527,9 @@ HoboBehavior = Class.create({
         this.mainSelector = mainSelector
         this.features = features
         this.addEvents(mainSelector, features.events)
+        if (features.initialize) {
+            document.observe("dom:loaded", features.initialize);
+        }
     },
     
     addEvents: function(parentSelector, events) {
@@ -557,91 +568,154 @@ new HoboBehavior("ul.input-many", {
           ".remove-item:click": 'removeOne'
       }
   },
-  
-  addOne: function(ev, el) {
-      Event.stop(ev)
-      var ul = el.up('ul'), li = el.up('li')
-      
-      var thisItem = li.down('div.input-many-item')
-      var newItem = "<li style='display:none'><div class='input-many-item'>" + 
-                    thisItem.innerHTML + 
-                    "</div>" + 
-                    "<div class='buttons' />" +
-                    "</div></li>"
-      var newItem = DOM.Builder.fromHTML(newItem)
-      ul.appendChild(newItem);
-      this.clearInputs(newItem);
-      
-      this.updateButtons()
-      this.updateInputNames()
-      
-      ul.fire("rapid:add", { element: newItem })
-      ul.fire("rapid:change", { element: newItem })
-      
-      new Effect.BlindDown(newItem, {duration: 0.3})
+
+  initialize: function(ul) {
+      // disable all elements inside our template, and mark them so we can find them later.
+      $$(".input-many-template input:enabled, .input-many-template select:enabled, .input-many-template textarea:enabled, .input-many-template button:enabled").each(function(input) {
+          input.disabled = true;
+          input.addClassName("input_many_template_input");
+      });
   },
-  
-  removeOne: function(ev, el) {
-      Event.stop(ev)
-      var self = this;
-      var ul = el.up('ul'), li = el.up('li')
-      if (li.parentNode.childElements().length == 1) {
-          // It's the last one - don't remove it, just clear it
-          this.clearInputs(li)
-      } else {      
-          new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
-              li.remove() 
-              self.updateButtons()
-              self.updateInputNames()
-          } });
+
+    // given this==the input-many, returns a lambda that updates the name & id for an element
+  getNameUpdater: function(new_index) {
+      var name_prefix = Hobo.getClassData(this, 'input-many-prefix');
+      var id_prefix = name_prefix.replace(/\[/g, "_").replace(/\]/g, "");
+      var name_re = RegExp("^" + RegExp.escape(name_prefix)+ "\[\-?[0-9]+\]");
+      var name_sub = name_prefix + '[' + new_index.toString() + ']';
+      var id_re = RegExp("^" + RegExp.escape(id_prefix)+ "_\-?[0-9]+");
+      var id_sub = id_prefix + '_' + new_index.toString();
+      var class_re = RegExp(RegExp.escape(name_prefix)+ "\[\-?[0-9]+\]");
+      var class_sub = name_sub;
+      
+      return function() {
+          if(this.name) {
+              this.name = this.name.replace(name_re, name_sub);
+          }
+          if (id_prefix==this.id.slice(0, id_prefix.length)) {
+              this.id = this.id.replace(id_re, id_sub);
+          } else {
+              // silly rails.  text_area_tag and text_field_tag use different conventions for the id.
+              if(name_prefix==this.id.slice(0, name_prefix.length)) {
+                  this.id = this.id.replace(name_re, name_sub);
+              } /* else {
+                            hjq.util.log("hjq.input_many.update_id: id_prefix "+id_prefix+" didn't match input "+this.id);
+                        } */
+          }
+          if (class_re.test(this.className)) {
+              this.className = this.className.replace(class_re, class_sub);
+          }
+          return this;
+      };
+  },
+
+  // given this==an input-many item, get the submit index
+  getIndex: function() {
+      return Number(this.id.match(/\[([0-9])+\]$/)[1]);
+  },
+
+  /* For some reason, select() and down() and all those useful functions aren't working for us.  Roll our own replacement. */
+  recurse_elements_with_class: function(el, klass, f) {
+      var that=this;
+      if(klass==null || el.hasClassName(klass)) {
+          f(el);
       }
-      ul.fire("rapid:remove")
+      el.childElements().each(function(el2) {that.recurse_elements_with_class.call(that, el2, klass, f);});
+  },
+
+  addOne: function(ev, el) {
+      Event.stop(ev);
+      var ul = el.up('ul.input-many'), li = el.up('li.input-many-li');
+
+      var template = ul.down("li.input-many-template");
+      var clone = $(template.cloneNode(true));
+      clone.removeClassName("input-many-template");
+      // length-2 because ignore the template li and the empty li
+      var name_updater = this.getNameUpdater.call(ul, ul.childElements().length-2);
+
+      function reenable_inputs(el) {
+          if(el.hasClassName("input_many_template_input")) {
+              el.disabled = false;
+              el.removeClassName("input_many_template_input");
+          }
+          el.childElements().each(function(el2) {
+              if(!el2.hasClassName("input-many-template")) reenable_inputs(el2);
+          });
+      }
+      reenable_inputs(clone);
+
+      // update id & name
+      this.recurse_elements_with_class.call(this, clone, null, function(el) {
+          name_updater.call(el);
+      });
+
+      // do the add with anim
+      clone.setStyle("display", "none")
+      li.insert({after: clone});
+      new Effect.BlindDown(clone, {duration: 0.3})
+
+      // visibility
+      if(li.hasClassName("empty")) {
+          li.addClassName("hidden");
+          li.childWithClass("empty-input").disabled = true;
+      } else {
+          // now that we've added an element after us, we should only have a '-' button
+          li.childWithClass("buttons").childWithClass("remove-item").removeClassName("hidden");
+          li.childWithClass("buttons").childWithClass("add-item").addClassName("hidden");
+      }
+      
+      Event.addBehavior.reload();
+
+      ul.fire("rapid:add", { element: clone })
+      ul.fire("rapid:change", { element: clone })
+
+      return;
+  },
+
+  removeOne: function(ev, el) {
+      Event.stop(ev);
+      var that = this;
+      var ul = el.up('ul.input-many'), li = el.up('li.input-many-li')
+      var minimum = parseInt(Hobo.getClassData(ul, 'minimum'));
+
+      ul.fire("rapid:remove", { element: li })
+
+      // rename everybody from me onwards
+      var i=this.getIndex.call(li)
+      var n=li.next();
+      for(; n; i+=1, n=n.next()) {          
+          var name_updater = this.getNameUpdater.call(ul, i);
+          this.recurse_elements_with_class.call(this, n, null, function(el) {name_updater.call(el);});
+      } 
+
+      // adjust +/- buttons on the button element as appropriate
+      var last=ul.childElements()[ul.childElements().length-1];
+      if(last==li) {
+          last = last.previous();
+      }
+
+      if(last.hasClassName("empty")) {
+          last.removeClassName("hidden");
+          this.recurse_elements_with_class.call(this, last, "empty-input", function(el) {el.disabled=false;});
+      } else {
+          // if we've reached the minimum, we don't want to add the '-' button
+          if(ul.childElements().length-3 <= minimum||0) {
+              last.childWithClass("buttons").childWithClass("remove-item").addClassName("hidden");
+          } else {
+              last.childWithClass("buttons").childWithClass("remove-item").removeClassName("hidden");
+          }
+          last.childWithClass("buttons").childWithClass("add-item").removeClassName("hidden");
+      }
+
+      new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
+          li.remove() 
+      } });
+
       ul.fire("rapid:change")
   },
 
-  
-  clearInputs: function(item) {
-      $(item).select('input,select,textarea').each(function(input){
-          t = input.getAttribute('type')
-          if (t && t.match(/hidden/i)) {
-              input.remove()
-          } else {
-              input.value = ""
-          }
-      })
-  },
-   
-  updateButtons: function() {
-      var removeButton = "<button class='remove-item'>-</button>"
-      var addButton    = "<button class='add-item'>+</button>"
 
-      var ul = this.element
-      var children = ul.childElements();
-      // assumption: only get here after add or remove, so only second last button needs the "+" removed
-      if(children.length > 1) {
-          // cannot use .down() because that's a depth-first search.  Did I mention that I hate Prototype?
-          children[children.length-2].childElements().last().innerHTML = removeButton;
-      }
-      if(children.length > 0) {
-          children[children.length-1].childElements().last().innerHTML = removeButton + ' ' + addButton;
-      }
-      Event.addBehavior.reload()
-  },
-  
-  updateInputNames: function() {
-      var prefix = Hobo.getClassData(this.element, 'input-many-prefix')
-      
-      this.element.selectChildren('li').each(function(li, index) {
-          li.select('*[name]').each(function(control) {
-              if(control.name) {
-                  var changeId = control.id == control.name;
-                  control.name   = control.name.sub(new RegExp("^" + RegExp.escape(prefix) + "\[[0-9]+\]"), prefix + '[' + index +']');
-                  if (changeId) control.id = control.name;
-              }
-          })
-      })
-  }
-  
+
 })
 
 

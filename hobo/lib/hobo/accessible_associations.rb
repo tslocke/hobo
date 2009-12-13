@@ -46,10 +46,13 @@ module Hobo
           # work around
           # https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/3510-has_many-build-does-not-set-reverse-reflection
           # https://hobo.lighthouseapp.com/projects/8324/tickets/447-validation-problems-with-has_many-accessible-true
-          method = "#{owner.class.reverse_reflection(association_name).name}=".to_sym
-          record.send(method, owner) if record.respond_to? method
+          reverse = owner.class.reverse_reflection(association_name)
+          if reverse && reverse.macro==:belongs_to
+            method = "#{reverse.name}=".to_sym
+            record.send(method, owner) if record.respond_to? method
+          end
         else
-          owner.include_in_save(association_name, record)
+          owner.include_in_save(association_name, record) unless owner.class.reflections[association_name].options[:through]
         end        
       else
         # It's already a record
