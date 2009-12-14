@@ -25,6 +25,11 @@ module ActiveRecord
         record
       end
 
+      # DO NOT call super here - AssociationProxy's version loads the collection, and that's bad.
+      # TODO: this really belongs in Rails; migrate it there ASAP
+      def respond_to?(*args)
+        proxy_respond_to?(*args) || Array.new.respond_to?(*args)
+      end
 
       def member_class
         proxy_reflection.klass

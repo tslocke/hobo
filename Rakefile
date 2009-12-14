@@ -55,6 +55,8 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.summary      = "The web app builder for Rails"
   gemspec.homepage     = "http://hobocentral.net/"
   gemspec.authors      = ["Tom Locke"]
+  gemspec.executables  = ['hobo']
+  gemspec.default_executable = 'hobo'
   gemspec.rubyforge_project = "hobo"
   gemspec.add_dependency("rails", [">= 2.2.2"])
   gemspec.add_dependency("will_paginate", [">= 2.3.11"])
