@@ -120,4 +120,15 @@ module ActiveRecord
       end
     end
   end
+
+  module NamedScope
+    class Scope
+      # we need to make sure we don't trigger AssociationCollections' method_missing
+      def try(*args, &block)
+        HoboSupport.hobo_try(self, *args, &block)
+      end
+    end
+  end
+
 end
+
