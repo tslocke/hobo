@@ -38,17 +38,18 @@ We have the "." operator to call methods on objects. These extensions introduce 
 
 ### `Object#_?`
 
-"`._?.`" only calls the method if the receiver is not `nil`.  Otherwise it returns nil.
+"`._?.`" only calls the method if the receiver is not `nil`.  Otherwise it returns nil.  So `x._?.method` is equivalent to `(nil == x ? nil : x.method)`.
 
     >> "foo"._?.length
     => 3
     >> nil._?.length
     => nil
 
-`to_s`, `to_yaml` and `to_json` and a few system functions that start with an underscore are the only exceptions -- they call their corresponding functions on nil.
+When the receiver is nil, any method with any arguments will return nil.  You can use Ruby's || idiom to provide a different value when nil.
 
-    >> nil._?.to_s
-    => ""
+    >> expires = nil
+    >> expires._?.to_s( :default ) || "never"
+    => "never"
 
 ### `Object#try`
 
