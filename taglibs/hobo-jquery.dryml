@@ -2,7 +2,7 @@
 
 This is the jQuery plugin for Hobo.  This plugin provides the jQuery UI widgets in a Hobo friendly manner, provides useful tags and functions for jQuery javascript coding, and provides additional composite tags.
 
-To use, see the [installation instructions](README.html)
+To use, see the [installation instructions](http://cookbook.hobocentral.net/plugins/hobo-jquery)  [(alternate link)](README.html)
 
 The jQuery UI tags support all of the [options that the corresponding jQuery UI widgets provide](http://docs.jquery.com/UI).  For example:
 
