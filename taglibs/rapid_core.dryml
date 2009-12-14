@@ -616,5 +616,6 @@ The context should be a user object. If `this == current_user` the "you" form is
                first-option="Guest" options="&user.all(:limit => 30).*.login"
                onchange="location.href = '#{dev_support_path}/set_current_user?login=' + this.options[this.selectedIndex].value"
                selected="#{current_user.login}"
-               class="dev-user-changer"/>
+               class="dev-user-changer"
+               merge-attrs/>
 </def>
