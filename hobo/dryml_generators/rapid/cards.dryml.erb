@@ -22,7 +22,7 @@ show_title = !show_link && (name_attribute || !has_body)
 model_key = model.name.pluralize.underscore
 -%>
 <def tag="card" for="<%= model.name %>">
-  <card class="<%= model_name :dashed %>" param="default" merge>
+  <card class="<%= model_class %>" param="default" merge>
 <% if name_attribute || show_link || has_actions || !has_body -%>
     <header: param>
 <% if show_link || show_title -%>
