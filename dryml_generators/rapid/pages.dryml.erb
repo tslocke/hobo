@@ -21,7 +21,7 @@ model_key = model.name.tableize
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index.title', :default=>['<%= model_name :plural %>'] }">
+  <page merge title="#{ht '<%= model_key %>.index.title', :default=>['<%= sq_escape(model_name :plural) %>'] }">
     <body: class="index-page <%= model_class %>" param/>
 
     <content: param>
@@ -77,7 +77,7 @@ model_key = model.name.tableize
 
 
 <def tag="new-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.new.title', :default=>['New <%=model_name %>'] }">
+  <page merge title="#{ht '<%= model_key %>.new.title', :default=>[' New <%= sq_escape(model_name) %>'] }">
     <body: class="new-page <%= model_class %>" param/>
 
     <content: param>
@@ -91,7 +91,7 @@ model_key = model.name.tableize
 
       <section param="content-body">
         <form param>
-          <submit: label="#{ht '<%= model_key %>.actions.create', :default=>['Create <%= model_name %>']}"/>
+          <submit: label="#{ht '<%= model_key %>.actions.create', :default=>['Create <%= sq_escape(model_name) %>']}"/>
         </form>
       </section>
     </content:>
@@ -126,7 +126,7 @@ unless model.view_hints.secondary_children.empty?
 end
 -%>
 <def tag="show-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=model_name %>'] }">
+  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=sq_escape model_name %>'] }">
 
     <body: class="show-page <%= model_class %>" param/>
 
@@ -202,7 +202,7 @@ end
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model.name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
                   <field-list: skip="<%= owner %>"/>
-                  <submit: label="#{ht '<%= collection.to_s.pluralize %>.actions.add', :default=>['Add'] }"/>
+                  <submit: label="#{ht '<%= sq_escape collection.to_s.pluralize %>.actions.add', :default=>['Add'] }"/>
                 </form>
               </section>
 <%   end -%>
@@ -251,7 +251,7 @@ end
 name_attribute = model.name_attribute
 -%>
 <def tag="edit-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%=model_name %>'] }">
+  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%= sq_escape model_name %>'] }">
 
     <body: class="edit-page <%= model_class %>" param/>
 
@@ -262,7 +262,7 @@ name_attribute = model.name_attribute
             Edit <type-name/>
           </ht>
         </h2>
-        <delete-button label="#{ht '<%= model_key %>.actions.delete', :default=>['Remove This <%= model_name %>']}" param/>
+        <delete-button label="#{ht '<%= model_key %>.actions.delete', :default=>['Remove This <%= sq_escape model_name %>']}" param/>
       </section>
 
       <section param="content-body">
@@ -290,7 +290,7 @@ new_link = :new.in?(actions)
 -%>
 <def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%=model_name :plural %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">    
+  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name :plural) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">    
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
     <content: param>
       <header param="content-header">
@@ -348,7 +348,7 @@ new_link = :new.in?(actions)
 <% if :new.in? actions -%>
 <def tag="new-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="new-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%=model_key %>.new_for_owner.title', :default=>['New <%=model_name %> for']} #{name :with => @<%= owner %>}">
+  <page merge title="#{ht '<%=model_key %>.new_for_owner.title', :default=>['New <%= sq_escape model_name %> for']} #{name :with => @<%= owner %>}">
     <body: class="new-for-owner-page <% owner.dasherize %> <%= model_class %>" param/>
 
     <content: param>
@@ -369,7 +369,7 @@ new_link = :new.in?(actions)
       <section param="content-body">
         <form owner="<%= owner %>" method="post" param>
           <field-list: skip="<%= owner %>"/>
-          <submit: label="#{ht '<%=model_key %>.actions.create', :default=>['Create <%= model_name %>']}"/>
+          <submit: label="#{ht '<%=model_key %>.actions.create', :default=>['Create <%= sq_escape model_name %>']}"/>
         </form>
       </section>
     </content:>
@@ -383,7 +383,7 @@ new_link = :new.in?(actions)
 <def tag="<%= creator.dasherize %>-page" polymorphic/>
 <def tag="<%= creator.dasherize %>-page" for="<%= model.name %>">
   
-  <page title="#{ht '<%=model_key %>.<%= creator.underscore %>.title', :default=>['<%= creator.titleize %>']}" merge>  
+  <page title="#{ht '<%=model_key %>.<%= creator.underscore %>.title', :default=>['<%= sq_escape creator.titleize %>']}" merge>  
 
     <body: class="lifecycle-start-page <%= creator.dasherize %>-page" param/>
 
