@@ -164,6 +164,12 @@ module Hobo
         name = name.camelize                                  if :camel.in?(options)
         name
       end
+
+      # escape single quotes and backslashes for use in a single
+      # quoted string
+      def sq_escape(s)
+        s.gsub(/[\\]/, "\\\\\\\\").gsub(/'/, "\\\\'")
+      end
       
       
       def model_class
