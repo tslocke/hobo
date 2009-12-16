@@ -10,7 +10,7 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/
 require 'hobo'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
-RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} `which rubydoctest`"
+RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
 desc "Default Task"
 task :default => [ :test ]
