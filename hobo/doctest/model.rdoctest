@@ -1,0 +1,330 @@
+Controllers and Routing
+{.document-title}
+
+This chapter of the Hobo Manual describes Hobo's model extensions,
+with the exception of [HoboFields](../hobofields) and
+[Permissions](../permissions), and [Scopes](../scopes) each of which
+have their own chapters in this manual.  This chapter should describe
+everything else that Hobo provides to your models.
+
+Contents
+{.contents-heading}
+
+- contents
+{:toc}
+
+    >> require 'rubygems'
+    >> require 'active_support'
+    >> require 'active_record'
+    >> require 'action_pack'
+    >> require 'action_view'
+    >> require 'action_controller'
+    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
+    >> mysql_user = 'root'; mysql_password = ''
+    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
+    >> mysql_database = "hobofields_doctest"
+    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
+    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
+                                               :database => mysql_database,
+                                               :host => "localhost", 
+                                               :username => mysql_user, 
+                                               :password => mysql_password)
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
+    >> require 'will_paginate'
+    >> require 'will_paginate/finder'
+    >> require 'hobosupport'
+    >> require 'hobofields'
+    >> require 'hobo'
+    >> Hobo::Model.enable
+    >>
+     def migrate(renames={})
+       up, down = HoboFields::MigrationGenerator.run(renames)
+       puts up
+       ActiveRecord::Migration.class_eval(up)
+       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       [up, down]
+     end
+{.hidden}
+
+# Special Attributes
+
+Rails provides one "special" attribute to your model: `primary_key`
+
+    >> class Foo < ActiveRecord::Base; end
+    >> Foo.primary_key
+    => "id"
+
+`primary_key` references one of the columns in your table.  Rails
+provides a default, but you can change it.
+
+In the same fashion, Hobo provides several special attributes that
+generally correspond to columns in your database table.
+
+In Hobo, these attributes are specified by passing options to their
+declaration:
+
+    >> class User < ActiveRecord::Base; end
+    >>
+     class Post < ActiveRecord::Base
+       hobo_model
+
+       fields do
+         title :string, :name => true, :index => true
+         content :text, :primary_content => true
+       end
+
+       belongs_to :poster, :class_name => "User", :creator => true
+
+       set_search_columns :title, :content
+       never_show :poster
+
+     end
+    >> migrate
+
+In the above example, `name`, `creator` and `primary_content` specify
+attributes that have meaning to Hobo.  `set_search_columns` and
+`never_show` also allow you to tag columns for Hobo.
+
+## name
+
+Many models have a column in their table that names the object.  A
+good example would be the title column in a blog object.
+
+    fields do
+      title :string, :name => true, :index => true
+    end
+
+    >> Post.name_attribute
+    => :title
+
+
+Rapid makes extensive use of this column, both directly and
+indirectly.   The `<name>` tag uses it, `<table-plus>` uses it as the
+default sort column, to give two examples of direct uses.
+
+Indirectly it is used much more often via the default `to_s` function
+that Hobo::Model provides.
+
+    >> post = Post.new(:title => "Hello")
+    >> post.to_s
+    => "Hello"
+
+Hobo::Model also provides a default `to_param` function to provide
+human readable URL's:
+
+    >> post.id = 17
+    >> post.to_param
+    => "17-hello"
+
+You are of course welcome to provide your own `to_s` and `to_param`
+functions, but in most cases the Hobo::Model definitions do well.
+
+Hobo::Model also provides a default finder, `named`:
+
+    >> post.save!
+    >> Post.named("Hello").title
+    => "Hello"
+
+If you are going to be using this finder, it is recommended that you
+also provide an index for your name column:
+
+    fields do
+      title :string, :name => true, :index => true
+    end
+
+Sometimes a single column does not do a good job of naming the
+object.  In this case, you can provide your own name method instead:
+
+    >>
+     class Person < ActiveRecord::Base
+       hobo_model
+       fields do
+         first_name :string
+         last_name :string
+       end
+
+       def name
+         first_name + ' ' + last_name
+       end
+     end
+    >> migrate
+    >> person = Person.new(:first_name => "John", :last_name => "Brown")
+    >> person.to_s
+    => "John Brown"
+
+If you use a composite name, you do lose a couple of features that
+require direct database access: the `named` finder, and the ability to
+use it as a sort column without loading the entire table.
+
+## primary\_content
+
+`primary_content` works very similarly to `name`, except that it
+provides the "description" of the row.   This is not used in very many
+places.  Currently it is only used in the generated `<card>` and
+`<show-page>` for your views, but it may be used in more places in the
+future.
+
+    fields do
+      content :text, :primary_content => true
+    end
+
+If you do not explicitly set `primary_content`, Hobo::Model will look
+for a method or attribute named `description`, `body`, `content`,
+or `profile` and use that.
+
+    >>
+     class Person < ActiveRecord::Base
+       def profile
+         "Boring"
+       end
+     end
+
+    >> Person.primary_content_attribute
+    => "profile"
+
+## login
+
+This field is only used in User models.  This attribute specifies
+the field that uniquely identifies a user.   Unsurprisingly, it's
+primary use is for the `login` field on the signup form, but it is
+used elsewhere.
+
+    >>
+     class User < ActiveRecord::Base
+       hobo_user_model
+       fields do
+         email_address :string, :login => true, :unique => true
+       end
+     end
+
+    >> User.login_attribute
+    => :email_address
+
+## creator
+
+If you specify the `creator` option on one of your fields, Hobo will
+set it to contain the current user when creating the object.
+
+Normally this is specified on a belongs\_to:
+
+    >>
+     class Post < ActiveRecord::Base
+       belongs_to :poster, :class_name => "User", :creator => true
+     end
+
+    >> Post.creator_attribute
+    => :poster
+
+However, it may also be added as an option to a string field, in which
+case the `login_attribute` is saved to the field:
+
+    >>
+     class Foo2 < ActiveRecord::Base
+        hobo_model
+        fields do
+          creator_login :string, :creator => true
+        end
+     end
+
+    >> Foo2.creator_attribute
+    => :creator_login
+
+Creator may also be specified via `attr_accessor` if you wish it to
+be set without being saved to the database:
+
+    >>
+     class Foo3 < ActiveRecord::Base
+       hobo_model
+       attr_accessor :created_by, :creator => true
+     end
+
+    >> Foo3.creator_attribute
+    => :created_by
+
+## set\_search\_columns
+
+Using the `set_search_columns` class function, you may specify which
+columns are searched by the rapid tags that provide searching
+capabilities.
+
+    >>
+     class Post < ActiveRecord::Base
+       set_search_columns :title, :content
+     end
+
+    >> Post.search_columns
+    => ["title", "content"]
+
+If you do not provide the search columns, Hobo defaults to `%w(name
+title body description content profile)`.
+
+## never\_show
+
+`never_show` columns are not displayed in any views that Rapid
+creates.
+
+    >>
+     class Post < ActiveRecord::Base
+       never_show :poster
+     end
+
+    >> Post.never_show?(:poster)
+    => true
+
+# typed\_id
+
+    >> post.typed_id
+    => "post:17"
+
+`typed_id` is a method added to Hobo models that uniquely identifies
+the model in your database.  This is very useful when coupled with
+`Hobo::Model.find_by_typed_id`:
+
+    >> Hobo::Model.find_by_typed_id("post:17")
+    => #<Post id: 17, title: "Hello", content: nil, poster_id: nil>
+
+This is the mechanism that is used to store the current user in the
+session.   It is also used throughout Rapid.
+
+# set\_default\_order
+
+    set_default_order :name
+    set_default_order "name DESC"
+
+This sets the :order option on the finder for the class.
+
+Note that Rails 2.3 has
+[default\_scope](http://ryandaigle.com/articles/2008/11/18/what-s-new-in-edge-rails-default-scoping).
+This may be used instead of `set_default_order`, although currently
+there are many bugs open against `default_scope` in Rails.  See [ticket #395](
+https://hobo.lighthouseapp.com/projects/8324/tickets/395-remove-default_order-once-were-on-rails-23)
+for more information on this issue.
+
+# reverse_reflection
+
+This is the mechanism that Hobo uses to find a matching association on
+the other model.
+
+    >>
+     class Post < ActiveRecord::Base
+       belongs_to :poster, :class_name => "User", :creator => true
+     end
+    >>
+     class User < ActiveRecord::Base
+       has_many :posts, :foreign_key => "poster_id"
+     end
+    >> migrate
+
+    >> Post.reverse_reflection(:poster).name
+    => :posts
+
+# view\_hints
+
+This provides a shortcut to the corresponding
+[ViewHints](../viewhints) object.
+
+    >> Post.view_hints
+    => PostHints
