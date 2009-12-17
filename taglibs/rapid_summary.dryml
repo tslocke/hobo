@@ -129,8 +129,7 @@
 
 <!-- repeats on the plugins used by the application -->
 <def tag="with-plugins">
-  <%  fi = Hobo::FakeInitializer.new(Rails.configuration)
-      plugins = Rails.configuration.plugin_loader.new(fi).plugins %>
+  <% plugins = Rails.configuration.plugin_loader.new(Hobo.rails_initializer).plugins %>
   <repeat with="&plugins">
     <do param="default" />
   </repeat>
