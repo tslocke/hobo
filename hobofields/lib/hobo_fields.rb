@@ -103,10 +103,14 @@ module HoboFields
     # automatically load other rich types from app/rich_types/*.rb
     # don't assume we're in a Rails app
     if defined?(::Rails)
-      Dir[File.join(::Rails.root, 'app', 'rich_types', '*.rb')].each do |f|
-        # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-        require f
+      plugins = Rails.configuration.plugin_loader.new(Hobo.rails_initializer).plugins
+      ([::Rails.root] + plugins.map(&:directory)).each do |dir|
+        Dir[File.join(dir, 'app', 'rich_types', '*.rb')].each do |f|
+          # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
+          require f
+        end
       end
+
     end
 
     # Monkey patch ActiveRecord so that the attribute read & write methods
