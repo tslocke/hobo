@@ -13,7 +13,8 @@ require 'hobofields'
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    exit(1) if !system("#{RUBYDOCTEST} test/*.rdoctest")
+    files=Dir['test/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
 
   desc "Run the unit tests"

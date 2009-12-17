@@ -28,8 +28,9 @@ Rake::TestTask.new(:test) { |t|
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
+    files=Dir['doctest/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
     # note, tests in doctest/hobo/ are out of date
-    exit(1) if !system("#{RUBYDOCTEST} doctest/*.rdoctest")
+    exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
 end
 
