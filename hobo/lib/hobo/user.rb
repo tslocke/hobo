@@ -154,7 +154,7 @@ module Hobo
     # again.  See
     # https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/590
     def stash_current_password
-      self.current_password ||= password
+      @current_password ||= password
     end
 
     def changing_password?
