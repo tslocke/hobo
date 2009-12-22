@@ -43,6 +43,7 @@ module Hobo
         attr_accessor :current_password, :password, :password_confirmation, :type => :password
 
         before_save :encrypt_password
+        after_save :stash_current_password
 
         never_show *AUTHENTICATION_FIELDS
 
@@ -148,6 +149,13 @@ module Hobo
       self.crypted_password = encrypt(password)
     end
 
+    # after filter that sets current_password so we can pass
+    # validate_current_password_when_changing_password if you save
+    # again.  See
+    # https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/590
+    def stash_current_password
+      self.current_password ||= password
+    end
 
     def changing_password?
       !new_record? && !lifecycle_changing_password? &&
