@@ -41,6 +41,7 @@ Require the module we're testing:
 
     >> require 'hobosupport'
     >> require 'hobofields'
+    >> HoboFields.enable
 
 ## Example Models
 

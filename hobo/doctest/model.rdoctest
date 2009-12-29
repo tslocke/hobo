@@ -39,6 +39,7 @@ Contents
     >> require 'hobofields'
     >> require 'hobo'
     >> Hobo::Model.enable
+    >> HoboFields.enable
     >>
      def migrate(renames={})
        up, down = HoboFields::MigrationGenerator.run(renames)

@@ -39,6 +39,7 @@ And we'll require:
 
     >> require 'hobosupport'
     >> require 'hobofields'
+    >> HoboFields.enable
 
 ## The migration generator -- introduction
 

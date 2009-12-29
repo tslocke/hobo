@@ -33,6 +33,7 @@ And we'll require:
 
     >> require 'hobosupport'
     >> require 'hobofields'
+    >> HoboFields.enable
 
 OK we're ready to get going.
 
