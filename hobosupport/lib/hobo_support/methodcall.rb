@@ -3,7 +3,7 @@
 #   .? calls a method if the receiver is not nil, returns nil
 #   otherwise. We have to write it ._?. in order to be valid Ruby
 #
-#   .try. calls a mehod only if the recipient resonds to that method
+#   .try. calls a method only if the recipient responds to that method
 
 require 'delegate'
 require 'singleton'
@@ -56,7 +56,12 @@ end
 class SafeNil
   include Singleton
 
-  instance_methods.each { |m| undef_method m unless m[0,2] == '__' }
+  begin
+    old_verbose, $VERBOSE = $VERBOSE, nil   # just like Rails silence_warnings: suppress "warning: undefining `object_id' may cause serious problem"
+    instance_methods.each { |m| undef_method m unless m[0,2] == '__' }
+  ensure
+    $VERBOSE = old_verbose
+  end
 
   def method_missing(method, *args, &b)
     return nil

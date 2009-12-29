@@ -38,7 +38,7 @@ We have the "." operator to call methods on objects. These extensions introduce 
 
 ### `Object#_?`
 
-"`._?.`" only calls the method if the receiver is not `nil`.  Otherwise it returns nil.  So `x._?.method` is equivalent to `(nil == x ? nil : x.method)`.
+"`._?.`" only calls the method if the receiver is not `nil`.  Otherwise it returns nil.  So `x._?.method(*args)` is equivalent to `(nil == x ? nil : x.method(*args))`.
 
     >> "foo"._?.length
     => 3
@@ -51,9 +51,13 @@ When the receiver is nil, any method with any arguments will return nil.  You ca
     >> expires._?.to_s( :default ) || "never"
     => "never"
 
+Note that `_?` should *always* be followed by a method call.  It is not intended to store the intermediate result.  Don't do this!
+
+intermediate = nil._?
+
 ### `Object#try`
 
-"`.try`" only calls the method if the receiver responds to that method.
+"`.try`" only calls the method if the receiver responds to that method.  Otherwise it returns nil.  So `x.try.method(*args)` is equivalent to `(x.respond_to?(:method) ? x.method(*args) : nil)`.
 
     >> "foo".try.reverse
     => "oof"
@@ -62,10 +66,10 @@ When the receiver is nil, any method with any arguments will return nil.  You ca
 
 ### What's the difference?
 
-`_?` is generally used when nil is an expected response.  `try` is
-generally used when interfaces may be different.  For instance, you
+Use `_?` when you want to call a method but you know the receiver may be nil.
+Use `try` when you want to call a method but you know the receiver may not respond to it.  For instance, you
 may use `try` to call a Rails 2.3 function that doesn't exist on Rails
-2.2.  nil responds to some functions that may surprise you.
+2.2.  Note that nil responds to some functions that may surprise you.
 
     >> nil.try.to_i
     => 0
