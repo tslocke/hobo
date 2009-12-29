@@ -220,4 +220,3 @@ module ::Enumerable
   alias_method_chain :group_by, :metadata
 end
 
-Hobo.enable if defined?(Rails)

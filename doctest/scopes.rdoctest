@@ -80,6 +80,7 @@ And we'll require hobo:
     >> require 'hobofields'
     >> require 'hobo'
     >> Hobo::Model.enable
+    >> HoboFields.enable
 {.hidden}
 
 Let's set up a few models for our testing:
