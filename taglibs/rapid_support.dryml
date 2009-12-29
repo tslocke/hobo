@@ -44,11 +44,13 @@ This tag is in need of a review - it's a bit funky.
   field_names -= comma_split(skip) if skip
   field_names = field_names.select {|f| can_view?(this, f)} unless force_all
   field_names.each do |field| 
+    %><set-scoped field-name="&field"><%
     if field == "this"
       %><do param="default"/><%
     else
       %><with field="&field"><do param="default"/></with><%
     end
+    %></set-scoped><%
   end
 %></def>
 
