@@ -3,3 +3,4 @@
 hobo/taglib-docs
 
 */pkg
+**/*.gemspec

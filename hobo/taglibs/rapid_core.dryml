@@ -36,11 +36,11 @@
        input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
       <labelled-item unless="&tag == 'input' && no_edit == 'skip' && !can_edit?">
-        <item-label param="#{this_field.to_s.sub('?', '')}-label" unless="&field_name.blank?">
+        <item-label param="#{scope.field_name.to_s.sub('?', '').sub('.', '-')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
-        <item-value param="#{this_field.to_s.sub('?', '')}-view" colspan="&2 if field_name.blank?">
-          <do param="view"><call-tag tag="&tag" param="#{this_field.to_s.sub('?', '')}-tag" merge-attrs="&input_attrs"/></do>
+        <item-value param="#{scope.field_name.to_s.sub('?', '').sub('.', '-')}-view" colspan="&2 if field_name.blank?">
+          <do param="view"><call-tag tag="&tag" param="#{scope.field_name.to_s.sub('?', '').sub('.', '-')}-tag" merge-attrs="&input_attrs"/></do>
           <div param="input-help" if="&tag.to_sym == :input && !this_field_help.blank?"><%= this_field_help %></div>
         </item-value>
       </labelled-item>
@@ -119,7 +119,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
               class="#{scope.even_odd} #{this_type.name.underscore} #{model_id_class}">
             <if test="&fields">
               <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
-                <td param="#{this_field.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+                <td param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
                 <a param="edit-link" action="edit" if="&can_edit?"><ht key="hobo.action.edit">Edit</ht></a>
