@@ -20,7 +20,7 @@ subversion.
 
 `x._?.to_s` now returns nil rather than a blank string
 
-[#592](https://hobo.lighthouseapp.com/projects/8324/tickets/537): 
+[#592](https://hobo.lighthouseapp.com/projects/8324/tickets/592): 
 
 If you previously had a snippet such as this:
 
@@ -48,6 +48,8 @@ If you are on Rails 2.3.5 and are running Hobo as a plugin,
 please check out bug
 [#574](https://hobo.lighthouseapp.com/projects/8324/tickets/574-rails-235-b0rks-our-rake-tasks-running-on-edge-hobo)
 for a workaround you need to apply to your Rakefile.
+
+NOTE: fixed in 0.9.104
 
 ### Bugs
 
