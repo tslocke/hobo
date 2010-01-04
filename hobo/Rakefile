@@ -62,7 +62,8 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.add_dependency("rails", [">= 2.2.2"])
   gemspec.add_dependency("will_paginate", [">= 2.3.11"])
   gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
-  gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])    
+  gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])
+  gemspec.files.include %w(tasks/environments.rake tasks/hobo_tasks.rake)
 end
 Jeweler::GemcutterTasks.new
 Jeweler::RubyforgeTasks.new do |rubyforge|
