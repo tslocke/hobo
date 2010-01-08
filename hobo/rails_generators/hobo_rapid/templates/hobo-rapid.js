@@ -712,7 +712,7 @@ new HoboBehavior("ul.input-many", {
       } });
 
       ul.fire("rapid:change")
-  },
+  }
 
 
 
