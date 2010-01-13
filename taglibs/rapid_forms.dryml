@@ -436,7 +436,7 @@ procedure call.
 The URL that the call is POSTed to is the `object_url` of `this`, plus the method name
 
 `<remote-method-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid
-Forms). If any ajax attributes are given, the button becomes an ajax button, if not,
+Forms). If any ajax attributes are given, the button becomes an ajax button, if not, Rails' `button_to` is used, which behaves similarly to a standard link.
 
 ### Attributes 
 
