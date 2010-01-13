@@ -105,9 +105,10 @@ module HoboFields
     if defined?(::Rails)
       plugins = Rails.configuration.plugin_loader.new(HoboFields.rails_initializer).plugins
       ([::Rails.root] + plugins.map(&:directory)).each do |dir|
+        ActiveSupport::Dependencies.load_paths << File.join(dir, 'app', 'rich_types')
         Dir[File.join(dir, 'app', 'rich_types', '*.rb')].each do |f|
           # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-          require f
+          require_dependency f
         end
       end
 
