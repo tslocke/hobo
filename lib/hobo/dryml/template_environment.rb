@@ -397,7 +397,7 @@ module Hobo::Dryml
                              end
       end
 
-      if param_name == :default && overriding_proc
+      if param_name == :default && overriding_proc && overriding_proc.arity>0
         # :default content is handled specially
 
         call_tag_parameter_with_default_content(the_tag, attributes, parameters[:default], overriding_proc)
