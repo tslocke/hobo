@@ -910,8 +910,33 @@ A fully worked up example of nested hjq-input-many's may be found in [agility/jq
 
  - `template`: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
 
+### Events
+
+ - `rapid:add`: fired after the element is inserted.  `memo.element`
+ is set to the new element inserted.
+
+ - `rapid:remove`: fired before the element is
+ inserted. `memo.element` is set to the element to be deleted.  The
+ removal may be cancelled by stopping the event.
+
+ - `rapid:change`: fired after an element has been removed or
+ inserted.  `memo.element` set as above.
+
+Example javascript:
+
+      var last_added;
+      var last_removed;
+      Event.addBehavior({
+        '.stories:rapid:add' : function(ev) {
+          last_added = ev.memo.element;
+        },
+        '.stories:rapid:remove' : function(ev) {
+          if(!confirm("really?")) ev.stop();
+        }
+      });
+
   -->
-<def tag="input-many" attrs="minimum, fields, skip, template, add-hook, remove-hook" polymorphic >
+<def tag="input-many" attrs="minimum, fields, skip, template" polymorphic >
 <%
 # helper function to create id's on buttons to facilitate testing
 def underize(s)
@@ -922,7 +947,7 @@ end
   <% template ||= this.try.new_candidate || this.member_class.new %>
   <% minimum ||= 0 ; minimum = minimum.to_i %>
   <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection %>           
-  <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} #{css_data(:minimum, minimum)} #{css_data(:add_hook, add_hook) if add_hook} #{css_data(:remove_hook, remove_hook) if remove_hook}">
+  <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} #{css_data(:minimum, minimum)}">
     <fake-field-context fake-field="-1" context="&template">
       <li class="input-many-li input-many-template" id="#{param_name_for_this}">
         <div class="input-many-item" param="default">
