@@ -652,7 +652,12 @@ new HoboBehavior("ul.input-many", {
       // do the add with anim
       clone.setStyle("display", "none")
       li.insert({after: clone});
-      new Effect.BlindDown(clone, {duration: 0.3})
+      new Effect.BlindDown(clone, {duration: 0.3, afterFinish: function(ef) {
+          Event.addBehavior.reload();
+
+          ul.fire("rapid:add", { element: clone });
+          ul.fire("rapid:change", { element: clone });
+      }});
 
       // visibility
       if(li.hasClassName("empty")) {
@@ -664,11 +669,6 @@ new HoboBehavior("ul.input-many", {
           li.childWithClass("buttons").childWithClass("add-item").addClassName("hidden");
       }
       
-      Event.addBehavior.reload();
-
-      ul.fire("rapid:add", { element: clone })
-      ul.fire("rapid:change", { element: clone })
-
       return;
   },
 
@@ -678,7 +678,7 @@ new HoboBehavior("ul.input-many", {
       var ul = el.up('ul.input-many'), li = el.up('li.input-many-li')
       var minimum = parseInt(Hobo.getClassData(ul, 'minimum'));
 
-      ul.fire("rapid:remove", { element: li })
+      if(ul.fire("rapid:remove", { element: li }).stopped) return;
 
       // rename everybody from me onwards
       var i=this.getIndex.call(li)
@@ -708,10 +708,10 @@ new HoboBehavior("ul.input-many", {
       }
 
       new Effect.BlindUp(li, { duration: 0.3, afterFinish: function (ef) {
+          ul.fire("rapid:change")
           li.remove() 
       } });
 
-      ul.fire("rapid:change")
   }
 
 
