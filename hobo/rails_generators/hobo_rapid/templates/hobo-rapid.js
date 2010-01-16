@@ -570,6 +570,14 @@ new HoboBehavior("ul.input-many", {
   },
 
   initialize: function(ul) {
+      /* the second clause should be sufficient, but it isn't in IE7.  See bug 603  */
+      $$(".input-many-template input:hidden, .input-many-template select:hidden, .input-many-template textarea:hidden, .input-many-template button:hidden").each(function(input) {
+          if(!input.disabled) {
+              input.disabled = true;
+              input.addClassName("input_many_template_input");
+          }
+      });
+
       // disable all elements inside our template, and mark them so we can find them later.
       $$(".input-many-template input:enabled, .input-many-template select:enabled, .input-many-template textarea:enabled, .input-many-template button:enabled").each(function(input) {
           input.disabled = true;
