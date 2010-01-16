@@ -481,9 +481,9 @@ Element.findContaining = function(el, tag) {
     return null;
 }
 
-Element.prototype.childWithClass = function(klass) {
+Element.Methods.childWithClass = function(el, klass) {
     var ret=null;
-    this.childElements().each(function(el2) {
+    el.childElements().each(function(el2) {
         if(ret==null && el2.hasClassName(klass)) ret=el2;
     });
     return ret;
