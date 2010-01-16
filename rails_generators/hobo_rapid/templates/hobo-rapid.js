@@ -635,6 +635,11 @@ new HoboBehavior("ul.input-many", {
       Event.stop(ev);
       var ul = el.up('ul.input-many'), li = el.up('li.input-many-li');
 
+      if(li.id.search(/\[-1\]/)>=0) {
+          /* if(console) console.log("IE7 messed up again (bug 605)"); */
+          return;
+      }
+
       var template = ul.down("li.input-many-template");
       var clone = $(template.cloneNode(true));
       clone.removeClassName("input-many-template");
@@ -685,6 +690,11 @@ new HoboBehavior("ul.input-many", {
       var that = this;
       var ul = el.up('ul.input-many'), li = el.up('li.input-many-li')
       var minimum = parseInt(Hobo.getClassData(ul, 'minimum'));
+
+      if(li.id.search(/\[-1\]/)>=0) {
+          /* if(console) console.log("IE7 messed up again (bug 605)"); */
+          return;
+      }
 
       if(ul.fire("rapid:remove", { element: li }).stopped) return;
 
