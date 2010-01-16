@@ -611,7 +611,7 @@ new HoboBehavior("ul.input-many", {
 
   // given this==an input-many item, get the submit index
   getIndex: function() {
-      return Number(this.id.match(/\[([0-9])+\]$/)[1]);
+      return Number(this.id.match(/\[([-0-9]+)\]$/)[1]);
   },
 
   /* For some reason, select() and down() and all those useful functions aren't working for us.  Roll our own replacement. */
