@@ -118,7 +118,21 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
  - reset-form: Clear the form after submission (only makes sense for ajax forms)
  
  - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
-   
+
+### Parameters
+
+The standard form tag does not have any parameters, nor does it have any default content.   However, Hobo does autogenerate polymorphic form tags for each of your models into `app/views/taglibs/auto/rapid/forms.dryml`.  These forms have the following parameters:
+
+ - error-messages
+
+ - field-list
+ 
+ - actions
+
+ - submit
+
+ - cancel
+
 -->
 <def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%= 
   ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
