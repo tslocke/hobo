@@ -46,4 +46,4 @@ prototype.js.  To use jQuery, use `jQuery` instead of `$`.
 
 [Auto generated documentation on GitHub](http://bryanlarsen.github.com/hobo-jquery/documentation.html).
 
-[Auto generated documentation on HoboCentral](http://http://cookbook.hobocentral.net/api_taglibs/hobo-jquery).
+[Auto generated documentation on HoboCentral](http://cookbook.hobocentral.net/api_taglibs/hobo-jquery).
