@@ -375,7 +375,9 @@ module HoboFields
     end
 
     def drop_index(table, name)
-      "remove_index :#{table}, :name => :#{name}"
+      # see https://hobo.lighthouseapp.com/projects/8324/tickets/566
+      # for why the rescue exists
+      "remove_index :#{table}, :name => :#{name} rescue ActiveRecord::StatementInvalid"
     end
 
     def format_options(options, type, changing=false)
