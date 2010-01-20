@@ -1,11 +1,12 @@
-Controllers and Routing
+Hobo's Miscellaneous Model Extensions
 {.document-title}
 
 This chapter of the Hobo Manual describes Hobo's model extensions,
 with the exception of [HoboFields](../hobofields) and
-[Permissions](../permissions), and [Scopes](../scopes) each of which
-have their own chapters in this manual.  This chapter should describe
-everything else that Hobo provides to your models.
+[Permissions](../permissions), 
+[Accessible Associations](../multi_model_forms) and [Scopes](../scopes) each of
+which have their own chapters in this manual.  This chapter should
+describe everything else that Hobo provides to your models.
 
 Contents
 {.contents-heading}
@@ -304,7 +305,7 @@ there are many bugs open against `default_scope` in Rails.  See [ticket #395](
 https://hobo.lighthouseapp.com/projects/8324/tickets/395-remove-default_order-once-were-on-rails-23)
 for more information on this issue.
 
-# reverse_reflection
+# reverse\_reflection
 
 This is the mechanism that Hobo uses to find a matching association on
 the other model.

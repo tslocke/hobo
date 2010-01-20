@@ -62,9 +62,9 @@ The source lives on GitHub as part of the main Hobo repo:
 
  - [http://github.com/tablatom/hobo](http://github.com/tablatom/hobo)
 
-The simplest way to install HoboFields as a plugin is to use the subversion mirror:
-
-        svn export svn://hobocentral.net/hobo/tags/rel_0.7.5/hobofields vendor/plugins
+To use hobofields as a plugin is not as simple as it should be.  You
+will have to clone `git://github.com/tablatom/hobo` and then copy the
+`hobofields` subdirectory into `/vendors/plugins`
 
 ## Rich Types
 
