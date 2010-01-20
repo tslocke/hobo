@@ -1,9 +1,9 @@
-Multi-Model Forms
+Accessible Associations
 {.document-title}
 
-This chapter describes Hobo's support for multi-model forms.  This is
-mostly technical background -- beginners should not have to read more
-than the introduction.
+This chapter describes Hobo's support for nested models in forms.
+This is mostly technical background -- beginners should not have to
+read more than the introduction.
 
 Contents
 {.contents-heading}
