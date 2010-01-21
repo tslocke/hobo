@@ -14,7 +14,13 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
-=== Hobo Edge ===
+=== Hobo 0.9.104 (AKA 1.0RC3) ===
+
+[#604](https://hobo.lighthouseapp.com/projects/8324/tickets/604):
+
+The new input-many introduced in 0.9.103 had issues with >10 elements,
+several issues running with IE7 and an issue with its javascript
+callbacks.
 
 [#537](https://hobo.lighthouseapp.com/projects/8324/tickets/537):
 
@@ -39,6 +45,12 @@ You now have to use:
     </table>
 
 The same change has been applied to `<field-list>`
+
+[#568](https://hobo.lighthouseapp.com/projects/8324/tickets/568):
+
+`hobo_index` now supports the `:scope` option
+
+See also the [git log](http://github.com/tablatom/hobo/commits/v0.9.104)
 
 === Hobo 0.9.103 (AKA 1.0.RC2) ===
 
