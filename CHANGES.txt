@@ -14,6 +14,14 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo 0.9.105 ===
+
+Iterating quickly now so we can cut this off as soon as possible.
+
+[#608](https://hobo.lighthouseapp.com/projects/8324/tickets/608):
+
+One of the IE7 fixes was too aggressive, and broke input-many.
+
 === Hobo 0.9.104 (AKA 1.0RC3) ===
 
 [#604](https://hobo.lighthouseapp.com/projects/8324/tickets/604):
