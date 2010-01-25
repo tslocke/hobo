@@ -2,7 +2,7 @@
 
 require 'fileutils'
 require 'pathname'
-require 'active_support'
+
 require 'rbconfig'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
@@ -124,7 +124,7 @@ Dir.chdir(app_path) do
   end
 end
 
-if invite_only.present?
+if !invite_only.empty?
   puts %(
 Invite-only website
   If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
