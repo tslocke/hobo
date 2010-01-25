@@ -33,7 +33,7 @@ module ActiveRecord
 
       # TODO: send this patch into Rails. There's no reason to load the collection just to find out it acts like an array.
       def is_a?(klass)
-        Array.is_a?(klass)
+        [].is_a?(klass)
       end
 
       def member_class
