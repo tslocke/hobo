@@ -208,6 +208,7 @@ module HoboFields
 
     # Return the entry from #columns for the named column
     def self.column(name)
+      return unless table_exists?
       name = name.to_s
       columns.find {|c| c.name == name }
     end
