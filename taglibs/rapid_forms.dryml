@@ -115,6 +115,20 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
   
 ### Attributes
 
+ - [all AJAX attributes](/api_taglibs/rapid_forms)
+
+ - action: the controller action.  Default is create or update as appropriate
+
+ - method: PUT or POST
+
+ - web-method
+
+ - lifecycle
+
+ - owner
+
+ - multipart: if set, the encoding is set to multipart/form-data.  The default is x-www-form-urlencoded
+
  - reset-form: Clear the form after submission (only makes sense for ajax forms)
  
  - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
