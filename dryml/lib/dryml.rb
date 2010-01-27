@@ -1,9 +1,12 @@
-module Hobo
+# gem dependencies
+require 'hobosupport'
 
-  module Dryml
+module Dryml
+
+    VERSION = "0.9.106"
 
     class DrymlSyntaxError < RuntimeError; end
-
+      
     class DrymlException < Exception
       def initialize(message, path=nil, line_num=nil)
         if path && line_num
@@ -182,7 +185,5 @@ module Hobo
         word
       end
     end
-
-  end
-
+    
 end
