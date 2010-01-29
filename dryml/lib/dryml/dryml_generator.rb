@@ -4,8 +4,6 @@ require 'fileutils'
 
 require 'action_controller/dispatcher'
 
-module Hobo
-  
   module Dryml
     
     class DrymlGenerator
@@ -30,7 +28,7 @@ module Hobo
             class << self
               def reload_application_with_dryml_generators
                 reload_application_without_dryml_generators
-                DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
+                DrymlGenerator.run unless Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
               end
               alias_method_chain :reload_application, :dryml_generators
             end
@@ -38,7 +36,7 @@ module Hobo
             #Rails <= 2.2
             def reload_application_with_dryml_generators
               reload_application_without_dryml_generators
-              DrymlGenerator.run unless Hobo::Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
+              DrymlGenerator.run unless Dryml::DrymlGenerator.run_on_every_request == false || Rails.env.production?
             end
             alias_method_chain :reload_application, :dryml_generators
           end
@@ -259,5 +257,4 @@ module Hobo
     end
     
   end
-  
-end
+

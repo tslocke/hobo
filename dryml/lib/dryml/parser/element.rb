@@ -1,10 +1,10 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   class Element < REXML::Element
 
     def initialize(*args)
       super
-      @elements = Hobo::Dryml::Parser::Elements.new(self)
+      @elements = Dryml::Parser::Elements.new(self)
     end
 
     def dryml_name

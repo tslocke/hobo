@@ -1,10 +1,10 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   class Element < REXML::Element
 
     def initialize(*args)
       super
-      @elements = Hobo::Dryml::Parser::Elements.new(self)
+      @elements = Dryml::Parser::Elements.new(self)
     end
 
     def dryml_name
@@ -30,9 +30,9 @@ module Hobo::Dryml::Parser
     def add(element=nil)
       rv = nil
       if element.nil?
-        Hobo::Dryml::Parser::Element.new("", self, @element.context)
+        Dryml::Parser::Element.new("", self, @element.context)
       elsif not element.kind_of?(Element)
-        Hobo::Dryml::Parser::Element.new(element, self, @element.context)
+        Dryml::Parser::Element.new(element, self, @element.context)
       else
         @element << element
         element.context = @element.context

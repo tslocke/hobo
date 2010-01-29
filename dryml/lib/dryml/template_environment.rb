@@ -1,4 +1,4 @@
-module Hobo::Dryml
+module Dryml
 
   class TemplateEnvironment
     
@@ -22,9 +22,9 @@ module Hobo::Dryml
       alias_method :delayed_alias_method_chain, :alias_method_chain
 
     end
-    
-    include ActionView::Helpers
 
+    include ActionView::Helpers
+    include Helper  ## FIXME remove
 
     def initialize(view_name=nil, view=nil)
       unless view_name.nil? && view.nil?
@@ -56,7 +56,7 @@ module Hobo::Dryml
     end
     
     def path_for_form_field
-      @_form_field_path.nil? and raise Hobo::Dryml::DrymlException, 
+      @_form_field_path.nil? and raise Dryml::DrymlException, 
         "DRYML cannot provide the correct form-field name here (this_field = #{this_field.inspect}, this = #{this.inspect})"
       @_form_field_path
     end
@@ -163,7 +163,7 @@ module Hobo::Dryml
     
     
     def refresh_part(encoded_context, session, dom_id)
-      context = Hobo::Dryml::PartContext.for_refresh(encoded_context, @this, session)
+      context = Dryml::PartContext.for_refresh(encoded_context, @this, session)
         
       with_part_context(context) do
         send("#{context.part_name}_part", *context.locals)

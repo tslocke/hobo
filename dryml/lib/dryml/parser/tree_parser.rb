@@ -1,9 +1,9 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   class TreeParser < REXML::Parsers::TreeParser
     def initialize( source, build_context = Document.new )
       @build_context = build_context
-      @parser = Hobo::Dryml::Parser::BaseParser.new(source)
+      @parser = Dryml::Parser::BaseParser.new(source)
     end
 
 
@@ -26,7 +26,7 @@ module Hobo::Dryml::Parser
             tag_stack.push(event[1])
             el = @build_context = @build_context.add_element( event[1] )
             event[2].each do |key, value|
-              el.attributes[key]=Hobo::Dryml::Parser::Attribute.new(key,value,self)
+              el.attributes[key]=Dryml::Parser::Attribute.new(key,value,self)
             end
             @build_context.start_tag_source = event[3]
             @build_context.source_offset = event[4]
@@ -40,7 +40,7 @@ module Hobo::Dryml::Parser
                 @build_context[-1] << event[1]
               else
                 @build_context.add(
-                                   Hobo::Dryml::Parser::Text.new(event[1], @build_context.whitespace, nil, true)
+                                   Dryml::Parser::Text.new(event[1], @build_context.whitespace, nil, true)
                                    ) unless (
                                              @build_context.ignore_whitespace_nodes and
                                              event[1].strip.size==0

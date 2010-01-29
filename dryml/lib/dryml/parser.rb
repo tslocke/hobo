@@ -1,3 +1,3 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
 end

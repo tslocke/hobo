@@ -1,9 +1,29 @@
-== Welcome to Hobo
-Hobo is an Open Source extension to Ruby on Rails which helps you build full blown web applications incredibly quickly and easily. Available as a Gem or Rails plugin, Hobo provides a simple, clean and elegant development framework which allows for rapid prototyping or production of the most sophisticated web applications.
+# DRYML
 
-== Main Features
+DRYML is the Don't Repeat Yourself Markup Language.  It uses an XML
+syntax and is best at creating XML documents.  It could be used to
+create other forms of plain-text documents, but the syntax is not
+optimized for that and you may end up with extra carriage returns.
+(Which would be a bug, so please send test cases).
 
-    * Rapid implementation of dynamic Ajax interfaces in your application with no extra programming.
-    * Switchable themes. Customise and tweak your application structure and layout to meet any design goals.
-    * Powerful mark-up language, DRYML, combines rapid development with ultimate design flexibility. The end of the cookie cutter blues!
+DRYML was created for the Hobo project, but this is an extraction from
+that project and can be used separately.
 
+# How to use
+
+Compile your template:  (*path* should be an identifying string useful
+for caching and error messages).
+
+     renderer_class = Dryml.make_renderer_class(src, path)
+
+If you don't have a view, you need one:
+
+     view = ActionView::Base.new(ActionController::Base.view_paths, {})  
+
+Instantiate your template:
+
+     renderer = renderer_class.new(view_name, view)
+
+Render:
+
+     puts renderer.render_page(page_this, page_locals)

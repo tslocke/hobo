@@ -1,4 +1,4 @@
-module Hobo::Dryml
+module Dryml
 
   class ScopedVariables
 

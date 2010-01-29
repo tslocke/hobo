@@ -76,22 +76,22 @@ collection is considered blank)
 <def tag="if" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)
   res = (cond = !test.blank?) ? parameters.default : ""
-  Hobo::Dryml.last_if = cond
+  Dryml.last_if = cond
   res
 %></def>
 
 <!-- General purpose `else` clause.
 
-`<else>` works with various tags such as `<if>` and `<repeat>` (the else clause will be output if the collection was empty). It simply outputs its content if `Hobo::Dryml.last_if` is false. This is pretty much a crazy hack which violates many good principles of language design, but it's very useful : )
+`<else>` works with various tags such as `<if>` and `<repeat>` (the else clause will be output if the collection was empty). It simply outputs its content if `Dryml.last_if` is false. This is pretty much a crazy hack which violates many good principles of language design, but it's very useful : )
 -->
-<def tag="else"><%= parameters.default unless Hobo::Dryml.last_if %></def>
+<def tag="else"><%= parameters.default unless Dryml.last_if %></def>
 
 
 <!-- Same behaviour as `<if>`, except the test is negated. -->
 <def tag="unless" attrs="test"><%= 
   test = all_attributes.fetch(:test, this)     
   res = (cond = test.blank?) ? parameters.default : ""
-  Hobo::Dryml.last_if = cond
+  Dryml.last_if = cond
   res
 %></def>
 

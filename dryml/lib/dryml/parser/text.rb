@@ -1,4 +1,4 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   class Text < REXML::Text
 

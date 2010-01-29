@@ -1,4 +1,4 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   # A REXML source that keeps track of where in the buffer it is
   class Source < REXML::Source

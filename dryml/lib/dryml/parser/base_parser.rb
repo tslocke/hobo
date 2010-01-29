@@ -1,4 +1,4 @@
-module Hobo::Dryml::Parser
+module Dryml::Parser
 
   class BaseParser < REXML::Parsers::BaseParser
 

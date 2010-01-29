@@ -1,4 +1,4 @@
-module Hobo::Dryml
+module Dryml
 
   module Parser
 
@@ -19,13 +19,13 @@ module Hobo::Dryml
 
 
         @reference_src = "<dryml_page>" + source + "</dryml_page>"
-        rex_src = Hobo::Dryml::Parser::Source.new(@reference_src)
+        rex_src = Dryml::Parser::Source.new(@reference_src)
 
-        @elements = Hobo::Dryml::Parser::Elements.new(self)
+        @elements = Dryml::Parser::Elements.new(self)
         build(rex_src)
 
       rescue REXML::ParseException => e
-        raise Hobo::Dryml::DrymlSyntaxError, "File: #{path}\n#{e}"
+        raise Dryml::DrymlSyntaxError, "File: #{path}\n#{e}"
       end
 
 
@@ -47,7 +47,7 @@ module Hobo::Dryml
 
       private
       def build( source )
-        Hobo::Dryml::Parser::TreeParser.new( source, self ).parse
+        Dryml::Parser::TreeParser.new( source, self ).parse
       end
 
     end

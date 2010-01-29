@@ -1,6 +1,18 @@
+# The Don't Repeat Yourself Markup Language
+#
+# Author::    Tom Locke (tom@tomlocke.com)
+# Copyright:: Copyright (c) 2008
+# License::   Distributes under the same terms as Ruby
+
+
+
 # gem dependencies
 require 'hobosupport'
 
+# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
+::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+
+# The Don't Repeat Yourself Markup Language
 module Dryml
 
     VERSION = "0.9.106"
@@ -24,13 +36,16 @@ module Dryml
     EMPTY_PAGE = "[tag-page]"
 
     APPLICATION_TAGLIB = { :src => "taglibs/application" }
-    CORE_TAGLIB        = { :src => "core", :plugin => "hobo" }
+    CORE_TAGLIB        = { :src => "core", :plugin => "dryml" }
 
-    DEFAULT_IMPORTS = (if defined?(ApplicationHelper)
-                         [Hobo::HoboHelper, Hobo::Translations, ApplicationHelper]
-                       else
-                         [Hobo::HoboHelper, Hobo::Translations]
-                       end)
+
+    # FIXME 
+    # DEFAULT_IMPORTS = (if defined?(ApplicationHelper)
+    #                      [Hobo::HoboHelper, Hobo::Translations, ApplicationHelper]
+    #                    else
+    #                      [Hobo::HoboHelper, Hobo::Translations]
+    #                    end)
+    DEFAULT_IMPORTS = []
 
     @renderer_classes = {}
     @tag_page_renderer_classes = {}
@@ -156,8 +171,20 @@ module Dryml
       end
     end
 
-
-    def make_renderer_class(template_src, template_path, locals, imports, included_taglibs=[])
+    # create and compile a renderer class
+    #
+    # template_src:: the DRYML source
+    # template_path:: the filename of the source.  This is used for
+    #                 caching
+    # locals:: local variables.
+    # imports:: A list of helper modules to import.  For example, Hobo
+    #           uses [Hobo::HoboHelper, Hobo::Translations,
+    #           ApplicationHelper] 
+    # included_taglibs:: A list of Taglibs to include. { :src =>
+    #                    "core", :plugin => "dryml" } is automatically
+    #                    added to this list.
+    #
+    def make_renderer_class(template_src, template_path, locals=[], imports=[], included_taglibs=[])
       renderer_class = Class.new(TemplateEnvironment)
       compile_renderer_class(renderer_class, template_src, template_path, locals, imports, included_taglibs)
       renderer_class
@@ -185,5 +212,19 @@ module Dryml
         word
       end
     end
+
+
+    def static_tags
+      @static_tags ||= begin
+                         path = if FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
+                                    "#{RAILS_ROOT}/config/dryml_static_tags.txt"
+                                else
+                                    File.join(File.dirname(__FILE__), "dryml/static_tags")
+                                end
+                         File.readlines(path).*.chop
+                       end
+    end
+
+    attr_writer :static_tags
     
 end

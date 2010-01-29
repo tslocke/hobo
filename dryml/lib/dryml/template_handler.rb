@@ -1,4 +1,4 @@
-module Hobo::Dryml
+module Dryml
 
   class TemplateHandler < ActionView::TemplateHandler
     
@@ -8,7 +8,7 @@ module Hobo::Dryml
     
     # Pre Rails 2.2
     def render(template)
-      renderer = Hobo::Dryml.page_renderer_for_template(@view, template.locals.keys, template)
+      renderer = Dryml.page_renderer_for_template(@view, template.locals.keys, template)
       this = @view.instance_variable_set("@this", @view.controller.send(:dryml_context) || template.locals[:this])
       s = renderer.render_page(this, template.locals)
       # Important to strip whitespace, or the browser hangs around for ages (FF2)
@@ -16,7 +16,7 @@ module Hobo::Dryml
     end
     
     def render_for_rails22(template, view, local_assigns)
-      renderer = Hobo::Dryml.page_renderer_for_template(view, local_assigns.keys, template)
+      renderer = Dryml.page_renderer_for_template(view, local_assigns.keys, template)
       this = view.controller.send(:dryml_context) || local_assigns[:this]
       @view._?.instance_variable_set("@this", this)
       s = renderer.render_page(this, local_assigns)
@@ -52,7 +52,7 @@ module ActionController
         options[:with] = dryml_context
       end
 
-      Hobo::Dryml.render_tag(@template, tag, options)
+      Dryml.render_tag(@template, tag, options)
     end
 
 
@@ -102,7 +102,7 @@ end
 class ActionView::Template
   
   def render_with_dryml(view, local_assigns = {})
-    if handler == Hobo::Dryml::TemplateHandler
+    if handler == Dryml::TemplateHandler
       render_dryml(view, local_assigns)
     else
       render_without_dryml(view, local_assigns)
@@ -127,7 +127,7 @@ class ActionView::Template
       view.send(:_evaluate_assigns_and_ivars)
       view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
  
-      result = Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
+      result = Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)
  
       stack.pop
       result
@@ -139,7 +139,7 @@ class ActionView::Template
         view.send(:_evaluate_assigns_and_ivars)
         view.send(:_set_controller_content_type, mime_type) if respond_to?(:mime_type)
         
-        Hobo::Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)      
+        Dryml::TemplateHandler.new.render_for_rails22(self, view, local_assigns)      
       end
     end
   end

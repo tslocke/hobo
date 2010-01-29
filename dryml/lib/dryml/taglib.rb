@@ -1,5 +1,3 @@
-module Hobo
-
   module Dryml
 
     class Taglib
@@ -28,7 +26,9 @@ module Hobo
 
         def taglib_filename(options)
           plugin = options[:plugin]
-          base = if plugin == "hobo"
+          base = if plugin == "dryml"
+                   "#{DRYML_ROOT}/taglibs"
+                 elsif plugin == "hobo"
                    "#{HOBO_ROOT}/taglibs"
                  elsif plugin
                    "#{RAILS_ROOT}/vendor/plugins/#{plugin}/taglibs"
@@ -119,5 +119,3 @@ module Hobo
     end
 
   end
-
-end

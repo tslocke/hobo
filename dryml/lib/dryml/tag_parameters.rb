@@ -1,5 +1,3 @@
-module Hobo
-
   module Dryml
 
     class NoParameterError < RuntimeError; end
@@ -32,5 +30,3 @@ module Hobo
     end
 
   end
-
-end

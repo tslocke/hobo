@@ -1,7 +1,5 @@
 require 'rexml/xpath'
 
-module Hobo
-  
   module Dryml
 
     # DrymlDoc provides the facility to parse a directory tree of DRYML taglibs, building a collection of objects that provide metadata
@@ -34,7 +32,7 @@ module Hobo
         
         def initialize(home, filename, name=nil)
           @name = name || filename.sub(/.dryml$/, '')[home.length+1..-1]
-          @doc = Hobo::Dryml::Parser::Document.new(File.read(filename), filename)
+          @doc = Dryml::Parser::Document.new(File.read(filename), filename)
           parse_tag_defs
         end
         
@@ -155,5 +153,3 @@ module Hobo
     end
     
   end
-  
-end

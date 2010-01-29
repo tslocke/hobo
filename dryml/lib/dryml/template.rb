@@ -1,7 +1,7 @@
 require 'rexml/document'
 require 'pathname'
 
-module Hobo::Dryml
+module Dryml
 
   class Template
 
@@ -89,7 +89,7 @@ module Hobo::Dryml
 
 
     def process_src
-      @doc = Hobo::Dryml::Parser::Document.new(@src, @template_path)
+      @doc = Dryml::Parser::Document.new(@src, @template_path)
       result = children_to_erb(@doc.root)
       restore_erb_scriptlets(result)
     end
@@ -164,7 +164,7 @@ module Hobo::Dryml
         param_content_element(el)
 
       else
-        if el.dryml_name.not_in?(Hobo.static_tags) || el.attributes['param'] || el.attributes['restore']
+        if el.dryml_name.not_in?(Dryml.static_tags) || el.attributes['param'] || el.attributes['restore']
           tag_call(el)
         else
           static_element_to_erb(el)
@@ -277,7 +277,7 @@ module Hobo::Dryml
       @def_element = el
 
       unsafe_name = el.attributes["tag"]
-      name = Hobo::Dryml.unreserve(unsafe_name)
+      name = Dryml.unreserve(unsafe_name)
       suffix = type_specific_suffix
       if suffix
         name        += suffix
@@ -299,7 +299,7 @@ module Hobo::Dryml
 
       alias_of and @builder.add_build_instruction(:alias_method,
                                                   :new => ruby_name(name).to_sym,
-                                                  :old => ruby_name(Hobo::Dryml.unreserve(alias_of)).to_sym)
+                                                  :old => ruby_name(Dryml.unreserve(alias_of)).to_sym)
 
       res = if alias_of
               "<% #{tag_newlines(el)} %>"
@@ -341,8 +341,8 @@ module Hobo::Dryml
       end
             
       src = "<% def #{name}(all_attributes={}, all_parameters={}); " +
-        "parameters = Hobo::Dryml::TagParameters.new(all_parameters, #{param_names.inspect.underscore}); " +
-        "all_parameters = Hobo::Dryml::TagParameters.new(all_parameters); " +
+        "parameters = Dryml::TagParameters.new(all_parameters, #{param_names.inspect.underscore}); " +
+        "all_parameters = Dryml::TagParameters.new(all_parameters); " +
         tag_method_body(el) +
         "; end#{alias_statement} %>"
       @extend_key = nil
@@ -355,7 +355,7 @@ module Hobo::Dryml
 
       # A statement to assign values to local variables named after the tag's attrs
       # The trailing comma on `attributes` is supposed to be there!
-      setup_locals = attrs.map{|a| "#{Hobo::Dryml.unreserve(a).underscore}, "}.join + "attributes, = " +
+      setup_locals = attrs.map{|a| "#{Dryml.unreserve(a).underscore}, "}.join + "attributes, = " +
         "_tag_locals(all_attributes, #{attrs.inspect})"
 
       start = "_tag_context(all_attributes) do #{setup_locals}"
@@ -488,7 +488,7 @@ module Hobo::Dryml
     def call_name(el)
       dryml_exception("invalid tag name", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
       
-      name = Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
+      name = Dryml.unreserve(ruby_name(el.dryml_name))
       if call_to_self_from_type_specific_def?(el)
         "#{name}__base"
       elsif old_tag_call?(el)
@@ -901,11 +901,11 @@ module Hobo::Dryml
         x = gensym
         case attr
         when "if"
-          "(if !(#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
-            "else (Hobo::Dryml.last_if = false; ''); end)"
+          "(if !(#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
+            "else (Dryml.last_if = false; ''); end)"
         when "unless"
-          "(if (#{control}).blank?; (#{x} = #{expression}; Hobo::Dryml.last_if = true; #{x}) " +
-            "else (Hobo::Dryml.last_if = false; ''); end)"
+          "(if (#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
+            "else (Dryml.last_if = false; ''); end)"
         when "repeat"
           "repeat_attribute(#{control}) { #{expression} }"
         end

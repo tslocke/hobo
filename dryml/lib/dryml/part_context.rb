@@ -1,5 +1,3 @@
-module Hobo
-
   module Dryml
 
     # Raised when the part context fails its integrity check.
@@ -133,5 +131,3 @@ module Hobo
     end
 
   end
-
-end
