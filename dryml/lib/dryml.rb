@@ -54,14 +54,14 @@ module Dryml
 
     attr_accessor :last_if
     
-    def enable
-      ActionView::Template.register_template_handler("dryml", Hobo::Dryml::TemplateHandler)
+    def enable(generator_directories=[])
+      ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
       if ActionView::Template.respond_to? :exempt_from_layout
         ActionView::Template.exempt_from_layout('dryml')
       elsif
         ActionView::Base.exempt_from_layout('dryml')
       end
-      DrymlGenerator.enable
+      DrymlGenerator.enable(generator_directories)
     end
     
     
@@ -69,7 +69,7 @@ module Dryml
       Dir.chdir(RAILS_ROOT) do
         taglibs = Dir["vendor/plugins/**/taglibs/**/*.dryml"] + Dir["app/views/taglibs/**/*.dryml"]
         taglibs.each do |f|
-          Hobo::Dryml::Taglib.get(:template_dir => File.dirname(f), :src => File.basename(f).remove(".dryml"))
+          Dryml::Taglib.get(:template_dir => File.dirname(f), :src => File.basename(f).remove(".dryml"))
         end
       end
     end

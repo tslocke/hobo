@@ -9,7 +9,29 @@ optimized for that and you may end up with extra carriage returns.
 DRYML was created for the Hobo project, but this is an extraction from
 that project and can be used separately.
 
-# How to use
+# How to use with rails but without Hobo
+
+- install both HoboSupport and Dryml as a plugin or gem
+
+- create an `application.dryml`
+
+    $ mkdir app/views/taglibs
+    $ touch app/views/taglibs/application.dryml
+
+- create `config/initializers/dryml.rb`
+
+    require 'dryml'
+    require 'dryml/template'
+    require 'dryml/dryml_generator'
+    Dryml.enable
+
+Now you can use templates that end in ".dryml".  Such templates will
+ignore layouts.
+
+# How to use outside of Rails
+
+(Note:  you don't need Rails, but you do need ActionView, although you
+can use a dummy view)
 
 Compile your template:  (*path* should be an identifying string useful
 for caching and error messages).

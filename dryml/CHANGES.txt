@@ -3,6 +3,7 @@ CHANGES:
  - Hobo::Dryml moved to Dryml
  - Hobo.static_tags moved to Dryml.static_tags
  - core.dryml moved to dryml/taglibs
+ - generator_directories moved from constant to parameter to Dryml.enable
 
     
     

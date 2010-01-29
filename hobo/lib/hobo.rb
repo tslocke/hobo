@@ -136,7 +136,7 @@ module Hobo
       require 'hobo/dryml/dryml_generator'
 
       Hobo::Model.enable
-      Hobo::Dryml.enable
+      Hobo::Dryml.enable(["#{HOBO_ROOT}/dryml_generators"])
       Hobo::Permissions.enable
       Hobo::ViewHints.enable
       

@@ -8,7 +8,6 @@ require 'action_controller/dispatcher'
     
     class DrymlGenerator
       
-      TEMPLATES = "#{HOBO_ROOT}/dryml_generators"
       OUTPUT    = "#{RAILS_ROOT}/app/views/taglibs/auto"
       
       HEADER = "<!-- AUTOMATICALLY GENERATED FILE - DO NOT EDIT -->\n\n"
@@ -17,8 +16,9 @@ require 'action_controller/dispatcher'
         attr_accessor :run_on_every_request
       end
       
-      def self.enable
-        
+      def self.enable(generator_directories = [])
+        @generator_directories = generator_directories
+
         # Unfortunately the dispatcher callbacks don't give us the hook we need (after routes are reloaded) 
         # so we have to alias_method_chain
         ActionController::Dispatcher.class_eval do
@@ -44,39 +44,46 @@ require 'action_controller/dispatcher'
       end
       
       def self.run
-        @generator ||= DrymlGenerator.new
+        @generator ||= DrymlGenerator.new(@generator_directories)
         @generator.run
       end
       
       
-      def initialize
+      def initialize(generator_directories=[])
         @templates = {}
         @digests   = {}
-        load_templates
+        load_templates(generator_directories)
       end
       
       attr_accessor :subsite
       
       
-      def load_templates
-        Dir["#{TEMPLATES}/**/*.dryml.erb"].each do |f|
-          name = f[TEMPLATES.length + 1..-11]
-          erb = File.read(f)
-          @templates[name] = ERB.new(erb, nil, '-').src
-          
-          # Create output directories and parents as required
-          [nil, *Hobo.subsites].each do |s| 
-            FileUtils.mkdir_p(File.dirname("#{output_dir s}/#{name}"))
+      def load_templates(generator_directories)
+        generator_directories.each do |dir|
+          Dir["#{dir}/**/*.dryml.erb"].each do |f|
+            name = f[dir.length + 1..-11]
+            erb = File.read(f)
+            @templates[name] = ERB.new(erb, nil, '-').src
+            
+            # Create output directories and parents as required
+            [nil, *Hobo.subsites].each do |s| 
+              FileUtils.mkdir_p(File.dirname("#{output_dir s}/#{name}"))
+            end
           end
         end
       end
       
       
       def run
+        # FIXME
         # Ensure all view hints loaded before running
-        Hobo::Model.all_models.*.view_hints
-        
-        [nil, *Hobo.subsites].each { |s| run_for_subsite(s) }
+        subsites = []
+        if self.class.const_defined?(:Hobo)
+          Hobo::Model.all_models.*.view_hints
+          subsites += [*Hobo.subsites]
+        end
+
+        subsites.each { |s| run_for_subsite(s) }
       end
       
       
