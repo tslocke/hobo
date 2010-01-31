@@ -26,18 +26,19 @@
 
         def taglib_filename(options)
           plugin = options[:plugin]
+          rails_root = self.class.const_defined?(:RAILS_ROOT) ? RAILS_ROOT : "."
           base = if plugin == "dryml"
                    "#{DRYML_ROOT}/taglibs"
                  elsif plugin == "hobo"
                    "#{HOBO_ROOT}/taglibs"
                  elsif plugin
-                   "#{RAILS_ROOT}/vendor/plugins/#{plugin}/taglibs"
+                   "#{rails_root}/vendor/plugins/#{plugin}/taglibs"
                  elsif options[:src] =~ /\//
-                   "#{RAILS_ROOT}/app/views"
+                   "#{rails_root}/app/views"
                  elsif options[:template_dir] =~ /^#{HOBO_ROOT}/
                    options[:template_dir]
                  else
-                   "#{RAILS_ROOT}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
+                   "#{rails_root}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
                  end
 
           src = options[:src] || plugin

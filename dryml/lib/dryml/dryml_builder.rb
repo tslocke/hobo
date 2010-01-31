@@ -8,7 +8,7 @@ module Dryml
       @part_names = []
     end
 
-    attr_reader :template
+    attr_reader :template, :environment
 
     def template_path
       template.template_path

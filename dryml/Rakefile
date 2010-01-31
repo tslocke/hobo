@@ -14,20 +14,17 @@ task :default => [ :test ]
 
 # --- Testing --- #
 
-desc "Run all unit tests"
-Rake::TestTask.new(:test) { |t|
-  t.libs << "test"
-  t.test_files=Dir.glob( "test/**/*_test.rb" ).sort
-  t.verbose = true
-}
+desc "Run all tests"
+task :test do |t|
+  files=Dir['test/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+  exit(1) if !system("#{RUBYDOCTEST} #{files}")
+end
 
-namespace "test" do
-  desc "Run the doctests"
-  task :doctest do |t|
-    files=Dir['doctest/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
-    # note, tests in doctest/hobo/ are out of date
-    exit(1) if !system("#{RUBYDOCTEST} #{files}")
-  end
+# --- RDOC --- #
+
+require 'yard'
+YARD::Rake::YardocTask.new do |t|
+  t.files = ['lib/**/*.rb', 'README', 'LICENSE.txt', 'CHANGES.txt']
 end
 
 # --- Packaging and Rubyforge & gemcutter & github--- #

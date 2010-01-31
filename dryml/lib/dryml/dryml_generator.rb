@@ -8,15 +8,15 @@ require 'action_controller/dispatcher'
     
     class DrymlGenerator
       
-      OUTPUT    = "#{RAILS_ROOT}/app/views/taglibs/auto"
-      
       HEADER = "<!-- AUTOMATICALLY GENERATED FILE - DO NOT EDIT -->\n\n"
       
       class << self
         attr_accessor :run_on_every_request
+        attr_accessor :output_directory
       end
       
-      def self.enable(generator_directories = [])
+      def self.enable(generator_directories = [], output_directory = nil)
+        @output_directory ||= "#{RAILS_ROOT}/app/views/taglibs/auto" if const_defined? :RAILS_ROOT
         @generator_directories = generator_directories
 
         # Unfortunately the dispatcher callbacks don't give us the hook we need (after routes are reloaded) 
@@ -96,7 +96,7 @@ require 'action_controller/dispatcher'
       
       
       def output_dir(s=subsite)
-        s ? "#{OUTPUT}/#{s}" : OUTPUT
+        s ? "#{Dryml.output_directory}/#{s}" : Dryml.output_directory
       end
       
       

@@ -8,6 +8,10 @@
 
 # gem dependencies
 require 'hobosupport'
+require 'action_view'
+require 'action_controller'
+
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -104,7 +108,7 @@ module Dryml
       end
 
       prepare_view!(view)
-      included_taglibs = ([subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
+      included_taglibs = ([APPLICATION_TAGLIB, subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
 
       if page.ends_with?(EMPTY_PAGE)
         # DELETE ME: controller_class = controller_class_for(page)
@@ -153,7 +157,7 @@ module Dryml
       parts = page.split("/")
       subsite = parts.length >= 3 ? parts[0..-3].join('_') : "front"
       src = "taglibs/#{subsite}_site"
-      { :src => src } if File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
+      { :src => src } if const_defined?(:RAILS_ROOT) && File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
     end
 
 
@@ -171,7 +175,7 @@ module Dryml
       end
     end
 
-    # create and compile a renderer class
+    # create and compile a renderer class (AKA Dryml::Template::Environment)
     #
     # template_src:: the DRYML source
     # template_path:: the filename of the source.  This is used for
@@ -195,7 +199,7 @@ module Dryml
       template = Dryml::Template.new(template_src, renderer_class, template_path)
       imports.each {|m| template.import_module(m)}
 
-      taglibs = [CORE_TAGLIB, APPLICATION_TAGLIB] + included_taglibs
+      taglibs = [CORE_TAGLIB] + included_taglibs
 
       # the sum of all the names we've seen so far - eventually we'll be ready for all of 'em
       all_local_names = renderer_class.compiled_local_names | locals
@@ -216,7 +220,7 @@ module Dryml
 
     def static_tags
       @static_tags ||= begin
-                         path = if FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
+                         path = if const_defined?(:RAILS_ROOT) && FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
                                     "#{RAILS_ROOT}/config/dryml_static_tags.txt"
                                 else
                                     File.join(File.dirname(__FILE__), "dryml/static_tags")
@@ -226,5 +230,38 @@ module Dryml
     end
 
     attr_writer :static_tags
+
+    # Helper function for use outside Hobo/Rails
+    #
+    # Pass the template context in locals[:this]
+    #
+    # This function caches.  If the mtime of template_path is older
+    # than the last compilation time, the cached version will be
+    # used.  If no template_path is given, template_src is used as the
+    # key to the cache.
+    #
+    # If a local variable is not present when the template is
+    # compiled, it will be ignored when the template is used.  In
+    # other words, the variable values may change, but the names may
+    # not.
+    #
+    # included_taglibs is only used during template compilation.
+    #
+    # @param [String] template_src the DRYML source
+    # @param [Hash] locals local variables.
+    # @param [String, nil] template_path the filename of the source.  
+    # @param [Array] included_taglibs A list of Taglibs to include. { :src =>
+    #                    "core", :plugin => "dryml" } is automatically
+    #                    added to this list.
+    # @param [ActionView::Base] view an ActionView instance    
+    def render(template_src, locals={}, template_path=nil, included_taglibs=[], view=nil)
+      template_path ||= template_src
+      view ||= ActionView::Base.new(ActionController::Base.view_paths, {})
+      this = locals[:this] || nil
+
+      renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
+        Dryml.make_renderer_class(template_src, template_path, locals.keys)
+      renderer_class.new(template_path, view).render_page(this, locals)      
+    end
     
 end

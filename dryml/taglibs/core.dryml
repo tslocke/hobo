@@ -102,3 +102,35 @@ collection is considered blank)
   new_field_context(fake_field, context) { res << parameters.default }
   res
 %></def>
+
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="html"><%= "<html#{tag_options(attributes)}>" -%><do param="default"/><%= "</html>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="table"><%= "<table#{tag_options(attributes)}>" -%><do param="default"/><%= "</table>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="a"><%= "<a#{tag_options(attributes)}>" -%><do param="default"/><%= "</a>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="section"><%= "<section#{tag_options(attributes)}>" -%><do param="default"/><%= "</section>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="header"><%= "<header#{tag_options(attributes)}>" -%><do param="default"/><%= "</header>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="footer"><%= "<footer#{tag_options(attributes)}>" -%><do param="default"/><%= "</footer>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="form"><%= "<form#{tag_options(attributes)}>" -%><do param="default"/><%= "</form>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="submit"><%= "<submit#{tag_options(attributes)}>" -%><do param="default"/><%= "</submit>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="input"><%= "<input#{tag_options(attributes)}>" -%><do param="default"/><%= "</input>" -%></def>
+
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="link"><%= "<link#{tag_options(attributes)}>" -%><do param="default"/><%= "</link>" -%></def>
+

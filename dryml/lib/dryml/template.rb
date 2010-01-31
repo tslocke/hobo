@@ -1,4 +1,5 @@
 require 'rexml/document'
+require 'digest/sha1'
 require 'pathname'
 
 module Dryml
@@ -36,7 +37,8 @@ module Dryml
     def initialize(src, environment, template_path)
       @src = src
       @environment = environment # a class or a module
-      @template_path = template_path.sub(%r(^#{Regexp.escape(RAILS_ROOT)}/), "")
+      @template_path = template_path
+      @template_path.sub!(%r(^#{Regexp.escape(RAILS_ROOT)}/), "") if self.class.const_defined? :RAILS_ROOT
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
@@ -51,8 +53,8 @@ module Dryml
 
       unless @template_path.ends_with?(EMPTY_PAGE)
         p = Pathname.new template_path
-        p = Pathname.new(RAILS_ROOT) + p unless p.absolute?
-        mtime = p.mtime
+        p = Pathname.new(RAILS_ROOT) + p unless p.absolute? || !self.class.const_defined?(:RAILS_ROOT)
+        mtime = p.mtime rescue Time.now
       
         if !@builder.ready?(mtime)
           @builder.start
@@ -72,7 +74,7 @@ module Dryml
       # compile the build instructions
       @builder.build(local_names, auto_taglibs, mtime)
 
-      logger.info("  DRYML: Compiled #{template_path} in %.2fs" % (Time.now - now)) if parsed
+      logger._?.info("  DRYML: Compiled " +template_path+" in %.2fs" % (Time.now - now)) if parsed
     end
 
 
