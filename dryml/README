@@ -1,9 +1,9 @@
 # DRYML
 
-DRYML is the Don't Repeat Yourself Markup Language.  It uses an XML
-syntax and is best at creating XML documents.  It could be used to
-create other forms of plain-text documents, but the syntax is not
-optimized for that and you may end up with extra carriage returns.
+DRYML is the Don't Repeat Yourself Markup Language.  It uses an
+XML-like syntax and is best at creating XHTML documents.  It could be
+used to create other forms of plain-text documents, but the syntax is
+not optimized for that and you may end up with extra carriage returns.
 (Which would be a bug, so please send test cases).
 
 DRYML was created for the Hobo project, but this is an extraction from

@@ -7,3 +7,6 @@ Hobo is an Open Source extension to Ruby on Rails which helps you build full blo
     * Switchable themes. Customise and tweak your application structure and layout to meet any design goals.
     * Powerful mark-up language, DRYML, combines rapid development with ultimate design flexibility. The end of the cookie cutter blues!
 
+== RDOC Note
+
+This is also the front page to the Hobo RDOC.  RDOC is not the main documentation method for Hobo.  See [hobocentral](http://cookbook.hobocentral.net) for the Hobo documentation.
