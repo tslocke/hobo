@@ -160,6 +160,37 @@ module Dryml
       { :src => src } if const_defined?(:RAILS_ROOT) && File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
     end
 
+    def get_field(object, field)
+      return nil if object.nil?
+      field_str = field.to_s
+      begin
+        return object.send(field_str)
+      rescue NoMethodError => ex
+        if field_str =~ /^\d+$/
+          return object[field.to_i]
+        else
+          return object[field]
+        end
+      end
+    end
+
+
+    def get_field_path(object, path)
+      path = if path.is_a? String
+               path.split('.')
+             else
+               Array(path)
+             end
+
+      parent = nil
+      path.each do |field|
+        return nil if object.nil?
+        parent = object
+        object = get_field(parent, field)
+      end
+      [parent, path.last, object]
+    end    
+
 
     def prepare_view!(view)
       # Not sure why this isn't done for me...
@@ -257,7 +288,7 @@ module Dryml
     def render(template_src, locals={}, template_path=nil, included_taglibs=[], view=nil)
       template_path ||= template_src
       view ||= ActionView::Base.new(ActionController::Base.view_paths, {})
-      this = locals[:this] || nil
+      this = locals.delete(:this) || nil
 
       renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
         Dryml.make_renderer_class(template_src, template_path, locals.keys)

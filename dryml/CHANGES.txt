@@ -6,4 +6,4 @@ CHANGES:
  - generator_directories moved from constant to parameter to Dryml.enable
  - APPLICATION_TAGLIB not necessarily loaded automatically
  - generator input and output directors no longer hardcoded, must be passed to #enable
-    
+ - a bunch of functions in hobo.rb moved to dryml.rb

@@ -83,39 +83,6 @@ module Hobo
         (not refl.options[:conditions])
     end
 
-
-    def get_field(object, field)
-      return nil if object.nil?
-      field_str = field.to_s
-      begin
-        return object.send(field_str)
-      rescue NoMethodError => ex
-        if field_str =~ /^\d+$/
-          return object[field.to_i]
-        else
-          return object[field]
-        end
-      end
-    end
-
-
-    def get_field_path(object, path)
-      path = if path.is_a? String
-               path.split('.')
-             else
-               Array(path)
-             end
-
-      parent = nil
-      path.each do |field|
-        return nil if object.nil?
-        parent = object
-        object = get_field(parent, field)
-      end
-      [parent, path.last, object]
-    end
-
-
     def subsites
       # Any directory inside app/controllers defines a subsite
       @subsites ||= Dir["#{RAILS_ROOT}/app/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact

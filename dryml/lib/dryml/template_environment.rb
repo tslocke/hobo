@@ -280,7 +280,7 @@ module Dryml
           raise ArgumentError, "invlaid context change" unless path.length == 1
           @_this_parent, @_this_field, @_this = this, path.first, new_this
         else
-          parent, field, obj = Hobo.get_field_path(this, path)
+          parent, field, obj = Dryml.get_field_path(this, path)
           @_this, @_this_parent, @_this_field = obj, parent, field
         end
         
