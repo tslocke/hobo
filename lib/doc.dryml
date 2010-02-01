@@ -35,42 +35,41 @@
   <body>
     <div id="tabs-top">
       <ul>
-        <% this.each {|taglib| %>
-          <tag-link content="&taglib.name" link="#{taglib.name}-taglib"/>
-        <% } %>
+        <repeat with="&this">
+          <tag-link content="&this.name" link="#{this.name}-taglib"/>
+        </repeat>
       </ul>
-      <!-- unfortunately, <repeat> is problematic here -->
-      <% this.each {|taglib| %>
-        <div class="taglib" id="#{taglib.name}-taglib">
-          <%= taglib.comment_html %>
+      <repeat>
+        <div class="taglib" id="#{this.name}-taglib">
+          <%= this.comment_html %>
           <ul>
-            <% taglib.tag_defs.each {|tag| %>
-              <tag-link content="&tag.name" link="#{tag.name}-tag"/>
-            <% } %>
+            <repeat:tag_defs>
+              <tag-link content="&this.name" link="#{this.name}-tag"/>
+            </repeat>
           </ul>
-          <% taglib.tag_defs.each {|tag| %>
-            <div id="#{tag.name}-tag">
+          <repeat:tag_defs>
+            <div id="#{this.name}-tag">
           
-              <h2><%= tag.name %></h2>
+              <h2><%= this.name %></h2>
               
-              <%= tag.comment_intro_html %>
+              <%= this.comment_intro_html %>
           
-              <% if !tag.parameters.empty? %>
+              <unless test="&this.parameters.empty?">
                 <h3>Parameters</h3>
-                <param-list with="&tag.parameters"/>
-              <% end %>
+                <param-list with="&this.parameters"/>
+              </unless>
           
-              <%= tag.comment_rest_html %>
+              <%= this.comment_rest_html %>
 
               <div class="source">
                 <h3><a href="#">Source</a></h3>
-                <pre><code><%= h tag.source %></code></pre>
+                <pre><code><%= h this.source %></code></pre>
               </div>
           
             </div>
-          <% } %>
+          </repeat>
         </div>
-      <% } %>
+      </repeat>
     </div>
   </body>
 </html>
