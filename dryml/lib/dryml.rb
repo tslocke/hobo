@@ -42,14 +42,7 @@ module Dryml
     APPLICATION_TAGLIB = { :src => "taglibs/application" }
     CORE_TAGLIB        = { :src => "core", :plugin => "dryml" }
 
-
-    # FIXME 
-    # DEFAULT_IMPORTS = (if defined?(ApplicationHelper)
-    #                      [Hobo::HoboHelper, Hobo::Translations, ApplicationHelper]
-    #                    else
-    #                      [Hobo::HoboHelper, Hobo::Translations]
-    #                    end)
-    DEFAULT_IMPORTS = []
+    DEFAULT_IMPORTS = defined?(ApplicationHelper) ? [ApplicationHelper] : []
 
     @renderer_classes = {}
     @tag_page_renderer_classes = {}
@@ -58,14 +51,14 @@ module Dryml
 
     attr_accessor :last_if
     
-    def enable(generator_directories=[])
+    def enable(generator_directories=[], output_directory=".")
       ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
       if ActionView::Template.respond_to? :exempt_from_layout
         ActionView::Template.exempt_from_layout('dryml')
       elsif
         ActionView::Base.exempt_from_layout('dryml')
       end
-      DrymlGenerator.enable(generator_directories)
+      DrymlGenerator.enable(generator_directories, output_directory)
     end
     
     

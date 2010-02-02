@@ -98,12 +98,12 @@ module Hobo
       require 'hobo/model_router'
       require 'hobo/undefined'
       require 'hobo/user'
-      require 'hobo/dryml'
-      require 'hobo/dryml/template'
-      require 'hobo/dryml/dryml_generator'
+      require 'dryml'
+      require 'dryml/template'
+      require 'dryml/dryml_generator'
 
       Hobo::Model.enable
-      Hobo::Dryml.enable(["#{HOBO_ROOT}/dryml_generators"])
+      Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{RAILS_ROOT}/app/views/taglibs/auto")
       Hobo::Permissions.enable
       Hobo::ViewHints.enable
       

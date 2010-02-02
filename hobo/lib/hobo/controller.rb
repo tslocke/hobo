@@ -80,7 +80,7 @@ module Hobo
 
     def ajax_update_response(page_path, render_specs, results={})
       @template.send(:_evaluate_assigns_and_ivars)
-      renderer = Hobo::Dryml.page_renderer(@template, [], page_path) if page_path
+      renderer = Dryml.page_renderer(@template, [], page_path) if page_path
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
@@ -124,7 +124,7 @@ module Hobo
     def tag_renderer
       @tag_renderer ||= begin
         @template.send(:_evaluate_assigns_and_ivars)
-        Hobo::Dryml.empty_page_renderer(@template)
+        Dryml.empty_page_renderer(@template)
       end
     end    
     

@@ -16,6 +16,7 @@ require 'action_controller/dispatcher'
       end
       
       def self.enable(generator_directories = [], output_directory = nil)
+        @output_directory = output_directory
         @output_directory ||= "#{RAILS_ROOT}/app/views/taglibs/auto" if const_defined? :RAILS_ROOT
         @generator_directories = generator_directories
 
@@ -43,15 +44,18 @@ require 'action_controller/dispatcher'
         end
       end
       
-      def self.run
-        @generator ||= DrymlGenerator.new(@generator_directories)
+      def self.run(generator_directories=nil, output_directory=nil)
+        @generator_directories ||= generator_directories
+        @output_directory ||= output_directory
+        @generator ||= DrymlGenerator.new(generator_directories || @generator_directories)
         @generator.run
       end
       
       
-      def initialize(generator_directories=[])
+      def initialize(generator_directories=nil)
         @templates = {}
         @digests   = {}
+        generator_directories ||= Dryml::DrymlGenerator.generator_directories
         load_templates(generator_directories)
       end
       
@@ -77,7 +81,7 @@ require 'action_controller/dispatcher'
       def run
         # FIXME
         # Ensure all view hints loaded before running
-        subsites = []
+        subsites = [nil]
         if self.class.const_defined?(:Hobo)
           Hobo::Model.all_models.*.view_hints
           subsites += [*Hobo.subsites]
@@ -96,7 +100,7 @@ require 'action_controller/dispatcher'
       
       
       def output_dir(s=subsite)
-        s ? "#{Dryml.output_directory}/#{s}" : Dryml.output_directory
+        s ? "#{Dryml::DrymlGenerator.output_directory}/#{s}" : Dryml::DrymlGenerator.output_directory
       end
       
       

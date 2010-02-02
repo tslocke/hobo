@@ -174,7 +174,7 @@ The standard form tag does not have any parameters, nor does it have any default
   if action.nil? && (html_attrs[:action].nil? ||
                      (lifecycle.nil? && new_record && !this.creatable_by?(current_user)) ||
                      (lifecycle.nil? && !new_record && !can_edit?))
-    Hobo::Dryml.last_if = false
+    Dryml.last_if = false
     ""
   else
     if method == "put"
@@ -211,7 +211,7 @@ The standard form tag does not have any parameters, nor does it have any default
       page_path = if (request.post? || request.put?) && params[:page_path]
                     params[:page_path]
                   else
-                    view_name.sub(Hobo::Dryml::EMPTY_PAGE, params[:action] || '')
+                    view_name.sub(Dryml::EMPTY_PAGE, params[:action] || '')
                   end
       page_path_hidden = hidden_field_tag("page_path", page_path) 
     end
@@ -228,7 +228,7 @@ The standard form tag does not have any parameters, nor does it have any default
       end
     end
 
-    Hobo::Dryml.last_if = true
+    Dryml.last_if = true
     element("form", html_attrs, body)
   end
 %></def>
@@ -557,7 +557,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
 <def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
   in_place = false if in_place.nil? && this == @this && request.method == :get
   url = object_url(this, :method => :delete, :subsite => subsite)
-  if (Hobo::Dryml.last_if = url && can_delete?)
+  if (Dryml.last_if = url && can_delete?)
     attributes = attributes.merge(if image
                                     { :type => "image", :src => "#{base_url}/images/#{image}" }
                                   else

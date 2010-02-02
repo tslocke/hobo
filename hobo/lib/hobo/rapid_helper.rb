@@ -1,5 +1,16 @@
 module Hobo::RapidHelper
 
+  def comma_split(x)
+    case x
+    when nil
+      []
+    when String
+      x.strip.split(/\s*,\s*/)
+    else
+      x.compact.map{|e| comma_split(e)}.flatten
+    end
+  end
+
   def rapid_build_callbacks(options)
     callbacks = {}
     options.each do |callback, code|

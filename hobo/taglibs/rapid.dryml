@@ -6,7 +6,9 @@ The Rapid tag library makes web development go fast. The Rapid tag library is yo
 
 -->
 
+<include module="Hobo::HoboHelper"/>
 <include module="Hobo::RapidHelper"/>
+<include module="Hobo::Translations"/>
 
 <include src="rapid_core"/>
 <include src="rapid_support"/>

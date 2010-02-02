@@ -157,18 +157,6 @@ module Hobo
       object.respond_to?(:typed_id) ? "model::#{typed_id(object, attribute).to_s.dasherize}" : ""
     end
 
-    def comma_split(x)
-      case x
-      when nil
-        []
-      when String
-        x.strip.split(/\s*,\s*/)
-      else
-        x.compact.map{|e| comma_split(e)}.flatten
-      end
-    end
-
-
     def can_create?(object=this)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new

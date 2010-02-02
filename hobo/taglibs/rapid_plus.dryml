@@ -81,7 +81,7 @@ This tag assumes the controller has a `reorder` action. This action is added aut
       <do param="default"><card param/></do>
     </item:>
   </collection>
-  <%= if Hobo::Dryml.last_if
+  <%= if Dryml.last_if
         opts = { :url => reorder_url,
                  :constraint => :vertical,
                  :overlap => :vertical,
