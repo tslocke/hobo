@@ -150,7 +150,7 @@ module Dryml
       parts = page.split("/")
       subsite = parts.length >= 3 ? parts[0..-3].join('_') : "front"
       src = "taglibs/#{subsite}_site"
-      { :src => src } if const_defined?(:RAILS_ROOT) && File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
+      { :src => src } if Object.const_defined?(:RAILS_ROOT) && File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
     end
 
     def get_field(object, field)
@@ -244,7 +244,7 @@ module Dryml
 
     def static_tags
       @static_tags ||= begin
-                         path = if const_defined?(:RAILS_ROOT) && FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
+                         path = if Object.const_defined?(:RAILS_ROOT) && FileTest.exists?("#{RAILS_ROOT}/config/dryml_static_tags.txt")
                                     "#{RAILS_ROOT}/config/dryml_static_tags.txt"
                                 else
                                     File.join(File.dirname(__FILE__), "dryml/static_tags")

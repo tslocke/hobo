@@ -26,7 +26,7 @@
 
         def taglib_filename(options)
           plugin = options[:plugin]
-          rails_root = self.class.const_defined?(:RAILS_ROOT) ? RAILS_ROOT : "."
+          rails_root = Object.const_defined?(:RAILS_ROOT) ? RAILS_ROOT : "."
           base = if plugin == "dryml"
                    "#{DRYML_ROOT}/taglibs"
                  elsif plugin == "hobo"

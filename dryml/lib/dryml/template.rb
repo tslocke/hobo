@@ -38,7 +38,7 @@ module Dryml
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path
-      @template_path.sub!(%r(^#{Regexp.escape(RAILS_ROOT)}/), "") if self.class.const_defined? :RAILS_ROOT
+      @template_path = @template_path.sub(%r(^#{Regexp.escape(RAILS_ROOT)}/), "") if Object.const_defined? :RAILS_ROOT
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
@@ -53,7 +53,7 @@ module Dryml
 
       unless @template_path.ends_with?(EMPTY_PAGE)
         p = Pathname.new template_path
-        p = Pathname.new(RAILS_ROOT) + p unless p.absolute? || !self.class.const_defined?(:RAILS_ROOT)
+        p = Pathname.new(RAILS_ROOT) + p unless p.absolute? || !Object.const_defined?(:RAILS_ROOT)
         mtime = p.mtime rescue Time.now
       
         if !@builder.ready?(mtime)

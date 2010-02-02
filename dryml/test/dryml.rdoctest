@@ -58,5 +58,5 @@ Test caching
         => "Bye"
         >> t3 = Time.now
 
-        >> (t3-t2)*2 < (t2-t1)
+        >> (t3-t2)*1.5 < (t2-t1)
         => true
