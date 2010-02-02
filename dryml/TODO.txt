@@ -1,0 +1,6 @@
+- remove actionview requirement
+- get Hobo working
+- standalone generators
+- get it working in Sinatra
+- get it working in rtomayko/tilt
+- get it working in Rails3

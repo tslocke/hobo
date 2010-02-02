@@ -1,0 +1,62 @@
+
+        >> require 'rubygems'
+        >> require 'active_support'
+        >> require 'action_view'
+        >> require 'action_controller'
+        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../dryml/lib')
+        >> require 'hobosupport'
+        >> require 'dryml'
+        >> require 'dryml/template_handler'
+        >> Dryml.enable
+
+{.hidden}
+
+        >> Dryml.render("hi")
+        => "hi"
+
+        >> Dryml.render("<%= this %>", {:this => "hello"})
+        => "hello"
+
+        >> Dryml.render(%q{<if test="&true">Hi</if><else>Bye</else>})
+        => "Hi"
+
+        >> Dryml.render(%q{<repeat with="&[1,2,3]"><%= this %> </repeat>})
+        => "1 2 3 "
+
+        >> Dryml.render(%q{<def tag="myp"><p param="default"/></def><myp>Hi</myp>})
+        => "<p>Hi</p>"
+
+        >> Dryml.render(%q{<def tag="myp"><p param="default"/></def><call-tag tag="myp">Hi</call-tag>}).strip
+        => "<p>Hi</p>"
+
+        >> Dryml.render(%q{<def tag="myp"><p param="default"/></def><wrap tag="myp" when="&true">img</wrap>}).strip
+        => "<p>img</p>"
+
+This triggers bug #452, so disabled.  FIXME.
+
+        #>> 
+         Dryml.render(%q{<def tag="myp">
+                             <p param="default"/>
+                           </def>
+                           <extend tag="myp">                             
+                             <old-myp merge>
+                               <default: replace>Hello <default: restore/></default:>
+                             </old-myp>
+                           </extend>
+                           <myp>World</myp>}).strip
+        #=> "<p>Hello World</p>"
+
+Test caching
+
+        >> template = %q{<if test="&x">Hi</if><else>Bye</else>}
+        >> t1 = Time.now
+        >> Dryml.render(template, {:x => true})
+        => "Hi"
+        >> t2 = Time.now
+        >> Dryml.render(template, {:x => false})
+        => "Bye"
+        >> t3 = Time.now
+
+        >> (t3-t2)*2 < (t2-t1)
+        => true
