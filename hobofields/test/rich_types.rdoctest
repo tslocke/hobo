@@ -59,7 +59,7 @@ This class defines the methods `to_html` to customize the way the type is render
         # Loud text always renderd in caps.
         # It's rude to shout too much so it's not allowed to be
         # longer than 100 characters
-        class LoudText < DelegateClass(String)
+        class LoudText < String
 
           COLUMN_TYPE = :string
 
@@ -80,9 +80,11 @@ This class defines the methods `to_html` to customize the way the type is render
 
         end
 
+If you place this class in `app/rich_types/loud_text.rb`, Hobo will load it automatically.
+
 That's all there is to it. Defining `to_html`, `format` and `validate` are optional, defining `COLUMN_TYPE` and calling `HoboFields.register_type` are not.
 
-We use `DelegateClass` so that we can act like a string without actually being a string.
+We inherit from String in this instance.   This does not work for all types -- for example, with Fixnum, you should inherit from `DelegateClass(Fixnum)` instead.
 
 The format function is added as a before\_validation hook.  Ensure that multiple invocations of your format function is safe -- shout.format.format should return the same as shout.format.
 
