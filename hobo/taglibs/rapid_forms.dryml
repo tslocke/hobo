@@ -963,8 +963,11 @@ Example javascript:
         }
       });
 
+Note: if your javascript does not work, please ensure that you have
+the Hobo version of lowpro.js.
+
   -->
-<def tag="input-many" attrs="minimum, fields, skip, template" polymorphic >
+<def tag="input-many" attrs="minimum, fields, skip, more-skip, template" polymorphic >
 <%
 # helper function to create id's on buttons to facilitate testing
 def underize(s)
@@ -974,10 +977,11 @@ end
   <set empty="&this.empty?"/>
   <% template ||= this.try.new_candidate || this.member_class.new %>
   <% minimum ||= 0 ; minimum = minimum.to_i %>
-  <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection %>           
+  <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection %>
+  <% skip += ",#{more_skip}" if more_skip -%>
   <ul class="input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} #{css_data(:minimum, minimum)}" merge-attrs>
     <fake-field-context fake-field="-1" context="&template">
-      <li class="input-many-li input-many-template" id="#{param_name_for_this}">
+      <li class="input-many-li input-many-template" id="#{underize param_name_for_this}">
         <div class="input-many-item" param="default">
           <field-list param merge-attrs="fields" skip="&skip" />
         </div>
@@ -987,9 +991,9 @@ end
         </div>
       </li>
     </fake-field-context>
-    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{param_name_for_this}[-1]_empty">
+    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{underize param_name_for_this}_-1_empty">
       <!-- HACK way to signal an empty collection to the controller -->
-      <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
+      <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
           <ht key="#{this.class.class_name.tableize}.collection.empty_message">          
@@ -1003,7 +1007,7 @@ end
       </fake-field-context>      
     </li>
     <fake-field-context fake-field="0" context="&template">
-      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{param_name_for_this}">
+      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{underize param_name_for_this}">
         <div class="input-many-item" param="default">
           <field-list param merge-attrs="fields" skip="&skip" />
         </div>
@@ -1013,7 +1017,7 @@ end
         </div>
       </li>
     </fake-field-context>       
-    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{param_name_for_this}">
+    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{underize param_name_for_this}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <div class="input-many-item" param="default">
@@ -1040,6 +1044,38 @@ end
       </set-scoped>
     </li>
   </ul>
+</def>
+
+<!-- An enhanced version of [`<input-many>`](/api_tag_defs/input-many)  that supports drag-and-drop re-ordering.
+
+Each item in the collection has a `<div class="ordering-handle" param="handle">` added, which can be used to drag the item up and down.
+
+If the items in the collection contain an [`acts_as_list`](http://ar.rubyonrails.org/classes/ActiveRecord/Acts/List/ClassMethods.html) declaration, it is updated.
+
+The specified sort order may be maintained even without `acts_as_list`.  The items will be passed to the controller in the correct order, so the order may be persisted there.
+
+### Attributes
+
+ - `id`:  Due to a limitation in script.aculo.us, an id is required.  If you do not supply one, one will be generated.
+ - `position-column`:  The position column may be specified via `acts_as_list`, via a `position_column` method on your model or via this attribute.
+ - others:  all other attributes are passed through to `<input-many>`
+
+-->
+
+<def tag="sortable-input-many" attrs="id, position-column, template">
+  <% this_id = this_parent.id || rand(100000) -%>
+  <% id ||= "sortable-input-many-#{this_parent.class.name.underscore.dasherize}-#{this_id}-#{this_field_reflection.name}" -%>
+  <% template ||= this.try.new_candidate || this.member_class.new %>
+  <% position_column ||= template.try.position_column -%>
+  <input-many merge id="&id" class="sortable-input-many" template="&template" more-skip="&position_column">
+    <default: replace>
+        <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
+        <if test="&position_column">
+          <input class="sortable-position" type="hidden" value="&this.send(position_column)" name="#{param_name_for_this}[#{position_column}]" />
+        </if>
+        <default restore/>
+    </default:>
+  </input-many>
 </def>
 
 <!-- Renders the common "or (Cancel)" for a form. Attributes are merged into the link (`<a>Cancel</a>`), making it easy to customise the destination of the cancel link. By default it will link to `this` or `this.class`.
