@@ -161,6 +161,9 @@ If you use a composite name, you do lose a couple of features that
 require direct database access: the `named` finder, and the ability to
 use it as a sort column without loading the entire table.
 
+If you do not provide a name for your model, Hobo will use the `title`
+attribute or function instead.
+
 ## primary\_content
 
 `primary_content` works very similarly to `name`, except that it
