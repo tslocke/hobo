@@ -300,31 +300,34 @@ module Hobo
       def exists_sql_condition(reflection, any=false)
         owner = @klass
         owner_primary_key = "#{owner.table_name}.#{owner.primary_key}"
+ 
         if reflection.options[:through]
           join_table   = reflection.through_reflection.klass.table_name
           owner_fkey   = reflection.through_reflection.primary_key_name
+          conditions   = reflection.options[:conditions].blank? ? '' : " AND #{reflection.through_reflection.klass.send(:sanitize_sql_for_conditions, reflection.options[:conditions])}"
+ 
           if any
-            "EXISTS (SELECT * FROM #{join_table} WHERE #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+            "EXISTS (SELECT * FROM #{join_table} WHERE #{join_table}.#{owner_fkey} = #{owner_primary_key}#{conditions})"
           else
             source_fkey  = reflection.source_reflection.primary_key_name
             "EXISTS (SELECT * FROM #{join_table} " +
-              "WHERE #{join_table}.#{source_fkey} = ? AND #{join_table}.#{owner_fkey} = #{owner_primary_key})"
+              "WHERE #{join_table}.#{source_fkey} = ? AND #{join_table}.#{owner_fkey} = #{owner_primary_key}#{conditions})"
           end
         else
           foreign_key = reflection.primary_key_name
           related     = reflection.klass
-
+          conditions = reflection.options[:conditions].blank? ? '' : " AND #{reflection.klass.send(:sanitize_sql_for_conditions, reflection.options[:conditions])}"
+ 
           if any
             "EXISTS (SELECT * FROM #{related.table_name} " +
-              "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key})"
+              "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key}#{conditions})"
           else
             "EXISTS (SELECT * FROM #{related.table_name} " +
               "WHERE #{related.table_name}.#{foreign_key} = #{owner_primary_key} AND " +
-              "#{related.table_name}.#{related.primary_key} = ?)"
+              "#{related.table_name}.#{related.primary_key} = ?#{conditions})"
           end
         end
       end
-
 
       def find_if_named(reflection, string_or_record)
         if string_or_record.is_a?(String)
