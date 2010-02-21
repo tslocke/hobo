@@ -717,14 +717,26 @@ We're using an object as the complete-target rather than a class.   This allows 
 
 There's another example of `<name-one>` use in the [recipes](http://cookbook.hobocentral.net/recipes/36-using-a-name-one-one-a).
 
+### Attributes:
+
+- `complete-target`, `completer`: see above
+- `min-chars`: The minimum number of characters that must be entered in the input field before an Ajax request is made.
+- `nil-value`: If there is no current value, this text will appear greyed out inside the control, and will disappear on focus.
+
+### Note:
+
+If you wish to set `min-chars` to 0, you will require this [patch to controls.js](http://github.com/bryanlarsen/scriptaculous/commit/3915b7b).   'controls.js' was added to your project via the rails generator, not via Hobo.
+
   -->
-<def tag="name-one" attrs="complete-target, completer"><%
+<def tag="name-one" attrs="complete-target, completer, min-chars, nil-value"><%
   complete_target ||= this_field_reflection.klass
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
+  min_chars ||= 1
+  value = name(:no_wrapper => true, :if_present => true)
   -%>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field.dasherize} #{css_data :complete_on, typed_id(complete_target), completer}"
-         value="&name :no_wrapper => true, :if_present => true"
+         class="autocompleter #{type_and_field.dasherize} #{css_data :complete_on, typed_id(complete_target), completer} #{css_data :min_chars, min_chars} #{'nil-value' if value==''}"
+         value="#{value=='' ? nil_value : value}"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
 </def>
