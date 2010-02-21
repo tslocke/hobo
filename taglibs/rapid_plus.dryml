@@ -135,6 +135,21 @@ This tag assumes the controller has a `reorder` action. This action is added aut
 </def>
 
 <!-- A `<select>` menu intended to act as a filter for index pages.
+
+### Example
+
+Filtering on state is a common use.   Here's the dryml for Order:
+
+    <filter-menu param-name="state" options="&Order::Lifecycle.states.keys" />
+
+And the controller action:
+
+    def index
+      # always validate data given in URL's!!!
+      params[:state]=nil unless Order::Lifecycle.states.include?(params[:state]._?.to_sym)
+      finder = params[:state] ? Order.send(params[:state]) : Order
+      hobo_index finder
+    end
   
 See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status) in the [Agility Tutorial](/tutorials/agility) for an example.
 
