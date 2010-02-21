@@ -5,8 +5,44 @@
   <page without-live-search without-main-nav merge>
     <account-nav: replace />
   </page>
-</def>    
+</def>
 
+<!-- Simple log-in form.
+
+### Attributes
+
+ - `user-model`: The User class
+ - all other attributes are passed on to `<form>`.   You will probably need to set the action attribute:  `action="&user_login_path"`.
+ -->
+<def tag="login-form" attrs="user-model">
+  <% user_model ||= self.try.model -%>
+  <form action="&request.request_uri" class="login" merge>
+    <labelled-item-list param>
+      <labelled-item>
+        <item-label param="login-label"><ht key="hobo.login.email"><%= user_model.login_attribute.to_s.titleize %></ht></item-label>
+        <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
+      </labelled-item>
+      
+      <labelled-item>
+        <item-label param="password-label"><ht key="hobo.login.password">Password</ht></item-label>
+        <item-value>
+          <input type="password" name="password" id="password" class="string" param="password-input"/>
+        </item-value>
+      </labelled-item>
+      
+      <labelled-item param="remember-me">
+        <item-label class="field-label" param="remember-me-label"><ht key="hobo.login.remember_me">Remember me:</ht></item-label>
+        <item-value>
+          <input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input" checked/>
+        </item-value>
+      </labelled-item>
+    </labelled-item-list>
+    <div param="actions">
+      <submit label="#{ht 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
+      <ht key="hobo.support.or">or</ht> <a param="signup" href="&signup_url"><ht key="hobo.login.signup">Sign up</ht></a></if>
+    </div>
+  </form>
+</def>
 
 <!-- Simple log-in page  -->
 <def tag="login-page">
@@ -21,32 +57,7 @@
       </header>
       
       <section param="content-body">      
-        <form action="&request.request_uri" class="login" param>
-          <labelled-item-list param>
-            <labelled-item>
-              <item-label param="login-label"><ht key="hobo.login.email"><%= model.login_attribute.to_s.titleize %></ht></item-label>
-              <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
-            </labelled-item>
-
-            <labelled-item>
-              <item-label param="password-label"><ht key="hobo.login.password">Password</ht></item-label>
-              <item-value>
-                <input type="password" name="password" id="password" class="string" param="password-input"/>
-              </item-value>
-            </labelled-item>
-
-            <labelled-item param="remember-me">
-              <item-label class="field-label" param="remember-me-label"><ht key="hobo.login.remember_me">Remember me:</ht></item-label>
-              <item-value>
-                <input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input" checked/>
-              </item-value>
-            </labelled-item>
-          </labelled-item-list>
-          <div param="actions">
-            <submit label="#{ht 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
-            <ht key="hobo.support.or">or</ht> <a param="signup" href="&signup_url"><ht key="hobo.login.signup">Sign up</ht></a></if>
-          </div>
-        </form>
+        <login-form param="form" user-model="&model"/>
         <a href="&forgot_password_url" param="forgot-password" if="&forgot_password_url"><ht key="hobo.login.forgot_password">Forgot your password?</ht></a>
       </section>
     </content:>
