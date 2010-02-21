@@ -70,6 +70,7 @@ module Hobo
         user = model.authenticate(params[:login], params[:password])
         if user.nil?
           flash[:error] = options[:failure_notice]
+          hobo_ajax_response if request.xhr? && !performed?
         else
           old_user = current_user
           self.current_user = user
