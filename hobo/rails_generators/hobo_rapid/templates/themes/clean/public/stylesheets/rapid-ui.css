@@ -98,3 +98,5 @@ optgroup.disabled-option {
     color: #ccc;
     height: 1em;
 }
+
+input.nil-value { color:grey; }

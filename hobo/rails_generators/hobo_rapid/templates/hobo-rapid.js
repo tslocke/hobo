@@ -811,9 +811,10 @@ NameManyInput = Object.extend(SelectManyInput, {
     }
 })
 
-                              
+             
 AutocompleteBehavior = Behavior.create({
     initialize : function() {
+        this.minChars  = parseInt(Hobo.getClassData(this.element, "min-chars")); 
         var match     = this.element.className.match(/complete-on::([\S]+)/)
         var target    = match[1].split('::')
         var typedId   = target[0]
@@ -822,11 +823,22 @@ AutocompleteBehavior = Behavior.create({
         var spec = Hobo.parseModelSpec(typedId)
         var url = urlBase + "/" + Hobo.pluralise(spec.name) +  "/complete_" + completer
         var parameters = spec.id ? "id=" + spec.id : ""
-        new Ajax.Autocompleter(this.element, 
-                               this.element.next('.completions-popup'), 
-                               url, 
-                               {paramName:'query', method:'get', parameters: parameters});
+        this.autocompleter = new Ajax.Autocompleter(this.element, 
+            this.element.next('.completions-popup'), 
+            url, 
+            {paramName:'query', method:'get', parameters: parameters, minChars: this.minChars});
+    },
+
+    onfocus: function() {
+        if(this.element.hasClassName("nil-value")) {
+            this.element.value = '';
+            this.element.removeClassName("nil-value");
+        }
+        if(this.minChars==0) { 
+            this.autocompleter.activate();
+        }
     }
+        
 })
 
 
