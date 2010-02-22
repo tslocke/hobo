@@ -1,3 +1,84 @@
+if !Object.const_defined?(:Rails)
+  # do nothing
+elsif Rails.version.to_i > 2
+  # Rails 3
+
+  module ActionController
+    
+    class Base
+      
+      def dryml_context
+        @this
+      end
+    end
+  end
+
+
+  class ActionView::Template
+      
+    def render_with_dryml(view, locals, &block)
+      if @handler == Dryml::TemplateHandler
+        @handler.render(self, view, locals, &block)
+      else
+        render_without_dryml(view, locals, &block)
+      end
+    end
+    alias_method_chain :render, :dryml
+  end
+  
+
+  module Dryml    
+    class TemplateHandler < ActionView::Template::Handler
+      def self.render(template, view, local_assigns, &block)
+        Rails.logger.debug(template.source)
+        renderer = Dryml.page_renderer(view, local_assigns.keys, template.details[:virtual_path], template.identifier)
+        this = view.controller.send(:dryml_context) || local_assigns[:this]
+
+        @view._?.instance_variable_set("@this", this)
+        s = renderer.render_page(this, local_assigns)
+
+        # Important to strip whitespace, or the browser hangs around for ages (FF2)
+        s.strip
+      end
+    end
+
+    # quacks like a Rails3 ActionView::Template
+    class MissingTemplate
+      attr_reader :details
+
+      def identifier
+        "#{@prefix}/#{@name}"
+      end
+
+      def mime_type
+        details[:mime_type]
+      end
+      
+      def initialize(name, details, prefix, partial)
+        @name = name
+        @details = details
+        @prefix = prefix
+        @partial = partial
+      end
+      
+      def render(view, locals, &block)
+        renderer = Dryml.empty_page_renderer(view)
+        renderer.render_tag("#{@name}-page", locals)
+      end
+
+    end
+  end
+
+  class ActionView::FileSystemResolverWithFallback < ActionView::Resolver
+    def find_templates_with_dryml(*args)
+      results = find_templates_without_dryml(*args)      
+      results.empty? ? [Dryml::MissingTemplate.new(*args)] : results
+    end
+    alias_method_chain :find_templates, :dryml
+  end
+
+else
+  # Rails 2
 module Dryml
 
   class TemplateHandler < ActionView::TemplateHandler
@@ -18,6 +99,7 @@ module Dryml
     def render_for_rails22(template, view, local_assigns)
       renderer = Dryml.page_renderer_for_template(view, local_assigns.keys, template)
       this = view.controller.send(:dryml_context) || local_assigns[:this]
+
       @view._?.instance_variable_set("@this", this)
       s = renderer.render_page(this, local_assigns)
 
@@ -185,3 +267,4 @@ module ActionView
   end
 end
         
+end # if Rails 2
