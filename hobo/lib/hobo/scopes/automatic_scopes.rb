@@ -56,6 +56,19 @@ module Hobo
             { :conditions => [exists_sql, record] }
           end
 
+        # any_of_players(player1, player2)
+        elsif name =~ /^any_of_(.*)/ && (refl = reflection($1))
+
+          def_scope do |*records|
+            if records.empty?
+              { :conditions => exists_sql_condition(refl, true) }
+            else
+              records = records.flatten.compact.map {|r| find_if_named(refl, r) }
+              exists_sql = ([exists_sql_condition(refl)] * records.length).join(" OR ")
+              { :conditions => [exists_sql] + records }
+            end
+          end
+
         # without_players(player1, player2)
         elsif name =~ /^without_(.*)/ && (refl = reflection($1))
 
