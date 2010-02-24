@@ -14,6 +14,15 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo 1.0.0 ===
+
+Drumm-roll! Trumpets! Fanfare! 
+
+We did it : )
+
+Hobo 1.0.0 is the same as Hobo 0.9.106 except for documentation
+updates and [this tiny commit](http://github.com/tablatom/hobo/commit/ba9d2cc60fad2e45c7006c31492607882f568763).
+
 === Hobo 0.9.106 ===
 
 Three small bug fixes.   See the Git log for more details.

@@ -16,7 +16,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "0.9.106"
+  VERSION = "1.1.0.pre0"
   
   class PermissionDeniedError < RuntimeError; end
 
