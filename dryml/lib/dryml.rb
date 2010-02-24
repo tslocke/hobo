@@ -19,7 +19,7 @@ ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSup
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
-    VERSION = "0.9.106"
+    VERSION = "1.1.0.pre0"
 
     class DrymlSyntaxError < RuntimeError; end
       
