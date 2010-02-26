@@ -74,7 +74,7 @@ module Dryml
       # compile the build instructions
       @builder.build(local_names, auto_taglibs, mtime)
 
-      logger._?.info("  DRYML: Compiled " +template_path+" in %.2fs" % (Time.now - now)) if parsed
+      logger.info("  DRYML: Compiled #{template_path} in #{'%.2fs' % (Time.now - now)}") if parsed
     end
 
 
