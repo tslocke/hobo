@@ -42,7 +42,6 @@ Contents
     >>
      def migrate(renames={})
        up, down = HoboFields::MigrationGenerator.run(renames)
-       puts up
        ActiveRecord::Migration.class_eval(up)
        ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
        [up, down]
