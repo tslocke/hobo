@@ -123,7 +123,7 @@
 <!-- inside `<with-gems>`, returns the gem dependencies -->
 <def tag="gem-dependencies">
   <repeat with="&this.dependencies">
-    <%= this.name -%><gem-version-requirement:requirement />
+    <%= this.name -%><gem-version-requirement with="&this.requirement || this.version_requirements" />
   </repeat>
 </def>
 
