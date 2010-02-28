@@ -666,8 +666,71 @@ HoboFields has some support for legacy keys.
     =>
      "rename_column :adverts, :id, :advert_id
 
+    >> nuke_model_class(Advert)
+    >> nuke_model_class(Ad)
+    >> ActiveRecord::Base.connection.execute "drop table `adverts`;"
+{.hidden}
+
+
+## Comments
+
+Comments can be added to tables and fields with HoboFields.
+
+    >>
+     class Product < ActiveRecord::Base
+       fields do
+         name :string, :comment => "short name"
+         description :string
+       end
+     end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    => 
+     'create_table :products do |t|
+       t.string :name, :comment => "short name"
+       t.string :description
+     end'
+    >> migrate
+
+These comments will be saved to your schema if you have the [column_comments](http://github.com/bryanlarsen/column_comments) plugin installed.  If you do not have this plugin installed, the comments will be available by querying `field_specs`:
+
+    >> Product.field_specs["name"].comment
+    => "short name"
+
+The plugin [activerecord-comments](http://github.com/bryanlarsen/activerecord-comments) may be used to get the comments from the database directly.  If the plugin is installed, use this instead:
+
+    Product.column("name").comment
+
+Because it will be quite common for people not to have both [column_comments](http://github.com/bryanlarsen/column_comments) and [activerecord-comments](http://github.com/bryanlarsen/activerecord-comments) installed, it is impossible for HoboFields to determine the difference between no previous comment and a previously missing plugin.   Therefore, HoboFields will not generate a migration if the only change was to add a comment.  HoboFields will generate a migration for a comment change, but only if the plugin is installed.
+
+    >> require 'activerecord-comments'
+
+    >> # manually add comment as the column_comments plugin would
+    >> Product.connection.execute "alter table `products` modify `name` varchar(255) default null comment 'short name';"
+
+
+    >>
+     class Product < ActiveRecord::Base
+       fields do
+         name :string, :comment => "Short namex"
+         description :string, :comment => "Long name"
+       end
+     end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    => "change_column :products, :name, :string, :comment => \"Short namex\", :limit => 255"
+
+
 Cleanup
+{.hidden}
+
+    >> nuke_model_class(Product)
+    >> ActiveRecord::Base.connection.execute "drop table `products`;"
+{.hidden}
+
+Final Cleanup
 {.hidden}
 
     >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
 {.hidden}
+

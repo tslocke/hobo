@@ -254,6 +254,11 @@
   <%= this.try.table_name -%>
 </def>
 
+<!-- given a model, returns the table comment, if it exists and if you have the activerecord-comments plugin installed. -->
+<def tag="model-table-comment">
+  <%= this.try.comment -%>
+</def>
+
 <!-- given a model, repeats on the database columns -->
 <def tag="with-model-columns">
   <repeat with="&this.try.content_columns">
@@ -269,6 +274,12 @@
 <!-- given a column, return the name -->
 <def tag="model-column-name">
   <%= this.name -%>
+</def>
+
+<!-- given a column in the context and the model as an attribute, returns the comment for the column.  It returns the SQL comment if that is available (using the activerecord-comments plugin).  If that is not available, it returns the HoboFields comment.  -->
+
+<def tag="model-column-comment" attrs="model">
+  <%= this.try.comment || model.try.field_specs.try.get(this.name).try.comment -%>
 </def>
 
 <!-- given a model, repeats on the associations -->

@@ -67,11 +67,12 @@
 
     <h2>Models</h2>
     <table class="app-summary">
-      <tr><th>Class</th><th>Table</th></tr>
+      <tr><th>Class</th><th>Table</th><th></th></tr>
       <with-models>
         <tr>
           <td><model-name/></td>
           <td><model-table-name/></td>
+          <td><model-table-comment/></td>
         </tr>
       </with-models>
     </table>        
@@ -80,10 +81,11 @@
       <h3 if="&this.try.table_name"><model-name /></h3>
       <table class="app-summary">
         <with-model-columns>
-          <tr if="&first_item?"><th>Column</th><th>Type</th></tr>
+          <tr if="&first_item?"><th>Column</th><th>Type</th><th></th></tr>
           <tr>
             <td><model-column-name/></td>
             <td><model-column-type/></td>
+            <td><model-column-comment/></td>
           </tr>
         </with-model-columns>
       </table>
