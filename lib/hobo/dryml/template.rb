@@ -502,7 +502,7 @@ module Hobo::Dryml
 
 
     def call_name(el)
-      dryml_exception("invalid tag name", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
+      dryml_exception("invalid tag name (remember to use '-' rather than '_')", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
       
       name = Hobo::Dryml.unreserve(ruby_name(el.dryml_name))
       if call_to_self_from_type_specific_def?(el)
@@ -793,7 +793,7 @@ module Hobo::Dryml
     def tag_attributes(el)
       attributes = el.attributes
       items = attributes.map do |n,v|
-        dryml_exception("invalid attribute name '#{n}'", el) unless n =~ DRYML_NAME_RX
+        dryml_exception("invalid attribute name '#{n}' (remember to use '-' rather than '_')", el) unless n =~ DRYML_NAME_RX
 
         next if n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
         next if el.attributes['part'] && n == 'id' # The id is rendered on the <div class="part-wrapper"> instead
