@@ -55,10 +55,13 @@ module Dryml
       ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
       if ActionView::Template.respond_to? :exempt_from_layout
         ActionView::Template.exempt_from_layout('dryml')
-      elsif
+      elsif ActionView::Base.respond_to? :exempt_from_layout
         ActionView::Base.exempt_from_layout('dryml')
       end
-      DrymlGenerator.enable(generator_directories, output_directory)
+      # exempt_from_layout doesn't exist in Rails3.   But the lack of
+      # it doesn't cause DRYML to blow up like in Rails2, so that's
+      # OK.
+      # FIXME DrymlGenerator.enable(generator_directories, output_directory)
     end
     
     

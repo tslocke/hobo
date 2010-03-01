@@ -1,4 +1,6 @@
-# register the path for explicit .dryml files
-ActionView::Template.register_template_handler(:dryml, Dryml::TemplateHandler)
-# register the path for missing templates
-ActionController::Base.view_paths << Dryml::FallbackResolver.new
+# If Hobo is defined, assume that it enables DRYML.  Otherwise enable ourselves
+begin
+  Hobo  # can't use const_defined? in case it's autoloaded.
+rescue NameError
+  Dryml.enable
+end
