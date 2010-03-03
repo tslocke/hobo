@@ -60,6 +60,10 @@ module HoboFields
     def default
       options[:default]
     end
+
+    def comment
+      options[:comment]
+    end
     
     def same_type?(col_spec)
       t = sql_type
@@ -74,6 +78,12 @@ module HoboFields
 
     def different_to?(col_spec)
       !same_type?(col_spec) ||
+        # we should be able to use col_spec.comment, but col_spec has
+        # a nil table_name for some strange reason.
+        begin
+          col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name)
+          col_comment != nil && col_comment != comment
+        end ||
         begin
           check_attributes = [:null, :default]
           check_attributes += [:precision, :scale] if sql_type == :decimal && !col_spec.is_a?(SQLITE_COLUMN_CLASS)  # remove when rails fixes https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/2872

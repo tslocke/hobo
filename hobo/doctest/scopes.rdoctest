@@ -317,6 +317,13 @@ You can also specify multiple records with the plural form
     >> Person.with_friends(Bethany, nil).*.name
     => ["Bryan"]
 
+## any\_of\_
+
+This works on plural associations to find a model associated with any of the arguments
+
+    >> Person.any_of_friends(Bethany, Bryan).*.name
+    => ["Bryan"]
+
 ## without\_
 
     >> Person.without_friend(Bethany).*.name

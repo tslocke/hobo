@@ -335,6 +335,7 @@ module HoboFields
           change_spec[:scale]     = spec.scale     unless spec.scale.nil?
           change_spec[:null]      = spec.null      unless spec.null && col.null
           change_spec[:default]   = spec.default   unless spec.default.nil? && col.default.nil?
+          change_spec[:comment]   = spec.comment   unless spec.comment.nil? && col.try.comment.nil?
 
           changes << "change_column :#{new_table_name}, :#{c}, " +
             ([":#{spec.sql_type}"] + format_options(change_spec, spec.sql_type, true)).join(", ")
