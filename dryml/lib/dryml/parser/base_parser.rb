@@ -1,3 +1,5 @@
+require 'rexml/document'
+
 module Dryml::Parser
 
   class BaseParser < REXML::Parsers::BaseParser

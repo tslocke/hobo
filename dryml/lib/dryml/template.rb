@@ -575,7 +575,7 @@ module Dryml
              end
 
       call = apply_control_attributes(call, el)
-      call = maybe_make_part_call(el, "<% concat(#{call}) %>")
+      call = maybe_make_part_call(el, "<% safe_concat(#{call}) %>")
       wrap_tag_call_with_metadata(el, call)
     end
 
@@ -677,7 +677,7 @@ module Dryml
     def before_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'before' parameters", el) if param_name
-      content = children_to_erb(el) + "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>"
+      content = children_to_erb(el) + "<% safe_concat(#{param_restore_local_name(name)}.call({}, {})) %>"
       ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
 
@@ -685,7 +685,7 @@ module Dryml
     def after_parameter_tag_hash_item(name, el, metadata_name)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'after' parameters", el) if param_name
-      content = "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el)
+      content = "<% safe_concat(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el)
       ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
     end
 
@@ -850,7 +850,7 @@ module Dryml
         end
 
         output_tag = "element(:#{el.name}, #{attrs}, new_context { %>#{body}<% })"
-        "<% concat(" + apply_control_attributes(output_tag, el) + ") %>"
+        "<% safe_concat(" + apply_control_attributes(output_tag, el) + ") %>"
       end
     end
 

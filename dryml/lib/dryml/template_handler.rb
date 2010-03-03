@@ -1,6 +1,6 @@
-if !Object.const_defined?(:Rails)
+if !Object.const_defined?(:ActionView)
   # do nothing
-elsif Rails.version.to_i > 2
+elsif ActionView::Template.const_defined? :Handler
   # Rails 3
 
   module ActionController

@@ -12,6 +12,9 @@
 
 {.hidden}
 
+        >> Dryml.render(%q{<p>Hi</p>}.html_safe)
+        => "<p>Hi</p>"
+
         >> Dryml.render("hi")
         => "hi"
 
@@ -60,3 +63,18 @@ Test caching
 
         >> (t3-t2)*1.5 < (t2-t1)
         => true
+
+
+Test html-safeness
+
+        >> Dryml.render(%q{<%= "<p/>" %>})
+        => "&lt;p/&gt;"
+
+        >> Dryml.render(%q{<%= "<p/>".html_safe %>})
+        => "<p/>"
+
+        >> Dryml.render(%q{<p a="#{'<>'}"/>})
+        >> '<p a="&lt;&gt;"/>'
+
+        >> Dryml.render(%q{<p a="#{'<>'.html_safe}"/>})
+        >> '<p a="<>"/>'

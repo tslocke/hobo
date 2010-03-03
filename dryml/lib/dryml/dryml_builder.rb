@@ -1,3 +1,23 @@
+class ActionView::Template::Handlers::Erubis < ::Erubis::Eruby
+
+  def add_text(src, text)
+    return if text.empty?
+    src << "output_buffer.safe_concat('" << escape_text(text) << "');"
+  end
+  
+  def add_expr_literal(src, code)
+    if code =~ /\s*raw\s+(.*)/
+      src << "output_buffer.safe_concat((" << $1 << ").to_s);"
+    else
+      src << 'output_buffer << ((' << code << ').to_s);'
+    end
+  end
+  
+  def add_expr_escaped(src, code)
+    src << 'output_buffer << ' << escaped_expr(code) << ';'
+  end
+end
+  
 module Dryml
 
   class DRYMLBuilder
@@ -60,8 +80,15 @@ module Dryml
 
     def erb_process(erb_src, method_def=false)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
-      erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
-      src = erb.src.split(';')[1..-2].join(';')
+      #erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
+      #src = erb.src.split(';')[1..-2].join(';')
+      begin
+        erb = ActionView::Template::Handlers::ERB.erubis_implementation
+      rescue
+        erb = Erubis
+      end
+      src = erb.new(erb_src, :trim => (trim_mode=='-'), :preamble => false, :postamble => false).src
+      #require 'ruby-debug'; debugger
       
       if method_def
         src.sub /^\s*def.*?\(.*?\)/, '\0 __in_erb_template=true; '
@@ -88,6 +115,7 @@ module Dryml
         when :render_page
           method_src = render_page_source(erb_process(instruction[:src]), local_names)
           @environment.compiled_local_names = local_names
+          puts method_src
           @environment.class_eval(method_src, template_path, instruction[:line_num])
 
         when :include
