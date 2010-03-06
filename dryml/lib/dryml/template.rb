@@ -321,9 +321,25 @@ module Dryml
       res
     end
 
+    def self.descendents(el,&block)
+      return if el.elements.empty?
+      el.elements.each do |child|
+        block.call(child)
+        descendents(child,&block)
+      end
+    end
+
+    # Using REXML::XPath is slow
+    def self.descendent_select(el)
+      result = []
+      descendents(el) { |desc|
+        result << desc if yield(desc)
+      }
+      result
+    end
 
     def param_names_in_definition(el)
-      REXML::XPath.match(el, ".//*[@param]").map do |e|
+      self.class.descendent_select(el) { |el| el.attribute 'param' }.map do |e|
         name = get_param_name(e)
         dryml_exception("invalid param name: #{name.inspect}", e) unless
           is_code_attribute?(name) || name =~ RUBY_NAME_RX || name =~ /#\{/

@@ -60,3 +60,9 @@ Test caching
 
         >> (t3-t2)*1.5 < (t2-t1)
         => true
+
+Test descendent searching
+
+        >> doc = REXML::Document.new '<a><b><c><d a="b">sean</d></c></b></a>'
+        >> Dryml::Template.descendent_select(doc.root) { |el| el.attribute 'a' }.size
+        => 1
