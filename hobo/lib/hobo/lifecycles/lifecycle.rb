@@ -177,6 +177,7 @@ module Hobo
       def become(state_name, validate=true)
         state_name = state_name.to_sym
         record.write_attribute self.class.state_field, state_name.to_s
+	generate_key if @key_was_used	# Make sure a secure key can be used only once
 
         if state_name == :destroy
           record.destroy
@@ -229,7 +230,9 @@ module Hobo
       end
 
       def valid_key?
-        provided_key && provided_key == key && !key_expired?
+        if provided_key && provided_key == key && !key_expired?
+	  @key_was_used = true
+	end
       end
 
       def invariants_satisfied?
