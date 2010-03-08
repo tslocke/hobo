@@ -177,7 +177,7 @@ module Hobo
       def become(state_name, validate=true)
         state_name = state_name.to_sym
         record.write_attribute self.class.state_field, state_name.to_s
-	generate_key if @key_was_used	# Make sure a secure key can be used only once
+	@dont_clear_key || clear_key 
 
         if state_name == :destroy
           record.destroy
@@ -211,6 +211,7 @@ module Hobo
         end
         key_timestamp = Time.now.utc
         record.write_attribute key_timestamp_field, key_timestamp
+	@dont_clear_key =  true
         key
       end
 
@@ -230,9 +231,11 @@ module Hobo
       end
 
       def valid_key?
-        if provided_key && provided_key == key && !key_expired?
-	  @key_was_used = true
-	end
+        provided_key && provided_key == key && !key_expired?
+      end
+
+      def clear_key
+	  record.write_attribute key_timestamp_field, nil
       end
 
       def invariants_satisfied?
