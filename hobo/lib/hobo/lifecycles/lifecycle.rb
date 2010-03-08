@@ -219,7 +219,7 @@ module Hobo
         timestamp = record.read_attribute(key_timestamp_field)
         if timestamp
           timestamp = timestamp.getutc
-          Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
+          Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}-#{ActionController::Base.session_options[:secret]}")
         end
       end
 
