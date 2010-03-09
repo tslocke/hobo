@@ -235,7 +235,7 @@ module Hobo
       end
 
       def clear_key
-	record.write_attribute key_timestamp_field, nil
+        record.write_attribute key_timestamp_field, nil
       end
 
       def invariants_satisfied?
