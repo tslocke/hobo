@@ -177,7 +177,7 @@ module Hobo
       def become(state_name, validate=true)
         state_name = state_name.to_sym
         record.write_attribute self.class.state_field, state_name.to_s
-	dont_clear_key || clear_key 
+        dont_clear_key || clear_key 
 
         if state_name == :destroy
           record.destroy
@@ -211,7 +211,7 @@ module Hobo
         end
         key_timestamp = Time.now.utc
         record.write_attribute key_timestamp_field, key_timestamp
-	self.dont_clear_key =  true
+        self.dont_clear_key =  true
         key
       end
 
@@ -235,7 +235,7 @@ module Hobo
       end
 
       def clear_key
-	  record.write_attribute key_timestamp_field, nil
+          record.write_attribute key_timestamp_field, nil
       end
 
       def invariants_satisfied?
