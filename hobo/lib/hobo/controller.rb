@@ -133,12 +133,11 @@ module Hobo
       tag_renderer.send(name, options)
     end
     
-    NO_SEARCH_RESULTS_HTML = "<p>Your search returned no matches.</p>"
     def site_search(query)
       results_hash = Hobo.find_by_search(query)
       all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
       if all_results.empty?
-        render :text => NO_SEARCH_RESULTS_HTML
+        render :text => "<p>"+ ht(:"hobo.live_search.no_results", :default=>["Your search returned no matches."]) + "</p>"
       else
         # TODO: call one tag that renders all the search results with headings for each model
         render_tags(all_results, :search_card, :for_type => true)
