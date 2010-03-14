@@ -20,7 +20,7 @@ Will lookup the "my.app"-key for your locale and replaces the "My Application" c
 
 Will look up both the "my"- and "app"-key for your locale, and replaces the "My Application" with the "my"-key contents (interpolated using the "app"-key.
 
-sample.en.yml-file:
+sample.no.yml-file:
 
       "no":
         my: "Mitt {{app}}"
