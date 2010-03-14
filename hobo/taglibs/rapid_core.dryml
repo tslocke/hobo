@@ -310,7 +310,7 @@ Or a new page if the context is a class:
 
 * to:  Use this item as the target instead of the current context.
 
-* params, query-params:  These are appended to the target as a query string after a "?".
+* params, query-params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{id=>17, name=>'joe'}"`
 
 * href, name:  If either of these attributes are present, the smart features of this tag are turned off.
 
