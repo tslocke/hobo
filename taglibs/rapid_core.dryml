@@ -613,8 +613,8 @@ The context should be a user object. If `this == current_user` the "you" form is
 <def tag="dev-user-changer">
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"
-               first-option="Guest" options="&user.all(:limit => 30).*.login"
-               onchange="location.href = '#{dev_support_path}/set_current_user?login=' + this.options[this.selectedIndex].value"
+               first-option="#{ht('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
+               onchange="location.href = '#{dev_support_path}/set_current_user?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"
                selected="#{current_user.login}"
                class="dev-user-changer"
                merge-attrs/>
