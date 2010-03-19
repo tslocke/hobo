@@ -111,7 +111,7 @@ module Hobo
 
       attr_reader :record
 
-      attr_accessor :provided_key, :active_step, :dont_clear_key
+      attr_accessor :provided_key, :active_step
 
 
       def initialize(record)
@@ -177,8 +177,6 @@ module Hobo
       def become(state_name, validate=true)
         state_name = state_name.to_sym
         record.write_attribute self.class.state_field, state_name.to_s
-        dont_clear_key || clear_key 
-
         if state_name == :destroy
           record.destroy
           true
@@ -211,7 +209,6 @@ module Hobo
         end
         key_timestamp = Time.now.utc
         record.write_attribute key_timestamp_field, key_timestamp
-        self.dont_clear_key =  true
         key
       end
 
