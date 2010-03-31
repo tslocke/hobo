@@ -102,7 +102,9 @@
 </def>
 
 <def tag="gem-version-requirement">
-  <%= this.requirements.map{|l| l.first+l.second.to_s}.join(",") -%>
+  <unless test="this.nil?"><%=
+    this.requirements.map{|l| l.first+l.second.to_s}.join(",")
+-%></unless>
 </def>
 
 <!-- inside `<with-gems>`, returns the version required -->
