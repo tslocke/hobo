@@ -72,7 +72,12 @@ module Hobo
     
       Rails.logger.info "..translate(#{key}, #{options.inspect}) to #{I18n.locale}" if defined?(HOBO_VERBOSE_TRANSLATIONS)
       
-      I18n.translate(key.to_sym, options)+(key_prefix ? key_prefix:"")
+      translation = I18n.translate(key.to_sym, options)
+      if translation.respond_to? :to_str
+        key_prefix ? translation.to_str+key_prefix : translation
+      else
+        "translation invalid: #{key}"
+      end
     end
 
     # if somebody includes us, give them ht as an instance method
