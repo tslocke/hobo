@@ -85,7 +85,7 @@ module HoboFields
             col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name) 
             col_comment != nil && col_comment != comment
           else
-            true
+            false
           end
         end ||
         begin
