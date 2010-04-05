@@ -39,11 +39,18 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 <!-- Renders a div containing transition buttons for every transition available to the current user.
 
 For example, you could use this on a `Friendship` card: the person invited to have friendship would automatically see 'Accept' and 'Decline' buttons, while the person initiating the invite would see 'Retract'.
+
+This tag behaves similarly to repeat: an else tag may be used to handle the case of no buttons:
+
+    <transition-buttons/><else>Sorry, no buttons to press.</else>
   -->  
 <def tag="transition-buttons">
   <div merge-attrs class="transitions">
-    <% this.lifecycle.publishable_transitions_for(current_user).each do |t| %>
-      <transition-button transition="&t"/>
-    <% end %>
+    <% transitions = this.lifecycle.publishable_transitions_for(current_user) %>
+    <if test="&transitions">
+      <% transitions.each do |t| %>
+        <transition-button transition="&t"/>
+      <% end %>
+    </if>
   </div>
 </def>
