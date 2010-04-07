@@ -9,6 +9,11 @@
  - `label` - the label on the button. Defaults to the name of the transition
 
 All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also supported. 
+
+### Warning
+
+Transitions with parameters are implemented using a form.  HTML does not allow forms to be nested, so a transitions with parameters should not be placed inside of a form.
+
   -->
 <def tag="transition-button" attrs="transition, update, label"><%=
     if transition.is_a?(String)
