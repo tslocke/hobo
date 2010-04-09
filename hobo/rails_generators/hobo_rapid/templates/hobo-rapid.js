@@ -884,7 +884,8 @@ AutocompleteBehavior = Behavior.create({
         this.autocompleter = new Ajax.Autocompleter(this.element, 
             this.element.next('.completions-popup'), 
             url, 
-            {paramName:'query', method:'get', parameters: parameters, minChars: this.minChars});
+            {paramName:'query', method:'get', parameters: parameters, minChars: this.minChars,
+            afterUpdateElement: this.afterUpdateElement});
     },
 
     onfocus: function() {
@@ -895,6 +896,10 @@ AutocompleteBehavior = Behavior.create({
         if(this.minChars==0) { 
             this.autocompleter.activate();
         }
+    },
+
+    afterUpdateElement: function(input, li) {
+        input.fire("rapid:autocomplete-assigned");
     }
         
 })
