@@ -67,7 +67,7 @@ Each item in the collection has a `<div class="ordering-handle" param="handle">`
           
 ### Controller support 
 
-This tag assumes the controller has a `reorder` action. This action is added automatically by Hobo's model-controller if the model declares `acts_as_list`. See also [Drag and Drop Reordering](/manual/controllers#drag_and_drop_reordering) in the [Controllers and Routing](/manual/controllers) chapter of the manual.
+This tag assumes the controller has a `reorder` action and the model has a `position_column` method. This action is added automatically by Hobo's model-controller if the model declares `acts_as_list`. See also [Drag and Drop Reordering](/manual/controllers#drag_and_drop_reordering) in the [Controllers and Routing](/manual/controllers) chapter of the manual.
  -->
 <def tag="sortable-collection" attrs="sortable-options"><%
   singular_name = this.member_class.name.underscore
@@ -77,7 +77,7 @@ This tag assumes the controller has a `reorder` action. This action is added aut
 %>
   <collection class="sortable" merge>
     <item: id="#{singular_name}_#{this.id}" param>
-      <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
+      <div class="ordering-handle" param="handle" if="&can_edit?(this.position_column)">&uarr;<br/>&darr;</div>
       <do param="default"><card param/></do>
     </item:>
   </collection>

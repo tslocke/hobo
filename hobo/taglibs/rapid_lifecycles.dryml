@@ -50,11 +50,12 @@ This tag behaves similarly to repeat: an else tag may be used to handle the case
     <transition-buttons/><else>Sorry, no buttons to press.</else>
   -->  
 <def tag="transition-buttons">
-  <div merge-attrs class="transitions">
+  <% ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS) %>
+  <div merge-attrs="&html_attrs" class="transitions">
     <% transitions = this.lifecycle.publishable_transitions_for(current_user) %>
     <if test="&transitions">
       <% transitions.each do |t| %>
-        <transition-button transition="&t"/>
+        <transition-button merge-attrs="&ajax_attrs" transition="&t"/>
       <% end %>
     </if>
   </div>
