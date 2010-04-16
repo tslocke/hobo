@@ -754,7 +754,8 @@ module Hobo
       ordering = params["#{model.name.underscore}_ordering"]
       if ordering
         ordering.each_with_index do |id, position|
-          model.find(id).user_update_attributes(current_user, :position => position+1)
+          object = model.find(id)
+          object.user_update_attributes!(current_user, object.position_column => position+1)
         end
         hobo_ajax_response || render(:nothing => true)
       else
