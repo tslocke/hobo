@@ -14,6 +14,15 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo 1.0.1 ===
+
+This version contains two speedups: one fix that reduces the number of
+database accesses by Matt Jones and one that speeds up compilation of
+DRYML by Petteri Räty.
+
+This version also contains several bug fixes.  See the [github
+log](http://github.com/tablatom/hobo/tree/v1.0.1) for more details.
+
 === Hobo 1.0.0 ===
 
 Drumm-roll! Trumpets! Fanfare! 
