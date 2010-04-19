@@ -94,7 +94,7 @@ if run_rails
     opts << "_#{rails_version}_"
   else
     v=`#{RUBY} -S rails -v`.split[1].split(".")
-    unless v.length===3
+    unless v.length>=3
       puts "rails not found!"
       exit 2
     end
