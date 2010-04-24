@@ -242,7 +242,7 @@ module Hobo
       if field
         # Field can be a dot separated path
         if field.is_a?(String) && (path = field.split(".")).length > 1
-          _, _, object = Hobo.get_field_path(object, path[0..-2])
+          _, _, object = Dryml.get_field_path(object, path[0..-2])
           field = path.last
         end
       elsif (origin = object.try.origin)
