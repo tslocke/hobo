@@ -5,7 +5,9 @@ module Hobo
   module LegacyI18nMethods
   
     def load_legacy_i18n(method, *args)
-      Rails.logger.warn "The methods model_name, model_name_plural and field_name have been deprecated. Please, use a locale file."
+      Rails.logger.warn "The ViewHints methods 'model_name', 'model_name_plural' and 'field_name' \
+have been deprecated. Please, set the names in a locale file and use the ActiveRecord::Base methods \
+'human_name' and 'human_attribute_name' to retrieve them."
       # TODO: add a file with instructions about how to use canonical i18n in hobo
       require 'hobo/legacy_i18n'
       send method, *args

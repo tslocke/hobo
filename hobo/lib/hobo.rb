@@ -174,3 +174,22 @@ module ::Enumerable
   alias_method_chain :group_by, :metadata
 end
 
+class ActiveRecord::Base
+  class << self
+    # adds a default pluralization for english
+    # useful to avoid to set a locale 'en' file and avoid
+    # to pass around pluralize calls for 'en' defaults in hobo
+    def human_name_with_en_pluralization_default(options={})
+      if I18n.locale.to_s.match(/^en/) 
+        unless options[:count] == 1 || options[:count].blank?
+          default = options[:default].class.eql?(Array) ? options[:default] : [options[:default]]
+          default << self.name.underscore.pluralize.humanize
+          options = options.merge(:default=>default) 
+        end
+      end
+      human_name_without_en_pluralization_default(options)
+    end
+    
+    alias_method_chain :human_name, :en_pluralization_default
+  end
+end
