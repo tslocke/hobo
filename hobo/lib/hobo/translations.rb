@@ -26,6 +26,11 @@ module Hobo
     #       "no":
     #         my: "Mitt {{app}}"
     #       The output should be: Mitt Program
+    #
+    # The "pluralized" option set the count to the Model.count. The following lines are the same:
+    #
+    # <ht key="modelname.any.key" pluralized/>
+    # <ht key="modelname.any.key" count="&model.count">
     # 
     # Otherwise with features as the ht method, step 1, 2 and 3 above. 
     def self.ht(key, options={})
@@ -41,6 +46,7 @@ module Hobo
         key = options.delete(:key) # returns value for options[:key] as well as deleting it
         # Set options[:default] to complete the tag-argument-conversion process.
         options[:default] = (defaults.class == Proc) ? [defaults.call(options)] : (options[:default].blank? ? [] : [options[:default]])
+        pluralized = options.delete(:pluralized)
       else
         # Not called as a tag. Prepare options[:default].
         if options[:default].nil?
@@ -58,17 +64,22 @@ module Hobo
       else
         subkey = key
       end
-    
+      
+      # set the count option in order to allow multiple pluralization
+      if pluralized
+        options[:count] = model.singularize.camelize.constantize.try.count
+      end
+      options[:count] ||= 1
+
       # add :"hobo.#{key}" as the first fallback
       options[:default].unshift("hobo.#{subkey}".to_sym)
     
       # translate the model
       unless model.blank?
-        count = options[:count] || 1
         # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
         # no default needed because human_name defaults to the model name
         # try because Hobo class is not an ActiveRecord::Base subclass
-        translated_pluralized_model = model.singularize.camelize.constantize.try.human_name(:count=>count)
+        translated_pluralized_model = model.singularize.camelize.constantize.try.human_name(:count=>options[:count])
         options[:model] = translated_pluralized_model
       end
     
