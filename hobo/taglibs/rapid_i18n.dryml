@@ -1,0 +1,20 @@
+<!-- Rapid i18n provides tags related with the Rails-I18n project -->
+
+<!-- Wrapper around ActiveRecord::Base.human_name. It accepts "model", "count" and "pluralized" attributes:
+"model" should be a model class or a record object (default to this)
+"count" (optional) should be an integer 
+"pluralized" set the count = model.count and silently ignore any count attr -->
+
+<def tag="human-name" attrs="model, count, pluralized"><%=
+  model ||= this
+  model = model.class unless model.kind_of? Class
+  case
+  when pluralized
+    model.human_name(:count=>model.count)
+  when count.blank?
+    model.human_name
+  else
+    model.human_name(:count=>count.to_i)
+  end
+%>
+</def>
