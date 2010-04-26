@@ -64,8 +64,12 @@ module Hobo
     
       # translate the model
       unless model.blank?
-        translated_model = I18n.translate( "activerecord.models.#{model.singularize.underscore}", :default=>model).titleize
-        options[:model] = translated_model
+        count = options[:count] || 1
+        # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
+        # no default needed because human_name defaults to the model name
+        # try because Hobo class is not an ActiveRecord::Base subclass
+        translated_pluralized_model = model.singularize.camelize.constantize.try.human_name(:count=>count)
+        options[:model] = translated_pluralized_model
       end
     
       key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
