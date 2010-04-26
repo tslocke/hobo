@@ -1,20 +1,19 @@
 <!-- Rapid i18n provides tags related with the Rails-I18n project -->
 
-<!-- Wrapper around ActiveRecord::Base.human_name. It accepts "model", "count" and "pluralized" attributes:
+<!-- Wrapper around ActiveRecord::Base.human_name with added sugar. 
+It dynamically pluralizes the human_name by using the implicit count.
+It accepts "model" and "count" attributes:
 "model" should be a model class or a record object (default to this)
-"count" (optional) should be an integer 
-"pluralized" set the count = model.count and silently ignore any count attr -->
+"count" (optional) should be an integer and will override the default pluralization.  -->
 
-<def tag="human-name" attrs="model, count, pluralized"><%=
+<def tag="human-name" attrs="model, count"><%=
   model ||= this
   model = model.class unless model.kind_of? Class
-  case
-  when pluralized
-    model.human_name(:count=>model.count)
-  when count.blank?
-    model.human_name
-  else
-    model.human_name(:count=>count.to_i)
-  end
+  # adapted from count tag
+  c = count.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+  # prepare symbolized attributes for merging
+  attrs = {}
+  attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.human_name( {:count=>c}.merge(attrs) )
 %>
 </def>
