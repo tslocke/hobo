@@ -21,13 +21,13 @@ model_key = model.name.tableize
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index.title', :default=>[model.human_name(:count=>model.count)] }">
+  <page merge title="#{ht '<%= model_key %>.index.title', :pluralized=>true, :default=>[model.human_name(:count=>model.count)] }">
     <body: class="index-page <%= model_class %>" param/>
 
     <content: param>
       <header param="content-header">
         <h2 param="heading">
-          <ht key="<%= model_key %>.index.heading">
+          <ht key="<%= model_key %>.index.heading" pluralized>
             <human-name model="&model"/>
           </ht>
         </h2>
@@ -176,7 +176,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
+                <ht key="<%= collection.to_s.tableize %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" count="&this.<%= collection.to_s %>.count" >
                   <%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %>
                 </ht>
               </h3>
@@ -189,7 +189,7 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)" param="new-link">
-                <ht key="<%= collection.to_s.pluralize %>.actions.new">
+                <ht key="<%= collection.to_s.tableize %>.actions.new">
                   New <%= collection.to_s.singularize.titleize %>
                 </ht>
               </a:<%= collection %>>
