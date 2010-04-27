@@ -46,7 +46,6 @@ module Hobo
         key = options.delete(:key) # returns value for options[:key] as well as deleting it
         # Set options[:default] to complete the tag-argument-conversion process.
         options[:default] = (defaults.class == Proc) ? [defaults.call(options)] : (options[:default].blank? ? [] : [options[:default]])
-        pluralized = options.delete(:pluralized)
       else
         # Not called as a tag. Prepare options[:default].
         if options[:default].nil?
@@ -55,6 +54,7 @@ module Hobo
           options[:default] = [options[:default]]
         end
       end
+      pluralized = options.delete(:pluralized)
       
       # assume the first part of the key to be the model
       keys = key.to_s.split(".")
