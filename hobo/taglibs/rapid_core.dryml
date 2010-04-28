@@ -570,7 +570,7 @@ The context should be a user object. If `this == current_user` the "you" form is
  - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
  - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
 
-The tag is also localized in the namespaces "hobo.tags.you.current_user" and "hobo.tags.you.other_user". 
+The tag is also localized in the namespaces "tags.you.current_user" and "tags.you.other_user". 
 Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes, 
 and "nothing" used when no attribute is passed. But you can also use your own keys, providing 
 that you add the keys in the correct namespaces. 
@@ -578,19 +578,18 @@ that you add the keys in the correct namespaces.
 ### Examples
 
     it:
-      hobo:
-        tags:
-          you:
-            current_user:
-              nothing: "Tu"
-              have: "Hai"
-              are: "sei"
-              can: "Puoi"
-            other_user:
-              nothing: "{{name}}"
-              have: "{{name}} ha"
-              are: "{{name}} è"
-              can: "{{name}} può"
+      tags:
+        you:
+          current_user:
+            nothing: "Tu"
+            have: "Hai"
+            are: "sei"
+            can: "Puoi"
+          other_user:
+            nothing: "{{name}}"
+            have: "{{name}} ha"
+            are: "{{name}} è"
+            can: "{{name}} può"
 
  - `<you have/> un nuovo messaggio.` -> "Hai un nuovo messaggio." or "Jim ha un nuovo messaggio."
  - `Adesso <you are/> amministratore.` -> "Adesso sei amministratore." or "Adesso Jim è amministratore."
@@ -612,12 +611,12 @@ that you add the keys in the correct namespaces.
          when attributes[:do] then 'do'
          end -%>
   <if test="&this == current_user">
-    <%= s = I18n.t("hobo.tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
+    <%= s = I18n.t("tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
        (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
   </if>
   <else>
     <do param="default">
-      <%= s = I18n.t("hobo.tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name, 
+      <%= s = I18n.t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name, 
           :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}") 
           (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
     </do>
@@ -634,8 +633,8 @@ that you add the keys in the correct namespaces.
  - capitalize: the first letter of the resulting sentence will be capitalized
  - count: used in pluralization. If omitted it will be set to 1.
  - key: used to lookup the translation in the locale file. It allows 3 different options: 
-   - single key like 'message': simple translation in 'hobo.tags.your.message.current_user' 
-     or 'hobo.tags.your.message.other_user'
+   - single key like 'message': simple translation in 'tags.your.message.current_user' 
+     or 'tags.your.message.other_user'
    - composite key like 'any.namespace.message': translation as for the previous case, but it will
      translate also the 'any.namespace.message' and will interpolate the variable <key> (in this case :message)
      in the translation
@@ -654,21 +653,20 @@ Notes
 ### Examples
 
     it:
-      hobo:
-        tags:
-          your:
-            message:
-              current_user: 
-                one: "Tuo Messaggio"
-                other: "Tuoi Messaggi"
-              other_user:
-                one: "Messaggio di {{name}}"
-                other: "Messaggi di {{name}
-            entry:
-              current_user:
-                one: "Tua {{entry}}"
-                other: "Tue {{entry}}"
-              other_user: "{{entry}} di {{name}}"
+      tags:
+        your:
+          message:
+            current_user: 
+              one: "Tuo Messaggio"
+              other: "Tuoi Messaggi"
+            other_user:
+              one: "Messaggio di {{name}}"
+              other: "Messaggi di {{name}
+          entry:
+            current_user:
+              one: "Tua {{entry}}"
+              other: "Tue {{entry}}"
+            other_user: "{{entry}} di {{name}}"
               
  - `<your key="message" count=>"&messages.count"/>` 
    -> count => 1 -> "Tuo Messaggio" or "Messaggio di Jim"
