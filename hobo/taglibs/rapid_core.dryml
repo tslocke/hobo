@@ -570,27 +570,142 @@ The context should be a user object. If `this == current_user` the "you" form is
  - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
  - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
 
+The tag is also localized in the namespaces "hobo.tags.you.current_user" and "hobo.tags.you.other_user". 
+Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes, 
+and "nothing" used when no attribute is passed. But you can also use your own keys, providing 
+that you add the keys in the correct namespaces. 
+
+### Examples
+
+    it:
+      hobo:
+        tags:
+          you:
+            current_user:
+              nothing: "Tu"
+              have: "Hai"
+              are: "sei"
+              can: "Puoi"
+            other_user:
+              nothing: "{{name}}"
+              have: "{{name}} ha"
+              are: "{{name}} è"
+              can: "{{name}} può"
+
+ - `<you have/> un nuovo messaggio.` -> "Hai un nuovo messaggio." or "Jim ha un nuovo messaggio."
+ - `Adesso <you are/> amministratore.` -> "Adesso sei amministratore." or "Adesso Jim è amministratore."
+ - `<you can/> scrivere.` -> "Puoi scrivere." or "Jim può scrivere."
+
+(note: :name is added by default as an interpolable variable)
+
 ### Attributes
 
- - titleize: render "You" instead of "you"
-  
+ - capitalize: the first letter of the resulting sentence will be capitalized
+
 -->
-<def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
-
-<!-- Equivalent to `<you titleize/>`. Yes it's an abuse of Ruby naming conventions, but it's so cute : ) -->
-<def tag="You"><you merge titleize/></def>
-
-<!--  Similar to `<you>`, but renders "Your" or "Fred's" -->
-<def tag="your">
-  <if test="&this == current_user">your</if>
-  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+<def tag="you" attrs="titleize, capitalize">
+  <% Rails.logger.warn "'titleize' is a deprecated attribute of the 'you' tag. Please, use 'capitalize' instead." -%>
+  <% raise ArgumentError, "You can add only one attribute-key to the 'you' tag." if attributes.size > 1 -%>
+  <% k = case
+         when attributes[:have] then 'have'
+         when attributes[:are] then 'are'
+         when attributes[:do] then 'do'
+         end -%>
+  <if test="&this == current_user">
+    <%= s = I18n.t("hobo.tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
+       (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
+  </if>
+  <else>
+    <do param="default">
+      <%= s = I18n.t("hobo.tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name, 
+          :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}") 
+          (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
+    </do>
+  </else>
 </def>
 
-<!-- Capitalised versin of `<your>` -->
-<def tag="Your">
-  <if test="&this == current_user">Your</if>
-  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+<!-- Equivalent to `<you capitalize/>`-->
+<def tag="You"><you merge capitalize/></def>
+
+<!-- Similar to `<you>`, but renders "Your" or "Fred's" or equivalent localized strings
+
+### Attributes
+
+ - capitalize: the first letter of the resulting sentence will be capitalized
+ - count: used in pluralization. If omitted it will be set to 1.
+ - key: used to lookup the translation in the locale file. It allows 3 different options: 
+   - single key like 'message': simple translation in 'hobo.tags.your.message.current_user' 
+     or 'hobo.tags.your.message.other_user'
+   - composite key like 'any.namespace.message': translation as for the previous case, but it will
+     translate also the 'any.namespace.message' and will interpolate the variable <key> (in this case :message)
+     in the translation
+   - when key is omitted it will be set to "default" and will do the translation with that key. 
+     Pass other meaningful attributes to achieve a dynamic usage
+ - any other attribute passed to the tag will be used as a variable for interpolation
+ 
+Notes
+
+ - The :name variable is added by default as an interpolable variable
+ - If no translation is found an automatic (only english) default is generated: 
+   the Your/Jim's string, joined to the tag content.
+   If you pass an explicit 'default' attribute you will override the automatic default. 
+
+ 
+### Examples
+
+    it:
+      hobo:
+        tags:
+          your:
+            message:
+              current_user: 
+                one: "Tuo Messaggio"
+                other: "Tuoi Messaggi"
+              other_user:
+                one: "Messaggio di {{name}}"
+                other: "Messaggi di {{name}
+            entry:
+              current_user:
+                one: "Tua {{entry}}"
+                other: "Tue {{entry}}"
+              other_user: "{{entry}} di {{name}}"
+              
+ - `<your key="message" count=>"&messages.count"/>` 
+   -> count => 1 -> "Tuo Messaggio" or "Messaggio di Jim"
+   -> count => 5 -> "Tuoi Messaggi" or "Messaggi di Jim"
+ 
+ - `<your key="activerecord.models.entry" count=>"&this.entries.count"/>` 
+   -> count => 1 -> "Tua Entrata" or "Entrata di Jim"
+   -> count => 5 -> "Tue Entrate" or "Entrate di Jim"
+
+ - `<your>Posts</your>` -> "your Posts" or "Jim's Posts"
+ -->
+
+<def tag="your" attrs="key, capitalize">
+  <% key ||= 'default'
+     # prepare symbolized attributes for merging
+     attrs = {}
+     attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+     d = this == current_user ? "your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
+     d = "#{d} #{all_parameters.default}"
+     options = {:default=>d, :count=>(attrs[:count]||1), :name=>this.name}
+     your_key = key.split('.').last
+     unless key.eql?(your_key) || options.has_key?(your_key.to_sym)
+       options[your_key.to_sym] = I18n.t(key, :count=>options[:count], :default=>your_key.titleize)
+     end
+  -%>
+  <if test="&this == current_user">
+    <%= s = I18n.t("tags.your.#{your_key}.current_user", options.merge(attributes))
+        capitalize ? s.sub(/^./){|c| c.upcase} : s %>
+  </if>
+  <else>
+      <%= s = I18n.t("tags.your.#{your_key}.other_user", options.merge(attributes))
+          capitalize ? s.sub!(/^./){|c| c.upcase} : s %> 
+  </else>
 </def>
+
+<!-- Equivalent to `<your ... capitalize/>`-->
+<def tag="Your"><your merge capitalize/></def>
 
 <!-- Deprecated. It's harder than you think to do this (e.g. an umbrealla, an user)
 -->
