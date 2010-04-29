@@ -29,7 +29,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
              sort_url = url_for(params.merge(:sort => sort) - [:page])
-             col_heading_name = this.member_class.try.view_hints.try.field_name(scope.field_name) || scope.field_name.titleize %>
+             col_heading_name = this.member_class.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
                           
           <th param="#{scope.field-name}-heading">
             <a href="&sort_url" class="column-sort" 
@@ -43,7 +43,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
         <th if="&all_parameters[:controls]" class="controls"></th>
       </field-heading-row>
     </table>    
-    <do param="empty-message" if="empty?"><ht key="hobo.table_plus.empty" model="&model.human_name">No <collection-name lowercase/> to display</ht></do>
+    <do param="empty-message" if="empty?"><ht key="#{this.member_class.to_s.tableize}.table_plus.empty" count="0">No <collection-name lowercase/> to display</ht></do>
 
    
     <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
