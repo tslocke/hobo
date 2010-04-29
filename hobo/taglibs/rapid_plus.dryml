@@ -156,14 +156,15 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 ### Attributes
 
  - `param-name` - the name of the HTTP parameter to use for the filter
- - `options` - an array of options for the menu. 
+ - `options` - an array of options or an array of arrays (useful for localized apps) for the menu. 
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
   -->
 <def tag="filter-menu" attrs="param-name, options, no-filter, id">
   <% no_filter ||= "All" %>
   <form action="&request.request_uri" method="get" class="filter-menu" merge-attrs="id">
     <div>
-      <% selected = options.detect {|o| o.to_s==params[param_name.gsub('-', '_')] } %>
+      <% opt = options.first.kind_of?(Array) ? options.*.last : options
+         selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
       <select-menu name="&param_name" options="&options" selected="&selected"
                    first-option="&no_filter" merge-params/>
     </div>
