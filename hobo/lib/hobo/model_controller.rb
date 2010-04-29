@@ -589,7 +589,7 @@ module Hobo
       options = args.extract_options!
 
       self.this ||= args.first || find_instance
-      changes = options[:attributes] || attribute_parameters or raise RuntimeError, ht(:"hobo.messages.update.no_attribute_error", :default=>["No update specified in params"])
+      changes = options[:attributes] || attribute_parameters or raise RuntimeError, I18n.t("hobo.messages.update.no_attribute_error", :default=>["No update specified in params"])
       this.user_update_attributes(current_user, changes)
 
       # Ensure current_user isn't out of date
@@ -779,11 +779,11 @@ module Hobo
             if render_tag("permission-denied-page", { }, :status => 403)
               # job done
             else
-              render :text => ht(:"hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
+              render :text => I18n.t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
             end
           end
           wants.js do
-            render :text => ht(:"hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
+            render :text => I18n.t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
           end
         end
       end

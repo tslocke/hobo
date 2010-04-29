@@ -38,7 +38,7 @@
       </labelled-item>
     </labelled-item-list>
     <div param="actions">
-      <submit label="#{ht 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
+      <submit label="#{I18n.t 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
       <t key="hobo.support.or">or</t> <a param="signup" href="&signup_url"><t key="hobo.login.signup">Sign up</t></a></if>
     </div>
   </form>
@@ -47,7 +47,7 @@
 <!-- Simple log-in page  -->
 <def tag="login-page">
   <% remember_me = true if remember_me.nil? %>
-  <simple-page title="#{ht 'hobo.login.title', :default=>['Log in'] }" merge>
+  <simple-page title="#{I18n.t 'hobo.login.title', :default=>['Log in'] }" merge>
    
     <body: class="login-page" param/>
     
