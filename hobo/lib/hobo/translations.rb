@@ -65,23 +65,25 @@ module Hobo
         subkey = key
       end
       
-      # set the count option in order to allow multiple pluralization
-      if pluralized
-        options[:count] = model.singularize.camelize.constantize.try.count
-      end
-      options[:count] ||= 1
-
-      # add :"hobo.#{key}" as the first fallback
-      options[:default].unshift("hobo.#{subkey}".to_sym)
+      # will skip useless code in case the first part of the key is 'hobo'
+      model = '' if model.eql?('hobo')
     
-      # translate the model
       unless model.blank?
+        # add :"hobo.#{key}" as the first fallback
+        options[:default].unshift("hobo.#{subkey}".to_sym)
+        # set the count option in order to allow multiple pluralization
+        if pluralized
+          options[:count] = model.singularize.camelize.constantize.try.count
+        end
+        options[:count] ||= 1
+        # translate the model
         # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
         # no default needed because human_name defaults to the model name
         # try because Hobo class is not an ActiveRecord::Base subclass
         translated_pluralized_model = model.singularize.camelize.constantize.try.human_name(:count=>options[:count])
         options[:model] = translated_pluralized_model
       end
+      options[:count] ||= 1
     
       key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
     
