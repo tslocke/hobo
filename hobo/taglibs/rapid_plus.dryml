@@ -17,7 +17,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <hidden-fields for-query-string skip="page, search"/>
           <span><ht key="hobo.table_plus.search">Search</ht></span>
           <input class="search" type="search" name="search" value="&params[:search]"/>
-          <submit label="Go" class="search-button" param="search-submit"/>
+          <submit label="&I18n.t('hobo.table_plus.submit_label', :default=>'Go')" class="search-button" param="search-submit"/>
         </form>
       </div>
     </div>
