@@ -46,30 +46,22 @@ The passed options are used as a default in case the lookup fails (e.g. in engli
 ### Example
 
   es:
-    select_menu:
+    filter_menu:
       period:
         no_filter: Todos Períodos
         options:
         - [ "Hoy", "today" ]
         - [ "Ayer", "yesterday" ]
-        - [ "Semana Corriente", "current_week" ]
-        - [ "Semana Pasada", "last_week"]
-        - [ "Més Corriente", "current_month" ]
-        - [ "Més Pasado", "last_month" ]
 
    TIME_PERIODS = %w[today yesterday current_week last_week current_month last_month]
    
-   <filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+   <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
    
    with I18n.locale == :es
    <select name="period">
      <option value="">Todos Períodos</option>
      <option value="today">Hoy</option>
      <option value="yesterday">Ayer</option>
-     <option value="current_week">Semana Corriente</option>
-     <option value="last_week">Semana Pasada</option>
-     <option value="current_month">Més Corriente</option>
-     <option value="last_month">Més Pasado</option>
    </select>
    
    with I18n.locale == :en (i.e no locale file)
@@ -77,16 +69,12 @@ The passed options are used as a default in case the lookup fails (e.g. in engli
      <option value="">All Periods</option>
      <option value="today">today</option>
      <option value="yesterday">yesterday</option>
-     <option value="current_week">current_week</option>
-     <option value="last_week">last_week</option>
-     <option value="current_month">current_month</option>
-     <option value="last_month">last_month</option>
    </select>
 -->
 
 <def tag="t-filter-menu" attrs="param-name, options, no-filter">
-  <% opt = I18n.t("select_menu.#{param_name}.options", :default=>'')
+  <% opt = I18n.t("filter_menu.#{param_name}.options", :default=>'')
      opt = options if opt.blank?
-     nf = I18n.t("select_menu.#{param_name}.no_filter", :default=>no_filter) %>
+     nf = I18n.t("filter_menu.#{param_name}.no_filter", :default=>no_filter) %>
   <filter-menu param-name="&param_name" options="&opt" no-filter="&nf" merge-attrs/>
 </def>
