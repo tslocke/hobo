@@ -136,8 +136,6 @@ module Hobo
 
 
     module ClassMethods
-      require 'active_record/viewhints_validations_interceptor'
-      include Hobo::ViewHintsValidationsInterceptor
 
       # TODO: should this be an inheriting_cattr_accessor as well? Probably.
       attr_accessor :creator_attribute

@@ -401,11 +401,11 @@ module Hobo
     # --- ViewHint Helpers --- #
     
     def this_field_name
-      this_parent.class.try.view_hints.try.field_name(this_field) || this_field
+      this_parent.class.human_attribute_name(this_field)
     end
 
     def this_field_help
-      key = "#{this_parent.class.try.name.tableize}.hints.#{this_field.to_s}"
+      key = "#{this_parent.class.name.tableize}.hints.#{this_field.to_s}"
       default = this_parent.class.try.view_hints.try.field_help[this_field.to_sym] || ""
       Hobo::Translations.ht(key, :default=>default)
     end
