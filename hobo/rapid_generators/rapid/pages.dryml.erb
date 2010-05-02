@@ -34,7 +34,7 @@ model_key = model.name.tableize
 
         <p param="count" if>
           <ht key="<%= model_key %>.collection.count" count="&this.size">
-            There <count prefix="are"/>
+            <count summary/>
           </ht>
         </p>
       </header>
@@ -325,7 +325,7 @@ new_link = :new.in?(actions)
 <% end -%>
         <p param="count" if>
           <ht key="<%= model_key %>.collection.count" count="&this.size">
-            There <count prefix="are"/>
+            <count summary/>
           </ht>
         </p>
       </header>
