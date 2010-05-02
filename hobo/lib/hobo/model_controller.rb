@@ -564,7 +564,7 @@ module Hobo
 
 
     def create_response(new_action, options={}, &b)
-      flash_notice (ht( :"#{@this.class.name.pluralize.underscore}.messages.create.success", :default=>["The #{@this.class.view_hints.model_name.downcase} was created successfully"])) if valid?
+      flash_notice (ht( :"#{@this.class.name.tableize}.messages.create.success", :default=>["The #{@this.class.human_name} was created successfully"])) if valid?
 
       response_block(&b) or
         if valid?
@@ -602,7 +602,7 @@ module Hobo
 
     def update_response(in_place_edit_field=nil, options={}, &b)
       
-      flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.view_hints.model_name.downcase} were saved"])) if valid?
+      flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.human_name} were saved"])) if valid?
 
       response_block(&b) or
         if valid?
