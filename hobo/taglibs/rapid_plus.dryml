@@ -103,7 +103,8 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
     <h3 param="heading"><%= name.titleize %></h3>
     <a param="more"><t key="hobo.live_search.more">More</t> <type-name plural lowercase/>...</a>
     <collection param/>
-    <a action="new" if="&can_create?(this.new)" param="new-link">New <%= this.member_class.view_hints.model_name %></a>
+    <a action="new" if="&can_create?(this.new)" param="new-link">
+      <ht key="#{this.member_class.tableize}.actions.new">New <%= this.member_class.human_name %></ht></a>
   </section>
 </def>
 
