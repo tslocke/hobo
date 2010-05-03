@@ -27,8 +27,6 @@ module Hobo
       end
     end
 
-    setter :field_names, {}
-    
     setter :field_help,  {}
     
     setter :children,    [] do |*args|

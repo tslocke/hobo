@@ -29,6 +29,9 @@ end
 
 module Hobo
   class ViewHints
+    
+    setter :field_names, {}
+
     class << self
       
       def model_name(new_name=nil)
