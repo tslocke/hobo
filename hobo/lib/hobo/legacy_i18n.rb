@@ -31,6 +31,7 @@ module Hobo
   class ViewHints
     
     setter :field_names, {}
+    setter :field_help,  {}
 
     class << self
       
@@ -93,5 +94,17 @@ module Hobo
       end
     
     end
+  end
+  
+  module HoboHelper
+    
+    # We redefine the method because we need to add search in the legacy namespace 
+    # and we fallback to the canonical namespace.
+    def this_field_help
+      I18n.t "#{this_parent.class.name.tableize}.hints.#{this_field.to_s}",
+             :default => this_parent.class.attribute_help(this_field.to_sym),
+             :count => 1
+    end
+    
   end
 end

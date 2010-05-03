@@ -405,9 +405,7 @@ module Hobo
     end
 
     def this_field_help
-      key = "#{this_parent.class.name.tableize}.hints.#{this_field.to_s}"
-      default = this_parent.class.try.view_hints.try.field_help[this_field.to_sym] || ""
-      Hobo::Translations.ht(key, :default=>default)
+      this_parent.class.attribute_help(this_field.to_sym)
     end
 
 

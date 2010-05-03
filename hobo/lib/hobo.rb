@@ -191,5 +191,20 @@ class ActiveRecord::Base
     end
     
     alias_method_chain :human_name, :en_pluralization_default
+    
+    # Similar to human_name_attributes, this method retrieves the localized help string 
+    # of an attribute if it is defined as the key "activerecord.attribute_help.<attribute_name>", 
+    # otherwise it returns "".
+    def attribute_help(attribute_key_name, options = {})
+      defaults = self_and_descendants_from_active_record.map do |klass|
+        :"#{klass.name.underscore}.#{attribute_key_name}"
+      end
+      defaults << options[:default] if options[:default]
+      defaults.flatten!
+      defaults << ""
+      options[:count] ||= 1
+      I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => [:activerecord, :attribute_help]))
+    end
+
   end
 end

@@ -27,8 +27,6 @@ module Hobo
       end
     end
 
-    setter :field_help,  {}
-    
     setter :children,    [] do |*args|
       # Setting children also gives a default parent using the reverse association
       child_model = model.reflections[args.first].klass
