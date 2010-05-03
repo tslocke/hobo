@@ -170,7 +170,7 @@ if a given email is associated with an account or not. -->
           </field-list>
 
           <div class="actions" param="actions">
-            <submit label="#{I18n.t 'hobo.actions.save', :default=>'Save'}" param/>
+            <submit label="#{I18n.t 'hobo.actions.save_account', :default=>'Save'}" param/>
           </div>
         </form>
       </section>
