@@ -264,7 +264,7 @@ name_attribute = model.name_attribute
       <section param="content-header">
         <h2 param="heading">
           <ht key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
-            Edit <type-name/>
+            Edit <%= model_name %>
           </ht>
         </h2>
         <delete-button label="#{ht '<%= model_key %>.actions.delete', :default=>['Remove This <%= sq_escape model_name %>']}" param/>
