@@ -117,7 +117,7 @@ module Hobo
       
       
       def digest(s)
-        OpenSSL::Digest::Digest.digest('sha1', s)
+        OpenSSL::Digest::SHA1.hexdigest(s)
       end
       
       
