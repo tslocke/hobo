@@ -135,7 +135,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
   </section>
 </def>
 
-<!-- A `<select>` menu intended to act as a filter for index pages.
+<!-- A `<select>` menu intended to act as a filter for index pages. 
 
 ### Example
 
@@ -158,10 +158,48 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 
  - `param-name` - the name of the HTTP parameter to use for the filter
  - `options` - an array of options or an array of arrays (useful for localized apps) for the menu. 
+   It can be omitted if you provide the options as an array or array of arrays in the locale file.
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+
+### I18n
+
+It lookups the options attributes in filter_menu.#{param_name}.options.
+The passed options are used as a default in case the lookup fails.  
+
+### I18n Example
+
+  es:
+    tags:
+      filter_menu:
+        period:
+          no_filter: Todos Períodos
+          options:
+          - [ "Hoy", "today" ]
+          - [ "Ayer", "yesterday" ]
+
+   TIME_PERIODS = %w[today yesterday]
+   
+   <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+   
+   with I18n.locale == :es
+   <select name="period">
+     <option value="">Todos Períodos</option>
+     <option value="today">Hoy</option>
+     <option value="yesterday">Ayer</option>
+   </select>
+   
+   with I18n.locale == :en (i.e no locale file)
+   <select name="period">
+     <option value="">All Periods</option>
+     <option value="today">today</option>
+     <option value="yesterday">yesterday</option>
+   </select>
+
   -->
 <def tag="filter-menu" attrs="param-name, options, no-filter, id">
-  <% no_filter ||= "All" %>
+  <% opt = I18n.t("tags.filter_menu.#{param_name}.options", :default=>'')
+     options = opt unless opt.blank?
+     no_filter = I18n.t("tags.filter_menu.#{param_name}.no_filter", :default=>(no_filter||"All")) %>
   <form action="&request.request_uri" method="get" class="filter-menu" merge-attrs="id">
     <div>
       <% opt = options.first.kind_of?(Array) ? options.*.last : options
