@@ -147,7 +147,7 @@ it:
       #heading: 
         #<<: *collection_count
       add_form_heading: "Aggiungere {{model}}"
-      empty_message: "Nessuna record collegato"
+      empty_message: "Nessun record collegato"
             
     # default hobo form translation
     form:

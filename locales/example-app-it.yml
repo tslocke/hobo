@@ -79,7 +79,7 @@ it:
       - [ "Oggi", "today" ]
       - [ "Ieri", "yesterday" ]
       - [ "Settimana Corrente", "current_week" ]
-      - [ "Settimana Scorso", "last_week"]
+      - [ "Settimana Scorsa", "last_week"]
       - [ "Mese Corrente", "current_month" ]
       - [ "Mese Scorso", "last_month" ]
     user:
