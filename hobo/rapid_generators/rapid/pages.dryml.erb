@@ -180,7 +180,7 @@ end
                   <% if is_user_model -%>
                     <Your key="<%= collection.to_s %>" count="&this.<%= collection.to_s %>.count" ><%= collection.to_s.humanize %></Your>
                   <% else -%>
-                    <%= collection.to_s.humanize %>
+                    <human-name model="&<%= collection_class %>" count="&this.<%= collection.to_s %>.count" />
                   <% end -%>
                 </ht>
               </h3>
