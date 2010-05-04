@@ -3,6 +3,37 @@
 
 it:
 
+  strings:
+    unit_price: "Prezzo Unitario:"
+    total_price: "Prezzo Totale:"
+    total_commission: "Commissione Totale:"
+    active: &active Attivo
+    expired: &expired Scaduto
+    no_customer_found: "Nessun Cliente trovato"
+    state:
+      expired: "- scaduta -"
+      just_used: "- appena usata -"
+      void_membership: "Rinnovare Iscrizione!"
+      empty: "- vuota -"
+    enter: "Entra"
+    use: "Usa"
+    ### new subscription form
+    new_subscription: "Nuovo Abbonamento"
+    quantity: "Quantità:"
+    expires_at: "Scade il:"
+    timetable: "Orario:"
+    no_active_membership: "(Nessuna Iscrizione Attiva: qualche Abbonamento non sarà disponiile fino a che non si aggiungerà l'Iscrizine)"
+    select_menu_first_option: "-- seleziona --"
+    
+  subscription_validation:
+    subscription_type_needed: "Specificare il tipo di Abbonamento"
+    no_quantity_needed: "non necessaria per questo tipo di Abbonamento"
+    quantity_needed: "necessaria per questo tipo di Abbonamento"
+    price_needed: "necessario per questo tipo di de Abbonamento"
+    membership_needed: "Iscrizione necessario per questo tipo di Abbonamento"
+    no_membership_needed: "L'Iscrizione del Cliente è ancora attiva"
+    
+
   tags:
   
     count:
@@ -39,56 +70,24 @@ it:
           zero: "{{name}} non ha Commissioni"
           one: "La Commissione di {{name}} è"
           other: "Il totale delle Commissioni di {{name}} es"
-  
-  strings:
-    unit_price: "Prezzo Unitario:"
-    total_price: "Prezzo Totale:"
-    total_commission: "Commissione Totale:"
-    active: &active Attivo
-    expired: &expired Scaduto
-    no_customer_found: "Nessun Cliente trovato"
-    state:
-      expired: "- scaduta -"
-      just_used: "- appena usata -"
-      void_membership: "Rinnovare Iscrizione!"
-      empty: "- vuota -"
-    enter: "Entra"
-    use: "Usa"
-    ### new subscription form
-    new_subscription: "Nuovo Abbonamento"
-    quantity: "Quantità:"
-    expires_at: "Scade il:"
-    timetable: "Orario:"
-    no_active_membership: "(Nessuna Iscrizione Attiva: qualche Abbonamento non sarà disponiile fino a che non si aggiungerà l'Iscrizine)"
     
-  subscription_validation:
-    subscription_type_needed: "Specificare il tipo di Abbonamento"
-    no_quantity_needed: "non necessaria per questo tipo di Abbonamento"
-    quantity_needed: "necessaria per questo tipo di Abbonamento"
-    price_needed: "necessario per questo tipo di de Abbonamento"
-    membership_needed: "Iscrizione necessario per questo tipo di Abbonamento"
-    no_membership_needed: "L'Iscrizione del Cliente è ancora attiva"
-    
-  select_menu:
-    first_option: "-- seleziona --"
-    
-  filter_menu:
-    period:
-      no_filter: "Tutti i Periodi"
-      options:
-      - [ "Oggi", "today" ]
-      - [ "Ieri", "yesterday" ]
-      - [ "Settimana Corrente", "current_week" ]
-      - [ "Settimana Scorsa", "last_week"]
-      - [ "Mese Corrente", "current_month" ]
-      - [ "Mese Scorso", "last_month" ]
-    user:
-      no_filter: "Tutti gli Utenti"
-    status:
-      no_filter: "Tutti gli Stati"
-      options:
-      - [ *active, "active" ]
-      - [ *expired, "expired" ]
+    filter_menu:
+      period:
+        no_filter: "Tutti i Periodi"
+        options:
+        - [ "Oggi", "today" ]
+        - [ "Ieri", "yesterday" ]
+        - [ "Settimana Corrente", "current_week" ]
+        - [ "Settimana Scorsa", "last_week"]
+        - [ "Mese Corrente", "current_month" ]
+        - [ "Mese Scorso", "last_month" ]
+      user:
+        no_filter: "Tutti gli Utenti"
+      status:
+        no_filter: "Tutti gli Stati"
+        options:
+        - [ *active, "active" ]
+        - [ *expired, "expired" ]
       
   user/locales:
     it: "Italiano"
@@ -182,6 +181,7 @@ it:
         Entry: *entry
         subscription_customer: *customer
         subscription: *subscription
+
         
     # just to show a stupid example
     attribute_help:
