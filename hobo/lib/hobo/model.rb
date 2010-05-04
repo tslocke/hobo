@@ -439,7 +439,7 @@ module Hobo
       if self.class.name_attribute
         send self.class.name_attribute
       else
-        "#{self.class.name.titleize} #{id}"
+        "#{self.class.human_name} #{id}"
       end
     end
 
