@@ -176,13 +176,15 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= collection.to_s.tableize %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
-                  <% if is_user_model -%>
-                    <Your key="<%= collection.to_s %>" count="&this.<%= collection.to_s %>.count" ><%= collection.to_s.humanize %></Your>
-                  <% else -%>
-                    <human-name model="&<%= collection_class %>" count="&this.<%= collection.to_s %>.count" />
-                  <% end -%>
-                </ht>
+                <ht key="<%= collection.to_s.tableize %>.collection.heading.<%= is_user_model ? 'user': 'other' %>" count="&this.<%= collection.to_s %>.count" >
+<%    if is_user_model -%>
+                    <Your key="<%= collection.to_s %>" count="&this.<%= collection.to_s %>.count" > 
+<%    end -%>
+                      <human-name model="&<%= collection_class %>" count="&this.<%= collection.to_s %>.count" />
+<%    if is_user_model -%>
+                    </Your>
+<%    end -%>
+                  </ht>
               </h3>
 
 <%   if sortable_collection?(collection) -%>
@@ -220,7 +222,7 @@ end
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
-          <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
+         <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
 <%       if is_user_model -%>
             <heading:>
               <t key="hobo.undefined">  
@@ -235,8 +237,14 @@ end
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
-              <ht key="<%= refl.name.to_s.pluralize %>.collection.heading.other" >
-                <%= refl.name.to_s.titleize %>
+              <ht key="<%= refl.name.to_s.tableize %>.collection.heading.<%= is_user_model ? 'user': 'other' %>" count="&this.<%= refl.name.to_s %>.count" >
+<%       if is_user_model -%>  
+                <Your key="<%= refl.name.to_s %>" count="&this.<%= refl.name.to_s %>.count" > 
+<%       end -%>
+                  <human-name model="&<%= refl.class_name %>" count="&this.<%= refl.name.to_s %>.count" />
+<%       if is_user_model -%>
+                </Your>
+<%       end -%>
               </ht>
             </h3>
             <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
