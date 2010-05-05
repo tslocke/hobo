@@ -192,6 +192,24 @@ class ActiveRecord::Base
     
     alias_method_chain :human_name, :en_pluralization_default
     
+    # adds a default pluralization and singularization for english
+    # useful to avoid to set a locale 'en' file and avoid
+    # to pass around pluralize calls for 'en' defaults in hobo
+    def human_attribute_name_with_en_pluralization_default(attribute, options={})
+      if I18n.locale.to_s.match(/^en/) 
+        default = options[:default].class.eql?(Array) ? options[:default] : [options[:default]]
+        if options[:count] == 1 || options[:count].blank?
+          default << attribute.to_s.singularize.humanize
+        else
+          default << attribute.to_s.pluralize.humanize
+        end
+        options = options.merge(:default=>default) 
+      end
+      human_attribute_name_without_en_pluralization_default(attribute, options)
+    end
+    
+    alias_method_chain :human_attribute_name, :en_pluralization_default
+
     # Similar to human_name_attributes, this method retrieves the localized help string 
     # of an attribute if it is defined as the key "activerecord.attribute_help.<attribute_name>", 
     # otherwise it returns "".
