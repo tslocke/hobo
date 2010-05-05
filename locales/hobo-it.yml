@@ -144,9 +144,13 @@ it:
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
       # default output for User models
+      # you better define the heading.* in the specific collection namespace
       #heading: 
-        #<<: *collection_count
-      add_form_heading: "Aggiungere {{model}}"
+        #user: 
+        #other: 
+      # if you don't use the following you will also have a or an added to the collection name
+      # you better define the add_form_heading in the specific collection namespace
+      # add_form_heading: "Aggiungere {{model}}"
       empty_message: "Nessun record collegato"
             
     # default hobo form translation
