@@ -180,7 +180,7 @@ end
 <%    if is_user_model -%>
                     <Your key="<%= collection.to_s %>" count="&this.<%= collection.to_s %>.count" > 
 <%    end -%>
-                      <human-name model="&<%= collection_class %>" count="&this.<%= collection.to_s %>.count" />
+                      <human-collection-name collection="<%= collection %>" />
 <%    if is_user_model -%>
                     </Your>
 <%    end -%>
@@ -195,16 +195,16 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)" param="new-link">
-                <ht key="<%= collection.to_s.tableize %>.actions.new">
-                  New <%= collection.to_s.singularize.humanize %>
+                <ht key="<%= collection.to_s.tableize %>.actions.new" count="1">
+                  New <%= collection.to_s.singularize.titleize %>
                 </ht>
               </a:<%= collection %>>
 <%   elsif add_form -%>
 
               <section param="add-to-collection" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading">
-                    Add <%= a_or_an collection.to_s.singularize.humanize %>
+                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading" count="1">
+                    Add <%= a_or_an collection.to_s.singularize.titleize %>
                   </ht>
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model.name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
@@ -241,7 +241,7 @@ end
 <%       if is_user_model -%>  
                 <Your key="<%= refl.name.to_s %>" count="&this.<%= refl.name.to_s %>.count" > 
 <%       end -%>
-                  <human-name model="&<%= refl.class_name %>" count="&this.<%= refl.name.to_s %>.count" />
+                  <human-collection-name collection="<%= refl.name %>" />
 <%       if is_user_model -%>
                 </Your>
 <%       end -%>
