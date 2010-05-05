@@ -18,10 +18,13 @@ There is a default :count => 1
 %></def>
 
 <!-- Wrapper around ActiveRecord::Base.human_name with added sugar. 
-It dynamically pluralizes the human_name by using the implicit count.
-It accepts "model" and "count" attributes:
-"model" should be a model class or a record object (default to this)
-"count" (optional) should be an integer and will override the default pluralization.  -->
+It dynamically pluralizes the human_name by using the implicit model.count.
+
+#### Attributes
+
+ - model - (optional) should be a model class or a record object (default to this)
+ - count - (optional) should be an integer and will override the default pluralization (:count=>model.count)
+ -->
 
 <def tag="human-name" attrs="model, count"><%=
   model ||= this
@@ -32,6 +35,49 @@ It accepts "model" and "count" attributes:
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v}
   model.human_name( {:count=>c}.merge(attrs) )
+%>
+</def>
+
+
+<!-- Wrapper around ActiveRecord::Base.human_attribute_name.
+
+#### Attributes
+
+ - attribute - the attribute to lookup
+ - model - (optional) should be a model class or a record object (default to this)
+ - count - (optional) should be an integer and will override the default pluralization (:count=>1)
+ -->
+
+<def tag="human-attribute-name" attrs="attribute, model"><%=
+  model ||= this
+  model = model.class unless model.kind_of? Class
+  # prepare symbolized attributes for merging
+  attrs = {}
+  attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.human_attribute_name( attribute.to_sym, {:count=>1}.merge(attrs) )
+%>
+</def>
+
+<!-- Used to localize and pluralize collection names. 
+A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them. It does also default pluralization by calling count on the collection attribute (that you can override passing an explicit `count` attribute).
+
+### Attributes
+
+ - collection - the name of the collection/attribute to lookup
+ - model - (optional) should be a model class or a record object (default to this)
+ - count - (optional) should be an integer and will override the default pluralization (:count=>model.<collection>.count)
+ 
+-->
+
+<def tag="human-collection-name" attrs="collection, model, count"><%=
+  model ||= this
+  model = model.class unless model.kind_of? Class
+  # adapted from count tag
+  c = count.try.to_int || this.send(collection.to_sym, :count)
+  # prepare symbolized attributes for merging
+  attrs = {}
+  attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.human_attribute_name( collection.to_sym, {:count=>c}.merge(attrs) )
 %>
 </def>
 
