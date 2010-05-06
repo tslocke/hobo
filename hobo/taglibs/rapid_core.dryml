@@ -725,8 +725,7 @@ Notes
      # prepare symbolized attributes for merging
      attrs = {}
      attributes.each_pair{|k,v| attrs[k.to_sym] = v}
-     d = this == current_user ? "your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
-     d = "#{d} #{all_parameters.default}"
+     d = "#{your_default} #{all_parameters.default}"
      options = {:default=>[d], :count=>(attrs[:count]||1), :name=>this.name}
      your_key = key.split('.').last
      unless key.eql?(your_key) || attrs.has_key?(your_key.to_sym)

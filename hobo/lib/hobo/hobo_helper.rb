@@ -409,6 +409,12 @@ module Hobo
     end
 
 
+    # --- default Helpers --- #
+    
+    def your_default
+      this == current_user ? "Your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
+    end
+
     # --- Debugging Helpers ---- #
 
     def abort_with(*args)

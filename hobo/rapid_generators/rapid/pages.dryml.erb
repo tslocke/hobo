@@ -176,15 +176,9 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= collection.to_s.tableize %>.collection.heading.<%= is_user_model ? 'user': 'other' %>" count="&this.<%= collection.to_s %>.count" >
-<%    if is_user_model -%>
-                    <Your key="<%= collection.to_s %>" count="&this.<%= collection.to_s %>.count" > 
-<%    end -%>
-                      <human-collection-name collection="<%= collection %>" />
-<%    if is_user_model -%>
-                    </Your>
-<%    end -%>
-                  </ht>
+                <ht key="<%= collection.to_s.tableize %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
+                  <human-collection-name collection="<%= collection %>"/>
+                </ht>
               </h3>
 
 <%   if sortable_collection?(collection) -%>
@@ -222,29 +216,15 @@ end
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
-         <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
-<%       if is_user_model -%>
-            <heading:>
-              <t key="hobo.undefined">  
-                <Your with="&@<%= model.name.underscore %>"/> <%= refl.name.to_s.titleize %>
-              </t>
-            </heading:>
-<%       end -%>
-            <more:>
-              <t key="hobo.actions.more">more</t>
-            </more:>
-          </preview-with-more:<%= refl.name %>.recent>
+         <%% record = this -%>
+         <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
+           <heading:><human-collection-name with="&record" collection="<%= refl.name %>"/></heading:>
+         </collection-preview:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
-              <ht key="<%= refl.name.to_s.tableize %>.collection.heading.<%= is_user_model ? 'user': 'other' %>" count="&this.<%= refl.name.to_s %>.count" >
-<%       if is_user_model -%>  
-                <Your key="<%= refl.name.to_s %>" count="&this.<%= refl.name.to_s %>.count" > 
-<%       end -%>
-                  <human-collection-name collection="<%= refl.name %>" />
-<%       if is_user_model -%>
-                </Your>
-<%       end -%>
+              <ht key="<%= refl.name.to_s.tableize %>.collection.heading" count="&this.<%= refl.name.to_s %>.count" >
+                <human-collection-name collection="<%= refl.name %>"/>
               </ht>
             </h3>
             <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
@@ -312,18 +292,12 @@ new_link = :new.in?(actions)
           <t key="hobo.actions.back">Back to</t> <a with="&@<%= owner %>"/>
         </div>
 <% end -%>
-<% if owner_is_user %>
         <h2 param="heading">
-          <ht key="<%= model_key %>.index_for_owner.heading.your">
-            <Your with="&@<%= owner %>"/> <%= model_name :plural %>
+          <ht key="<%= model_key %>.index_for_owner.heading">
+            <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" />
           </ht>
         </h2>
-<% else -%>
-        <h2 param="heading">
-          <ht key="<%= model_key %>.index_for_owner.heading.other">
-            <%= model_name :plural %>
-          </ht>
-        </h2>
+<% unless owner_is_user %>
         <h3 param="subheading">
           <ht key="<%= model_key %>.index_for_owner.subheading">
             For:
