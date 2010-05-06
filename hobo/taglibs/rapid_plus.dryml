@@ -96,15 +96,23 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
 </def>
 
 
+<!-- Deprecated: use collection-preview instead. -->
+<def tag="preview-with-more"><collection-preview merge/></def>
+
+
 <!-- Captures the common pattern of a list of "the first few" cards, along with a link to the rest. -->
-<def tag="preview-with-more" attrs="name">
-  <% name ||= collection_name.pluralize -%>
-  <section class="#{name.gsub(' ', '-').dasherize} preview-with-more" param="default">
-    <h3 param="heading"><%= name.titleize %></h3>
-    <a param="more"><t key="hobo.live_search.more">More</t> <type-name plural lowercase/>...</a>
+<def tag="collection-preview" attrs="name">
+  <% model_class = this.member_class 
+     name ||= model_class.name.downcase.pluralize -%>
+  <section class="#{name.dasherize} collection-preview" param="default">
+    <h3 param="heading">
+      <ht key="#{model_class.to_s.tableize}.collection_preview.heading" count="&this.size"><%= name.pluralize.titleize %></ht>
+    </h3>
+    <a with="&model_class" action="new" if="&can_create?(model_class.new)" param="new-link">
+      <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.human_name %></ht>
+    </a>
     <collection param/>
-    <a action="new" if="&can_create?(this.new)" param="new-link">
-      <ht key="#{this.member_class.tableize}.actions.new">New <%= this.member_class.human_name %></ht></a>
+    <a param="more"><ht key="#{model_class.to_s.tableize}.actions.more" pluralized>More <%= name.pluralize.titleize %>...</ht></a>
   </section>
 </def>
 
