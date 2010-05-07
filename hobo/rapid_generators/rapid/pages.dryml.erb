@@ -218,7 +218,7 @@ end
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
          <%% record = this -%>
          <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
-           <heading:><human-collection-name with="&record" collection="<%= refl.name %>"/></heading:>
+           <heading-content:><human-collection-name with="&record" collection="<%= refl.name %>"/></heading-content:>
          </collection-preview:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
@@ -293,7 +293,7 @@ new_link = :new.in?(actions)
         </div>
 <% end -%>
         <h2 param="heading">
-          <ht key="<%= model_key %>.index_for_owner.heading">
+          <ht key="<%= model_key %>.index_for_owner.heading" count="&@<%= owner %>.<%= collection_name %>.count">
             <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" />
           </ht>
         </h2>

@@ -106,7 +106,9 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
      name ||= model_class.name.downcase.pluralize -%>
   <section class="#{name.dasherize} collection-preview" param="default">
     <h3 param="heading">
-      <ht key="#{model_class.to_s.tableize}.collection_preview.heading" count="&this.size"><%= name.pluralize.titleize %></ht>
+      <ht key="#{name.to_s.tableize}.collection.heading" count="&this.size">
+        <do param="heading-content"><%= name.pluralize.titleize %></do>
+      </ht>
     </h3>
     <a with="&model_class" action="new" if="&can_create?(model_class.new)" param="new-link">
       <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.human_name %></ht>
