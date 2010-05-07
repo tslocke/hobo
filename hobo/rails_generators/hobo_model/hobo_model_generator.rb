@@ -27,5 +27,17 @@ class HoboModelGenerator < Rails::Generator::NamedBase
     def max_attribute_length
       attributes.*.name.*.length.max
     end
+    
+    def field_attributes
+      attributes.reject { |a| a.name == "bt" || a.name == "hm" }
+    end
+    
+    def hms
+      attributes.select { |a| a.name == "hm" }.*.type
+    end
+
+    def bts
+      attributes.select { |a| a.name == "bt" }.*.type
+    end
 
 end
