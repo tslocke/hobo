@@ -28,11 +28,11 @@ it:
 
     index_for_owner:
       title: "{{model}} per"
-      heading:
-        your: 
-          one: "Tu {{model}}"
-          other: "Tus {{model}}"
-        other: "{{model}}"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading: "{{model}} per"
       subheading: "Per:"
 
     new_for_owner:
@@ -63,8 +63,8 @@ it:
       send: "Invia"
 
     forgot_password_sent:
-      title: &forgot_password_str "Parola Chiave Dimenticata - Messaggio inviato"
-      heading: *forgot_password_str
+      title: "Parola Chiave Dimenticata - Messaggio inviato"
+      heading: "Parola Chiave Dimenticata - Messaggio inviato"
       text: "Il messaggio con le istruioni per generare una nuova Parola Chiave ti è stato inviato a {{email}}.
              Se non lo ricevi, per favore verifica il filtro anti-spam."
 
@@ -87,7 +87,7 @@ it:
       previous: "Precedente"
       next: "Prossimo"
       add: "Aggiungere"
-      more: "Altro"
+      more: "vedi tutti..."
       delete: "Elimina {{model}}"
       save: "Registra {{model}}"
       cancel: "Annulla"
@@ -141,18 +141,15 @@ it:
         zero: "Non ci sono {{model}}"
         one: "C'è solo 1 {{model}}"
         other: "Ci sono {{count}} {{model}}"
+        
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
       # default output for User models
       # you better define the heading.* in the specific collection namespace
-      #heading: 
-        #user: 
-        #other: 
-      # if you don't use the following you will also have a or an added to the collection name
-      # you better define the add_form_heading in the specific collection namespace
-      # add_form_heading: "Aggiungere {{model}}"
-      empty_message: "Nessun record collegato"
-            
+      #heading:
+      add_form_heading: "Aggiungere {{model}}"
+      empty_message: "Non ci sono records"
+      
     # default hobo form translation
     form:
       new:
@@ -171,13 +168,12 @@ it:
     table_plus:
       search: "Cerca"
       empty: "Nessun record {{model}}"
-      submit_label: "vai"
+      submit_label: "Vai"
       
     live_search:
       label: "Cerca"
       results_label: "Cerca nei risultati"
       close_button: "chiudi"
-      more: "Altro"
       no_results: "Nessun risultato trovato."
 
     dev_user_changer:

@@ -28,11 +28,11 @@
 
     index_for_owner:
       title: "{{model}} para"
-      heading:
-        your: 
-          one: "Tu {{model}}"
-          other: "Tus {{model}}"
-        other: "{{model}}"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
       subheading: "Para:"
 
     new_for_owner:
@@ -63,8 +63,8 @@
       send: "Enviar"
 
     forgot_password_sent:
-      title: &forgot_password_str "Contraseña olvidada - Correo Eléctronico enviado"
-      heading: *forgot_password_str
+      title: "Contraseña olvidada - Correo Eléctronico enviado"
+      heading: "Contraseña olvidada - Correo Eléctronico enviado"
       text: "El mensaje con las instruciones para generar una nueva contraseña ha sido enviado a {{email}}
              Si no lo recibe, por favor verifique el filtro anti-spam." 
 
@@ -86,7 +86,7 @@
       previous: "Precedente"
       next: "Proxima"
       add: "Añadir"
-      more: "Más"
+      more: "todos..."
       delete: "Borrar {{model}}"
       save: "Guardar {{model}}"
       cancel: "Cancelar"
@@ -116,7 +116,7 @@
         success: "Los cambios a {{model}} han sido guardados"
         error: "Ha habido un problema con ese cambio.\n{{errors}}"
       destroy:
-        success: "La borradura {{model}} ha sido exitosa."
+        success: "La borradura de {{model}} ha sido exitosa."
       signup:
         success: "¡Gracias por inscribirse!"
         must_activate: "Tiene que activar la cuenta antes de iniciar la sesión. Por favor verifique su correo eléctronico."
@@ -145,12 +145,8 @@
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading: 
-        #user: 
-        #other: 
-      # if you don't use the following you will also have a or an added to the collection name
-      # you better define the add_form_heading in the specific collection namespace
-      # add_form_heading: "Añadir {{model}}"
-      empty_message: "Ningun registro relacionado"
+      add_form_heading: "Añadir {{model}}"
+      empty_message: "No hay registros"
             
     # default hobo form translation
     form:
@@ -176,7 +172,6 @@
       label: "Buscar"
       results_label: "Buscar Resultados"
       close_button: "cierrar"
-      more: "Más"
       no_results: "No se encuentran resultados."
 
     dev_user_changer:

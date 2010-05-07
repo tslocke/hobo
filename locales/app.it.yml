@@ -1,6 +1,3 @@
-# just an example of a real world app
-# may be useful to check the use of the keys
-
 it:
 
   strings:
@@ -54,6 +51,13 @@ it:
         other_user:
           one: "Ruolo di {{name}}"
           other: "Ruoli di {{name}}"
+      subscriptions:
+        current_user:
+          one: "Il tuo Abbonamento"
+          other: "I tuoi Abbonamenti"
+        other_user:
+          one: "Abbonamento di {{name}}"
+          other: "Abbonamenti di {{name}}"
       month_commissions:
         current_user:
           one: "Tua Commissione del Mese"
@@ -88,6 +92,7 @@ it:
         options:
         - [ *active, "active" ]
         - [ *expired, "expired" ]
+     
       
   user/locales:
     it: "Italiano"
@@ -111,17 +116,18 @@ it:
         one: &contract Contratto
         other: &contracts Contratti
 
-      subscription:
+      subscription: &subscriptions_all
         one: &subscription Abbonamento
         other: &subscriptions Abbonamenti
 
-      entry:
+      entry: &entry_all
         one: &entry Entrata
         other: &entries Entrate
 
-      role:
+      role: &roles_all
         one: &role Ruolo
         other: &roles Ruoli
+
 
 
     attributes:
@@ -132,8 +138,11 @@ it:
         password: Parola Chiave
         password_confirmation: Conferma Parola Chiave
         email_address: Indirizzo Elettronico
-        roles: Ruoli
         locale: "Lingua"
+        roles: 
+          <<: *roles_all
+        subscriptions:
+          <<: *subscriptions_all
 
       customer:
         created_at: *created_at
@@ -146,7 +155,8 @@ it:
         serial: Serie
 
         Customer: *customer
-        subscriptions: *subscriptions
+        subscriptions: 
+          <<: *subscriptions_all
 
       contract: &contract_data
         created_at: *created_at
@@ -170,6 +180,8 @@ it:
         commission: Commissione
 
         Subscription: *subscription
+        entries:
+          <<: *entry_all
         customer: *customer
         user_name: *user
         status: Stato
@@ -182,7 +194,6 @@ it:
         subscription_customer: *customer
         subscription: *subscription
 
-        
     # just to show a stupid example
     attribute_help:
       user:

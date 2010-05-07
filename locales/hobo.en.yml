@@ -16,7 +16,7 @@ en:
 
     show:
       title: "{{model}}"
-      heading: "{{model}}"
+      heading: "{{model}} {{name}}"
       back_link: "Back"
       edit_link: "Edit {{model}}"
       new_link: "New {{model}}"
@@ -28,9 +28,10 @@ en:
 
     index_for_owner:
       title: "{{model}} for"
-      heading:
-        your: "Your {{model}}"
-        other: "{{model}}"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
       subheading: "For:"
 
     new_for_owner:
@@ -85,7 +86,7 @@ en:
       previous: "Previous"
       next: "Next"
       add: "Add"
-      more: "More"
+      more: "show all..."
       delete: "Delete {{model}}"
       save: "Save {{model}}"
       cancel: "Cancel"
@@ -144,11 +145,7 @@ en:
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading: 
-        #user: 
-        #other: 
-      # if you don't use the following you will also have a or an added to the collection name
-      # you better define the add_form_heading in the specific collection namespace
-      # add_form_heading: "Add {{model}}"
+      add_form_heading: "Add {{model}}"
       empty_message: "No registered relations"
             
     # default hobo form translation
@@ -169,12 +166,12 @@ en:
     table_plus:
       search: "Search"
       empty: "No {{model}} to display"
+      submit_label: "Go"
       
     live_search:
       label: "Search"
       results_label: "Search Results"
       close_button: "close"
-      more: "More"
       no_results: "Your search returned no matches."
 
     dev_user_changer:

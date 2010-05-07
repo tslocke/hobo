@@ -1,3 +1,3 @@
 This dir contains a few locale files that are working with this fork. 
 They fix a few problem with the official hobo locale files and add a few keys.
-The 'example-app-it.yml' is just an example of custom translations useful to check teh use of certain keys.
+The 'app.it.yml' is just an example of custom translations useful to check the use of certain keys.
