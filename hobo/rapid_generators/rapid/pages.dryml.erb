@@ -216,9 +216,8 @@ end
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
-         <%% record = this -%>
          <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
-           <heading-content:><human-collection-name with="&record" collection="<%= refl.name %>" your/></heading-content:>
+           <heading-content:><human-collection-name with="&this.origin" collection="<%= refl.name %>" your/></heading-content:>
          </collection-preview:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
