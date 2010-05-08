@@ -146,7 +146,7 @@
       # you better define the heading.* in the specific collection namespace
       #heading: 
       add_form_heading: "Añadir {{model}}"
-      empty_message: "No hay registros"
+      empty_message: "Ningun registros"
             
     # default hobo form translation
     form:
@@ -165,7 +165,6 @@
     
     table_plus:
       search: "Buscar"
-      empty: "No hay {{model}}"
       submit_label: "Ir"
       
     live_search:
