@@ -177,7 +177,7 @@ end
             <section param="collection-section">
               <h3 param="collection-heading">
                 <ht key="<%= collection.to_s.tableize %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
-                  <human-collection-name collection="<%= collection %>"/>
+                  <human-collection-name collection="<%= collection %>" your/>
                 </ht>
               </h3>
 
@@ -218,13 +218,13 @@ end
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
          <%% record = this -%>
          <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
-           <heading-content:><human-collection-name with="&record" collection="<%= refl.name %>"/></heading-content:>
+           <heading-content:><human-collection-name with="&record" collection="<%= refl.name %>" your/></heading-content:>
          </collection-preview:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
               <ht key="<%= refl.name.to_s.tableize %>.collection.heading" count="&this.<%= refl.name.to_s %>.count" >
-                <human-collection-name collection="<%= refl.name %>"/>
+                <human-collection-name collection="<%= refl.name %>" your/>
               </ht>
             </h3>
             <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
@@ -294,7 +294,7 @@ new_link = :new.in?(actions)
 <% end -%>
         <h2 param="heading">
           <ht key="<%= model_key %>.index_for_owner.heading" count="&@<%= owner %>.<%= collection_name %>.count">
-            <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" />
+            <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" your/>
           </ht>
         </h2>
 <% unless owner_is_user %>
