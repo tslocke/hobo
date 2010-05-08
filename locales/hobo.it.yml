@@ -87,7 +87,7 @@ it:
       previous: "Precedente"
       next: "Prossimo"
       add: "Aggiungere"
-      more: "vedi tutti..."
+      show_all: "vedi tutti..."
       delete: "Elimina {{model}}"
       save: "Registra {{model}}"
       cancel: "Annulla"

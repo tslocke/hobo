@@ -86,7 +86,7 @@ en:
       previous: "Previous"
       next: "Next"
       add: "Add"
-      more: "show all..."
+      show_all: "show all..."
       delete: "Delete {{model}}"
       save: "Save {{model}}"
       cancel: "Cancel"

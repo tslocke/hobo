@@ -86,7 +86,7 @@
       previous: "Precedente"
       next: "Proxima"
       add: "Añadir"
-      more: "todos..."
+      show_all: "todos..."
       delete: "Borrar {{model}}"
       save: "Guardar {{model}}"
       cancel: "Cancelar"

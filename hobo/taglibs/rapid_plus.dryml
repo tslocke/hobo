@@ -113,7 +113,9 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
       <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.human_name %></ht>
     </a>
     <collection param/>
-    <a param="more"><ht key="#{model_class.to_s.tableize}.actions.more" pluralized>More <%= name.pluralize.titleize %>...</ht></a>
+    <unless test="&this.empty?">
+      <a param="show-all"><ht key="#{model_class.to_s.tableize}.actions.show_all" pluralized>Show all <%= name.pluralize.titleize %>...</ht></a>
+    </unless>
   </section>
 </def>
 
