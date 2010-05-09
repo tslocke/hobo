@@ -39,7 +39,8 @@ The `<li>` tags are automatically given a 'model ID' CSS class, which means the 
   <empty-collection-message param="empty-message"/>
 </def>
 
-<!-- Renders a comma separated list of any fields passed in the `fields` attribute that are true (in the Ruby sense). For example, if a forum post had a boolean field `sticky`, this tag can be used to automatically label sticky posts "Sticky". Similarly, you could automatically add an "Administrator" label to the user's home page (this is seen in the default Hobo app).  -->
-<def tag="record-flags" attrs="fields"><%=
-  comma_split(fields).select { |f| this.send(f) }.map { |f| this.class.human_attribute_name(f) }.join(', ')
+<!-- Renders a `separator` separated list of any fields passed in the `fields` attribute that are true (in the Ruby sense). For example, if a forum post had a boolean field `sticky`, this tag can be used to automatically label sticky posts "Sticky". Similarly, you could automatically add an "Administrator" label to the user's home page (this is seen in the default Hobo app).  -->
+<def tag="record-flags" attrs="fields, separator"><%=
+  separator ||= ', '
+  comma_split(fields).select { |f| this.send(f) }.map { |f| this.class.human_attribute_name(f) }.join(separator)
 %></def>
