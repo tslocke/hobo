@@ -866,14 +866,13 @@ Use the `uri` option to specify a redirect location:
  - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
  - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
  - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
- - `key` - the key used to lookup in the locale file. If you pass it hobo will lookup in the namespace "tags.select_menu.#{key}" in order to find `options`, `first_option` and `first_value`. The passed attributes are used as a default in case the lookups fail. (see the documentation of filter-menu tag for a similar example)
+ - `key` - the key used to lookup in the locale file or 'default' by default. If you pass it hobo will lookup in the namespace "tags.select_menu.#{key}" in order to find `options`, `first_option` and `first_value`. The passed attributes are used as a default in case the lookups fail. (see the documentation of filter-menu tag for a similar example).
  -->
 <def tag="select-menu" attrs="options, selected, first-option, first-value, key">
-<% unless key.blank?
-     %w[options first_option first_value].each do |a|
-       str = I18n.t("tags.select_menu.#{key}.#{a}", :default=>'')
-       eval "#{a} = str unless str.blank?"
-     end
+<% key ||= 'default'
+   %w[options first_option first_value].each do |a|
+     str = I18n.t("tags.select_menu.#{key}.#{a}", :default=>'')
+     eval "#{a} = str unless str.blank?"
    end
 -%>
   <select merge-attrs param="default">

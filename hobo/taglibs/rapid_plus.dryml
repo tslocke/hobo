@@ -175,7 +175,9 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 ### I18n
 
 It lookups the options attributes in filter_menu.#{param_name}.options.
-The passed options are used as a default in case the lookup fails.  
+The passed options are used as a default in case the lookup fails. 
+Besides the "tags.filter_menu.default.no_filter" key is used as default of the attribute "no-filter" 
+(or "All" if no default is found) 
 
 ### I18n Example
 
@@ -210,7 +212,7 @@ The passed options are used as a default in case the lookup fails.
 <def tag="filter-menu" attrs="param-name, options, no-filter, id">
   <% opt = I18n.t("tags.filter_menu.#{param_name}.options", :default=>'')
      options = opt unless opt.blank?
-     no_filter = I18n.t("tags.filter_menu.#{param_name}.no_filter", :default=>(no_filter||"All")) %>
+     no_filter = I18n.t("tags.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
   <form action="&request.request_uri" method="get" class="filter-menu" merge-attrs="id">
     <div>
       <% opt = options.first.kind_of?(Array) ? options.*.last : options
