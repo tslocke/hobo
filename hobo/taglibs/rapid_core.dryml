@@ -18,6 +18,8 @@
    - disable: render the input as normal, but add HTML's `disabled` attribute
    - skip: render nothing at all. This will omit the entire row (including the label)
    - ignore: render the input normally. That is, don't even perform the edit check.
+   
+ - no-blanks: (boolean) Controls the behavior of `<view>` tags. The entire row (including the label) will be omitted if `this` is blank. Default false.
 
 ### Example
 
@@ -28,14 +30,14 @@
     </field-list>
 
 -->
-<def tag="field-list" attrs="tag, no-edit">
+<def tag="field-list" attrs="tag, no-edit, no-blanks">
   <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
     <% field_name = this_field_name 
        input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
-      <labelled-item unless="&tag == 'input' && no_edit == 'skip' && !can_edit?">
+      <labelled-item unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
         <item-label param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
