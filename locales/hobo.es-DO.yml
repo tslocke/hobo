@@ -29,7 +29,7 @@
     index_for_owner:
       title: "{{model}} para"
       # you can use the following to completely override the collection heading
-      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading:
@@ -39,11 +39,12 @@
       title: "Nuevo Registro de {{model}} para"
       heading: "Nuevo Registro de {{model}}"
       subheading: "Para:"
-        
+
     login:
       title: "Iniciar Sesión"
       heading: "Iniciar Sesión"
-      email: &email "Correo Eléctronico"
+      email_address: &email_address "Correo Eléctronico"
+      name: "Nombre"
       password: "Contraseña"
       remember_me: "Recuerda mis datos"
       login: "Identifición"
@@ -59,26 +60,26 @@
       heading: *forgot_password
       text: "Ingresa la dirección de tu Correo Eléctronico que utilizaste cuando te inscribste.
              Te enviaremos un Correo Eléctronico que podras utilizar para generar una nueva contraseña."
-      email: *email
+      email_address: *email_address
       send: "Enviar"
 
     forgot_password_sent:
       title: "Contraseña olvidada - Correo Eléctronico enviado"
       heading: "Contraseña olvidada - Correo Eléctronico enviado"
-      text: "El mensaje con las instruciones para generar una nueva contraseña ha sido enviado a {{email}}
-             Si no lo recibe, por favor verifique el filtro anti-spam." 
+      text: "El mensaje con las instruciones para generar una nueva contraseña ha sido enviado a {{email_address}}
+             Si no lo recibe, por favor verifique el filtro anti-spam."
 
     account_disabled_page:
       title: "Cuenta Desactivada"
-      heading: "Cuenta Desactivada" 
+      heading: "Cuenta Desactivada"
       text: "Su cuenta está desactivada en ese momento."
-    
+
     account_page:
       title: "Tu Perfil"
       heading: "Tu Perfil"
       new_password: "Nueva Contraseña"
       confirm_new_password: "Confirmación Nueva Contraseña"
-    
+
     # default hobo action translation
     actions:
       new: "Nuevo Registro de {{model}}"
@@ -101,7 +102,7 @@
       logged_in_as: "{{name}}"
       account: "Perfil"
       save_account: "Guarda Tu Perfil"
-          
+
     # default hobo message translation
     messages:
       create:
@@ -133,7 +134,7 @@
       you_signed_up: "Usted se inscribió."
       no: "No hay {{model}} disponibles."
       confirm: "¿Está seguro?"
-        
+
     # default hobo collection translation
     collection:
       count: &collection_count
@@ -141,13 +142,13 @@
         one: "Hay solo 1 {{model}}"
         other: "Hay {{count}} {{model}}"
       # you can use the following to completely override the collection heading
-      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
-      #heading: 
+      #heading:
       add_form_heading: "Añadir {{model}}"
       empty_message: "Ningun registros"
-            
+
     # default hobo form translation
     form:
       new:
@@ -162,11 +163,11 @@
       or: "o"
       a: "un/una"
       an: "un/una"
-    
+
     table_plus:
       search: "Buscar"
       submit_label: "Ir"
-      
+
     live_search:
       label: "Buscar"
       results_label: "Buscar Resultados"
@@ -175,4 +176,4 @@
 
     dev_user_changer:
       guest: "Invitado"
-      
+

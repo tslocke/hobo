@@ -28,7 +28,7 @@ en:
 
     index_for_owner:
       title: "{{model}} for"
-      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading:
@@ -38,11 +38,12 @@ en:
       title: "New {{model}} for"
       heading: "New {{model}}"
       subheading: "For:"
-        
+
     login:
       title: "Login"
       heading: "Login"
-      email: &email "E-mail"
+      email_address: &email_address "E-mail"
+      name: "Name"
       password: "Password"
       remember_me: "Remember me"
       login: "Login"
@@ -58,13 +59,13 @@ en:
       heading: *forgot_password
       text: "Enter the e-mail address you used when you signed up for this site.
              We will then send you an e-mail that you can use to generate a new password."
-      email: *email
+      email_address: *email_address
       send: "Send"
 
     forgot_password_sent:
       title: "Forgotten password - E-mail sent"
       heading: "Forgotten password - E-mail sent"
-      text: "En e-mail with instructions on how you generate a new password has been sent to {{email}}. If you don't receive this e-mail please check your spamfilter."
+      text: "En e-mail with instructions on how you generate a new password has been sent to {{email_address}}. If you don't receive this e-mail please check your spamfilter."
 
     account_disabled_page:
       title: "Account disabled"
@@ -101,7 +102,7 @@ en:
       logged_in_as: "Logged in as {{name}}"
       account: "Account"
       save_account: "Save Your Data"
-          
+
     # default hobo message translation
     messages:
       create:
@@ -133,7 +134,7 @@ en:
       you_signed_up: "You have signed up"
       no: "No {{model}} available."
       confirm: "Are you sure?"
-        
+
     # default hobo collection translation
     collection:
       count: &collection_count
@@ -141,13 +142,13 @@ en:
         one: "There is only one {{model}} at the moment"
         other: "There are already {{count}} {{model}}"
       # you can use the following to completely override the collection heading
-      # be aware that you will loose the automatic Your <collection> / Jom's <collection>  
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
-      #heading: 
+      #heading:
       add_form_heading: "Add {{model}}"
       empty_message: "No records to display"
-            
+
     # default hobo form translation
     form:
       new:
@@ -156,17 +157,17 @@ en:
         heading: "The following error occured:"
       select_many:
             prompt: "Add {{model}}"
-        
+
     # hobo support
     support:
       or: "or"
       a: "a"
       an: "an"
-    
+
     table_plus:
       search: "Search"
       submit_label: "Go"
-      
+
     live_search:
       label: "Search"
       results_label: "Search Results"

@@ -19,7 +19,7 @@
   <form action="&request.request_uri" class="login" merge>
     <labelled-item-list param>
       <labelled-item>
-        <item-label param="login-label"><t key="hobo.login.email"><%= user_model.login_attribute.to_s.titleize %></t></item-label>
+        <item-label param="login-label"><t key="hobo.login.#{user_model.login_attribute}"><%= user_model.login_attribute.to_s.titleize %></t></item-label>
         <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
       </labelled-item>
       
@@ -84,7 +84,7 @@
         <form action="" class="forgot-password" param>
           <labelled-item-list param>
             <labelled-item>
-              <item-label param="email-address-label"><t key="hobo.forgot_password.email">Email Address</t></item-label>
+              <item-label param="email-address-label"><t key="hobo.forgot_password.email_address">Email Address</t></item-label>
               <item-value>
                 <input type="text" name="email_address" id="email-address" class="email-address" param="email-address-input" />
               </item-value>
@@ -114,7 +114,7 @@ if a given email is associated with an account or not. -->
 
       <section param="content-body">
         <p param="message">
-        	<t key="hobo.forgot_password_sent.text" email="#{params[:email_address]}">
+        	<t key="hobo.forgot_password_sent.text" email-address="#{params[:email_address]}">
         	If the e-mail address you entered, <%= h params[:email_address] %>,
           is in our records, you will
         receive an e-mail from us with instructions for resetting your
