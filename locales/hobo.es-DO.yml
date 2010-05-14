@@ -123,7 +123,7 @@
         must_activate: "Tiene que activar la cuenta antes de iniciar la sesión. Por favor verifique su correo eléctronico."
       login:
         success: "La sesión ha iniciado."
-        error: "¡No se ingresaron usuario ({{login}}) y contraseña validos!"
+        error: "¡No se ingresaron {{login}} y Contraseña validos!"
       logout: "La sesión ha terminado."
       reset_password: "Tu contraseña ha sido reiniciada."
       permission_denied: "¡Permiso denegado!"

@@ -123,7 +123,7 @@ en:
         must_activate: "You must activate your account before you can log in. Please check your email."
       login:
         success: "You have logged in."
-        error: "You did not provide a valid userid ({{login}}) and password!"
+        error: "You did not provide a valid {{login}} and Password!"
       logout: "You have logged out."
       reset_password: "Your password has been reset."
       permission_denied: "Permission Denied"

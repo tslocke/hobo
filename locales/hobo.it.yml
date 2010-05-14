@@ -124,7 +124,7 @@ it:
         must_activate: "Prima di iniziare la sessione devi attivare la registrazione. Per favore verifica la tua Posta Elettronica."
       login:
         success: "La sessione è iniziata."
-        error: "L'identificativo ({{login}}) e la Parola Chiave inseriti non sono validi."
+        error: "{{login}} e Parola Chiave non validi."
       logout: "La sessione è terminata."
       reset_password: "La tua Parola Chiave è stata azzerata."
       permission_denied: "Permesso negato!"
