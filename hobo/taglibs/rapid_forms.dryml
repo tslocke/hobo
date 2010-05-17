@@ -872,7 +872,7 @@ Use the `uri` option to specify a redirect location:
 <% key ||= 'default'
    %w[options first_option first_value].each do |a|
      str = I18n.t("tags.select_menu.#{key}.#{a}", :default=>'')
-     eval "#{a} ||= str unless str.blank?"
+     eval "#{a} = str unless str.blank?"
    end
 -%>
   <select merge-attrs param="default">

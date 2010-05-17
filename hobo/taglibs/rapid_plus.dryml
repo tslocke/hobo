@@ -218,7 +218,7 @@ Besides the "tags.filter_menu.default.no_filter" key is used as default of the a
       <% opt = options.first.kind_of?(Array) ? options.*.last : options
          selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
       <select-menu name="&param_name" options="&options" selected="&selected"
-                   first-option="&no_filter" merge-params/>
+                   first-option="&no_filter" key="&param_name" merge-params/>
     </div>
   </form>
 </def>
