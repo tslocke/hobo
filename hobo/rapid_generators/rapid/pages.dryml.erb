@@ -291,7 +291,7 @@ new_link = :new.in?(actions)
           <t key="hobo.actions.back">Back to</t> <a with="&@<%= owner %>"/>
         </div>
 <% end -%>
-        <h2 param="heading">
+        <h2 param="heading" if="&@owner">
           <ht key="<%= model_key %>.index_for_owner.heading" count="&@<%= owner %>.<%= collection_name %>.count">
             <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" your/>
           </ht>

@@ -205,7 +205,7 @@ class ActiveRecord::Base
         end
         options = options.merge(:default=>default) 
       end
-      human_attribute_name_without_en_pluralization_default(attribute, options)
+      human_attribute_name_without_en_pluralization_default(attribute.to_s, options)
     end
     
     alias_method_chain :human_attribute_name, :en_pluralization_default
