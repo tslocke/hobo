@@ -30,7 +30,7 @@ It dynamically pluralizes the human_name by using the implicit model.count.
   model ||= this
   model = model.class unless model.kind_of? Class
   # adapted from count tag
-  c = count.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+  c = count.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length || 1
   # prepare symbolized attributes for merging
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v}
