@@ -24,6 +24,7 @@ module Hobo
         # TODO: figure out how to merge with parent, if desired
         if self.const_defined?(:Lifecycle)
           lifecycle = self::Lifecycle
+          state_field_class = self::LifecycleStateField
         else
           # First call
           

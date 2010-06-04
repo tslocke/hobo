@@ -285,10 +285,12 @@ module Hobo
 
           when "search"
             def_scope do |query, *fields|
+              match_keyword = ::ActiveRecord::Base.connection.adapter_name == "PostgreSQL" ? "ILIKE" : "LIKE"
+
               words = query.split
               args = []
               word_queries = words.map do |word|
-                field_query = '(' + fields.map { |field| "(#{@klass.table_name}.#{field} like ?)" }.join(" OR ") + ')'
+                field_query = '(' + fields.map { |field| "(#{@klass.table_name}.#{field} #{match_keyword} ?)" }.join(" OR ") + ')'
                 args += ["%#{word}%"] * fields.length
                 field_query
               end

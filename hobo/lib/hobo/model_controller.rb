@@ -564,7 +564,7 @@ module Hobo
 
 
     def create_response(new_action, options={}, &b)
-      flash_notice (ht( :"#{@this.class.name.pluralize.underscore}.messages.create.success", :default=>["The #{@this.class.name.titleize.downcase} was created successfully"])) if valid?
+      flash_notice (ht( :"#{@this.class.name.pluralize.underscore}.messages.create.success", :default=>["The #{@this.class.view_hints.model_name.downcase} was created successfully"])) if valid?
 
       response_block(&b) or
         if valid?
@@ -602,7 +602,7 @@ module Hobo
 
     def update_response(in_place_edit_field=nil, options={}, &b)
       
-      flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.name.titleize.downcase} were saved"])) if valid?
+      flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.view_hints.model_name.downcase} were saved"])) if valid?
 
       response_block(&b) or
         if valid?
@@ -754,7 +754,8 @@ module Hobo
       ordering = params["#{model.name.underscore}_ordering"]
       if ordering
         ordering.each_with_index do |id, position|
-          model.find(id).user_update_attributes(current_user, :position => position+1)
+          object = model.find(id)
+          object.user_update_attributes!(current_user, object.position_column => position+1)
         end
         hobo_ajax_response || render(:nothing => true)
       else

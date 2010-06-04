@@ -83,6 +83,7 @@ module HoboFields
     def self.belongs_to_with_field_declarations(name, options={}, &block)
       column_options = {}
       column_options[:null] = options.delete(:null) if options.has_key?(:null)
+      column_options[:comment] = options.delete(:comment) if options.has_key?(:comment)
 
       index_options = {}
       index_options[:name] = options.delete(:index) if options.has_key?(:index)
@@ -208,7 +209,7 @@ module HoboFields
 
     # Return the entry from #columns for the named column
     def self.column(name)
-      return unless table_exists?
+      return unless (@table_exists ||= table_exists?)
       name = name.to_s
       columns.find {|c| c.name == name }
     end

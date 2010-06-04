@@ -81,8 +81,12 @@ module HoboFields
         # we should be able to use col_spec.comment, but col_spec has
         # a nil table_name for some strange reason.
         begin
-          col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name)
-          col_comment != nil && col_comment != comment
+          if model.table_exists?
+            col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name) 
+            col_comment != nil && col_comment != comment
+          else
+            false
+          end
         end ||
         begin
           check_attributes = [:null, :default]

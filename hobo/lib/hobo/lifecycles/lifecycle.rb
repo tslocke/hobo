@@ -93,7 +93,7 @@ module Hobo
 
 
       def self.create(name, user, attributes=nil)
-        creator = creators[name.to_sym]
+        creator = creators[name.to_sym] or raise LifecycleError, "No creator #{name} available"
         creator.run!(user, attributes)
       end
 
@@ -125,8 +125,8 @@ module Hobo
 
 
       def transition(name, user, attributes)
-        transition = find_transition(name, user)
-        transition.run!(record, user, attributes) unless transition.nil?
+        transition = find_transition(name, user) or raise LifecycleError, "No transition #{name} available"
+        transition.run!(record, user, attributes)
       end
 
 

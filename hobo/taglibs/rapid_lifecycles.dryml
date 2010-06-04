@@ -9,6 +9,11 @@
  - `label` - the label on the button. Defaults to the name of the transition
 
 All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also supported. 
+
+### Warning
+
+Transitions with parameters are implemented using a form.  HTML does not allow forms to be nested, so a transitions with parameters should not be placed inside of a form.
+
   -->
 <def tag="transition-button" attrs="transition, update, label"><%=
     if transition.is_a?(String)
@@ -39,11 +44,19 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 <!-- Renders a div containing transition buttons for every transition available to the current user.
 
 For example, you could use this on a `Friendship` card: the person invited to have friendship would automatically see 'Accept' and 'Decline' buttons, while the person initiating the invite would see 'Retract'.
+
+This tag behaves similarly to repeat: an else tag may be used to handle the case of no buttons:
+
+    <transition-buttons/><else>Sorry, no buttons to press.</else>
   -->  
 <def tag="transition-buttons">
-  <div merge-attrs class="transitions">
-    <% this.lifecycle.publishable_transitions_for(current_user).each do |t| %>
-      <transition-button transition="&t"/>
-    <% end %>
+  <% ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS) %>
+  <div merge-attrs="&html_attrs" class="transitions">
+    <% transitions = this.lifecycle.publishable_transitions_for(current_user) %>
+    <if test="&transitions">
+      <% transitions.each do |t| %>
+        <transition-button merge-attrs="&ajax_attrs" transition="&t"/>
+      <% end %>
+    </if>
   </div>
 </def>

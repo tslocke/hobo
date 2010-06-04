@@ -408,8 +408,8 @@ var Hobo = {
 
 
     updateElement: function(id, content) {
-        // TODO: Do we need this method?
         Element.update(id, content)
+        Element.fire($(id), "rapid:partupdated")
     },
 
     getStyle: function(el, styleProp) {
@@ -569,9 +569,9 @@ HoboInputMany = {
       }
   },
 
-  initialize: function(ul) {
+  initialize: function(ev) {
       /* the second clause should be sufficient, but it isn't in IE7.  See bug 603  */
-      $$(".input-many-template input:hidden, .input-many-template select:hidden, .input-many-template textarea:hidden, .input-many-template button:hidden").each(function(input) {
+      Element.select(ev.target, ".input-many-template input:hidden, .input-many-template select:hidden, .input-many-template textarea:hidden, .input-many-template button:hidden").each(function(input) {
           if(!input.disabled) {
               input.disabled = true;
               input.addClassName("input_many_template_input");
@@ -579,12 +579,12 @@ HoboInputMany = {
       });
 
       // disable all elements inside our template, and mark them so we can find them later.
-      $$(".input-many-template input:enabled, .input-many-template select:enabled, .input-many-template textarea:enabled, .input-many-template button:enabled").each(function(input) {
+      Element.select(ev.target, ".input-many-template input:enabled, .input-many-template select:enabled, .input-many-template textarea:enabled, .input-many-template button:enabled").each(function(input) {
           input.disabled = true;
           input.addClassName("input_many_template_input");
       });
 
-      $$(".sortable-input-many").each(function(el) {
+      Element.select(ev.target, ".sortable-input-many").each(function(el) {
           HoboInputMany.createSortable.call(el);
       });
 
@@ -592,6 +592,8 @@ HoboInputMany = {
       Event.addBehavior({".sortable-input-many:rapid:change": function(ev) {
           HoboInputMany.createSortable.call(this);
       }});
+
+      document.observe("rapid:partupdated", HoboInputMany.initialize);
   },
 
   createSortable: function() {
@@ -882,7 +884,8 @@ AutocompleteBehavior = Behavior.create({
         this.autocompleter = new Ajax.Autocompleter(this.element, 
             this.element.next('.completions-popup'), 
             url, 
-            {paramName:'query', method:'get', parameters: parameters, minChars: this.minChars});
+            {paramName:'query', method:'get', parameters: parameters, minChars: this.minChars,
+            afterUpdateElement: this.afterUpdateElement});
     },
 
     onfocus: function() {
@@ -893,6 +896,10 @@ AutocompleteBehavior = Behavior.create({
         if(this.minChars==0) { 
             this.autocompleter.activate();
         }
+    },
+
+    afterUpdateElement: function(input, li) {
+        input.fire("rapid:autocomplete-assigned");
     }
         
 })

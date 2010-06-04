@@ -735,7 +735,7 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
   value = name(:no_wrapper => true, :if_present => true)
   -%>
   <input type="text" name="#{param_name_for_this}" 
-         class="autocompleter #{type_and_field.dasherize} #{css_data :complete_on, typed_id(complete_target), completer} #{css_data :min_chars, min_chars} #{'nil-value' if value==''}"
+         class="autocompleter #{type_and_field._?.dasherize} #{css_data :complete_on, typed_id(complete_target), completer} #{css_data :min_chars, min_chars} #{'nil-value' if value==''}"
          value="#{value=='' ? nil_value : value}"
          merge-attrs/>
   <div class="completions-popup" style="display:none"></div>
