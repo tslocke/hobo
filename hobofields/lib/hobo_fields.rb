@@ -11,6 +11,21 @@ end
 module HoboFields
 
   VERSION = "1.1.0.pre0"
+  
+  if defined?(::Rails)
+    class Railtie < Rails::Railtie
+      ActiveSupport.on_load(:active_record) do
+        HoboFields.enable
+      
+        # automatically load other rich types from app/rich_types/*.rb
+        ActiveSupport::Dependencies.load_paths << Rails.root.join('app', 'rich_types')
+        Dir[Rails.root.join('app', 'rich_types', '*.rb')].each do |f|
+          # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
+          require_dependency f
+        end
+      end
+    end
+  end
 
   extend self
 
@@ -100,26 +115,11 @@ module HoboFields
     require "hobo_fields/fields_declaration"
 
     # Add the fields do declaration to ActiveRecord::Base
-    ActiveRecord::Base.send(:include, HoboFields::FieldsDeclaration)
-
-    # automatically load other rich types from app/rich_types/*.rb
-    # don't assume we're in a Rails app
-    if defined?(::Rails)
-      plugins = Rails.configuration.plugin_loader.new(HoboFields.rails_initializer).plugins
-      ([::Rails.root] + plugins.map(&:directory)).each do |dir|
-        ActiveSupport::Dependencies.load_paths << File.join(dir, 'app', 'rich_types')
-        Dir[File.join(dir, 'app', 'rich_types', '*.rb')].each do |f|
-          # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-          require_dependency f
-        end
-      end
-
-    end
+    ActiveRecord::Base.send :include, HoboFields::FieldsDeclaration
     
     # Override ActiveRecord's default methods so that the attribute read & write methods
     # automatically wrap richly-typed fields.
     ActiveRecord::Base.send :include, AttributeMethods
-
   end
 
 end
