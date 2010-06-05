@@ -21,7 +21,7 @@ module HoboFields
 
 
     def method_missing(name, *args)
-      field(name, *args)
+      field(name, args.first, args.rest)
     end
 
   end
