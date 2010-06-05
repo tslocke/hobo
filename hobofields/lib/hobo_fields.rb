@@ -14,15 +14,12 @@ module HoboFields
   
   if defined?(::Rails)
     class Railtie < Rails::Railtie
-      ActiveSupport.on_load(:active_record) do
-        HoboFields.enable
+      initializer :eager_load_rich_types, :after => :set_autoload_paths do |app|
+        app.config.eager_load_paths += %W( #{app.config.root}/app/rich_types )
+      end
       
-        # automatically load other rich types from app/rich_types/*.rb
-        ActiveSupport::Dependencies.load_paths << Rails.root.join('app', 'rich_types')
-        Dir[Rails.root.join('app', 'rich_types', '*.rb')].each do |f|
-          # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-          require_dependency f
-        end
+      ActiveSupport.on_load(:before_initialize) do
+        HoboFields.enable
       end
     end
   end
@@ -115,7 +112,7 @@ module HoboFields
     require "hobo_fields/fields_declaration"
 
     # Add the fields do declaration to ActiveRecord::Base
-    ActiveRecord::Base.send :include, HoboFields::FieldsDeclaration
+    ActiveRecord::Base.send :include, FieldsDeclaration
     
     # Override ActiveRecord's default methods so that the attribute read & write methods
     # automatically wrap richly-typed fields.
@@ -123,3 +120,5 @@ module HoboFields
   end
 
 end
+
+
