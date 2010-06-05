@@ -9,33 +9,9 @@
 # gem dependencies
 require 'hobosupport'
 require 'action_pack'
-require 'action_view'
-require 'action_controller'
 require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
-# local dependencies.   We could just use Rails Autoload, but...
-require 'dryml/dryml_builder'
-require 'dryml/dryml_doc'
-#require 'dryml/dryml_generator'
-require 'dryml/dryml_support_controller'
-require 'dryml/fallback_resolver'
-require 'dryml/helper'
-require 'dryml/parser'
-require 'dryml/parser/attribute'
-require 'dryml/parser/base_parser'
-require 'dryml/parser/document'
-require 'dryml/parser/element'
-require 'dryml/parser/elements'
-require 'dryml/parser/source'
-require 'dryml/parser/text'
-require 'dryml/parser/tree_parser'
-require 'dryml/part_context'
-require 'dryml/scoped_variables'
-require 'dryml/taglib'
-require 'dryml/tag_parameters'
-require 'dryml/template_environment'
-require 'dryml/template_handler'
-require 'dryml/template'
+ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -79,17 +55,10 @@ module Dryml
       ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
       if ActionView::Template.respond_to? :exempt_from_layout
         ActionView::Template.exempt_from_layout('dryml')
-      elsif ActionView::Base.respond_to? :exempt_from_layout
+      elsif
         ActionView::Base.exempt_from_layout('dryml')
       end
-      # exempt_from_layout doesn't exist in Rails3.   But the lack of
-      # it doesn't cause DRYML to blow up like in Rails2, so that's
-      # OK.
-
-      if ActionView.const_defined? :Resolver
-        ActionController::Base.view_paths << Dryml::FallbackResolver.new
-      end
-      # FIXME DrymlGenerator.enable(generator_directories, output_directory)
+      DrymlGenerator.enable(generator_directories, output_directory)
     end
     
     

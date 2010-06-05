@@ -1,34 +1,3 @@
-if !Object.const_defined?(:ActionView)
-  # do nothing
-elsif ActionView::Template.const_defined? :Handler
-  # Rails 3
-
-  module ActionController
-    
-    class Base
-      
-      def dryml_context
-        @this
-      end
-    end
-  end
-
-  module Dryml    
-    class TemplateHandler < ActionView::Template::Handler
-      def self.call(template)
-        "renderer = Dryml.page_renderer(self, local_assigns.keys, '#{template.details[:virtual_path]}', '#{template.identifier}')
-
-        @this = self.controller.send(:dryml_context) || @this || local_assigns[:this]
-        s = renderer.render_page(@this, local_assigns)
-
-        # Important to strip whitespace, or the browser hangs around for ages (FF2)
-        s.strip"
-      end
-    end
-  end
-
-else
-  # Rails 2
 module Dryml
 
   class TemplateHandler < ActionView::TemplateHandler
@@ -49,7 +18,6 @@ module Dryml
     def render_for_rails22(template, view, local_assigns)
       renderer = Dryml.page_renderer_for_template(view, local_assigns.keys, template)
       this = view.controller.send(:dryml_context) || local_assigns[:this]
-
       @view._?.instance_variable_set("@this", this)
       s = renderer.render_page(this, local_assigns)
 
@@ -217,4 +185,3 @@ module ActionView
   end
 end
         
-end # if Rails 2
