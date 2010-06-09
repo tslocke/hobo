@@ -34,6 +34,7 @@ Some load path manipulation you shouldn't need:
 
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+    >> I18n.config.load_path << File.join(File.expand_path(File.dirname(__FILE__)), 'en.yml')
 {.hidden}
 
 Require the module we're testing:

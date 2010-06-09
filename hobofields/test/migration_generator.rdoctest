@@ -716,7 +716,10 @@ Because it will be quite common for people not to have both [column_comments](ht
      end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => "change_column :products, :name, :string, :limit => 255, :comment => \"Short namex\""
+    >> up.split(',').slice(0,3).join(',')
+    => 'change_column :products, :name, :string'
+    >> up.split(',').slice(3,2).sort.join(',')
+    => " :comment => \"Short namex\", :limit => 255"
 
 
 Cleanup
