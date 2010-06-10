@@ -2,7 +2,6 @@
 unless defined? BlankSlate
   require 'builder' rescue nil
   unless defined? BlankSlate
-    require 'ruby-debug'; debugger
     class BlankSlate
       instance_methods.reject { |m| m =~ /^__/ || m.to_s == 'object_id' }.each { |m| undef_method m }
       def initialize(me)
