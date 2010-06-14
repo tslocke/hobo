@@ -101,7 +101,7 @@ module Dryml
       end
 
       prepare_view!(view)
-      included_taglibs = ([APPLICATION_TAGLIB, subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
+      included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
 
       if page.ends_with?(EMPTY_PAGE)
         # DELETE ME: controller_class = controller_class_for(page)
@@ -151,6 +151,14 @@ module Dryml
       subsite = parts.length >= 3 ? parts[0..-3].join('_') : "front"
       src = "taglibs/#{subsite}_site"
       { :src => src } if Object.const_defined?(:RAILS_ROOT) && File.exists?("#{RAILS_ROOT}/app/views/#{src}.dryml")
+    end
+    
+    def application_taglibs
+      Dir.chdir(RAILS_ROOT) do
+        Dir["app/views/taglibs/application/**/*.dryml"].map{|f| File.basename f, '.dryml'}.map do |n|
+          { :src => "taglibs/application/#{n}" }
+        end
+      end
     end
 
     def get_field(object, field)
