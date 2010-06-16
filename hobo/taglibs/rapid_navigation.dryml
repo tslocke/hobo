@@ -36,7 +36,26 @@ Then in your pages you can call the tag like this
 </def>
 
 
-<!-- Renders a single item in a `<navigation>` menu. See [`<navigation`>](/api_tag_defs/navigation). -->
+<!-- Renders a single item in a [`<navigation>`](/api_tag_defs/navigation).
+
+`<nav-item>` is basically an [`<a>`](/api_tag_defs/a) tag wrapped in an `<li>` tag.  The attributes for [`<a>`](/api_tag_defs/a) may all be used on this tag, and work the same way.
+
+Example 1: explicit links.  Note that we're using explicit routes for clarity.  Named routes are better.
+
+    <navigation current="home">
+      <nav-item href="/">Home</nav-item>
+      <nav-item href="/logout">Logout</nav-item>
+    </navigation>
+
+Example 2: navigation based on a collection of items.  Each item will be transformed into a link as described in [`<a>`](/api_tag_defs/a).
+
+    <navigation with="&links">
+      <repeat>
+        <nav-item/>
+      </repeat>
+    </navigation>
+
+-->
 <def tag="nav-item" attrs="name">
   <% body = parameters.default 
      body = h(this.to_s) if body.blank?
