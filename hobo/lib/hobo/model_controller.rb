@@ -772,7 +772,7 @@ module Hobo
       logger.info "Hobo: Permission Denied!"
       @permission_error = error
       if self.class.superclass.method_defined?("permission_denied")
-        super
+        self.class.superclass.instance_method(:permission_denied).bind(self).call(error)
       else
         respond_to do |wants|
           wants.html do
