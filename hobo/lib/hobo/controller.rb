@@ -157,8 +157,8 @@ module Hobo
     end
 
     def not_found(error)
-      if self.class.superclass.method_defined?("not_found_response")
-        super
+      if self.class.superclass.method_defined?(:not_found)
+        self.class.superclass.instance_method(:not_found).bind(self).call(error)
       elsif render_tag("not-found-page", {}, :status => 404)
         # cool
       else
