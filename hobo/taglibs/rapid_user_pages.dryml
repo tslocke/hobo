@@ -65,7 +65,7 @@
 </def>
 
 
-<!-- The page that initiates the forgotten password process. Contians a single text-input where the user can provide
+<!-- The page that initiates the forgotten password process. Contains a single text-input where the user can provide
  their email address -->
 <def tag="forgot-password-page">
   <simple-page title="#{ht 'hobo.forgot_password.title', :default=>['Forgotten Password'] }" merge>
