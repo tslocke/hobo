@@ -319,11 +319,10 @@ var hjq = (function() {
                 }
 
                 // make sure we don't serialize any nested forms
-                var clone = formlet.clone();
-                clone.find("form").remove();
-                clone.find(".formlet").remove();
-
-                options.data = clone.find(":input").serialize();
+                options.data = formlet.find(":input").
+                    not(formlet.find("form :input")).
+                    not(formlet.find(".formlet :input")).
+                    serialize();
                 options.dataType = 'script';
 
                 // we tell our controller which parts to return by sending it a "render" array.
