@@ -82,7 +82,7 @@ module HoboFields
     COLUMN_TYPE = :string
 
     def initialize(value)
-      super(self.class.detranslated_values.nil? ? value : self.class.detranslated_values[value.to_s])
+      super(self.class.detranslated_values.nil? ? value: (self.class.detranslated_values[value.to_s] || value))
     end
 
     def validate
