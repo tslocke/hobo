@@ -14,8 +14,6 @@ module Hobo
 
       register_model(base)
 
-      patch_will_paginate
-
       base.class_eval do
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
@@ -132,6 +130,8 @@ module Hobo
         
         Hobo::Permissions.enable
       end
+
+      patch_will_paginate
     end
 
 
