@@ -40,7 +40,9 @@ module Hobo
           end
         end
       end
-      
+
+      # https://hobo.lighthouseapp.com/projects/8324/tickets/762-hobo_model-outside-a-full-rails-env-can-lead-to-stack-level-too-deep
+      raise HoboError, "HoboFields.enable has not been called" unless base.respond_to?(:fields)
       base.fields(false) # force hobofields to load
 
       included_in_class_callbacks(base)
