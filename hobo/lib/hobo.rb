@@ -3,6 +3,7 @@ require 'hobosupport'
 require 'hobofields'
 begin
   require 'will_paginate'
+  require 'will_paginate/finder'
 rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
