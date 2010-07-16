@@ -9,6 +9,8 @@
 # gem dependencies
 require 'hobosupport'
 require 'action_pack'
+require 'action_view'
+require 'action_controller'
 require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
 ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
