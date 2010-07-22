@@ -53,6 +53,13 @@ module HoboFields
       g.generate
     end
 
+    def self.default_migration_name
+      existing = Dir["#{Rails.root}/db/migrate/*hobo_migration*"]
+      max = existing.grep(/([0-9]+)\.rb$/) { $1.to_i }.max
+      n = max ? max + 1 : 1
+      "hobo_migration_#{n}"
+    end
+
     def initialize(ambiguity_resolver={})
       @ambiguity_resolver = ambiguity_resolver
       @drops = []
@@ -60,7 +67,7 @@ module HoboFields
     end
 
     attr_accessor :renames
-    
+
 
     def load_rails_models
       if defined? RAILS_ROOT
@@ -142,7 +149,7 @@ module HoboFields
         to_rename
 
       elsif @ambiguity_resolver
-        @ambiguity_resolver.extract_renames!(to_create, to_drop, "table")
+        @ambiguity_resolver.call(to_create, to_drop, "table", nil)
 
       else
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities"
@@ -168,7 +175,7 @@ module HoboFields
         to_rename
 
       elsif @ambiguity_resolver
-        @ambiguity_resolver.extract_renames!(to_add, to_remove, "column", "#{table_name}.")
+        @ambiguity_resolver.call(to_add, to_remove, "column", "#{table_name}.")
 
       else
         raise MigrationGeneratorError, "Unable to resolve migration ambiguities in table #{table_name}"
@@ -282,7 +289,7 @@ module HoboFields
       db_columns = model.connection.columns(current_table_name).index_by{|c|c.name}
       key_missing = db_columns[model.primary_key].nil? && model.primary_key
       db_columns -= [model.primary_key]
-      
+
       model_column_names = model.field_specs.keys.*.to_s
       db_column_names = db_columns.keys.*.to_s
 
@@ -292,7 +299,7 @@ module HoboFields
       to_remove = to_remove - [model.primary_key.to_sym] if model.primary_key
 
       to_rename = extract_column_renames!(to_add, to_remove, new_table_name)
-      
+
       db_column_names -= to_rename.keys
       db_column_names |= to_rename.values
       to_change = db_column_names & model_column_names
