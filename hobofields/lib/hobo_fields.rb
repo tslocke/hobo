@@ -11,22 +11,8 @@ end
 module HoboFields
 
   VERSION = "1.1.0.pre0"
-  
-  if defined?(::Rails::Railtie)
-    class Railtie < Rails::Railtie
-      initializer :eager_load_rich_types, :after => :set_autoload_paths do |app|
-        app.config.eager_load_paths += %W( #{app.config.root}/app/rich_types )
-        Dir[app.config.root.join('app', 'rich_types', '*.rb')].each do |f|
-          # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-          require_dependency f
-        end
-      end
 
-      ActiveSupport.on_load(:before_initialize) do
-        HoboFields.enable
-      end
-    end
-  end
+  require 'hobo_fields/railtie' if defined?(::Rails)
 
   extend self
 
@@ -47,7 +33,7 @@ module HoboFields
   }
 
   # Provide a lookup for these rather than loading them all preemptively
-  
+
   STANDARD_TYPES = {
     :raw_html      => "RawHtmlString",
     :html          => "HtmlString",
@@ -61,7 +47,7 @@ module HoboFields
   }
 
   @field_types   = PLAIN_TYPES.with_indifferent_access
-  
+
   @never_wrap_types = Set.new([NilClass, Hobo::Boolean, TrueClass, FalseClass])
 
   attr_reader :field_types
@@ -110,29 +96,18 @@ module HoboFields
     "HoboFields::#{class_name}".constantize if class_name
   end
 
-  def enable
-    require "hobo_fields/attribute_methods"
-    require "hobo_fields/enum_string"
-    require "hobo_fields/fields_declaration"
-
-    # Add the fields do declaration to ActiveRecord::Base
-    ActiveRecord::Base.send :include, FieldsDeclaration
-    
-    if defined?(::Rails) && Rails::VERSION::MAJOR == 2
-      plugins = Rails.configuration.plugin_loader.new(HoboFields.rails_initializer).plugins
-        ([::Rails.root] + plugins.map(&:directory)).each do |dir|
-          ActiveSupport::Dependencies.load_paths << File.join(dir, 'app', 'rich_types')
-          Dir[File.join(dir, 'app', 'rich_types', '*.rb')].each do |f|
-            # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
-            require_dependency f
-          end
-      end
-    end
-    
-    # Override ActiveRecord's default methods so that the attribute read & write methods
-    # automatically wrap richly-typed fields.
-    ActiveRecord::Base.send :include, AttributeMethods
-  end
+#  def enable
+#    require "hobo_fields/attribute_methods"
+#    require "hobo_fields/enum_string"
+#    require "hobo_fields/fields_declaration"
+#
+#    # Add the fields do declaration to ActiveRecord::Base
+#    ActiveRecord::Base.send :include, FieldsDeclaration
+#
+#    # Override ActiveRecord's default methods so that the attribute read & write methods
+#    # automatically wrap richly-typed fields.
+#    ActiveRecord::Base.send :include, AttributeMethods
+#  end
 
 end
 

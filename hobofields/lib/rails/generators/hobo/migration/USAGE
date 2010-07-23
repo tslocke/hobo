@@ -19,7 +19,7 @@ Description:
 
 Examples:
 
-        $ rails generate hobo_migration
+        $ rails generate hobo:migration
 
         ---------- Up Migration ----------
         create_table :foos do |t|

@@ -14,16 +14,16 @@ Description:
     db/migrate.
 
 Examples:
-    `./script/generate hobofield_model account`
+    $ rails generate hobo:model account
 
         creates an Account model, test, fixture, and migration:
             Model:      app/models/account.rb
             Test:       test/unit/account_test.rb
             Fixtures:   test/fixtures/accounts.yml
 
-    `./script/generate hobofield_model post title:string body:text published:boolean`
+    $ rails generate hobo:model post title:string body:text published:boolean
 
         creates a Post model with a string title, text body, and published flag.
-        
-After the model is created, and the fields are specified, use hobofield
+
+After the model is created, and the fields are specified, use hobofields
 to create the migrations incrementally.
