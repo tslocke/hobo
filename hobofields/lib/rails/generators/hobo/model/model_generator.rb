@@ -1,33 +1,28 @@
 module Hobo
-    class ModelGenerator < Rails::Generators::NamedBase
+  class ModelGenerator < Rails::Generators::NamedBase
 
-    source_root File.expand_path('../templates', __FILE__)
-
-    class_option :timestamps,
-                 :type => :boolean,
-                 :default => true,
-                 :desc => "Add timestamps to the migration file for this model. Skip with '--no-timestamps'"
-
-    class_option :fixture,
-                 :type => :boolean,
-                 :default => true,
-                 :desc => "Generate a fixture file for this model. Skip with '--no-fixture'"
+    # work around: for some reason the USAGE file is not shown withouth this line
+    desc File.read(File.expand_path('../USAGE', __FILE__))
 
     argument :attributes,
-             :type => :string,
-             :default => ''
+             :type => :array,
+             :default => [],
+             :banner => "field:type field:type"
 
-    def create_stubs
-      # Check for class naming collisions.
-      class_collisions class_path, class_name, "#{class_name}Test"
+    class_option :timestamps, :type => :boolean
 
-      # Create stubs
-      template "model.rb.erb",  File.join("app/models", class_path, "#{file_name}.rb")
-      template "test.rb.erb",   File.join("test/unit", class_path, "#{file_name}_test.rb")
+    hook_for :orm
 
-      unless options[:skip_fixture]
-       	template 'fixtures.yml.erb',  File.join('test/fixtures', "#{file_name.pluralize}.yml")
+    def inject_fields_block_into_model_file
+      data = "\n  fields do\n"
+      attributes.reject {|attr| attr.reference? }.each do |attribute|
+        data << "    #{attribute.name} :#{attribute.type}\n"
       end
+      data << "timestamps\n" if options[:timestamps]
+      data << "  end\n"
+
+      model_path = File.join("app/models", class_path, "#{file_name}.rb")
+      inject_into_file model_path, data, :after => /class[^\n]+/
     end
 
   end

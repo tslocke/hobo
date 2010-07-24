@@ -11,7 +11,7 @@ Description:
         Enter "m" to generate the migration and run it, or press "c"
         to do nothing.
 
-        The generator will then prompt you for the generator name,
+        The generator will then prompt you for the migration name,
         supplying a numbered default name.
 
         The generator is conservative and will prompt you to resolve

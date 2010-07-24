@@ -96,19 +96,6 @@ module HoboFields
     "HoboFields::#{class_name}".constantize if class_name
   end
 
-#  def enable
-#    require "hobo_fields/attribute_methods"
-#    require "hobo_fields/enum_string"
-#    require "hobo_fields/fields_declaration"
-#
-#    # Add the fields do declaration to ActiveRecord::Base
-#    ActiveRecord::Base.send :include, FieldsDeclaration
-#
-#    # Override ActiveRecord's default methods so that the attribute read & write methods
-#    # automatically wrap richly-typed fields.
-#    ActiveRecord::Base.send :include, AttributeMethods
-#  end
-
 end
 
 

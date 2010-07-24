@@ -21,23 +21,23 @@ module Hobo
              :default => HoboFields::MigrationGenerator.default_migration_name
 
     class_option :force_drop,
+                 :aliases => '-fd',
                  :type => :boolean,
-                 :default => false,
                  :desc => "Don't prompt with 'drop or rename' - just drop everything"
 
     class_option :default_name,
+                 :aliases => '-dn',
                  :type => :boolean,
-                 :default => false,
                  :desc => "Don't prompt for a migration name - just pick one"
 
     class_option :generate,
+                 :aliases => '-g',
                  :type => :boolean,
-                 :default => false,
                  :desc => "Don't prompt for action - generate the migration"
 
     class_option :migrate,
+                 :aliases => '-m',
                  :type => :boolean,
-                 :default => false,
                  :desc => "Don't prompt for action - generate and migrate"
 
     def migrate
@@ -69,7 +69,7 @@ module Hobo
         final_migration_name = choose("Filename [#{migration_name}]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_') unless options[:default_name]
         final_migration_name = migration_name if final_migration_name.blank?
 
-        at_exit { rake_migrate } if action == 'm'
+        at_exit { rake('db:migrate') } if action == 'm'
 
         up.gsub!("\n", "\n    ")
         up.gsub!(/ +\n/, "\n")
@@ -149,22 +149,9 @@ module Hobo
       to_rename
     end
 
-
     def choose(prompt, format)
       choice = ask prompt
-      if choice =~ format
-        choice
-      else
-        choose prompt, format
-      end
-    end
-
-    def rake_migrate
-      if RUBY_PLATFORM =~ /mswin32/
-        system "rake.bat db:migrate"
-      else
-        system "rake db:migrate"
-      end
+      (choice =~ format) ? choice : choose(prompt, format)
     end
 
   end
