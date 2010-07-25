@@ -2,46 +2,12 @@
 
 This doctest describes the rich types bundled with HoboFields, and the process by which you can create and register your own types.
 
-Our test requires rails:
+Our test requires to prepare the testapp:
 {.hidden}
 
-        >> require 'rubygems'
-        >> require 'active_support'
-        >> require 'active_record'
-        >> require 'action_pack'
-        >> require 'action_view'
-        >> require 'action_controller'
-{.hidden}
+    doctest_require: 'prepare_testapp'
 
-ActiveRecord 2.3.2 doesn't work very well without a connection, even
-though we don't need it for this test:
 {.hidden}
-
-        >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-        >> mysql_user = 'root'; mysql_password = ''
-        >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-        >> mysql_database = "hobofields_doctest"
-        >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-        >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-        >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
-                                               :database => mysql_database,
-                                               :host => "localhost", :user => mysql_user, :password => mysql_password)
-{.hidden}
-
-Some load path manipulation you shouldn't need:
-{.hidden}
-
-        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-        >> I18n.config.load_path << File.join(File.expand_path(File.dirname(__FILE__)), 'en.yml')
-{.hidden}
-
-Finally we can require hobofields: 
-{.hidden}
-
-        >> require 'hobosupport'
-        >> require 'hobofields'
-        >> HoboFields.enable
 
 ## `to_html` method
 
@@ -288,6 +254,7 @@ Translations only work with named EnumString's.  The recommended way of naming t
 ## Cleanup
 {.hidden}
 
-        >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> FileUtils.rm_rf  TEST_APP_ROOT
+
 {.hidden}
 
