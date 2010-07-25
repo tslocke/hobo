@@ -14,7 +14,7 @@ It still has all the benefits of writing your own migrations, for example if you
 
 First off, if you're using the migration generator outside of Hobo, do remember the `--skip-migration` option when generating your models:
 
-        $ ./script/generate model blog_post --skip-migration
+        $ rails generate model blog_post --skip-migration
 
 Now edit your model as follows:
 
@@ -30,7 +30,7 @@ Now edit your model as follows:
 
 Then, simply run
 
-        $ ./script/generate hobo_migration
+        $ rails generate hobo:migration
 
 And voila
 
