@@ -1,69 +1,45 @@
 
 # HoboFields API
 
-In order for the API examples to run we need a connection to a database. You can ignore this if you're just looking for documentation.
-{.hidden}
+In order for the API examples to run we need to load the rails generators of our testapp:
 
-Our test requires rails:
-{.hidden}
-
-    >> require 'rubygems'
-    >> require 'active_support'
-    >> require 'active_record'
-    >> require 'action_controller'
-{.hidden}
-
-We need a database connection for this test:
-{.hidden}
-
-    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-    >> mysql_user = 'root'; mysql_password = ''
-    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobofields_doctest"
-    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
-                                               :database => mysql_database,
-                                               :host => "localhost", 
-                                               :username => mysql_user, 
-                                               :password => mysql_password)
-{.hidden}
-
-Some load path manipulation you shouldn't need:
-{.hidden}
-
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-    >> I18n.config.load_path << File.join(File.expand_path(File.dirname(__FILE__)), 'en.yml')
-{.hidden}
-
-Require the module we're testing:
-{.hidden}
-
-    >> require 'hobosupport'
-    >> require 'hobofields'
-    >> HoboFields.enable
+    doctest_require: 'prepare_testapp'
 
 ## Example Models
 
-Let's define some example models that we can use to demonstrate the API. With HoboFields we define the model's fields, with their name and type, directly in the model like so:
+Let's define some example models that we can use to demonstrate the API. With HoboFields we can use the 'hobo:model' generator like so:
 
-        >>
-         class Advert < ActiveRecord::Base
-           fields do
-                 title           :string
-                 body            :text
-                 contact_address :email_address
-           end
-         end
+    $ rails generate hobo:model advert title:string body:text contact_address:email_address
+
+{.hidden}
+
+    >> Rails::Generators.invoke 'hobo:model', %w(advert title:string body:text contact_address:email_address)
+
+{.hidden}
+
+This will generate the test, fixture and a model file like this:
+
+    class Advert < ActiveRecord::Base
+      fields do
+        title :string
+        body :text
+        contact_address :email_address
+      end
+
+    end
 
 (Note: `:email_address` is an example of a "Rich Type" provided by HoboFields -- more on those later)
 
 The migration generator uses this information to create a migration. The following creates and runs the migration so we're ready to go.
 
-        >> up, down = HoboFields::MigrationGenerator.run
-        >> ActiveRecord::Migration.class_eval up
+    $ rails generate hobo:migration --name --migrate
 
+{.hidden}
+
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+
+{.hidden}
 We're now ready to start demonstrating the API
 
 ## The Basics
@@ -273,5 +249,8 @@ To have them validated use `validate_virtual_field`:
 Cleanup
 {.hidden}
 
-    >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> FileUtils.rm_rf  TEST_APP_ROOT
+
 {.hidden}
+
+
