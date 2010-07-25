@@ -1,6 +1,10 @@
 module Hobo
   class ModelGenerator < Rails::Generators::NamedBase
 
+    def self.banner
+      "rails generate hobo:model #{self.arguments.map(&:usage).join(' ')} [options]"
+    end
+
     # work around: for some reason the USAGE file is not shown withouth this line
     desc File.read(File.expand_path('../USAGE', __FILE__))
 

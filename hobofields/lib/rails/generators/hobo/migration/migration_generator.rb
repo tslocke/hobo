@@ -11,7 +11,11 @@ module Hobo
     # For other ORMs we will wait for the rails implementation
     # see http://groups.google.com/group/rubyonrails-talk/browse_thread/thread/a507ce419076cda2
     def self.next_migration_number(dirname)
-     ActiveRecord::Generators::Base.next_migration_number dirname
+      ActiveRecord::Generators::Base.next_migration_number dirname
+    end
+
+    def self.banner
+      "rails generate hobo:migration #{self.arguments.map(&:usage).join(' ')} [options]"
     end
 
     source_root File.expand_path('../templates', __FILE__)
@@ -20,13 +24,13 @@ module Hobo
              :type => :string,
              :default => HoboFields::MigrationGenerator.default_migration_name
 
-    class_option :force_drop,
-                 :aliases => '-fd',
+    class_option :drop,
+                 :aliases => '-d',
                  :type => :boolean,
                  :desc => "Don't prompt with 'drop or rename' - just drop everything"
 
-    class_option :default_name,
-                 :aliases => '-dn',
+    class_option :name,
+                 :aliases => '-n',
                  :type => :boolean,
                  :desc => "Don't prompt for a migration name - just pick one"
 
@@ -61,15 +65,15 @@ module Hobo
 
       action = options[:generate] && 'g' ||
                options[:migrate] && 'm' ||
-               choose("What now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
+               choose("\nWhat now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
 
       if action != 'c'
-        say "\nMigration filename:"
-        say "(you can type spaces instead of '_' -- every little helps)"
-        final_migration_name = choose("Filename [#{migration_name}]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_') unless options[:default_name]
+        unless options[:name]
+          say "\nMigration filename:"
+          say "(you can type spaces instead of '_' -- every little helps)"
+          final_migration_name = choose("Filename [#{migration_name}]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
+        end
         final_migration_name = migration_name if final_migration_name.blank?
-
-        at_exit { rake('db:migrate') } if action == 'm'
 
         up.gsub!("\n", "\n    ")
         up.gsub!(/ +\n/, "\n")
@@ -81,6 +85,7 @@ module Hobo
         @migration_class_name = final_migration_name.camelize
 
         migration_template 'migration.rb.erb', "db/migrate/#{final_migration_name.underscore}.rb"
+        rake('db:migrate') if action == 'm'
       end
     rescue HoboFields::FieldSpec::UnknownSqlTypeError => e
       say "Invalid field type: #{e}"
