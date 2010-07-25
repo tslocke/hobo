@@ -1,0 +1,63 @@
+doctest: prepare testapp environment
+doctest_require: 'prepare_testapp'
+
+doctest: generate hobo:model
+>> Rails::Generators.invoke 'hobo:model', %w(alpha/beta one:string two:integer)
+
+
+doctest: model file exists
+>> File.exist? 'app/models/alpha/beta.rb'
+=> true
+
+doctest: model content matches
+>> File.read 'app/models/alpha/beta.rb'
+=> "class Alpha::Beta < ActiveRecord::Base\n  fields do\n    one :string\n    two :integer\n  end\n\nend\n"
+
+
+doctest: module file exists
+>> File.exist? 'app/models/alpha.rb'
+=> true
+
+doctest: module content matches
+>> File.read 'app/models/alpha.rb'
+=> "module Alpha\n  def self.table_name_prefix\n    'alpha_'\n  end\nend\n"
+
+
+doctest: test file exists
+>> File.exist? 'test/unit/alpha/beta_test.rb'
+=> true
+
+doctest: test content matches
+>> File.read 'test/unit/alpha/beta_test.rb'
+=> "require 'test_helper'\n\nclass Alpha::BetaTest < ActiveSupport::TestCase\n  # Replace this with your real tests.\n  test \"the truth\" do\n    assert true\n  end\nend\n"
+
+
+doctest: fixture file exists
+>> File.exist? 'test/fixtures/alpha_betas.yml'
+=> true
+
+doctest: fixture content matches
+>> File.read 'test/fixtures/alpha_betas.yml'
+=> "# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html\n\none:\n  one: MyString\n  two: 1\n\ntwo:\n  one: MyString\n  two: 1\n"
+
+
+
+doctest: generate hobo:migration
+>> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+
+doctest: schema.rb file exists
+>> File.exist? 'db/schema.rb'
+=> true
+
+doctest: db file exists
+>> File.exist? 'db/development.sqlite3'
+=> true
+
+doctest: Alpha::Beta class exists
+>> Alpha::Beta
+=> Alpha::Beta(id: integer, one: string, two: integer)
+
+
+
+doctest: remove testapp dir
+>> FileUtils.rm_rf  TEST_APP_ROOT
