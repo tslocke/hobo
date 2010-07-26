@@ -1,45 +1,11 @@
 # HoboFields - Migration Generator
 
-Note that these doctests are good tests but not such good docs. The migration generator doesn't really fit well with the doctest concept of a single IRB session. As you'll see, there's a lot of jumping-through-hoops and doing stuff that no normal user of the migration generator would ever do.
+Our test requires to prepare the testapp:
 {.hidden}
 
-Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
-{.hidden}
+    doctest_require: 'prepare_testapp'
 
-    >> require 'rubygems'
-    >> require 'active_support'
-    >> require 'active_record'
 {.hidden}
-
-We also need to get ActiveRecord set up with a database connection
-{.hidden}
-
-    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-    >> mysql_user = 'root'; mysql_password = ''
-    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobofields_doctest"
-    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
-                                               :database => mysql_database,
-                                               :host => "localhost", 
-                                               :username => mysql_user, 
-                                               :password => mysql_password)
-{.hidden}
-
-Some load path manipulation you shouldn't need:
-{.hidden}
-
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-{.hidden}
-
-And we'll require:
-{.hidden}
-
-    >> require 'hobosupport'
-    >> require 'hobofields'
-    >> HoboFields.enable
 
 ## The migration generator -- introduction
 
@@ -87,7 +53,7 @@ Here we see a simple `create_table` migration along with the `drop_table` down m
      end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => 
+    =>
      "create_table :adverts do |t|
        t.string :name
      end"
@@ -193,7 +159,7 @@ Let's apply that change to the database
 
     >> Advert.attr_type :title
     => String
-    >>    
+    >>
      class Advert
        fields do
          title :text
@@ -223,8 +189,8 @@ Let's apply that change to the database
     => ' :default => "Untitled", :limit => 255'
     >> down
     => "change_column :adverts, :title, :string"
-    
-    
+
+
 ### Limits
 
     >>
@@ -238,7 +204,7 @@ Let's apply that change to the database
     => "add_column :adverts, :price, :integer, :limit => 2"
 
 Note that limit on a decimal column is ignored (use :scale and :precision)
-    
+
     >>
      class Advert
        fields do
@@ -254,7 +220,7 @@ Cleanup
 
     >> Advert.field_specs.delete :price
 {.hidden}
-    
+
 
 ### Foreign Keys
 
@@ -267,12 +233,12 @@ foreign-key field.  It also generates an index on the field.
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => 
+        =>
          "add_column :adverts, :category_id, :integer
 
          add_index :adverts, [:category_id]"
         >> down
-        => 
+        =>
          "remove_column :adverts, :category_id
 
          remove_index :adverts, :name => :index_adverts_on_category_id rescue ActiveRecord::StatementInvalid"
@@ -292,7 +258,7 @@ If you specify a custom foreign key, the migration generator observes that:
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => 
+        =>
          "add_column :adverts, :c_id, :integer
 
          add_index :adverts, [:c_id]"
@@ -329,7 +295,7 @@ You can specify the index name with :index
          end
         >> up, down = HoboFields::MigrationGenerator.run
         >> up
-        => 
+        =>
          "add_column :adverts, :category_id, :integer
 
          add_index :adverts, [:category_id], :name => 'my_index'"
@@ -568,7 +534,7 @@ Adding a subclass or two should introduce the 'type' column and no other changes
 
          add_index :adverts, [:type]"
         >> down
-        => 
+        =>
          "remove_column :adverts, :type
 
          remove_index :adverts, :name => :index_adverts_on_type rescue ActiveRecord::StatementInvalid"
@@ -684,7 +650,7 @@ Comments can be added to tables and fields with HoboFields.
      end
     >> up, down = HoboFields::MigrationGenerator.run
     >> up
-    => 
+    =>
      'create_table :products do |t|
        t.string :name, :comment => "short name"
        t.string :description
@@ -732,6 +698,7 @@ Cleanup
 Final Cleanup
 {.hidden}
 
-    >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+  >> FileUtils.rm_rf  TEST_APP_ROOT
+
 {.hidden}
 

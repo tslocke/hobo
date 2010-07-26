@@ -2,39 +2,12 @@
 
 # HoboFields - Migration Generator
 
-Note that these doctests are good tests but not such good docs. The migration generator doesn't really fit well with the doctest concept of a single IRB session. As you'll see, there's a lot of jumping-through-hoops and doing stuff that no normal user of the migration generator would ever do.
+Our test requires to prepare the testapp:
+{.hidden}
 
-Firstly, in order to test the migration generator outside of a full Rails stack, there's a few things we need to do. First off we need to configure ActiveSupport for auto-loading
+    doctest_require: 'prepare_testapp'
 
-    >> require 'rubygems'
-    >> require 'active_support'
-    >> require 'active_record'
-
-We also need to get ActiveRecord set up with a database connection
-
-    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-    >> mysql_user = 'root'; mysql_password = ''
-    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobofields_doctest"
-    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
-                                               :database => mysql_database,
-                                               :host => "localhost", 
-                                               :username => mysql_user, 
-                                               :password => mysql_password)
-
-Some load path manipulation you shouldn't need:
-
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
-
-And we'll require:
-
-    >> require 'hobosupport'
-    >> require 'hobofields'
-    >> HoboFields.enable
-
+{.hidden}
 OK we're ready to get going.
 
 We'll define a method to make that easier next time
@@ -59,11 +32,11 @@ We'll define a method to make that easier next time
     end
    >> up, down = HoboFields::MigrationGenerator.run
    >> up
-   =>  
+   =>
      "create_table :foos, :primary_key => :foo_id do |t|
      end"
    >> migrate
-  
+
 ### migrate from
 
    >>
@@ -96,4 +69,4 @@ We'll define a method to make that easier next time
 
 ## Cleanup
 
-   >> system  "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
+    >> FileUtils.rm_rf  TEST_APP_ROOT
