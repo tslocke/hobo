@@ -62,7 +62,7 @@ module Hobo
         return
       end
 
-      login_attr = model.login_attribute.to_s.titleize.downcase
+      login_attr = model.human_attribute_name(model.login_attribute)
       options.reverse_merge!(:success_notice => ht(:"users.messages.login.success", :default=>["You have logged in."]),
                              :failure_notice => ht(:"users.messages.login.error", :login=>login_attr, :default=>["You did not provide a valid #{login_attr} and password."]))
 

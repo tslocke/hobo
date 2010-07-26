@@ -49,6 +49,7 @@ end
 user_model = "user"
 create_db  = false
 run_rails  = true
+add_gem    = true
 invite_only = ""
 
 while true
@@ -67,6 +68,8 @@ while true
     rails_version = ARGV.shift
   when "-n", "--no-rails"
     run_rails = false
+  when "--no-gem"
+    add_gem = false
   when "--invite-only"
     invite_only = "--invite-only"
   when "--help"
@@ -115,7 +118,10 @@ Dir.chdir(app_path) do
   FileUtils.touch("public/stylesheets/application.css")
 
   puts "\nInitialising Hobo...\n"
-  command(gen, "hobo --add-gem --add-routes")
+  if add_gem
+    command(gen, "hobo --add-gem")
+  end
+  command(gen, "hobo --add-routes")
 
   puts "\nInstalling Hobo Rapid and default theme...\n"
   command("#{gen} hobo_rapid --import-tags #{invite_only}")

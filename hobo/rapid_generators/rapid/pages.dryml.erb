@@ -4,7 +4,7 @@
   <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
 <% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
-    <nav-item with="&<%= m.name %>"><ht key="<%= m.name.tableize %>.nav_item"><%= m.view_hints.model_name_plural %></ht></nav-item>
+    <nav-item with="&<%= m.name %>"><ht key="<%= m.name.tableize %>.nav_item" pluralized><human-name/></ht></nav-item>
 <% end -%>
   </navigation>
 </def>
@@ -21,20 +21,20 @@ model_key = model.name.tableize
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index.title', :default=>['<%= sq_escape(model_name :plural) %>'] }">
+  <page merge title="#{ht '<%= model_key %>.index.title', :pluralized=>true, :default=>[model.human_name(:count=>model.count)] }">
     <body: class="index-page <%= model_class %>" param/>
 
     <content: param>
       <header param="content-header">
         <h2 param="heading">
-          <ht key="<%= model_key %>.index.heading">
-            <%= model_name :plural %>
+          <ht key="<%= model_key %>.index.heading" pluralized>
+            <human-name model="&model"/>
           </ht>
         </h2>
 
         <p param="count" if>
           <ht key="<%= model_key %>.collection.count" count="&this.size">
-            There <count prefix="are"/>
+            <count summary/>
           </ht>
         </p>
       </header>
@@ -101,6 +101,7 @@ model_key = model.name.tableize
 
 <%
 back_link      = model.view_hints.parent
+back_link_human_name  = back_link.to_s.singularize.camelize.constantize.human_name unless back_link.blank?
 boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans
 creator        = model.creator_attribute
 creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
@@ -137,7 +138,7 @@ end
 <% end -%>
           <header param="content-header">
 <% if back_link -%>
-            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back" to="<%= back_link %>"><name/></ht></a:<%= back_link %>>
+            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="&<%= back_link.to_s.singularize.camelize %>.human_name" name="&this">Back to <name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
               <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
@@ -165,7 +166,7 @@ end
 <% end -%>
           </header>
 
-          <section param="content-body"<%= ' with-flash-messages' if aside_collections %>>
+          <section param="content-body">
 <% if main_content -%>
             <view:<%= main_content %> param="description"/>
 <% end -%>
@@ -175,8 +176,8 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
-                  <%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %>
+                <ht key="<%= collection.to_s.tableize %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
+                  <human-collection-name collection="<%= collection %>" your/>
                 </ht>
               </h3>
 
@@ -188,7 +189,7 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)" param="new-link">
-                <ht key="<%= collection.to_s.pluralize %>.actions.new">
+                <ht key="<%= collection.to_s.tableize %>.actions.new" count="1">
                   New <%= collection.to_s.singularize.titleize %>
                 </ht>
               </a:<%= collection %>>
@@ -196,7 +197,7 @@ end
 
               <section param="add-to-collection" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading">
+                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading" count="1">
                     Add <%= a_or_an collection.to_s.singularize.titleize %>
                   </ht>
                 </h3>
@@ -215,23 +216,14 @@ end
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
 <%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
-          <preview-with-more:<%= refl.name %>.recent param="<%= refl.name %>-preview">
-<%       if is_user_model -%>
-            <heading:>
-              <ht key="hobo.undefined">  
-                <Your with="&@<%= model.name.underscore %>"/> <%= refl.name.to_s.titleize %>
-              </ht>
-            </heading:>
-<%       end -%>
-            <more:>
-              <ht key="hobo.actions.more">more</ht>
-            </more:>
-          </preview-with-more:<%= refl.name %>.recent>
+         <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
+           <heading-content:><human-collection-name with="&this.origin" collection="<%= refl.name %>" your/></heading-content:>
+         </collection-preview:<%= refl.name %>.recent>
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
-              <ht key="<%= refl.name.to_s.pluralize %>.collection.heading.other" >
-                <%= refl.name.to_s.titleize %>
+              <ht key="<%= refl.name.to_s.tableize %>.collection.heading" count="&this.<%= refl.name.to_s %>.count" >
+                <human-collection-name collection="<%= refl.name %>" your/>
               </ht>
             </h3>
             <collection:<%= refl.name %>  param="<%= refl.name %>-collection"/>
@@ -259,7 +251,7 @@ name_attribute = model.name_attribute
       <section param="content-header">
         <h2 param="heading">
           <ht key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
-            Edit <type-name/>
+            Edit <%= model_name %>
           </ht>
         </h2>
         <delete-button label="#{ht '<%= model_key %>.actions.delete', :default=>['Remove This <%= sq_escape model_name %>']}" param/>
@@ -290,27 +282,21 @@ new_link = :new.in?(actions)
 -%>
 <def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name :plural) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">    
+  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name(:plural)) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">    
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
     <content: param>
       <header param="content-header">
 <% if linkable_owner -%>
         <div param="back-to">
-          <ht key="hobo.actions.back">Back to</ht> <a with="&@<%= owner %>"/>
+          <t key="hobo.actions.back">Back to</t> <a with="&@<%= owner %>"/>
         </div>
 <% end -%>
-<% if owner_is_user %>
-        <h2 param="heading">
-          <ht key="<%= model_key %>.index_for_owner.heading.your">
-            <Your with="&@<%= owner %>"/> <%= model_name :plural %>
+        <h2 param="heading" if="&@owner">
+          <ht key="<%= model_key %>.index_for_owner.heading" count="&@<%= owner %>.<%= collection_name %>.count">
+            <human-collection-name with="&@<%= owner %>" collection="<%= collection_name %>" your/>
           </ht>
         </h2>
-<% else -%>
-        <h2 param="heading">
-          <ht key="<%= model_key %>.index_for_owner.heading.other">
-            <%= model_name :plural %>
-          </ht>
-        </h2>
+<% unless owner_is_user %>
         <h3 param="subheading">
           <ht key="<%= model_key %>.index_for_owner.subheading">
             For:
@@ -320,7 +306,7 @@ new_link = :new.in?(actions)
 <% end -%>
         <p param="count" if>
           <ht key="<%= model_key %>.collection.count" count="&this.size">
-            There <count prefix="are"/>
+            <count summary/>
           </ht>
         </p>
       </header>

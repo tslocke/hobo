@@ -26,6 +26,11 @@ module Hobo
     #       "no":
     #         my: "Mitt {{app}}"
     #       The output should be: Mitt Program
+    #
+    # The "pluralized" option set the count to the Model.count. The following lines are the same:
+    #
+    # <ht key="modelname.any.key" pluralized/>
+    # <ht key="modelname.any.key" count="&model.count">
     # 
     # Otherwise with features as the ht method, step 1, 2 and 3 above. 
     def self.ht(key, options={})
@@ -49,6 +54,7 @@ module Hobo
           options[:default] = [options[:default]]
         end
       end
+      pluralized = options.delete(:pluralized)
       
       # assume the first part of the key to be the model
       keys = key.to_s.split(".")
@@ -58,15 +64,26 @@ module Hobo
       else
         subkey = key
       end
+      
+      # will skip useless code in case the first part of the key is 'hobo'
+      model = '' if model.eql?('hobo')
     
-      # add :"hobo.#{key}" as the first fallback
-      options[:default].unshift("hobo.#{subkey}".to_sym)
-    
-      # translate the model
       unless model.blank?
-        translated_model = I18n.translate( "activerecord.models.#{model.singularize.underscore}", :default=>model).titleize
-        options[:model] = translated_model
+        # add :"hobo.#{key}" as the first fallback
+        options[:default].unshift("hobo.#{subkey}".to_sym)
+        # set the count option in order to allow multiple pluralization
+        if pluralized
+          options[:count] = model.singularize.camelize.constantize.try.count
+        end
+        options[:count] ||= 1
+        # translate the model
+        # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
+        # no default needed because human_name defaults to the model name
+        # try because Hobo class is not an ActiveRecord::Base subclass
+        translated_pluralized_model = model.singularize.camelize.constantize.try.human_name(:count=>options[:count])
+        options[:model] = translated_pluralized_model
       end
+      options[:count] ||= 1
     
       key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
     

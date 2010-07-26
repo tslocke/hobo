@@ -166,9 +166,11 @@ require 'action_controller/dispatcher'
         @model || @controller.model
       end
       
-      
+      # This method is used only to generate static default Model names in english only
+      # it does not provide any translation
+      # Localized apps will override the defaults by setting the specific keys in their locale files
       def model_name(*options)
-        name = :plural.in?(options) ? model.view_hints.model_name_plural : model.view_hints.model_name
+        name = :plural.in?(options) ? model.human_name(:count=>2, :locale=>:en) : model.human_name(:locale=>:en)
         name = name.titleize.downcase                         if :lowercase.in?(options)
         name = name.camelize                                  if :camel.in?(options)
         name

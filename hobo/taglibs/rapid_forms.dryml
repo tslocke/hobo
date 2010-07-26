@@ -563,8 +563,8 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
                                   else
                                     { :type => "button" }
                                   end)
-    label ||= ht("hobo.actions.remove", :default=>"Remove") 
-    confirm = ht("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
+    label ||= I18n.t("hobo.actions.remove", :default=>"Remove") 
+    confirm = I18n.t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
     
     add_classes!(attributes,
                  image ? "image-button" : "button",
@@ -611,7 +611,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
   if can_create?(new)
-    label ||= ht("#{new.class.name.pluralize.underscore}.actions.new", :default=>"New #{new.class.name.titleize}")  
+    label ||= ht("#{new.class.name.tableize}.actions.new", :default=>"New #{new.class.human_name}")  
     ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
@@ -641,8 +641,7 @@ For situations where there are too many target records to practically include in
   -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
-
-  blank_message ||= ht("#{this_type.name.underscore}.message.no", :default=>"(No #{this_type.view_hints.model_name})")
+  blank_message ||= ht("#{this_type.name.tableize}.message.no", :default=>"(No #{this_type.human_name})")
   limit ||= 100
    
   options ||= begin
@@ -765,14 +764,15 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
 </def>
 
 
-<!-- Renders a readable list of error messages following a form submission. Expects the errors to be in `this.errors`. Renders nothing if there are no errors.
+<!-- Renders a localized list of error messages following a form submission. Expects the errors to be in `this.errors`. Renders nothing if there are no errors.
   -->
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
-    <h2 param="heading">To proceed please correct the following:</h2>
+    <h2 param="heading"><t key="activerecord.errors.template.header" model="&this.class.human_name" count="&this.errors.size"/></h2>
+    <t key="activerecord.errors.template.body"></t>
     <ul param>
-      <% this.errors.each do |attr, message|; next if message == "..." -%>
-        <li param><%= this.class.human_attribute_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
+      <% this.errors.each_full do |message| -%>
+      <li param><%= message %></li>
       <% end -%>
     </ul>
   </section>
@@ -785,12 +785,12 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
-  prompt ||= "Add #{this_field.titleize.singularize}"
+  prompt ||= ht("#{this_field.tableize}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
   options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
   name ||= param_name_for_this
                 
   values = this
-  remove_label ||= ht("hobo.actions.remove", :default=>'Remove')
+  remove_label ||= I18n.t("hobo.actions.remove", :default=>'Remove')
   -%>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
@@ -866,9 +866,15 @@ Use the `uri` option to specify a redirect location:
  - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
  - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
  - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
-
+ - `key` - the key used to lookup in the locale file or 'default' by default. If you pass it hobo will lookup in the namespace "tags.select_menu.#{key}" in order to find `options`, `first_option` and `first_value`. The passed attributes are used as a default in case the lookups fail. (see the documentation of filter-menu tag for a similar example).
  -->
-<def tag="select-menu" attrs="options, selected, first-option, first-value">
+<def tag="select-menu" attrs="options, selected, first-option, first-value, key">
+<% key ||= 'default'
+   %w[options first_option first_value].each do |a|
+     str = I18n.t("tags.select_menu.#{key}.#{a}", :default=>'')
+     eval "#{a} = str unless str.blank?"
+   end
+-%>
   <select merge-attrs param="default">
     <% selected=this if selected.nil? %>
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
@@ -1093,8 +1099,8 @@ The specified sort order may be maintained even without `acts_as_list`.  The ite
 <!-- Renders the common "or (Cancel)" for a form. Attributes are merged into the link (`<a>Cancel</a>`), making it easy to customise the destination of the cancel link. By default it will link to `this` or `this.class`.
   -->
 <def tag="or-cancel">
-  <if test="&linkable?"><ht key="hobo.support.or">or</ht> <a merge-attrs><ht key="hobo.actions.cancel">Cancel</ht></a></if>
+  <if test="&linkable?"><t key="hobo.support.or">or</t> <a merge-attrs><t key="hobo.actions.cancel">Cancel</t></a></if>
   <else>
-    <if test="&linkable?(this.class)"><ht key="hobo.support.or">or</ht> <a to="&this.class" merge-attrs><ht key="hobo.actions.cancel">Cancel</ht></a></if>
+    <if test="&linkable?(this.class)"><t key="hobo.support.or">or</t> <a to="&this.class" merge-attrs><t key="hobo.actions.cancel">Cancel</t></a></if>
   </else>
 </def>

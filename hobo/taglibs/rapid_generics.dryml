@@ -18,11 +18,13 @@
 <!-- Renders a message such as "No products to display". If the collection (`this`) is empty, `style="display:none"` is added. This means the message is still present and can be revealed with JavaScript if all items in the collection are removed with ajax remove buttons.
   -->
 <def tag="empty-collection-message">
-  <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
-    <ht key="#{this.member_class.name.tableize}.collection.empty_message">
-      No <collection-name lowercase/> to display
-    </ht>
-  </div>
+  <unless test="&this.member_class.nil?">
+    <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
+      <ht key="#{this.member_class.name.tableize}.collection.empty_message">
+        No <collection-name lowercase/> to display
+      </ht>
+    </div>
+  </unless>
 </def>
 
 
@@ -39,7 +41,8 @@ The `<li>` tags are automatically given a 'model ID' CSS class, which means the 
   <empty-collection-message param="empty-message"/>
 </def>
 
-<!-- Renders a comma separated list of any fields passed in the `fields` attribute that are true (in the Ruby sense). For example, if a forum post had a boolean field `sticky`, this tag can be used to automatically label sticky posts "Sticky". Similarly, you could automatically add an "Administrator" label to the user's home page (this is seen in the default Hobo app).  -->
-<def tag="record-flags" attrs="fields"><%=
-  comma_split(fields).select { |f| this.send(f) }.map { |f| f.titleize }.join(', ')
+<!-- Renders a `separator` separated list of any fields passed in the `fields` attribute that are true (in the Ruby sense). For example, if a forum post had a boolean field `sticky`, this tag can be used to automatically label sticky posts "Sticky". Similarly, you could automatically add an "Administrator" label to the user's home page (this is seen in the default Hobo app).  -->
+<def tag="record-flags" attrs="fields, separator"><%=
+  separator ||= ', '
+  comma_split(fields).select { |f| this.send(f) }.map { |f| this.class.human_attribute_name(f) }.join(separator)
 %></def>

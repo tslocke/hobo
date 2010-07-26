@@ -18,6 +18,8 @@
    - disable: render the input as normal, but add HTML's `disabled` attribute
    - skip: render nothing at all. This will omit the entire row (including the label)
    - ignore: render the input normally. That is, don't even perform the edit check.
+   
+ - no-blanks: (boolean) Controls the behavior of `<view>` tags. The entire row (including the label) will be omitted if `this` is blank. Default false.
 
 ### Example
 
@@ -28,14 +30,14 @@
     </field-list>
 
 -->
-<def tag="field-list" attrs="tag, no-edit">
+<def tag="field-list" attrs="tag, no-edit, no-blanks">
   <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
     <% field_name = this_field_name 
        input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
-      <labelled-item unless="&tag == 'input' && no_edit == 'skip' && !can_edit?">
+      <labelled-item unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
         <item-label param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
@@ -108,7 +110,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">
           <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-            <th param="#{scope.field_name}-heading"><%= (this.member_class.try.view_hints.try.field_name(scope.field_name) || scope.field_name.titleize) if scope %></th>
+            <th param="#{scope.field_name}-heading"><%= this.member_class.human_attribute_name(scope.field_name) if scope %></th>
           </with-field-names>
           <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
@@ -122,7 +124,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
                 <td param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
-                <a param="edit-link" action="edit" if="&can_edit?"><ht key="hobo.action.edit">Edit</ht></a>
+                <a param="edit-link" action="edit" if="&can_edit?"><t key="hobo.action.edit">Edit</t></a>
                 <delete-button param/>
               </td>
             </if>
@@ -224,7 +226,7 @@ Provides a short hand way of displaying images in public/images
 <def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
   
-  name = type.respond_to?(:view_hints) ? type.view_hints.model_name : type.name
+  name = type.respond_to?(:human_name) ? type.human_name : type.name
   name = dasherize ? name.underscore.dasherize : name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
@@ -467,17 +469,17 @@ Assuming the context is a blog post...
 <!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
 <def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.join(", ") %></def>
 
-<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
-<def tag="view" for="Date" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a locale key or a standard format string (see strftime) -->
+<def tag="view" for="Date" attrs="format"><%= this && (format||= :default) && I18n.backend.localize(I18n.locale, this, format) %></def>
 
-<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
-<def tag="view" for="Time" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a locale key or a standard format string (see strftime) -->
+  <def tag="view" for="Time" attrs="format"><%= this && (format||= :default) && I18n.backend.localize(I18n.locale, this, format) %></def>
 
-<!-- Renders `this.to_s(:long)`, or `this.strftime(format)` if the `format` attribute is given -->
-<def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format ? this.strftime(format) : this.to_s(:long)) %></def>
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a locale key or a standard format string (see strftime) -->
+<def tag="view" for="ActiveSupport::TimeWithZone" attrs="format"><%= this && (format||= :default) && I18n.backend.localize(I18n.locale, this, format) %></def>
 
-<!-- Renders `this.to_s`, or `format % this` if the `format` attribute is given -->
-<def tag="view" for="Numeric" attrs="format"><%= format ? format % this : this.to_s %></def>
+<!-- Renders localized `number_with_delimiter this`, or `format % this` if the `format` attribute is given -->
+<def tag="view" for="Numeric" attrs="format"><%= format ? format % this : number_with_delimiter(this) %></def>
 
 <!-- Renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
 <def tag="view" for="string"><%= 
@@ -496,7 +498,7 @@ Assuming the context is a blog post...
 
 
 <!--
-A convenience tag used to output a count and a correctly pluralised label. Works with any kind of collection such as an `ActiveRecord` association or an array.
+A convenience tag used to output a count summary with a correctly localized and pluralised label. Works with any kind of collection such as an `ActiveRecord` association or an array.
 
 ### Usage
 
@@ -507,13 +509,48 @@ A convenience tag used to output a count and a correctly pluralised label. Works
 The label can be customised using the `label` attribute, e.g.
 
     <count:comments label="blog post comment"/> -> <span class="count">12 blog post comments</span>
+    
+You can pass a summary attribute, which will generate a complete localized sentence. It allows 2 options:
+  - boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file. 
+    If the lookup fails, it will fallback to the english default sentences consistent with the count.
+  - String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file. 
+    If the lookup fails, it will fallback to the english default sentences consistent with the count.
+
+### Examples
+
+    it:
+      tags:
+        count:
+          default:
+            zero: "Non ci sono {{label}}"
+            one: "C'è solo 1 {{label}}"
+            other: "Ci sono {{count}} {{label}}"
+          choice:
+            zero: "Non ci sono {{label}} da scegliere"
+            one: "Puoi scegliere solo una {{label}}"
+            other: "Puoi scegliere tra {{count}} {{label}}" 
+   
+    with :en locale and boolean summary (internal defaults)
+    <count:comments summary/> -> <span class="count">There is 1 Comment</span>
+    <count:viewings summary/> -> <span class="count">There are 3 Viewings</span>
+    (note: just add the locale english strings to use like the following examples)
+
+    with :it locale and boolean summary (key "tags.count.default")
+    <count:comments summary/> 
+    -> count => 0 -> <span class="count">Non ci sono Commenti</span>
+    -> count => 1 -> <span class="count">C'è solo 1 Commento</span>
+    -> count => 5 -> <span class="count">Ci sono 5 Commenti</span>
+    
+    with :it locale and summary="choice" (key "tags.count.choice")
+    <count:comments summary="choice"/> 
+    -> count => 0 -> <span class="count">Non ci sono Commenti da scegliere</span>
+    -> count => 1 -> <span class="count">Puoi scegliere solo 1 Commento</span>
+    -> count => 5 -> <span class="count">Puoi scegliere tra 5 Commenti</span>
 
 ### Additional Notes
 
-* Use the `prefix` attribute to insert words before the count. If the prefix is "are" or "is" then it will be pluralised if needed:
+* The `prefix` attribute is deprecated: use summary instead.
 
-        There <count:comments prefix="are"/> -> There <span class="count">is 1 Comment</span>
-        There <count:viewings prefix="are"/> -> There <span class="count">are 3 Viewings</span>
 * Use the `lowercase` attribute to force the generated label to be lowercase:
 
         <count:comments lowercase/> -> <span class="count">1 comment</span>
@@ -521,33 +558,39 @@ The label can be customised using the `label` attribute, e.g.
 
         <count:comments if-any/><else>There are no comments</else>
 -->
-<def tag="count" attrs="label, prefix, if-any, lowercase"><span class="count"><%=
+<def tag="count" attrs="summary, label, if-any, lowercase, prefix"><span class="count"><%=
   raise Exception.new("asked for count of a string") if this.is_a?(String)
-   
+  Rails.logger.warn('The "prefix" attribute is deprecated: please, use a locale string') unless prefix.blank?
+
   c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
 
-  label ||= if this.is_a?(Class)
-              this.view_hints.model_name
-            elsif (attr = this.try.origin_attribute)
-              this.member_class.view_hints.field_name(attr).singularize
+  # generated label will be pluralized
+  label ||= case
+            when this.is_a?(Class)
+              this.human_name(:count=>c)
+            when (attr = this.try.origin_attribute)
+              this.member_class.human_attribute_name(attr)
             else
-              this.member_class.view_hints.model_name
-            end.titleize
+              this.member_class.human_name(:count=>c)
+            end
 
   label = label.downcase if lowercase
-   
+
   Dryml.last_if = c > 0 if if_any
   if if_any && c == 0
     ""
   else
-    main = label.blank? ? c : pluralize(c, label)
-   
-    if prefix.in? %w(are is)
-      prefix = c == 1 ? "is" : "are"
+    if summary.blank?  # old behaviour
+      main = label.blank? ? c : "#{c} #{label}"
+      if prefix.in? %w(are is)
+        prefix = c == 1 ? "is" : "are"
+      end
+      (prefix ? "#{prefix} #{main}" : main.to_s)
+    else
+      key = summary.kind_of?(String) ? summary : "default"
+      default = c == 1 ? "There is 1 #{label}" : "There are #{c} #{label}"
+      I18n.t "tags.count.#{key}", {:count=>c, :label=>label, :default=>default}.merge(attributes)
     end
-
-    (prefix ? "#{prefix} #{main}" : main.to_s)
-
   end
 %></span></def>
 
@@ -570,27 +613,138 @@ The context should be a user object. If `this == current_user` the "you" form is
  - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
  - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
 
+The tag is also localized in the namespaces "tags.you.current_user" and "tags.you.other_user". 
+Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes, 
+and "nothing" used when no attribute is passed. But you can also use your own keys, providing 
+that you add the keys in the correct namespaces. 
+
+### Examples
+
+    it:
+      tags:
+        you:
+          current_user:
+            nothing: "Tu"
+            have: "Hai"
+            are: "sei"
+            can: "Puoi"
+          other_user:
+            nothing: "{{name}}"
+            have: "{{name}} ha"
+            are: "{{name}} è"
+            can: "{{name}} può"
+
+ - `<you have/> un nuovo messaggio.` -> "Hai un nuovo messaggio." or "Jim ha un nuovo messaggio."
+ - `Adesso <you are/> amministratore.` -> "Adesso sei amministratore." or "Adesso Jim è amministratore."
+ - `<you can/> scrivere.` -> "Puoi scrivere." or "Jim può scrivere."
+
+(note: :name is added by default as an interpolable variable)
+
 ### Attributes
 
- - titleize: render "You" instead of "you"
-  
+ - capitalize: the first letter of the resulting sentence will be capitalized
+
 -->
-<def tag="you" attrs="have, are, do, titleize"><if test="&this == current_user"><%= "#{titleize ? 'Y' : 'y'}ou#{' have' if have}#{' are' if are}#{' do' if do_}" %></if><else><do param="default"><name/><%= "#{' has' if have}#{' is' if are}#{' does' if do_}" %></do></else></def>
-
-<!-- Equivalent to `<you titleize/>`. Yes it's an abuse of Ruby naming conventions, but it's so cute : ) -->
-<def tag="You"><you merge titleize/></def>
-
-<!--  Similar to `<you>`, but renders "Your" or "Fred's" -->
-<def tag="your">
-  <if test="&this == current_user">your</if>
-  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
+<def tag="you" attrs="titleize, capitalize">
+  <% Rails.logger.warn "'titleize' is a deprecated attribute of the 'you' tag. Please, use 'capitalize' instead." -%>
+  <% raise ArgumentError, "You can add only one attribute-key to the 'you' tag." if attributes.size > 1 -%>
+  <% k = case
+         when attributes[:have] then 'have'
+         when attributes[:are] then 'are'
+         when attributes[:do] then 'do'
+         end -%>
+  <if test="&this == current_user">
+    <%= s = I18n.t("tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
+       (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
+  </if>
+  <else>
+    <do param="default">
+      <%= s = I18n.t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name, 
+          :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}") 
+          (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
+    </do>
+  </else>
 </def>
 
-<!-- Capitalised versin of `<your>` -->
-<def tag="Your">
-  <if test="&this == current_user">Your</if>
-  <else><do param="default"><%= n = name; n.ends_with?('s') ? "#{n}'" : "#{n}'s" %></do></else>
-</def>
+<!-- Equivalent to `<you capitalize/>`-->
+<def tag="You"><you merge capitalize/></def>
+
+<!-- Similar to `<you>`, but renders "Your" or "Fred's" or equivalent localized strings
+
+### Attributes
+
+ - capitalize: the first letter of the resulting sentence will be capitalized
+ - count: used in pluralization. If omitted it will be set to 1.
+ - key: used to lookup the translation in the locale file. It allows 3 different options: 
+   - single key like 'message': simple translation in 'tags.your.message.current_user' 
+     or 'tags.your.message.other_user'
+   - composite key like 'any.namespace.message': translation as for the previous case, but it will
+     translate also the 'any.namespace.message' and will interpolate the variable <key> (in this case :message)
+     in the translation
+   - when key is omitted it will be set to "default" and will do the translation with that key. 
+     Pass other meaningful attributes to achieve a dynamic usage
+ - any other attribute passed to the tag will be used as a variable for interpolation
+ 
+Notes
+
+ - The :name variable is added by default as an interpolable variable
+ - If no translation is found an automatic (only english) default is generated: 
+   the Your/Jim's string, joined to the tag content.
+   If you pass an explicit 'default' attribute you will override the automatic default. 
+
+ 
+### Examples
+
+    it:
+      tags:
+        your:
+          message:
+            current_user: 
+              one: "Tuo Messaggio"
+              other: "Tuoi Messaggi"
+            other_user:
+              one: "Messaggio di {{name}}"
+              other: "Messaggi di {{name}
+          entry:
+            current_user:
+              one: "Tua {{entry}}"
+              other: "Tue {{entry}}"
+            other_user: "{{entry}} di {{name}}"
+              
+ - `<your key="message" count=>"&messages.count"/>` 
+   -> count => 1 -> "Tuo Messaggio" or "Messaggio di Jim"
+   -> count => 5 -> "Tuoi Messaggi" or "Messaggi di Jim"
+ 
+ - `<your key="activerecord.models.entry" count=>"&this.entries.count"/>` 
+   -> count => 1 -> "Tua Entrata" or "Entrata di Jim"
+   -> count => 5 -> "Tue Entrate" or "Entrate di Jim"
+
+ - `<your>Posts</your>` -> "your Posts" or "Jim's Posts"
+ -->
+
+<def tag="your" attrs="key, capitalize"><%=
+   key ||= 'default'
+   # prepare symbolized attributes for merging
+   attrs = {}
+   attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+   d = "#{your_default} #{all_parameters.default}"
+   options = {:default=>[d], :count=>(attrs[:count]||1), :name=>this.name}
+   your_key = key.split('.').last
+   unless key.eql?(your_key) || attrs.has_key?(your_key.to_sym)
+     options[your_key.to_sym] = I18n.t(key, :count=>options[:count], :default=>your_key.titleize)
+   end
+   s = if this == current_user
+         options[:default].unshift :"tags.your.default.current_user"
+         I18n.t("tags.your.#{your_key}.current_user", options.merge(attrs))
+       else
+         options[:default].unshift :"tags.your.default.other_user"
+         I18n.t("tags.your.#{your_key}.other_user", options.merge(attrs))
+       end
+   capitalize ? s.sub(/^./){|c| c.upcase} : s
+%></def>
+
+<!-- Equivalent to `<your ... capitalize/>`-->
+<def tag="Your"><your merge capitalize/></def>
 
 <!-- Deprecated. It's harder than you think to do this (e.g. an umbrealla, an user)
 -->
@@ -613,7 +767,7 @@ The context should be a user object. If `this == current_user` the "you" form is
 <def tag="dev-user-changer">
   <set user="&Hobo::User.default_user_model"/>
   <select-menu if="&user && RAILS_ENV == 'development'"
-               first-option="#{ht('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
+               first-option="#{I18n.t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
                onchange="location.href = '#{dev_support_path}/set_current_user?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"
                selected="#{current_user.login}"
                class="dev-user-changer"

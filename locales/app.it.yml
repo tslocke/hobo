@@ -1,0 +1,200 @@
+it:
+
+  strings:
+    unit_price: "Prezzo Unitario:"
+    total_price: "Prezzo Totale:"
+    total_commission: "Commissione Totale:"
+    active: &active Attivo
+    expired: &expired Scaduto
+    no_customer_found: "Nessun Cliente trovato"
+    state:
+      expired: "- scaduta -"
+      just_used: "- appena usata -"
+      void_membership: "Rinnovare Iscrizione!"
+      empty: "- vuota -"
+    enter: "Entra"
+    use: "Usa"
+    ### new subscription form
+    new_subscription: "Nuovo Abbonamento"
+    quantity: "Quantità:"
+    expires_at: "Scade il:"
+    timetable: "Orario:"
+    no_active_membership: "(Nessuna Iscrizione Attiva: qualche Abbonamento non sarà disponiile fino a che non si aggiungerà l'Iscrizine)"
+    select_menu_first_option: "-- seleziona --"
+    
+  subscription_validation:
+    subscription_type_needed: "Specificare il tipo di Abbonamento"
+    no_quantity_needed: "non necessaria per questo tipo di Abbonamento"
+    quantity_needed: "necessaria per questo tipo di Abbonamento"
+    price_needed: "necessario per questo tipo di de Abbonamento"
+    membership_needed: "Iscrizione necessario per questo tipo di Abbonamento"
+    no_membership_needed: "L'Iscrizione del Cliente è ancora attiva"
+    
+
+  tags:
+  
+    count:
+      default:
+        zero: "Non ci sono {{label}}"
+        one: "C'è solo 1 {{label}}"
+        other: "Ci sono {{count}} {{label}}"
+    
+    you:
+      current_user:
+      other_user:
+      
+    your:
+      roles:
+        current_user:
+          one: "Il tuo Ruolo"
+          other: "I tuoi Ruoli"
+        other_user:
+          one: "Ruolo di {{name}}"
+          other: "Ruoli di {{name}}"
+      subscriptions:
+        current_user:
+          one: "Il tuo Abbonamento"
+          other: "I tuoi Abbonamenti"
+        other_user:
+          one: "Abbonamento di {{name}}"
+          other: "Abbonamenti di {{name}}"
+      month_commissions:
+        current_user:
+          one: "Tua Commissione del Mese"
+          other: "Tue Commissioni del Mese"
+        other_user:
+          one: "Commissione del Mese per {{name}}"
+          other: "Commissioni del Mese per {{name}}"
+      total_month_commissions:
+        current_user:
+          zero: "Non hai Comissioni"
+          one: "La tua Commissione è"
+          other: "Il totale delle tue Commissioni è"
+        other_user:
+          zero: "{{name}} non ha Commissioni"
+          one: "La Commissione di {{name}} è"
+          other: "Il totale delle Commissioni di {{name}} es"
+    
+    filter_menu:
+      period:
+        no_filter: "Tutti i Periodi"
+        options:
+        - [ "Oggi", "today" ]
+        - [ "Ieri", "yesterday" ]
+        - [ "Settimana Corrente", "current_week" ]
+        - [ "Settimana Scorsa", "last_week"]
+        - [ "Mese Corrente", "current_month" ]
+        - [ "Mese Scorso", "last_month" ]
+      user:
+        no_filter: "Tutti gli Utenti"
+      status:
+        no_filter: "Tutti gli Stati"
+        options:
+        - [ *active, "active" ]
+        - [ *expired, "expired" ]
+     
+      
+  user/locales:
+    it: "Italiano"
+    "es-DO": "Español"
+    en: "English"
+
+
+  activerecord:
+
+    models:
+
+      user:
+        one: &user Utente
+        other: &users Utenti
+
+      customer:
+        one: &customer Cliente
+        other: &customers Clienti
+
+      contract:
+        one: &contract Contratto
+        other: &contracts Contratti
+
+      subscription: &subscriptions_all
+        one: &subscription Abbonamento
+        other: &subscriptions Abbonamenti
+
+      entry: &entry_all
+        one: &entry Entrata
+        other: &entries Entrate
+
+      role: &roles_all
+        one: &role Ruolo
+        other: &roles Ruoli
+
+
+
+    attributes:
+
+      user:
+        created_at: &created_at "Creazione"
+        name: &name "Nome"
+        password: Parola Chiave
+        password_confirmation: Conferma Parola Chiave
+        email_address: Indirizzo Elettronico
+        locale: "Lingua"
+        roles: 
+          <<: *roles_all
+        subscriptions:
+          <<: *subscriptions_all
+
+      customer:
+        created_at: *created_at
+        name: *name
+        birth_date: Data di Nascita
+        address: Indirizzo
+        phone: Telefono
+        email_address: Indirizzo Elettronico
+        certificate_date: Data Certificato
+        serial: Serie
+
+        Customer: *customer
+        subscriptions: 
+          <<: *subscriptions_all
+
+      contract: &contract_data
+        created_at: *created_at
+        name: *name
+        duration: Durata
+        commission_rate: Tasso di Commissione
+        price: Prezzo
+        membership: Iscrizione
+        membership_required: Iscrizione Obbligatoria
+        quantity_limited: Limitato in Quantità
+        time_limited: Limitato in Orario
+        custom_price: Prezzo Personalizzato
+        from_time: Dalle ore
+        to_time: Alle ore
+        timetable: Orario
+
+      subscription:
+        <<: *contract_data
+        ends_at: Scadenza
+        quantity: Quantità
+        commission: Commissione
+
+        Subscription: *subscription
+        entries:
+          <<: *entry_all
+        customer: *customer
+        user_name: *user
+        status: Stato
+
+      entry:
+        created_at: *create_at
+        name: *name
+
+        Entry: *entry
+        subscription_customer: *customer
+        subscription: *subscription
+
+    # just to show a stupid example
+    attribute_help:
+      user:
+        locale: "Scegli la tua lingua"

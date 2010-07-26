@@ -242,7 +242,7 @@ module Hobo
       if field
         # Field can be a dot separated path
         if field.is_a?(String) && (path = field.split(".")).length > 1
-          _, _, object = Hobo.get_field_path(object, path[0..-2])
+          _, _, object = Dryml.get_field_path(object, path[0..-2])
           field = path.last
         end
       elsif (origin = object.try.origin)
@@ -401,15 +401,19 @@ module Hobo
     # --- ViewHint Helpers --- #
     
     def this_field_name
-      this_parent.class.try.view_hints.try.field_name(this_field) || this_field
+      this_parent.class.try.human_attribute_name(this_field) || this_field
     end
 
     def this_field_help
-      key = "#{this_parent.class.try.name.tableize}.hints.#{this_field.to_s}"
-      default = this_parent.class.try.view_hints.try.field_help[this_field.to_sym] || ""
-      Hobo::Translations.ht(key, :default=>default)
+      this_parent.class.try.attribute_help(this_field.to_sym) || ""
     end
 
+
+    # --- default Helpers --- #
+    
+    def your_default
+      this == current_user ? "Your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
+    end
 
     # --- Debugging Helpers ---- #
 

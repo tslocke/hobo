@@ -91,7 +91,10 @@ module Hobo
     public
 
     def enable
-      require 'action_view_extensions/helpers/tag_helper'
+      require 'hobo_extensions/action_view/helpers/tag_helper'
+      require 'hobo_extensions/array'
+      require 'hobo_extensions/enumerable'
+      require 'hobo_extensions/active_record/base'
 
       # Modules that must *not* be auto-reloaded by activesupport
       # (explicitly requiring them means they're never unloaded)
@@ -144,33 +147,6 @@ module Hobo
 end
 
 
-# Add support for type metadata to arrays
-class ::Array
-
-  attr_accessor :member_class, :origin, :origin_attribute
-
-  def to_url_path
-    base_path = origin_object.try.to_url_path
-    "#{base_path}/#{origin_attribute}" unless base_path.blank?
-  end
-
-  def typed_id
-    origin and origin_id = origin.try.typed_id and "#{origin_id}:#{origin_attribute}"
-  end
-
-end
 
 
-module ::Enumerable
-  def group_by_with_metadata(&block)
-    r=group_by_without_metadata(&block)
-    r.each do |k,v|
-      v.origin = origin
-      v.origin_attribute = origin_attribute
-      v.member_class = member_class
-    end
-    r
-  end
-  alias_method_chain :group_by, :metadata
-end
 
