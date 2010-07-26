@@ -1,11 +1,11 @@
 module Hobo
-  
+
   class ViewHints
-    
+
     def self.enable
       ActiveSupport::Dependencies.load_paths |= ["#{RAILS_ROOT}/app/viewhints"]
     end
-  
+
     def self.setter(name, default=nil, &block)
       ivname = name.to_s.remove(/\?$/)
       metaclass.send :define_method, name do |*args|
@@ -16,7 +16,7 @@ module Hobo
             instance_variable_set("@#{ivname}", val)
           end
           val
-        else 
+        else
           arg = if block
                   instance_exec(*args, &block)
                 else
@@ -36,7 +36,7 @@ module Hobo
       end
       args
     end
-    
+
     setter :parent,         nil do |*args|
       options = args.extract_options!
       parent_defined(true) unless options[:undefined]
@@ -44,10 +44,10 @@ module Hobo
     end
 
     setter :parent_defined, nil
-    
+
     setter :paginate?,    proc { !sortable? }
-    
-    setter :sortable?,    proc { defined?(ActiveRecord::Acts::List::InstanceMethods) && 
+
+    setter :sortable?,    proc { defined?(ActiveRecord::Acts::List::InstanceMethods) &&
                                  model < ActiveRecord::Acts::List::InstanceMethods &&
                                  model.new.try.scope_condition == "1 = 1" }
 
@@ -62,28 +62,25 @@ module Hobo
     # Accessors
 
     class << self
-      
-      ##### legacy code to remove some day
-      include Hobo::LegacyI18nMethods
-    
+
       def _name
         @_name ||= name.sub(/Hints$/, '')
       end
-      
+
       def model
         @model ||= _name.constantize
       end
-        
+
       def primary_children
         children.first
       end
-      
+
       def secondary_children
         children.rest
       end
-      
+
     end
-    
+
   end
-  
-end    
+
+end
