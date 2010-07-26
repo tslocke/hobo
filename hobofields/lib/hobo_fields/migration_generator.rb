@@ -70,8 +70,8 @@ module HoboFields
 
 
     def load_rails_models
-      if defined? RAILS_ROOT
-        Dir["#{RAILS_ROOT}/app/models/**/[a-z0-9_]*.rb"].each do |f|
+      if defined? Rails.root
+        Dir["#{Rails.root}/app/models/**/[a-z0-9_]*.rb"].each do |f|
           _, filename = *f.match(%r{/app/models/([_a-z0-9/]*).rb$})
           filename.camelize.constantize
         end
