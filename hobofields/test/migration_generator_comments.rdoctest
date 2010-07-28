@@ -1,0 +1,81 @@
+# HoboFields - Migration Generator Comments
+
+Our test requires to prepare the testapp for a different environment:
+{.hidden}
+
+    doctest_require: ENV["RAILS_ENV"] = 'mysql_test'; 'prepare_testapp'
+
+    >> system "cd #{TEST_APP_ROOT} && rake db:setup"
+    => true
+
+    >> p Rails.env
+    >>
+     def nuke_model_class(klass)
+      ActiveRecord::Base.instance_eval { class_variable_get('@@subclasses')[klass.superclass].delete(klass) }
+      Object.instance_eval { remove_const klass.name.to_sym }
+     end
+
+{.hidden}
+
+
+## Comments
+
+Comments can be added to tables and fields with HoboFields.
+
+    >>
+     class Product < ActiveRecord::Base
+       fields do
+         name :string, :comment => "short name"
+         description :string
+       end
+     end
+    >> Rails.env
+    => "mysql_test"
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+
+These comments will be saved to your schema if you have the [column_comments](http://github.com/bryanlarsen/column_comments) plugin installed.  If you do not have this plugin installed, the comments will be available by querying `field_specs`:
+
+    >> Product.field_specs["name"].comment
+    => "short name"
+
+The plugin [activerecord-comments](http://github.com/bryanlarsen/activerecord-comments) may be used to get the comments from the database directly.  If the plugin is installed, use this instead:
+
+    Product.column("name").comment
+
+Because it will be quite common for people not to have both [column_comments](http://github.com/bryanlarsen/column_comments) and [activerecord-comments](http://github.com/bryanlarsen/activerecord-comments) installed, it is impossible for HoboFields to determine the difference between no previous comment and a previously missing plugin.   Therefore, HoboFields will not generate a migration if the only change was to add a comment.  HoboFields will generate a migration for a comment change, but only if the plugin is installed.
+
+    >> require 'activerecord-comments'
+
+    >> # manually add comment as the column_comments plugin would
+    >> Product.connection.execute "alter table `products` modify `name` varchar(255) default null comment 'short name';"
+
+    >>
+     class Product < ActiveRecord::Base
+       fields do
+         name :string, :comment => "Short namex"
+         description :string, :comment => "Long name"
+       end
+     end
+    >> up, down = HoboFields::MigrationGenerator.run
+    >> up
+    >> up.split(',').slice(0,3).join(',')
+    => 'change_column :products, :name, :string'
+    >> up.split(',').slice(3,2).sort.join(',')
+    => " :comment => \"Short namex\", :limit => 255"
+
+
+Cleanup
+{.hidden}
+
+    >> nuke_model_class(Product)
+    >> ActiveRecord::Base.connection.execute "drop table `products`;"
+    >> system "cd #{TEST_APP_ROOT} && rake db:drop RAILS_ENV=mysql_test"
+{.hidden}
+
+Final Cleanup
+{.hidden}
+
+  >> FileUtils.rm_rf  TEST_APP_ROOT
+
+{.hidden}
+
