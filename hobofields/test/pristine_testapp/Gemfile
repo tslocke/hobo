@@ -31,3 +31,4 @@ gem 'hobosupport', :path => File.expand_path('../../../../hobosupport', __FILE__
 gem 'hobofields', :path => File.expand_path('../../../../hobofields', __FILE__)
 gem 'bluecloth'
 gem 'RedCloth', :require => 'redcloth'
+gem 'mysql'
