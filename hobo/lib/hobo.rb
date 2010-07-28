@@ -17,7 +17,7 @@ class HoboError < RuntimeError; end
 module Hobo
 
   VERSION = "1.1.0.pre0"
-  
+
   class PermissionDeniedError < RuntimeError; end
 
   class RawJs < String; end
@@ -87,14 +87,14 @@ module Hobo
       # Any directory inside app/controllers defines a subsite
       @subsites ||= Dir["#{RAILS_ROOT}/app/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
     end
-    
+
     public
 
     def enable
-      require 'hobo_extensions/action_view/helpers/tag_helper'
-      require 'hobo_extensions/array'
-      require 'hobo_extensions/enumerable'
-      require 'hobo_extensions/active_record/base'
+      require 'hobo/extensions/action_view/helpers/tag_helper'
+      require 'hobo/extensions/array'
+      require 'hobo/extensions/enumerable'
+      require 'hobo/extensions/active_record/base'
 
       # Modules that must *not* be auto-reloaded by activesupport
       # (explicitly requiring them means they're never unloaded)
@@ -109,7 +109,7 @@ module Hobo
       Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{RAILS_ROOT}/app/views/taglibs/auto")
       Hobo::Permissions.enable
       Hobo::ViewHints.enable
-      
+
       Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
 
       require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
