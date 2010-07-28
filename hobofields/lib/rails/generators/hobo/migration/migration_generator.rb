@@ -20,16 +20,16 @@ module Hobo
 
     source_root File.expand_path('../templates', __FILE__)
 
-    argument :migration_name,
+    argument :name,
              :type => :string,
-             :default => HoboFields::MigrationGenerator.default_migration_name
+             :optional => true
 
     class_option :drop,
                  :aliases => '-d',
                  :type => :boolean,
                  :desc => "Don't prompt with 'drop or rename' - just drop everything"
 
-    class_option :name,
+    class_option :default_name,
                  :aliases => '-n',
                  :type => :boolean,
                  :desc => "Don't prompt for a migration name - just pick one"
@@ -68,7 +68,7 @@ module Hobo
                choose("\nWhat now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
 
       if action != 'c'
-        unless options[:name]
+        unless options[:default_name]
           say "\nMigration filename:"
           say "(you can type spaces instead of '_' -- every little helps)"
           final_migration_name = choose("Filename [#{migration_name}]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
@@ -108,44 +108,46 @@ module Hobo
     end
 
     def extract_renames!(to_create, to_drop, kind_str, name_prefix="")
-      return {} if options[:force_drop]
-
       to_rename = {}
-      rename_to_choices = to_create
-      to_drop.dup.each do |t|
-        while true
-          if rename_to_choices.empty?
-            say "\nCONFIRM DROP! #{kind_str} #{name_prefix}#{t}"
-            resp = ask("Enter 'drop #{t}' to confirm or press enter to keep:")
-            if resp.strip == "drop " + t.to_s
-              break
-            elsif resp.strip.empty?
-              to_drop.delete(t)
-              break
-            else
-              next
-            end
-          else
-            say "\nDROP, RENAME or KEEP?: #{kind_str} #{name_prefix}#{t}"
-            say "Rename choices: #{to_create * ', '}"
-            resp = ask "Enter either 'drop #{t}' or one of the rename choices or press enter to keep:"
-            resp.strip!
 
-            if resp == "drop " + t
-              # Leave things as they are
-              break
-            else
-              resp.gsub!(' ', '_')
-              to_drop.delete(t)
-              if resp.in?(rename_to_choices)
-                to_rename[t] = resp
-                to_create.delete(resp)
-                rename_to_choices.delete(resp)
+      unless options[:drop]
+
+        rename_to_choices = to_create
+        to_drop.dup.each do |t|
+          while true
+            if rename_to_choices.empty?
+              say "\nCONFIRM DROP! #{kind_str} #{name_prefix}#{t}"
+              resp = ask("Enter 'drop #{t}' to confirm or press enter to keep:")
+              if resp.strip == "drop " + t.to_s
                 break
-              elsif resp.empty?
+              elsif resp.strip.empty?
+                to_drop.delete(t)
                 break
               else
                 next
+              end
+            else
+              say "\nDROP, RENAME or KEEP?: #{kind_str} #{name_prefix}#{t}"
+              say "Rename choices: #{to_create * ', '}"
+              resp = ask "Enter either 'drop #{t}' or one of the rename choices or press enter to keep:"
+              resp.strip!
+
+              if resp == "drop " + t
+                # Leave things as they are
+                break
+              else
+                resp.gsub!(' ', '_')
+                to_drop.delete(t)
+                if resp.in?(rename_to_choices)
+                  to_rename[t] = resp
+                  to_create.delete(resp)
+                  rename_to_choices.delete(resp)
+                  break
+                elsif resp.empty?
+                  break
+                else
+                  next
+                end
               end
             end
           end
@@ -157,6 +159,10 @@ module Hobo
     def choose(prompt, format)
       choice = ask prompt
       (choice =~ format) ? choice : choose(prompt, format)
+    end
+
+    def migration_name
+      name || HoboFields::MigrationGenerator.default_migration_name
     end
 
   end

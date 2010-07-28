@@ -1,0 +1,58 @@
+-*- indent-tabs-mode:nil; -*-
+
+# HoboFields - Migration Generator
+
+Our test requires to prepare the testapp:
+{.hidden}
+
+    doctest_require: 'prepare_testapp'
+
+{.hidden}
+
+And requires also that you enter the right choice when prompted. OK we're ready to get going.
+
+## Alternate Primary Keys
+
+### create
+   doctest: create table with custom primary_key
+   >>
+    class Foo < ActiveRecord::Base
+      fields do
+      end
+      set_primary_key "foo_id"
+    end
+   >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+   >> Foo.primary_key
+   => 'foo_id'
+
+### migrate from
+   doctest: rename from custom primary_key
+   >>
+    class Foo < ActiveRecord::Base
+      set_primary_key "id"
+    end
+   >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+   >> Foo.primary_key
+   => 'id'
+
+### migrate to
+
+   doctest: rename to custom primary_key
+   >>
+    class Foo < ActiveRecord::Base
+      set_primary_key "foo_id"
+    end
+   >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+   >> Foo.primary_key
+   => 'foo_id'
+
+### ensure it doesn't cause further migrations
+
+   doctest: check no further migrations
+   >> up, down = HoboFields::MigrationGenerator.run
+   >> up
+   => ""
+
+## Cleanup
+
+    >> FileUtils.rm_rf  TEST_APP_ROOT
