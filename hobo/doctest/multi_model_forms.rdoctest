@@ -20,7 +20,7 @@ Contents
     >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
     >> mysql_user = 'root'; mysql_password = ''
     >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobofields_doctest"
+    >> mysql_database = "hobo_fields_doctest"
     >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
     >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
@@ -28,13 +28,13 @@ Contents
                                                :host => "localhost", 
                                                :username => mysql_user, 
                                                :password => mysql_password)
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_fields/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_support/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
     >> require 'will_paginate'
     >> require 'will_paginate/finder'
-    >> require 'hobosupport'
-    >> require 'hobofields'
+    >> require 'hobo_support'
+    >> require 'hobo_fields'
     >> require 'hobo'
     >> Hobo::Model.enable
     >> HoboFields.enable

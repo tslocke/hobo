@@ -4,5 +4,5 @@ Rich field types and migration-generator for Rails.
 
 Part of the Hobo project
 
-http://hobocentral.net/hobofields
+http://hobocentral.net/hobo_fields
 

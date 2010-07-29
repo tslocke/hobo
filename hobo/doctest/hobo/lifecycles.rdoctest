@@ -19,8 +19,8 @@ First the junk to get us started:
     doctest_require: 'active_record'
     >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
     >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobofields/lib'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobosupport/lib'
+    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo_fields/lib'
+    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo_support/lib'
     >> require 'hobo'
     >> require 'hobo/model'
     >> ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
@@ -53,7 +53,7 @@ Now the friendship. For now we'll just declare the *invite* part of the lifecycl
 
 Now let's get the DB ready:
 
-        doctest_require: '../../../hobofields/lib/hobo_fields/migration_generator'
+        doctest_require: '../../../hobo_fields/lib/hobo_fields/migration_generator'
         >> up, down = HoboFields::MigrationGenerator.run
         >> ActiveRecord::Migration.class_eval up
         >> User.delete_all

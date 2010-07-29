@@ -1,6 +1,6 @@
 # HoboSupport - Hash extensions
 
-    doctest_require: '../../lib/hobosupport'
+    doctest_require: '../../lib/hobo_support'
 {.hidden}
 
 ## `Hash#select_hash`

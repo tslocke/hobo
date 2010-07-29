@@ -1,6 +1,6 @@
 HOBO_HOME = "#{File.dirname(__FILE__)}/../../../.."
-$:.unshift "#{HOBO_HOME}/hobosupport/lib"
-$:.unshift "#{HOBO_HOME}/hobofields/lib"
+$:.unshift "#{HOBO_HOME}/hobo_support/lib"
+$:.unshift "#{HOBO_HOME}/hobo_fields/lib"
 $:.unshift "#{HOBO_HOME}/hobo/lib"
 
 require 'rubygems'
@@ -139,8 +139,8 @@ end
 # load hobo.  see https://gist.github.com/90542/0417ee6e71f0bed287824d47163c0e34ff4dc321
 # otherwise, this line should be in Models.init
 Models.create_database_sqlite3
-require 'hobosupport'
-require 'hobofields'
+require 'hobo_support'
+require 'hobo_fields'
 require 'hobo'
 
 

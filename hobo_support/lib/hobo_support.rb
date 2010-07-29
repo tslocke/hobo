@@ -1,9 +1,24 @@
+require 'active_support'
+require 'active_support/core_ext'
+
+require "hobo_support/fixes"
+require 'hobo_support/blankslate'
+require 'hobo_support/methodcall'
+require 'hobo_support/methodphitamine'
+require 'hobo_support/metaid'
+require 'hobo_support/implies'
+require 'hobo_support/enumerable'
+require 'hobo_support/array'
+require 'hobo_support/hash'
+require 'hobo_support/module'
+require 'hobo_support/string'
+
 module HoboSupport
 
-  VERSION = "1.1.0.pre0"
+  VERSION = "1.3.0.pre0"
 
   RAILS_VERSION_FLOAT = Object.const_defined?(:Rails) ? Rails::VERSION::STRING.match(/^\d+\.\d+/)[0].to_f : 0
-  
+
   RAILS_AT_LEAST_23 = (RAILS_VERSION_FLOAT >= 2.3)
 
 end
@@ -41,7 +56,7 @@ class String
 end
 
 module Kernel
-  
+
   def dbg(*args)
     puts "---DEBUG---"
     args.each do |a|

@@ -43,7 +43,7 @@ module Hobo
         end
       end
       
-      base.fields(false) # force hobofields to load
+      base.fields(false) # force hobo_fields to load
 
       included_in_class_callbacks(base)
     end
@@ -122,7 +122,7 @@ module Hobo
       ActiveRecord::Base.class_eval do
         def self.hobo_model
           include Hobo::Model
-          fields(false) # force hobofields to load
+          fields(false) # force hobo_fields to load
         end
         def self.hobo_user_model
           include Hobo::Model

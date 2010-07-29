@@ -1,6 +1,8 @@
 require 'active_record'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
-require File.dirname(__FILE__) + '/lib/hobo_support.rb'
+
+$:.unshift File.expand_path( '../lib', __FILE__)
+require 'hobo_support'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
@@ -8,7 +10,7 @@ RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    files=Dir['test/*.rdoctest','test/hobosupport/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    files=Dir['test/*.rdoctest','test/hobo_support/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
     exit(1) if !system("#{RUBYDOCTEST} --single #{files}")
   end
 end
@@ -18,12 +20,12 @@ end
 require 'jeweler'
 Jeweler::Tasks.new do |gemspec|
   gemspec.version      = HoboSupport::VERSION
-  gemspec.name         = "hobosupport"
+  gemspec.name         = "hobo_support"
   gemspec.email        = "tom@tomlocke.com"
   gemspec.summary      = "Core Ruby extensions from the Hobo project"
   gemspec.homepage     = "http://hobocentral.net/"
   gemspec.authors      = ["Tom Locke"]
-  gemspec.rubyforge_project = "hobosupport"
+  gemspec.rubyforge_project = "hobo_support"
 end
 Jeweler::GemcutterTasks.new
 Jeweler::RubyforgeTasks.new do |rubyforge|

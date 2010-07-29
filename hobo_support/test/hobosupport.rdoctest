@@ -4,20 +4,20 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
 [Hobo]: http://hobocentral.net
 
-    doctest_require: '../lib/hobosupport'
+    doctest_require: '../lib/hobo_support'
 {.hidden}
 
     >> HoboSupport::VERSION
-    => "1.1.0.pre0"
+    => "1.3.0.pre0"
 
 ## Contents
 
- * [Enumerable](/manual/hobosupport/enumerable)
- * [Hash](/manual/hobosupport/hash)
- * [Implies](/manual/hobosupport/implies)
- * [Metaid](/manual/hobosupport/metaid)
- * [Methodphitamine](/manual/hobosupport/methodphitamine)
- * [Module](/manual/hobosupport/module)
+ * [Enumerable](/manual/hobo_support/enumerable)
+ * [Hash](/manual/hobo_support/hash)
+ * [Implies](/manual/hobo_support/implies)
+ * [Metaid](/manual/hobo_support/metaid)
+ * [Methodphitamine](/manual/hobo_support/methodphitamine)
+ * [Module](/manual/hobo_support/module)
 
 ## Object extensions
 

@@ -1,6 +1,6 @@
 # gem dependencies
-require 'hobosupport'
-require 'hobofields'
+require 'hobo_support'
+require 'hobo_fields'
 begin
   require 'will_paginate'
 rescue MissingSourceFile
@@ -16,7 +16,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "1.1.0.pre0"
+  VERSION = "1.3.0.pre0"
 
   class PermissionDeniedError < RuntimeError; end
 

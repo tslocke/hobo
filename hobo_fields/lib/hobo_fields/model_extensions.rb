@@ -110,7 +110,7 @@ module HoboFields
     def self.declare_polymorphic_type_field(name, column_options)
       type_col = "#{name}_type"
       declare_field(type_col, :string, column_options)
-      # FIXME: Before hobofields was extracted, this used to now do:
+      # FIXME: Before hobo_fields was extracted, this used to now do:
       # never_show(type_col)
       # That needs doing somewhere
     end

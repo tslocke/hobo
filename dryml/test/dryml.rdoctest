@@ -3,9 +3,9 @@
         >> require 'active_support'
         >> require 'action_view'
         >> require 'action_controller'
-        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
+        >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_support/lib')
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../dryml/lib')
-        >> require 'hobosupport'
+        >> require 'hobo_support'
         >> require 'dryml'
         >> require 'dryml/template_handler'
         >> Dryml.enable

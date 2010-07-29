@@ -5,10 +5,10 @@ ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/proje
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
-$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')
-$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/lib')
-require 'hobosupport'
-require 'hobofields'
+$:.unshift File.expand_path('../../hobo_support/lib', __FILE__)
+$:.unshift File.expand_path('../lib', __FILE__)
+require 'hobo_support'
+require 'hobo_fields'
 
 namespace "test" do
   desc "Run the doctests"
@@ -28,14 +28,14 @@ end
 require 'jeweler'
 Jeweler::Tasks.new do |gemspec|
   gemspec.version      = HoboFields::VERSION
-  gemspec.name         = "hobofields"
+  gemspec.name         = "hobo_fields"
   gemspec.email        = "tom@tomlocke.com"
   gemspec.summary      = "Rich field types and migration generator for Rails"
   gemspec.homepage     = "http://hobocentral.net/"
   gemspec.authors      = ["Tom Locke"]
   gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("rails", [">= 2.2.2"])
-  gemspec.add_dependency("hobosupport", ["= #{HoboFields::VERSION}"])    
+  gemspec.add_dependency("rails", ["= 3.0.0.beta4"])
+  gemspec.add_dependency("hobo_support", ["= #{HoboFields::VERSION}"])
 end
 Jeweler::GemcutterTasks.new
 Jeweler::RubyforgeTasks.new do |rubyforge|

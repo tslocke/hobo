@@ -1,6 +1,6 @@
-= hobosupport
+= hobo_support
 
-* http://hobocentral.net/hobosupport
+* http://hobocentral.net/hobo_support
 
 == DESCRIPTION:
 
@@ -8,7 +8,7 @@ A mixed bag of core Ruby extenstion that have been extracted from the Hobo proje
 
 == INSTALL:
 
-* sudo gem install hobosupport
+* sudo gem install hobo_support
 
 == LICENSE:
 

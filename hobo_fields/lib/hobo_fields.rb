@@ -1,4 +1,4 @@
-require 'hobosupport'
+require 'hobo_support'
 require 'active_support/dependencies'
 
 ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__) ]
@@ -10,7 +10,7 @@ end
 
 module HoboFields
 
-  VERSION = "1.1.0.pre0"
+  VERSION = "1.3.0.pre0"
 
   require 'hobo_fields/railtie' if defined?(::Rails)
 

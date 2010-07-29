@@ -56,15 +56,15 @@ Note that the migration generator is interactive -- it can't tell the difference
 
 The simplest and recommended way to install HoboFields is as a gem:
 
-        $ gem install hobofields
+        $ gem install hobo_fields
 
 The source lives on GitHub as part of the main Hobo repo:
 
  - [http://github.com/tablatom/hobo](http://github.com/tablatom/hobo)
 
-To use hobofields as a plugin is not as simple as it should be.  You
+To use hobo_fields as a plugin is not as simple as it should be.  You
 will have to clone `git://github.com/tablatom/hobo` and then copy the
-`hobofields` subdirectory into `/vendors/plugins`
+`hobo_fields` subdirectory into `/vendors/plugins`
 
 ## Rich Types
 
@@ -72,19 +72,19 @@ In addition to the migration generator, HoboFields provides a Rich-Type mechanis
 
 Read more:
 
- - [HoboFields Rich Types](/manual/hobofields/rich_types)
+ - [HoboFields Rich Types](/manual/hobo_fields/rich_types)
 
 ## API
 
 HoboFields provides various API methods. Read more:
 
- - [HoboFields API](/manual/hobofields/hobofields_api)
+ - [HoboFields API](/manual/hobo_fields/hobo_fields_api)
 
 ## Migration Generator Details
 
 The migration generator doctests provide a lot more detail. They're not really that great as documentation because doctests run in a single irb session, and that doesn't fit well with the concept of a generator. Skip these unless you're really keen to see the details of the migration generator in action
 
- - [Migration Generator Details](/manual/hobofields/migration_generator)
+ - [Migration Generator Details](/manual/hobo_fields/migration_generator)
 
 ## About Doctests
 

@@ -7,7 +7,7 @@
 
 
 # gem dependencies
-require 'hobosupport'
+require 'hobo_support'
 require 'action_pack'
 require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
@@ -19,7 +19,7 @@ ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSup
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
-    VERSION = "1.1.0.pre0"
+    VERSION = "1.3.0.pre0"
 
     class DrymlSyntaxError < RuntimeError; end
       
