@@ -91,11 +91,7 @@ module Hobo
     public
 
     def enable
-      require 'hobo/extensions/action_view/helpers/tag_helper'
-      require 'hobo/extensions/array'
-      require 'hobo/extensions/enumerable'
-      require 'hobo/extensions/active_record/base'
-
+      require 'hobo/extensions'
       # Modules that must *not* be auto-reloaded by activesupport
       # (explicitly requiring them means they're never unloaded)
       require 'hobo/model_router'
