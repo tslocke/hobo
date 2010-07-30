@@ -1,7 +1,5 @@
 require 'hobo'
 require 'rails'
-require 'rails/generators'
-
 
 module Hobo
   class Engine < Rails::Engine
@@ -31,12 +29,11 @@ module Hobo
    #   Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{RAILS_ROOT}/app/views/taglibs/auto")
       Hobo::Permissions.enable
       Hobo::ViewHints.enable
-
-
-      HoboFields.never_wrap(Hobo::Undefined) if defined? HoboFields
-
     end
 
+    initialize 'hobo.hobo_fields' do
+      HoboFields.never_wrap(Hobo::Undefined) if defined? HoboFields
+    end
 
   end
 end

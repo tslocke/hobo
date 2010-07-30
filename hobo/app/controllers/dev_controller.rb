@@ -1,9 +1,9 @@
-class Hobo::DevController < ActionController::Base
+class DevController < ActionController::Base
 
   hobo_controller
 
   before_filter :developer_modes_only
-  
+
   def set_current_user
     model = params[:model] || Hobo::User.default_user_model
     self.current_user = if params[:login]
@@ -19,7 +19,7 @@ class Hobo::DevController < ActionController::Base
   def developer_modes_only
     # Belt and braces. In addition to this check, the routes only get
     # defined when developer_features? is true
-    render :text => "Permission Denied", :status => 403 unless Hobo.developer_features?
+    render :text => "Permission Denied", :status => 403 unless Rails.application.config.hobo.developer_features
   end
 
 end
