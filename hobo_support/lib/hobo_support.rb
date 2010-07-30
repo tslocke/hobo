@@ -1,5 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext'
+require 'active_support/dependencies'
 
 require "hobo_support/fixes"
 require 'hobo_support/blankslate'
