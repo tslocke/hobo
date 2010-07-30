@@ -1,32 +1,3 @@
-if defined? ActionController::Routing::RouteSet
-
-  class ActionController::Routing::RouteSet
-    # Monkey patch this method so routes are reloaded on *every*
-    # request. Without this Rails checks the mtime of config/routes.rb
-    # which doesn't take into account Hobo's auto routing
-
-    def reload_with_hobo_routes
-      if Hobo::ModelRouter.reload_routes_on_every_request
-        load!
-      else
-        reload_without_hobo_routes
-      end
-    end
-    alias_method_chain :reload, :hobo_routes
-
-    # temporay hack -- reload assemble.rb whenever routes need reloading
-    def reload_with_hobo_assemble
-      if defined? ::ApplicationController
-        load "#{RAILS_ROOT}/app/assemble.rb" if File.exists? "#{RAILS_ROOT}/app/assemble.rb"
-      end
-      reload_without_hobo_assemble
-    end
-    alias_method_chain :reload, :hobo_assemble
-
-  end
-
-end
-
 module Hobo
 
   class ModelRouter
@@ -55,7 +26,7 @@ module Hobo
         options[:method] ||= :get
         @linkable.member? linkable_key(klass, action, options)
       end
-      
+
       def called_from_generator?
         caller[-1] =~ /script[\/\\]generate:\d+$/ || caller[-1] =~ /script[\/\\]destroy:\d+$/
       end
@@ -78,7 +49,7 @@ module Hobo
         rescue MissingSourceFile => ex
           # must be on Rails 2.3.  Yay!
         end
-        
+
         # Add non-subsite, and all subsite routes
         [nil, *Hobo.subsites].each { |subsite| add_routes_for(map, subsite) }
 
@@ -117,8 +88,8 @@ module Hobo
 
 
     attr_reader :map, :model, :controller, :subsite
-    
-    
+
+
     def model
       controller.model
     end
@@ -196,7 +167,7 @@ module Hobo
           end
         end
       end
-    end 
+    end
 
     def web_method_routes
       controller.web_methods.each do |method|
