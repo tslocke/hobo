@@ -17,6 +17,7 @@ class HoboError < RuntimeError; end
 module Hobo
 
   VERSION = "1.3.0.pre0"
+  require 'hobo/engine'
 
   class PermissionDeniedError < RuntimeError; end
 
@@ -26,20 +27,11 @@ module Hobo
 
   class << self
 
-
     attr_accessor :current_theme
-    attr_writer :developer_features
-
-
-    def developer_features?
-      @developer_features
-    end
-
 
     def raw_js(s)
       RawJs.new(s)
     end
-
 
     def find_by_search(query, search_targets=nil)
       search_targets ||=
@@ -70,11 +62,6 @@ module Hobo
       end
     end
 
-    def add_routes(m)
-      Hobo::ModelRouter.add_routes(m)
-    end
-
-
     def simple_has_many_association?(array_or_reflection)
       refl = array_or_reflection.respond_to?(:proxy_reflection) ? array_or_reflection.proxy_reflection : array_or_reflection
       return false unless refl.is_a?(ActiveRecord::Reflection::AssociationReflection)
@@ -85,54 +72,9 @@ module Hobo
 
     def subsites
       # Any directory inside app/controllers defines a subsite
-      @subsites ||= Dir["#{RAILS_ROOT}/app/controllers/*"].map { |f| File.basename(f) if File.directory?(f) }.compact
-    end
-
-    public
-
-    def enable
-      require 'hobo/extensions'
-      # Modules that must *not* be auto-reloaded by activesupport
-      # (explicitly requiring them means they're never unloaded)
-      require 'hobo/model_router'
-      require 'hobo/undefined'
-      require 'hobo/user'
-      require 'dryml'
-      require 'dryml/template'
-      require 'dryml/dryml_generator'
-
-      Hobo::Model.enable
-      Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{RAILS_ROOT}/app/views/taglibs/auto")
-      Hobo::Permissions.enable
-      Hobo::ViewHints.enable
-
-      Hobo.developer_features = RAILS_ENV.in?(["development", "test"]) if Hobo.developer_features?.nil?
-
-      require 'hobo/dev_controller' if RAILS_ENV == Hobo.developer_features?
-
-      ActionController::Base.send(:include, Hobo::ControllerExtensions)
-
-      HoboFields.never_wrap(Hobo::Undefined) if defined? HoboFields
-
-      ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
-    end
-
-  end
-
-  ControllerExtensions = classy_module do
-    def self.hobo_user_controller(model=nil)
-      @model = model
-      include Hobo::ModelController
-      include Hobo::UserController
-    end
-
-    def self.hobo_model_controller(model=nil)
-      @model = model
-      include Hobo::ModelController
-    end
-
-    def self.hobo_controller
-      include Hobo::Controller
+      @subsites ||= Dir["#{Rails.root}/app/controllers/*"].map do |f|
+                      File.basename(f) if File.directory?(f)
+                    end.compact
     end
 
   end

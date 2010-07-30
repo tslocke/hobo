@@ -16,7 +16,7 @@ module Hobo
         klass.extend(ClassMethods)
         klass.send(:include, Hobo::Translations)
         klass.class_eval do
-          before_filter :login_from_cookie 
+          before_filter :login_from_cookie
           alias_method_chain :redirect_to, :object_url
           around_filter do |controller, action|
             Thread.current['Hobo.current_controller'] = controller
@@ -119,20 +119,20 @@ module Hobo
 
       render :text => results + tag_renderer.part_contexts_storage
     end
-    
-    
+
+
     def tag_renderer
       @tag_renderer ||= begin
         @template.send(:_evaluate_assigns_and_ivars)
         Dryml.empty_page_renderer(@template)
       end
-    end    
-    
-    
+    end
+
+
     def call_tag(name, options={})
       tag_renderer.send(name, options)
     end
-    
+
     def site_search(query)
       results_hash = Hobo.find_by_search(query)
       all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
@@ -170,10 +170,3 @@ module Hobo
 end
 
 
-class ActionController::Base
-
-  def home_page
-    base_url
-  end
-
-end
