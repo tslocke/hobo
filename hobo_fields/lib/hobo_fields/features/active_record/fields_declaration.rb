@@ -1,6 +1,4 @@
-module HoboFields
-
-  FieldsDeclaration = classy_module do
+ActiveRecord::Base.class_eval do
 
     def self.fields(include_in_migration = true, &b)
       # Any model that calls 'fields' gets a bunch of other
@@ -19,6 +17,5 @@ module HoboFields
       end
     end
 
-  end
 
 end

@@ -5,11 +5,8 @@ module HoboFields
   class Railtie < Rails::Railtie
 
     ActiveSupport.on_load(:active_record) do
-      # Add the fields declaration to ActiveRecord::Base
-      include HoboFields::FieldsDeclaration
-      # Override ActiveRecord's default methods so that the attribute read & write methods
-      # automatically wrap richly-typed fields.
-      include HoboFields::AttributeMethods
+      require 'hobo_fields/features/active_record/attribute_methods'
+      require 'hobo_fields/features/active_record/fields_declaration'
     end
 
     # switches off the default migration of ActiveRecord model generator
