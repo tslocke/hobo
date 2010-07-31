@@ -1,6 +1,9 @@
 # gem dependencies
 require 'hobo_support'
 require 'hobo_fields'
+require 'hobo/features/enumerable'
+require 'hobo/features/array'
+
 begin
   require 'will_paginate'
 rescue MissingSourceFile

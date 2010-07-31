@@ -1,4 +1,5 @@
- Hobo::ControllerMethods = classy_module do
+ActionController::Base.class_eval do
+
   def self.hobo_user_controller(model=nil)
     @model = model
     include Hobo::ModelController

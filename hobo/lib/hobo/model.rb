@@ -42,7 +42,7 @@ module Hobo
           end
         end
       end
-      
+
       base.fields(false) # force hobo_fields to load
 
       included_in_class_callbacks(base)
@@ -69,8 +69,8 @@ module Hobo
 
       end
     end
-    
-    
+
+
     def self.register_model(model)
       @model_names ||= Set.new
       @model_names << model.name
@@ -92,8 +92,8 @@ module Hobo
         name.safe_constantize || (@model_names.delete name; nil)
       end.compact
     end
-    
-    
+
+
     def self.find_by_typed_id(typed_id)
       return nil if typed_id == 'nil'
 
@@ -110,27 +110,6 @@ module Hobo
         attr ? obj.send(attr) : obj
       else
         model_class
-      end
-    end
-
-
-    def self.enable
-      require 'active_record/association_collection'
-      require 'active_record/association_proxy'
-      require 'active_record/association_reflection'
-
-      ActiveRecord::Base.class_eval do
-        def self.hobo_model
-          include Hobo::Model
-          fields(false) # force hobo_fields to load
-        end
-        def self.hobo_user_model
-          include Hobo::Model
-          include Hobo::User
-        end
-        alias_method :has_hobo_method?, :respond_to_without_attributes?
-        
-        Hobo::Permissions.enable
       end
     end
 
@@ -255,7 +234,7 @@ module Hobo
         options = args.extract_options!
         if options[:order] == :default || (options[:order].blank? && !scoped?(:find, :order))
           # TODO: decide if this is correct. AR is no help, as passing :order to a scoped proxy
-          #       MERGES the order, but nesting two scopes with :order completely ignores the 
+          #       MERGES the order, but nesting two scopes with :order completely ignores the
           #       first scope's order.
           #       Are we more like default_scope, or more like passing :order => model.default_order?
           options = if default_order.blank?
@@ -272,8 +251,8 @@ module Hobo
         result.member_class = self if result.is_a?(Array)
         result
       end
-      
-      
+
+
       def find_by_sql(*args)
         result = super
         result.member_class = self # find_by_sql always returns array
@@ -295,21 +274,21 @@ module Hobo
       def reverse_reflection(association_name)
         refl = reflections[association_name.to_sym] or raise "No reverse reflection for #{name}.#{association_name}"
         return nil if refl.options[:conditions] || refl.options[:polymorphic]
-        
+
         if refl.macro == :has_many && (self_to_join = refl.through_reflection)
           # Find the reverse of a has_many :through (another has_many :through)
-          
+
           join_to_self  = reverse_reflection(self_to_join.name)
           join_to_other = refl.source_reflection
           other_to_join = self_to_join.klass.reverse_reflection(join_to_other.name)
-          
+
           return nil if self_to_join.options[:conditions] || join_to_other.options[:conditions]
-          
+
           refl.klass.reflections.values.find do |r|
             r.macro == :has_many &&
               !r.options[:conditions] &&
               !r.options[:scope] &&
-              r.through_reflection == other_to_join && 
+              r.through_reflection == other_to_join &&
               r.source_reflection  == join_to_self
           end
         else
@@ -321,7 +300,7 @@ module Hobo
                            when :belongs_to
                              [:has_many, :has_one]
                            end
-          
+
           refl.klass.reflections.values.find do |r|
             r.macro.in?(reverse_macros) &&
               r.klass >= self &&
@@ -361,8 +340,8 @@ module Hobo
       def typed_id
         HoboFields.to_name(self) || name.underscore.gsub("/", "__")
       end
-      
-      
+
+
       def view_hints
         class_name = "#{name}Hints"
         class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::ViewHints; end; #{class_name}")
@@ -378,8 +357,8 @@ module Hobo
     def to_url_path
       "#{self.class.to_url_path}/#{to_param}" unless new_record?
     end
-    
-    
+
+
     def to_param
       name_attr = self.class.name_attribute and name = send(name_attr)
       if name_attr && !name.blank? && id.is_a?(Fixnum)
@@ -488,6 +467,3 @@ module Hobo
   end
 
 end
-
-
-Hobo::Model.enable if defined? ActiveRecord
