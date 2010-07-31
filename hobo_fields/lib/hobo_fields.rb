@@ -11,8 +11,6 @@ module HoboFields
 
   VERSION = "1.3.0.pre0"
 
-  require 'hobo_fields/railtie' if defined?(::Rails)
-
   extend self
 
   PLAIN_TYPES = {
@@ -96,5 +94,7 @@ module HoboFields
   end
 
 end
+
+require 'hobo_fields/railtie'
 
 

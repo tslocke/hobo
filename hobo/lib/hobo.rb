@@ -20,7 +20,6 @@ class HoboError < RuntimeError; end
 module Hobo
 
   VERSION = "1.3.0.pre0"
-  require 'hobo/engine'
 
   class PermissionDeniedError < RuntimeError; end
 
@@ -86,6 +85,8 @@ module Hobo
   class Boolean; end
 
 end
+
+require 'hobo/engine'
 
 
 
