@@ -18,7 +18,7 @@ module Hobo
         base.class_eval do
           @auto_actions ||= {}
 
-          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [], 
+          inheriting_cattr_reader :web_methods => [], :show_actions => [], :index_actions => [],
                                   :owner_actions => {}
 
           extend ClassMethods
@@ -33,7 +33,7 @@ module Hobo
           rescue_from Hobo::Lifecycles::LifecycleKeyError, :with => :permission_denied
 
           alias_method_chain :render, :hobo_model
-          
+
         end
         register_controller(base)
 
@@ -41,14 +41,14 @@ module Hobo
       end
 
     end
-    
-    
+
+
     def self.register_controller(controller)
       @controller_names ||= Set.new
       @controller_names << controller.name
     end
-    
-    
+
+
     def self.all_controllers(subsite=nil, force=false)
       # Load every controller in app/controllers/<subsite>...
       @controllers_loaded ||= {}
@@ -63,27 +63,27 @@ module Hobo
         end
         @controllers_loaded[subsite] = true
       end
-      
+
       # ...but only return the ones that registered themselves
       names = (@controller_names || []).select { |n| subsite ? n =~ /^#{subsite.camelize}::/ : n !~ /::/ }
-      
+
       names.map do |name|
         name.safe_constantize || (@controller_names.delete name; nil)
       end.compact
     end
-    
+
 
 
     module ClassMethods
 
       attr_writer :model
-      
+
       def model_name
-        name.demodulize.remove(/Controller$/).singularize
+        model.name.underscore
       end
-      
+
       def model
-        @model ||= model_name.constantize
+        @model ||= controller_name.camelcase.singularize.constantize
       end
 
 
@@ -227,8 +227,8 @@ module Hobo
           end
         end
       end
-      
-      
+
+
       def creator_page_action(name, options={}, &block)
         define_method(name) do
           creator_page_action name, options, &block
@@ -241,7 +241,7 @@ module Hobo
           do_creator_action name, options, &block
         end
       end
-      
+
 
       def transtion_page_action(name, options={}, &block)
         define_method(name) do
@@ -256,7 +256,7 @@ module Hobo
         end
       end
 
-      
+
       def auto_actions_for(owner, actions)
         name = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner
 
@@ -355,7 +355,7 @@ module Hobo
 
     def re_render_form(default_action=nil)
       if params[:page_path]
-        @invalid_record = this        
+        @invalid_record = this
         controller, view = Controller.controller_and_view_for(params[:page_path])
         view = default_action if view == Dryml::EMPTY_PAGE
 
@@ -396,8 +396,8 @@ module Hobo
       method = @this.class.view_hints.parent
       method ? @this.send(method) : nil
     end
-    
-    
+
+
     def url_for_page_path
       controller, view = Controller.controller_and_view_for(params[:page_path])
       url_for :controller => controller, :action => view
@@ -407,8 +407,8 @@ module Hobo
     def previous_page_path
       session[:previous_page_path]
     end
-    
-    
+
+
     def redirect_after_submit(*args)
       options = args.extract_options!
       o = options[:redirect]
@@ -425,7 +425,7 @@ module Hobo
         redirect_to destination_after_submit(*args)
       end
     end
-    
+
 
     def response_block(&b)
       if b
@@ -460,8 +460,8 @@ module Hobo
         finder.all(options.except(*WILL_PAGINATE_OPTIONS))
       end
     end
-    
-    
+
+
     def find_owner_and_association(owner_association)
       owner_name = name_of_auto_action_for(owner_association)
       refl = model.reflections[owner_association]
@@ -483,8 +483,8 @@ module Hobo
       self.this = find_or_paginate(finder, options)
       response_block(&b)
     end
-    
-    
+
+
     def hobo_index_for(owner, *args, &b)
       options = args.extract_options!
       owner, association = find_owner_and_association(owner)
@@ -505,8 +505,8 @@ module Hobo
       self.this = record || model.user_new(current_user)
       response_block(&b)
     end
-    
-    
+
+
     def hobo_new_for(owner, record=nil, &b)
       owner, association = find_owner_and_association(owner)
       self.this = record || association.user_new(current_user)
@@ -516,7 +516,7 @@ module Hobo
 
     def hobo_create(*args, &b)
       options = args.extract_options!
-      attributes = options[:attributes] || attribute_parameters || {}      
+      attributes = options[:attributes] || attribute_parameters || {}
       if self.this ||= args.first
         this.user_update_attributes(current_user, attributes)
       else
@@ -525,8 +525,8 @@ module Hobo
       end
       create_response(:new, options, &b)
     end
-    
-    
+
+
     def hobo_create_for(owner_association, *args, &b)
       options = args.extract_options!
       owner, association = find_owner_and_association(owner_association)
@@ -537,7 +537,7 @@ module Hobo
         self.this = association.new(attributes)
         this.save
       end
-      create_response(:"new_for_#{name_of_auto_action_for(owner_association)}", options, &b)    
+      create_response(:"new_for_#{name_of_auto_action_for(owner_association)}", options, &b)
     end
 
 
@@ -551,13 +551,13 @@ module Hobo
       create_model = type_param ? type_param.constantize : model
       create_model.user_new(current_user, attributes)
     end
-    
-    
+
+
     def subtype_for_create
       model.has_inheritance_column? && (t = params['type']) && t.in?(model.send(:subclasses).*.name) and
         t
     end
-    
+
     def flash_notice(message)
       flash[:notice] = message unless request.xhr?
     end
@@ -601,7 +601,7 @@ module Hobo
 
 
     def update_response(in_place_edit_field=nil, options={}, &b)
-      
+
       flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.human_name} were saved"])) if valid?
 
       response_block(&b) or
@@ -745,7 +745,7 @@ module Hobo
           finder2 = finder.send(qscope, params[options[:param]])
           items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
         end
-      end       
+      end
       render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
     end
 
