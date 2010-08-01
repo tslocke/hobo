@@ -15,6 +15,9 @@ module Hobo
     end
 
     ActiveSupport.on_load(:active_record) do
+      require 'hobo/features/active_record/association_collection'
+      require 'hobo/features/active_record/association_proxy'
+      require 'hobo/features/active_record/association_reflection'
       require 'hobo/features/active_record/hobo_methods'
       require 'hobo/features/active_record/i18n'
       require 'hobo/features/active_record/permissions'
