@@ -18,7 +18,7 @@ module Hobo
     hook_for :orm
 
     def inject_fields_block_into_model_file
-      data = "\n  fields do\n"
+      data = "\n  hobo_model # Don't put anything above this\n\n  fields do\n"
       attributes.reject {|attr| attr.reference? }.each do |attribute|
         data << "    #{attribute.name} :#{attribute.type}\n"
       end
