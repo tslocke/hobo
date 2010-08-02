@@ -1,4 +1,4 @@
-class Dryml::DrymlSupportController < ActionController::Base
+class DrymlSupportController < ActionController::Base
 
   def edit_source
     dryml_editor = ENV['DRYML_EDITOR']
