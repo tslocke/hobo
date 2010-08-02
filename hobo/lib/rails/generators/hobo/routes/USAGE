@@ -1,0 +1,10 @@
+Description:
+    This generator prepares the auto routes for your Application.
+    It is automatically used internally, so you should not use it manually
+    unless you switch off auto routing (config.hobo.auto_routes = false)
+
+Example:
+    rails generate hobo_auto_routes
+
+    This will create:
+        config/hobo_auto_routes.rb

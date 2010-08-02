@@ -9,11 +9,11 @@ module Hobo
     ModelExtensions = classy_module do
 
       attr_writer :lifecycle
-      
+
       def self.has_lifecycle?
         defined?(self::Lifecycle)
       end
-      
+
       def self.lifecycle(*args, &block)
         options = args.extract_options!
         options = options.reverse_merge(:state_field => :state,
@@ -27,7 +27,7 @@ module Hobo
           state_field_class = self::LifecycleStateField
         else
           # First call
-          
+
           module_eval "class ::#{name}::Lifecycle < Hobo::Lifecycles::Lifecycle; end"
           lifecycle = self::Lifecycle
           lifecycle.init(self, options)
@@ -53,29 +53,29 @@ module Hobo
           never_show      options[:key_timestamp_field]
           attr_protected  options[:key_timestamp_field]
         end
-        
+
       end
-      
-      
+
+
       def self.validation_method_with_lifecycles(on)
         if has_lifecycle? && self::Lifecycle.step_names.include?(on)
           callback = :"validate_on_#{on}"
-          
+
           # define these lifecycle validation callbacks on demand
           define_callbacks callback unless respond_to? :callback
           define_method(callback) {}
-          
+
           callback
         else
           validation_method_without_lifecycles(on)
         end
       end
-      metaclass.alias_method_chain :validation_method, :lifecycles
-      
-      
+    #  metaclass.alias_method_chain :validation_method, :lifecycles
+
+
       def valid_with_lifecycles?
         valid_without_lifecycles?
-        
+
         if self.class.has_lifecycle? && (step = lifecycle.active_step) && respond_to?(cb = "validate_on_#{step.name}")
           run_callbacks cb
         end

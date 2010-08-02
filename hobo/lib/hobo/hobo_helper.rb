@@ -99,7 +99,7 @@ module Hobo
                 end
       end
 
-      if Hobo::ModelRouter.linkable?(klass, action, options)
+      if Hobo::Routes.linkable?(klass, action, options)
 
         url = base_url_for(obj, subsite, action)
         url += "/#{action_path || action}" unless action.in?(IMPLICIT_ACTIONS)
@@ -389,7 +389,7 @@ module Hobo
         action ||= :show
       end
 
-      Hobo::ModelRouter.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
+      Hobo::Routes.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
     
     

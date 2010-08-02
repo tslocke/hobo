@@ -1,13 +1,11 @@
 ActionController::Base.class_eval do
 
-  def self.hobo_user_controller(model=nil)
-    @model = model
+  def self.hobo_user_controller
     include Hobo::ModelController
     include Hobo::UserController
   end
 
-  def self.hobo_model_controller(model=nil)
-    @model = model
+  def self.hobo_model_controller
     include Hobo::ModelController
   end
 

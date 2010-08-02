@@ -208,7 +208,7 @@ require 'action_controller/dispatcher'
                         else
                           args
                         end
-        Hobo::ModelRouter.linkable?(klass, action, options)
+        Hobo::Routes.linkable?(klass, action, options)
       end  
 
 

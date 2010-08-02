@@ -1,13 +1,21 @@
 require 'hobo'
 require 'rails'
+require 'rails/generators'
 
 
 module Hobo
   class Engine < Rails::Engine
 
+    config.to_prepare do
+      # generators are used in other to_prepare blocks
+      Rails::Generators.configure!
+    end
+
     ActiveSupport.on_load(:before_configuration) do
       h = config.hobo = ActiveSupport::OrderedOptions.new
       h.developer_features = Rails.env.in?(["development", "test"])
+      h.routes_path = File.expand_path('config/hobo_routes.rb', Rails.root)
+      h.auto_routes = true
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -30,7 +38,7 @@ module Hobo
     ActiveSupport.on_load(:before_initialize) do
       # Modules that must *not* be auto-reloaded by activesupport
       # (explicitly requiring them means they're never unloaded)
-      require 'hobo/model_router'
+      require 'hobo/routes'
       require 'hobo/undefined'
       require 'hobo/user'
    #   require 'dryml'
@@ -44,6 +52,19 @@ module Hobo
 
       HoboFields.never_wrap(Hobo::Undefined)
 
+    end
+
+    initializer 'hobo.routes' do |app|
+      h = app.config.hobo
+      if h.auto_routes
+        # generate at first boot, so no manual generation is required
+        Rails::Generators.invoke('hobo:routes', %w[-f -q]) unless File.exists?(h.routes_path)
+        app.routes_reloader.paths << h.routes_path
+        app.config.to_prepare do
+          # generate before each request in development
+          Rails::Generators.invoke('hobo:routes', %w[-f -q])
+        end
+      end
     end
 
 
