@@ -4,7 +4,7 @@ Description:
     unless you switch off auto routing (config.hobo.auto_routes = false)
 
 Example:
-    rails generate hobo_auto_routes
+    rails generate hobo:routes
 
     This will create:
-        config/hobo_auto_routes.rb
+        config/hobo_routes.rb
