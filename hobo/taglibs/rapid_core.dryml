@@ -2,23 +2,23 @@
 
 <!-- Renders a table with one row per field, where each row contains a `<th>` with the field name, and a `<td>` with (by default)
      a `<view>` of the field.
-         
+
 ### Attributes
 
  - fields: Comma separated list of field names to display. Defaults to the fields returned by the `standard_fields` helper. That is, all fields apart from IDs and timestamps.
- 
+
  - force-all: All non-viewable fields will be skipped unless this attribute is given
- 
+
  - skip: Comma separated list of fields to exclude
 
  - tag: The name of a tag to use inside the `<td>` to display the value. Defaults to `view`
- 
+
  - no-edit: Controls the behavior of `<input>` tags when the user doesn't have edit permission for a field.
    - view: render the current value using the `<view>` tag
    - disable: render the input as normal, but add HTML's `disabled` attribute
    - skip: render nothing at all. This will omit the entire row (including the label)
    - ignore: render the input normally. That is, don't even perform the edit check.
-   
+
  - no-blanks: (boolean) Controls the behavior of `<view>` tags. The entire row (including the label) will be omitted if `this` is blank. Default false.
 
 ### Example
@@ -34,7 +34,7 @@
   <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" %>
   <labelled-item-list merge-attrs="&attributes - attrs_for(:with_fields)">
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
-    <% field_name = this_field_name 
+    <% field_name = this_field_name
        input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
       <labelled-item unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
@@ -51,13 +51,13 @@
 </def>
 
 <!-- Used to render nil values. By default renders "(Not Available)"
-  
+
 ### Usage
 
 Redefine in your app to have nil values displayed differently, e.g.:
 
     <def tag="nil-view">-</def>
-  
+
 -->
 <def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>
 
@@ -129,7 +129,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
               </td>
             </if>
           </tr>
-        </repeat>      
+        </repeat>
       </tbody>
       <tfoot if="&all_parameters[:tfoot]" param/>
       <% end %>
@@ -177,7 +177,7 @@ Provides a short hand way of displaying images in public/images
 %></def>
 
 <!-- Renders the name of the current context using a variety of methods.
-  
+
 ### Details
 
  - Equivalent to `<nil-view>` if `this` is nil
@@ -189,9 +189,9 @@ Provides a short hand way of displaying images in public/images
 ### Attributes
 
  - if-present: if given, nothing at all will be rendered for nil values (as opposed to rendering `<nil-view>`)
-  
+
 -->
-<def tag="name" attrs="if-present"><%= 
+<def tag="name" attrs="if-present"><%=
   if this.nil?
     nil_view unless if_present
   else
@@ -209,44 +209,44 @@ Provides a short hand way of displaying images in public/images
 
 
 <!-- Renders a human readable version of the type of the context
-  
+
 ### Details
 
  - If `this` is already a class, the name of that class is used
  - Otherwise, first `this.member_class` (for collections), then `this.class` are tried
  - By default the name is titleised and singular.
- 
+
 ### Attributes
 
  - plural: pluralise the name
  - lowercase: render the name in all lower case
- - dasherize: render the name in lower case with dashes instead of spaces. 
+ - dasherize: render the name in lower case with dashes instead of spaces.
 
 -->
 <def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
-  
+
   name = type.respond_to?(:human_name) ? type.human_name : type.name
   name = dasherize ? name.underscore.dasherize : name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
   name
 %></def>
-     
+
 
 <!-- Renders a human readable name of a collection
-  
+
 ### Details
 
  - Uses `this.origin_attribute` as the name.
  - Falls back to `<type-name>` otherwise.
  - By default the name is titleised and plural.
- 
+
 ### Attributes
 
  - singular: singularise the name
  - lowercase: render the name in all lower case
- - dasherize: render the name in lower case with dashes instead of spaces. 
+ - dasherize: render the name in lower case with dashes instead of spaces.
 
 -->
 <def tag="collection-name" attrs="singular, lowercase, dasherize"><%=
@@ -287,7 +287,7 @@ An action can be provided for an alternative show page:
     <a with="&blog_post" action="edit">Edit Post</a> -> <a href="/blog_posts/1/edit">Edit Post</a>
 
 Or a new page if the context is a class:
-  
+
     <a with="&BlogPost" action="new">New Blog Post</a> -> <a href="/blog_posts/new">New Blog Post</a>
 
 ### Additional Features
@@ -327,16 +327,16 @@ Or a new page if the context is a class:
 -->
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
   content = parameters.default
-   
+
   params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
-  
+
   if href || attributes[:name]
     # Regular link
     href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if !params.blank?
     element(:a, attributes.update(:href => href), content)
   else
     target = to || this
-  
+
     if target.nil?
       Dryml.last_if = false
       nil_view
@@ -345,7 +345,7 @@ Or a new page if the context is a class:
       new_record = target.new
       new_record.set_creator(current_user)
       href = object_url(target, "new", params._?.merge(:subsite => subsite))
-      
+
       if href && (force || can_create?(new_record))
         new_class_name = if target.respond_to?(:proxy_reflection)
                            target.proxy_reflection.klass.name
@@ -365,17 +365,17 @@ Or a new page if the context is a class:
       # Link to an existing object
 
       content = name if content.blank?
-      
+
       href = object_url(target, action, (params || {}).merge(:subsite => subsite))
       if href.nil?
-        # This target is registered with ModelRouter as not linkable
+        # This target is registered with Hobo::Routes as not linkable
         content
       else
         css_class = target.try.origin_attribute || target.class.name.underscore.dasherize
         add_classes!(attributes, "#{css_class}-link")
-      
+
         href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
-      
+
         # Set default link text if none given
         element(:a, attributes.update(:href => href), content)
       end
@@ -419,14 +419,14 @@ Assuming the context is a blog post...
 <def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
   raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
-   
+
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
         elsif (refl = this_field_reflection) && refl.macro == :has_many
           collection_view(attributes)
         else
           view_tag = find_polymorphic_tag("view")
-          
+
           if view_tag == "view" # i.e. it didn't find a type specific tag
             if this.respond_to?(:to_html)
               this.to_html(scope.xmldoctype)
@@ -438,13 +438,13 @@ Assuming the context is a blog post...
 
             view_attrs = attrs_for(view_tag)
             the_view = send(view_tag, attrs & view_attrs)
-            
+
             the_view = if_blank if if_blank && the_view.blank?
 
             truncate = 30 if truncate == true
             the_view = self.truncate(the_view, :length => truncate.to_i) if truncate
             the_view = the_view.strip
-            
+
             if no_wrapper
               the_view
             else
@@ -482,11 +482,11 @@ Assuming the context is a blog post...
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : number_with_delimiter(this) %></def>
 
 <!-- Renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
-<def tag="view" for="string"><%= 
+<def tag="view" for="string"><%=
   if !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
     this.to_html(scope.xmldoctype)
   else
-    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>") 
+    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>")
   end
 %></def>
 
@@ -509,11 +509,11 @@ A convenience tag used to output a count summary with a correctly localized and 
 The label can be customised using the `label` attribute, e.g.
 
     <count:comments label="blog post comment"/> -> <span class="count">12 blog post comments</span>
-    
+
 You can pass a summary attribute, which will generate a complete localized sentence. It allows 2 options:
-  - boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file. 
+  - boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file.
     If the lookup fails, it will fallback to the english default sentences consistent with the count.
-  - String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file. 
+  - String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file.
     If the lookup fails, it will fallback to the english default sentences consistent with the count.
 
 ### Examples
@@ -528,21 +528,21 @@ You can pass a summary attribute, which will generate a complete localized sente
           choice:
             zero: "Non ci sono {{label}} da scegliere"
             one: "Puoi scegliere solo una {{label}}"
-            other: "Puoi scegliere tra {{count}} {{label}}" 
-   
+            other: "Puoi scegliere tra {{count}} {{label}}"
+
     with :en locale and boolean summary (internal defaults)
     <count:comments summary/> -> <span class="count">There is 1 Comment</span>
     <count:viewings summary/> -> <span class="count">There are 3 Viewings</span>
     (note: just add the locale english strings to use like the following examples)
 
     with :it locale and boolean summary (key "tags.count.default")
-    <count:comments summary/> 
+    <count:comments summary/>
     -> count => 0 -> <span class="count">Non ci sono Commenti</span>
     -> count => 1 -> <span class="count">C'è solo 1 Commento</span>
     -> count => 5 -> <span class="count">Ci sono 5 Commenti</span>
-    
+
     with :it locale and summary="choice" (key "tags.count.choice")
-    <count:comments summary="choice"/> 
+    <count:comments summary="choice"/>
     -> count => 0 -> <span class="count">Non ci sono Commenti da scegliere</span>
     -> count => 1 -> <span class="count">Puoi scegliere solo 1 Commento</span>
     -> count => 5 -> <span class="count">Puoi scegliere tra 5 Commenti</span>
@@ -595,7 +595,7 @@ You can pass a summary attribute, which will generate a complete localized sente
 %></span></def>
 
 
-<!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages. 
+<!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages.
 -->
 <def tag="theme-stylesheet" attrs="name">
   <% name ||= Hobo.current_theme -%>
@@ -613,10 +613,10 @@ The context should be a user object. If `this == current_user` the "you" form is
  - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
  - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
 
-The tag is also localized in the namespaces "tags.you.current_user" and "tags.you.other_user". 
-Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes, 
-and "nothing" used when no attribute is passed. But you can also use your own keys, providing 
-that you add the keys in the correct namespaces. 
+The tag is also localized in the namespaces "tags.you.current_user" and "tags.you.other_user".
+Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes,
+and "nothing" used when no attribute is passed. But you can also use your own keys, providing
+that you add the keys in the correct namespaces.
 
 ### Examples
 
@@ -659,8 +659,8 @@ that you add the keys in the correct namespaces.
   </if>
   <else>
     <do param="default">
-      <%= s = I18n.t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name, 
-          :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}") 
+      <%= s = I18n.t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name,
+          :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}")
           (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
     </do>
   </else>
@@ -675,31 +675,31 @@ that you add the keys in the correct namespaces.
 
  - capitalize: the first letter of the resulting sentence will be capitalized
  - count: used in pluralization. If omitted it will be set to 1.
- - key: used to lookup the translation in the locale file. It allows 3 different options: 
-   - single key like 'message': simple translation in 'tags.your.message.current_user' 
+ - key: used to lookup the translation in the locale file. It allows 3 different options:
+   - single key like 'message': simple translation in 'tags.your.message.current_user'
      or 'tags.your.message.other_user'
    - composite key like 'any.namespace.message': translation as for the previous case, but it will
      translate also the 'any.namespace.message' and will interpolate the variable <key> (in this case :message)
      in the translation
-   - when key is omitted it will be set to "default" and will do the translation with that key. 
+   - when key is omitted it will be set to "default" and will do the translation with that key.
      Pass other meaningful attributes to achieve a dynamic usage
  - any other attribute passed to the tag will be used as a variable for interpolation
- 
+
 Notes
 
  - The :name variable is added by default as an interpolable variable
- - If no translation is found an automatic (only english) default is generated: 
+ - If no translation is found an automatic (only english) default is generated:
    the Your/Jim's string, joined to the tag content.
-   If you pass an explicit 'default' attribute you will override the automatic default. 
+   If you pass an explicit 'default' attribute you will override the automatic default.
 
- 
+
 ### Examples
 
     it:
       tags:
         your:
           message:
-            current_user: 
+            current_user:
               one: "Tuo Messaggio"
               other: "Tuoi Messaggi"
             other_user:
@@ -710,12 +710,12 @@ Notes
               one: "Tua {{entry}}"
               other: "Tue {{entry}}"
             other_user: "{{entry}} di {{name}}"
-              
- - `<your key="message" count=>"&messages.count"/>` 
+
+ - `<your key="message" count=>"&messages.count"/>`
    -> count => 1 -> "Tuo Messaggio" or "Messaggio di Jim"
    -> count => 5 -> "Tuoi Messaggi" or "Messaggi di Jim"
- 
- - `<your key="activerecord.models.entry" count=>"&this.entries.count"/>` 
+
+ - `<your key="activerecord.models.entry" count=>"&this.entries.count"/>`
    -> count => 1 -> "Tua Entrata" or "Entrata di Jim"
    -> count => 5 -> "Tue Entrate" or "Entrate di Jim"
 
