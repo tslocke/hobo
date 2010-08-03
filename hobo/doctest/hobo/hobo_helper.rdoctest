@@ -11,7 +11,7 @@ Various view helpers
 
 Create a mock view layer:
 
-        >> 
+        >>
          class View
            extend Hobo::HoboHelper
            class << self
@@ -49,19 +49,19 @@ Something to link to:
 
 ### Simple 'show' URLs
 
-        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(true)
+        >> Hobo::Routes.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(true)
         >> View.object_url(thing)
         => "/things/1"
 
-Returns nil if ModelRouter says it's not linkable
+Returns nil if Routes says it's not linkable
 
-        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(false)
+        >> Hobo::Routes.expects(:linkable?).with(Thing, :show, {:subsite => ''}).returns(false)
         >> View.object_url(thing)
         => nil
 
 A URL to the 'edit' page:
 
-        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
+        >> Hobo::Routes.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
         >> View.object_url(thing, :edit)
         => "/things/1/edit"
 
@@ -69,7 +69,7 @@ A URL to the 'edit' page:
 ### POST URLs for creating new items in collections:
 
         >> collection = mock(:origin => thing, :origin_attribute => "parts")
-        >> Hobo::ModelRouter.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
+        >> Hobo::Routes.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
         >> View.object_url(collection, :method => :post)
         => "/things/1/parts"
 
