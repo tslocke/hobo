@@ -25,8 +25,6 @@ module Hobo
 
   class RawJs < String; end
 
-  @models = []
-
   class << self
 
     attr_accessor :current_theme
@@ -35,16 +33,10 @@ module Hobo
       RawJs.new(s)
     end
 
-    def find_by_search(query, search_targets=nil)
-      search_targets ||=
-        begin
-          # FIXME: This should interrogate the model-router directly, there's no need to enumerate models
-          # By default, search all models, but filter out...
-          Hobo::Model.all_models.select do |m|
-            ModelRouter.linkable?(m, :show) &&  # ...non-linkables
-              m.search_columns.any?             # and models with no search-columns
-          end
-        end
+    def find_by_search(query, search_targets=[])
+      if search_targets.empty?
+       search_targets = Hobo::Routes.models_with(:show).select {|m| m.search_columns.any? }
+      end
 
       query_words = ActiveRecord::Base.connection.quote_string(query).split
 
