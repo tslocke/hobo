@@ -15,7 +15,6 @@ module Hobo
       h = config.hobo = ActiveSupport::OrderedOptions.new
       h.developer_features = Rails.env.in?(["development", "test"])
       h.routes_path = File.expand_path('config/hobo_routes.rb', Rails.root)
-      h.auto_routes = true
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -56,14 +55,12 @@ module Hobo
 
     initializer 'hobo.routes' do |app|
       h = app.config.hobo
-      if h.auto_routes
-        # generate at first boot, so no manual generation is required
-        Rails::Generators.invoke('hobo:routes', %w[-f -q]) unless File.exists?(h.routes_path)
-        app.routes_reloader.paths << h.routes_path
-        app.config.to_prepare do
-          # generate before each request in development
-          Rails::Generators.invoke('hobo:routes', %w[-f -q])
-        end
+      # generate at first boot, so no manual generation is required
+      Rails::Generators.invoke('hobo:routes', %w[-f -q]) unless File.exists?(h.routes_path)
+      app.routes_reloader.paths << h.routes_path
+      app.config.to_prepare do
+        # generate before each request in development
+        Rails::Generators.invoke('hobo:routes', %w[-f -q])
       end
     end
 
