@@ -57,9 +57,6 @@ module Hobo
                        def can_#{name}?(user, attributes=nil)
                          can_transition?(:#{name}, user)
                        end
-                       def valid_for_#{name}?
-                         valid_for_transition?(:#{name})
-                       end
                       }
 
         end
@@ -68,20 +65,20 @@ module Hobo
       def self.state_names
         states.keys
       end
-      
+
       def self.publishable_creators
         creators.values.where.publishable?
       end
-      
+
       def self.publishable_transitions
         transitions.where.publishable?
       end
-      
-      def self.step_names 
+
+      def self.step_names
         (creators.keys | transitions.*.name).uniq
       end
-      
-      
+
+
       def self.creator(name)
         creators[name.to_sym] or raise ArgumentError, "No such creator in lifecycle: #{name}"
       end
@@ -133,15 +130,6 @@ module Hobo
       def find_transition(name, user)
         available_transitions_for(user, name).first
       end
-      
-      
-      def valid_for_transition?(name)
-        record.valid?
-        callback = :"validate_on_#{name}"
-        record.run_callbacks callback
-        record.send callback
-        record.errors.empty?
-      end
 
 
       def state_name
@@ -172,7 +160,7 @@ module Hobo
       def publishable_transitions_for(user)
         available_transitions_for(user).select {|t| t.publishable_by(user, t.available_to, record)}
       end
-        
+
 
       def become(state_name, validate=true)
         state_name = state_name.to_sym
@@ -194,8 +182,8 @@ module Hobo
           end
         end
       end
-            
-      
+
+
       def key_timestamp_field
         record.class::Lifecycle.options[:key_timestamp_field]
       end
@@ -240,7 +228,7 @@ module Hobo
       def active_step_is?(name)
         active_step && active_step.name == name.to_sym
       end
-      
+
       def method_missing(name, *args)
         if name.to_s =~ /^(.*)_in_progress\?$/
           active_step_is?($1)

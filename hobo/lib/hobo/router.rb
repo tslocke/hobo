@@ -40,7 +40,6 @@ module Hobo
       routes
     end
 
-
     def resource_routes
       [
       link( "get '#{records}(.:format)' => '#{records}#index', :as => '#{records}'", 'index'),
@@ -61,9 +60,7 @@ module Hobo
                          "(e.g. the :has_many that corresponds to a :belongs_to)" if collection_refl.nil?
         collection         = collection_refl.name
         owner_class        = model.reflections[owner].klass.name.underscore
-
         owner = owner.to_s.singularize if model.reflections[owner].macro == :has_many
-
         collection_path = "#{owner_class.pluralize}/:#{owner}_id/#{collection}"
 
         actions.each do |action|
