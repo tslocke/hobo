@@ -1,9 +1,11 @@
-
 # HoboFields API
 
 In order for the API examples to run we need to load the rails generators of our testapp:
+{.hidden}
 
+    doctest: prepare testapp environment
     doctest_require: 'prepare_testapp'
+{.hidden}
 
 ## Example Models
 
@@ -11,10 +13,7 @@ Let's define some example models that we can use to demonstrate the API. With Ho
 
     $ rails generate hobo:model advert title:string body:text contact_address:email_address
 
-{.hidden}
-
     >> Rails::Generators.invoke 'hobo:model', %w(advert title:string body:text contact_address:email_address)
-
 {.hidden}
 
 This will generate the test, fixture and a model file like this:
@@ -32,14 +31,12 @@ This will generate the test, fixture and a model file like this:
 
 The migration generator uses this information to create a migration. The following creates and runs the migration so we're ready to go.
 
-    $ rails generate hobo:migration --name --migrate
-
-{.hidden}
+    $ rails generate hobo:migration -n -m
 
     >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
     >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
-
 {.hidden}
+
 We're now ready to start demonstrating the API
 
 ## The Basics
@@ -250,7 +247,6 @@ Cleanup
 {.hidden}
 
     >> FileUtils.rm_rf  TEST_APP_ROOT
-
 {.hidden}
 
 
