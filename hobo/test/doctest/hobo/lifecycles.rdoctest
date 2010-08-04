@@ -15,17 +15,8 @@ Hobo lifecycles is a mechanism for declaring the life-cycle of a model in a natu
 
 First the junk to get us started:
 
-    doctest_require: 'rubygems'
-    doctest_require: 'active_record'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo/lib'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo_fields/lib'
-    >> $:.unshift '/home/blarsen/dev/agility-master/vendor/plugins/hobo/hobo_support/lib'
-    >> require 'hobo'
-    >> require 'hobo/model'
-    >> ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
-                                               :database => "lifecycle_doctest")
-
+doctest: prepare testapp environment
+doctest_require: '../../prepare_testapp'
 
 A user model for our example:
 
@@ -42,6 +33,7 @@ Now the friendship. For now we'll just declare the *invite* part of the lifecycl
     >>
      class Friendship < ActiveRecord::Base
        hobo_model
+       fields {} # just to trigger hobo:migration
        belongs_to :requester, :class_name => "User"
        belongs_to :requestee, :class_name => "User"
 
@@ -53,9 +45,7 @@ Now the friendship. For now we'll just declare the *invite* part of the lifecycl
 
 Now let's get the DB ready:
 
-        doctest_require: '../../../hobo_fields/lib/hobo_fields/migration_generator'
-        >> up, down = HoboFields::MigrationGenerator.run
-        >> ActiveRecord::Migration.class_eval up
+        >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
         >> User.delete_all
         >> Friendship.delete_all
 
@@ -85,8 +75,8 @@ To continue modeling the friendship lifecycle, we add some *transitions*:
          class Friendship
             lifecycle do
               state :active
-              transition :accept, { :requested => :active}, :available_to => :requestee 
-              transition :reject, { :requested => :destroy}, :available_to => :requestee 
+              transition :accept, { :requested => :active}, :available_to => :requestee
+              transition :reject, { :requested => :destroy}, :available_to => :requestee
             end
          end
 
@@ -101,7 +91,7 @@ We can test which transitions are available:
         >> f.lifecycle.available_transitions_for(tom).*.name
         => []
         >> f.lifecycle.available_transitions_for(bob).*.name
-        => ["accept", "reject"]
+        => [:accept, :reject]
         >> f.lifecycle.can_accept?(tom)
         => false
         >> f.lifecycle.can_reject?(tom)
@@ -113,7 +103,7 @@ We can test which transitions are available:
 
 Accept the friendship
 
-        >> f.lifecycle.accept(bob)
+        >> f.lifecycle.accept!(bob)
         >> f.state
         => "active"
 
@@ -137,7 +127,7 @@ Let's try a rejected friendship:
         => true
         >> Friendship.count
         => 1
-        >> f.lifecycle.reject(bob)
+        >> f.lifecycle.reject!(bob)
         >> Friendship.count
         => 0
 
@@ -165,40 +155,40 @@ We'll extend the lifecycle to allow:
 
 Here is the entire lifecycle
 
-        >>
-    class Friendship < ActiveRecord::Base
-      hobo_model
-      belongs_to :requester, :class_name => "User"
-      belongs_to :requestee, :class_name => "User"
+          >>
+            class Friendship < ActiveRecord::Base
+              hobo_model
+              belongs_to :requester, :class_name => "User"
+              belongs_to :requestee, :class_name => "User"
 
-      lifecycle do
-            state :requested, :active, :ignored
+              lifecycle do
+                    state :requested, :active, :ignored
 
-        create :requester, :request, :params => [ :requestee ], :become => :requested do
-          $emails << "Dear #{requestee.name}, #{requester.name} wants to be friends with you"
-        end
+                create :requester, :request, :params => [ :requestee ], :become => :requested do
+                  $emails << "Dear #{requestee.name}, #{requester.name} wants to be friends with you"
+                end
 
 
-                transition :requestee, :accept, { :requested => :active } do
-          $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
-        end
+                        transition :requestee, :accept, { :requested => :active } do
+                  $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
+                end
 
-                transition :requestee, :reject, { :requested => :destroy } do
-          $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
-        end
+                        transition :requestee, :reject, { :requested => :destroy } do
+                  $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
+                end
 
-                transition :requestee, :ignore, { :requested => :ignored }
+                        transition :requestee, :ignore, { :requested => :ignored }
 
-                transition :requester, :retract, { :requested => :destroy } do
-          $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
-        end
+                        transition :requester, :retract, { :requested => :destroy } do
+                  $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
+                end
 
-                transition [ :requester, :requestee ], :cancel, { :active => :destroy }
-                # TODO: send the email - for this we need the acting user to be passed to the block
+                        transition [ :requester, :requestee ], :cancel, { :active => :destroy }
+                        # TODO: send the email - for this we need the acting user to be passed to the block
 
-      end
+              end
 
-    end
+            end
 
 Check the simple accept still works, and sends emails
 
