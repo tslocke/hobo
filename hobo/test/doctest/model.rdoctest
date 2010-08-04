@@ -3,7 +3,7 @@ Hobo's Miscellaneous Model Extensions
 
 This chapter of the Hobo Manual describes Hobo's model extensions,
 with the exception of [HoboFields](../hobo_fields) and
-[Permissions](../permissions), 
+[Permissions](../permissions),
 [Accessible Associations](../multi_model_forms) and [Scopes](../scopes) each of
 which have their own chapters in this manual.  This chapter should
 describe everything else that Hobo provides to your models.
@@ -14,40 +14,8 @@ Contents
 - contents
 {:toc}
 
-    >> require 'rubygems'
-    >> require 'active_support'
-    >> require 'active_record'
-    >> require 'action_pack'
-    >> require 'action_view'
-    >> require 'action_controller'
-    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-    >> mysql_user = 'root'; mysql_password = ''
-    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobo_fields_doctest"
-    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
-                                               :database => mysql_database,
-                                               :host => "localhost", 
-                                               :username => mysql_user, 
-                                               :password => mysql_password)
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_fields/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_support/lib')
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
-    >> require 'will_paginate'
-    >> require 'will_paginate/finder'
-    >> require 'hobo_support'
-    >> require 'hobo_fields'
-    >> require 'hobo'
-    >> Hobo::Model.enable
-    >> HoboFields.enable
-    >>
-     def migrate(renames={})
-       up, down = HoboFields::MigrationGenerator.run(renames)
-       ActiveRecord::Migration.class_eval(up)
-       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
-       [up, down]
-     end
+   doctest: prepare testapp environment
+   doctest_require: '../prepare_testapp'
 {.hidden}
 
 # Special Attributes
@@ -83,7 +51,14 @@ declaration:
        never_show :poster
 
      end
-    >> migrate
+
+    $ rails generate hobo:migration -n -m
+
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+    >> Post.all
+    => []
+{.hidden}
+
 
 In the above example, `name`, `creator` and `primary_content` specify
 attributes that have meaning to Hobo.  `set_search_columns` and
@@ -100,6 +75,9 @@ good example would be the title column in a blog object.
 
     >> Post.name_attribute
     => :title
+
+    >> Post.all
+    => []
 
 
 Rapid makes extensive use of this column, both directly and
@@ -151,7 +129,14 @@ object.  In this case, you can provide your own name method instead:
          first_name + ' ' + last_name
        end
      end
-    >> migrate
+
+    $ rails generate hobo:migration -n -m
+
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+    >> Person.all
+    => []
+{.hidden}
+
     >> person = Person.new(:first_name => "John", :last_name => "Brown")
     >> person.to_s
     => "John Brown"
@@ -320,7 +305,14 @@ the other model.
      class User < ActiveRecord::Base
        has_many :posts, :foreign_key => "poster_id"
      end
-    >> migrate
+
+    $ rails generate hobo:migration -n -m
+
+    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
+    >> Post.all
+    >> User.all
+{.hidden}
+
 
     >> Post.reverse_reflection(:poster).name
     => :posts
@@ -332,3 +324,10 @@ This provides a shortcut to the corresponding
 
     >> Post.view_hints
     => PostHints
+
+Cleanup
+{.hidden}
+
+    >> FileUtils.rm_rf  TEST_APP_ROOT
+{.hidden}
+
