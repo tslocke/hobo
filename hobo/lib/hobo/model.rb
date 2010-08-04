@@ -230,24 +230,8 @@ module Hobo
       end
 
 
-      def find(*args, &b)
-        options = args.extract_options!
-        if options[:order] == :default || (options[:order].blank? && !scoped?(:find, :order))
-          # TODO: decide if this is correct. AR is no help, as passing :order to a scoped proxy
-          #       MERGES the order, but nesting two scopes with :order completely ignores the
-          #       first scope's order.
-          #       Are we more like default_scope, or more like passing :order => model.default_order?
-          options = if default_order.blank?
-                      options.except :order
-                    else
-                      options.merge(:order => if default_order[/(\.|\(|,| )/]
-                                                default_order
-                                              else
-                                                "#{quoted_table_name}.#{default_order}"
-                                              end)
-                    end
-        end
-        result = super(*args + [options])
+      def find(*args)
+        result = super
         result.member_class = self if result.is_a?(Array)
         result
       end
