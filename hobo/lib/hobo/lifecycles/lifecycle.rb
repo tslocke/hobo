@@ -164,7 +164,7 @@ module Hobo
 
       def become(state_name, validate=true)
         state_name = state_name.to_sym
-        record.write_attribute self.class.state_field, state_name.to_s
+        record.send :write_attribute, self.class.state_field, state_name.to_s
 
         if state_name == :destroy
           record.destroy
@@ -197,7 +197,7 @@ module Hobo
           raise RuntimeError, "Cannot generate lifecycle key timestamp if the time-zone is not configured. Please add, e.g. config.time_zone = 'UTC' to environment.rb"
         end
         key_timestamp = Time.now.utc
-        record.write_attribute key_timestamp_field, key_timestamp
+        record.send :write_attribute, key_timestamp_field, key_timestamp
         key
       end
 
