@@ -64,6 +64,5 @@ module Hobo
       end
     end
 
-
   end
 end

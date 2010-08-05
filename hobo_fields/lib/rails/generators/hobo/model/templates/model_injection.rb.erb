@@ -1,0 +1,17 @@
+
+  fields do
+<% for attribute in field_attributes -%>
+    <%= "%-#{max_attribute_length}s" % attribute.name %> :<%= attribute.type %>
+<% end -%>
+    timestamps
+  end
+
+<% for bt in bts -%>
+  belongs_to :<%= bt %>
+<% end -%>
+<%= "\n" unless bts.empty? -%>
+<% for hm in hms -%>
+  has_many :<%= hm %>, :dependent => :destroy
+<% end -%>
+<%= "\n" unless hms.empty? -%>
+
