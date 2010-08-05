@@ -78,7 +78,7 @@ module Hobo
 
 
     def self.all_models
-      # Load every controller in app/controllers...
+      # Load every model in app/models...
       unless @models_loaded
         Dir.entries("#{Rails.root}/app/models/").each do |f|
           f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
