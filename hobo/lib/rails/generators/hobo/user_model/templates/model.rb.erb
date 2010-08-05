@@ -19,7 +19,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
   alias_method_chain :new_password_required?, :invite_only
 <% end -%>
-  
+
   # --- Signup lifecycle --- #
 
   lifecycle do
@@ -35,17 +35,17 @@ class <%= class_name %> < ActiveRecord::Base
            :become => :invited do
        UserMailer.deliver_invite(self, lifecycle.key)
     end
-  
+
     transition :accept_invitation, { :invited => :active }, :available_to => :key_holder,
                :params => [ :password, :password_confirmation ]
-  
+
 <% else -%>
     state :active, :default => true
 
     create :signup, :available_to => "Guest",
            :params => [:name, :email_address, :password, :password_confirmation],
            :become => :active
-             
+
 <% end -%>
     transition :request_password_reset, { :active => :active }, :new_key => true do
       <%= class_name %>Mailer.deliver_forgot_password(self, lifecycle.key)
@@ -55,7 +55,7 @@ class <%= class_name %> < ActiveRecord::Base
                :params => [ :password, :password_confirmation ]
 
   end
-  
+
 
   # --- Permissions --- #
 
@@ -69,7 +69,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   def update_permitted?
-    acting_user.administrator? || 
+    acting_user.administrator? ||
       (acting_user == self && only_changed?(:email_address, :crypted_password,
                                             :current_password, :password, :password_confirmation))
     # Note: crypted_password has attr_protected so although it is permitted to change, it cannot be changed

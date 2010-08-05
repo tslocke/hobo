@@ -1,0 +1,31 @@
+class <%= class_name -%>Mailer < ActionMailer::Base
+  default :from => "no-reply@#{Hobo::Controller.request_host}"
+
+  def forgot_password(user, key)
+    set_variables(user, key)
+    mail( :subject => "#{app_name} -- forgotten password",
+          :to      => user.email_address )
+  end
+<% if invite_only? -%>
+
+  def invite(user, key)
+    set_variables(user, key)
+    mail( :subject => "Invitation to #{app_name}",
+          :to      => user.email_address )
+  end
+<% end -%>
+
+private
+
+  def app_name
+    Rails.application.class.name
+  end
+
+  def set_variables(user, key)
+    @user = user
+    @key = key
+    @host = Hobo::Controller.request_host
+    @app_name = app_name
+  end
+
+end
