@@ -1,12 +1,11 @@
 module Hobo
   class User::MailerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
+    include Hobo::Generators::InviteOnlyModule
 
     def self.banner
       "rails generate hobo:user:mailer #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
-
-    class_option :invite_only, :type => :boolean, :desc => "Add features for an invite only website"
 
     check_class_collision :suffix => 'Mailer'
 
@@ -21,12 +20,6 @@ module Hobo
     end
 
     hook_for :test_framework, :as => :mailer
-
-  private
-
-    def invite_only?
-      options[:invite_only]
-    end
 
   end
 end
