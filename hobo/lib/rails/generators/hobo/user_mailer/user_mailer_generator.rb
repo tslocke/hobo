@@ -1,10 +1,10 @@
 module Hobo
-  class User::MailerGenerator < Rails::Generators::NamedBase
+  class UserMailerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
     include Hobo::Generators::InviteOnlyModule
 
     def self.banner
-      "rails generate hobo:user:mailer #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
+      "rails generate hobo:user_mailer #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
 
     check_class_collision :suffix => 'Mailer'
