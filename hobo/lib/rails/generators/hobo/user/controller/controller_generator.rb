@@ -1,10 +1,10 @@
 module Hobo
-  class UserControllerGenerator < Rails::Generators::NamedBase
+  class User::ControllerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
     include Hobo::ControllerGeneratorModule
 
     def self.banner
-      "rails generate hobo:user_controller #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
+      "rails generate hobo:user:controller #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
 
     class_option :invite_only, :type => :boolean, :desc => "Add features for an invite only website"

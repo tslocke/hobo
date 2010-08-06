@@ -9,4 +9,4 @@ Description:
     the hobo:user_mailer andgenerator the test framework.
 
 Examples:
-    $ rails generate hobo:user_model User
+    $ rails generate hobo:user:model User
