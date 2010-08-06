@@ -4,7 +4,7 @@ module Hobo
     check_class_collision :suffix => 'Controller'
 
     def self.banner
-      "rails generate hobo:cotroller #{self.arguments.map(&:usage).join(' ')}"
+      "rails generate hobo:controller #{self.arguments.map(&:usage).join(' ')}"
     end
 
     def generate_controller
