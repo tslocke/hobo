@@ -6,7 +6,7 @@ module Hobo
       "rails generate hobo:user_model #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
 
-    class_option :invite_only, :type => :boolean
+    class_option :invite_only, :type => :boolean, :desc => "Add features for an invite only website"
 
     def generate_user_model
       template 'model.rb.erb', File.join('app/models', "#{file_path}.rb")

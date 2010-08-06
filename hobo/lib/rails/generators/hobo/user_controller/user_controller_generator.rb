@@ -7,7 +7,7 @@ module Hobo
       "rails generate hobo:user_controller #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
 
-    class_option :invite_only, :type => :boolean
+    class_option :invite_only, :type => :boolean, :desc => "Add features for an invite only website"
 
     def generate_controller
       template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")

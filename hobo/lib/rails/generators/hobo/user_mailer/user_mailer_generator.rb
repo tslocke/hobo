@@ -6,7 +6,7 @@ module Hobo
       "rails generate hobo:user_mailer #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
     end
 
-    class_option :invite_only, :type => :boolean
+    class_option :invite_only, :type => :boolean, :desc => "Add features for an invite only website"
 
     check_class_collision :suffix => 'Mailer'
 
