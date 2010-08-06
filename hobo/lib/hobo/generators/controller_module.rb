@@ -1,5 +1,5 @@
 module Hobo
-  ControllerGeneratorModule = classy_module do
+  Generators::ControllerModule = classy_module do
 
     check_class_collision :suffix => 'Controller'
 

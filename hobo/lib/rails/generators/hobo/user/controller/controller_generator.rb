@@ -1,7 +1,7 @@
 module Hobo
   class User::ControllerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
-    include Hobo::ControllerGeneratorModule
+    include Hobo::Generators::ControllerModule
 
     def self.banner
       "rails generate hobo:user:controller #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
