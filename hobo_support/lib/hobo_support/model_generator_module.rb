@@ -1,5 +1,5 @@
 module HoboSupport
-  ModelGeneratorHelper = classy_module do
+  ModelGeneratorModule = classy_module do
 
     argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
