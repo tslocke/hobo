@@ -11,6 +11,7 @@ module Hobo
                  :desc => "Include Rapid features in the subsite taglib",
                  :default => true
 
+    check_class_collision :suffix => 'SiteController'
 
     def move_and_generate_files
       if options[:make_front_site]
@@ -25,6 +26,10 @@ module Hobo
 
       template "controller.rb.erb", File.join('app/controllers', file_name, "#{file_name}_site_controller.rb")
       template "site_taglib.dryml", File.join('app/views/taglibs', "#{file_name}_site.dryml")
+    end
+
+    hook_for :test_framework, :as => :controller do | instance, controller_test |
+      instance.invoke controller_test, ["#{file_name}_site"]
     end
 
   private
