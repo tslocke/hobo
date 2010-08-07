@@ -9,7 +9,7 @@ module Hobo
     argument :name, :type => :string, :default => 'admin', :optional => true
 
     def self.banner
-      "rails generate hobo:admin_subsite #{self.arguments.map(&:usage).join(' ')} [options]"
+      "rails generate hobo:admin_subsite [NAME=admin] [options]"
     end
 
     def generate_admin_css

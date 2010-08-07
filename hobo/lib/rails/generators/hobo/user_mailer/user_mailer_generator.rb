@@ -3,8 +3,11 @@ module Hobo
     source_root File.expand_path('../templates', __FILE__)
     include Hobo::Generators::InviteOnlyModule
 
+    # overrides the default
+    argument :name, :type => :string, :default => 'user', :optional => true
+
     def self.banner
-      "rails generate hobo:user_mailer #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
+      "rails generate hobo:user_mailer [NAME=user] [options]"
     end
 
     check_class_collision :suffix => 'Mailer'

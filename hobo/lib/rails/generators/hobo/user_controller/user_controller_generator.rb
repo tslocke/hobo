@@ -4,8 +4,11 @@ module Hobo
     include Hobo::Generators::ControllerModule
     include Hobo::Generators::InviteOnlyModule
 
+    # overrides the default
+    argument :name, :type => :string, :default => 'users', :optional => true
+
     def self.banner
-      "rails generate hobo:user_controller #{self.arguments.map(&:usage).join(' ')} [--invite-only]"
+      "rails generate hobo:user_controller [NAME=users] [options]"
     end
 
     def generate_controller
