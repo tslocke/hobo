@@ -29,7 +29,7 @@ module Hobo
     end
 
     hook_for :test_framework, :as => :controller do | instance, controller_test |
-      instance.invoke controller_test, ["#{file_name}_site"]
+      instance.invoke controller_test, ["#{instance.name}_site"]
     end
 
   private
