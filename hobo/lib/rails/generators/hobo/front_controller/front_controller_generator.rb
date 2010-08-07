@@ -1,0 +1,46 @@
+module Hobo
+  class FrontControllerGenerator < Rails::Generators::NamedBase
+
+    source_root File.expand_path('../templates', __FILE__)
+    include Hobo::Generators::ControllerModule
+    include Hobo::Generators::InviteOnlyModule
+
+    def self.banner
+      "rails generate hobo:front_controller #{self.arguments.map(&:usage).join(' ')} [options]"
+    end
+
+    class_option :add_routes,
+                 :type => :boolean,
+                 :desc => "Modify config/routes.rb to support the front controller"
+
+    class_option :delete_index,
+                 :aliases => '-d',
+                 :type => :boolean,
+                 :desc => "Delete public/index.html"
+
+    def generate_controller
+      template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")
+    end
+
+    def generate_index_and_summary
+      template("index.dryml", File.join('app/views', file_path, "index.dryml"))
+      template("summary.dryml", File.join('app/views', file_path, "summary.dryml"))
+    end
+
+    def remove_index_html
+      return unless options[:delete_index]
+      remove_file File.join(Rails.root, "public/index.html")
+    end
+
+    def add_routes
+      return unless options[:add_routes]
+      route "match 'search' => '#{file_path}#search', :as => 'search'"
+      if class_path.empty?
+        route "root :to => '#{file_path}#index'"
+      else
+        route "match '#{file_path}' => '#{file_path}#index', :as => '#{file_path.gsub(/\//,'_')}'"
+      end
+    end
+
+  end
+end
