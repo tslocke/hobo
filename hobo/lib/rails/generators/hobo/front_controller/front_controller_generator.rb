@@ -5,8 +5,11 @@ module Hobo
     include Hobo::Generators::ControllerModule
     include Hobo::Generators::InviteOnlyModule
 
+    # overrides the default
+    argument :name, :type => :string, :default => 'front', :optional => true
+
     def self.banner
-      "rails generate hobo:front_controller #{self.arguments.map(&:usage).join(' ')} [options]"
+      "rails generate hobo:front_controller [NAME=front] [options]"
     end
 
     class_option :add_routes,
