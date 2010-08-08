@@ -4,7 +4,7 @@ module Hobo
     include Hobo::Generators::InviteOnlyModule
 
     def self.banner
-      "rails generate hobo:rapid #{self.arguments.map(&:usage).join(' ')} [options]"
+      "rails generate hobo:rapid [options]"
     end
 
     class_option :admin,
