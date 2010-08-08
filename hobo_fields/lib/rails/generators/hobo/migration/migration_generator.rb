@@ -5,6 +5,7 @@ module Hobo
   class MigrationGenerator < Rails::Generators::Base
 
     include Rails::Generators::Migration
+    include HoboSupport::Generators::ChooseModule
 
     # the Rails::Generators::Migration.next_migration_number gives a NotImplementedError
     # in Rails 3.0.0.beta4, so we need to implement the logic of ActiveRecord.
@@ -154,11 +155,6 @@ module Hobo
         end
       end
       to_rename
-    end
-
-    def choose(prompt, format)
-      choice = ask prompt
-      (choice =~ format) ? choice : choose(prompt, format)
     end
 
     def migration_name

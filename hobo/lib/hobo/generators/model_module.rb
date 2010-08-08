@@ -1,7 +1,7 @@
 require 'hobo_support/model_generator_module'
 module Hobo
   Generators::ModelModule = classy_module do
-    include HoboSupport::ModelGeneratorModule
+    include HoboSupport::Generators::ModelModule
 
     check_class_collision :suffix => 'Hints'
 
