@@ -1,0 +1,8 @@
+
+<extend tag="page">
+  <old-page merge>
+    <footer:>
+      <a href="&<%= name.underscore >_<%= user_resource_name.underscore %>_url" if="&current_user.administrator?">Admin</a>
+    </footer:>
+  </old-page>
+</extend>

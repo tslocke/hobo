@@ -1,5 +1,5 @@
 <!-- Tag definitions for the <%= subsite_name %> subsite -->
-  
+
 <% if options[:rapid] -%>
 <include src="rapid" plugin="hobo"/>
 
@@ -15,7 +15,7 @@
 <extend tag="page">
   <old-page merge>
     <append-stylesheets:>
-      <stylesheet name="admin"/>
+      <stylesheet name="<%= file_name %>"/>
     </append-stylesheets:>
     <footer:>
       <a href="#{base_url}/">View Site</a>

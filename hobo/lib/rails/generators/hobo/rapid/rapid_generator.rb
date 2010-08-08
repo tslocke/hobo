@@ -1,15 +1,10 @@
 module Hobo
   class RapidGenerator < Rails::Generators::Base
     source_root File.expand_path('../templates', __FILE__)
-    include Hobo::Generators::InviteOnlyModule
 
     def self.banner
       "rails generate hobo:rapid [options]"
     end
-
-    class_option :admin,
-                 :type => :boolean,
-                 :desc => "Generate an admin subsite"
 
     class_option :import_tags,
                  :type => :boolean,
@@ -27,11 +22,6 @@ module Hobo
       directory "themes/clean/views", "app/views/taglibs/themes/clean"
     end
 
-    def generate_admin_subsite
-      return unless with_admin_site?
-      invoke 'hobo:admin_subsite', ['admin'], options.slice( :make_front_site, :invite_only )
-    end
-
     def prepend_rapid_tags_into_application_taglib
       return unless options[:import_tags]
       source  = File.expand_path(find_in_source_paths('rapid_tags_injection.erb'))
@@ -40,12 +30,6 @@ module Hobo
       prepend_file destination do
         ERB.new(::File.binread(source), nil, '-').result(context)
       end
-    end
-
-  private
-
-    def with_admin_site?
-      options[:admin] || options[:invite_only]
     end
 
   end
