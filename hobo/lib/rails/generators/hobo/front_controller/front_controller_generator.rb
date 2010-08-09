@@ -14,12 +14,14 @@ module Hobo
 
     class_option :add_routes,
                  :type => :boolean,
-                 :desc => "Modify config/routes.rb to support the front controller"
+                 :desc => "Modify config/routes.rb to support the front controller",
+                 :default => true
 
     class_option :delete_index,
                  :aliases => '-d',
                  :type => :boolean,
-                 :desc => "Delete public/index.html"
+                 :desc => "Delete public/index.html",
+                 :default => true
 
     def generate_controller
       template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")
