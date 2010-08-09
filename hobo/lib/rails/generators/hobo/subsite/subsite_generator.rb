@@ -8,5 +8,9 @@ module Hobo
 
     include Hobo::Generators::SubsiteModule
 
+    def generate_site_taglib
+      invoke 'hobo:subsite_taglib', [name]
+    end
+
   end
 end

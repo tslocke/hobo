@@ -1,6 +1,5 @@
-<!-- Tag definitions for the <%= subsite_name %> subsite -->
+<!-- Tag definitions for the <%= file_name %> subsite -->
 
-<% if options[:rapid] -%>
 <include src="rapid" plugin="hobo"/>
 
 <include src="taglibs/auto/<%= file_name %>/rapid/cards"/>
@@ -8,9 +7,9 @@
 <include src="taglibs/auto/<%= file_name %>/rapid/forms"/>
 
 <set-theme name="clean"/>
-<% end -%>
 
-<def tag="app-name"><%= app_name %></def>
+<def tag="app-name"><%= "#{application_name.titleize} - #{name.titleize}" %></def>
+<% if options[:admin]%>
 
 <extend tag="page">
   <old-page merge>
@@ -18,13 +17,14 @@
       <stylesheet name="<%= file_name %>"/>
     </append-stylesheets:>
     <footer:>
-      <a href="#{base_url}/">View Site</a>
+      <a href="#{base_url}/">View Site</a> |
     </footer:>
   </old-page>
 </extend>
+<% end -%>
 <% if invite_only? -%>
 
-<extend tag="card" for="User">
+<extend tag="card" for="user_resource_name.camelcase">
   <old-card merge>
     <append-header:><%%= h this.state.titleize %></append-header:>
   </old-card>

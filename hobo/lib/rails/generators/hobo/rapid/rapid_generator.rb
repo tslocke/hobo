@@ -6,10 +6,6 @@ module Hobo
       "rails generate hobo:rapid [options]"
     end
 
-    class_option :import_tags,
-                 :type => :boolean,
-                 :desc => "Modify taglibs/application.dryml to import hobo-rapid and theme tags"
-
     def copy_rapid_files
       copy_file "hobo-rapid.js",      "public/javascripts/hobo-rapid.js"
       copy_file "lowpro.js",          "public/javascripts/lowpro.js"
@@ -20,16 +16,6 @@ module Hobo
       copy_file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
       directory "themes/clean/public","public/hobothemes/clean"
       directory "themes/clean/views", "app/views/taglibs/themes/clean"
-    end
-
-    def prepend_rapid_tags_into_application_taglib
-      return unless options[:import_tags]
-      source  = File.expand_path(find_in_source_paths('rapid_tags_injection.erb'))
-      destination = File.join(Rails.root, "app/views/taglibs/application.dryml")
-      context = instance_eval('binding')
-      prepend_file destination do
-        ERB.new(::File.binread(source), nil, '-').result(context)
-      end
     end
 
   end

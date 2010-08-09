@@ -1,1 +1,0 @@
-<def tag="app-name"><%= application_name.humanize %></def>
