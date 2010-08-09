@@ -1,0 +1,4 @@
+/app/views/taglibs/auto/
+/config/hobo_routes.rb
+/log/
+/tmp/
