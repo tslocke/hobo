@@ -5,7 +5,7 @@ module Hobo
   class MigrationGenerator < Rails::Generators::Base
 
     include Rails::Generators::Migration
-    include HoboSupport::Generators::ChooseModule
+    include HoboSupport::Generators::ThorShellModule
 
     # the Rails::Generators::Migration.next_migration_number gives a NotImplementedError
     # in Rails 3.0.0.beta4, so we need to implement the logic of ActiveRecord.
