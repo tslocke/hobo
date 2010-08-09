@@ -19,8 +19,8 @@ module Hobo
           say "Cannot rename application.dryml to #{file_name}_site.dryml"
           exit 1
         end
-        say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/#{file_name}site.dryml"
-        FileUtils.mv('app/views/taglibs/application.dryml', "app/views/taglibs/#{file_name}.dryml")
+        say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml"
+        FileUtils.mv('app/views/taglibs/application.dryml', "app/views/taglibs/front_site.dryml")
         template "application.dryml", 'app/views/taglibs/application.dryml'
       end
 
