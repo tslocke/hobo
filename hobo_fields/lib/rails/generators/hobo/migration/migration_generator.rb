@@ -1,5 +1,6 @@
 require 'rails/generators/migration'
 require 'rails/generators/active_record'
+require 'hobo_support/generators/thor_shell_module'
 
 module Hobo
   class MigrationGenerator < Rails::Generators::Base
