@@ -8,12 +8,12 @@ module Hobo
       "rails generate hobo:user_resource [NAME=user] [options]"
     end
 
-    def generate_hobo_user_controller
-      invoke 'hobo:user_controller', [name.pluralize], options
-    end
-
     def generate_hobo_model
       invoke 'hobo:user_model', [name.singularize], options
+    end
+
+    def generate_hobo_user_controller
+      invoke 'hobo:user_controller', [name.pluralize], options
     end
 
   end

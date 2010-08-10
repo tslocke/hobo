@@ -18,12 +18,12 @@ module Hobo
 
     def rapid
       say 'Installing Hobo Rapid and default theme...'
-      invoke 'hobo:rapid', :invite_only => @invite_only
+      invoke 'hobo:rapid', [], :invite_only => @invite_only
     end
 
     def user_resource
       @user_resource_name = ask("Choose a name for the user resource (leave it blank for 'user') [user|<custom_name>]:", 'user')
-      say "Installing #{@user_resource_name} resources..."
+      say "Installing '#{@user_resource_name}' resources..."
       invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only
     end
 

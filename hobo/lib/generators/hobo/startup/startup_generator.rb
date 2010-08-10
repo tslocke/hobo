@@ -5,7 +5,6 @@ module Hobo
     include Generators::Hobo::Helper
 
     def add_basic_resources
-      gem 'hobo', Hobo::VERSION
       template  'application.dryml.erb',  'app/views/taglibs/application.dryml'
       copy_file 'application.css',    'public/stylesheets/application.css'
       copy_file 'dryml-support.js',   'public/javascripts/dryml-support.js'
