@@ -28,17 +28,10 @@ module Hobo
 
     def choose_test_framework
       say_title 'Test Framework'
-      test_framework = ask('Choose your preferred test framework [<enter>=test_unit|<custom_test_framework_and_options>]:', 'test_unit')
-      if test_framework == 'test_unit'
-        return say "'test_unit' is the default test framework: nothing to change"
-      else
-        say "Setting '#{test_framework}' as the test framework"
-        environment <<EOE
-config.generators do |g|
-  g.test_framework  :#{test_framework}
-end
-EOE
-      end
+      require 'generators/hobo/test_framework/test_framework_generator'
+      f = Hobo::TestFrameworkGenerator::FRAMEWORKS * '|'
+      test_framework = choose("Choose your preferred test framework: [<enter>=#{f}]:", /^(#{f})$/, 'test_unit')
+      invoke 'hobo:test_framework', [test_framework]
     end
 
     def invite_only_option
