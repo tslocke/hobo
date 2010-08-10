@@ -67,10 +67,8 @@ module Hobo
                choose("\nWhat now: [g]enerate migration, generate and [m]igrate now or [c]ancel?", /^(g|m|c)$/)
 
       if action != 'c'
-        unless options[:default_name]
-          say "\nMigration filename:"
-          say "(you can type spaces instead of '_' -- every little helps)"
-          final_migration_name = choose("Filename [#{migration_name}]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
+        if name.blank? && !options[:default_name]
+          final_migration_name = choose("\nMigration filename: [<enter>=#{migration_name}|<custom_name>]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
         end
         final_migration_name = migration_name if final_migration_name.blank?
 
