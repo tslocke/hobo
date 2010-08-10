@@ -5,54 +5,78 @@ module Hobo
 
     include Generators::HoboSupport::ThorShell
 
-    def ask_site_wide_questions
-      say 'Please, answer to these questions in order to customize your Hobo Application:'
-      @invite_only   = yes_no?("Do you want to add the features for an invite only website?")
-      @admin_subsite = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
-    end
 
     def startup
+      say_title 'Startup'
       say 'Initializing Hobo...'
       invoke 'hobo:startup'
     end
 
-    def rapid
-      say 'Installing Hobo Rapid and default theme...'
-      invoke 'hobo:rapid', [], :invite_only => @invite_only
-    end
-
-    def user_resource
-      @user_resource_name = ask("Choose a name for the user resource (leave it blank for 'user') [user|<custom_name>]:", 'user')
-      say "Installing '#{@user_resource_name}' resources..."
-      invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only
-    end
-
-    def front_controller
-      front_controller_name = ask("Choose a name for the front controller (leave it blank for 'front') [front|<custom_name>]:", 'front')
-      say "Installing #{front_controller_name} controller..."
-      invoke 'hobo:front_controller', [front_controller_name], :invite_only => @invite_only
-    end
-
-    def admin_subsite
-      return unless @amin_subsite
-      admin_subsite_name = ask("Choose a name for the admin subsite (leave it blank for 'admin') [admin|<custom_name>]:", 'user')
-      say "Installing admin subsite..."
-      invoke 'hobo:admin_subsite', [admin_subsite_name, @user_resource_name], :invite_only => @invite_only
-    end
-
     def gems
-      say "Optional Gems..."
+      say_title "Optional Gems"
       gem 'will_paginate' if yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
       gem 'meta_where' if yes_no?("Do you want to use the 'meta_where' gem in your application?")
       say "If you want to use other gems, please add them to the Gemfile"
     end
 
     def bundle_install
+      say_title 'Bundler'
       return unless yes_no?("Do you want to run 'bundle install' now? (recommended)")
+      say 'Running bundle install...'
       puts run('bundle install')
     end
 
+    def choose_test_framework
+      say_title 'Test Framework'
+      test_framework = ask('Choose your preferred test framework [<enter>=test_unit|<custom_test_framework_and_options>]:', 'test_unit')
+      if test_framework == 'test_unit'
+        return say "'test_unit' is the default test framework: nothing to change"
+      else
+        say "Setting '#{test_framework}' as the test framework"
+        environment <<EOE
+config.generators do |g|
+  g.test_framework  :#{test_framework}
+end
+EOE
+      end
+    end
+
+    def invite_only_option
+      say_title 'Invite Only Option'
+      @invite_only = yes_no?("Do you want to add the features for an invite only website?")
+    end
+
+    def rapid
+      say_title 'Hobo Rapid'
+      say 'Installing Hobo Rapid and default theme...'
+      invoke 'hobo:rapid', [], :invite_only => @invite_only
+    end
+
+    def user_resource
+      say_title 'User Resource'
+      @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
+      say "Installing '#{@user_resource_name}' resources..."
+      invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only
+    end
+
+    def front_controller
+      say_title 'Front Controller'
+      front_controller_name = ask("Choose a name for the front controller [<enter>=front|<custom_name>]:", 'front')
+      say "Installing #{front_controller_name} controller..."
+      invoke 'hobo:front_controller', [front_controller_name], :invite_only => @invite_only
+    end
+
+    def admin_subsite
+      say_title 'Admin Subsite'
+      admin_subsite = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
+      return unless admin_subsite
+      admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
+      say "Installing admin subsite..."
+      invoke 'hobo:admin_subsite', [admin_subsite_name, @user_resource_name], :invite_only => @invite_only
+    end
+
     def migration
+      say_title 'DB Migration'
       action = choose('Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate [s|g|m]:', /^(s|g|m)$/)
       opt = case action
             when 's'
@@ -61,7 +85,8 @@ module Hobo
               {:generate => true}
             when 'm'
               {:migrate => true}
-            end
+          end
+      say action == 'g' ? 'Generating Migration...' : 'Migrating...'
       invoke 'hobo:migration', ['initial_migration'], opt
     end
 
@@ -71,17 +96,18 @@ module Hobo
     end
 
     def git_repo
+      say_title 'Git Repository'
       return unless yes_no?("Do you want to initialize a git repository now?")
-      copy_file 'gitignore', '.gitignore'
+      say 'Initializing git repository...'
+      append_file '.gitignore', "/app/views/taglibs/auto/*\n/config/hobo_routes.rb\n"
       git :init
       git :add => '.'
       git :commit => '-m "initial commit"'
     end
 
     def finalize
-      say 'Process completed!'
-      say <<EOF, Color::WHITE
-
+      say_title 'Process completed!'
+      say <<EOF
 You can start your application with `rails server`
 (run with --help for options). Then point your browser to
 http://localhost:3000/
@@ -91,6 +117,7 @@ You can find the following resources handy:
 
 * The Getting Started Guide: http://guides.rubyonrails.org/getting_started.html
 * Ruby on Rails Tutorial Book: http://www.railstutorial.org/
+
 EOF
     end
 
