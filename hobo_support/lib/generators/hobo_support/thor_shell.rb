@@ -6,14 +6,10 @@ module Generators
 
       private
 
-      def say(message="", color=Thor::Shell::Color::GREEN, force_new_line=(message.to_s !~ /( |\t)$/))
-        super
-      end
-
       def ask(statement, default='', color=Thor::Shell::Color::MAGENTA)
         result = super(statement, color)
         result = default if result.blank?
-        say PREFIX + result
+        say PREFIX + result.inspect
         result
       end
 
@@ -22,14 +18,29 @@ module Generators
         result == 'y' ? true : false
       end
 
-      def choose(prompt, format)
-        choice = ask prompt
-        if choice =~ format
+      def choose(prompt, format, default=nil)
+        choice = ask prompt, default
+        case
+        when choice =~ format
           choice
+        when choice.blank? && !default.blank?
+          default
         else
-          say 'Wrong choice! '
+          say 'Unknown choice! ', Thor::Shell::Color::RED
           choose(prompt, format)
         end
+      end
+
+      def say_title(title)
+        say "\n #{title} \n", (Thor::Shell::Color::ON_BLUE + Thor::Shell::Color::WHITE)
+      end
+
+      def multi_ask(statement)
+        result = []
+        while (r = ask(statement)) && !r.blank?
+          result << r
+        end
+        result
       end
 
     end
