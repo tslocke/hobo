@@ -1,13 +1,13 @@
 module Hobo
   class AdminSubsiteGenerator < Rails::Generators::NamedBase
-
     source_root File.expand_path('../templates', __FILE__)
-    include Generators::Hobo::Subsite
-    include Generators::Hobo::InviteOnly
 
     # overrides the default
     argument :name, :type => :string, :default => 'admin', :optional => true
     argument :user_resource_name, :type => :string, :default => 'user', :optional => true
+
+    include Generators::Hobo::Subsite
+    include Generators::Hobo::InviteOnly
 
     def self.banner
       "rails generate hobo:admin_subsite [NAME=admin [USER_RESOURCE_NAME=user]] [options]"

@@ -1,12 +1,12 @@
 module Hobo
   class FrontControllerGenerator < Rails::Generators::NamedBase
-
     source_root File.expand_path('../templates', __FILE__)
-    include Generators::Hobo::Controller
-    include Generators::Hobo::InviteOnly
 
     # overrides the default
     argument :name, :type => :string, :default => 'front', :optional => true
+
+    include Generators::Hobo::Controller
+    include Generators::Hobo::InviteOnly
 
     def self.banner
       "rails generate hobo:front_controller [NAME=front] [options]"

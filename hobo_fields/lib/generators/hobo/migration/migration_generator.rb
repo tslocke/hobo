@@ -4,6 +4,9 @@ require 'generators/hobo_support/thor_shell'
 
 module Hobo
   class MigrationGenerator < Rails::Generators::Base
+    source_root File.expand_path('../templates', __FILE__)
+
+    argument :name, :type => :string, :optional => true
 
     include Rails::Generators::Migration
     include Generators::HoboSupport::ThorShell
@@ -19,12 +22,6 @@ module Hobo
     def self.banner
       "rails generate hobo:migration #{self.arguments.map(&:usage).join(' ')} [options]"
     end
-
-    source_root File.expand_path('../templates', __FILE__)
-
-    argument :name,
-             :type => :string,
-             :optional => true
 
     class_option :drop,
                  :aliases => '-d',

@@ -1,11 +1,12 @@
 module Hobo
   class UserControllerGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
-    include Generators::Hobo::Controller
-    include Generators::Hobo::InviteOnly
 
     # overrides the default
     argument :name, :type => :string, :default => 'users', :optional => true
+
+    include Generators::Hobo::Controller
+    include Generators::Hobo::InviteOnly
 
     def self.banner
       "rails generate hobo:user_controller [NAME=users] [options]"
