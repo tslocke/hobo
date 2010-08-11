@@ -11,8 +11,7 @@ doctest: model file exists
 
 doctest: model content matches
 >> File.read 'app/models/alpha/beta.rb'
-=> "class Alpha::Beta < ActiveRecord::Base\n  fields do\n    one :string\n    two :integer\n  end\n\nend\n"
-
+=> "class Alpha::Beta < ActiveRecord::Base\n\n  fields do\n    one :string\n    two :integer\n  end\n\nend\n"
 
 doctest: module file exists
 >> File.exist? 'app/models/alpha.rb'
@@ -33,13 +32,8 @@ doctest: test content matches
 
 
 doctest: fixture file exists
->> File.exist? 'test/fixtures/alpha_betas.yml'
+>> File.exist? 'test/fixtures/alpha/betas.yml'
 => true
-
-doctest: fixture content matches
->> File.read 'test/fixtures/alpha_betas.yml'
-=> "# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html\n\none:\n  one: MyString\n  two: 1\n\ntwo:\n  one: MyString\n  two: 1\n"
-
 
 
 doctest: generate hobo:migration

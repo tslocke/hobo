@@ -3,7 +3,9 @@
 <% for attribute in field_attributes -%>
     <%= "%-#{max_attribute_length}s" % attribute.name %> :<%= attribute.type %>
 <% end -%>
+<% if options[:timestamps] -%>
     timestamps
+<% end -%>
   end
 
 <% for bt in bts -%>
@@ -14,4 +16,3 @@
   has_many :<%= hm %>, :dependent => :destroy
 <% end -%>
 <%= "\n" unless hms.empty? -%>
-
