@@ -16,7 +16,7 @@ Hobo lifecycles is a mechanism for declaring the life-cycle of a model in a natu
 First the junk to get us started:
 
 doctest: prepare testapp environment
-doctest_require: '../../prepare_testapp'
+doctest_require: '../prepare_testapp'
 
 A user model for our example:
 
