@@ -1,10 +1,8 @@
 require 'generators/hobo_support/thor_shell'
 module Hobo
   class SetupWizardGenerator < Rails::Generators::Base
-    source_root File.expand_path('../templates', __FILE__)
 
     include Generators::HoboSupport::ThorShell
-
 
     def startup
       say_title 'Startup'
@@ -12,26 +10,32 @@ module Hobo
       invoke 'hobo:startup'
     end
 
-    def gems
-      say_title "Optional Gems"
-      gem 'will_paginate' if yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
-      gem 'meta_where' if yes_no?("Do you want to use the 'meta_where' gem in your application?")
-      say "If you want to use other gems, please add them to the Gemfile"
-    end
-
-    def bundle_install
-      say_title 'Bundler'
-      return unless yes_no?("Do you want to run 'bundle install' now? (recommended)")
-      say 'Running bundle install...'
-      puts run('bundle install')
-    end
-
     def choose_test_framework
       say_title 'Test Framework'
+      return unless yes_no? "Do you want to customize the test_framework?"
       require 'generators/hobo/test_framework/test_framework_generator'
       f = Hobo::TestFrameworkGenerator::FRAMEWORKS * '|'
       test_framework = choose("Choose your preferred test framework: [<enter>=#{f}]:", /^(#{f})$/, 'test_unit')
-      invoke 'hobo:test_framework', [test_framework]
+      fixtures = yes_no?("Do you want the test framework to generate the fixtures?")
+      fixture_replacement = ask("Type your preferred fixture replacement or <enter> for no replacement:")
+      invoke 'hobo:test_framework', [test_framework, fixture_replacement], :fixtures => fixtures
+      say("WARNING: Remember to add the '#{fixture_replacement}' gem to the Gemfile at the following prompt", Color::RED) unless fixture_replacement.blank?
+    end
+
+    def gems
+      say_title "Optional Gems"
+      gem 'will_paginate' if yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
+      statements = []
+      say <<EOQ
+You can append a few statements to the Gemfile now. For example if you choose 'factory_girl' as the fixture_replacement, you should enter something like:
+    gem 'factory_girl', :group => :test
+and that will be appended to the Gemfile, so the Hobo generators will imediately use it to produce your fixtures.
+EOQ
+      statements = multi_ask "Type your statement or <enter> to stop adding:"
+      unless statements.empty?
+        append_file 'Gemfile', statements * "\n"
+        puts run('bundle install')
+      end
     end
 
     def invite_only_option
@@ -61,8 +65,8 @@ module Hobo
 
     def admin_subsite
       say_title 'Admin Subsite'
-      admin_subsite = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
-      return unless admin_subsite
+      admin = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
+      return unless admin
       admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
       say "Installing admin subsite..."
       invoke 'hobo:admin_subsite', [admin_subsite_name, @user_resource_name], :invite_only => @invite_only
@@ -84,8 +88,18 @@ module Hobo
     end
 
     def i18n
+      say_title 'I18n'
       # search for hobo available locales
+      locales = Hobo::Engine.paths.config.locales.paths.map do |l|
+        l =~ /hobo\.([^\/]+)\.yml$/
+        $1.to_sym.inspect
+      end
       # choose default_locale
+      say "The available Hobo internal locales are #{locales * ', '} (please, contribute to more translations)"
+      default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
+      default_locale.gsub!(/\:/, '')
+      environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
+      say "NOTICE: You should manually install in 'config/locales' the Rails locale file(s) that your application will use.", Color::YELLOW
     end
 
     def git_repo
