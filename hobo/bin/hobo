@@ -1,157 +1,32 @@
 #!/usr/bin/env ruby
+puts 'Hobo Command Line Interface 1.3.0.pre0'
 
-require 'fileutils'
-require 'pathname'
+banner = <<EOU
 
-require 'rbconfig'
+Usage:
+    hobo new <app_name> [rails_options]   Creates a new Hobo Application
+    hobo g <generator> [ARGS] [options]   Fires the hobo:<generator>
+    hobo --help                           This help screen
 
-RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
+EOU
 
-if RUBY.empty?
-  puts "ruby not found"
-  exit 2
-end
+template_path = File.expand_path('../hobo_template.rb', __FILE__)
 
-Signal.trap("INT") { puts; exit }
+command = ARGV.shift
+argv = ARGV * ' '
 
-hobo_src = File.join(File.dirname(__FILE__), "../hobo_files/plugin")
-
-USAGE = "USAGE: hobo <options> <app-path>
-
-Options:
-  --user-model <model-name-or-false>
-  --db-create                        # Run rake db:create:all
-  --hobo-src <path to hobo src>
-  -d | --database <database>         # e.g. mysql, sqlite
-  -r | --rails <version>             # rails version to use
-  -n | --no-rails                    # don't run 'rails'.  Assumes app-path=='.'
-  --invite-only                      # add features for an invite-only website (admin site, no signup)
-"
-
-
-### Nasty stuff needed for Windows :-( ###
-if Config::CONFIG["arch"] =~ /win32/
-  require "win32/registry"
-  def system(command)
-    win = Win32API.new("crtdll", "system", ['P'], 'L').Call(command)
-  end
-end
-### end nasty stuff ###
-
-
-def command(*s)
-  com = s.join(' ')
-  puts "--> #{com}"
-  ok = system(com)
-  exit(1) unless ok
-end
-
-user_model = "user"
-create_db  = false
-run_rails  = true
-add_gem    = true
-invite_only = ""
-
-while true
-  case arg_name = ARGV.shift
-  when "--user-model"
-    arg = ARGV.shift
-    user_model = arg == "false" ? nil : arg
-  when "--db-create"
-    create_db = true
-  when "--hobo-src"
-    hobo_src = ARGV.shift
-    hobo_src = "../" + hobo_src unless Pathname.new(hobo_src).absolute?
-  when "-d", "--database"
-    database_type = ARGV.shift
-  when "-r", "--rails"
-    rails_version = ARGV.shift
-  when "-n", "--no-rails"
-    run_rails = false
-  when "--no-gem"
-    add_gem = false
-  when "--invite-only"
-    invite_only = "--invite-only"
-  when "--help"
-    puts USAGE
-    exit
+case command
+when 'new'
+  exec "rails new #{argv} -m #{template_path}"
+when /^(g|generate)$/
+  if ARGV.empty?
+    puts "\nThe generator name is missing!\n"
+    puts banner
   else
-    app_path = arg_name
-    break
+    exec "rails g hobo:#{argv}"
   end
+else
+  puts "\n  => '#{command}' is an unknown command!\n"
+  puts banner
 end
 
-if run_rails==false && app_path.nil?
-  app_path = '.'
-end
-
-if !ARGV.empty? || app_path.nil?
-  puts USAGE
-  exit 1
-end
-
-if run_rails
-  puts "\nGenerating Rails app...\n"
-  opts = []
-  if rails_version
-    opts << "_#{rails_version}_"
-  else
-    v=`#{RUBY} -S rails -v`.split[1].split(".")
-    unless v.length>=3
-      puts "rails not found!"
-      exit 2
-    end
-    unless v[0]=='2' && ['2', '3'].include?(v[1])
-      puts "Rails 2.2 or 2.3 required!"
-      puts "Rails 3 requires Hobo 1.1 or later."
-      exit 2
-    end
-  end
-  opts << "-d #{database_type}" if database_type
-  system("#{RUBY} -S rails #{opts * ' '} #{app_path}")
-end
-
-Dir.chdir(app_path) do
-  gen = "#{RUBY} #{File.join('script', 'generate')}"
-  plugin = "#{RUBY} #{File.join('script', 'plugin')}"
-
-  FileUtils.touch("public/stylesheets/application.css")
-
-  puts "\nInitialising Hobo...\n"
-  if add_gem
-    command(gen, "hobo --add-gem")
-  end
-  command(gen, "hobo --add-routes")
-
-  puts "\nInstalling Hobo Rapid and default theme...\n"
-  command("#{gen} hobo_rapid --import-tags #{invite_only}")
-
-  if user_model
-    puts "\nCreating #{user_model} model and controller...\n"
-    command("#{gen} hobo_user_model #{user_model} #{invite_only}")
-    command("#{gen} hobo_user_controller #{user_model} #{invite_only}")
-  end
-
-  puts "\nCreating standard pages...\n"
-  command("#{gen} hobo_front_controller front --delete-index --add-routes #{invite_only}")
-
-  if create_db
-    puts "\nCreating databases"
-    command("#{RUBY} -S rake db:create:all")
-  end
-end
-
-if !invite_only.empty?
-  puts %(
-Invite-only website
-  If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
-  to the relevant controllers, e.g. to prevent all access to the site, add
-  
-    include Hobo::AuthenticationSupport
-    before_filter :login_required
-  
-  to application_controller.rb (note that the include statement is not required for hobo_controllers)
-  
-  NOTE: You might want to sign up as the administrator before adding this!
-)
-end
