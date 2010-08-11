@@ -1,0 +1,18 @@
+doctest: prepare application environment
+doctest_require: '../prepare_testapp'
+
+>> Rails::Generators.invoke 'hobo:startup'
+
+>> File.exists? 'app/views/taglibs/application.dryml'
+=> true
+
+>> File.exists?  'public/stylesheets/application.css'
+=> true
+
+>> File.exists?  'public/javascripts/dryml-support.js'
+=> true
+
+>> File.exists?  'app/model/guest.rb'
+=> true
+
+>> FileUtils.rm_rf  TEST_APP_ROOT
