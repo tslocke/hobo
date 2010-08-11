@@ -24,7 +24,8 @@ module Hobo
 
     def gems
       say_title "Optional Gems"
-      gem 'will_paginate' if yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
+      will_paginate = yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
+      gem 'will_paginate' if will_paginate
       statements = []
       say %(
 You can append a few statements to the Gemfile now. For example if you choose 'factory_girl' as the fixture_replacement, you should enter something like:
@@ -32,10 +33,8 @@ You can append a few statements to the Gemfile now. For example if you choose 'f
 and that will be appended to the Gemfile, so the Hobo generators will imediately use it to generate your fixtures.
 )
       statements = multi_ask "Type your statement or <enter> to stop adding:"
-      unless statements.empty?
-        append_file 'Gemfile', statements * "\n"
-        puts run('bundle install')
-      end
+      append_file 'Gemfile', statements * "\n" unless statements.empty?
+      puts run('bundle install') if !statements.empty? || will_paginate
     end
 
     def invite_only_option
@@ -107,6 +106,7 @@ Invite-only website
       end
       say "The available Hobo internal locales are #{locales * ', '} (please, contribute to more translations)"
       default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
+      return if default_locale.blank?
       default_locale.gsub!(/\:/, '')
       environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
       say "NOTICE: You should manually install in 'config/locales' the Rails locale file(s) that your application will use.", Color::YELLOW
@@ -117,11 +117,17 @@ Invite-only website
       return unless yes_no?("Do you want to initialize a git repository now?")
       say 'Initializing git repository...'
       hobo_routes_rel_path = Hobo::Engine.config.hobo.routes_path.relative_path_from Rails.root
-      append_file '.gitignore', "/app/views/taglibs/auto/*\n/#{hobo_routes_rel_path}\n"
+      append_file '.gitignore', "app/views/taglibs/auto/**/*\n#{hobo_routes_rel_path}\n"
       git :init
       git :add => '.'
       git :commit => '-m "initial commit"'
       say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly."
+    end
+
+     def cleanup_app_template
+      say_title 'Cleanup'
+      # remove the template if one
+      remove_file File.join(File.dirname(Rails.root), ".hobo_app_template")
     end
 
     def finalize

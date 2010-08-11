@@ -1,0 +1,4 @@
+Description:
+    This wizard is used by bin/hobo to configure a new
+    created application. You can use it directly in order
+    to overwrite any file of the original installation.
