@@ -26,11 +26,11 @@ module Hobo
       say_title "Optional Gems"
       gem 'will_paginate' if yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
       statements = []
-      say <<EOQ
+      say %(
 You can append a few statements to the Gemfile now. For example if you choose 'factory_girl' as the fixture_replacement, you should enter something like:
     gem 'factory_girl', :group => :test
-and that will be appended to the Gemfile, so the Hobo generators will imediately use it to produce your fixtures.
-EOQ
+and that will be appended to the Gemfile, so the Hobo generators will imediately use it to generate your fixtures.
+)
       statements = multi_ask "Type your statement or <enter> to stop adding:"
       unless statements.empty?
         append_file 'Gemfile', statements * "\n"
@@ -41,6 +41,18 @@ EOQ
     def invite_only_option
       say_title 'Invite Only Option'
       @invite_only = yes_no?("Do you want to add the features for an invite only website?")
+      say %(
+Invite-only website
+  If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
+  to the relevant controllers, e.g. to prevent all access to the site, add
+
+    include Hobo::AuthenticationSupport
+    before_filter :login_required
+
+  to application_controller.rb (note that the include statement is not required for hobo_controllers)
+
+  NOTE: You might want to sign up as the administrator before adding this!
+) if @invte_only
     end
 
     def rapid
@@ -89,12 +101,10 @@ EOQ
 
     def i18n
       say_title 'I18n'
-      # search for hobo available locales
       locales = Hobo::Engine.paths.config.locales.paths.map do |l|
         l =~ /hobo\.([^\/]+)\.yml$/
         $1.to_sym.inspect
       end
-      # choose default_locale
       say "The available Hobo internal locales are #{locales * ', '} (please, contribute to more translations)"
       default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
       default_locale.gsub!(/\:/, '')
@@ -114,8 +124,7 @@ EOQ
 
     def finalize
       say_title 'Process completed!'
-      say <<EOF
-You can start your application with `rails server`
+      say %(You can start your application with `rails server`
 (run with --help for options). Then point your browser to
 http://localhost:3000/
 
@@ -124,8 +133,7 @@ You can find the following resources handy:
 
 * The Getting Started Guide: http://guides.rubyonrails.org/getting_started.html
 * Ruby on Rails Tutorial Book: http://www.railstutorial.org/
-
-EOF
+)
     end
 
   end
