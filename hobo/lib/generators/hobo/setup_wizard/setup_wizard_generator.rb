@@ -116,10 +116,12 @@ Invite-only website
       say_title 'Git Repository'
       return unless yes_no?("Do you want to initialize a git repository now?")
       say 'Initializing git repository...'
-      append_file '.gitignore', "/app/views/taglibs/auto/*\n/config/hobo_routes.rb\n"
+      hobo_routes_rel_path = Hobo::Engine.config.hobo.routes_path.relative_path_from Rails.root
+      append_file '.gitignore', "/app/views/taglibs/auto/*\n/#{hobo_routes_rel_path}\n"
       git :init
       git :add => '.'
       git :commit => '-m "initial commit"'
+      say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly."
     end
 
     def finalize

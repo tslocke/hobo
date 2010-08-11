@@ -14,7 +14,7 @@ module Hobo
     ActiveSupport.on_load(:before_configuration) do
       h = config.hobo = ActiveSupport::OrderedOptions.new
       h.developer_features = Rails.env.in?(["development", "test"])
-      h.routes_path = File.expand_path('config/hobo_routes.rb', Rails.root)
+      h.routes_path = Pathname.new File.expand_path('config/hobo_routes.rb', Rails.root)
     end
 
     ActiveSupport.on_load(:action_controller) do

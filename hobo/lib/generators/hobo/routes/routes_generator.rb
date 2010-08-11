@@ -8,7 +8,7 @@ module Hobo
 
     def generate_routes
       Hobo::Routes.reset_linkables
-      template "hobo_routes.rb.erb", Rails.application.config.hobo.routes_path
+      template "hobo_routes.rb.erb", Hobo::Engine.config.hobo.routes_path
     end
 
 private
