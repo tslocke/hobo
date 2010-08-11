@@ -15,16 +15,6 @@ test:
   pool: 5
   timeout: 5000
 
-mysql_test:
-  adapter: mysql
-  encoding: utf8
-  reconnect: false
-  database: agility_mysql_test
-  pool: 5
-  username: root
-  password:
-  host: localhost
-
 production:
   adapter: sqlite3
   database: db/production.sqlite3
