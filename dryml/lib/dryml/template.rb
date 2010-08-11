@@ -38,7 +38,7 @@ module Dryml
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path
-      @template_path = @template_path.sub(%r(^#{Regexp.escape(RAILS_ROOT)}/), "") if Object.const_defined? :RAILS_ROOT
+      @template_path = @template_path.sub(%r(^#{Regexp.escape(Rails.root)}/), "") if Object.const_defined? :Rails
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
@@ -53,9 +53,9 @@ module Dryml
 
       unless @template_path.ends_with?(EMPTY_PAGE)
         p = Pathname.new template_path
-        p = Pathname.new(RAILS_ROOT) + p unless p.absolute? || !Object.const_defined?(:RAILS_ROOT)
+        p = Pathname.new(Rails.root) + p unless p.absolute? || !Object.const_defined?(:Rails)
         mtime = p.mtime rescue Time.now
-      
+
         if !@builder.ready?(mtime)
           @builder.start
           parsed = true
@@ -70,7 +70,7 @@ module Dryml
           Template.build_cache[@template_path] = @builder
         end
       end
-      
+
       # compile the build instructions
       @builder.build(local_names, auto_taglibs, mtime)
 
@@ -234,7 +234,7 @@ module Dryml
 
 
     def define_polymorphic_dispatcher(el, name)
-      # FIXME: The new erb context ends up being set-up twice 
+      # FIXME: The new erb context ends up being set-up twice
       src = %(
       def #{name}(attributes={}, parameters={})
         _tag_context(attributes) do
@@ -246,20 +246,20 @@ module Dryml
       )
       @builder.add_build_instruction(:eval, :src => src, :line_num => element_line_num(el))
     end
-    
-    
+
+
     def extend_element(el)
       def_element(el, true)
     end
-    
-    
+
+
     def type_specific_suffix
       el = @def_element
       for_type = el.attributes['for']
       if for_type
         type_name = if defined?(HoboFields) && for_type =~ /^[a-z]/
                       # It's a symbolic type name - look up the Ruby type name
-                      klass = HoboFields.to_class(for_type) or 
+                      klass = HoboFields.to_class(for_type) or
                         dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el)
                       klass.name
                     else
@@ -268,7 +268,7 @@ module Dryml
         "__for_#{type_name}"
       end
     end
-        
+
 
     def def_element(el, extend_tag=false)
       require_toplevel(el)
@@ -285,12 +285,12 @@ module Dryml
         name        += suffix
         unsafe_name += suffix
       end
-      
+
       if el.attributes['polymorphic']
         %w(for alias-of).each do |attr|
           dryml_exception("def cannot have both 'polymorphic' and '#{attr}' attributes") if el.attributes[attr]
         end
-        
+
         define_polymorphic_dispatcher(el, ruby_name(name))
         name        += "__base"
         unsafe_name += "__base"
@@ -351,13 +351,13 @@ module Dryml
     def tag_method(name, el, extend_tag=false)
       name = ruby_name name
       param_names = param_names_in_definition(el)
-      
+
       if extend_tag
         @extend_key = 'a' + Digest::SHA1.hexdigest(el.to_s)[0..10]
         alias_statement = "; alias_method_chain_on_include :#{name}, :#{@extend_key}"
         name = "#{name}_with_#{@extend_key}"
       end
-            
+
       src = "<% def #{name}(all_attributes={}, all_parameters={}); " +
         "parameters = Dryml::TagParameters.new(all_parameters, #{param_names.inspect.underscore}); " +
         "all_parameters = Dryml::TagParameters.new(all_parameters); " +
@@ -477,8 +477,8 @@ module Dryml
     def part_delegate_tag_name(el)
       "#{@def_name}_#{el.attributes['part']}__part_delegate"
     end
-    
-    
+
+
     def current_def_name
       @def_element && @def_element.attributes['tag']
     end
@@ -496,8 +496,8 @@ module Dryml
         nil
       end
     end
-    
-    
+
+
     def inside_def_for_type?
       @def_element && @def_element.attributes['for']
     end
@@ -505,7 +505,7 @@ module Dryml
 
     def call_name(el)
       dryml_exception("invalid tag name (remember to use '-' rather than '_')", el) unless el.dryml_name =~ /^#{DRYML_NAME}(\.#{DRYML_NAME})*$/
-      
+
       name = Dryml.unreserve(ruby_name(el.dryml_name))
       if call_to_self_from_type_specific_def?(el)
         "#{name}__base"
@@ -517,8 +517,8 @@ module Dryml
         name
       end
     end
-    
-    
+
+
     def old_tag_call?(el)
       @def_element && el.dryml_name == "old-#{current_def_name}"
     end
@@ -527,7 +527,7 @@ module Dryml
     def call_to_self_from_type_specific_def?(el)
       inside_def_for_type? && el.dryml_name == current_def_name &&!el.attributes['for-type']
     end
-    
+
 
     def polymorphic_call_type(el)
       t = el.attributes['for-type']
@@ -607,7 +607,7 @@ module Dryml
       call_type = nil
 
       metadata_name = containing_tag_name || el.expanded_name
-      
+
       param_items = el.map do |node|
         case node
         when REXML::Text
@@ -642,7 +642,7 @@ module Dryml
           param_items = " :default => #{default_param_proc(el, containing_tag_name)}, "
         end
       end
-      
+
       param_items.concat without_parameters(el)
 
       merge_params = el.attributes['merge-params'] || merge_attribute(el)
@@ -660,8 +660,8 @@ module Dryml
         "{#{param_items}}"
       end
     end
-    
-    
+
+
     def without_parameters(el)
       without_names = el.attributes.keys.map { |name| name =~ /^without-(.*)/ and $1 }.compact
       without_names.map { |name| ":#{ruby_name name}_replacement => proc {|__discard__| '' }, " }.join
@@ -799,7 +799,7 @@ module Dryml
 
         next if n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
         next if el.attributes['part'] && n == 'id' # The id is rendered on the <div class="part-wrapper"> instead
-        
+
         ":#{ruby_name n} => #{attribute_to_ruby(v)}"
       end.compact
 
@@ -817,8 +817,8 @@ module Dryml
         hash
       end
     end
-    
-    
+
+
     def compile_merge_attrs(el)
       merge_attrs = el.attributes['merge-attrs']
       if merge_attrs == "&true"
@@ -830,7 +830,7 @@ module Dryml
         "(all_attributes & #{merge_attr_names.inspect})"
       end
     end
-    
+
 
     def static_tag_to_method_call(el)
       part = el.attributes["part"]

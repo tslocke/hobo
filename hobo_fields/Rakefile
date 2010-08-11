@@ -34,7 +34,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.homepage     = "http://hobocentral.net/"
   gemspec.authors      = ["Tom Locke"]
   gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("rails", ["= 3.0.0.beta4"])
+  gemspec.add_dependency("rails", ["= 3.0.0.rc"])
   gemspec.add_dependency("hobo_support", ["= #{HoboFields::VERSION}"])
 end
 Jeweler::GemcutterTasks.new

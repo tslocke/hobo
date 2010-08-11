@@ -10,9 +10,9 @@
   <%= Rails.vendor_rails? ? "vendor" : "gem" -%>
 </def>
 
-<!-- `RAILS_ROOT` -->
+<!-- `Rails.root` -->
 <def tag="rails-root">
-  <%= RAILS_ROOT -%>
+  <%= Rails.root -%>
 </def>
 
 <!-- `RAILS_ENV` -->
@@ -22,9 +22,9 @@
 
 <!-- Which change management system is in use:  "git" "subversion" "other" -->
 <def tag="cms-method">
-  <%= if File.exist?("#{RAILS_ROOT}/.git")
+  <%= if File.exist?("#{Rails.root}/.git")
         "git"
-      elsif File.exist?("#{RAILS_ROOT}/.svn")
+      elsif File.exist?("#{Rails.root}/.svn")
         "subversion"
       else
         "other"
@@ -38,13 +38,13 @@
 
 <!-- the git version currently in use -->
 <def tag="git-version" attrs="dir">
-  <% dir=RAILS_ROOT if dir.blank? -%>
+  <% dir=Rails.root if dir.blank? -%>
   <%= Dir.chdir(dir) {`git rev-list "HEAD^..HEAD" --abbrev-commit --abbrev=7`} -%>
 </def>
 
 <!-- returns 'clean' if there are no modified files, 'modified' otherwise. -->
 <def tag="git-clean" attrs="dir">
-  <% dir=RAILS_ROOT if dir.blank? -%>
+  <% dir=Rails.root if dir.blank? -%>
   <%= Dir.chdir(dir) {`git ls-files -m`}.blank? ? "clean" : "modified"  -%>
 </def>
 
@@ -158,8 +158,8 @@
 <!-- within `<with-plugins>`, try and determine the method that was used to install the plugin.   Returns "braid", "symlink", "git-submodule" or "other" -->
 <def tag="plugin-method">
   <%= 
-      braids = File.open("#{RAILS_ROOT}/.braids") {|f| YAML::load(f) } rescue {}
-      if !braids[this.directory.gsub(RAILS_ROOT+"/", "")].nil?
+      braids = File.open("#{Rails.root}/.braids") {|f| YAML::load(f) } rescue {}
+      if !braids[this.directory.gsub(Rails.root+"/", "")].nil?
         "braid"
       elsif File.lstat(this.directory).symlink?
         "symlink"
@@ -186,13 +186,13 @@
 </def>
 
 <def tag="plugin-braid-clean">
-  <%= diff=`braid diff #{this.directory.gsub(RAILS_ROOT+"/", "")}`
+  <%= diff=`braid diff #{this.directory.gsub(Rails.root+"/", "")}`
       diff.strip.empty? ? "clean" : "modified" -%>
 </def>
 
 <def tag="plugin-braid-version">
-  <%=  braids = File.open("#{RAILS_ROOT}/.braids") {|f| YAML::load(f) } rescue {}
-       b=braids[this.directory.gsub(RAILS_ROOT+"/", "")]
+  <%=  braids = File.open("#{Rails.root}/.braids") {|f| YAML::load(f) } rescue {}
+       b=braids[this.directory.gsub(Rails.root+"/", "")]
        b['revision'][0...7] if b -%>
 </def>
 

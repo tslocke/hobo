@@ -44,10 +44,10 @@ module Hobo
    #   require 'dryml/template'
    #   require 'dryml/dryml_generator'
 
-   #   Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{RAILS_ROOT}/app/views/taglibs/auto")
+   #   Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{Rails.root}/app/views/taglibs/auto")
 
       # should not be needed
-      # ActiveSupport::Dependencies.load_paths |= ["#{RAILS_ROOT}/app/viewhints"]
+      # ActiveSupport::Dependencies.autoload_paths |= ["#{Rails.root}/app/viewhints"]
 
       HoboFields.never_wrap(Hobo::Undefined)
 

@@ -6,7 +6,7 @@ namespace :hobo do
     
     path_to_generators = HOBO_ROOT.match(%r(vendor/plugins/.*$))[0] + "/rails_generators"
     
-    Dir.chdir("#{RAILS_ROOT}/public") do
+    Dir.chdir("#{Rails.root}/public") do
       Dir.chdir("javascripts") do
         puts "hobo-rapid.js"
         `rm -f hobo-rapid.js`
@@ -20,7 +20,7 @@ namespace :hobo do
       end
     end
     
-    Dir.chdir("#{RAILS_ROOT}/app/views/taglibs/themes") do
+    Dir.chdir("#{Rails.root}/app/views/taglibs/themes") do
       puts 'taglibs/themes/clean'
       `rm -rf clean`
       `ln -s ../../../../#{path_to_generators}/hobo_rapid/templates/themes/clean/views clean`

@@ -53,7 +53,7 @@ module Hobo
       # Load every controller in app/controllers/<subsite>...
       @controllers_loaded ||= {}
       if force || !@controllers_loaded[subsite]
-        dir = "#{RAILS_ROOT}/app/controllers#{'/' + subsite if subsite}"
+        dir = "#{Rails.root}/app/controllers#{'/' + subsite if subsite}"
         Dir.entries(dir).each do |f|
           if f =~ /^[a-zA-Z_][a-zA-Z0-9_]*_controller\.rb$/
             name = f.remove(/.rb$/).camelize

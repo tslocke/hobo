@@ -22,7 +22,7 @@ Create a mock view layer:
              def base_url; "" ;end
            end
          end
-        >> RAILS_ROOT = "test-app"
+        >> Rails.root = "test-app"
 
 Useful stuff
 
