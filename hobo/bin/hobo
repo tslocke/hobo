@@ -1,23 +1,50 @@
 #!/usr/bin/env ruby
 puts 'Hobo Command Line Interface 1.3.0.pre0'
 
-banner = <<EOU
-
+banner = %(
 Usage:
     hobo new <app_name> [rails_options]   Creates a new Hobo Application
     hobo g <generator> [ARGS] [options]   Fires the hobo:<generator>
     hobo --help                           This help screen
 
-EOU
+Dev Notes:
+    Set the HOBO_DEV_ROOT ENV variable to the Hobo root path in order
+    to use your local dev version instead of the installed gem.
 
-template_path = File.expand_path('../hobo_template.rb', __FILE__)
+)
+
 
 command = ARGV.shift
 argv = ARGV * ' '
 
+
+
 case command
+
 when 'new'
+  app_name = ARGV.first
+  if app_name.nil?
+    puts "\nThe application name is missing!\n"
+    puts banner
+    exit
+  end
+  template_path = "./.hobo_app_template"
+  File.open(template_path, 'w') do |file|
+    file.puts '#!/usr/bin/env ruby'
+    if ENV["HOBO_DEV_ROOT"]
+      file.puts %(
+gem 'hobo_support', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo_support'
+gem 'hobo_fields', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo_fields'
+gem 'dryml', :path => '#{ENV["HOBO_DEV_ROOT"]}/dryml'
+gem 'hobo', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo'
+)
+    else
+      file.puts "gem 'hobo', '>= 1.3.0.pre0'"
+    end
+    file.puts "exec 'rails g hobo:setup_wizard'"
+  end
   exec "rails new #{argv} -m #{template_path}"
+
 when /^(g|generate)$/
   if ARGV.empty?
     puts "\nThe generator name is missing!\n"
@@ -25,6 +52,7 @@ when /^(g|generate)$/
   else
     exec "rails g hobo:#{argv}"
   end
+
 else
   puts "\n  => '#{command}' is an unknown command!\n"
   puts banner
