@@ -11,7 +11,9 @@ Our test requires to prepare the testapp for a different environment:
     >> p Rails.env
     >>
      def nuke_model_class(klass)
-      ActiveRecord::Base.instance_eval { class_variable_get('@@subclasses')[klass.superclass].delete(klass) }
+       ActiveSupport::DescendantsTracker.instance_eval do
+         class_variable_get('@@direct_descendants')[ActiveRecord::Base].delete(klass)
+       end
       Object.instance_eval { remove_const klass.name.to_sym }
      end
 
