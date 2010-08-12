@@ -55,7 +55,7 @@ module Hobo
           attr_accessor :member_class, :origin, :origin_attribute
         end
 
-        WillPaginate::Finder::ClassMethods.class_eval do
+        WillPaginate::Finders::Base.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
             collection = paginate_without_hobo_metadata(*args, &block)
             collection.member_class     = self
