@@ -24,8 +24,6 @@ module Hobo
 
     def gems
       say_title "Optional Gems"
-      will_paginate = yes_no?("Do you want to use the 'will_paginate' gem in your application (recommended)?")
-      gem 'will_paginate' if will_paginate
       statements = []
       say %(
 You can append a few statements to the Gemfile now. For example if you choose 'factory_girl' as the fixture_replacement, you should enter something like:
@@ -34,7 +32,7 @@ and that will be appended to the Gemfile, so the Hobo generators will imediately
 )
       statements = multi_ask "Type your statement or <enter> to stop adding:"
       append_file 'Gemfile', statements * "\n" unless statements.empty?
-      puts run('bundle install') if !statements.empty? || will_paginate
+      puts run('bundle install') if !statements.empty?
     end
 
     def invite_only_option
