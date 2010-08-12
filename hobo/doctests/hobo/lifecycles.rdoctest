@@ -155,56 +155,54 @@ We'll extend the lifecycle to allow:
 
 Here is the entire lifecycle
 
-          >>
-            class Friendship < ActiveRecord::Base
-              hobo_model
-              belongs_to :requester, :class_name => "User"
-              belongs_to :requestee, :class_name => "User"
+        >>
+         class Friendship < ActiveRecord::Base
+           fields {}
 
-              lifecycle do
-                    state :requested, :active, :ignored
+           lifecycle do
+                 state :requested, :active, :ignored
 
-                create :requester, :request, :params => [ :requestee ], :become => :requested do
-                  $emails << "Dear #{requestee.name}, #{requester.name} wants to be friends with you"
-                end
+             create :request, :params => [ :requestee ], :become => :requested, :available_to => "User", :user_becomes => :requester do
+               $emails << "Dear #{requestee.name}, #{requester.name} wants to be friends with you"
+             end
 
 
-                        transition :requestee, :accept, { :requested => :active } do
-                  $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
-                end
+             transition :accept, { :requested => :active }, :available_to => :requestee do
+               $emails << "Dear #{requester.name}, #{requestee.name} is now your friend :-)"
+             end
 
-                        transition :requestee, :reject, { :requested => :destroy } do
-                  $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
-                end
+             transition :reject, { :requested => :destroy }, :available_to => :requestee do
+               $emails << "Dear #{requester.name}, #{requestee.name} blew you out :-("
+             end
 
-                        transition :requestee, :ignore, { :requested => :ignored }
+             transition :ignore, { :requested => :ignored }, :available_to => :requestee
 
-                        transition :requester, :retract, { :requested => :destroy } do
-                  $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
-                end
+             transition :retract, { :requested => :destroy }, :available_to => :requester do
+               $emails << "Dear #{requestee.name}, #{requester.name} reconsidered"
+             end
 
-                        transition [ :requester, :requestee ], :cancel, { :active => :destroy }
-                        # TODO: send the email - for this we need the acting user to be passed to the block
+             transition :cancel, { :active => :destroy }, :available_to => [ :requester, :requestee ]
+             # TODO: send the email - for this we need the acting user to be passed to the block
 
-              end
+           end
 
-            end
+         end
 
 Check the simple accept still works, and sends emails
 
         >> f = Friendship::Lifecycle.request(tom, :requestee => bob)
         >> $emails.last
         => "Dear Bob, Tom wants to be friends with you"
-        >> f.lifecycle.accept(bob)
+        >> f.lifecycle.accept!(bob)
         >> $emails.last
         => "Dear Tom, Bob is now your friend :-)"
-        >> f.lifecycle.active?
-        => true
+        >> f.state
+        => "active"
 
 Rejection:
 
         >> f = Friendship::Lifecycle.request(tom, :requestee => bob)
-        >> f.lifecycle.reject(bob)
+        >> f.lifecycle.reject!(bob)
         >> $emails.last
         => "Dear Tom, Bob blew you out :-("
         >> f.state
@@ -215,16 +213,17 @@ Retraction:
         >> f = Friendship::Lifecycle.request(tom, :requestee => bob)
         >> f.lifecycle.can_retract?(bob)
         => false
-        >> f.lifecycle.retract(tom)
+        >> f.lifecycle.retract!(tom)
         >> $emails.last
         => "Dear Bob, Tom reconsidered"
-        >> f.lifecycle.active?
+        >> f.state
+        => "destroy"
 
 Ignoring
 
         >> f = Friendship::Lifecycle.request(tom, :requestee => bob)
         >> $emails = []
-        >> f.lifecycle.ignore(bob)
+        >> f.lifecycle.ignore!(bob)
         >> $emails # Ignoring shouldn't send any email
         => []
         >> f.state
@@ -235,17 +234,10 @@ Requester cancels
         >> f = Friendship::Lifecycle.request(tom, :requestee => bob)
         >> f.lifecycle.can_cancel?(tom)
         => false
-        >> f.lifecycle.accept(bob)
-        >> f.lifecycle.cancel(tom)
+        >> f.lifecycle.accept!(bob)
+        >> f.lifecycle.cancel!(tom)
         >> f.state
         => "destroy"
 
 
-
-
-
-
-
-
-
-
+>> FileUtils.rm_rf  TEST_APP_ROOT
