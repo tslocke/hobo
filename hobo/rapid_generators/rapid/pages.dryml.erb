@@ -175,7 +175,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
+                <ht key="<%= collection.to_s.tableize %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
                   <%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %>
                 </ht>
               </h3>
