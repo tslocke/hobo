@@ -622,7 +622,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
   if can_create?(new)
-    label ||= ht("#{new.class.name.pluralize.underscore}.actions.new", :default=>"New #{new.class.name.titleize}")  
+    label ||= ht("#{new.class.name.tableize}.actions.new", :default=>"New #{new.class.name.titleize}")  
     ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
@@ -653,7 +653,7 @@ For situations where there are too many target records to practically include in
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
-  blank_message ||= ht("#{this_type.name.underscore}.message.no", :default=>"(No #{this_type.view_hints.model_name})")
+  blank_message ||= ht("#{this_type.name.tableize}.message.none", :default=>"(No #{this_type.view_hints.model_name})")
   limit ||= 100
    
   options ||= begin
@@ -796,7 +796,7 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
-  prompt ||= "Add #{this_field.titleize.singularize}"
+  prompt ||= ht("#{this.name.tableize}.message.none", :default=>"Add #{this.view_hints.model_name}")
   options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
   name ||= param_name_for_this
                 
