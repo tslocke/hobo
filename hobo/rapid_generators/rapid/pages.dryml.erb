@@ -140,7 +140,7 @@ end
             <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back" to="<%= back_link %>"><name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
-              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : this.send(this.class.name_attribute)">
                 <name/>
               </ht>
             </h2>
