@@ -91,7 +91,7 @@ It's probably useful to set global options such as dateFormat in application.dry
 -->
 <def attrs="name" tag="hjq-datepicker">
 <%
-  options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
+  options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'selectOtherMonths','shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
   events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
 %>
  <annotate-tag tag="hjq-datepicker" init="hjq.datepicker.init" options="&options" events="&events" />
