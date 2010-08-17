@@ -496,7 +496,7 @@ Assuming the context is a blog post...
 
 <!-- Renders `this.to_s` with localization support -->
 <def tag="view" for="HoboFields::LifecycleState">
-    <span class='#{this.class.parent.name.downcase}-state-#{this.to_s.downcase} state-#{this.to_s.downcase}'>
+    <span class='#{this.class.parent.name.downcase}-states #{this.class.parent.name.downcase}-state-#{this.to_s.downcase} state-#{this.to_s.downcase}'>
         <ht key='#{this.class.parent.name.tableize}.lifecycle_states.#{this.to_s.downcase}'><%= this.to_s %></ht>
     </span>
 </def>
