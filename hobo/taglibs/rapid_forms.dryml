@@ -574,7 +574,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
                                   else
                                     { :type => "button" }
                                   end)
-    label ||= ht("hobo.actions.remove", :default=>"Remove") 
+    label ||= ht("#{this.class.name.tableize}.actions.remove", :default=>"Remove") 
     confirm = ht("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
     
     add_classes!(attributes,
@@ -801,7 +801,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
   name ||= param_name_for_this
                 
   values = this
-  remove_label ||= ht("hobo.actions.remove", :default=>'Remove')
+  remove_label ||= ht("#{this.name.tableize}.actions.remove", :default=>'Remove')
   -%>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
