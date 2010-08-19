@@ -9,6 +9,11 @@ module Hobo
       "rails generate hobo:test_framework NAME [fixture_replacement] [options]"
     end
 
+    def initialize
+      super
+      @finalize_hooks = []
+    end
+
     class_option :fixtures,
            :type => :boolean,
            :desc => "Add the fixture option to the test framework",
@@ -18,37 +23,42 @@ module Hobo
       if FRAMEWORKS.include?(name)
         eval 'setup_' + name
       else
-        say "'#{name}' is not supported.'"
-        exit
+        say "'#{name}' is not supported. You should configure it manually."
+        exit 1
       end
+    end
+
+    def fixture_replacement_installation
+      return if fixture_replacement.blank?
+      gem fixture_replacement, :group => :test
+    end
+
+    def finalize_installation
+      # add the block only if it's not the default
+      add_generators_block unless (name == 'test_unit' && options[:fixtures] && fixture_replacement.blank?)
+      invoke Bundle::CLI, :update if @should_update
+      @finalize_hooks.each {|h| h.call }
     end
 
 private
 
     def setup_test_unit
-      # add the block only if it's not the default
-      add_generators_block unless (name == 'test_unit' && options[:fixtures] && fixture_replacement.blank?)
     end
 
     def setup_rspec
-      say 'Setting up rspec...'
       gem 'rspec-rails', '>= 2.0.0.beta.10', :group => :test
-      puts run 'bundle install'
-      invoke 'rspec:install'
-      add_generators_block
+      @should_update = true
+      @finalize_hooks << lambda {say "Finalizing rspec installation..."; invoke 'rspec:install'}
     end
 
     def setup_shoulda
-      say 'Setting up shoulda...'
       gem "shoulda", :group => :test
-      puts run 'bundle install'
-      add_generators_block
+      @should_update = true
     end
 
     def setup_rspec_with_shoulda
-      say 'Setting up rspec and shoulda...'
-      gem "shoulda", :group => :test
       setup_rspec
+      setup_shoulda
     end
 
     def add_generators_block
