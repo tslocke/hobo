@@ -9,7 +9,7 @@ module Hobo
       "rails generate hobo:test_framework NAME [fixture_replacement] [options]"
     end
 
-    def initialize
+    def initialize(*)
       super
       @finalize_hooks = []
     end
