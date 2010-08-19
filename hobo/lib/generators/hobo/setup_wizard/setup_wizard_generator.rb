@@ -2,12 +2,19 @@ require 'generators/hobo_support/thor_shell'
 module Hobo
   class SetupWizardGenerator < Rails::Generators::Base
 
+    source_root File.expand_path('../templates', __FILE__)
+
+    include Generators::Hobo::Helper
     include Generators::HoboSupport::ThorShell
+
 
     def startup
       say_title 'Startup'
       say 'Initializing Hobo...'
-      invoke 'hobo:startup'
+      template  'application.dryml.erb',  'app/views/taglibs/application.dryml'
+      copy_file 'application.css',    'public/stylesheets/application.css'
+      copy_file 'dryml-support.js',   'public/javascripts/dryml-support.js'
+      copy_file 'guest.rb',           'app/model/guest.rb'
     end
 
     def choose_test_framework
@@ -19,25 +26,11 @@ module Hobo
       fixtures = yes_no?("Do you want the test framework to generate the fixtures?")
       fixture_replacement = ask("Type your preferred fixture replacement or <enter> for no replacement:")
       invoke 'hobo:test_framework', [test_framework, fixture_replacement], :fixtures => fixtures
-      say("WARNING: Remember to add the '#{fixture_replacement}' gem to the Gemfile at the following prompt", Color::RED) unless fixture_replacement.blank?
-    end
-
-    def gems
-      say_title "Optional Gems"
-      statements = []
-      say %(
-You can append a few statements to the Gemfile now. For example if you choose 'factory_girl' as the fixture_replacement, you should enter something like:
-    gem 'factory_girl', :group => :test
-and that will be appended to the Gemfile, so the Hobo generators will imediately use it to generate your fixtures.
-)
-      statements = multi_ask "Type your statement or <enter> to stop adding:"
-      append_file 'Gemfile', statements * "\n" unless statements.empty?
-      puts run('bundle install') if !statements.empty?
     end
 
     def invite_only_option
       say_title 'Invite Only Option'
-      @invite_only = yes_no?("Do you want to add the features for an invite only website?")
+      return unless (@invite_only = yes_no?("Do you want to add the features for an invite only website?"))
       say %(
 Invite-only website
   If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
@@ -49,7 +42,7 @@ Invite-only website
   to application_controller.rb (note that the include statement is not required for hobo_controllers)
 
   NOTE: You might want to sign up as the administrator before adding this!
-) if @invte_only
+), Color::Yellow
     end
 
     def rapid
@@ -91,7 +84,7 @@ Invite-only website
               {:generate => true}
             when 'm'
               {:migrate => true}
-          end
+            end
       say action == 'g' ? 'Generating Migration...' : 'Migrating...'
       invoke 'hobo:migration', ['initial_migration'], opt
     end
@@ -119,10 +112,10 @@ Invite-only website
       git :init
       git :add => '.'
       git :commit => '-m "initial commit"'
-      say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly."
+      say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly.", Color::YELLOW
     end
 
-     def cleanup_app_template
+    def cleanup_app_template
       say_title 'Cleanup'
       # remove the template if one
       remove_file File.join(File.dirname(Rails.root), ".hobo_app_template")
