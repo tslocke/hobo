@@ -7,10 +7,15 @@ module Hobo
     include Generators::Hobo::Helper
     include Generators::HoboSupport::ThorShell
 
+    class_option :main_title,
+           :type => :boolean,
+           :desc => "Shows the main title",
+           :default => true
+
 
     def startup
-      say_title 'Startup'
-      say 'Initializing Hobo...'
+      say_title options[:main_title] ? 'Hobo Setup Wizard' : 'Startup'
+      say 'Installing basic Hobo Files...'
       template  'application.dryml.erb',  'app/views/taglibs/application.dryml'
       copy_file 'application.css',    'public/stylesheets/application.css'
       copy_file 'dryml-support.js',   'public/javascripts/dryml-support.js'
