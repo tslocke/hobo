@@ -31,7 +31,7 @@ module Hobo
     def finalize_installation
       # add the block only if it's not the default
       add_generators_block unless (name == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
-      invoke Bundle::CLI, :update if @should_update
+      invoke Bundle::CLI, :update if options[:update] && @should_update
       @finalize_hooks.each {|h| h.call }
     end
 
@@ -43,11 +43,12 @@ private
     def setup_rspec
       gem 'rspec-rails', '>= 2.0.0.beta.10', :group => :test
       @should_update = true
+      return unless options[:update]
       @finalize_hooks << lambda {say "Finalizing rspec installation..."; invoke 'rspec:install'}
     end
 
     def setup_shoulda
-      gem "shoulda", :group => :test
+      gem 'shoulda', :group => :test
       @should_update = true
     end
 
@@ -57,11 +58,12 @@ private
     end
 
     def add_generators_block
-      block = 'config.generators do |g|'
-      block << "  g.test_framework :#{name}, :fixtures => #{options[:fixtures].inspect}" if !options[:fixtures] || name != 'test_unit'
-      block << "\n  g.fallbacks[:#{name}] = :test_unit" unless name == 'test_unit'
-      block << "\n  g.fixture_replacement => :#{options[:fixture_replacement]}" unless options[:fixture_replacement].blank?
-      block << "\nend"
+      n = name == 'rspec_with_shoulda' ? 'rspec' : name
+      block = "  config.generators do |g|"
+      block << "\n    g.test_framework :#{n}, :fixtures => #{options[:fixtures].inspect}" if !options[:fixtures] || name != 'test_unit'
+      block << "\n    g.fallbacks[:#{n}] = :test_unit" unless name == 'test_unit'
+      block << "\n    g.fixture_replacement => :#{options[:fixture_replacement]}" unless options[:fixture_replacement].blank?
+      block << "\n  end"
       environment block
     end
 

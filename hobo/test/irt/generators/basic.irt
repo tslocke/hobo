@@ -1,0 +1,16 @@
+require File.expand_path('../../helper.rb', __FILE__)
+irt_at_exit {git_reset_app}
+
+desc "hobo:basic invoke"
+invoke 'hobo:basic', %w(-q)
+
+files_exist? %w[ app/views/taglibs/application.dryml
+                 public/stylesheets/application.css
+                 public/javascripts/dryml-support.js
+                 app/model/guest.rb
+]
+test_value_eql? true
+
+desc "Application.dryml content matches"
+file_include? 'app/views/taglibs/application.dryml', 'Testapp'
+test_value_eql? true

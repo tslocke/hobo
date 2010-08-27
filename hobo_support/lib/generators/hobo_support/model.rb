@@ -11,7 +11,7 @@ module Generators
       class_option :timestamps, :type => :boolean
 
       def generate_model
-        invoke "active_record:model", [name], :migration => false
+        invoke "active_record:model", [name], {:migration => false}.merge(options)
       end
 
       def inject_hobo_code_into_model_file

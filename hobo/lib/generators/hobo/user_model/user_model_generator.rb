@@ -12,11 +12,5 @@ module Hobo
       "rails generate hobo:user_model [NAME=user] [options]"
     end
 
-    def generate_mailer
-      invoke 'hobo:user_mailer', [name], :invite_only => invite_only?
-    end
-
-    hook_for :test_framework, :as => :model
-
   end
 end

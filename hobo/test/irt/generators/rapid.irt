@@ -1,0 +1,29 @@
+require File.expand_path('../../helper.rb', __FILE__)
+irt_at_exit {git_reset_app}
+
+desc "hobo:rapid invoke"
+invoke 'hobo:rapid', %w(-q)
+
+files_exist? %w[ public/javascripts/hobo-rapid.js
+                 public/javascripts/lowpro.js
+                 public/javascripts/IE7.js
+                 public/javascripts/ie7-recalc.js
+                 public/javascripts/blank.gif
+                 public/stylesheets/reset.css
+                 public/stylesheets/hobo-rapid.css
+                 public/hobothemes/clean
+                 public/hobothemes/clean/images/101-3B5F87-ACD3E6.png
+                 public/hobothemes/clean/images/30-3E547A-242E42.png
+                 public/hobothemes/clean/images/30-DBE1E5-FCFEF5.png
+                 public/hobothemes/clean/images/300-ACD3E6-fff.png
+                 public/hobothemes/clean/images/50-ACD3E6-fff.png
+                 public/hobothemes/clean/images/fieldbg.gif
+                 public/hobothemes/clean/images/pencil.png
+                 public/hobothemes/clean/images/small_close.png
+                 public/hobothemes/clean/images/spinner.gif
+                 public/hobothemes/clean/stylesheets/clean.css
+                 public/hobothemes/clean/stylesheets/rapid-ui.css
+                 app/views/taglibs/themes/clean
+                 app/views/taglibs/themes/clean/clean.dryml
+]
+test_value_eql? true

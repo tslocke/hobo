@@ -11,6 +11,9 @@ module Generators
       class_option :fixture_replacement, :type => :string,
       :desc => "Use a specific fixture replacement"
 
+      class_option :update, :type => :boolean,
+      :desc => "Run bundle update to install the missing gems"
+
     end
   end
 end

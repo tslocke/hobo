@@ -1,0 +1,62 @@
+require File.expand_path('../../helper.rb', __FILE__)
+irt_at_exit {git_reset_app}
+
+desc "test_unit: default no-changes'"
+invoke 'hobo:test_framework', %w(test_unit)
+file_exclude? 'config/application.rb',
+              'config.generators do' ,
+              'test_framework :test_unit'
+test_value_eql? true
+
+git_reset_app
+
+desc "test_unit: don't generate fixtures'"
+invoke 'hobo:test_framework', %w(test_unit --no-fixtures)
+file_include? 'config/application.rb',
+              'config.generators do' ,
+              'test_framework :test_unit, :fixtures => false'
+test_value_eql? true
+
+git_reset_app
+
+desc "shoulda application.rb injection"
+invoke 'hobo:test_framework', %w(shoulda --no-update -q)
+file_include? 'config/application.rb',
+              'config.generators do' ,
+              'test_framework :shoulda, :fixtures => true'
+test_value_eql? true
+
+desc "shoulda Gemfile injection"
+file_include? 'Gemfile', %(gem "shoulda", :group => :test)
+test_value_eql? true
+
+git_reset_app
+
+desc "rspec application.rb injection"
+invoke 'hobo:test_framework', %w(rspec --no-update -q)
+file_include? 'config/application.rb',
+              'config.generators do' ,
+              'test_framework :rspec, :fixtures => true',
+              'fallbacks[:rspec] = :test_unit'
+test_value_eql? true
+
+desc "rspec Gemfile injection"
+file_include? 'Gemfile',  %(gem "rspec-rails", ">= 2.0.0.beta.10", :group => :test)
+test_value_eql? true
+
+git_reset_app
+
+desc "rspec_with_shoulda application.rb injection"
+invoke 'hobo:test_framework', %w(rspec_with_shoulda --no-update -q)
+file_include? 'config/application.rb',
+              'config.generators do' ,
+              'test_framework :rspec, :fixtures => true',
+              'fallbacks[:rspec] = :test_unit'
+test_value_eql? true
+
+desc "rspec_with_shoulda Gemfile injection"
+file_include? 'Gemfile', %(gem "rspec-rails", ">= 2.0.0.beta.10", :group => :test),
+                       %(gem "shoulda", :group => :test)
+test_value_eql? true
+
+

@@ -23,7 +23,9 @@ module Hobo
       template( 'invite.erb', File.join(mailer_dir, "invite.erb")) if invite_only?
     end
 
-    hook_for :test_framework, :as => :mailer
+    hook_for :test_framework, :as => :mailer do | instance, mailer |
+      instance.invoke mailer, ["#{instance.name}_mailer"]
+    end
 
   end
 end

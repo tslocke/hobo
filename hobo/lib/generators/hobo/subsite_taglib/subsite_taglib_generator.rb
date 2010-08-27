@@ -3,12 +3,7 @@ module Hobo
     source_root File.expand_path('../templates', __FILE__)
     include Generators::Hobo::InviteOnly
     include Generators::Hobo::Helper
-
-    argument :user_resource_name, :type => :string, :default => 'user', :optional => true
-
-    class_option :admin,
-                 :type => :boolean,
-                 :desc => "Includes the tags for the admin site"
+    include Generators::Hobo::Taglib
 
     def self.banner
       "rails generate hobo:site_taglib NAME [USER_RESOURCE_NAME=user] [options]"

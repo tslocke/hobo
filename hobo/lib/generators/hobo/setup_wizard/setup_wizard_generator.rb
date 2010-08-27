@@ -46,10 +46,7 @@ module Hobo
         say_title options[:main_title] ? 'Hobo Setup Wizard' : 'Startup'
         say 'Installing basic Hobo Files...'
       end
-      template  'application.dryml.erb', 'app/views/taglibs/application.dryml'
-      copy_file 'application.css',       'public/stylesheets/application.css'
-      copy_file 'dryml-support.js',      'public/javascripts/dryml-support.js'
-      copy_file 'guest.rb',              'app/model/guest.rb'
+      invoke 'hobo:basic'
     end
 
     def choose_test_framework
@@ -68,7 +65,10 @@ module Hobo
         fixtures = options[:fixtures]
         fixture_replacement = options[:fixture_replacement]
       end
-      invoke 'hobo:test_framework', [test_framework], :fixture_replacement => fixture_replacement, :fixtures => fixtures
+      invoke 'hobo:test_framework', [test_framework],
+                                    :fixture_replacement => fixture_replacement,
+                                    :fixtures => fixtures,
+                                    :update => true
     end
 
     def invite_only_option
@@ -97,7 +97,7 @@ Invite-only website
         say_title 'Hobo Rapid'
         say 'Installing Hobo Rapid and default theme...'
       end
-      invoke 'hobo:rapid', [], :invite_only => @invite_only
+      invoke 'hobo:rapid'
     end
 
     def user_resource

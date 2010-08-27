@@ -3,7 +3,7 @@ module Hobo
     source_root File.expand_path('../templates', __FILE__)
 
     def self.banner
-      "rails generate hobo:rapid [options]"
+      "rails generate hobo:rapid"
     end
 
     def copy_rapid_files

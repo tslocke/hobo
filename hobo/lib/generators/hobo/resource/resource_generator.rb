@@ -14,7 +14,9 @@ module Hobo
     end
 
     def generate_hobo_model
-      invoke 'hobo:model', [name.singularize], attributes, options
+      # is there any better way to pass attributes?
+      attr = attributes.map{|a| "#{a.name}:#{a.type}"} * ' '
+      invoke 'hobo:model', [name.singularize, attr], options
     end
 
   end

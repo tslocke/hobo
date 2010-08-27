@@ -3,6 +3,9 @@ module Generators
   module Hobo
     Subsite = classy_module do
 
+      include Generators::Hobo::InviteOnly
+      include Generators::Hobo::Taglib
+
       class_option :make_front_site,
                  :type => :boolean,
                  :desc => "Rename application.dryml to front_site.dryml"
@@ -15,7 +18,8 @@ module Generators
             say "Cannot rename application.dryml to #{file_name}_site.dryml"
             exit 1
           end
-          say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml"
+          say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml" \
+              unless options[:quiet]
           FileUtils.mv('app/views/taglibs/application.dryml', "app/views/taglibs/front_site.dryml")
           copy_file "application.dryml", 'app/views/taglibs/application.dryml'
         end

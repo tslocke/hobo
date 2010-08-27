@@ -21,7 +21,9 @@ module Generators
         invoke 'helper', [name], options
       end
 
-      hook_for :test_framework, :as => :controller
+      hook_for :test_framework, :as => :controller do | instance, controller_test |
+        instance.invoke controller_test, [ instance.name ]
+      end
 
     end
   end
