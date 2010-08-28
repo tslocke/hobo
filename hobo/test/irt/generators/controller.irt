@@ -3,4 +3,4 @@ irt_at_exit {git_reset_app}
 
 invoke 'hobo:controller' , %w(houses -q)
 
-insert_file '../generators/partials/_house_controller_tests.rb'
+eval_file '../generators/partials/_house_controller_tests.rb'

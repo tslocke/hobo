@@ -16,8 +16,8 @@ test_value_eql? true
 
 
 user_resource_name = 'user'
-insert_file '../generators/partials/_subsite_taglib_variables.rb'
-insert_file '../generators/partials/_subsite_taglib_noopt.rb'
+eval_file '../generators/partials/_subsite_taglib_variables.rb'
+eval_file '../generators/partials/_subsite_taglib_noopt.rb'
 
 git_reset_app
 
@@ -34,17 +34,17 @@ test_value_eql? true
 
 git_reset_app
 invoke 'hobo:subsite', %w[ subs -q --admin]
-insert_file '../generators/partials/_subsite_taglib_admin.rb'
+eval_file '../generators/partials/_subsite_taglib_admin.rb'
 
 git_reset_app
 invoke 'hobo:subsite', %w[ subs -q --admin --invite-only]
-insert_file '../generators/partials/_subsite_taglib_admin_invite_only.rb'
+eval_file '../generators/partials/_subsite_taglib_admin_invite_only.rb'
 
 git_reset_app
 invoke 'hobo:subsite', %w[ subs account -q --admin --invite-only]
 user_resource_name = 'account'
-insert_file '../generators/partials/_subsite_taglib_variables.rb'
-insert_file '../generators/partials/_subsite_taglib_admin_invite_only.rb'
+eval_file '../generators/partials/_subsite_taglib_variables.rb'
+eval_file '../generators/partials/_subsite_taglib_admin_invite_only.rb'
 
 
 

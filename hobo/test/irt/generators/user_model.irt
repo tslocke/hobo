@@ -3,8 +3,8 @@ irt_at_exit {git_reset_app}
 
 invoke 'hobo:user_model', %w(-q)
 
-insert_file '../generators/partials/_default_user_model_tests.rb'
+eval_file '../generators/partials/_default_user_model_tests.rb'
 
 invoke 'hobo:user_model', %w(account -q)
 
-insert_file '../generators/partials/_account_user_model_tests.rb'
+eval_file '../generators/partials/_account_user_model_tests.rb'

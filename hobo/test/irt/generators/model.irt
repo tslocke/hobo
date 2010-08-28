@@ -3,7 +3,7 @@ irt_at_exit {git_reset_app}
 
 invoke 'hobo:model', %w(house alpha:string -q)
 
-insert_file '../generators/partials/_house_model_tests.rb'
+eval_file '../generators/partials/_house_model_tests.rb'
 
 invoke 'hobo:model', %w(nest/ed alpha:string -q)
 
