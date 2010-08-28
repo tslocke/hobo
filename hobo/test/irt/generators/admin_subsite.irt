@@ -1,0 +1,26 @@
+require File.expand_path('../../helper.rb', __FILE__)
+irt_at_exit {git_reset_app}
+
+invoke 'hobo:basic', %w[ -q ]
+invoke 'hobo:admin_subsite', %w[ -q ]
+desc "Admin Subsite files exist"
+files_exist? %w[ app/controllers/admin/admin_site_controller.rb
+                 test/functional/admin_site_controller_test.rb
+                 public/stylesheets/admin.css
+                 app/controllers/admin/user_controller.rb
+                 app/helpers/admin/user_helper.rb
+                 test/unit/helpers/admin/user_helper_test.rb
+                 app/views/taglibs/admin_site.dryml
+]
+test_value_eql? true
+
+desc "application.dryml injection matches"
+file_include? "app/views/taglibs/application.dryml",
+%(<extend tag="page">
+  <old-page merge>
+    <footer:>
+      <a href="&admin_user_url" if="&current_user.administrator?">Admin</a>
+    </footer:>
+  </old-page>
+</extend>)
+test_value_eql? true
