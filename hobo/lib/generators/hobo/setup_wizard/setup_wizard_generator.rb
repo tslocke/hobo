@@ -8,6 +8,7 @@ module Hobo
     include Generators::HoboSupport::ThorShell
     include Generators::Hobo::InviteOnly
     include Generators::Hobo::TestOptions
+    include Generators::Hobo::Taglib
 
     def self.banner
       "rails generate hobo:test_framework NAME [options]"
@@ -24,9 +25,6 @@ module Hobo
 
     class_option :front_controller_name, :type => :string,
     :desc => "Front Controller Name", :default => 'front'
-
-    class_option :admin_subsite_name, :type => :string,
-    :desc => "Admin Subsite Name", :default => 'admin'
 
     class_option :migration_generate, :type => :boolean,
     :desc => "Generate migration only"
@@ -130,6 +128,8 @@ Invite-only website
         admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
         say "Installing admin subsite..."
       else
+        admin = @invite_only ? true : options[:admin]
+        return unless admin
         admin_subsite_name = options[:admin_subsite_name]
       end
       invoke 'hobo:admin_subsite', [admin_subsite_name, @user_resource_name], :invite_only => @invite_only
