@@ -9,7 +9,6 @@
 # gem dependencies
 require 'hobo_support'
 require 'action_pack'
-require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
 
@@ -51,16 +50,6 @@ module Dryml
 
     attr_accessor :last_if
 
-    def enable(generator_directories=[], output_directory=".")
-      ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
-      if ActionView::Template.respond_to? :exempt_from_layout
-        ActionView::Template.exempt_from_layout('dryml')
-      elsif
-        ActionView::Base.exempt_from_layout('dryml')
-      end
-      DrymlGenerator.enable(generator_directories, output_directory)
-    end
-
 
     def precompile_taglibs
       Dir.chdir(Rails.root) do
@@ -88,9 +77,12 @@ module Dryml
       page_renderer(view, [], "#{controller_name}/#{EMPTY_PAGE}")
     end
 
-
-    def page_renderer_for_template(view, local_names, template)
-      page_renderer(view, local_names, template.path_without_extension, template.filename)
+    def call_render(view, local_assigns, identifier)
+      page = identifier.sub(/\.dryml$/, '')
+      renderer = page_renderer(view, local_assigns.keys, page, identifier)
+      this = view.controller.send(:dryml_context) || local_assigns[:this]
+      view.instance_variable_set("@this", this)
+      renderer.render_page(this, local_assigns).strip
     end
 
 
@@ -110,13 +102,6 @@ module Dryml
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
         @tag_page_renderer_classes[controller_class.name].new(page, view)
       else
-        filename ||= if view.view_paths.respond_to? :find_template
-                       # Rails 2.3
-                       view.view_paths.find_template(page + ".dryml").filename
-                     else
-                       # Rails 2.2
-                       view._pick_template(page + ".dryml").filename
-                     end
         mtime = File.mtime(filename)
         renderer_class = @renderer_classes[page]
 
@@ -297,3 +282,5 @@ module Dryml
     end
 
 end
+
+require 'dryml/railtie' if Object.const_defined?(:Rails)

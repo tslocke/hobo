@@ -65,7 +65,7 @@ module Hobo::RapidHelper
 
   def ajax_updater(url_or_form, update, options={})
     options ||= {}
-    options.symbolize_keys!
+    options = options.symbolize_keys
 
     target = if url_or_form == :post_form
                target = "this"
@@ -110,7 +110,7 @@ module Hobo::RapidHelper
     attributes.update(:hobo_blank_message => blank_message,
                       :if_blank => blank_message,
                       :no_wrapper => false)
-    
+
     edit_text = this._?.to_s
     attributes.update(:hobo_edit_text => edit_text) unless edit_text.nil?
 
@@ -143,7 +143,7 @@ module Hobo::RapidHelper
 
     names - through_collection_names
   end
-  
+
   def standard_fields(model, include_timestamps=false)
     fields = model.attr_order.*.to_s & model.content_columns.*.name
     fields -= %w{created_at updated_at created_on updated_on deleted_at} unless include_timestamps

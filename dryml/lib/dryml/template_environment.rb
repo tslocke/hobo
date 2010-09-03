@@ -1,7 +1,7 @@
 module Dryml
 
   class TemplateEnvironment
-    
+
     class << self
       def inherited(subclass)
         subclass.compiled_local_names = []
@@ -54,9 +54,9 @@ module Dryml
                  :form_this, :form_field_path, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"
     end
-    
+
     def path_for_form_field
-      @_form_field_path.nil? and raise Dryml::DrymlException, 
+      @_form_field_path.nil? and raise Dryml::DrymlException,
         "DRYML cannot provide the correct form-field name here (this_field = #{this_field.inspect}, this = #{this.inspect})"
       @_form_field_path
     end
@@ -142,7 +142,7 @@ module Dryml
           object = this
         end
       end
-      
+
       id = if (typed_id = object.try.typed_id)
              typed_id
            elsif object == @this
@@ -160,26 +160,26 @@ module Dryml
       end
       res
     end
-    
-    
+
+
     def refresh_part(encoded_context, session, dom_id)
       context = Dryml::PartContext.for_refresh(encoded_context, @this, session)
-        
+
       with_part_context(context) do
         send("#{context.part_name}_part", *context.locals)
       end
     end
 
-    
+
     def with_part_context(context, &block)
       this, this_field = context.this, context.this_field
-      
+
       b = if context.form_field_path
             proc { with_form_context(:unknown, context.form_field_path, &block) }
           else
             block
           end
-      
+
       if this && this_field
         new_object_context(this) { new_field_context(this_field, &b) }
       elsif this
@@ -206,7 +206,7 @@ module Dryml
 
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
-      
+
       begin
         found = nil
         while true
@@ -283,17 +283,17 @@ module Dryml
           parent, field, obj = Dryml.get_field_path(this, path)
           @_this, @_this_parent, @_this_field = obj, parent, field
         end
-        
+
         if @_form_field_path
-          @_form_field_path += path 
+          @_form_field_path += path
           @_form_field_paths_by_object[@_this] = @_form_field_path
         end
-        
+
         yield
       end
     end
-    
-    
+
+
     def find_form_field_path(object)
       back = []
       while object
@@ -310,8 +310,8 @@ module Dryml
         end
       end
     end
-        
-        
+
+
 
 
     def _tag_context(attributes)
@@ -348,7 +348,7 @@ module Dryml
 
 
     def _tag_locals(attributes, locals)
-      attributes.symbolize_keys!
+      attributes = attributes.symbolize_keys
       #ensure with and field are not in attributes
       attributes.delete(:with)
       attributes.delete(:field)
@@ -386,13 +386,13 @@ module Dryml
     def call_tag_parameter(the_tag, attributes, parameters, caller_parameters, param_name)
       overriding_proc = caller_parameters[param_name]
       replacing_proc  = caller_parameters[:"#{param_name}_replacement"]
-      
+
       unless param_name == the_tag || param_name == :default
         classes = attributes[:class]
         param_class = param_name.to_s.gsub('_', '-')
         attributes[:class] = if classes
                                classes =~ /\b#{param_class}\b/ ? classes : "#{classes} #{param_class}"
-                             else 
+                             else
                                param_class
                              end
       end
@@ -456,7 +456,7 @@ module Dryml
               else
                 proc { |default| default_content.call(default) if default_content }
               end
-          parameters = parameters.merge(:default => d) 
+          parameters = parameters.merge(:default => d)
         end
 
         if the_tag.is_one_of?(String, Symbol)
@@ -511,20 +511,20 @@ module Dryml
         end
       end
     end
-    
-    
+
+
     def merge_parameter_hashes(given_parameters, overriding_parameters)
       to_merge = given_parameters.keys & overriding_parameters.keys
       no_merge = overriding_parameters.keys - to_merge
       result = given_parameters.dup
-      
+
       no_merge.each { |k| result[k] = overriding_parameters[k] }
       to_merge.each { |k| result[k] = merge_tag_parameter(given_parameters[k], overriding_parameters[k])}
-      
+
       result
     end
-      
-      
+
+
 
 
     def part_contexts_javascripts
@@ -580,17 +580,13 @@ module Dryml
         end
         attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
       end
-
-      content = new_context { yield } if block_given?
-      res = if empty
-              "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
-            else
-              "<#{name}#{attr_string}>#{content}</#{name}>"
-            end
-      if block_called_from_erb? block
-        concat res
+      # TEST IT: does that work in rails 3?
+      # changed because block_called_from_erb? has been removed
+      content = capture(new_context { yield }) if block_given?
+      if empty
+        "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
       else
-        res
+        "<#{name}#{attr_string}>#{content}</#{name}>"
       end
     end
 

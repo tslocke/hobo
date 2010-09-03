@@ -6,15 +6,12 @@ require 'rails/generators'
 module Hobo
   class Engine < Rails::Engine
 
-    config.to_prepare do
-      # generators are used in other to_prepare blocks
-      Rails::Generators.configure!
-    end
-
     ActiveSupport.on_load(:before_configuration) do
       h = config.hobo = ActiveSupport::OrderedOptions.new
       h.developer_features = Rails.env.in?(["development", "test"])
       h.routes_path = Pathname.new File.expand_path('config/hobo_routes.rb', Rails.root)
+      h.rapid_generators_path = Pathname.new File.expand_path('../../../rapid_generators', __FILE__)
+      h.auto_taglibs_path = Pathname.new File.expand_path('app/views/taglibs/auto', Rails.root)
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -40,17 +37,13 @@ module Hobo
       require 'hobo/routes'
       require 'hobo/undefined'
       require 'hobo/user'
-   #   require 'dryml'
-   #   require 'dryml/template'
-   #   require 'dryml/dryml_generator'
-
-   #   Dryml.enable(["#{HOBO_ROOT}/rapid_generators"], "#{Rails.root}/app/views/taglibs/auto")
+      h = config.hobo
+      Dryml::DrymlGenerator.enable([h.rapid_generators_path], h.auto_taglibs_path)
 
       # should not be needed
       # ActiveSupport::Dependencies.autoload_paths |= ["#{Rails.root}/app/viewhints"]
 
       HoboFields.never_wrap(Hobo::Undefined)
-
     end
 
     initializer 'hobo.routes' do |app|
@@ -59,10 +52,21 @@ module Hobo
       Rails::Generators.invoke('hobo:routes', %w[-f -q]) unless File.exists?(h.routes_path)
       app.routes_reloader.paths << h.routes_path
       app.config.to_prepare do
+        Rails::Generators.configure!
         # generate before each request in development
         Rails::Generators.invoke('hobo:routes', %w[-f -q])
       end
     end
+
+    initializer 'hobo.dryml' do |app|
+      # avoids to fail the initial migration from the setup_wizard generator
+      unless $0 =~ /rake$/
+        app.config.to_prepare do
+          Dryml::DrymlGenerator.run
+        end
+      end
+    end
+
 
   end
 end
