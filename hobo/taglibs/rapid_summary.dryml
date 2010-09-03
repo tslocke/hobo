@@ -17,7 +17,7 @@
 
 <!-- `RAILS_ENV` -->
 <def tag="rails-env">
-  <%= RAILS_ENV -%>
+  <%= Rails.env -%>
 </def>
 
 <!-- Which change management system is in use:  "git" "subversion" "other" -->
@@ -110,7 +110,7 @@
 <!-- inside `<with-gems>`, returns the version required -->
 <def tag="gem-version-required">
   <gem-version-requirement:version-requirements />
-</def>  
+</def>
 
 <!-- inside `<with-gems>`, returns the version -->
 <def tag="gem-version">
@@ -157,7 +157,7 @@
 
 <!-- within `<with-plugins>`, try and determine the method that was used to install the plugin.   Returns "braid", "symlink", "git-submodule" or "other" -->
 <def tag="plugin-method">
-  <%= 
+  <%=
       braids = File.open("#{Rails.root}/.braids") {|f| YAML::load(f) } rescue {}
       if !braids[this.directory.gsub(Rails.root+"/", "")].nil?
         "braid"
@@ -305,7 +305,7 @@
       end -%>
 </def>
 
-<!-- given an association, return the name --> 
+<!-- given an association, return the name -->
 <def tag="model-association-class-name">
   <%= (this.class_name.try.respond_to? 'underscore') ? this.class_name.underscore.singularize.camelize : this.try.class_name -%>
 </def>

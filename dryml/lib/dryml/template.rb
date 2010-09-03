@@ -1012,7 +1012,7 @@ module Dryml
     def include_source_metadata
       # disabled for now -- we're still getting broken rendering with this feature on
       return false
-      @include_source_metadata = RAILS_ENV == "development" && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
+      @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
       @include_source_metadata
     end
 

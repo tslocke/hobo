@@ -95,7 +95,7 @@ module Dryml
 
 
     def page_renderer(view, local_names=[], page=nil, filename=nil)
-      if RAILS_ENV == "development"
+      if Rails.env.development?
         clear_cache
         Taglib.clear_cache
       end

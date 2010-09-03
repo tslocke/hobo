@@ -544,7 +544,7 @@ module Dryml
         res = send(method_name, attributes).strip
 
         # TODO: Temporary hack to get the dryml metadata comments in the right place
-        if false && RAILS_ENV == "development"
+        if false && Rails.env.development?
           res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
         else
           res
