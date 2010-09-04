@@ -7,37 +7,37 @@ it:
     index:
       # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
       # if you need a different title you should implement a different way to select the tab on your own
-      #title: "Indice {{model}}"
-      heading: "Indice {{model}}"
+      #title: "Indice %{model}"
+      heading: "Indice %{model}"
 
     new:
-      title: "Nuovo Record {{model}}"
-      heading: "Nuovo Record {{model}}"
+      title: "Nuovo Record %{model}"
+      heading: "Nuovo Record %{model}"
 
     show:
-      title: "{{model}}"
-      heading: "{{model}} {{name}}"
+      title: "%{model}"
+      heading: "%{model} %{name}"
       back_link: "Indietro"
-      edit_link: "Modifica {{model}}"
-      new_link: "Nuovo Record {{model}}"
-      add_form_heading: "Aggiungi {{model}}"
+      edit_link: "Modifica %{model}"
+      new_link: "Nuovo Record %{model}"
+      add_form_heading: "Aggiungi %{model}"
 
     edit:
-      title: "Modifica {{model}}"
-      heading: "Modifica {{model}}"
+      title: "Modifica %{model}"
+      heading: "Modifica %{model}"
 
     index_for_owner:
-      title: "{{model}} per"
+      title: "%{model} per"
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
-      #heading: "{{model}} per"
+      #heading: "%{model} per"
       subheading: "Per:"
 
     new_for_owner:
-      title: "Nuovo Record {{model}} per"
-      heading: "Nuovo Record {{model}}"
+      title: "Nuovo Record %{model} per"
+      heading: "Nuovo Record %{model}"
       subheading: "Per:"
 
     login:
@@ -66,7 +66,7 @@ it:
     forgot_password_sent:
       title: "Parola Chiave Dimenticata - Messaggio inviato"
       heading: "Parola Chiave Dimenticata - Messaggio inviato"
-      text: "Il messaggio con le istruioni per generare una nuova Parola Chiave ti è stato inviato a {{email_address}}.
+      text: "Il messaggio con le istruioni per generare una nuova Parola Chiave ti è stato inviato a %{email_address}.
              Se non lo ricevi, per favore verifica il filtro anti-spam."
 
     account_disabled_page:
@@ -83,48 +83,48 @@ it:
 
     # default hobo action translation
     actions:
-      new: "Nuovo Record {{model}}"
-      create: "Crea {{model}}"
+      new: "Nuovo Record %{model}"
+      create: "Crea %{model}"
       previous: "Precedente"
       next: "Prossimo"
       add: "Aggiungere"
       show_all: "vedi tutti..."
-      delete: "Elimina {{model}}"
-      save: "Registra {{model}}"
+      delete: "Elimina %{model}"
+      save: "Registra %{model}"
       cancel: "Annulla"
-      edit: "Modifica {{model}}"
+      edit: "Modifica %{model}"
       back: "Ritorna a"
-      back_to_parent: "Ritorna a {{parent}} {{name}}"
+      back_to_parent: "Ritorna a %{parent} %{name}"
       send: "Invia"
       remove: "Elimina"
       signup: "Iscrizione"
       login: *start_session
       logout: "Chiudi Sessione"
-      logged_in_as: "{{name}}"
+      logged_in_as: "%{name}"
       account: "Profilo"
       save_account: "Registra Profilo"
 
     # default hobo message translation
     messages:
       create:
-        success: "Creazione del record {{model}} avvenuta con successo."
-        error: "Creazione del record {{model}} fallita.\n{{errors}}"
+        success: "Creazione del record %{model} avvenuta con successo."
+        error: "Creazione del record %{model} fallita.\n%{errors}"
       creator:
-        error: "Impossibile eseguire il creatore {{name}}.\n{{errors}}"
+        error: "Impossibile eseguire il creatore %{name}.\n%{errors}"
       transition:
-        error: "Impossibile eseguire la transizione {{name}}.\n{{errors}}"
+        error: "Impossibile eseguire la transizione %{name}.\n%{errors}"
       update:
         no_attribute_error: "Nessuna modifica specificata nei parametri."
-        success: "Le modifiche al record {{model}} sono state registrate."
-        error: "La modifica ha generato un problema.\n{{errors}}"
+        success: "Le modifiche al record %{model} sono state registrate."
+        error: "La modifica ha generato un problema.\n%{errors}"
       destroy:
-        success: "Il record {{model}} è stato eliminato con successo."
+        success: "Il record %{model} è stato eliminato con successo."
       signup:
         success: "Grazie per iscriverti!"
         must_activate: "Prima di iniziare la sessione devi attivare la registrazione. Per favore verifica la tua Posta Elettronica."
       login:
         success: "La sessione è iniziata."
-        error: "{{login}} e Parola Chiave non validi."
+        error: "%{login} e Parola Chiave non validi."
       logout: "La sessione è terminata."
       reset_password: "La tua Parola Chiave è stata azzerata."
       permission_denied: "Permesso negato!"
@@ -133,32 +133,32 @@ it:
       current_password_is_not_correct: "non è esatta"
       you_are_site_admin: "Adesso sei amministratore del sito."
       you_signed_up: "Ti sei iscritto."
-      no: "Nessun record {{model}} disponibile."
+      no: "Nessun record %{model} disponibile."
       confirm: "Sei sicuro?"
 
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "Non ci sono {{model}}"
-        one: "C'è solo 1 {{model}}"
-        other: "Ci sono {{count}} {{model}}"
+        zero: "Non ci sono %{model}"
+        one: "C'è solo 1 %{model}"
+        other: "Ci sono %{count} %{model}"
 
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading:
-      add_form_heading: "Aggiungere {{model}}"
+      add_form_heading: "Aggiungere %{model}"
       empty_message: "Nessun record"
 
     # default hobo form translation
     form:
       new:
-        heading: "Nuovo Record {{model}}"
+        heading: "Nuovo Record %{model}"
       error:
         heading: "Si è verificato il seguente errore:"
       select_many:
-        prompt: "Aggiungere {{model}}"
+        prompt: "Aggiungere %{model}"
 
     # hobo support
     support:

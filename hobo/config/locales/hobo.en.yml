@@ -7,27 +7,27 @@ en:
     index:
       # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
       # if you need a different title you should implement a different way to select the tab on your own
-      #title: "{{model}} Index"
-      heading: "{{model}} Index"
+      #title: "%{model} Index"
+      heading: "%{model} Index"
 
     new:
-      title: "New {{model}}"
-      heading: "New {{model}}"
+      title: "New %{model}"
+      heading: "New %{model}"
 
     show:
-      title: "{{model}}"
-      heading: "{{model}} {{name}}"
+      title: "%{model}"
+      heading: "%{model} %{name}"
       back_link: "Back"
-      edit_link: "Edit {{model}}"
-      new_link: "New {{model}}"
-      add_form_heading: "Add {{model}}"
+      edit_link: "Edit %{model}"
+      new_link: "New %{model}"
+      add_form_heading: "Add %{model}"
 
     edit:
-      title: "Edit {{model}}"
-      heading: "Edit {{model}}"
+      title: "Edit %{model}"
+      heading: "Edit %{model}"
 
     index_for_owner:
-      title: "{{model}} for"
+      title: "%{model} for"
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
@@ -35,8 +35,8 @@ en:
       subheading: "For:"
 
     new_for_owner:
-      title: "New {{model}} for"
-      heading: "New {{model}}"
+      title: "New %{model} for"
+      heading: "New %{model}"
       subheading: "For:"
 
     login:
@@ -65,7 +65,7 @@ en:
     forgot_password_sent:
       title: "Forgotten password - E-mail sent"
       heading: "Forgotten password - E-mail sent"
-      text: "En e-mail with instructions on how you generate a new password has been sent to {{email_address}}. If you don't receive this e-mail please check your spamfilter."
+      text: "En e-mail with instructions on how you generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spamfilter."
 
     account_disabled_page:
       title: "Account disabled"
@@ -82,48 +82,48 @@ en:
     # The action with added model variable are new, create, delete, save,
     # edit and back_to_parent
     actions:
-      new: "New {{model}}"
-      create: "Create {{model}}"
+      new: "New %{model}"
+      create: "Create %{model}"
       previous: "Previous"
       next: "Next"
       add: "Add"
       show_all: "show all..."
-      delete: "Delete {{model}}"
-      save: "Save {{model}}"
+      delete: "Delete %{model}"
+      save: "Save %{model}"
       cancel: "Cancel"
-      edit: "Edit {{model}}"
+      edit: "Edit %{model}"
       back: "Back to"
-      back_to_parent: "Back to {{parent}} {{name}}"
+      back_to_parent: "Back to %{parent} %{name}"
       send: "Send"
       remove: "Remove"
       signup: "Signup"
       login: "Login"
       logout: "Log out"
-      logged_in_as: "Logged in as {{name}}"
+      logged_in_as: "Logged in as %{name}"
       account: "Account"
       save_account: "Save Your Data"
 
     # default hobo message translation
     messages:
       create:
-        success: "The {{model}} was created successfully"
-        error: "Couldn't create the {{model}}.\n{{errors}}"
+        success: "The %{model} was created successfully"
+        error: "Couldn't create the %{model}.\n%{errors}"
       creator:
-        error: "Couldn't do creator {{name}}.\n{{errors}}"
+        error: "Couldn't do creator %{name}.\n%{errors}"
       transition:
-        error: "Couldn't do transition {{name}}.\n{{errors}}"
+        error: "Couldn't do transition %{name}.\n%{errors}"
       update:
         no_attribute_error: "No update specified in params"
-        success: "Changes to the {{model}} were saved"
-        error: "There was a problem with that change.\n{{errors}}"
+        success: "Changes to the %{model} were saved"
+        error: "There was a problem with that change.\n%{errors}"
       destroy:
-        success: "The {{model}} was deleted"
+        success: "The %{model} was deleted"
       signup:
         success: "Thanks for signing up!"
         must_activate: "You must activate your account before you can log in. Please check your email."
       login:
         success: "You have logged in."
-        error: "You did not provide a valid {{login}} and Password!"
+        error: "You did not provide a valid %{login} and Password!"
       logout: "You have logged out."
       reset_password: "Your password has been reset."
       permission_denied: "Permission Denied"
@@ -132,31 +132,31 @@ en:
       current_password_is_not_correct: "is not correct"
       you_are_site_admin: "You are now the site administrator"
       you_signed_up: "You have signed up"
-      no: "No {{model}} available."
+      no: "No %{model} available."
       confirm: "Are you sure?"
 
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "No {{model}}"
-        one: "There is only one {{model}} at the moment"
-        other: "There are already {{count}} {{model}}"
+        zero: "No %{model}"
+        one: "There is only one %{model} at the moment"
+        other: "There are already %{count} %{model}"
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
       # you better define the heading.* in the specific collection namespace
       #heading:
-      add_form_heading: "Add {{model}}"
+      add_form_heading: "Add %{model}"
       empty_message: "No records to display"
 
     # default hobo form translation
     form:
       new:
-        heading: "New {{model}}"
+        heading: "New %{model}"
       error:
         heading: "The following error occured:"
       select_many:
-            prompt: "Add {{model}}"
+            prompt: "Add %{model}"
 
     # hobo support
     support:
