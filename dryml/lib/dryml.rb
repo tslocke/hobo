@@ -12,7 +12,6 @@ require 'action_pack'
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
 
-# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 # The Don't Repeat Yourself Markup Language

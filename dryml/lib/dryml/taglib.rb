@@ -31,8 +31,6 @@
                    "#{DRYML_ROOT}/taglibs"
                  elsif plugin == "hobo"
                    "#{HOBO_ROOT}/taglibs"
-                 elsif plugin
-                   "#{rails_root}/vendor/plugins/#{plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{rails_root}/app/views"
                  elsif options[:template_dir] =~ /^#{HOBO_ROOT}/

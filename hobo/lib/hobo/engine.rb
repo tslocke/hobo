@@ -10,7 +10,7 @@ module Hobo
       h = config.hobo = ActiveSupport::OrderedOptions.new
       h.developer_features = Rails.env.in?(["development", "test"])
       h.routes_path = Pathname.new File.expand_path('config/hobo_routes.rb', Rails.root)
-      h.rapid_generators_path = Pathname.new File.expand_path('../../../rapid_generators', __FILE__)
+      h.rapid_generators_path = Pathname.new File.expand_path('rapid_generators', HOBO_ROOT)
       h.auto_taglibs_path = Pathname.new File.expand_path('app/views/taglibs/auto', Rails.root)
     end
 

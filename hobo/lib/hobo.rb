@@ -12,7 +12,6 @@ end
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 
-# Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 class HoboError < RuntimeError; end
