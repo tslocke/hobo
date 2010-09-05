@@ -31,7 +31,7 @@ module Hobo
 
 
     def base_url
-      ActionController::Base.relative_url_root || ""
+      "#{Rails.application.config.action_controller.relative_url_root}"
     end
 
 
@@ -60,7 +60,7 @@ module Hobo
 
       if obj.respond_to?(:member_class) && obj.respond_to?(:origin)
         # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
-        
+
         refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
         owner_name = refl.name.to_s
         owner_name = owner_name.singularize if refl.macro == :has_many
@@ -89,7 +89,7 @@ module Hobo
           # Asking for url to post new record to
           obj = obj.class
         end
-        
+
         klass = if obj.is_a?(Class)
                   obj
                 elsif obj.respond_to?(:member_class)
@@ -183,7 +183,7 @@ module Hobo
                           [this, nil]
                         elsif this_parent && this_field
                           [this_parent, this_field]
-                        else 
+                        else
                           [this, nil]
                         end
                       elsif args.length == 2
@@ -198,14 +198,14 @@ module Hobo
 
       object.editable_by?(current_user, field)
     end
-    
+
 
     def can_delete?(object=this)
       object.destroyable_by?(current_user)
     end
 
 
-    
+
     def can_call?(*args)
       method = args.last
       object = args.length == 2 ? args.first : this
@@ -213,7 +213,7 @@ module Hobo
       object.method_callable_by?(current_user, method)
     end
 
-    
+
     # can_view? has special behaviour if it's passed a class or an
     # association-proxy -- it instantiates the class, or creates a new
     # instance "in" the association, and tests the permission of this
@@ -224,7 +224,7 @@ module Hobo
     # belongs_to the proxy owner.
     def can_view?(*args)
       # TODO: Man does this need a big cleanup!
-      
+
       if args.empty?
         if this_parent && this_field
           object = this_parent
@@ -238,7 +238,7 @@ module Hobo
       else
         object, field = args
       end
-      
+
       if field
         # Field can be a dot separated path
         if field.is_a?(String) && (path = field.split(".")).length > 1
@@ -248,7 +248,7 @@ module Hobo
       elsif (origin = object.try.origin)
         object, field = origin, object.origin_attribute
       end
-      
+
       @can_view_cache ||= {}
       @can_view_cache[ [object, field] ] ||=
         if !object.respond_to?(:viewable_by?)
@@ -264,7 +264,7 @@ module Hobo
           false
         end
     end
-    
+
 
     def select_viewable(collection=this)
       collection.select {|x| can_view?(x)}
@@ -352,12 +352,12 @@ module Hobo
 
 
     def current_page_url
-      request.request_uri.match(/^([^?]*)/)._?[1]
+      request.fullpath.match(/^([^?]*)/)._?[1]
     end
 
     def query_params
-      query = request.request_uri =~ /\?([^?]+)/ && $1
-      result = HashWithIndifferentAccess.new 
+      query = request.fullpath =~ /\?([^?]+)/ && $1
+      result = HashWithIndifferentAccess.new
       if query
         query.gsub!('+', ' ')
         query.split('&').each do |param|
@@ -391,15 +391,15 @@ module Hobo
 
       Hobo::Routes.linkable?(klass, action, options.reverse_merge(:subsite => subsite))
     end
-    
-    
+
+
     def css_data(name, *args)
       "#{name.to_s.dasherize}::#{args * '::'}"
     end
-        
+
 
     # --- ViewHint Helpers --- #
-    
+
     def this_field_name
       this_parent.class.try.human_attribute_name(this_field) || this_field
     end
@@ -410,7 +410,7 @@ module Hobo
 
 
     # --- default Helpers --- #
-    
+
     def your_default
       this == current_user ? "Your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
     end
@@ -428,7 +428,7 @@ module Hobo
       logger.debug("DRYML THIS = #{this.typed_id rescue this.inspect}")
       logger.debug("###################\n")
       args.first unless args.empty?
-    end    
+    end
 
   end
 

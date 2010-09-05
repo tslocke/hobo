@@ -16,7 +16,7 @@
  -->
 <def tag="login-form" attrs="user-model">
   <% user_model ||= self.try.model -%>
-  <form action="&request.request_uri" class="login" merge>
+  <form action="&request.fullpath" class="login" merge>
     <labelled-item-list param>
       <labelled-item>
 
