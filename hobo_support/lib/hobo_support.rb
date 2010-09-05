@@ -13,6 +13,7 @@ require 'hobo_support/array'
 require 'hobo_support/hash'
 require 'hobo_support/module'
 require 'hobo_support/string'
+require 'hobo_support/xss'
 
 module HoboSupport
 

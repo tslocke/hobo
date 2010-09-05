@@ -578,15 +578,15 @@ module Dryml
             %(#{key}="#{value}")
           end
         end
-        attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
+        attr_string = " #{attrs.sort * ' '}".html_safe unless attrs.empty?
       end
       # TEST IT: does that work in rails 3?
       # changed because block_called_from_erb? has been removed
       content = capture(new_context { yield }) if block_given?
       if empty
-        "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>"
+        "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>".html_safe
       else
-        "<#{name}#{attr_string}>#{content}</#{name}>"
+        "<#{name}#{attr_string}>".html_safe + content + "</#{name}>".html_safe
       end
     end
 

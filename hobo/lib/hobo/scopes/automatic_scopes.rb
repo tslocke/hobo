@@ -268,7 +268,7 @@ module Hobo
               type = klass.attr_type(field)
               if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
                 colspec = "#{field}" # don't prepend the table name 
-              elsif type.respond_to?(:table_name) && (name = type.name_attribute)
+              elsif type.respond_to?(:name_attribute) && (name = type.name_attribute)
                 include = field
                 colspec = "#{type.table_name}.#{name}"
               else

@@ -47,7 +47,7 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
   raise ArgumentError, "Cannot <repeat> on #{this.inspect}" unless this.respond_to? :each
   context_map do
     parameters.default
-  end.join(join)
+  end.safe_join(join)
 %></if></def>
 
 
@@ -105,32 +105,32 @@ collection is considered blank)
 
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="html"><%= "<html#{tag_options(attributes)}>" -%><do param="default"/><%= "</html>" -%></def>
+<def tag="html"><%=raw "<html#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</html>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="table"><%= "<table#{tag_options(attributes)}>" -%><do param="default"/><%= "</table>" -%></def>
+<def tag="table"><%=raw "<table#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</table>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="a"><%= "<a#{tag_options(attributes)}>" -%><do param="default"/><%= "</a>" -%></def>
+<def tag="a"><%=raw "<a#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</a>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="section"><%= "<section#{tag_options(attributes)}>" -%><do param="default"/><%= "</section>" -%></def>
+<def tag="section"><%=raw "<section#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</section>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="header"><%= "<header#{tag_options(attributes)}>" -%><do param="default"/><%= "</header>" -%></def>
+<def tag="header"><%=raw "<header#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</header>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="footer"><%= "<footer#{tag_options(attributes)}>" -%><do param="default"/><%= "</footer>" -%></def>
+<def tag="footer"><%=raw "<footer#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</footer>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="form"><%= "<form#{tag_options(attributes)}>" -%><do param="default"/><%= "</form>" -%></def>
+<def tag="form"><%=raw "<form#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</form>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="submit"><%= "<submit#{tag_options(attributes)}>" -%><do param="default"/><%= "</submit>" -%></def>
+<def tag="submit"><%=raw "<submit#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</submit>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="input"><%= "<input#{tag_options(attributes)}>" -%><do param="default"/><%= "</input>" -%></def>
+<def tag="input"><%=raw "<input#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</input>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="link"><%= "<link#{tag_options(attributes)}>" -%><do param="default"/><%= "</link>" -%></def>
+<def tag="link"><%=raw "<link#{tag_options(attributes, true)}>" -%><do param="default"/><%= "</link>" -%></def>
 

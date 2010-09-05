@@ -19,17 +19,18 @@
   <form action="&request.request_uri" class="login" merge>
     <labelled-item-list param>
       <labelled-item>
+
         <item-label param="login-label"><t key="hobo.login.#{user_model.login_attribute}"><%= user_model.login_attribute.to_s.titleize %></t></item-label>
         <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
       </labelled-item>
-      
+
       <labelled-item>
         <item-label param="password-label"><t key="hobo.login.password">Password</t></item-label>
         <item-value>
           <input type="password" name="password" id="password" class="string" param="password-input"/>
         </item-value>
       </labelled-item>
-      
+
       <labelled-item param="remember-me">
         <item-label class="field-label" param="remember-me-label"><t key="hobo.login.remember_me">Remember me:</t></item-label>
         <item-value>
@@ -48,15 +49,15 @@
 <def tag="login-page">
   <% remember_me = true if remember_me.nil? %>
   <simple-page title="#{I18n.t 'hobo.login.title', :default=>['Log in'] }" merge>
-   
+
     <body: class="login-page" param/>
-    
+
     <content: param>
       <header param="content-header">
         <h2 param="heading"><t key="hobo.login.heading">Log In</t></h2>
       </header>
-      
-      <section param="content-body">      
+
+      <section param="content-body">
         <login-form param="form" user-model="&model"/>
         <a href="&forgot_password_url" param="forgot-password" if="&forgot_password_url"><t key="hobo.login.forgot_password">Forgot your password?</t></a>
       </section>
@@ -69,9 +70,9 @@
  their email address -->
 <def tag="forgot-password-page">
   <simple-page title="#{I18n.t 'hobo.forgot_password.title', :default=>['Forgotten Password'] }" merge>
-   
+
     <body: class="forgot-password-page" param/>
-    
+
     <content: param>
       <header param="content-header">
         <h2 param="heading"><t key="hobo.forgot_password.heading">Forgotten Password</t></h2>
@@ -96,7 +97,7 @@
         </form>
       </section>
     </content:>
-      
+
   </simple-page>
 </def>
 
@@ -106,7 +107,7 @@ if a given email is associated with an account or not. -->
 <def tag="forgot-password-email-sent-page">
   <simple-page title="#{I18n.t 'hobo.forgot_password_sent.title', :default=>['Forgotten Password - Sent'] }" merge>
     <body: class="forgot-password-page" param/>
-    
+
     <content: param>
       <header param="content-header">
         <h2 param><t key="hobo.forgot_password_sent.heading">Forgotten Password - Sent</t></h2>
@@ -123,7 +124,7 @@ if a given email is associated with an account or not. -->
         <p><a href="#{base_url}/"><t key="hobo.actions.back">Back to</t> <app-name/></a></p>
       </section>
     </content:>
-        
+
   </simple-page>
 </def>
 
@@ -132,7 +133,7 @@ if a given email is associated with an account or not. -->
 <def tag="account-disabled-page">
 
   <simple-page title="#{I18n.t 'hobo.account_disabled_page.title', :default=>['Account Disabled'] }" merge>
-       
+
     <body: class="account-disabled-page" param/>
 
     <content: param>
@@ -175,7 +176,7 @@ if a given email is associated with an account or not. -->
         </form>
       </section>
     </content:>
-    
+
   </page>
 
 </def>

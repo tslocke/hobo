@@ -431,7 +431,7 @@ module Dryml
                el.attributes['for'] || @containing_tag_name
              end
       local_name = param_content_local_name(name)
-      "<%= #{local_name} && #{local_name}.call %>"
+      "<%= #{local_name}.call if #{local_name} %>"
     end
 
 
@@ -459,7 +459,7 @@ module Dryml
 
       newlines = "\n" * part_src.count("\n")
       args = [attribute_to_ruby(dom_id), ":#{part_name}", part_locals].compact
-      "<%= call_part(#{args * ', '}) #{newlines} %>"
+      "<%=raw call_part(#{args * ', '}) #{newlines} %>"
     end
 
 
@@ -780,7 +780,7 @@ module Dryml
       part_name = el.attributes['part']
       if part_name
         part_id = el.attributes['id'] || part_name
-        "<div class='part-wrapper' id='<%= #{attribute_to_ruby part_id} %>'>#{part_element(el, call)}</div>"
+        "<div class='part-wrapper' id='<%=raw #{attribute_to_ruby part_id} %>'>".html_safe+part_element(el, call)+"</div>".html_safe
       else
         call
       end
@@ -920,10 +920,10 @@ module Dryml
         case attr
         when "if"
           "(if !(#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
-            "else (Dryml.last_if = false; ''); end)"
+            "else (Dryml.last_if = false; ''.html_safe); end)"
         when "unless"
           "(if (#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
-            "else (Dryml.last_if = false; ''); end)"
+            "else (Dryml.last_if = false; ''.html_safe); end)"
         when "repeat"
           "repeat_attribute(#{control}) { #{expression} }"
         end
@@ -947,9 +947,13 @@ module Dryml
                 "(#{attr[1..-1]})"
               else
                 if attr !~ /"/
-                  '"' + attr + '"'
+                  if attr =~ /\#\{/
+                    '"' + attr + '"'
+                  else
+                    '"' + attr + '".html_safe'
+                  end
                 elsif attr !~ /'/
-                  "'#{attr}'"
+                  "'#{attr}'.html_safe"
                 else
                   dryml_exception("invalid quote(s) in attribute value")
                 end

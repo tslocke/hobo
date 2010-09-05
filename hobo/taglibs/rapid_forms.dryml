@@ -65,7 +65,7 @@ executed at various points in the ajax request cycle:
           end
   skip = comma_split skip
   pairs.reject! { |p| p.first.in?(skip) }
-  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.join("\n")
+  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.safe_join("\n".html_safe)
 %></def>
 
 
@@ -182,16 +182,17 @@ The standard form tag does not have any parameters, nor does it have any default
       http_method_hidden = hidden_field_tag("_method", "PUT") 
       html_attrs[:method] = "post" 
     else
+      http_method_hidden = "".html_safe
       html_attrs[:method] = method
     end
      
     if update || !ajax_attrs.empty?
       # add an onsubmit to convert to an ajax form if `update` is given
       function = ajax_updater(:post_form, update, ajax_attrs)
-      html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.join("; ")
+      html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.safe_join("; ".html_safe)
     end
      
-    hiddens = nil
+    hiddens = "".html_safe
     body = with_form_context do
       # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
       b = parameters.default
@@ -216,9 +217,9 @@ The standard form tag does not have any parameters, nor does it have any default
       page_path_hidden = hidden_field_tag("page_path", page_path) 
     end
     
-    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].join)
+    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].safe_join)
      
-    body = [hiddens_div, body].join
+    body = [hiddens_div, body].safe_join
     
     if action.nil? # don't add automatic css classes if the action was specified
       if web_method
