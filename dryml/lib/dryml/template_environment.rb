@@ -541,14 +541,7 @@ module Dryml
     def render_tag(tag_name, attributes)
       method_name = tag_name.to_s.gsub('-', '_')
       if respond_to?(method_name)
-        res = send(method_name, attributes).strip
-
-        # TODO: Temporary hack to get the dryml metadata comments in the right place
-        if false && Rails.env.development?
-          res.gsub(/^(.*?)(<!DOCTYPE.*?>).*?(<html.*?>)/m, "\\2\\3\\1")
-        else
-          res
-        end
+        send(method_name, attributes).strip
       else
         false
       end
