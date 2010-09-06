@@ -1,7 +1,7 @@
 <!-- Tags that define higher level interactive 'widgets' -->
 
 <!-- An enhanced version of Rapid's `<table>` that has support for column sorting, searching and pagination.
-  
+
 This tag calls `<table merge-params>`, so the parameters for `<table>` are also available.
 
 An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchable_sortable_table) of this tag is available in the [Agility Tutorial](/tutorials/agility)
@@ -30,9 +30,9 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
                       "-#{col}" : col
              sort_url = url_for(params.merge(:sort => sort) - [:page])
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
-                          
+
           <th param="#{scope.field-name}-heading">
-            <a href="&sort_url" class="column-sort" 
+            <a href="&sort_url" class="column-sort"
                param="#{scope.field-name}-heading-link"><%= col_heading_name %></a>
             <if test="&col == sort_field">
               <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
@@ -42,18 +42,18 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
         </with-field-names>
         <th if="&all_parameters[:controls]" class="controls"></th>
       </field-heading-row>
-    </table>    
+    </table>
     <empty-collection-message param="empty-message"/>
-   
+
     <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
   </div>
 </def>
 
 
-<!-- An enhanced version of Rapid's `<collection>` tag that supports drag-and-drop re-ordering. 
-  
+<!-- An enhanced version of Rapid's `<collection>` tag that supports drag-and-drop re-ordering.
+
 Each item in the collection has a `<div class="ordering-handle" param="handle">` added, which can be used to drag the item up and down.
-  
+
 ### Attributes
 
  - `sortable-options` - a hash of options to pass to the `sortable_elemnt` helper. Default are:
@@ -63,8 +63,8 @@ Each item in the collection has a `<div class="ordering-handle" param="handle">`
           :scroll => :window,
           :handle => 'ordering-handle',
           :complete => [visual_effect(:highlight, attributes[:id])] }
-          
-### Controller support 
+
+### Controller support
 
 This tag assumes the controller has a `reorder` action and the model has a `position_column` method. This action is added automatically by Hobo's model-controller if the model declares `acts_as_list`. See also [Drag and Drop Reordering](/manual/controllers#drag_and_drop_reordering) in the [Controllers and Routing](/manual/controllers) chapter of the manual.
  -->
@@ -101,7 +101,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
 
 <!-- Captures the common pattern of a list of "the first few" cards, along with a link to the rest. -->
 <def tag="collection-preview" attrs="name">
-  <% model_class = this.member_class 
+  <% model_class = this.member_class
      name ||= model_class.name.downcase.pluralize -%>
   <section class="#{name.dasherize} collection-preview" param="default">
     <h3 param="heading">
@@ -110,7 +110,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
       </ht>
     </h3>
     <a with="&model_class" action="new" if="&can_create?(model_class.new)" param="new-link">
-      <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.human_name %></ht>
+      <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.model_name.human %></ht>
     </a>
     <collection param/>
     <unless test="&this.empty?">
@@ -122,7 +122,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
 
 <!-- Renders a gravatar (see [gravatar.com](http://gravatar.com)) image in side a link to `this`. Requires `this` to have an `email_address` field. Normally called with a user record in context.
 
-### Attributes 
+### Attributes
 
  - `size` - Size in pixels of the image. Defaults to 80.
  - `rating` - The rating allowed. Defaults to 'g'. See [gravatar.com](http://gravatar.com) for information on ratings.
@@ -146,7 +146,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
   </section>
 </def>
 
-<!-- A `<select>` menu intended to act as a filter for index pages. 
+<!-- A `<select>` menu intended to act as a filter for index pages.
 
 ### Example
 
@@ -162,22 +162,22 @@ And the controller action:
       finder = params[:state] ? Order.send(params[:state]) : Order
       hobo_index finder
     end
-  
+
 See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status) in the [Agility Tutorial](/tutorials/agility) for an example.
 
 ### Attributes
 
  - `param-name` - the name of the HTTP parameter to use for the filter
- - `options` - an array of options or an array of arrays (useful for localized apps) for the menu. 
+ - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
    It can be omitted if you provide the options as an array or array of arrays in the locale file.
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
 
 ### I18n
 
 It lookups the options attributes in filter_menu.#{param_name}.options.
-The passed options are used as a default in case the lookup fails. 
-Besides the "tags.filter_menu.default.no_filter" key is used as default of the attribute "no-filter" 
-(or "All" if no default is found) 
+The passed options are used as a default in case the lookup fails.
+Besides the "tags.filter_menu.default.no_filter" key is used as default of the attribute "no-filter"
+(or "All" if no default is found)
 
 ### I18n Example
 
@@ -191,16 +191,16 @@ Besides the "tags.filter_menu.default.no_filter" key is used as default of the a
           - [ "Ayer", "yesterday" ]
 
    TIME_PERIODS = %w[today yesterday]
-   
+
    <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
-   
+
    with I18n.locale == :es
    <select name="period">
      <option value="">Todos Períodos</option>
      <option value="today">Hoy</option>
      <option value="yesterday">Ayer</option>
    </select>
-   
+
    with I18n.locale == :en (i.e no locale file)
    <select name="period">
      <option value="">All Periods</option>

@@ -17,8 +17,8 @@ There is a default :count => 1
   I18n.t(k, {:default=>all_parameters.default, :count=>1}.merge(options))
 %></def>
 
-<!-- Wrapper around ActiveRecord::Base.human_name with added sugar.
-It dynamically pluralizes the human_name by using the implicit model.count.
+<!-- Wrapper around ActiveModel::Name#human with added sugar.
+It dynamically pluralizes the human name by using the implicit model.count.
 
 #### Attributes
 
@@ -34,7 +34,7 @@ It dynamically pluralizes the human_name by using the implicit model.count.
   # prepare symbolized attributes for merging
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v}
-  model.human_name( {:count=>c}.merge(attrs) )
+  model.model_name.human( {:count=>c}.merge(attrs) )
 %>
 </def>
 

@@ -21,7 +21,7 @@ model_key = model.name.tableize
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index.title', :pluralized=>true, :default=>[model.human_name(:count=>model.count)] }">
+  <page merge title="#{ht '<%= model_key %>.index.title', :pluralized=>true, :default=>[model.model_name.human(:count=>model.count)] }">
     <body: class="index-page <%= model_class %>" param/>
 
     <content: param>
@@ -101,7 +101,7 @@ model_key = model.name.tableize
 
 <%
 back_link      = model.view_hints.parent
-back_link_human_name  = back_link.to_s.singularize.camelize.constantize.human_name unless back_link.blank?
+back_link_human_name  = back_link.to_s.singularize.camelize.constantize.model_name.human unless back_link.blank?
 boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans
 creator        = model.creator_attribute
 creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
@@ -138,7 +138,7 @@ end
 <% end -%>
           <header param="content-header">
 <% if back_link -%>
-            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="&<%= back_link.to_s.singularize.camelize %>.human_name" name="&this">Back to <name/></ht></a:<%= back_link %>>
+            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="&<%= back_link.to_s.singularize.camelize %>.model_name.human" name="&this">Back to <name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
               <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
@@ -282,7 +282,7 @@ new_link = :new.in?(actions)
 -%>
 <def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name(:plural)) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">    
+  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name(:plural)) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
     <content: param>
       <header param="content-header">
@@ -368,8 +368,8 @@ new_link = :new.in?(actions)
 <% creator_names.each do |creator| -%>
 <def tag="<%= creator.dasherize %>-page" polymorphic/>
 <def tag="<%= creator.dasherize %>-page" for="<%= model.name %>">
-  
-  <page title="#{ht '<%=model_key %>.<%= creator.underscore %>.title', :default=>['<%= sq_escape creator.titleize %>']}" merge>  
+
+  <page title="#{ht '<%=model_key %>.<%= creator.underscore %>.title', :default=>['<%= sq_escape creator.titleize %>']}" merge>
 
     <body: class="lifecycle-start-page <%= creator.dasherize %>-page" param/>
 

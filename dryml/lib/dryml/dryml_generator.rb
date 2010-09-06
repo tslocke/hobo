@@ -144,7 +144,7 @@ require 'fileutils'
       # it does not provide any translation
       # Localized apps will override the defaults by setting the specific keys in their locale files
       def model_name(*options)
-        name = :plural.in?(options) ? model.human_name(:count=>2, :locale=>:en) : model.human_name(:locale=>:en)
+        name = :plural.in?(options) ? model.model_name.human(:count=>2, :locale=>:en) : model.model_name.human(:locale=>:en)
         name = name.titleize.downcase                         if :lowercase.in?(options)
         name = name.camelize                                  if :camel.in?(options)
         name

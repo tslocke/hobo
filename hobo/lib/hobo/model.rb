@@ -402,7 +402,7 @@ module Hobo
       if self.class.name_attribute
         send self.class.name_attribute
       else
-        "#{self.class.human_name} #{id}"
+        "#{self.class.model_name.human} #{id}"
       end
     end
 

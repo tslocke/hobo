@@ -226,7 +226,7 @@ Provides a short hand way of displaying images in public/images
 <def tag="type-name" attrs="plural, lowercase, dasherize"><%=
   type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
 
-  name = type.respond_to?(:human_name) ? type.human_name : type.name
+  name = type.respond_to?(:model_name) ? type.model_name.human : type.name
   name = dasherize ? name.underscore.dasherize : name.titleize
   name = name.pluralize if plural
   name = name.downcase if lowercase
@@ -567,11 +567,11 @@ You can pass a summary attribute, which will generate a complete localized sente
   # generated label will be pluralized
   label ||= case
             when this.is_a?(Class)
-              this.human_name(:count=>c)
+              this.model_name.human(:count=>c)
             when (attr = this.try.origin_attribute)
               this.member_class.human_attribute_name(attr)
             else
-              this.member_class.human_name(:count=>c)
+              this.member_class.model_name.human(:count=>c)
             end
 
   label = label.downcase if lowercase
