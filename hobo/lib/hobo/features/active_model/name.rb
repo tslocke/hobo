@@ -6,12 +6,11 @@ ActiveModel::Name.class_eval do
       if I18n.locale.to_s.match(/^en/)
         unless options[:count] == 1 || options[:count].blank?
           default = ActiveSupport::Inflector.pluralize(@human)
-          options = options.merge(:default=>default)
+          options.merge! :default => default
         end
       end
       human_without_en_pluralization_default(options)
     end
-
     alias_method_chain :human, :en_pluralization_default
 
 end

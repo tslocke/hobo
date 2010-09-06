@@ -5,17 +5,13 @@ ActiveModel::Translation.class_eval do
     # to pass around pluralize calls for 'en' defaults in hobo
     def human_attribute_name_with_en_pluralization_default(attribute, options={})
       if I18n.locale.to_s.match(/^en/)
-        default = Array.wrap(options[:default])
-        if options[:count] == 1 || options[:count].blank?
-          default = attribute.to_s.singularize.humanize
-        else
-          default = attribute.to_s.pluralize.humanize
-        end
-        options = options.merge(:default=>default)
+        default = (options[:count] == 1 || options[:count].blank?) ?
+                    attribute.to_s.singularize.humanize :
+                    attribute.to_s.pluralize.humanize
+        options.merge! :default => default
       end
       human_attribute_name_without_en_pluralization_default(attribute, options)
     end
-
     alias_method_chain :human_attribute_name, :en_pluralization_default
 
     # Similar to human_name_attributes, this method retrieves the localized help string
