@@ -117,7 +117,7 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
     klass  = @reflection.through_reflection.klass
     user = acting_user
     if user && records.any? { |r|
-        joiner = klass.find(:first, :conditions => construct_join_attributes(r))
+        joiner = klass.where(construct_join_attributes(r)).first
         joiner.is_a?(Hobo::Model) && !joiner.destroyable_by?(user)
       }
       raise Hobo::PermissionDeniedError, "#{@owner.class}##{proxy_reflection.name}.destroy"

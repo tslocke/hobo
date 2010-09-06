@@ -50,7 +50,7 @@ module Hobo
         end
         conditions = conditions.join(" and ")
 
-        results = search_target.find(:all, :conditions => [conditions, *parameters])
+        results = search_target.where(conditions, *parameters)
         [search_target.name, results] unless results.empty?
       end
     end

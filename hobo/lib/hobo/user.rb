@@ -79,7 +79,7 @@ module Hobo
 
       # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
       def authenticate(login, password)
-        u = find(:first, :conditions => ["#{@login_attribute} = ?", login]) # need to get the salt
+        u = where("#{@login_attribute} = ?", login).first # need to get the salt
 
         if u && u.authenticated?(password)
           if u.respond_to?(:last_login_at) || u.respond_to?(:login_count)
@@ -161,8 +161,8 @@ module Hobo
       !new_record? && !lifecycle_changing_password? &&
         (current_password.present? || password.present? || password_confirmation.present?)
     end
-    
-    
+
+
     def lifecycle_changing_password?
       self.class.has_lifecycle? && lifecycle.active_step && :password.in?(lifecycle.active_step.parameters)
     end

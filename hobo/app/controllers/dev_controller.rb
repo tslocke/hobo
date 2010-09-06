@@ -7,7 +7,7 @@ class DevController < ActionController::Base
   def set_current_user
     model = params[:model] || Hobo::User.default_user_model
     self.current_user = if params[:login]
-                          model.find(:first, :conditions => {model.login_attribute => params[:login]})
+                          model.where(model.login_attribute => params[:login]).first
                         else
                           model.find(params[:id])
                         end
