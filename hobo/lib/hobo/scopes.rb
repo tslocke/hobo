@@ -18,7 +18,7 @@ module Hobo
       include ApplyScopes
 
       # --- monkey-patches to allow :scope key on has_many, has_one and belongs_to ---
-      
+
       def valid_keys_for_has_many_association_with_scopes
         valid_keys_for_has_many_association_without_scopes + [:scope]
       end
@@ -40,4 +40,3 @@ end
 ActiveRecord::Associations::AssociationProxy.send(:include, Hobo::Scopes::AssociationProxyExtensions)
 ActiveRecord::Associations::AssociationCollection.send(:include, Hobo::Scopes::AssociationCollectionExtensions)
 ActiveRecord::Associations::HasManyThroughAssociation.send(:include, Hobo::Scopes::HasManyThroughAssociationExtensions)
-require "hobo/scopes/named_scope_extensions"

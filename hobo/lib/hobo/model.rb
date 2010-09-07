@@ -312,7 +312,7 @@ module Hobo
 
 
       def respond_to?(method, include_private=false)
-        super || create_automatic_scope(method)
+        super || create_automatic_scope(method, true)
       end
 
 
