@@ -1,5 +1,3 @@
-require 'hobo_fields/field_declaration_dsl'
-
 module HoboFields
 
   class EnumString < String
@@ -11,9 +9,6 @@ module HoboFields
       end
 
     end
-
-    FieldDeclarationDsl.send(:include, DeclarationHelper)
-
 
     class << self
 
@@ -28,7 +23,7 @@ module HoboFields
             hash[value]
           end
         end
-            
+
         @detranslated_values = Hash.new do |hash, value|
           if name.blank?
             hash[value] = value

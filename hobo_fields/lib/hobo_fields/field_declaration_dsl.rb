@@ -1,6 +1,10 @@
+require 'hobo_fields/enum_string'
+
 module HoboFields
 
   class FieldDeclarationDsl < BlankSlate
+
+    include HoboFields::EnumString::DeclarationHelper
 
     def initialize(model)
       @model = model
