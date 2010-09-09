@@ -118,7 +118,7 @@ module Dryml
         "<% safe_concat %q(#{REXML::Comment::START + node.to_s + REXML::Comment::STOP}) %>"
 
       when REXML::Text
-        strip_suppressed_whiteaspace(node.to_s)
+        text_with_scriplets_to_erb(node.to_s)
 
       when REXML::Element
         element_to_erb(node)
@@ -126,8 +126,16 @@ module Dryml
     end
 
 
-    def strip_suppressed_whiteaspace(s)
-      s # s.gsub(/ -(\s*\n\s*)/, '<% \1 %>')
+    def text_with_scriplets_to_erb(s)
+     scriplet_rex = /(\[!\[DRYML-ERB\d+\s*\]!\])/m
+     s.split(scriplet_rex).map do |t|
+       case t
+       when scriplet_rex, /^\s*$/
+         t
+       else
+         "<% safe_concat %(#{t}) %>"
+       end
+     end.join
     end
 
 
