@@ -877,15 +877,11 @@ module Dryml
       else
         start_tag_src = el.start_tag_source.gsub(REXML::CData::START, "").gsub(REXML::CData::STOP, "")
 
-        # Allow #{...} as an alternate to <%= ... %>
-        start_tag_src.gsub!(/=\s*('.*?'|".*?")/) do |s|
-          s.gsub(/#\{(.*?)\}/, '<%= \1 %>')
-        end
-
+        sts = "<% safe_concat(%(#{start_tag_src}))%>"
         if el.has_end_tag?
-          start_tag_src + children_to_erb(el) + "</#{el.name}>"
+          sts + children_to_erb(el) + "<% safe_concat(%(</#{el.name}>)) %>"
         else
-          start_tag_src
+          sts
         end
       end
     end
