@@ -6,13 +6,12 @@ module Hobo
       def included(base)
         base.class_eval do
           extend ClassMethods
-          
+
           class << self
             alias_method_chain :available_auto_actions, :user_actions
             alias_method_chain :def_auto_actions, :user_actions
           end
-          
-          filter_parameter_logging "password"
+
           skip_before_filter :login_required, :only => [:login, :signup, :forgot_password, :reset_password, :do_reset_password,
                                                         :accept_invitation, :do_accept_invitation]
 
@@ -20,20 +19,20 @@ module Hobo
 
           alias_method_chain :hobo_update, :account_flash
         end
-        
+
       end
 
-          
+
     end
-    
+
     module ClassMethods
 
       def available_auto_actions_with_user_actions
-        available_auto_actions_without_user_actions + 
+        available_auto_actions_without_user_actions +
           [:login, :logout, :forgot_password, :reset_password, :account]
       end
 
-      
+
       def def_auto_actions_with_user_actions
         def_auto_actions_without_user_actions
 
@@ -74,7 +73,7 @@ module Hobo
         else
           old_user = current_user
           self.current_user = user
-          
+
           yield if block_given?
 
           if !user.account_active?
