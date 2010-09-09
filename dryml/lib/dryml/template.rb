@@ -112,10 +112,10 @@ module Dryml
 
       # v important this comes before REXML::Text, as REXML::CData < REXML::Text
       when REXML::CData
-        REXML::CData::START + node.to_s + REXML::CData::STOP
+        "<% safe_concat %q(#{REXML::CData::START + node.to_s + REXML::CData::STOP}) %>"
 
       when REXML::Comment
-        REXML::Comment::START + node.to_s + REXML::Comment::STOP
+        "<% safe_concat %q(#{REXML::Comment::START + node.to_s + REXML::Comment::STOP}) %>"
 
       when REXML::Text
         strip_suppressed_whiteaspace(node.to_s)
