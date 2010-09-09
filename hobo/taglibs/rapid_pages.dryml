@@ -200,7 +200,7 @@ See the source for the actual output
 
  -->
 <def tag="if-ie" attrs="version">
-  <%= "<!--[if ".html_safe+(version || 'IE'.html_safe)+"]>".html_safe %><do param="default"/><%=raw "<![endif]-->" %>
+  <%=raw "<!--[if #{version || 'IE'}]>" %><do param="default"/><%=raw "<![endif]-->" %>
 </def>
 
 <!-- Simple wrapper for the `stylesheet_link_tag` helper. The `name` attribute can be a comma-separated list of stylesheet names.
