@@ -249,10 +249,10 @@ The flash is output in a `<div class="flash notice">`, where `notice` is the `ty
 %></def>
 
 <!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`. The theme will style this as an ajax progress 'spinner' -->
-<def tag="ajax-progress"><%= raw %(
+<def tag="ajax-progress">
   <div id="ajax-progress" merge-attrs>
     <div>
       <span id="ajax-progress-text"></span>
     </div>
   </div>
-)%></def>
+</def>
