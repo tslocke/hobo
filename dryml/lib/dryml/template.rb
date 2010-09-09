@@ -916,10 +916,10 @@ module Dryml
         case attr
         when "if"
           "(if !(#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
-            "else (Dryml.last_if = false; ''.html_safe); end)"
+            "else (Dryml.last_if = false; ''); end)"
         when "unless"
           "(if (#{control}).blank?; (#{x} = #{expression}; Dryml.last_if = true; #{x}) " +
-            "else (Dryml.last_if = false; ''.html_safe); end)"
+            "else (Dryml.last_if = false; ''); end)"
         when "repeat"
           "repeat_attribute(#{control}) { #{expression} }"
         end
@@ -946,10 +946,10 @@ module Dryml
                   if attr =~ /\#\{/
                     '"' + attr + '"'
                   else
-                    '"' + attr + '".html_safe'
+                    '"' + attr + '"'
                   end
                 elsif attr !~ /'/
-                  "'#{attr}'.html_safe"
+                  "'#{attr}'"
                 else
                   dryml_exception("invalid quote(s) in attribute value")
                 end

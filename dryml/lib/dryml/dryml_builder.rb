@@ -58,7 +58,7 @@ module Dryml
     end
 
 
-def erb_process(erb_src, method_def=false)
+    def erb_process(erb_src, method_def=false)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
       erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
       src = erb.src.split(';')[1..-2].join(';')
