@@ -112,10 +112,10 @@ module Dryml
 
       # v important this comes before REXML::Text, as REXML::CData < REXML::Text
       when REXML::CData
-        "<% safe_concat %q(#{REXML::CData::START + node.to_s + REXML::CData::STOP}) %>"
+        "<% safe_concat %(#{REXML::CData::START + node.to_s + REXML::CData::STOP}) %>"
 
       when REXML::Comment
-        "<% safe_concat %q(#{REXML::Comment::START + node.to_s + REXML::Comment::STOP}) %>"
+        "<% safe_concat %(#{REXML::Comment::START + node.to_s + REXML::Comment::STOP}) %>"
 
       when REXML::Text
         text_with_scriplets_to_erb(node.to_s)
