@@ -130,10 +130,12 @@ module Dryml
      scriplet_rex = /(\[!\[DRYML-ERB\d+\s*\]!\])/m
      s.split(scriplet_rex).map do |t|
        case t
-       when scriplet_rex, /^\s*$/
+       when scriplet_rex
          t
-       else
+       when /\S+/
          "<% safe_concat %(#{t}) %>"
+       else
+         t
        end
      end.join
     end
