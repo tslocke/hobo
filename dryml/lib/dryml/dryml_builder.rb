@@ -76,8 +76,6 @@ module Dryml
 
         when :def
           src = erb_process(instruction[:src])
-         # puts src
-         # puts
           @environment.class_eval(src, template_path, instruction[:line_num])
 
         when :render_page
@@ -133,3 +131,4 @@ module Dryml
     end
   end
 end
+
