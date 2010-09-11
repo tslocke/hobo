@@ -12,9 +12,9 @@ There is a default :count => 1
 -->
 <def tag="t"><%=
   options = {}
-  attributes.each_pair{|k,v| options[k.to_sym] = v}
+  attributes.each_pair{|k,v| options[k.to_sym] = h(v)}
   k = options.delete(:key)
-  I18n.t(k, {:default=>all_parameters.default, :count=>1}.merge(options))
+  I18n.t(k, {:default=>all_parameters.default, :count=>1}.merge(options)).html_safe
 %></def>
 
 <!-- Wrapper around ActiveModel::Name#human with added sugar.
