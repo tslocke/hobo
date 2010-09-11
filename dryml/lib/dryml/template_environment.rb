@@ -588,9 +588,6 @@ module Dryml
       @view ? @view.session : {}
     end
 
-    def _buf
-      @view.output_buffer
-    end
 
     def method_missing(name, *args, &b)
       if @view
