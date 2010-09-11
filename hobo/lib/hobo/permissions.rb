@@ -48,7 +48,7 @@ module Hobo
           r.set_creator user
           yield r if block_given?
           r.user_view(user)
-          r.with_acting_user(user) { r.send :callback, :after_user_new }
+          r.with_acting_user(user) { r.send :run_callbacks, :after_user_new }
         end
       end
 
