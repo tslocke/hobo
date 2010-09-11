@@ -58,16 +58,12 @@ module Dryml
     end
 
 
-    def erb_process(erb_src, method_def=false)
+    def erb_process(erb_src)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
-      erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
-      src = erb.src.split(';')[1..-2].join(';')
-
-      if method_def
-        src.sub /^\s*def.*?\(.*?\)/, '\0 __in_erb_template=true; '
-      else
-        "__in_erb_template=true; " + src
-      end
+      Erubis::Eruby.new(erb_src,
+        :trim => (trim_mode=='-'),
+        :preamble => false,
+        :postamble => false).src
     end
 
     def build(local_names, auto_taglibs, src_mtime)
@@ -81,7 +77,7 @@ module Dryml
           @environment.class_eval(instruction[:src], template_path, instruction[:line_num])
 
         when :def
-          src = erb_process(instruction[:src], true)
+          src = erb_process(instruction[:src])
           @environment.class_eval(src, template_path, instruction[:line_num])
 
         when :render_page
