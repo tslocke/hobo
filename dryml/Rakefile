@@ -39,7 +39,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.authors      = ["Tom Locke"]
   gemspec.rubyforge_project = "hobo"
   gemspec.add_dependency("hobo_support", ["= #{Dryml::VERSION}"])
-  gemspec.add_dependency("actionpack", ["= 3.0.0.rc2"])
+  gemspec.add_dependency("actionpack", [">= 3.0.0"])
 end
 Jeweler::GemcutterTasks.new
 Jeweler::RubyforgeTasks.new do |rubyforge|
