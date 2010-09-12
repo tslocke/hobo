@@ -260,7 +260,7 @@ module Hobo
 
       return true if self.class.attributes_protected_by_default.include? attribute
 
-      if self.class.accessible_attributes
+      if !self.class.accessible_attributes.empty?
         return true if !self.class.accessible_attributes.include?(attribute)
       elsif self.class.protected_attributes
         return true if self.class.protected_attributes.include?(attribute)
