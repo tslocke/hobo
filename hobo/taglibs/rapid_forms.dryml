@@ -317,7 +317,7 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
                       (call_polymorphic_tag('input', HoboFields.to_class(this_type::COLUMN_TYPE), attrs) if defined?(this_type::COLUMN_TYPE)) or
                       raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
                   end
-      if this_parent.errors[this_field]
+      unless this_parent.errors[this_field].empty?
         "<span class='field-with-errors'>#{the_input}</span>"
       else
         the_input
