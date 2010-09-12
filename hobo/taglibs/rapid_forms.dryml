@@ -318,7 +318,7 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
                       raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
                   end
       unless this_parent.errors[this_field].empty?
-        "<span class='field-with-errors'>#{the_input}</span>"
+        "<span class='field-with-errors'>#{the_input}</span>".html_safe
       else
         the_input
       end
