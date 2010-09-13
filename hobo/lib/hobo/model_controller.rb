@@ -776,7 +776,7 @@ module Hobo
       else
         respond_to do |wants|
           wants.html do
-            if render_tag("permission-denied-page", { }, :status => 403)
+            if render :permission_denied, :status => 403
               # job done
             else
               render :text => I18n.t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403

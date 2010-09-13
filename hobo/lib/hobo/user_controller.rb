@@ -144,7 +144,7 @@ module Hobo
           user.lifecycle.request_password_reset!(:nobody)
         end
         respond_to do |wants|
-          wants.html { render_tag :forgot_password_email_sent_page }
+          wants.html { render :forgot_password_email_sent }
           wants.js { hobo_ajax_response}
         end
       end
