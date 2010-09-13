@@ -18,7 +18,7 @@ class <%= class_name -%>Mailer < ActionMailer::Base
 private
 
   def app_name
-    '<%= application_name.humanize %>'
+    Rails.application.config.hobo.app_name
   end
 
   def set_variables(user, key)

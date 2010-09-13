@@ -2,8 +2,6 @@ module Hobo
   class BasicGenerator < Rails::Generators::Base
     source_root File.expand_path('../templates', __FILE__)
 
-    include Generators::Hobo::Helper
-
     def self.banner
       "rails generate hobo:basic"
     end

@@ -8,6 +8,7 @@ module Hobo
 
     ActiveSupport.on_load(:before_configuration) do
       h = config.hobo = ActiveSupport::OrderedOptions.new
+      h.app_name = self.class.name.split('::').first.underscore.titleize
       h.developer_features = Rails.env.in?(["development", "test"])
       h.routes_path = Pathname.new File.expand_path('config/hobo_routes.rb', Rails.root)
       h.rapid_generators_path = Pathname.new File.expand_path('rapid_generators', HOBO_ROOT)

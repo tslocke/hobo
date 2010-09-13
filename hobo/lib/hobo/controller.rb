@@ -37,10 +37,6 @@ module Hobo
         Thread.current['Hobo.current_controller'].request.host_with_port
       end
 
-      def app_name
-        Thread.current['Hobo.current_controller'].send(:call_tag, :app_name)
-      end
-
     end
 
     module ClassMethods

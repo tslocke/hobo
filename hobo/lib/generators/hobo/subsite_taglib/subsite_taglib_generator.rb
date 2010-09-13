@@ -2,7 +2,6 @@ module Hobo
   class SubsiteTaglibGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
     include Generators::Hobo::InviteOnly
-    include Generators::Hobo::Helper
     include Generators::Hobo::Taglib
 
     def self.banner

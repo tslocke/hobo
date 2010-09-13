@@ -4,7 +4,6 @@ module Hobo
 
     source_root File.expand_path('../templates', __FILE__)
 
-    include Generators::Hobo::Helper
     include Generators::HoboSupport::ThorShell
     include Generators::Hobo::InviteOnly
     include Generators::Hobo::TestOptions

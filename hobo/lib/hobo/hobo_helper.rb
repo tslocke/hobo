@@ -110,6 +110,13 @@ module Hobo
     end
 
 
+    def app_name(add_subsite=true)
+      an = Rails.application.config.hobo.app_name
+      an << " - #{subsite.titleize}" if add_subsite && subsite
+      an
+    end
+
+
     def base_url_for(object, subsite, action)
       path = object.to_url_path or HoboError.new("cannot create url for #{object.inspect} (#{object.class})")
       "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
