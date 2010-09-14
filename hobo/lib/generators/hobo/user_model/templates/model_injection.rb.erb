@@ -32,11 +32,27 @@
            :params => [:name, :email_address],
            :new_key => true,
            :become => :invited do
-       UserMailer.deliver_invite(self, lifecycle.key)
+       UserMailer.invite(self, lifecycle.key).deliver
     end
 
     transition :accept_invitation, { :invited => :active }, :available_to => :key_holder,
                :params => [ :password, :password_confirmation ]
+
+<% elsif options[:activation_email] -%>
+    state :inactive, :default => true
+    state :active
+
+    create :signup, :available_to => "Guest",
+      :params => [:name, :email_address, :password, :password_confirmation],
+      :become => :inactive, :new_key => true  do
+      <%= class_name %>Mailer.activation(self, lifecycle.key).deliver
+    end
+
+    transition :activate, { :inactive => :active }, :available_to => :key_holder
+
+    transition :request_password_reset, { :inactive => :inactive }, :new_key => true do
+      <%= class_name %>Mailer.activation(self, lifecycle.key).deliver
+    end
 
 <% else -%>
     state :active, :default => true
@@ -47,7 +63,7 @@
 
 <% end -%>
     transition :request_password_reset, { :active => :active }, :new_key => true do
-      <%= class_name %>Mailer.deliver_forgot_password(self, lifecycle.key)
+      <%= class_name %>Mailer.forgot_password(self, lifecycle.key).deliver
     end
 
     transition :reset_password, { :active => :active }, :available_to => :key_holder,
@@ -55,7 +71,12 @@
 
   end
 
+<% if options[:activation_email] -%>
+  def signed_up?
+    state=="active"
+  end
 
+<% end -%>
   # --- Permissions --- #
 
   def create_permitted?

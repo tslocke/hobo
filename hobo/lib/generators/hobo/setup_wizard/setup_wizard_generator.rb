@@ -6,6 +6,7 @@ module Hobo
 
     include Generators::HoboSupport::ThorShell
     include Generators::Hobo::InviteOnly
+    include Generators::Hobo::ActivationEmail
     include Generators::Hobo::TestOptions
     include Generators::Hobo::Taglib
 
@@ -101,11 +102,13 @@ Invite-only website
       if wizard?
         say_title 'User Resource'
         @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
+        activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
         say "Installing '#{@user_resource_name}' resources..."
       else
         @user_resource_name = options[:user_resource_name]
+        activation_email = options[:activation_email]
       end
-      invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only
+      invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only, :activation_email => activation_email
     end
 
     def front_controller

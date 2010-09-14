@@ -5,6 +5,7 @@ module Hobo
     argument :name, :type => :string, :default => 'user', :optional => true
 
     include Generators::Hobo::InviteOnly
+    include Generators::Hobo::ActivationEmail
 
     def self.banner
       "rails generate hobo:user_resource [NAME=user] [options]"
