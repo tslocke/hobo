@@ -123,14 +123,14 @@ module Hobo
     def remember_me
       self.remember_token_expires_at = 2.weeks.from_now.utc
       self.remember_token            = encrypt("#{login}--#{remember_token_expires_at}")
-      save(false)
+      save(:validate => false)
     end
 
     # Expire the login token, resulting in a forced login next time.
     def forget_me
       self.remember_token_expires_at = nil
       self.remember_token            = nil
-      save(false)
+      save(:validate => :false)
     end
 
     def guest?

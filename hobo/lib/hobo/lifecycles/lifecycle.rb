@@ -164,7 +164,7 @@ module Hobo
           s = self.class.states[state_name]
           raise ArgumentError, "No such state '#{state_name}' for #{record.class.name}" unless s
 
-          if record.save(validate)
+          if record.save(:validate => validate)
             s.activate! record
             self.active_step = nil # That's the end of this step
             true

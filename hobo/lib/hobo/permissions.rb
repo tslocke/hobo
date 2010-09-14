@@ -171,7 +171,7 @@ module Hobo
     end
 
     def user_save(user, validate = true)
-      with_acting_user(user) { save(validate) }
+      with_acting_user(user) { save(:validate => validate) }
     end
 
     def user_save!(user)

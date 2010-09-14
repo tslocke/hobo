@@ -47,7 +47,7 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
        if force
          record.save!
        else
-         record.save(validate)
+         record.save(:validate => validate)
        end
     end
   end
