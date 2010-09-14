@@ -1,5 +1,5 @@
 class <%= class_name -%>Mailer < ActionMailer::Base
-  default :from => "no-reply@#{Hobo::Controller.request_host}"
+  default :from => "no-reply@#{host}"
 
   def forgot_password(user, key)
     set_variables(user, key)
@@ -20,8 +20,6 @@ private
   def set_variables(user, key)
     @user = user
     @key = key
-    @host = Hobo::Controller.request_host
-    @app_name = app_name
   end
 
 end

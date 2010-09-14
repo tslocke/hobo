@@ -17,7 +17,7 @@ module Hobo
 
     ActiveSupport.on_load(:action_controller) do
       require 'hobo/features/action_controller/hobo_methods'
-      require 'hobo/features/action_mailer/app_helper'
+      require 'hobo/features/action_mailer/helper'
     end
 
     ActiveSupport.on_load(:active_record) do

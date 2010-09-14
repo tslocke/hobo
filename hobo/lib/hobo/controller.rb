@@ -18,11 +18,14 @@ module Hobo
         klass.class_eval do
           before_filter :login_from_cookie
           alias_method_chain :redirect_to, :object_url
-          around_filter do |controller, action|
-            Thread.current['Hobo.current_controller'] = controller
-            action.call
-            Thread.current['Hobo.current_controller'] = nil  # should avoid memory-leakage
+          private
+          def set_mailer_default_url_options
+            unless Rails.application.config.action_mailer.default_url_options
+              Rails.application.config.action_mailer.default_url_options = { :host => request.host }
+              Rails.application.config.action_mailer.default_url_options[:port] = request.port unless request.port == 80
+            end
           end
+          before_filter :set_mailer_default_url_options
           @included_taglibs = []
           rescue_from ActionController::RoutingError, :with => :not_found
         end
@@ -31,10 +34,6 @@ module Hobo
 
       def controller_and_view_for(page_path)
         page_path.match(/(.*)\/([^\/]+)/)[1..2]
-      end
-
-      def request_host
-        Thread.current['Hobo.current_controller'].request.host_with_port
       end
 
     end
