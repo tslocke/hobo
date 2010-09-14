@@ -15,15 +15,10 @@ module Hobo
       @record = @records.singularize
     end
 
-    def link(route, action, method=:get)
-      Hobo::Routes.linkable!( model, action, :subsite => subsite, :method => method )
-      route
-    end
-
     def index_action_routes
       controller.index_actions.map do |action|
         link "get '#{records}/#{action}(.:format)', :as => '#{action}_#{records}'", action
-      end
+      end.compact
     end
 
     def lifecycle_routes
@@ -37,7 +32,7 @@ module Hobo
         routes << link("put '#{records}/:id/#{transition}(.:format)' => '#{records}#do_#{transition}', :as => 'do_#{record}_#{transition}'", transition, :put)
         routes << link("get '#{records}/:id/#{transition}(.:format)' => '#{records}##{transition}', :as => '#{record}_#{transition}'", transition)
       end
-      routes
+      routes.compact
     end
 
     def resource_routes
@@ -49,7 +44,7 @@ module Hobo
       link( "post '#{records}(.:format)' => '#{records}#create', :as => 'create_#{record}'", 'create', :post),
       link( "put '#{records}/:id(.:format)' => '#{records}#update', :as => 'update_#{record}', :constraints => #{ID_REQUIREMENT}", 'update', :put),
       link( "delete '#{records}/:id(.:format)' => '#{records}#destroy', :as => 'destroy_#{record}', :constraints => #{ID_REQUIREMENT}", 'delete', :delete)
-      ]
+      ].compact
     end
 
     def owner_routes
@@ -75,23 +70,23 @@ module Hobo
           end
         end
       end
-      routes
+      routes.compact
     end
 
     def web_method_routes
       controller.web_methods.map do |action|
         link "post '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action, :post
-      end
+      end.compact
     end
 
     def show_action_routes
       controller.show_actions.map do |action|
         link "get '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action
-      end
+      end.compact
     end
 
     def reorder_routes
-      [ link "post '#{records}/reorder(.:format)', :as => 'reorder_#{records}'", 'reorder', :post ]
+      [ link "post '#{records}/reorder(.:format)', :as => 'reorder_#{records}'", 'reorder', :post ].compact
     end
 
     def user_routes
@@ -101,7 +96,15 @@ module Hobo
       link("match '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
       link("get '#{prefix}logout(.:format)' => '#{records}#logout', :as => '#{record}_logout'",  'logout'),
       link("match '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
-      ]
+      ].compact
+    end
+
+  private
+
+    def link(route, action, method=:get)
+      return unless controller.public_method_defined?(action)
+      Hobo::Routes.linkable!( model, action, :subsite => subsite, :method => method )
+      route
     end
 
   end
