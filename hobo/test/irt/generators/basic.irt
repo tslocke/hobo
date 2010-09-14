@@ -7,10 +7,10 @@ invoke 'hobo:basic', %w(-q)
 files_exist? %w[ app/views/taglibs/application.dryml
                  public/stylesheets/application.css
                  public/javascripts/dryml-support.js
-                 app/model/guest.rb
+                 app/models/guest.rb
 ]
 test_value_eql? true
 
 desc "Application.dryml content matches"
-file_include? 'app/views/taglibs/application.dryml', 'Testapp'
+file_include? 'app/views/taglibs/application.dryml', '<set-theme name="clean"/>'
 test_value_eql? true

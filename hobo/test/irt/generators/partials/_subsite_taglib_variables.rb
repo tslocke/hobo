@@ -7,8 +7,6 @@ tags = %(<!-- Tag definitions for the subs subsite -->
 <include src="taglibs/auto/subs/rapid/forms"/>
 
 <set-theme name="clean"/>
-
-<def tag="app-name">Testapp - Subs</def>
 )
 
 admin_tag = '<extend tag="page">
