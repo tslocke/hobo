@@ -908,8 +908,8 @@ Use the `uri` option to specify a redirect location:
     <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked 
     %>
     <li repeat="&options" param>
-      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
-      <name param/>
+      <input id="#{dom_id(this)}" type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
+      <label for="#{dom_id(this)}"><name param/></label>
     </li>
   </ul>
 </def>
