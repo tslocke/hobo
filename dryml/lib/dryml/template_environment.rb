@@ -236,7 +236,7 @@ module Dryml
       else
         res = context_map(string_or_array) { yield }
       end
-      res.join
+      res.safe_join
     end
 
 

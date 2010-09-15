@@ -29,7 +29,7 @@
 
 
 <!-- Repeats the body of the tag inside a `<ul>` list with one item for each object in the collection (`this`). If no body is given, renders a `<card>` inside the `<li>`.
-  
+
 The `<li>` tags are automatically given a 'model ID' CSS class, which means the ajax `<remove-button>` will automatically be able to remove items from the collection. Also adds 'even' and 'odd' CSS classes.
  -->
 <def tag="collection">
