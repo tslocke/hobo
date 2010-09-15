@@ -177,3 +177,5 @@
     dev_user_changer:
       guest: "Invitado"
 
+    boolean_yes: "Si"
+    boolean_no: "No"

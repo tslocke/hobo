@@ -176,3 +176,6 @@ en:
 
     dev_user_changer:
       guest: "Guest"
+
+    boolean_yes: "Yes"
+    boolean_no: "No"

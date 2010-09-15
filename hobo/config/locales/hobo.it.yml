@@ -179,3 +179,5 @@ it:
     dev_user_changer:
       guest: "Invitato"
 
+    boolean_yes: "Si"
+    boolean_no: "No"
