@@ -8,7 +8,6 @@
         >> require 'hobo_support'
         >> require 'dryml'
         >> require 'dryml/template_handler'
-        >> Dryml.enable
 
 {.hidden}
 
@@ -35,11 +34,11 @@
 
 This triggers bug #452, so disabled.  FIXME.
 
-        #>> 
+        #>>
          Dryml.render(%q{<def tag="myp">
                              <p param="default"/>
                            </def>
-                           <extend tag="myp">                             
+                           <extend tag="myp">
                              <old-myp merge>
                                <default: replace>Hello <default: restore/></default:>
                              </old-myp>
