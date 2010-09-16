@@ -90,7 +90,7 @@ module HoboFields
 
   def standard_class(name)
     class_name = STANDARD_TYPES[name]
-    "HoboFields::#{class_name}".constantize if class_name
+    "HoboFields::Types::#{class_name}".constantize if class_name
   end
 
 end

@@ -63,15 +63,15 @@ You can use `LoudText` in your model with
 
 ## Bundled types
 
-Here we'll give a quick overview of the bundled types. Remember that along with the specific features the type provides (e.g. validation), the simple fact that the type exists is also useful in the other layers of Hobo. For example `HoboFields::PasswordString` doesn't add any features to `String`, but the fact that a specific type exists for passwords means that the view layer can automatically render an `<input type="password">`.
+Here we'll give a quick overview of the bundled types. Remember that along with the specific features the type provides (e.g. validation), the simple fact that the type exists is also useful in the other layers of Hobo. For example `HoboFields::Types::PasswordString` doesn't add any features to `String`, but the fact that a specific type exists for passwords means that the view layer can automatically render an `<input type="password">`.
 
 
-### `HoboFields::EmailAddress`
+### `HoboFields::Types::EmailAddress`
 
 Provides validation of correct email address format.
 
-        >> good = HoboFields::EmailAddress.new("foo@baa.com")
-        >> bad  = HoboFields::EmailAddress.new("foo.baa.com")
+        >> good = HoboFields::Types::EmailAddress.new("foo@baa.com")
+        >> bad  = HoboFields::Types::EmailAddress.new("foo.baa.com")
         >> !!good.valid?
         => true
         >> good.validate
@@ -81,46 +81,46 @@ Provides validation of correct email address format.
         >> bad.validate
         => "is invalid"
 
-### `HoboFields::HtmlString`
+### `HoboFields::Types::HtmlString`
 
 `HtmlString` provides no special behavior. The main reason for using this type is that the `to_html` method does not do any html-escaping. Use this for columns that store raw HTML in the database.
 
-### `HoboFields::MarkdownString`
+### `HoboFields::Types::MarkdownString`
 
-`HoboFields::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
+`HoboFields::Types::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
 
         >> require 'bluecloth'
-        >> markdown = HoboFields::MarkdownString.new %(
+        >> markdown = HoboFields::Types::MarkdownString.new %(
           This is a heading
           =================
 
           And text can be *emphasised*
           )
         >> markdown.to_html
-        >> markdown = HoboFields::MarkdownString.new "# This is a heading\n\nAnd text can be *emphasised*\n"
+        >> markdown = HoboFields::Types::MarkdownString.new "# This is a heading\n\nAnd text can be *emphasised*\n"
         =>""
         <h1>This is a heading</h1>
 
         <p>And text can be <em>emphasised</em></p>
         >>
 
-### `HoboFields::TextileString`
+### `HoboFields::Types::TextileString`
 
-`HoboFields::TextileString` provides a `to_html` that renders markdown syntax into html. It requires the redcloth gem.
+`HoboFields::Types::TextileString` provides a `to_html` that renders markdown syntax into html. It requires the redcloth gem.
 
         >> require 'redcloth'
-        >> textile = HoboFields::TextileString.new %(
+        >> textile = HoboFields::Types::TextileString.new %(
          Text can be _emphasised_
          )
         >> textile.to_html
         => "<p>Text can be <em>emphasised</em></p>"
         >>
 
-### `HoboFields::Text`
+### `HoboFields::Types::Text`
 
-`HoboFields::Text` provides a `to_html` method with HTML escaping and conversion of newlines to `<br />` tags.
+`HoboFields::Types::Text` provides a `to_html` method with HTML escaping and conversion of newlines to `<br />` tags.
 
-        >> text = HoboFields::Text.new %(Tom & Jerry
+        >> text = HoboFields::Types::Text.new %(Tom & Jerry
 
          Cat & Mouse)
         >> text.to_html
@@ -130,9 +130,9 @@ Provides validation of correct email address format.
          Cat &amp; Mouse"
         >>
 
-### `HoboFields::PasswordString`
+### `HoboFields::Types::PasswordString`
 
-`HoboFields::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "`[password hidden]`". The type is also used to indicate the need for an `<input type='password'>`
+`HoboFields::Types::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "`[password hidden]`". The type is also used to indicate the need for an `<input type='password'>`
 
 
 ## Enum Strings

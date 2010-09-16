@@ -49,21 +49,21 @@ Field values are returned as the type you specify.
 
         >> a = Advert.new :body => "This is the body"
         >> a.body.class
-        => HoboFields::Text
+        => HoboFields::Types::Text
 
 This also works after a round-trip to the database
 
         >> a.save
         >> b = Advert.find(a.id)
         >> b.body.class
-        => HoboFields::Text
+        => HoboFields::Types::Text
 
-HoboFields::Text is a simple subclass of string. It's a "wrapper type", by which we mean you pass the underlying value to the constructor.
+HoboFields::Types::Text is a simple subclass of string. It's a "wrapper type", by which we mean you pass the underlying value to the constructor.
 
-        >> t = HoboFields::Text.new("hello")
+        >> t = HoboFields::Types::Text.new("hello")
         => "hello"
         >> t.class
-        => HoboFields::Text
+        => HoboFields::Types::Text
 
 If you define your own rich types, they need to support a one argument constructor in the same way.
 
@@ -74,7 +74,7 @@ Although the body of our advert is really just a string, it's very useful that i
 
 In the `fields do ... end` block you can give the field-type either as a name (symbol) or a class. For example, we could have said
 
-        body HoboFields::Text
+        body HoboFields::Types::Text
 
 Obviously the symbol form is a nicer:
 
@@ -82,7 +82,7 @@ Obviously the symbol form is a nicer:
 
 If you provide a class it must define the `COLUMN_TYPE` constant. This instructs the migration generator to create the appropriate underlying database column type. It should be a symbol that is a valid column type in a Rails migration.
 
-        >> HoboFields::Text::COLUMN_TYPE
+        >> HoboFields::Types::Text::COLUMN_TYPE
         => :text
 
 The full set of available symbolic names is
@@ -115,7 +115,7 @@ Returns the type (i.e. class) declared for a given field or attribute
         >> Advert.attr_type :title
         => String
         >> Advert.attr_type :body
-        => HoboFields::Text
+        => HoboFields::Types::Text
 
 ### `Model.column`
 
@@ -138,7 +138,7 @@ In your HoboFields models you can also give type information to "virtual fields"
         >> a = Advert.new
         >> a.my_attr = "hello"
         >> a.my_attr.class
-        => HoboFields::Text
+        => HoboFields::Types::Text
 
 
 ## Field validations
@@ -203,7 +203,7 @@ Rich types can define there own validations by a `#validate` method. It should r
 
         >> a = Advert.new :contact_address => "not really an email address"
         >> a.contact_address.class
-        => HoboFields::EmailAddress
+        => HoboFields::Types::EmailAddress
         >> a.contact_address.validate
         => "is invalid"
 
