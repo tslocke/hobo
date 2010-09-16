@@ -22,7 +22,7 @@ module Hobo
 
         include Hobo::Permissions
         include Hobo::Lifecycles::ModelExtensions
-        include Hobo::FindFor
+        include Hobo::Model::FindFor
         include Hobo::Model::AccessibleAssociations
         include Hobo::Translations
       end

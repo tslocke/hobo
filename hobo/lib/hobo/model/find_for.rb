@@ -1,25 +1,25 @@
 module Hobo
-  
-  # FIXME: should be FindByBelongsTo maybe
-  module FindFor
-    
+  module Model
+    # FIXME: should be FindByBelongsTo maybe
+    module FindFor
+
     def self.included(base)
       base.alias_method_chain :method_missing, :find_for
     end
-    
+
     def method_missing_with_find_for(name, *args, &block)
       if name.to_s =~ /(.*)_by_(.*)/
         # name matches the general form
-        
+
         collection_name = $1.to_sym
         anchor_association_name = $2.to_sym
         if (refl = self.class.reflections[collection_name]) && refl.macro == :has_many
           # the association name matches (e.g. comment_for_...)
-          
+
           if (anchor_refl = refl.klass.reflections[anchor_association_name]) && anchor_refl.macro == :belongs_to
             # the whole thing matches (e.g. comment_for_user)
-            
-            
+
+
             #self.class.class_eval %{
             #  def #{name}(anchor)
             #    result = if #{collection_name}.loaded?
@@ -36,7 +36,7 @@ module Hobo
 
             self.class.class_eval %{
               def #{name}
-                Hobo::FindFor::Finder.new(self, '#{name}', :#{collection_name}, :#{anchor_association_name})
+                Hobo::Model::FindFor::Finder.new(self, '#{name}', :#{collection_name}, :#{anchor_association_name})
               end
             }
 
@@ -44,26 +44,26 @@ module Hobo
           end
         end
       end
-      
+
       method_missing_without_find_for(name, *args, &block)
     end
-    
+
     class Finder
-      
+
       def initialize(owner, name, collection, anchor_association)
         @association = owner.send(collection)
         @anchor_reflection = @association.member_class.reflections[anchor_association]
         @name = name
       end
-      
+
       def origin
         @association.proxy_owner
       end
-      
+
       def origin_attribute
         @name
       end
-      
+
       def [](anchor_or_id)
         anchor = if anchor_or_id.is_a?(String)
                    id, klass = anchor_or_id.split(':')
@@ -91,5 +91,5 @@ module Hobo
     end
 
   end
-
+  end
 end
