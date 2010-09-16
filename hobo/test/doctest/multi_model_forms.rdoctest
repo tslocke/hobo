@@ -88,7 +88,7 @@ are the models:
     >> migrate
 
 The `:accessible => true` option patches in
-`Hobo::AccessibleAssociations` to your ActiveRecord model.  It
+`Hobo::Model::AccessibleAssociations` to your ActiveRecord model.  It
 modifies the `bars=` writer function to support assigning an array of
 records, an array of hashes, an array of ids, or an empty string.
 
