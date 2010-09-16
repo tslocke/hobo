@@ -78,7 +78,7 @@ Invite-only website
   If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
   to the relevant controllers, e.g. to prevent all access to the site, add
 
-    include Hobo::AuthenticationSupport
+    include Hobo::Controller::AuthenticationSupport
     before_filter :login_required
 
   to application_controller.rb (note that the include statement is not required for hobo_controllers)
