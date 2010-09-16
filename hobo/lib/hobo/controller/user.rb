@@ -1,6 +1,6 @@
 module Hobo
-
-  module UserController
+  module Controller
+ 	 module User
 
     class << self
       def included(base)
@@ -184,5 +184,5 @@ module Hobo
     end
 
   end
-
+  end
 end
