@@ -149,7 +149,7 @@ The standard form tag does not have any parameters, nor does it have any default
 
 -->
 <def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%=
-  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
   html_attrs[:enctype] ||= "multipart/form-data" if multipart
 
   new_record = this.try.new_record?
@@ -475,7 +475,7 @@ Forms). If any ajax attributes are given, the button becomes an ajax button, if 
 
  -->
 <def tag="remote-method-button" attrs="method, update, label, confirm, url"><%=
-  ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+  ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
 
   url ||= object_url(this, method.to_s.gsub('-', '_'), :method => :post)
   raise ArgumentError, "no such web method '#{method}' on #{this.typed_id}" unless url
@@ -514,7 +514,7 @@ does ajax.
 <def tag="update-button" attrs="label, update, fields, params"><%=
    raise HoboError.new("no update specified") unless update
 
-   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::RapidHelper::AJAX_ATTRS)
+   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
    params = (params || {}).merge(this.class.name.underscore => fields)
    ajax_attributes.reverse_merge!(:message => label, :params => params, :method => :put)
    func = ajax_updater(object_url(this), update, ajax_attributes)
