@@ -21,6 +21,7 @@ module Hobo
   VERSION = "1.3.0.pre3"
 
   class PermissionDeniedError < RuntimeError; end
+  class UndefinedAccessError < RuntimeError; end
 
   class RawJs < String; end
 
