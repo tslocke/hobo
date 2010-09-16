@@ -2,7 +2,7 @@ module ActiveRecord
   module Associations
     class AssociationCollection
 
-      include Hobo::Scopes::ApplyScopes
+      include Hobo::Model::Scopes::ApplyScopes
 
 
       def hobo_association_collection?
