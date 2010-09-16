@@ -20,7 +20,7 @@ module Hobo
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
 
-        include Hobo::Permissions
+        include Hobo::Model::Permissions
         include Hobo::Lifecycles::ModelExtensions
         include Hobo::Model::FindFor
         include Hobo::Model::AccessibleAssociations
