@@ -64,7 +64,7 @@ class PermissionsTest < Test::Unit::TestCase
   context "The permission system" do
     
     context "with a guest user acting" do
-      setup { @guest = Hobo::Guest.new }
+      setup { @guest = Hobo::Model::Guest.new }
       
       should "prevent creation of a recipe" do
         assert_create_prevented(Recipe) { Recipe.user_create! @guest, :name => "test recipe" }
