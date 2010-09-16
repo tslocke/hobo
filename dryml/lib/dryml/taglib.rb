@@ -30,7 +30,7 @@
           base = if plugin == "dryml"
                    "#{DRYML_ROOT}/taglibs"
                  elsif plugin == "hobo"
-                   "#{HOBO_ROOT}/taglibs"
+                   "#{HOBO_ROOT}/lib/hobo/rapid/taglibs"
                  elsif options[:src] =~ /\//
                    "#{rails_root}/app/views"
                  elsif options[:template_dir] =~ /^#{HOBO_ROOT}/
