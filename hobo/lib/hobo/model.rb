@@ -24,6 +24,7 @@ module Hobo
         include Hobo::Lifecycles::ModelExtensions
         include Hobo::Model::FindFor
         include Hobo::Model::AccessibleAssociations
+        include Hobo::Model::IncludeInSave
         include Hobo::Translations
       end
 

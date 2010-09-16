@@ -95,85 +95,84 @@ module Hobo
 
     end
 
+
     classy_module(AccessibleAssociations) do
 
-    include Hobo::IncludeInSave
+      # --- has_many mass assignment support --- #
 
-    # --- has_many mass assignment support --- #
+      def self.has_many_with_accessible(name, options={}, &block)
+        has_many_without_accessible(name, options, &block)
 
-    def self.has_many_with_accessible(name, options={}, &block)
-      has_many_without_accessible(name, options, &block)
-
-      if options[:accessible]
-        class_eval %{
-          def #{name}_with_accessible=(array_or_hash)
-            __items = Hobo::Model::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
-            self.#{name}_without_accessible = __items
-            # ensure the loaded array contains any changed records
-            self.#{name}.proxy_target[0..-1] = __items
-          end
-        }, __FILE__, __LINE__ - 7
-        alias_method_chain :"#{name}=", :accessible
-      end
-    end
-    metaclass.alias_method_chain :has_many, :accessible
-
-
-
-    # --- belongs_to assignment support --- #
-
-    def self.belongs_to_with_accessible(name, options={}, &block)
-      belongs_to_without_accessible(name, options, &block)
-
-      if options[:accessible]
-        class_eval %{
-          def #{name}_with_accessible=(record_hash_or_string)
-            finder = Hobo::Model::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
-            record = Hobo::Model::AccessibleAssociations.find_or_create_and_update(self, :#{name}, finder, record_hash_or_string) do |id|
-              if id
-                raise ArgumentError, "attempted to update the wrong record in belongs_to association #{self}##{name}" unless
-                  #{name} && id.to_s == self.#{name}.id.to_s
-                #{name}
-              else
-                finder.new
-              end
+        if options[:accessible]
+          class_eval %{
+            def #{name}_with_accessible=(array_or_hash)
+              __items = Hobo::Model::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
+              self.#{name}_without_accessible = __items
+              # ensure the loaded array contains any changed records
+              self.#{name}.proxy_target[0..-1] = __items
             end
-            self.#{name}_without_accessible = record
-          end
-        }, __FILE__, __LINE__ - 15
-        alias_method_chain :"#{name}=", :accessible
-      else
-        # Not accessible - but finding by name and ID is still supported
-        class_eval %{
-          def #{name}_with_finder=(record_or_string)
-            record = if record_or_string.is_a?(String)
-                       finder = Hobo::Model::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
-                       Hobo::Model::AccessibleAssociations.find_by_name_or_id(finder, record_or_string)
-                     else # it is a record
-                       record_or_string
-                     end
-            self.#{name}_without_finder = record
-          end
-        }, __FILE__, __LINE__ - 12
-        alias_method_chain :"#{name}=", :finder
+          }, __FILE__, __LINE__ - 7
+          alias_method_chain :"#{name}=", :accessible
+        end
       end
+      metaclass.alias_method_chain :has_many, :accessible
+
+
+
+      # --- belongs_to assignment support --- #
+
+      def self.belongs_to_with_accessible(name, options={}, &block)
+        belongs_to_without_accessible(name, options, &block)
+
+        if options[:accessible]
+          class_eval %{
+            def #{name}_with_accessible=(record_hash_or_string)
+              finder = Hobo::Model::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
+              record = Hobo::Model::AccessibleAssociations.find_or_create_and_update(self, :#{name}, finder, record_hash_or_string) do |id|
+                if id
+                  raise ArgumentError, "attempted to update the wrong record in belongs_to association #{self}##{name}" unless
+                    #{name} && id.to_s == self.#{name}.id.to_s
+                  #{name}
+                else
+                  finder.new
+                end
+              end
+              self.#{name}_without_accessible = record
+            end
+          }, __FILE__, __LINE__ - 15
+          alias_method_chain :"#{name}=", :accessible
+        else
+          # Not accessible - but finding by name and ID is still supported
+          class_eval %{
+            def #{name}_with_finder=(record_or_string)
+              record = if record_or_string.is_a?(String)
+                         finder = Hobo::Model::AccessibleAssociations.finder_for_belongs_to(self, :#{name})
+                         Hobo::Model::AccessibleAssociations.find_by_name_or_id(finder, record_or_string)
+                       else # it is a record
+                         record_or_string
+                       end
+              self.#{name}_without_finder = record
+            end
+          }, __FILE__, __LINE__ - 12
+          alias_method_chain :"#{name}=", :finder
+        end
+      end
+      metaclass.alias_method_chain :belongs_to, :accessible
+
+
+      # Add :accessible to the valid keys so AR doesn't complain
+
+      def self.valid_keys_for_has_many_association_with_accessible
+        valid_keys_for_has_many_association_without_accessible + [:accessible]
+      end
+      metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
+
+      def self.valid_keys_for_belongs_to_association_with_accessible
+        valid_keys_for_belongs_to_association_without_accessible + [:accessible]
+      end
+      metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
+
+
     end
-    metaclass.alias_method_chain :belongs_to, :accessible
-
-
-    # Add :accessible to the valid keys so AR doesn't complain
-
-    def self.valid_keys_for_has_many_association_with_accessible
-      valid_keys_for_has_many_association_without_accessible + [:accessible]
-    end
-    metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
-
-    def self.valid_keys_for_belongs_to_association_with_accessible
-      valid_keys_for_belongs_to_association_without_accessible + [:accessible]
-    end
-    metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
-
-
-  end
   end
 end
