@@ -21,7 +21,7 @@ module Hobo
         alias_method_chain :attributes=, :hobo_type_conversion
 
         include Hobo::Model::Permissions
-        include Hobo::Lifecycles::ModelExtensions
+        include Hobo::Model::Lifecycles::ModelExtensions
         include Hobo::Model::FindFor
         include Hobo::Model::AccessibleAssociations
         include Hobo::Model::IncludeInSave
