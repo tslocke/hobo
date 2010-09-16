@@ -110,7 +110,7 @@ require 'fileutils'
 
 
       def controllers
-        Hobo::ModelController.all_controllers(subsite).sort_by &:name
+        Hobo::Controller::Model.all_controllers(subsite).sort_by &:name
       end
 
 

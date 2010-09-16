@@ -1,6 +1,6 @@
 module Hobo
-
-  module ModelController
+  module Controller
+	  module Model
 
     include Hobo::Controller
 
@@ -838,5 +838,5 @@ module Hobo
     end
 
   end
-
+  end
 end

@@ -7,7 +7,7 @@ module Hobo
     attr_reader :subsite, :controller, :model, :record, :records
 
     def initialize(subsite, controller)
-      raise "#{controller} is not a Hobo::ModelController" unless controller < Hobo::ModelController
+      raise "#{controller} is not a Hobo::Controller::Model" unless controller < Hobo::Controller::Model
       @subsite = subsite
       @controller = controller
       @model = controller.model

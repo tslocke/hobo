@@ -18,7 +18,7 @@ private
     end
 
     def controllers_for(subsite)
-      Hobo::ModelController.all_controllers(subsite, :force).select { |c| c < Hobo::ModelController }
+      Hobo::Controller::Model.all_controllers(subsite, :force).select { |c| c < Hobo::Controller::Model }
     end
 
     def router_for(subsite, controller)
