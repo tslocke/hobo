@@ -328,19 +328,19 @@ module Hobo
 
 
     # Login url for a given user record or user class
-    def forgot_password_url(user_class=Hobo::User.default_user_model)
+    def forgot_password_url(user_class=Hobo::Model::User.default_user_model)
       send("#{user_class.name.underscore}_forgot_password_url") rescue nil
     end
 
 
     # Login url for a given user record or user class
-    def login_url(user_class=Hobo::User.default_user_model)
+    def login_url(user_class=Hobo::Model::User.default_user_model)
       send("#{user_class.name.underscore}_login_url") rescue nil
     end
 
 
     # Sign-up url for a given user record or user class
-    def signup_url(user_class=Hobo::User.default_user_model)
+    def signup_url(user_class=Hobo::Model::User.default_user_model)
       send("#{user_class.name.underscore}_signup_url") rescue nil
     end
 

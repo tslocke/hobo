@@ -61,7 +61,7 @@ It dynamically pluralizes the human name by using the implicit model.count.
 <!-- Used to localize and pluralize collection names.
 A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them. It does also the default pluralization by calling count on the collection attribute (that you can override passing an explicit `count` attribute).
 
-With the `your` attribute and in the special case the context is a Hobo::User instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
+With the `your` attribute and in the special case the context is a Hobo::Model::User instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
 
 ### Attributes
 
@@ -116,7 +116,7 @@ With the `your` attribute and in the special case the context is a Hobo::User in
   # prepare symbolized attributes for merging
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
-<% if your and belong_class < Hobo::User and this.kind_of?(Hobo::User) -%>
+<% if your and belong_class < Hobo::Model::User and this.kind_of?(Hobo::Model::User) -%>
     <your key="&collection" merge-attrs="&{:count=>c, :name=>this.name}.merge(attrs)" capitalize>
       <%= belong_class.human_attribute_name(collection.to_sym, {:locale=>:en, :count=>c}.merge(attrs)) %>
     </your>

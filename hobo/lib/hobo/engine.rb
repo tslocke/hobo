@@ -39,7 +39,7 @@ module Hobo
       # (explicitly requiring them means they're never unloaded)
       require 'hobo/routes'
       require 'hobo/undefined'
-      require 'hobo/user'
+      #require 'hobo/model/user'
       h = config.hobo
       Dryml::DrymlGenerator.enable([h.rapid_generators_path], h.auto_taglibs_path)
 
