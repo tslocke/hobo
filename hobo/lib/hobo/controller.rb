@@ -29,7 +29,7 @@ module Hobo
           @included_taglibs = []
           rescue_from ActionController::RoutingError, :with => :not_found
         end
-        Hobo::HoboHelper.add_to_controller(klass)
+        Hobo::Helper.add_to_controller(klass)
       end
 
       def controller_and_view_for(page_path)

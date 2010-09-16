@@ -198,7 +198,7 @@ module Dryml
     #                 caching
     # locals:: local variables.
     # imports:: A list of helper modules to import.  For example, Hobo
-    #           uses [Hobo::HoboHelper, Hobo::Translations,
+    #           uses [Hobo::Helper, Hobo::Translations,
     #           ApplicationHelper]
     # included_taglibs:: A list of Taglibs to include. { :src =>
     #                    "core", :plugin => "dryml" } is automatically

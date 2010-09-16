@@ -1,4 +1,4 @@
-# Hobo::HoboHelper
+# Hobo::Helper
 
 Various view helpers
 
@@ -13,7 +13,7 @@ Create a mock view layer:
 
         >>
          class View
-           extend Hobo::HoboHelper
+           extend Hobo::Helper
            class << self
              protected_instance_methods.each {|m| public m }
 

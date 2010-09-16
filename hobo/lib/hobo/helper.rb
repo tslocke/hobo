@@ -1,6 +1,6 @@
 module Hobo
 
-  module HoboHelper
+  module Helper
 
     def self.add_to_controller(controller)
       controller.send(:include, self)
