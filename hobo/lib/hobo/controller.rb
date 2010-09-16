@@ -14,7 +14,7 @@ module Hobo
 
       def included_in_class(klass)
         klass.extend(ClassMethods)
-        klass.send(:include, Hobo::Translations)
+        klass.send(:include, Hobo::Helper::Translations)
         klass.class_eval do
           before_filter :login_from_cookie
           alias_method_chain :redirect_to, :object_url

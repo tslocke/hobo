@@ -25,7 +25,7 @@ module Hobo
         include Hobo::Model::FindFor
         include Hobo::Model::AccessibleAssociations
         include Hobo::Model::IncludeInSave
-        include Hobo::Translations
+        include Hobo::Helper::Translations
       end
 
       class << base
