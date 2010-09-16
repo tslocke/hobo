@@ -22,7 +22,7 @@ private
     end
 
     def router_for(subsite, controller)
-      Hobo::Router.new(subsite, controller)
+      Generators::Hobo::Routes::Router.new(subsite, controller)
     end
 
   end
