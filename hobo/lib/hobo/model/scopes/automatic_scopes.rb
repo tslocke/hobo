@@ -407,7 +407,7 @@ module Hobo
           # HOWEVER, they will pick up the scope setting via read_inheritable_attribute when they do
           # load, so only the currently existing subclasses need to be fixed up.
           _scope = @klass.scopes[_name]
-          @klass.send(:subclasses).each do |k|
+          @klass.send(:descendants).each do |k|
             k.scopes[_name] = _scope
           end
         end

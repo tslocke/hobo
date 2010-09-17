@@ -25,8 +25,8 @@ Contents
     >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
     >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
                                                :database => mysql_database,
-                                               :host => "localhost", 
-                                               :username => mysql_user, 
+                                               :host => "localhost",
+                                               :username => mysql_user,
                                                :password => mysql_password)
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_fields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo_support/lib')
@@ -43,7 +43,7 @@ Contents
      def migrate(renames={})
        up, down = HoboFields::MigrationGenerator.run(renames)
        ActiveRecord::Migration.class_eval(up)
-       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       ActiveRecord::Base.send(:descendants).each { |model| model.reset_column_information }
        [up, down]
      end
 {.hidden}
@@ -73,13 +73,13 @@ for more information on `:dependent => :destroy`.
 We'll use rubydoctest to provide our examples for this section.  Here
 are the models:
 
-    >> 
+    >>
      class Foo < ActiveRecord::Base
        hobo_model
        fields { name :string }
        has_many :bars, :accessible => true
      end
-    >> 
+    >>
      class Bar < ActiveRecord::Base
        hobo_model
        fields { name :string }
@@ -114,7 +114,7 @@ are deleted from your association.
     => "foo1"
     >> bar1.reload
     >> bar1.foo
-    => nil    
+    => nil
 
 If `:dependent => :destroy` had been set on `has_many :bars`, bar1
 would now be deleted from the database.   Since it hasn't, it still

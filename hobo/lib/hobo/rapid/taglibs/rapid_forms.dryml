@@ -745,7 +745,7 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
 <!-- nodoc. -->
 <def tag="sti-type-input">
   <select name="#{param_name_for(form_field_path + ['type'])}">
-    <%= options_for_select(this.class.send(:subclasses).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
+    <%= options_for_select(this.class.send(:descendants).map{|x| [x.name.titleize, x.name]}, this.class.name) %>
   </select>
 </def>
 

@@ -554,7 +554,7 @@ module Hobo
 
 
     def subtype_for_create
-      model.has_inheritance_column? && (t = params['type']) && t.in?(model.send(:subclasses).*.name) and
+      model.has_inheritance_column? && (t = params['type']) && t.in?(model.send(:descendants).*.name) and
         t
     end
 

@@ -72,7 +72,7 @@ We'll define a method to make that easier next time
      def migrate(renames={})
        up, down = HoboFields::MigrationGenerator.run(renames)
        ActiveRecord::Migration.class_eval(up)
-       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       ActiveRecord::Base.send(:descendants).each { |model| model.reset_column_information }
        [up, down]
      end
 

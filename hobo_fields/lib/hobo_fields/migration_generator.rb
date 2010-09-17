@@ -83,7 +83,7 @@ module HoboFields
     # ActiveRecord::Base, excluding anything in the CGI module
     def table_model_classes
       load_rails_models
-      ActiveRecord::Base.send(:subclasses).reject {|c| (c.base_class != c) || c.name.starts_with?("CGI::") }
+      ActiveRecord::Base.send(:descendants).reject {|c| (c.base_class != c) || c.name.starts_with?("CGI::") }
     end
 
 
@@ -109,7 +109,7 @@ module HoboFields
     # list habtm join tables
     def habtm_tables
       reflections = Hash.new { |h, k| h[k] = Array.new }
-      ActiveRecord::Base.send(:subclasses).map do |c|
+      ActiveRecord::Base.send(:descendants).map do |c|
         c.reflect_on_all_associations(:has_and_belongs_to_many).each do |a|
           reflections[a.options[:join_table].to_s] << a
         end
