@@ -109,9 +109,9 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
   I18n.locale = :it => "Ruolo" or "Ruoli"
 -->
 <def tag="human-collection-name" attrs="collection, count, your"><%
-  raise HoboError, "The 'collection' attribute must be defined" if collection.blank?
+  raise Hobo::Error, "The 'collection' attribute must be defined" if collection.blank?
   belong_class = this.kind_of?(Class) ? this : this.class
-  raise HoboError, "The context is not an ActiveRecord::Base instance or class. (this = #{this.typed_id rescue this.inspect})" unless belong_class < ActiveRecord::Base
+  raise Hobo::Error, "The context is not an ActiveRecord::Base instance or class. (this = #{this.typed_id rescue this.inspect})" unless belong_class < ActiveRecord::Base
   c = count.try.to_int || this.kind_of?(ActiveRecord::Base) && this.send(collection.to_sym).count || 1
   # prepare symbolized attributes for merging
   attrs = {}

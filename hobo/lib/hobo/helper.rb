@@ -118,7 +118,7 @@ module Hobo
 
 
     def base_url_for(object, subsite, action)
-      path = object.to_url_path or HoboError.new("cannot create url for #{object.inspect} (#{object.class})")
+      path = object.to_url_path or Hobo::Error.new("cannot create url for #{object.inspect} (#{object.class})")
       "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
     end
 

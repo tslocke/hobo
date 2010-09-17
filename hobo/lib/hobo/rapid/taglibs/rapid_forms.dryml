@@ -315,7 +315,7 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
                   else
                     call_polymorphic_tag('input', attrs) or
                       (call_polymorphic_tag('input', HoboFields.to_class(this_type::COLUMN_TYPE), attrs) if defined?(this_type::COLUMN_TYPE)) or
-                      raise HoboError, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+                      raise Hobo::Error, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
                   end
       unless this_parent.errors[this_field].empty?
         "<span class='field-with-errors'>#{the_input}</span>".html_safe
@@ -512,7 +512,7 @@ does ajax.
 
   -->
 <def tag="update-button" attrs="label, update, fields, params"><%=
-   raise HoboError.new("no update specified") unless update
+   raise Hobo::Error.new("no update specified") unless update
 
    ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
    params = (params || {}).merge(this.class.name.underscore => fields)
@@ -598,7 +598,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
 
  -->
 <def tag="create-button" attrs="model, update, label, fields, message"><%=
-  raise HoboError.new("no update specified") unless update
+  raise Hobo::Error.new("no update specified") unless update
 
   fields ||= {}
   class_or_assoc = if model
@@ -607,7 +607,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
                      fields[this_field_reflection.primary_key_name] = this.proxy_owner.id
                      this
                    else
-                     raise HoboError.new("invalid context for <create-button>")
+                     raise Hobo::Error.new("invalid context for <create-button>")
                    end
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
@@ -641,7 +641,7 @@ For situations where there are too many target records to practically include in
 
   -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
-  raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit?
+  raise Hobo::Error.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit?
   blank_message ||= ht("#{this_type.name.tableize}.message.no", :default=>"(No #{this_type.model_name.human})")
   limit ||= 100
 

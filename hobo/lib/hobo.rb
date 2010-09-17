@@ -8,12 +8,11 @@ ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
-class HoboError < RuntimeError; end
-
 module Hobo
 
   VERSION = "1.3.0.pre3"
 
+  class Error < RuntimeError; end
   class PermissionDeniedError < RuntimeError; end
   class UndefinedAccessError < RuntimeError; end
 

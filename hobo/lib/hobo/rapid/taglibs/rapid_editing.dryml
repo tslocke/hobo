@@ -19,7 +19,7 @@ This area of Hobo has had less attention that the non-ajax forms of late, so it'
       end
     else
       call_polymorphic_tag("editor", attrs) or
-        raise HoboError.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
+        raise Hobo::Error.new("<editor> not implemented for #{this.class.name}\##{this_field} " +
                             "(#{this.inspect}:#{this_type})")
     end
   end
@@ -66,7 +66,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 <def tag="editor" for="float"><%= in_place_editor(attributes, this) %></def>
 
 <!-- Raises an error - passwords cannot be edited in place -->
-<def tag="editor" for="password"><% raise HoboError, "passwords cannot be edited in place" %></def>
+<def tag="editor" for="password"><% raise Hobo::Error, "passwords cannot be edited in place" %></def>
 
 <!-- calls `<boolean-checkbox-editor>` -->
 <def tag="editor" for="boolean"><boolean-checkbox-editor merge-attrs/></def>
@@ -93,7 +93,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
   -->
 <def tag="select-one-editor" attrs="include-none, blank-message, sort, update, options"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit?
+  raise Hobo::Error.new("Not allowed to edit") unless can_edit?
   blank_message ||= "(No #{this_type.name.to_s.titleize})"
   options ||= this_field_reflection.klass.all.select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
@@ -130,7 +130,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
   -->
 <def tag="string-select-editor" attrs="update, values, labels, titleize"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit?
+  raise Hobo::Error.new("Not allowed to edit") unless can_edit?
 
   values = comma_split(values)
   labels ||= {}
@@ -161,7 +161,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
   -->
 <def tag="boolean-checkbox-editor" attrs="update, message"><%
-  raise HoboError.new("Not allowed to edit") unless can_edit?
+  raise Hobo::Error.new("Not allowed to edit") unless can_edit?
   f = ajax_updater(object_url(this_parent, :method => :put),
                    update,
                    :method => "put",
@@ -226,7 +226,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
 <!-- nodoc. -->
 <def tag="has-many-checkbox-editor" attrs="model, update, message"><%=
-  raise HoboError.new("no update specified") unless update
+  raise Hobo::Error.new("no update specified") unless update
 
   fields = attributes.delete_if{|k,v|!k.ends_with? "_id"}
   conditions = fields.map{|k,v|"#{k}=#{v}"}.join " AND "
