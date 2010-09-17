@@ -1,14 +1,8 @@
-# gem dependencies
 require 'hobo_support'
 require 'hobo_fields'
+require 'will_paginate'
 require 'hobo/features/enumerable'
 require 'hobo/features/array'
-
-begin
-  require 'will_paginate'
-rescue MissingSourceFile
-  # OK, Hobo won't do pagination then
-end
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 
@@ -23,6 +17,8 @@ module Hobo
   class PermissionDeniedError < RuntimeError; end
   class UndefinedAccessError < RuntimeError; end
 
+  # Empty class to represent the boolean type.
+  class Boolean; end
   class RawJs < String; end
 
   class << self
@@ -72,9 +68,6 @@ module Hobo
     end
 
   end
-
-  # Empty class to represent the boolean type.
-  class Boolean; end
 
 end
 
