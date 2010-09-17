@@ -39,8 +39,8 @@ module Hobo
         if included_in_save
           included_in_save.each_pair do |association, records|
             records.each do |record|
-              # save_without_validation means without transactions too
-              record.with_acting_user(acting_user) { record.save_without_validation }
+              # save(:validate => false) means without transactions too
+              record.with_acting_user(acting_user) { record.save(:validate => false) }
             end
           end
         end
