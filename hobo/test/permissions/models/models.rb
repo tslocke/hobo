@@ -6,48 +6,49 @@ $:.unshift "#{HOBO_HOME}/hobo/lib"
 require 'rubygems'
 require 'sqlite3'
 require 'active_record'
+gem 'will_paginate', ">= 3.0.pre"
+require 'will_paginate'
 
 module Models
-  
+
   extend self
-  
+
   HOME = File.dirname(__FILE__)
-  
+
   def model(name, &b)
     klass = Object.const_get(name)
     klass.hobo_model
     klass.class_eval(&b)
     klass.delete_all rescue nil
   end
-  
+
   def user_model(name, &b)
     klass = Object.const_get(name)
     klass.hobo_user_model
     klass.class_eval(&b)
     klass.delete_all rescue nil
   end
-  
+
   def create_database_sqlite3
     ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
                                             :database => "/tmp/hobo_permissions_test.sqlite3",
                                             :timeout => 5000)
   end
-  
+
   def init
-    Hobo::Model.enable
     make_models
     up, down = HoboFields::MigrationGenerator.run
     ActiveRecord::Migration.class_eval(up)
   end
-  
+
   def make_models
 
     [:Response, :Comment, :Request, :Recipe, :Collaboratorship, :Image, :CodeExample, :User].each do |m|
       Object.const_set(m, Class.new(ActiveRecord::Base))
     end
-      
+
     model :Response do
-      fields do 
+      fields do
         body :string
       end
       belongs_to :user
@@ -62,7 +63,7 @@ module Models
       belongs_to :user
       belongs_to :recipe
     end
-  
+
     model :Request do
       fields do
         body :string
@@ -83,19 +84,20 @@ module Models
       belongs_to :code_example, :dependent => :destroy, :accessible => true
       has_many   :collaboratorships
       has_many   :collaborators, :through => :collaboratorships, :source => :user, :accessible => true
-      
+
       def create_permitted?;  acting_user == user end
       def update_permitted?;  acting_user == user end
       def destroy_permitted?; acting_user == user end
     end
-    
+
     model :Collaboratorship do
+      fields {}
       belongs_to :user
       belongs_to :recipe
       def create_permitted?;  recipe.user == acting_user end
       def destroy_permitted?; recipe.user == acting_user end
     end
-    
+
     model :Image do
       fields do
         name :string
@@ -106,13 +108,13 @@ module Models
       def update_permitted?;  user == acting_user end
       def destroy_permitted?; user == acting_user end
     end
-    
+
     model :CodeExample do
       fields do
         filename :string
       end
       has_one :recipe
-      def update_permitted?;  recipe.user == acting_user end      
+      def update_permitted?;  recipe.user == acting_user end
       def create_permitted?;  true end
     end
 
@@ -125,14 +127,14 @@ module Models
       has_many :comments
       has_many :responses
       has_many :requests
-      
+
       lifecycle do
         state :active, :default => true
       end
     end
-    
+
   end
-  
+
 end
 
 # activerecord 2.3.2 is buggy.  It requires a connection before we can
