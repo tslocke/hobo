@@ -137,14 +137,14 @@ Provides validation of correct email address format.
 
 ## Enum Strings
 
-`HoboFields::EnumString` is not a rich type that you use directly. It's a "type generator", rather like Ruby's `Struct`. It's used for the common situation in database driven apps that you want an enumerated type, but it's not worth going to the extra bother of a separate table enumerating the values. For example you could create a type to represent the status of an article:
+`HoboFields::Types::EnumString` is not a rich type that you use directly. It's a "type generator", rather like Ruby's `Struct`. It's used for the common situation in database driven apps that you want an enumerated type, but it's not worth going to the extra bother of a separate table enumerating the values. For example you could create a type to represent the status of an article:
 
-        >> ArticleStatus = HoboFields::EnumString.for('', :draft, :approved, :published)
+        >> ArticleStatus = HoboFields::Types::EnumString.for('', :draft, :approved, :published)
         => ArticleStatus
 
 Note that, like all dynamically created classes in Ruby, the class is anonymous until assigned to a constant:
 
-        >> klass = HoboFields::EnumString.for(:draft, :approved, :published)
+        >> klass = HoboFields::Types::EnumString.for(:draft, :approved, :published)
         => #<EnumString draft approved published>
         >> AritcleStatus = klass
         >> ArticleStatus
@@ -179,9 +179,9 @@ Equality is string equality, with symbols first converted to strings:
         => true
 
 
-Note that every enum you create is a subclass of HoboFields::EnumString:
+Note that every enum you create is a subclass of HoboFields::Types::EnumString:
 
-        >> a.is_a?(HoboFields::EnumString)
+        >> a.is_a?(HoboFields::Types::EnumString)
         => true
 
 EnumString's have a `validate` function defined to fit in with the
@@ -194,7 +194,7 @@ ActiveRecord validation framework.
 
 ### Using EnumString in your models
 
-`HoboFields::EnumString` extends the field declaration DSL with a shorthand for creating enum types:
+`HoboFields::Types::EnumString` extends the field declaration DSL with a shorthand for creating enum types:
 
         >>
          class Article < ActiveRecord::Base
@@ -209,7 +209,7 @@ Sometimes it's nice to have a proper type name. Here's one way you might go abou
 
         >>
          class Article < ActiveRecord::Base
-           Status = HoboFields::EnumString.for(:draft, :approved, :published)
+           Status = HoboFields::Types::EnumString.for(:draft, :approved, :published)
            fields do
              status Article::Status
            end
@@ -246,7 +246,7 @@ The translated value is available via `to_html`:
 
 Translations only work with named EnumString's.  The recommended way of naming the EnumString is to assign it to a constant, but if you do not wish to do this, you can supply the name in an option:
 
-    >> HoboFields::EnumString.for('one', 'two', 'three', :name => "Count").inspect
+    >> HoboFields::Types::EnumString.for('one', 'two', 'three', :name => "Count").inspect
     => "Count"
 
 `tableize` will be called on your name to provide the translation key.

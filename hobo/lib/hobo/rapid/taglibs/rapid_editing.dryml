@@ -72,7 +72,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 <def tag="editor" for="boolean"><boolean-checkbox-editor merge-attrs/></def>
 
 <!-- Provides an editor that uses a `<select>` menu. Uses the `<string-select-editor>` tag. -->
-<def tag="editor" for="HoboFields::EnumString">
+<def tag="editor" for="HoboFields::Types::EnumString">
  <string-select-editor values="&this_type.values" merge/>
 </def>
 

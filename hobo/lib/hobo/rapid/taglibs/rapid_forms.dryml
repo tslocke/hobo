@@ -444,7 +444,7 @@ The menus default to the current time if the current value is nil.
  - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
 
    -->
-<def tag="input" for="HoboFields::EnumString" attrs="labels, titleize, first-option, first-value"><%
+<def tag="input" for="HoboFields::Types::EnumString" attrs="labels, titleize, first-option, first-value"><%
   labels ||= {}
   labels = HashWithIndifferentAccess.new(labels)
   titleize = true if titleize.nil?
