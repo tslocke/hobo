@@ -15,7 +15,7 @@ module HoboFields
     end
 
     attr_accessor :model, :name, :type, :position, :options
-    
+
     TYPE_SYNONYMS = [[:timestamp, :datetime]]
 
     begin
@@ -64,7 +64,7 @@ module HoboFields
     def comment
       options[:comment]
     end
-    
+
     def same_type?(col_spec)
       t = sql_type
       TYPE_SYNONYMS.each do |synonyms|
@@ -74,7 +74,7 @@ module HoboFields
       end
       t == col_spec.type
     end
-      
+
 
     def different_to?(col_spec)
       !same_type?(col_spec) ||
@@ -82,7 +82,7 @@ module HoboFields
         # a nil table_name for some strange reason.
         begin
           if model.table_exists?
-            col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name) 
+            col_comment = ActiveRecord::Base.try.column_comment(col_spec.name, model.table_name)
             col_comment != nil && col_comment != comment
           else
             false
@@ -111,7 +111,7 @@ module HoboFields
     end
 
     def native_types
-      MigrationGenerator.native_types
+      Generators::Hobo::Migration::Migrator.native_types
     end
 
   end

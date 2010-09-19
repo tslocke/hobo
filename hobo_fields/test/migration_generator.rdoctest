@@ -21,11 +21,11 @@ Normally you would run the migration generator as a regular Rails generator. You
 
 in your Rails app, and the migration file would be created in `db/migrate`.
 
-In order to demonstrate the generator in this doctest script however, we'll be using the Ruby API instead. The method `HoboFields::MigrationGenerator.run` returns a pair of strings -- the up migration and the down migration.
+In order to demonstrate the generator in this doctest script however, we'll be using the Ruby API instead. The method `Generators::Hobo::Migration::Migrator.run` returns a pair of strings -- the up migration and the down migration.
 
 At the moment the database is empty and no ActiveRecord models exist, so the generator is going to tell us there is nothing to do.
 
-    >> HoboFields::MigrationGenerator.run
+    >> Generators::Hobo::Migration::Migrator.run
     => ["", ""]
 
 
@@ -34,12 +34,12 @@ At the moment the database is empty and no ActiveRecord models exist, so the gen
 The migration generator only takes into account classes that use HoboFields, i.e. classes with a `fields do` declaration. Models without this are ignored:
 
     >> class Advert < ActiveRecord::Base; end
-    >> HoboFields::MigrationGenerator.run
+    >> Generators::Hobo::Migration::Migrator.run
     => ["", ""]
 
 You can also tell HoboFields to ignore additional tables.  You can place this command in your environment.rb or elsewhere:
 
-    >> HoboFields::MigrationGenerator.ignore_tables = ["green_fishes"]
+    >> Generators::Hobo::Migration::Migrator.ignore_tables = ["green_fishes"]
 
 ### Create the table
 
@@ -51,7 +51,7 @@ Here we see a simple `create_table` migration along with the `drop_table` down m
          name :string
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     =>
      "create_table :adverts do |t|
@@ -70,7 +70,7 @@ We'll define a method to make that easier next time
 
     >>
      def migrate(renames={})
-       up, down = HoboFields::MigrationGenerator.run(renames)
+       up, down = Generators::Hobo::Migration::Migrator.run(renames)
        ActiveRecord::Migration.class_eval(up)
        ActiveRecord::Base.send(:descendants).each { |model| model.reset_column_information }
        [up, down]
@@ -131,7 +131,7 @@ Here we rename the `name` field to `title`. By default the generator sees this a
        end
      end
     >> # Just generate - don't run the migration:
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     =>
      "add_column :adverts, :title, :string
@@ -144,7 +144,7 @@ Here we rename the `name` field to `title`. By default the generator sees this a
 
 When run as a generator, the migration-generator won't make this assumption. Instead it will prompt for user input to resolve the ambiguity. When using the Ruby API, we can ask for a rename instead of an add + drop by passing in a hash:
 
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => { :name => :title })
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => { :name => :title })
     >> up
     => "rename_column :adverts, :name, :title"
     >> down
@@ -166,7 +166,7 @@ Let's apply that change to the database
          body :text
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     => "change_column :adverts, :title, :text, :limit => nil"
     >> down
@@ -199,7 +199,7 @@ Let's apply that change to the database
          price :integer, :limit => 2
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     => "add_column :adverts, :price, :integer, :limit => 2"
 
@@ -211,7 +211,7 @@ Note that limit on a decimal column is ignored (use :scale and :precision)
          price :decimal, :limit => 4
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     => "add_column :adverts, :price, :decimal"
 
@@ -231,7 +231,7 @@ foreign-key field.  It also generates an index on the field.
          class Advert
            belongs_to :category
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         =>
          "add_column :adverts, :category_id, :integer
@@ -256,7 +256,7 @@ If you specify a custom foreign key, the migration generator observes that:
          class Advert
            belongs_to :category, :foreign_key => "c_id"
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         =>
          "add_column :adverts, :c_id, :integer
@@ -276,7 +276,7 @@ You can avoid generating the index by specifying `:index => false`
          class Advert
            belongs_to :category, :index => false
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         => "add_column :adverts, :category_id, :integer"
 
@@ -293,7 +293,7 @@ You can specify the index name with :index
          class Advert
            belongs_to :category, :index => 'my_index'
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         =>
          "add_column :adverts, :category_id, :integer
@@ -317,7 +317,7 @@ Cleanup:
              timestamps
            end
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         =>
          "add_column :adverts, :created_at, :datetime
@@ -345,7 +345,7 @@ You can add an index to a field definition
              title :string, :index => true
            end
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => 'add_index :adverts, [:title]'
 
@@ -363,7 +363,7 @@ You can ask for a unique index
              title :string, :index => true, :unique => true
            end
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => 'add_index :adverts, [:title], :unique => true'
 
@@ -381,7 +381,7 @@ You can specify the name for the index
              title :string, :index => 'my_index'
            end
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => "add_index :adverts, [:title], :name => 'my_index'"
 
@@ -397,7 +397,7 @@ You can ask for an index outside of the fields block
          class Advert
            index :title
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => "add_index :adverts, [:title]"
 
@@ -413,7 +413,7 @@ The available options for the index function are `:unique` and `:name`
          class Advert
            index :title, :unique => true, :name => 'my_index'
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => "add_index :adverts, [:title], :unique => true, :name => 'my_index'"
 
@@ -429,7 +429,7 @@ You can create an index on more than one field
          class Advert
            index [:title, :category_id]
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up.split("\n")[2]
         => "add_index :adverts, [:title, :category_id]"
 
@@ -453,7 +453,7 @@ The migration generator respects the `set_table_name` declaration, although as b
          body :text
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => :ads)
     >> up
     => "rename_table :adverts, :ads"
     >> down
@@ -462,7 +462,7 @@ The migration generator respects the `set_table_name` declaration, although as b
 Set the table name back to what it should be and confirm we're in sync:
 
     >> class Advert; set_table_name "adverts"; end
-    >> HoboFields::MigrationGenerator.run
+    >> Generators::Hobo::Migration::Migrator.run
     => ["", ""]
 
 ### Rename a table
@@ -487,7 +487,7 @@ As with renaming columns, we have to tell the migration generator about the rena
          body :text
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :advertisements)
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => :advertisements)
     >> up
     => "rename_table :adverts, :advertisements"
     >> down
@@ -502,7 +502,7 @@ If you delete a model, the migration generator will create a `drop_table` migrat
 
 Dropping tables is where the automatic down-migration really comes in handy:
 
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     => "drop_table :adverts"
     >> down
@@ -529,7 +529,7 @@ Adding a subclass or two should introduce the 'type' column and no other changes
          end
          class SuperFancyAdvert < FancyAdvert
          end
-        >> up, down = HoboFields::MigrationGenerator.run
+        >> up, down = Generators::Hobo::Migration::Migrator.run
         >> up
         =>
          "add_column :adverts, :type, :string
@@ -561,7 +561,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
     => ["adverts"]
     >> Advert.columns.*.name
     => ["id", "body", "title"]
-    >> HoboFields::MigrationGenerator.run
+    >> Generators::Hobo::Migration::Migrator.run
     => ["", ""]
 
 
@@ -575,7 +575,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
          body :text
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => {:title => :name})
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => {:title => :name})
     >> up
     =>
      "rename_column :adverts, :title, :name
@@ -599,7 +599,7 @@ First let's confirm we're in a known state. One model, 'Advert', with a string '
          created_at :datetime
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => :ads)
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => :ads)
     >> up
     =>
      "rename_table :adverts, :ads
@@ -628,7 +628,7 @@ HoboFields has some support for legacy keys.
        end
        set_primary_key "advert_id"
      end
-    >> up, down = HoboFields::MigrationGenerator.run(:adverts => {:id => :advert_id})
+    >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => {:id => :advert_id})
     >> up
     =>
      "rename_column :adverts, :id, :advert_id

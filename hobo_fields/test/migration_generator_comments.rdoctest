@@ -58,7 +58,7 @@ Because it will be quite common for people not to have both [column_comments](ht
          description :string, :comment => "Long name"
        end
      end
-    >> up, down = HoboFields::MigrationGenerator.run
+    >> up, down = Generators::Hobo::Migration::Migrator.run
     >> up
     >> up.split(',').slice(0,3).join(',')
     => 'change_column :products, :name, :string'

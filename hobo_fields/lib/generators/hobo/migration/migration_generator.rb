@@ -46,7 +46,7 @@ module Hobo
     def migrate
       return if migrations_pending?
 
-      generator = HoboFields::MigrationGenerator.new(lambda{|c,d,k,p| extract_renames!(c,d,k,p)})
+      generator = Generators::Hobo::Migration::Migrator.new(lambda{|c,d,k,p| extract_renames!(c,d,k,p)})
       up, down = generator.generate
 
       if up.blank?
@@ -154,7 +154,7 @@ module Hobo
     end
 
     def migration_name
-      name || HoboFields::MigrationGenerator.default_migration_name
+      name || Generators::Hobo::Migration::Migrator.default_migration_name
     end
 
   end

@@ -49,7 +49,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
 ### ensure it doesn't cause further migrations
 
    doctest: check no further migrations
-   >> up, down = HoboFields::MigrationGenerator.run
+   >> up, down = Generators::Hobo::Migration::Migrator.run
    >> up
    => ""
 

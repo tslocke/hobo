@@ -116,7 +116,7 @@ Let's set up a few models for our testing:
 Generate a migration and run it:
 {.hidden}
 
-    >> ActiveRecord::Migration.class_eval(HoboFields::MigrationGenerator.run[0])
+    >> ActiveRecord::Migration.class_eval(Generators::Hobo::Migration::Migrator.run[0])
     >> Person.columns.*.name
     => ["id", "name", "born_at", "code", "male", "created_at", "updated_at", "state"]
 {.hidden}

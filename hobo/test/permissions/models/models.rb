@@ -37,7 +37,7 @@ module Models
 
   def init
     make_models
-    up, down = HoboFields::MigrationGenerator.run
+    up, down = Generators::Hobo::Migration::Migrator.run
     ActiveRecord::Migration.class_eval(up)
   end
 

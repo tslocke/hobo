@@ -41,7 +41,7 @@ Contents
     >> ActiveRecord::Base.logger = ActiveSupport::BufferedLogger.new(STDOUT)
     >>
      def migrate(renames={})
-       up, down = HoboFields::MigrationGenerator.run(renames)
+       up, down = Generators::Hobo::Migration::Migrator.run(renames)
        ActiveRecord::Migration.class_eval(up)
        ActiveRecord::Base.send(:descendants).each { |model| model.reset_column_information }
        [up, down]
