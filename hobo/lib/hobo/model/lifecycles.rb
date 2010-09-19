@@ -32,7 +32,7 @@ module Hobo
             lifecycle = self::Lifecycle
             lifecycle.init(self, options)
 
-            module_eval "class ::#{name}::LifecycleStateField < HoboFields::LifecycleState; end"
+            module_eval "class ::#{name}::LifecycleStateField < HoboFields::Types::LifecycleState; end"
             state_field_class = self::LifecycleStateField
             state_field_class.table_name = name.tableize
           end
