@@ -22,7 +22,7 @@ module Generators
           i = 0
           foreign_keys.inject({}) do |h, v|
             # some trickery to avoid an infinite loop when FieldSpec#initialize tries to call model.field_specs
-            h[v] = HoboFields::FieldSpec.new(self, v, :integer, :position => i)
+            h[v] = HoboFields::Model::FieldSpec.new(self, v, :integer, :position => i)
             i += 1
             h
           end
@@ -366,7 +366,7 @@ module Generators
         def change_indexes(model, old_table_name)
           return [[],[]] if Migrator.disable_indexing || model.is_a?(HabtmModelShim)
           new_table_name = model.table_name
-          existing_indexes = HoboFields::IndexSpec.for_model(model, old_table_name)
+          existing_indexes = HoboFields::Model::IndexSpec.for_model(model, old_table_name)
           model_indexes = model.index_specs
           add_indexes = model_indexes - existing_indexes
           drop_indexes = existing_indexes - model_indexes

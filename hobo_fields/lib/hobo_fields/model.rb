@@ -1,6 +1,6 @@
 module HoboFields
 
-  ModelExtensions = classy_module do
+  Model = classy_module do
 
     # ignore the model in the migration until somebody sets
     # @include_in_migration via the fields declaration
@@ -32,7 +32,7 @@ module HoboFields
 
     def self.index(fields, options = {})
       # don't double-index fields
-      index_specs << HoboFields::IndexSpec.new(self, fields, options) unless index_specs.*.fields.include?(Array.wrap(fields).*.to_s)
+      index_specs << HoboFields::Model::IndexSpec.new(self, fields, options) unless index_specs.*.fields.include?(Array.wrap(fields).*.to_s)
     end
 
     # tell the migration generator to ignore the named index. Useful for existing indexes, or for indexes
@@ -136,7 +136,7 @@ module HoboFields
       add_validations_for_field(name, type, args)
       add_index_for_field(name, args, options)
       declare_attr_type(name, type, options) unless HoboFields.plain_type?(type)
-      field_specs[name] = HoboFields::FieldSpec.new(self, name, type, options)
+      field_specs[name] = HoboFields::Model::FieldSpec.new(self, name, type, options)
       attr_order << name unless name.in?(attr_order)
     end
 

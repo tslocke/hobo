@@ -84,7 +84,7 @@ module Hobo
         migration_template 'migration.rb.erb', "db/migrate/#{final_migration_name.underscore}.rb"
         rake('db:migrate') if action == 'm'
       end
-    rescue HoboFields::FieldSpec::UnknownSqlTypeError => e
+    rescue HoboFields::Model::FieldSpec::UnknownSqlTypeError => e
       say "Invalid field type: #{e}"
     end
 

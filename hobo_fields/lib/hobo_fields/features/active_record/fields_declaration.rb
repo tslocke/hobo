@@ -4,7 +4,7 @@ ActiveRecord::Base.class_eval do
       # Any model that calls 'fields' gets a bunch of other
       # functionality included automatically, but make sure we only
       # include it once
-      include HoboFields::ModelExtensions unless HoboFields::ModelExtensions.in?(included_modules)
+      include HoboFields::Model unless HoboFields::Model.in?(included_modules)
       @include_in_migration ||= include_in_migration
 
       if b
