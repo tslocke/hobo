@@ -6,11 +6,12 @@ require 'hobo/features/array'
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 
-::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 module Hobo
 
   VERSION = "1.3.0.pre3"
+  @@root = Pathname.new File.expand_path(File.dirname(__FILE__) + "/..")
+  def self.root; @@root; end
 
   class Error < RuntimeError; end
   class PermissionDeniedError < RuntimeError; end

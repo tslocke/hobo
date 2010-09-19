@@ -28,12 +28,12 @@
           plugin = options[:plugin]
           rails_root = Object.const_defined?(:Rails) ? Rails.root : "."
           base = if plugin == "dryml"
-                   "#{DRYML_ROOT}/taglibs"
+                   "#{Dryml.root}/taglibs"
                  elsif plugin == "hobo"
-                   "#{HOBO_ROOT}/lib/hobo/rapid/taglibs"
+                   "#{Hobo.root}/lib/hobo/rapid/taglibs"
                  elsif options[:src] =~ /\//
                    "#{rails_root}/app/views"
-                 elsif options[:template_dir] =~ /^#{HOBO_ROOT}/
+                 elsif options[:template_dir] =~ /^#{Hobo.root}/
                    options[:template_dir]
                  else
                    "#{rails_root}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
