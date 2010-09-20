@@ -455,6 +455,7 @@ module Hobo
 
       if do_pagination
         options.reverse_merge!(:page => params[:page] || 1)
+        options[:order] = :created_at if options[:order] == :default
         finder.paginate(options)
       else
         finder.all(options.except(*WILL_PAGINATE_OPTIONS))
