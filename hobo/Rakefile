@@ -64,6 +64,10 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.add_dependency("hobo_support", ["= #{Hobo::VERSION}"])
   gemspec.add_dependency("hobo_fields", ["= #{Hobo::VERSION}"])
   gemspec.add_dependency("dryml", ["= #{Hobo::VERSION}"])
+  gemspec.add_development_dependency "shoulda"
+  gemspec.add_development_dependency "rubydoctest"
+  gemspec.add_development_dependency "jeweler"
+  gemspec.add_development_dependency "irt", ">= 0.7.1"
   gemspec.files.include %w(tasks/environments.rake tasks/hobo_tasks.rake)
 end
 Jeweler::GemcutterTasks.new

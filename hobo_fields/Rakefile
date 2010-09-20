@@ -36,6 +36,8 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.rubyforge_project = "hobo"
   gemspec.add_dependency("rails", [">= 3.0.0"])
   gemspec.add_dependency("hobo_support", ["= #{HoboFields::VERSION}"])
+  gemspec.add_development_dependency "rubydoctest"
+  gemspec.add_development_dependency "jeweler"
 end
 Jeweler::GemcutterTasks.new
 Jeweler::RubyforgeTasks.new do |rubyforge|
