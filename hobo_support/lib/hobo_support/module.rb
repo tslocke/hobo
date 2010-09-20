@@ -92,3 +92,11 @@ module Kernel
   end
 
 end
+
+class Object
+
+  def is_one_of?(*args)
+    args.any? {|a| is_a?(a) }
+  end
+
+end
