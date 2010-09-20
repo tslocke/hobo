@@ -35,6 +35,8 @@
                    "#{rails_root}/app/views"
                  elsif options[:template_dir] =~ /^#{Hobo.root}/
                    options[:template_dir]
+                 elsif options[:absolute_template_path]
+                    options[:absolute_template_path]
                  else
                    "#{rails_root}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
                  end
