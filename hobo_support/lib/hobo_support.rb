@@ -19,10 +19,6 @@ module HoboSupport
 
   VERSION = "1.3.0.pre3"
 
-  RAILS_VERSION_FLOAT = Object.const_defined?(:Rails) ? Rails::VERSION::STRING.match(/^\d+\.\d+/)[0].to_f : 0
-
-  RAILS_AT_LEAST_23 = (RAILS_VERSION_FLOAT >= 2.3)
-
 end
 
 

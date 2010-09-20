@@ -349,7 +349,7 @@ edit collections a `Category` model in your application:
   <%= unless attributes[:disabled]
         cb_tag = check_box_tag(name, '1', this, attributes)
         cb_hidden_tag = hidden_field_tag(name, '0', :id => nil)
-        HoboSupport::RAILS_AT_LEAST_23 ? cb_hidden_tag + cb_tag : cb_tag + cb_hidden_tag
+        cb_hidden_tag + cb_tag
       end %>
 </def>
 
