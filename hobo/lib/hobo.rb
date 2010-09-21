@@ -1,5 +1,6 @@
 require 'hobo_support'
 require 'hobo_fields'
+require 'dryml'
 require 'will_paginate'
 require 'hobo/features/enumerable'
 require 'hobo/features/array'
