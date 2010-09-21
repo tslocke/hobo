@@ -19,7 +19,7 @@ module Generators
 
         def index_action_routes
           controller.index_actions.map do |action|
-            link "get '#{records}/#{action}(.:format)', :as => '#{action}_#{records}'", action
+            link( "get '#{records}/#{action}(.:format)', :as => '#{action}_#{records}'", action )
           end.compact
         end
 
@@ -39,13 +39,13 @@ module Generators
 
         def resource_routes
           [
-          link( "get '#{records}(.:format)' => '#{records}#index', :as => '#{records}'", 'index'),
-          link( "get '#{records}/new(.:format)', :as => 'new_#{record}'", 'new'),
-          link( "get '#{records}/:id/edit(.:format)' => '#{records}#edit', :as => 'edit_#{record}'", 'edit'),
-          link( "get '#{records}/:id(.:format)' => '#{records}#show', :as => '#{record}', :constraints => #{ID_REQUIREMENT}", 'show'),
-          link( "post '#{records}(.:format)' => '#{records}#create', :as => 'create_#{record}'", 'create', :post),
-          link( "put '#{records}/:id(.:format)' => '#{records}#update', :as => 'update_#{record}', :constraints => #{ID_REQUIREMENT}", 'update', :put),
-          link( "delete '#{records}/:id(.:format)' => '#{records}#destroy', :as => 'destroy_#{record}', :constraints => #{ID_REQUIREMENT}", 'delete', :delete)
+          link("get '#{records}(.:format)' => '#{records}#index', :as => '#{records}'", 'index'),
+          link("get '#{records}/new(.:format)', :as => 'new_#{record}'", 'new'),
+          link("get '#{records}/:id/edit(.:format)' => '#{records}#edit', :as => 'edit_#{record}'", 'edit'),
+          link("get '#{records}/:id(.:format)' => '#{records}#show', :as => '#{record}', :constraints => #{ID_REQUIREMENT}", 'show'),
+          link("post '#{records}(.:format)' => '#{records}#create', :as => 'create_#{record}'", 'create', :post),
+          link("put '#{records}/:id(.:format)' => '#{records}#update', :as => 'update_#{record}', :constraints => #{ID_REQUIREMENT}", 'update', :put),
+          link("delete '#{records}/:id(.:format)' => '#{records}#destroy', :as => 'destroy_#{record}', :constraints => #{ID_REQUIREMENT}", 'delete', :delete)
           ].compact
         end
 
@@ -77,18 +77,18 @@ module Generators
 
         def web_method_routes
           controller.web_methods.map do |action|
-            link "post '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action, :post
+            link("post '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action, :post)
           end.compact
         end
 
         def show_action_routes
           controller.show_actions.map do |action|
-            link "get '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action
+            link("get '#{records}/:id/#{action}(.:format)' => '#{records}##{action}', :as => '#{record}_#{action}'", action)
           end.compact
         end
 
         def reorder_routes
-          [ link "post '#{records}/reorder(.:format)', :as => 'reorder_#{records}'", 'reorder', :post ].compact
+          [ link("post '#{records}/reorder(.:format)', :as => 'reorder_#{records}'", 'reorder', :post) ].compact
         end
 
         def user_routes

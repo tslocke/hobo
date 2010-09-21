@@ -38,7 +38,7 @@ module Dryml
       @src = src
       @environment = environment # a class or a module
       @template_path = template_path
-      @template_path = @template_path.sub(%r(^#{Regexp.escape(Rails.root)}/), "") if Object.const_defined? :Rails
+      @template_path = @template_path.sub(%r(^#{Regexp.escape(Rails.root.to_s)}/), "") if Object.const_defined? :Rails
 
       @builder = Template.build_cache[@template_path] || DRYMLBuilder.new(self)
       @builder.set_environment(environment)
