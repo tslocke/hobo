@@ -26,6 +26,7 @@ module Hobo
       require 'hobo/features/active_record/association_reflection'
       require 'hobo/features/active_record/hobo_methods'
       require 'hobo/features/active_record/permissions'
+      require 'hobo/features/active_record/scopes'
       require 'hobo/features/active_model/name'
       require 'hobo/features/active_model/translation'
     end

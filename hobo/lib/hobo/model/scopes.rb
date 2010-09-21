@@ -36,7 +36,3 @@ module Hobo
     end
   end
 end
-
-ActiveRecord::Associations::AssociationProxy.send(:include, Hobo::Model::Scopes::AssociationProxyExtensions)
-ActiveRecord::Associations::AssociationCollection.send(:include, Hobo::Model::Scopes::AssociationCollectionExtensions)
-ActiveRecord::Associations::HasManyThroughAssociation.send(:include, Hobo::Model::Scopes::HasManyThroughAssociationExtensions)

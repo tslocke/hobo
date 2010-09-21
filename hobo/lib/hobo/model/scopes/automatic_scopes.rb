@@ -272,7 +272,7 @@ module Hobo
               return true if check_only
 
               def_scope do
-                order "#{@klass.table_name}.created_at DESC"
+                @klass.order "#{@klass.table_name}.created_at DESC"
               end
 
             when "recent"
@@ -281,7 +281,7 @@ module Hobo
               if "created_at".in?(@klass.columns.*.name)
                 def_scope do |*args|
                   count = args.first || 6
-                  order("#{@klass.table_name}.created_at DESC").limit(count)
+                  @klass.order("#{@klass.table_name}.created_at DESC").limit(count)
                 end
               else
                 def_scope do |*args|
@@ -305,7 +305,7 @@ module Hobo
                 else
                   colspec = "#{klass.table_name}.#{field}"
                 end
-                includes(include).order("#{colspec} #{asc._?.upcase}")
+                @klass.includes(include).order("#{colspec} #{asc._?.upcase}")
               end
 
 
@@ -313,7 +313,7 @@ module Hobo
               return true if check_only
 
               def_scope do |inclusions|
-                includes(inclusions)
+                @klass.includes(inclusions)
               end
 
             when "search"
@@ -401,7 +401,6 @@ module Hobo
 
         def def_scope(&block)
           _name = name.to_sym
-
           @klass.scope _name, (lambda &block)
           # this is tricky; ordinarily, we'd worry about subclasses that haven't yet been loaded.
           # HOWEVER, they will pick up the scope setting via read_inheritable_attribute when they do
