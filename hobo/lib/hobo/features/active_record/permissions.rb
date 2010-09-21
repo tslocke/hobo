@@ -27,7 +27,7 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
     end
 
     # Normal ActiveRecord implementatin
-    ids = quoted_record_ids(records)
+    ids = records.map { |record| record.quoted_id }.join(',')
     @reflection.klass.update_all(
       "#{@reflection.primary_key_name} = NULL",
       "#{@reflection.primary_key_name} = #{@owner.quoted_id} AND #{@reflection.klass.primary_key} IN (#{ids})"
