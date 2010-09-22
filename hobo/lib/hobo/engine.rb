@@ -38,7 +38,7 @@ module Hobo
     ActiveSupport.on_load(:before_initialize) do
       # Modules that must *not* be auto-reloaded by activesupport
       # (explicitly requiring them means they're never unloaded)
-      require 'hobo/generators/routes/router'
+      require 'generators/hobo/routes/router'
       require 'hobo/routes'
       require 'hobo/undefined'
 
