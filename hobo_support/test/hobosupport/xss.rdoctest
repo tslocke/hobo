@@ -1,8 +1,8 @@
 # HoboSupport - XSS helpers
 
     >> require 'active_support'
-    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../../hobosupport/lib')
-    >> require 'hobosupport'
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../../hobo_support/lib')
+    >> require 'hobo_support'
 
 ## safe_join
 
