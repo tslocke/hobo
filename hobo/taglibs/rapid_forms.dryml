@@ -760,7 +760,7 @@ There's another example of `<name-one>` use in the [recipes](http://cookbook.hob
     <h2 param="heading">To proceed please correct the following:</h2>
     <ul param>
       <% this.errors.each do |attr, message|; next if message == "..." -%>
-        <li param><%= this.class.human_attribute_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
+        <li param><%= this.class.view_hints.field_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
       <% end -%>
     </ul>
   </section>
