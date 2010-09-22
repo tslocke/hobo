@@ -10,7 +10,7 @@
 require 'hobo_support'
 require 'action_pack'
 
-ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
+ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 
 # The Don't Repeat Yourself Markup Language
 module Dryml

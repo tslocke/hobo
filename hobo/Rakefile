@@ -7,6 +7,7 @@ ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/proje
 $:.unshift File.expand_path('../lib', __FILE__)
 $:.unshift File.expand_path('../../hobo_support/lib', __FILE__)
 $:.unshift File.expand_path('../../hobo_fields/lib', __FILE__)
+$:.unshift File.expand_path('../../dryml/lib', __FILE__)
 require 'hobo'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
