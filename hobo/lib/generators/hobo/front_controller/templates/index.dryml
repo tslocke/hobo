@@ -20,7 +20,7 @@
           </form>
 <% else -%>
           <do with="&<%= user_resource_name.camelize %>.new"><%% this.exempt_from_edit_checks = true %>
-            <signup-form/>
+            <signup-form without-cancel/>
           </do>
 <% end -%>
         <%% end -%>

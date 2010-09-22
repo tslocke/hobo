@@ -14,7 +14,7 @@
 
 <% if invite_only? -%>
   def new_password_required_with_invite_only?
-    new_password_required_without_invite_only? || <%= class_name %>.count==0
+    new_password_required_without_invite_only? || self.class.count==0
   end
   alias_method_chain :new_password_required?, :invite_only
 <% end -%>
@@ -80,12 +80,8 @@
   # --- Permissions --- #
 
   def create_permitted?
-<% if invite_only? -%>
-    # Only the initial admin user can be created, from there it's invite-only
-    <%= class_name %>.count == 0
-<% else -%>
-    false
-<% end -%>
+    # Only the initial admin user can be created
+    self.class.count == 0
   end
 
   def update_permitted?
