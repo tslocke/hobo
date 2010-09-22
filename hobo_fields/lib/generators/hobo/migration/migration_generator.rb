@@ -68,7 +68,7 @@ module Hobo
 
       if action != 'c'
         if name.blank? && !options[:default_name]
-          final_migration_name = choose("\nMigration filename: [<enter>=#{migration_name}|<custom_name>]:", /^[a-z0-9_ ]*$/).strip.gsub(' ', '_')
+          final_migration_name = choose("\nMigration filename: [<enter>=#{migration_name}|<custom_name>]:", /^[a-z0-9_ ]*$/, migration_name).strip.gsub(' ', '_')
         end
         final_migration_name = migration_name if final_migration_name.blank?
 
