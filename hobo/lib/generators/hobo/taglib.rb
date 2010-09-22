@@ -1,4 +1,3 @@
-require 'fileutils'
 module Generators
   module Hobo
     Taglib = classy_module do
