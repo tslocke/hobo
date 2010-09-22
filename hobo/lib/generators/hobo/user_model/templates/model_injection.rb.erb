@@ -14,7 +14,7 @@
 
 <% if invite_only? -%>
   def new_password_required_with_invite_only?
-    new_password_required_without_invite_only? || User.count==0
+    new_password_required_without_invite_only? || <%= class_name %>.count==0
   end
   alias_method_chain :new_password_required?, :invite_only
 <% end -%>
@@ -32,7 +32,7 @@
            :params => [:name, :email_address],
            :new_key => true,
            :become => :invited do
-       UserMailer.invite(self, lifecycle.key).deliver
+       <%= class_name %>Mailer.invite(self, lifecycle.key).deliver
     end
 
     transition :accept_invitation, { :invited => :active }, :available_to => :key_holder,
@@ -82,7 +82,7 @@
   def create_permitted?
 <% if invite_only? -%>
     # Only the initial admin user can be created, from there it's invite-only
-    User.count == 0
+    <%= class_name %>.count == 0
 <% else -%>
     false
 <% end -%>
