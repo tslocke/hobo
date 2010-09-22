@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 
-puts 'Hobo Command Line Interface 1.3.0.pre5'
+puts 'Hobo Command Line Interface 1.3.0.pre6'
 
 banner = %(
 Usage:
@@ -39,7 +39,7 @@ gem 'dryml', :path => '#{ENV["HOBO_DEV_ROOT"]}/dryml'
 gem 'hobo', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo'
 )
     else
-      file.puts "gem 'hobo', '>= 1.3.0.pre5'"
+      file.puts "gem 'hobo', '>= 1.3.0.pre6'"
     end
     file.puts %(
 require 'generators/hobo_support/thor_shell'

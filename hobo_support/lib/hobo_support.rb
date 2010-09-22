@@ -20,6 +20,6 @@ require 'hobo_support/kernel'
 
 module HoboSupport
 
-  VERSION = "1.3.0.pre5"
+  VERSION = "1.3.0.pre6"
 
 end
