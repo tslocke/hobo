@@ -119,7 +119,7 @@ Invite-only website
       else
         front_controller_name = options[:front_controller_name]
       end
-      invoke 'hobo:front_controller', [front_controller_name], :invite_only => @invite_only
+      invoke 'hobo:front_controller', [front_controller_name, @user_resource_name], :invite_only => @invite_only
     end
 
     def admin_subsite

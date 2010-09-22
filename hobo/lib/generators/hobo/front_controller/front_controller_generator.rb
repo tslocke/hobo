@@ -4,6 +4,7 @@ module Hobo
 
     # overrides the default
     argument :name, :type => :string, :default => 'front', :optional => true
+    argument :user_resource_name, :type => :string, :default => 'user', :optional => true
 
     include Generators::Hobo::Controller
     include Generators::Hobo::InviteOnly
