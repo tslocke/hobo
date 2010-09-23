@@ -1,16 +1,7 @@
-In order to run the tests, you have to have git installed and:
+In order to run the tests, you need git and irt installed, then run:
 
-  $ sudo gem install irt
-  $ cd into this dir (test/irt)
-  $ ./setup.rb
-    or if you are testing a local repo of hobo
-  $ HOBO_DEV_ROOT=~/path/to/hoborepo ./setup.rb
+    $ rake irt_test_all
 
-  $ cd testapp
-  $ irt ../
-    or
-  $ irt ../path/to/test.irt
+or if you are testing a local repo of hobo, from the hobo repo root:
 
-You can delete the testapp dir when you finish.
-
-
+    $ rake HOBO_DEV_ROOT=. irt_test_all

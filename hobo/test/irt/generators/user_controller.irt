@@ -3,8 +3,8 @@ irt_at_exit {git_reset_app}
 
 invoke 'hobo:user_controller', %w[-q]
 
-eval_file '../generators/partials/_default_users_controller_tests.rb'
+eval_file '../partials/_default_users_controller_tests.rb'
 
 invoke 'hobo:user_controller' , %w(accounts -q)
 
-eval_file '../generators/partials/_accounts_users_controller_tests.rb'
+eval_file '../partials/_accounts_users_controller_tests.rb'

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
+require 'fileutils'
 
 puts 'Hobo Command Line Interface 1.3.0.pre6'
 
@@ -35,12 +36,13 @@ when 'new'
   template_path = "./.hobo_app_template"
   File.open(template_path, 'w') do |file|
     if ENV["HOBO_DEV_ROOT"]
+      dev_root = File.expand_path ENV["HOBO_DEV_ROOT"], FileUtils.pwd
       file.puts %(
-$:.unshift '#{ENV["HOBO_DEV_ROOT"]}/hobo_support/lib'
-gem 'hobo_support', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo_support'
-gem 'hobo_fields', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo_fields'
-gem 'dryml', :path => '#{ENV["HOBO_DEV_ROOT"]}/dryml'
-gem 'hobo', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo'
+$:.unshift '#{dev_root}/hobo_support/lib'
+gem 'hobo_support', :path => '#{dev_root}/hobo_support'
+gem 'hobo_fields', :path => '#{dev_root}/hobo_fields'
+gem 'dryml', :path => '#{dev_root}/dryml'
+gem 'hobo', :path => '#{dev_root}/hobo'
 )
     else
       file.puts "gem 'hobo', '>= 1.3.0.pre6'"

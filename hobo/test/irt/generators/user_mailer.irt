@@ -3,7 +3,7 @@ irt_at_exit {git_reset_app}
 
 invoke 'hobo:user_mailer', %w[ user -q ]
 
-eval_file '../generators/partials/_user_mailer_tests.rb'
+eval_file '../partials/_user_mailer_tests.rb'
 
 ############
 
@@ -12,7 +12,7 @@ git_reset_app
 desc "User Mailer --invite-only files exist"
 invoke 'hobo:user_mailer', %w[ user --invite-only -q ]
 
-eval_file '../generators/partials/_user_mailer_tests.rb'
+eval_file '../partials/_user_mailer_tests.rb'
 
 desc "user_mailer.rb file content invite"
 file_include? 'app/mailers/user_mailer.rb',
