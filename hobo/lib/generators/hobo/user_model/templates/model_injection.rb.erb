@@ -80,8 +80,12 @@
   # --- Permissions --- #
 
   def create_permitted?
-    # Only the initial admin user can be created
+<% if invite_only? -%>
+    # Only the initial admin user can be created, from there it's invite-only
     self.class.count == 0
+<% else -%>
+    false
+<% end -%>
   end
 
   def update_permitted?
