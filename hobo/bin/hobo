@@ -16,13 +16,17 @@ Dev Notes:
 )
 
 command = ARGV.shift
-argv = ARGV * ' '
-
+# for hobo developers only
+setup_wizard = true
 
 case command
 
 when 'new'
-  app_name = ARGV.first
+  app_name = ARGV.shift
+  if ARGV.first =~ /^--skip-wizard$/
+    setup_wizard = false
+    ARGV.shift
+  end
   if app_name.nil?
     puts "\nThe application name is missing!\n"
     puts banner
@@ -41,7 +45,8 @@ gem 'hobo', :path => '#{ENV["HOBO_DEV_ROOT"]}/hobo'
     else
       file.puts "gem 'hobo', '>= 1.3.0.pre6'"
     end
-    file.puts %(
+    if setup_wizard
+      file.puts %(
 require 'generators/hobo_support/thor_shell'
 extend Generators::HoboSupport::ThorShell
 
@@ -53,16 +58,18 @@ else
   say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", Thor::Shell::Color::RED
 end
 )
+    end
   end
   puts "Generating Rails infrastructure..."
-  exec "rails new #{argv} -m #{template_path}"
+  system "rails new #{app_name} #{ARGV * ' '} -m #{template_path}"
+  File.delete template_path
 
 when /^(g|generate)$/
   if ARGV.empty?
     puts "\nThe generator name is missing!\n"
     puts banner
   else
-    exec "rails g hobo:#{argv}"
+    exec "rails g hobo:#{ARGV * ' '}"
   end
 
 else

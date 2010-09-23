@@ -191,12 +191,6 @@ Invite-only website
       say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly.", Color::YELLOW
     end
 
-    def cleanup_app_template
-      say_title 'Cleanup' if wizard?
-      # remove the template if one
-      remove_file File.join(File.dirname(Rails.root), ".hobo_app_template")
-    end
-
     def finalize
       return unless wizard?
       say_title 'Process completed!'

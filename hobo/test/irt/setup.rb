@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
-puts %(Please chose 'no' at the next prompt)
-sleep 2
-system %(hobo new testapp)
+system %(hobo new testapp --skip-wizard)
 system %(cd testapp && echo "gem 'irt', '>= 0.6.1', :group => :console" >> Gemfile)
 system %(cd testapp && echo "" > app/models/.gitignore) # because git reset --hard would rm the dir
 system %(cd testapp && git init && git add . && git commit -m "initial commit")
