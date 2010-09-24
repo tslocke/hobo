@@ -251,10 +251,3 @@ Translations only work with named EnumString's.  The recommended way of naming t
 
 `tableize` will be called on your name to provide the translation key.
 
-## Cleanup
-{.hidden}
-
-    >> FileUtils.rm_rf  TEST_APP_ROOT
-
-{.hidden}
-

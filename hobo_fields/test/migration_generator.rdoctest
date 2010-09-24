@@ -637,11 +637,3 @@ HoboFields has some support for legacy keys.
     >> nuke_model_class(Ad)
     >> ActiveRecord::Base.connection.execute "drop table `adverts`;"
 {.hidden}
-
-Final Cleanup
-{.hidden}
-
-  >> FileUtils.rm_rf  TEST_APP_ROOT
-
-{.hidden}
-

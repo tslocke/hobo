@@ -242,11 +242,3 @@ To have them validated use `validate_virtual_field`:
          end
         >> a.valid?
         => false
-
-Cleanup
-{.hidden}
-
-    >> FileUtils.rm_rf  TEST_APP_ROOT
-{.hidden}
-
-

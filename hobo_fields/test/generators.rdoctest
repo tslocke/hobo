@@ -51,7 +51,3 @@ doctest: Alpha::Beta class exists
 >> Alpha::Beta
 => Alpha::Beta(id: integer, one: string, two: integer)
 
-
-
-doctest: remove testapp dir
->> FileUtils.rm_rf  TEST_APP_ROOT

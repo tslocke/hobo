@@ -73,11 +73,3 @@ Cleanup
     >> ActiveRecord::Base.connection.execute "drop table `products`;"
     >> system "cd #{TEST_APP_ROOT} && rake db:drop RAILS_ENV=mysql_test"
 {.hidden}
-
-Final Cleanup
-{.hidden}
-
-  >> FileUtils.rm_rf  TEST_APP_ROOT
-
-{.hidden}
-

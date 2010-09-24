@@ -52,7 +52,3 @@ And requires also that you enter the right choice when prompted. OK we're ready 
    >> up, down = Generators::Hobo::Migration::Migrator.run
    >> up
    => ""
-
-## Cleanup
-
-    >> FileUtils.rm_rf  TEST_APP_ROOT
