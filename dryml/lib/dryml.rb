@@ -15,7 +15,7 @@ ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
-    VERSION = "1.3.0.pre6"
+    VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
     @@root = Pathname.new File.expand_path(File.dirname(__FILE__) + "/..")
     def self.root; @@root; end
 

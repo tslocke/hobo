@@ -26,24 +26,3 @@ require 'yard'
 YARD::Rake::YardocTask.new do |t|
   t.files = ['lib/**/*.rb', 'README', 'LICENSE.txt', 'CHANGES.txt']
 end
-
-# --- Packaging and Rubyforge & gemcutter & github--- #
-
-require 'jeweler'
-Jeweler::Tasks.new do |gemspec|
-  gemspec.version      = Dryml::VERSION
-  gemspec.name         = "dryml"
-  gemspec.email        = "tom@tomlocke.com"
-  gemspec.summary      = "The web app builder for Rails"
-  gemspec.homepage     = "http://hobocentral.net/"
-  gemspec.authors      = ["Tom Locke"]
-  gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("hobo_support", ["= #{Dryml::VERSION}"])
-  gemspec.add_dependency("actionpack", [">= 3.0.0"])
-  gemspec.add_development_dependency "rubydoctest"
-  gemspec.add_development_dependency "jeweler"
-end
-Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end

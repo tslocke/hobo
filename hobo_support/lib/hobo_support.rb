@@ -20,6 +20,6 @@ require 'hobo_support/kernel'
 
 module HoboSupport
 
-  VERSION = "1.3.0.pre6"
+  VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
 
 end

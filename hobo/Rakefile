@@ -47,36 +47,6 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
 end
 
 
-# --- Packaging and Rubyforge & gemcutter & github--- #
-
-require 'jeweler'
-Jeweler::Tasks.new do |gemspec|
-  gemspec.version      = Hobo::VERSION
-  gemspec.name         = "hobo"
-  gemspec.email        = "tom@tomlocke.com"
-  gemspec.summary      = "The web app builder for Rails"
-  gemspec.homepage     = "http://hobocentral.net/"
-  gemspec.authors      = ["Tom Locke"]
-  gemspec.executables  = ['hobo']
-  gemspec.default_executable = 'hobo'
-  gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("rails", [">= 3.0.0"])
-  gemspec.add_dependency("will_paginate", ['>=3.0.pre'])
-  gemspec.add_dependency("hobo_support", ["= #{Hobo::VERSION}"])
-  gemspec.add_dependency("hobo_fields", ["= #{Hobo::VERSION}"])
-  gemspec.add_dependency("dryml", ["= #{Hobo::VERSION}"])
-  gemspec.add_development_dependency "shoulda"
-  gemspec.add_development_dependency "rubydoctest"
-  gemspec.add_development_dependency "jeweler"
-  gemspec.add_development_dependency "irt", ">= 0.7.5"
-  gemspec.files.include %w(tasks/environments.rake tasks/hobo_tasks.rake)
-end
-Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end
-
-
 TESTAPP_PATH = '/tmp/testapp'
 ROOT_PATH = File.expand_path('../', __FILE__)
 

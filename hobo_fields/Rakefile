@@ -25,24 +25,6 @@ namespace "test" do
   end
 end
 
-require 'jeweler'
-Jeweler::Tasks.new do |gemspec|
-  gemspec.version      = HoboFields::VERSION
-  gemspec.name         = "hobo_fields"
-  gemspec.email        = "tom@tomlocke.com"
-  gemspec.summary      = "Rich field types and migration generator for Rails"
-  gemspec.homepage     = "http://hobocentral.net/"
-  gemspec.authors      = ["Tom Locke"]
-  gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("rails", [">= 3.0.0"])
-  gemspec.add_dependency("hobo_support", ["= #{HoboFields::VERSION}"])
-  gemspec.add_development_dependency "rubydoctest"
-  gemspec.add_development_dependency "jeweler"
-end
-Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end
 
 
 desc "Prepare a rails application for testing"

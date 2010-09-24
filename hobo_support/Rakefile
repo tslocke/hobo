@@ -14,22 +14,3 @@ namespace "test" do
     exit(1) if !system("#{RUBYDOCTEST} --single #{files}")
   end
 end
-
-# --- build gem via Jeweler --- #
-
-require 'jeweler'
-Jeweler::Tasks.new do |gemspec|
-  gemspec.version      = HoboSupport::VERSION
-  gemspec.name         = "hobo_support"
-  gemspec.email        = "tom@tomlocke.com"
-  gemspec.summary      = "Core Ruby extensions from the Hobo project"
-  gemspec.homepage     = "http://hobocentral.net/"
-  gemspec.authors      = ["Tom Locke"]
-  gemspec.rubyforge_project = "hobo_support"
-  gemspec.add_development_dependency "rubydoctest"
-  gemspec.add_development_dependency "jeweler"
-end
-Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end
