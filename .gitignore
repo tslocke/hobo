@@ -3,7 +3,6 @@
 hobo/taglib-docs
 
 */pkg
-**/*.gemspec
 
 dryml/lib/doc
 doc
