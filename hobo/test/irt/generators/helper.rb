@@ -1,3 +1,5 @@
+system %(cd #{Hobo.root} && rake test:prepare_testapp)
+
 def invoke(*args)
   Rails::Generators.invoke *args
 end
