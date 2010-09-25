@@ -33,6 +33,32 @@ namespace "test" do
     # note, tests in doctest/hobo/ are out of date
     exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
+
+  desc "Run the irt tests"
+  task :irt => :prepare_testapp do |t|
+    chdir '/tmp/hobo_testapp'
+    sh %(irt #{File.expand_path('../', __FILE__)})
+  end
+
+  desc "Prepare a rails application for testing"
+  task :prepare_testapp, :force do |t, args|
+    args.with_default(:force => false)
+    path = "/tmp/hobo_testapp"
+    if args.force || !File.directory?(path)
+      remove_entry_secure( path, true )
+      sh %(hobo new #{path} --skip-wizard)
+      chdir path
+      sh %(echo "gem 'irt', :group => :console" >> Gemfile) # to make the bundler happy
+      sh %(echo "" > app/models/.gitignore) # because git reset --hard would rm the dir
+      rm %(.gitignore) # we need to reset everything in a testapp
+      sh %(git init && git add . && git commit -m "initial commit")
+      puts %(The testapp has been created in '#{path}')
+    else
+      chdir path
+      sh %(git add .)
+      sh %(git reset --hard -q HEAD)
+    end
+  end
 end
 
 # --- RDoc --- #
@@ -46,25 +72,4 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-
-TESTAPP_PATH = '/tmp/testapp'
-ROOT_PATH = File.expand_path('../', __FILE__)
-
-require 'fileutils'
-desc "Prepare a rails-hobo application for testing"
-task :prepare_testapp do |t|
-  remove_entry_secure( TESTAPP_PATH, true )
-  sh %(hobo new #{TESTAPP_PATH} --skip-wizard)
-  chdir TESTAPP_PATH
-  sh %(echo "gem 'irt', '>= 0.7.5', :group => :console" >> Gemfile)
-  sh %(echo "" > app/models/.gitignore) # because git reset --hard would rm the dir
-  sh %(git init && git add . && git commit -m "initial commit")
-  puts %(The appdir has been created in '#{TESTAPP_PATH}')
-end
-
-
-desc "Run all irt tests"
-task :irt_test_all => [:prepare_testapp] do |t|
-  sh %(irt #{ROOT_PATH})
-end
 
