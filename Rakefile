@@ -1,5 +1,6 @@
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} `which rubydoctest`"
+GEMS_ROOT = File.expand_path('../')
 
 desc "Run tests and doctests for all components."
 task :test_all do |t|
@@ -18,22 +19,25 @@ YARD::Rake::YardocTask.new do |t|
   t.files = ['*/lib/**/*.rb', '-', 'hobo/README', 'hobo/CHANGES.txt', 'hobo/LICENSE.txt', 'dryml/README', 'dryml/CHANGES.txt']
 end
 
-namespace :gems do
-  desc "Build and push all the hobo-gems"
-  task :push do |t|
-    unless `git status -s`.empty?
-      puts 'Rake task aborted: the working tree is dirty!'
-      exit
-    end
-
-    %w[hobo_support hobo_fields dryml hobo].each do |name|
-      chdir File.expand_path("../#{name}", __FILE__)
-      version = File.read('VERSION').strip
-      gem_name = "#{name}-#{version}.gem"
-      sh %(gem build #{name}.gemspec)
-      sh %(gem push #{gem_name})
-      rm gem_name
-    end
-
+desc "Build and push or install all the hobo-gems"
+task :gems, :action, :force do |t, args|
+  unless args.action == 'push' || args.action == 'install'
+    puts "Unknown '#{args.action}' action: it must be either 'push' or 'install'."
+    exit
   end
+  if ! args.force && ! `git status -s`.empty?
+    puts 'Rake task aborted: the working tree is dirty!'
+    exit
+  end
+
+  %w[hobo_support hobo_fields dryml hobo].each do |name|
+    chdir File.expand_path("../#{name}", __FILE__)
+    version = File.read('VERSION').strip
+    gem_name = "#{name}-#{version}.gem"
+    sh %(gem build #{name}.gemspec)
+    sh %(gem #{args.action} #{gem_name})
+    rm gem_name
+  end
+  chdir GEMS_ROOT
+  sh %(git tag -m '#{version}' #{args.force ? '-f' : ''})
 end
