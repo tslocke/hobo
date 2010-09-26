@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('redcloth', [">= 0"]) # for testing rich types
   s.add_development_dependency('bluecloth', [">= 0"])  # for testing rich types
 
+  s.executables = ["hobofields"]
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
 
   s.name = name

@@ -10,4 +10,4 @@ end
 
 require 'hobo_support/command'
 
-HoboSupport::Command.run(:hobo)
+HoboSupport::Command.run(:hobofields)
