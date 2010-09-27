@@ -38,6 +38,4 @@ task :gems, :action, :force do |t, args|
     sh %(gem #{args.action} #{gem_name})
     rm gem_name
   end
-  chdir GEMS_ROOT
-  sh %(git tag -m '#{version}' #{args.force ? '-f' : ''})
 end
