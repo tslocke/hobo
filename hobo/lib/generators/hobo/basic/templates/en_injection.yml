@@ -1,0 +1,16 @@
+
+  # you can change model and field names here
+  activerecord:
+
+    models:
+      user:
+        one: User
+        other: Users
+
+    attributes:
+      user:
+        created_at: Created at
+        name: Name
+        password: Password
+        password_confirmation: Password Confirmation
+        email_address: Email Address

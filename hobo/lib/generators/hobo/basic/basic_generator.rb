@@ -11,6 +11,7 @@ module Hobo
       copy_file 'application.css',       'public/stylesheets/application.css'
       copy_file 'dryml-support.js',      'public/javascripts/dryml-support.js'
       copy_file 'guest.rb',              'app/models/guest.rb'
+      append_file 'config/locales/en.yml', File.read(File.expand_path('../templates/en_injection.yml',__FILE__))
     end
 
   end
