@@ -780,10 +780,10 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
   -->
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
-    <h2 param="heading">To proceed please correct the following:</h2>
+      <h2 param="heading"><ht key="hobo.messages.error_correct_following">To proceed please correct the following:</ht></h2>
     <ul param>
       <% this.errors.each do |attr, message|; next if message == "..." -%>
-        <li param><%= this.class.human_attribute_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
+        <li param><%= this.class.view_hints.field_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
       <% end -%>
     </ul>
   </section>
