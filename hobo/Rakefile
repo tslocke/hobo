@@ -59,7 +59,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.executables  = ['hobo']
   gemspec.default_executable = 'hobo'
   gemspec.rubyforge_project = "hobo"
-  gemspec.add_dependency("rails", [">= 2.2.2"])
+  gemspec.add_dependency("rails", [">= 2.2.2", "< 3.0.0"])
   gemspec.add_dependency("will_paginate", [">= 2.3.11"])
   gemspec.add_dependency("hobosupport", ["= #{Hobo::VERSION}"])
   gemspec.add_dependency("hobofields", ["= #{Hobo::VERSION}"])
