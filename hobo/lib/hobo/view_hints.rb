@@ -75,6 +75,25 @@ module Hobo
         children.rest
       end
 
+
+##### LEGACY METHODS TO REMOVE #####
+
+      def model_name(*)
+        raise NotImplementedError, "ViewHints.model_name is no longer supported, please use model.model_name.human and set a the activerecord.models.<model_name> key in a locale file"
+      end
+
+      def model_name_plural(*)
+        raise NotImplementedError, "ViewHints.model_name_plural is no longer supported, please use model.model_name.human(:count => n) and set a the activerecord.models.<model_name> key in a locale file"
+      end
+
+      def field_name(*)
+        raise NotImplementedError, "ViewHints.field_name is no longer supported, please use model..human_attribute_name and set a the activerecord.attributes.<model_name>.<field_name> key in a locale file"
+      end
+
+      def field_names(*)
+        raise NotImplementedError, "ViewHints.field_names is no longer supported, please set the activerecord.attributes.<model_name>.<field_name> keys in a locale file"
+      end
+
     end
 
   end
