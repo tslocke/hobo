@@ -54,7 +54,7 @@ module Dryml::Parser
             c = REXML::CData.new( event[1] )
             @build_context.add( c )
           when :processing_instruction
-            @build_context.add( Instruction.new( event[1], event[2] ) )
+            @build_context.add( REXML::Instruction.new( event[1], event[2] ) )
           end
         end
       rescue REXML::Validation::ValidationException
