@@ -2,7 +2,7 @@
 
 
 <!-- Call with the context set to a record. Repeats the content of the tag with `this` and `this_field` set to the value and name of each of the record's fields in turn. E.g. this is useful for generating a form containing each of the fields. Tags like `<field-list>` and `<table>` forward their attributes to this tag and also have the features described here. For example, the `fields` attribute to `<field-list>` supports the same options as described here.
-  
+
 This tag is in need of a review - it's a bit funky.
 
 ### Attributes
@@ -17,14 +17,14 @@ This tag is in need of a review - it's a bit funky.
  - `skip-associations` - set to `has-many` to omit all `has_many` associations.
  - `include-timestamps` - whether or not to include the standard ActiveRecord timestamp fields such as `created_at` and `updated_at`. Defaults to false.
  - `force-all` - by default fields are skipped if the current user does not have view permission. Set `force-all` to true to skip this permission check and include all the fields.
-  
+
   -->
 <def tag="with-fields" attrs="fields, associations, skip, skip-associations, include-timestamps, force-all"><%
   fields.nil? || associations.nil? or raise ArgumentError, "with-fields -- specify either fields or associations but not both"
-   
+
   field_names = if associations == "has_many"
                   this.class.reflections.values.select { |refl| refl.macro == :has_many }.map { |refl| refl.name.to_s }
-                                                                                                                
+
                 elsif fields.nil? || fields == "*" || fields.is_a?(Class)
                   klass = fields.is_a?(Class) ? fields : this.class
                   columns = standard_fields(klass, include_timestamps)
@@ -43,7 +43,7 @@ This tag is in need of a review - it's a bit funky.
                 end
   field_names -= comma_split(skip) if skip
   field_names = field_names.select {|f| can_view?(this, f)} unless force_all
-  field_names.each do |field| 
+  field_names.each do |field|
     %><set-scoped field-name="&field"><%
     if field == "this"
       %><do param="default"/><%
@@ -55,7 +55,7 @@ This tag is in need of a review - it's a bit funky.
 %></def>
 
 <!-- Call with the context set to a model class. Repeats the content of the tag with `this` set name of each of the model's fields in turn. E.g. this tag is used when generating the heading row in a `<table fields='...'/>`.
-  
+
 This tag is in need of a review - it's a bit funky.
 
 ### Attributes
@@ -68,7 +68,7 @@ This tag is in need of a review - it's a bit funky.
  - `skip` - comma separated list of field names to omit.
  - `skip-associations` - set to `has-many` to omit all `has_many` associations.
  - `include-timestamps` - whether or not to include the standard ActiveRecord timestamp fields such as `created_at` and `updated_at`. Defaults to false.
-  
+
   -->
 <def tag="with-field-names" attrs="fields, skip, skip-associations, include-timestamps"><%=
   field_names = if fields.nil? || fields == "*" || fields.is_a?(Class)
@@ -92,10 +92,10 @@ This tag is in need of a review - it's a bit funky.
   field_names -= comma_split(skip) if skip
   scope.new_scope :field_name => nil, :field_path => nil do
     field_names.map do |n|
-      scope.field_name = n == "this" ? this.member_class.try.name : n.to_s.gsub("." , "_") 
+      scope.field_name = n == "this" ? this.member_class.try.name : n.to_s.gsub("." , "_")
       scope.field_path = n
       parameters.default
-    end.join
+    end.safe_join
   end
 %>
 </def>
