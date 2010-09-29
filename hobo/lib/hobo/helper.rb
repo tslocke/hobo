@@ -112,7 +112,7 @@ module Hobo
 
     def app_name(add_subsite=true)
       an = Rails.application.config.hobo.app_name
-      an << " - #{subsite.titleize}" if add_subsite && subsite
+      an + " - #{subsite.titleize}" if add_subsite && subsite
       an
     end
 
