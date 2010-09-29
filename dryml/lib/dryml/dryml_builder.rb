@@ -61,7 +61,11 @@ module Dryml
     def erb_process(erb_src)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
       erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
-      erb.src.split(';')[1..-2].join(';')
+      res = erb.src.split(';')[1..-2].join(';')
+      if res.respond_to? :force_encoding
+        res.force_encoding(erb_src.encoding)
+      end
+      res
     end
 
     def build(local_names, auto_taglibs, src_mtime)
