@@ -1,5 +1,5 @@
 <index-page>
   <after-count:>
-    <a with="&<%= user_resource_name.camelize %>" action="invite">Invite a new user</a>
+    <a with="&<%= options[:user_resource_name].camelize %>" action="invite">Invite a new user</a>
   </after-count:>
 </index-page>

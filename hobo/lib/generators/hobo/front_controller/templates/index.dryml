@@ -11,15 +11,15 @@
           <li>To customise this page: edit app/views/front/index.dryml</li>
         </ul>
 
-        <%% if <%= user_resource_name.camelize %>.count == 0 -%>
+        <%% if <%= options[:user_resource_name].camelize %>.count == 0 -%>
           <h3 style="margin-top: 20px;">There are no user accounts - please provide the details of the site administrator</h3>
 <% if invite_only? %>
-          <form with="&this || <%= user_resource_name.camelize %>.new" without-cancel>
+          <form with="&this || <%= options[:user_resource_name].camelize %>.new" without-cancel>
             <field-list: fields="name, email_address, password, password_confirmation"/>
             <submit: label="Register Administrator"/>
           </form>
 <% else -%>
-          <do with="&<%= user_resource_name.camelize %>.new"><%% this.exempt_from_edit_checks = true %>
+          <do with="&<%= options[:user_resource_name].camelize %>.new"><%% this.exempt_from_edit_checks = true %>
             <signup-form without-cancel/>
           </do>
 <% end -%>

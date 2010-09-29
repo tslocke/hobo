@@ -11,7 +11,7 @@ module Hobo
     include Generators::Hobo::Taglib
 
     def self.banner
-      "rails generate hobo:test_framework NAME [options]"
+      "rails generate hobo:setup_wizard [options]"
     end
 
     class_option :main_title, :type => :boolean,
@@ -19,9 +19,6 @@ module Hobo
 
     class_option :wizard, :type => :boolean,
     :desc => "Ask instead using options", :default => true
-
-    class_option :user_resource_name, :type => :string,
-    :desc => "User Resource Name", :default => 'user'
 
     class_option :front_controller_name, :type => :string,
     :desc => "Front Controller Name", :default => 'front'
@@ -119,7 +116,7 @@ Invite-only website
       else
         front_controller_name = options[:front_controller_name]
       end
-      invoke 'hobo:front_controller', [front_controller_name, @user_resource_name], :invite_only => @invite_only
+      invoke 'hobo:front_controller', [front_controller_name], :user_resource_name => @user_resource_name, :invite_only => @invite_only
     end
 
     def admin_subsite
@@ -134,7 +131,7 @@ Invite-only website
         return unless admin
         admin_subsite_name = options[:admin_subsite_name]
       end
-      invoke 'hobo:admin_subsite', [admin_subsite_name, @user_resource_name], :invite_only => @invite_only
+      invoke 'hobo:admin_subsite', [admin_subsite_name], :user_resource_name => @user_resource_name, :invite_only => @invite_only
     end
 
     def migration

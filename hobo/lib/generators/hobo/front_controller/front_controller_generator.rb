@@ -4,7 +4,6 @@ module Hobo
 
     # overrides the default
     argument :name, :type => :string, :default => 'front', :optional => true
-    argument :user_resource_name, :type => :string, :default => 'user', :optional => true
 
     include Generators::Hobo::Controller
     include Generators::Hobo::InviteOnly
@@ -23,6 +22,11 @@ module Hobo
                  :type => :boolean,
                  :desc => "Delete public/index.html",
                  :default => true
+
+    class_option :user_resource_name,
+                 :type => :string,
+                 :desc => "User Resource Name",
+                 :default => 'user'
 
     def generate_controller
       template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")

@@ -5,7 +5,7 @@ module Hobo
     include Generators::Hobo::Taglib
 
     def self.banner
-      "rails generate hobo:site_taglib NAME [USER_RESOURCE_NAME=user] [options]"
+      "rails generate hobo:subsite_taglib NAME [options]"
     end
 
     def generate_taglib

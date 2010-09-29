@@ -23,7 +23,7 @@
 <% end -%>
 <% if invite_only? -%>
 
-<extend tag="card" for="<%= user_resource_name.camelcase %>">
+<extend tag="card" for="<%= options[:user_resource_name].camelcase %>">
   <old-card merge>
     <append-header:><%%= h this.state.titleize %></append-header:>
   </old-card>

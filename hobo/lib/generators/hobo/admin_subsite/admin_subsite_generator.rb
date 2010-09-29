@@ -4,13 +4,12 @@ module Hobo
 
     # overrides the default
     argument :name, :type => :string, :default => 'admin', :optional => true
-    argument :user_resource_name, :type => :string, :default => 'user', :optional => true
 
     include Generators::Hobo::Subsite
     include Generators::Hobo::InviteOnly
 
     def self.banner
-      "rails generate hobo:admin_subsite [NAME=admin [USER_RESOURCE_NAME=user]] [options]"
+      "rails generate hobo:admin_subsite [NAME=admin] [options]"
     end
 
     def generate_admin_css
@@ -18,14 +17,15 @@ module Hobo
     end
 
     def generate_admin_user_controller
-      invoke "hobo:controller", ["#{file_name}/#{user_resource_name.pluralize.underscore}"]
+      invoke "hobo:controller", ["#{file_name}/#{options[:user_resource_name].pluralize.underscore}"]
       if invite_only?
-        template "users_index.dryml", "app/views/#{file_name}/#{user_resource_name.pluralize.underscore}/index.dryml"
+        template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
       end
     end
 
     def generate_site_taglib
-      invoke 'hobo:subsite_taglib', [name, user_resource_name],
+      invoke 'hobo:subsite_taglib', [name],
+                                    :user_resource_name => options[:user_resource_name],
                                     :admin => true,
                                     :invite_only => invite_only?
     end

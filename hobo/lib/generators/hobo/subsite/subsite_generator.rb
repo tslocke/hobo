@@ -3,13 +3,13 @@ module Hobo
     source_root File.expand_path('../templates', __FILE__)
 
     def self.banner
-      "rails generate hobo:subsite [USER_RESOURCE_NAME=user] [options]"
+      "rails generate hobo:subsite [options]"
     end
 
     include Generators::Hobo::Subsite
 
     def generate_site_taglib
-      invoke 'hobo:subsite_taglib', [name, user_resource_name], options
+      invoke 'hobo:subsite_taglib', [name], options
     end
 
   end
