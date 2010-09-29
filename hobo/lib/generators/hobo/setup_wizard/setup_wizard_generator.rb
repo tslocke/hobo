@@ -151,6 +151,7 @@ Invite-only website
         return if options[:migration_generate].blank? && options[:migration_migrate].blank?
         opt = options[:migration_migrate].blank? ? {:generate => true} : {:migrate => true}
       end
+      rake 'db:setup'
       invoke 'hobo:migration', ['initial_migration'], opt
     end
 
