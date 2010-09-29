@@ -64,15 +64,13 @@ module Hobo
     end
 
     initializer 'hobo.dryml' do |app|
-      app.config.to_prepare do
-        begin
+      # avoids to fail the initial migration from the setup_wizard generator
+      unless $0 =~ /rake$/
+        app.config.to_prepare do
           Dryml::DrymlGenerator.run
-        # avoids an error of the initial migration
-        rescue Exception
         end
       end
     end
-
 
   end
 end
