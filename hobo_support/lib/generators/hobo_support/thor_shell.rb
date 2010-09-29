@@ -32,7 +32,7 @@ module Generators
       end
 
       def say_title(title)
-        say "\n #{title} \n", (Thor::Shell::Color::ON_BLUE + Thor::Shell::Color::WHITE)
+        say "\n #{title} \n", "\e[37;44m"
       end
 
       def multi_ask(statement)
