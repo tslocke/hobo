@@ -68,7 +68,7 @@ module Hobo
         begin
           Dryml::DrymlGenerator.run
         # avoids an error of the initial migration
-        rescue ActiveRecord::StatementInvalid
+        rescue Exception
         end
       end
     end
