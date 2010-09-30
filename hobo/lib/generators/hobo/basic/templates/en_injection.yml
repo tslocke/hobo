@@ -14,6 +14,6 @@
 #        password: Password
 #        password_confirmation: Password Confirmation
 #        email_address: Email Address
-#     attribute_help:
-#       user:
-#         email_address: We will never share your address with third parties
+#    attribute_help:
+#      user:
+#        email_address: We will never share your address with third parties
