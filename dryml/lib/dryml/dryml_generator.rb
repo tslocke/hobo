@@ -204,7 +204,7 @@ require 'fileutils'
         klass = args.first.is_a?(Class) ? args.shift : model
         extras = args
 
-        fields = klass.attr_order.*.to_s & klass.content_columns.*.name
+        fields = klass.attr_order.*.to_s & (klass.table_exists? ? klass.content_columns.*.name : [])
 
         fields -= %w{created_at updated_at created_on updated_on deleted_at} unless extras.include?(:include_timestamps)
 

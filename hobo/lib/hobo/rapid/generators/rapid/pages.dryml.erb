@@ -103,7 +103,7 @@ model_key = model.name.tableize
 back_link      = model.view_hints.parent
 back_link_human_name = model.reflections[back_link] && model.reflections[back_link].klass unless back_link.blank?
 back_link_human_name = back_link_human_name && back_link_human_name.model_name.human
-boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans
+boolean_fields = model.table_exists? ? (model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans) : []
 creator        = model.creator_attribute
 creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
 edit_link      = linkable?(:edit)

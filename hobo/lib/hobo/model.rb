@@ -120,13 +120,11 @@ module Hobo
       # TODO: should this be an inheriting_cattr_accessor as well? Probably.
       attr_accessor :creator_attribute
       inheriting_cattr_accessor :name_attribute => Proc.new { |c|
-        names = c.columns.*.name + c.public_instance_methods.*.to_s
-        NAME_FIELD_GUESS.detect {|f| f.in? names }
+        NAME_FIELD_GUESS.detect {|f| f.in? c.send(:attrib_names) }
       }
 
       inheriting_cattr_accessor :primary_content_attribute => Proc.new { |c|
-        names = c.columns.*.name + c.public_instance_methods.*.to_s
-        PRIMARY_CONTENT_GUESS.detect {|f| f.in? names }
+        PRIMARY_CONTENT_GUESS.detect {|f| f.in? c.send(:attrib_names) }
       }
 
 
@@ -146,9 +144,13 @@ module Hobo
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
       end
 
-
       private
 
+      def attrib_names
+        names = []
+        names += table_exists? ? content_columns.*.name : field_specs.keys
+        names += public_instance_methods.*.to_s
+      end
 
       def belongs_to_with_creator_metadata(name, options={}, &block)
         self.creator_attribute = name.to_sym if options.delete(:creator)
