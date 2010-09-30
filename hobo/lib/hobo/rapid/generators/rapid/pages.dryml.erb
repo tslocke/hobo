@@ -101,7 +101,8 @@ model_key = model.name.tableize
 
 <%
 back_link      = model.view_hints.parent
-back_link_human_name  = back_link.to_s.singularize.camelize.constantize.model_name.human unless back_link.blank?
+back_link_human_name = model.reflections[back_link] && model.reflections[back_link].klass unless back_link.blank?
+back_link_human_name = back_link_human_name && back_link_human_name.model_name.human
 boolean_fields = model.columns.select { |c| c.type == :boolean }.*.name - model.view_hints.inline_booleans
 creator        = model.creator_attribute
 creator_link   = creator && model.reflections[creator] && linkable?(model.reflections[creator].klass, :show)
@@ -138,7 +139,7 @@ end
 <% end -%>
           <header param="content-header">
 <% if back_link -%>
-            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="&<%= back_link.to_s.singularize.camelize %>.model_name.human" name="&this">Back to <name/></ht></a:<%= back_link %>>
+            <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="<%= back_link_human_name %>" name="&this">Back to <name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
               <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
