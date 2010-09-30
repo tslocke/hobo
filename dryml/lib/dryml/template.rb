@@ -790,7 +790,10 @@ module Dryml
       part_name = el.attributes['part']
       if part_name
         part_id = el.attributes['id'] || part_name
-        "<div class='part-wrapper' id='<%=raw #{attribute_to_ruby part_id} %>'>".html_safe+part_element(el, call)+"</div>".html_safe
+
+        "<% safe_concat(\"<div class='part-wrapper' id='#{attribute_to_ruby(part_id).dump[1..-2]}'>\") %>" +
+          part_element(el, call) +
+          "<% safe_concat(%(</div>)) %>"
       else
         call
       end
