@@ -5,10 +5,12 @@ ActiveModel::Translation.class_eval do
     # to pass around pluralize calls for 'en' defaults in hobo
     def human_attribute_name_with_en_pluralization_default(attribute, options={})
       if I18n.locale.to_s.match(/^en/)
-        default = (options[:count] == 1 || options[:count].blank?) ?
-                    attribute.to_s.singularize.humanize :
+        unless options[:count].blank? # skip default if we don't pass any count
+          default = options[:count] == 1 ?
+                    attribute.to_s.singularize.humanize : # singularize possible plural attributes
                     attribute.to_s.pluralize.humanize
-        options.merge! :default => default
+          options.merge! :default => default
+        end
       end
       human_attribute_name_without_en_pluralization_default(attribute, options)
     end
