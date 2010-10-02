@@ -32,6 +32,9 @@ module Hobo
     class_option :default_locale, :type => :string,
     :desc => "Sets the default locale"
 
+    class_option :locales, :type => :array,
+    :desc => "Choose the locales"
+
     class_option :git_repo, :type => :boolean,
     :desc => "Create the git repository with the initial commit"
 
@@ -158,19 +161,26 @@ Invite-only website
     def i18n
       if wizard?
         say_title 'I18n'
-        locales = Hobo::Engine.paths.config.locales.paths.map do |l|
-          l =~ /hobo\.([^\/]+)\.yml$/
-          $1.to_sym.inspect
+        i18n_templates = File.expand_path('../../i18n/templates', __FILE__)
+        supported_locales = Dir.glob("#{i18n_templates}/hobo.*.yml").map do |l|
+          l =~ /([^\/.]+)\.yml$/
+          $1
         end
-        say "The available Hobo internal locales are #{locales * ', '} (please, contribute to more translations)"
-        default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
+        say "The Hobo supported locales are #{supported_locales * ' '} (please, contribute to more translations)"
+        locales = ask "Type the locales (space separated) you want to add to your application or <enter> for 'en':", 'en'
+        unless locales == 'en'
+          default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
+        end
       else
         default_locale = options[:default_locale]
+        locales = options[:locales]
       end
-      return if default_locale.blank?
-      default_locale.gsub!(/\:/, '')
-      environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
-      say "NOTICE: You should manually install in 'config/locales' the Rails locale file(s) that your application will use.", Color::YELLOW
+      unless default_locale.blank?
+        default_locale.gsub!(/\:/, '')
+        environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
+      end
+      invoke 'hobo:i18n', locales.split
+      say "NOTICE: You should manually install in 'config/locales' also the official Rails locale file(s) that your application will use.", Color::YELLOW
     end
 
     def git_repo
