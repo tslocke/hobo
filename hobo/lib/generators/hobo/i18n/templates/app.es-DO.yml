@@ -1,0 +1,24 @@
+# Hobo application translation file for Spanish.
+# Please, add the specific models and attributes for your application.
+
+es:
+
+  attributes:
+    created_at: Creado el
+    updated_at: Actualizado el
+
+  activerecord:
+    models:
+      user:
+        one: Usuario
+        other: Ususarios
+    attributes:
+      user:
+        name: Nombre
+        password: Contraseña
+        password_confirmation: Confirmacción Contraseña
+        email_address: Correo Electronico
+#    attribute_help:
+#      user:
+#        email_address:
+

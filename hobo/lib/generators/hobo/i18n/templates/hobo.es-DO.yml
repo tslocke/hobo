@@ -1,6 +1,10 @@
-####
-#### Hobo Translation
-####
+# Hobo internals translation file for Spanish (Dominican Republic).
+# Translated by Domizio Demichelis (dd.nexus@gmail.com)
+
+# This file might be used for other Latin America Spanish Countries without any change
+# It might be ok also for Spain. If you find any error, or if you have any more specific translation,
+# please post it to http://hobousers.googlegroups.com. Thank you!
+
 "es-DO":
   hobo:
     # default hobo pages translations
@@ -154,7 +158,7 @@
       new:
         heading: "Nuevo Registro de %{model}"
       error:
-        heading: "Occurió el siguiente error:"
+        heading: "Ocurrió el siguiente error:"
       select_many:
         prompt: "Añadir %{model}"
 

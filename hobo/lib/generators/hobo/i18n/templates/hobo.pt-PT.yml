@@ -1,0 +1,180 @@
+# Hobo internals translation file for Portuguese (Portugal).
+# Translated by Tiago Franco (gama.franco@gmail.com)
+
+# It might be ok also for Brazil. If you find any error or if you have any more specific translation,
+# please post it to http://hobousers.googlegroups.com. Thank you!
+
+"pt-PT":
+
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Índice"
+      heading: "%{model} Índice"
+
+    new:
+      title: "Novo %{model}"
+      heading: "Novo %{model}"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Voltar"
+      edit_link: "Editar %{model}"
+      new_link: "Novo %{model}"
+      add_form_heading: "Adicionar %{model}"
+
+    edit:
+      title: "Editar %{model}"
+      heading: "Editar %{model}"
+
+
+    index_for_owner:
+      title: "%{model} para"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "Para:"
+
+    new_for_owner:
+      title: "Novo %{model} para"
+      heading: "Novo %{model}"
+      subheading: "Para:"
+
+    login:
+      title: "Login"
+      heading: "Login"
+      email_address: &email_address "E-mail"
+      name: "Name"
+      password: "Palavra-chave"
+      remember_me: "Recordar-se de mim"
+      login: "Login"
+      signup: "Resgistar"
+      forgot_password: &forgot_password "Esqueceu-se da senha?"
+
+    signup:
+      title: "Registar"
+      heading: "Registar-se como novo utilizador"
+
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Introduza o seu endereço de e-mail, o mesmo com que se registou. Vamos enviar um endereço para gerar uma palavra-chave."
+      email: "E-mail"
+      send: "Enviar"
+
+    forgot_password_sent:
+      title: "Recuperação da palavra-chave - e-mail enviado"
+      heading: "Recuperação da palavra-chave - e-mail enviado"
+      text: "Foram enviadas para o e-mail %{email_address} as instruções de como gerar uma nova palavra-chave. Se não o receber, por favor verifique o filtro de spam."
+
+    account_disabled:
+      title: "Conta não encontrada"
+      heading: "Conta não encontrada"
+      text: "A sua conta não se encontra activa neste momento."
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "Novo %{model}"
+      create: "Criar %{model}"
+      previous: "Anterior"
+      next: "Seguinte"
+      add: "Adicionar"
+      show_all: "mostrar tudo..."
+      delete: "Apagar %{model}"
+      save: "Gravar %{model}"
+      cancel: "Cancelar"
+      edit: "Editar %{model}"
+      back: "Voltar para"
+      back_to_parent: "Voltar para %{parent} %{name}"
+      send: "Enviar"
+      remove: "Remover"
+      signup: "Registar"
+      login: "Login"
+      logout: "Sair"
+      logged_in_as: "Identificado como %{name}"
+      account: "Conta"
+      save_account: "Gravar os seus dados"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "O %{model} foi criado com sucesso"
+        error: "Não foi possível criar %{model}.\n%{errors}"
+      creator:
+        error: "Não foi possível criar %{name}.\n%{errors}"
+      transition:
+        error: "Não foi possível efectuar a transição %{name}.\n%{errors}"
+      update:
+        no_attribute_error: "Não foi espicificada alteração nos parâmetros"
+        success: "As alterações a %{model} foram gravadas"
+        error: "Ocorreu um erro com a alteração.\n%{errors}"
+      destroy:
+        success: "O %{model} foi removido"
+      signup:
+        success: "Obrigado por efectuar o registo!"
+        must_activate: "Deve ativar o seu registo antes de se identificar. Por favor, verifique na sua caixa de correio electrônico.
+      login:
+        success: "Está indetificado no sistema."
+        error: "Não especificou um utilizador válido ({{login}}) e respectiva palavra-chave!"
+      logout: "Saiu do sistema."
+      reset_password: "A sua palavra-chave foi apagada."
+      permission_denied: "Sem autorização!"
+      not_found: "A página solicitada não foi encontrada"
+      unauthenticated: "Não foi possível indentificá-lo(a)."
+      current_password_is_not_correct: "não está correta."
+      you_are_site_admin: "Agora é o administrador do site"
+      you_signed_up: "Acabou de se registar"
+      no: "Nenhum #{model} disponível."
+      confirm: "Tem a certeza?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: "Não há %{model}s"
+        one: "Só existe um(a) #{model} do momento"
+        other: "Já existem %{count} %{model}s"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "Adicionar %{model}"
+      empty_message: "Não existem registos para mostrar"
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "Novo %{model}"
+      error:
+        heading: "Ocorreu o seguinte erro:"
+      select_many:
+            prompt: "Adicionar %{model}"
+
+    # hobo support
+    support:
+      or: "ou"
+      a: "um"
+      an: "um"
+
+    table_plus:
+      search: "Pesquisar"
+      submit_label: "Ir"
+
+    live_search:
+      label: "Pesquisar"
+      results_label: "Resultados da pesquisa"
+      close_button: "fechar"
+      no_results: "A pesquisa não retornou resultados."
+
+    dev_user_changer:
+      guest: "Visitante"
+
+    boolean_yes: "Sim"
+    boolean_no: "Não"

@@ -1,0 +1,24 @@
+# Even if you only support one language, you can use this file to customise the names that appear in the UI
+# e.g.
+
+#en:
+#
+#  attributes:
+#    created_at: Created at
+#    updated_at: Updated at
+#
+#  activerecord:
+#    models:
+#      user:
+#        one: User
+#        other: Users
+#    attributes:
+#      user:
+#        created_at: Created at
+#        name: Name
+#        password: Password
+#        password_confirmation: Password Confirmation
+#        email_address: Email Address
+#    attribute_help:
+#      user:
+#        email_address: We will never share your address with third parties

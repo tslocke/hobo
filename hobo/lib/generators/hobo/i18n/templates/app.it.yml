@@ -1,0 +1,24 @@
+# Hobo application translation file for Italian.
+# Please, add the specific models and attributes for your application.
+
+it:
+
+  attributes:
+    created_at: Creato il
+    updated_at: Aggiornato il
+
+  activerecord:
+    models:
+      user:
+        one: Utente
+        other: Utenti
+    attributes:
+      user:
+        name: Nome
+        password: Parola chiave
+        password_confirmation: Conferma Parola Chiave
+        email_address: Indirizzo Elettronico
+#    attribute_help:
+#      user:
+#        email_address:
+

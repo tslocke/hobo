@@ -1,6 +1,9 @@
-####
-#### Hobo Translation
-####
+# Hobo internals translation file for Italian.
+# Translated by Domizio Demichelis (dd.nexus@gmail.com)
+
+# If you find any error, please post it to http://hobousers.googlegroups.com.
+# Thank you!
+
 it:
   hobo:
     # default hobo pages translations

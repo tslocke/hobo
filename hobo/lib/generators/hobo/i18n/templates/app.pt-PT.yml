@@ -1,0 +1,24 @@
+# Hobo application translation file for Portuguese (Portugal).
+# Please, add the specific models and attributes for your application.
+
+"pt-PT":
+
+  attributes:
+    created_at: "Criado em"
+    updated_at: "Actualizado em"
+
+  activerecord:
+    models:
+      user:
+        one: Utilizador
+        other: Utilizadores
+    attributes:
+      user:
+        name: Nome
+        password: Palavra-chave
+        password_confirmation: Confirmação da Palavra-chave
+        email_address: Enderesso de correio electrônico
+    attribute_help:
+      user:
+        email_address: Nunca iremos partilhar o seu endereço de correio com outras entidades
+
