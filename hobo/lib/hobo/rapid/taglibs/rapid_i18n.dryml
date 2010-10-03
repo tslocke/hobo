@@ -26,7 +26,7 @@ It dynamically pluralizes the human name by using the implicit model.count.
  - count - (optional) should be an integer and will override the default pluralization (:count=>model.count)
  -->
 
-<def tag="human-name" attrs="model, count"><%=
+<def tag="model-name-human" attrs="model, count"><%=
   model ||= this
   model = model.class unless model.kind_of? Class
   # adapted from count tag
