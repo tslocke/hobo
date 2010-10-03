@@ -1,8 +1,9 @@
 # Even if you only support one language, you can use this file to customise the names that appear in the UI
 # e.g.
 
-#en:
-#
+en:
+  hello: "Hello world"
+
 #  attributes:
 #    created_at: Created at
 #    updated_at: Updated at
