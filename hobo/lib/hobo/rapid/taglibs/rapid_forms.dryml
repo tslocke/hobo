@@ -657,7 +657,7 @@ For situations where there are too many target records to practically include in
   limit ||= 100
 
   options ||= begin
-    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
     this_field_reflection.klass.all(:conditions => conditions, :limit => limit).select {|x| can_view?(x)}
   end
 
@@ -798,7 +798,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
   prompt ||= ht("#{this_field.tableize}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
-  options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
+  options ||= this_field_reflection.klass.all(:conditions =>this.send(:conditions)).select {|x| can_view?(x)}
   name ||= param_name_for_this
 
   values = this
@@ -907,7 +907,7 @@ Use the `uri` option to specify a redirect location:
   collection = this
   param_name = param_name_for_this
   options ||= begin
-    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).conditions
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
     this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
   end
   -%>

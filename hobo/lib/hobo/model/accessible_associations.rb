@@ -9,7 +9,7 @@ module Hobo
 
         array = params_hash_to_array(array_or_hash)
         array.map! do |record_hash_or_string|
-          finder = association.member_class.scoped :conditions => association.conditions
+          finder = association.member_class.scoped :conditions => association.send(:conditions)
           find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
             # The block is required to either locate find an existing record in the collection, or build a new one
             if id
@@ -89,7 +89,7 @@ module Hobo
 
       def finder_for_belongs_to(record, name)
         refl = record.class.reflections[name]
-        conditions = ActiveRecord::Associations::BelongsToAssociation.new(record, refl).conditions
+        conditions = ActiveRecord::Associations::BelongsToAssociation.new(record, refl).send(:conditions)
         finder = refl.klass.scoped(:conditions => conditions)
       end
 
