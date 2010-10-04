@@ -2,6 +2,7 @@ HOBO_HOME = "#{File.dirname(__FILE__)}/../../../.."
 $:.unshift "#{HOBO_HOME}/hobo_support/lib"
 $:.unshift "#{HOBO_HOME}/hobo_fields/lib"
 $:.unshift "#{HOBO_HOME}/hobo/lib"
+$:.unshift "#{HOBO_HOME}/dryml/lib"
 
 require 'rubygems'
 require 'sqlite3'
