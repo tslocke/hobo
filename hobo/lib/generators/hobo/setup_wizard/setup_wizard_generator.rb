@@ -180,7 +180,7 @@ Invite-only website
         environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
       end
       invoke 'hobo:i18n', locales.split
-      say "NOTICE: You should manually install in 'config/locales' also the official Rails locale file(s) that your application will use.", Color::YELLOW
+      say( "NOTICE: You should manually install in 'config/locales' also the official Rails locale file(s) that your application will use.", Color::YELLOW) unless locales == 'en'
     end
 
     def git_repo
