@@ -9,8 +9,11 @@
   <%= "namespace :#{subsite} do" %>
   <%- end -%>
   <%- for controller in controllers_for(subsite) -%>
-    <%- router = router_for(subsite, controller) -%>
-    <%- for group in %w[ index_action lifecycle resource owner web_method show_action reorder user ] -%>
+    <%- router = router_for(subsite, controller)
+        groups = %w[ index_action resource owner web_method show_action reorder user ]
+        groups += %w[lifecycle] unless subsite -%>
+
+    <%- for group in groups -%>
     <%- gr = "#{group}_routes"
         routes = router.send(gr.to_sym) -%>
     <%- unless routes.empty? -%>
