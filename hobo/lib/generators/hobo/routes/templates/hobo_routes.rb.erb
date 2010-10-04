@@ -10,8 +10,9 @@
   <%- end -%>
   <%- for controller in controllers_for(subsite) -%>
     <%- router = router_for(subsite, controller)
-        groups = %w[ index_action resource owner web_method show_action reorder user ]
-        groups += %w[lifecycle] unless subsite -%>
+        groups = subsite ?
+                   %w[ index_action resource owner web_method show_action reorder user ] :
+                   %w[ index_action lifecycle resource owner web_method show_action reorder user ] -%>
 
     <%- for group in groups -%>
     <%- gr = "#{group}_routes"
