@@ -768,7 +768,8 @@ Notes
   <set user="&Hobo::Model::User.default_user_model"/>
   <select-menu if="&user && Rails.env.development?"
                first-option="#{I18n.t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
-               onchange="location.href = '#{dev_support_path :action=>:set_current_user}?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"               selected="#{current_user.login}"
+               onchange="location.href = '#{dev_support_path :action=>:set_current_user}?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"
+               selected="#{current_user.login}"
                class="dev-user-changer"
                merge-attrs/>
 </def>
