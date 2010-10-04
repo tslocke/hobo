@@ -15,13 +15,19 @@ Version of Array#join that preserves html\_safe:
     => true
 
     >> ["a".html_safe, "b".html_safe].safe_join(",").html_safe?
-    => false
+    => true
     >> ["a".html_safe, "b".html_safe].safe_join(",".html_safe).html_safe?
     => true
-    
+
+    >> ["a".html_safe, "b".html_safe].safe_join("<br>")
+    => "a&lt;br&gt;b"
+    >> ["a".html_safe, "b".html_safe].safe_join("<br>".html_safe)
+    => "a<br>b"
+
     >> $,="-".html_safe
     >> ["a".html_safe, "b".html_safe].safe_join.html_safe?
     => true
     >> $,="-"
     >> ["a".html_safe, "b".html_safe].safe_join.html_safe?
-    => false
+    => true
+
