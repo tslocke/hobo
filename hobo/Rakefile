@@ -13,9 +13,9 @@ require 'hobo'
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
-GEM_ROOT = File.expand_path('../')
+GEM_ROOT = File.expand_path('../', __FILE__)
 TESTAPP_PATH = '/tmp/hobo_testapp'
-BIN = File.expand_path('../bin/hobo')
+BIN = File.expand_path('../bin/hobo', __FILE__)
 require 'hobo_support/common_tasks'
 include HoboSupport::CommonTasks
 

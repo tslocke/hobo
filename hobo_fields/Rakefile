@@ -10,9 +10,9 @@ $:.unshift File.expand_path('../lib', __FILE__)
 require 'hobo_support'
 require 'hobo_fields'
 
-GEM_ROOT = File.expand_path('../')
+GEM_ROOT = File.expand_path('../', __FILE__)
 TESTAPP_PATH = '/tmp/hobo_fields_testapp'
-BIN = File.expand_path('../bin/hobofields')
+BIN = File.expand_path('../bin/hobofields', __FILE__)
 require 'hobo_support/common_tasks'
 include HoboSupport::CommonTasks
 
