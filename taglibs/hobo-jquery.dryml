@@ -121,7 +121,7 @@ And add something like this to your controller:
       render :json => Project.name_contains(params[:term]).limit(100).*.name
     end
 -->
-<def attrs="name" tag="hjq-autocomplete">
+<def tag="hjq-autocomplete">
 <%
   options, attrs = attributes.partition_hash(['disabled', 'delay', 'minLength', 'source'])
   events, html_attrs = attrs.partition_hash(['search', 'open', 'focus', 'select', 'close', 'change'])
@@ -133,7 +133,7 @@ And add something like this to your controller:
 %>
  <annotate-tag tag="hjq-autocomplete" init="hjq.autocomplete.init" options="&options" events="&events" />
  <% html_attrs = add_classes(html_attrs, "hjq-annotated"); %>
- <%= text_field_tag(name, this, html_attrs) %>
+ <input type="text" name="#{param_name_for_this}" value="&name(:no_wrapper => true, :if_present => true)" merge-attrs="&html_attrs" />
 </def>
 
 
