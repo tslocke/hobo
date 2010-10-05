@@ -8,6 +8,12 @@ else
   require 'rubygems'
 end
 
-require 'hobo_support/command'
+begin
+  require 'hobo_support/command'
+rescue LoadError
+  puts "The 'hobo_support' gem is not installed.
+You probably need to set the HOBO_DEV_ROOT environment variable to the local repository path."
+  exit
+end
 
 HoboSupport::Command.run(:hobofields)
