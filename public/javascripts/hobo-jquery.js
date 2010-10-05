@@ -359,6 +359,14 @@ var hjq = (function() {
             }
         },
 
+        autocomplete: {
+            init: function(annotations) {
+                if(!this.disabled) {
+                    jQuery(this).autocomplete(hjq.getOptions(annotations));
+                }
+            }
+        },
+
         dialog: {
             init: function(annotations) {                
                 var options=hjq.getOptions(annotations);

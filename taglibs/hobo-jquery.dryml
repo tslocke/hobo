@@ -100,6 +100,42 @@ It's probably useful to set global options such as dateFormat in application.dry
 </def>
 
 
+<!--
+This is the [jQuery-UI autocompleter](http://jqueryui.com/demos/autocomplete/).  All options and events provided by the jQuery autocompleter are supported in this Hobo tag.   Refer to the jquery autocomplete documentation for more details.
+
+This tag works very similarly to the `name-one` tag used in Hobo.  The main reason I use `hjq-autocomplete` is that the scriptaculous widget used by Hobo for `name-one` does not work well in Internet Explorer:  https://prototype.lighthouseapp.com/projects/8887/tickets/33
+
+If you do not provide a `source` option, this tag will essentially provide a default similar to this:
+
+    <hjq-autocomplete:project source="&Project.find(:all, :limit => 5000).map {|p| p.name}" />
+
+This will provide a local autocomplete, putting all possible options into your HTML.  This is useful when you have too many options to make a `select-one` infeasible, but will overload your server and crash your browser if you have millions of options.
+
+To do a server side autocomplete, use a path for your source option:
+
+    <hjq-autocomplete:project source="&query_projects_path" delay="500" minLength="3" />
+
+And add something like this to your controller:
+
+    index_action :query do
+      render :json => Project.name_contains(params[:term]).limit(100).*.name
+    end
+-->
+<def attrs="name" tag="hjq-autocomplete">
+<%
+  options, attrs = attributes.partition_hash(['disabled', 'delay', 'minLength', 'source'])
+  events, html_attrs = attrs.partition_hash(['search', 'open', 'focus', 'select', 'close', 'change'])
+  options["source"] ||= begin
+                          complete_target = this_field_reflection.klass
+                          complete_target.find(:all, :limit => 5000).*.send(complete_target.name_attribute)
+                        end
+
+%>
+ <annotate-tag tag="hjq-autocomplete" init="hjq.autocomplete.init" options="&options" events="&events" />
+ <% html_attrs = add_classes(html_attrs, "hjq-annotated"); %>
+ <%= text_field_tag(name, this, html_attrs) %>
+</def>
+
 
 <!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
 
