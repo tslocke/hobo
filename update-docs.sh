@@ -5,7 +5,12 @@
 set -e
 set -x
 
-( cd ../hobo-jquery-makedoc ; rake generate_all )
-( cd ../hobo-jquery-gh-pages ;
-  git commit -a -m "doc update" || true; 
-  git push origin gh-pages)
+cd lib
+ruby doc.rb
+cd ..
+git checkout gh-pages
+cp documentation/doc.html documentation.html
+git add documentation.html
+git commit -m "doc update"
+git push origin gh-pages
+git checkout master
