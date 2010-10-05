@@ -23,14 +23,17 @@ It dynamically pluralizes the human name by using the implicit model.count.
 #### Attributes
 
  - model - (optional) should be a model class or a record object (default to this)
- - count - (optional) should be an integer and will override the default pluralization (:count=>model.count)
+ - count - (optional) used to pick the inflected string for the model. It should be an integer
+   or the symbol :dynamic if you want to have the pluralization consistent with the model.count.
+   If you don't pass any count it uses the ApplicationHelper#default_count.
  -->
 
 <def tag="model-name-human" attrs="model, count"><%=
   model ||= this
   model = model.class unless model.kind_of? Class
   # adapted from count tag
-  c = count.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length || 1
+  count = default_count if count.blank?
+  c = count.try.to_int || count==:dynamic && this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
   # prepare symbolized attributes for merging
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v}
@@ -45,7 +48,8 @@ It dynamically pluralizes the human name by using the implicit model.count.
 
  - attribute - the attribute to lookup
  - model - (optional) should be a model class or a record object (default to this)
- - count - (optional) should be an integer and will override the default pluralization (:count=>1)
+ - count - (optional) should be an integer
+
  -->
 
 <def tag="human-attribute-name" attrs="attribute, model"><%=
@@ -66,7 +70,8 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
 ### Attributes
 
  - collection - the attribute/collection key to lookup in the `activerecord.attributes` namespace. (e.g. 'roles')
- - count - used for pluralization: you can omit it when the context is a record. In that case it will be computed calling count on the collection (:count=><record>.<collection>.count). You can also pass an explicit value or the default will be 1.
+ - count - It should be an integer or the symbol :dynamic if you want to have the pluralization
+   consistent with the collection.count. If you don't pass any count it uses the ApplicationHelper#default_count.
  - your - wraps the collection name in a `Your` tag
 
 ### Example
@@ -112,13 +117,14 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
   raise Hobo::Error, "The 'collection' attribute must be defined" if collection.blank?
   belong_class = this.kind_of?(Class) ? this : this.class
   raise Hobo::Error, "The context is not an ActiveRecord::Base instance or class. (this = #{this.typed_id rescue this.inspect})" unless belong_class < ActiveRecord::Base
-  c = count.try.to_int || this.kind_of?(ActiveRecord::Base) && this.send(collection.to_sym).count || 1
+  count = default_count if count.blank?
+  c = count.try.to_int || count==:dynamic && this.kind_of?(ActiveRecord::Base) && this.send(collection.to_sym).count
   # prepare symbolized attributes for merging
   attrs = {}
   attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
-<% if your and belong_class < Hobo::Model::User and this.kind_of?(Hobo::Model::User) -%>
+<% if your && belong_class < Hobo::Model::User && this.kind_of?(Hobo::Model::User) && I18n.locale == :en -%>
     <your key="&collection" merge-attrs="&{:count=>c, :name=>this.name}.merge(attrs)" capitalize>
-      <%= belong_class.human_attribute_name(collection.to_sym, {:locale=>:en, :count=>c}.merge(attrs)) %>
+      <%= belong_class.human_attribute_name(collection.to_sym, {:count=>c}.merge(attrs)) %>
     </your>
 <% else -%>
     <%= belong_class.human_attribute_name( collection.to_sym, {:count=>c}.merge(attrs) ) %>
