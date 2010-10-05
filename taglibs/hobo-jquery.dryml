@@ -132,8 +132,12 @@ And add something like this to your controller:
 
 %>
  <annotate-tag tag="hjq-autocomplete" init="hjq.autocomplete.init" options="&options" events="&events" />
- <% html_attrs = add_classes(html_attrs, "hjq-annotated"); %>
- <input type="text" name="#{param_name_for_this}" value="&name(:no_wrapper => true, :if_present => true)" merge-attrs="&html_attrs" />
+ <% html_attrs = add_classes(html_attrs, "hjq-annotated") 
+    html_attrs["name"] ||= param_name_for_this
+    html_attrs["value"] ||= name(:no_wrapper => true, :if_present => true)
+ %>
+ <%= text_field_tag(name, this, html_attrs) %>
+
 </def>
 
 
