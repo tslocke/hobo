@@ -1,4 +1,4 @@
-system %(cd #{Hobo.root} && rake test:prepare_testapp)
+irt_at_exit{git_reset_app}
 
 def invoke(*args)
   Rails::Generators.invoke *args
@@ -26,7 +26,6 @@ def file_content(path, action, *strings)
   wrong.empty? || wrong
 end
 
-def git_reset_app(commit='HEAD')
-  git :add, '.'
-  git :reset, "--hard -q #{commit}"
+def git_reset_app
+  system %(cd #{Hobo.root} && rake test:prepare_testapp -q)
 end

@@ -7,9 +7,9 @@ desc "Admin Subsite files exist"
 files_exist? %w[ app/controllers/admin/admin_site_controller.rb
                  test/functional/admin_site_controller_test.rb
                  public/stylesheets/admin.css
-                 app/controllers/admin/user_controller.rb
-                 app/helpers/admin/user_helper.rb
-                 test/unit/helpers/admin/user_helper_test.rb
+                 app/controllers/admin/users_controller.rb
+                 app/helpers/admin/users_helper.rb
+                 test/unit/helpers/admin/users_helper_test.rb
                  app/views/taglibs/admin_site.dryml
 ]
 test_value_eql? true
@@ -19,8 +19,9 @@ file_include? "app/views/taglibs/application.dryml",
 %(<extend tag="page">
   <old-page merge>
     <footer:>
-      <a href="&admin_user_url" if="&current_user.administrator?">Admin</a>
+      <a href="&admin_users_url" if="&current_user.administrator?">Admin</a>
     </footer:>
   </old-page>
-</extend>)
+</extend>
+)
 test_value_eql? true

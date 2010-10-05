@@ -15,7 +15,7 @@ file_include? "app/controllers/subs/subs_site_controller.rb",
 test_value_eql? true
 
 
-user_resource_name = 'user'
+user_resource_name = 'User'
 eval_file '../partials/_subsite_taglib_variables.rb'
 eval_file '../partials/_subsite_taglib_noopt.rb'
 
@@ -41,8 +41,8 @@ invoke 'hobo:subsite', %w[ subs -q --admin --invite-only]
 eval_file '../partials/_subsite_taglib_admin_invite_only.rb'
 
 git_reset_app
-invoke 'hobo:subsite', %w[ subs account -q --admin --invite-only]
-user_resource_name = 'account'
+invoke 'hobo:subsite', %w[ subs --user-resource-name=account -q --admin --invite-only]
+user_resource_name = 'Account'
 eval_file '../partials/_subsite_taglib_variables.rb'
 eval_file '../partials/_subsite_taglib_admin_invite_only.rb'
 

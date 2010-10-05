@@ -20,7 +20,7 @@ admin_tag = '<extend tag="page">
   </old-page>
 </extend>'
 
-invite_only = %(<extend tag="card" for="#{user_resource_name.camelcase}">
+invite_only = %(<extend tag="card" for="#{user_resource_name}">
   <old-card merge>
     <append-header:><%= h this.state.titleize %></append-header:>
   </old-card>
