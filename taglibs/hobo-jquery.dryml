@@ -181,7 +181,7 @@ end
 %>
   <set empty="&this.empty?"/>
   <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum, add-hook, remove-hook" />
-  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated">
+  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated" merge-attrs="&attributes - attrs_for(:hjq_input_many_item)">
     <% template ||= this.try.new_candidate || this.member_class.new %>
     <% minimum ||= 0 ; minimum = minimum.to_i %>
     <fake-field-context fake-field="-1" context="&template">
