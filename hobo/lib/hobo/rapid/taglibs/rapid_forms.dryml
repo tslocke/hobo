@@ -1026,8 +1026,8 @@ end
       <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          <ht key="#{this.class.class_name.tableize}.collection.empty_message">
-            No <%= this.class.class_name.titleize.downcase.pluralize %>.
+          <ht key="#{this.class.name.tableize}.collection.empty_message">
+            No <%= this.class.name.titleize.downcase.pluralize %>.
           </ht>
         </div>
         <div class="buttons">
