@@ -45,7 +45,7 @@ module Generators
           link("get '#{records}/:id(.:format)' => '#{records}#show', :as => '#{record}', :constraints => #{ID_REQUIREMENT}", 'show'),
           link("post '#{records}(.:format)' => '#{records}#create', :as => 'create_#{record}'", 'create', :post),
           link("put '#{records}/:id(.:format)' => '#{records}#update', :as => 'update_#{record}', :constraints => #{ID_REQUIREMENT}", 'update', :put),
-          link("delete '#{records}/:id(.:format)' => '#{records}#destroy', :as => 'destroy_#{record}', :constraints => #{ID_REQUIREMENT}", 'delete', :delete)
+          link("delete '#{records}/:id(.:format)' => '#{records}#destroy', :as => 'destroy_#{record}', :constraints => #{ID_REQUIREMENT}", 'destroy', :delete)
           ].compact
         end
 
