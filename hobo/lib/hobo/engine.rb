@@ -36,17 +36,10 @@ module Hobo
     end
 
     ActiveSupport.on_load(:before_initialize) do
-      # Modules that must *not* be auto-reloaded by activesupport
-      # (explicitly requiring them means they're never unloaded)
-      require 'generators/hobo/routes/router'
-      require 'hobo/routes'
       require 'hobo/undefined'
 
       h = config.hobo
       Dryml::DrymlGenerator.enable([h.rapid_generators_path], h.auto_taglibs_path)
-
-      # should not be needed
-      # ActiveSupport::Dependencies.autoload_paths |= ["#{Rails.root}/app/viewhints"]
 
       HoboFields.never_wrap(Hobo::Undefined)
     end
