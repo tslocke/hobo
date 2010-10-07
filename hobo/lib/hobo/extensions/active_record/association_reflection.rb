@@ -7,9 +7,8 @@ class ActiveRecord::Reflection::AssociationReflection
       begin
         klass_without_create_polymorphic_class
       rescue NameError => e
-        name = "#{active_record.name}::#{class_name}"
-        Object.class_eval "class #{name}; end"
-        active_record.const_get class_name
+        Object.class_eval "class #{e.missing_name} < ActiveRecord::Base; set_table_name '#{active_record.name.tableize}'; end"
+        e.missing_name.constantize
       end
     else
       klass_without_create_polymorphic_class
