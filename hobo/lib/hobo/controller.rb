@@ -32,10 +32,6 @@ module Hobo
         Hobo::Helper.add_to_controller(klass)
       end
 
-      def controller_and_view_for(page_path)
-        page_path.match(/(.*)\/([^\/]+)/)[1..2]
-      end
-
     end
 
     module ClassMethods

@@ -356,7 +356,9 @@ module Hobo
     def re_render_form(default_action=nil)
       if params[:page_path]
         @invalid_record = this
-        controller, view = Controller.controller_and_view_for(params[:page_path])
+        opt = ActionController::Routing::Routes.recognize_path(params[:page_path])
+        controller = opt[:controller]
+        view = opt[:action]
         view = default_action if view == Dryml::EMPTY_PAGE
 
         # Hack fix for Bug 477.  See also bug 489.
@@ -399,8 +401,7 @@ module Hobo
 
 
     def url_for_page_path
-      controller, view = Controller.controller_and_view_for(params[:page_path])
-      url_for :controller => controller, :action => view
+      url_for ActionController::Routing::Routes.recognize_path(params[:page_path])
     end
 
     # TODO: Get rid of this joke of an idea that fails miserably if you open another browser window.
