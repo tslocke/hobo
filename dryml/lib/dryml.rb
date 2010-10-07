@@ -95,7 +95,6 @@ module Dryml
       included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
 
       if page.ends_with?(EMPTY_PAGE)
-        # DELETE ME: controller_class = controller_class_for(page)
         controller_class = view.controller.class
         @tag_page_renderer_classes[controller_class.name] ||=
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
@@ -116,14 +115,6 @@ module Dryml
         renderer_class.new(page, view)
       end
     end
-
-
-    # TODO: Delete this - not needed (use view.controller.class)
-    def controller_class_for(page)
-      controller, view = Controller.controller_and_view_for(page)
-      "#{controller.camelize}Controller".constantize
-    end
-
 
     def controller_taglibs(controller_class)
       controller_class.try.included_taglibs || []
