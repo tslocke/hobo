@@ -1,4 +1,4 @@
-<index-page>
+<index-page without-new-form>
   <after-count:>
     <a with="&<%= options[:user_resource_name].camelize %>" action="invite">Invite a new user</a>
   </after-count:>

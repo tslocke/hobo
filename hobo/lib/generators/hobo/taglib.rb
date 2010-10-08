@@ -7,10 +7,6 @@ module Generators
                    :desc => "User Resource Name",
                    :default => 'user'
 
-      class_option :admin,
-                   :type => :boolean,
-                   :desc => "Includes the tags for the admin site"
-
     end
   end
 end

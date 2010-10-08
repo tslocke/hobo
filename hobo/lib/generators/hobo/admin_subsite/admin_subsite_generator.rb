@@ -18,9 +18,7 @@ module Hobo
 
     def generate_admin_user_controller
       invoke "hobo:controller", ["#{file_name}/#{options[:user_resource_name].pluralize.underscore}"]
-      if invite_only?
-        template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
-      end
+      template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
     end
 
     def generate_site_taglib

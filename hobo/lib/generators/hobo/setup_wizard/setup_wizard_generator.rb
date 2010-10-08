@@ -124,14 +124,11 @@ Invite-only website
     end
 
     def admin_subsite
+      return unless @invite_only
       if wizard?
         say_title 'Admin Subsite'
-        admin = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
-        return unless admin
         @admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
       else
-        admin = @invite_only ? true : options[:admin]
-        return unless admin
         @admin_subsite_name = options[:admin_subsite_name]
       end
     end
