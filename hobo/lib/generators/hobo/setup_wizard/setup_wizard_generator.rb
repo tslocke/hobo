@@ -26,6 +26,9 @@ module Hobo
     class_option :admin_subsite_name, :type => :string,
                  :desc => "Admin Subsite Name", :default => 'admin'
 
+    class_option :private_site, :type => :boolean,
+                 :desc => "Make the site unaccessible to non-mebers"
+
     class_option :migration_generate, :type => :boolean,
     :desc => "Generate migration only"
 
@@ -76,21 +79,27 @@ module Hobo
       if wizard?
         say_title 'Invite Only Option'
         return unless (@invite_only = yes_no?("Do you want to add the features for an invite only website?"))
-        say %(
-Invite-only website
-  If you wish to prevent all access to the site to non-members, add 'before_filter :login_required'
-  to the relevant controllers, e.g. to prevent all access to the site, add
+        private_site = yes_no?("Do you want to prevent all access to the site to non-members?")
+        say %( If you wish to prevent all access to some controller to non-members, add 'before_filter :login_required'
+to the relevant controllers:
 
     include Hobo::Controller::AuthenticationSupport
     before_filter :login_required
 
-  to application_controller.rb (note that the include statement is not required for hobo_controllers)
+(note that the include statement is not required for hobo_controllers)
 
-  NOTE: You might want to sign up as the administrator before adding this!
+NOTE: You might want to sign up as the administrator before adding this!
 ), Color::YELLOW
       else
         @invite_only = invite_only?
+        private_site = options[:private_site]
       end
+      inject_into_file 'app/controllers/application_controller.rb', <<EOI, :after => "protect_from_forgery\n" if private_site
+  include Hobo::Controller::AuthenticationSupport
+  before_filter :except => :login do
+     login_required unless User.count == 0
+  end
+EOI
     end
 
     def rapid
