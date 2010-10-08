@@ -169,7 +169,7 @@ module Hobo
 
       # Is a new password (and confirmation) required? (i.e. signing up or changing password)
       def new_password_required?
-        lifecycle_changing_password? || changing_password?
+        (new_record? && password) || lifecycle_changing_password? || changing_password?
       end
 
 
