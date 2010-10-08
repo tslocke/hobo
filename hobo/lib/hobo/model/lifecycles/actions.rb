@@ -114,6 +114,11 @@ module Hobo
         end
 
 
+        def routable_for?(subsite)
+          publishable? && options[:subsite] == subsite
+        end
+
+
         def apply_user_becomes!(record)
           if (assoc = options[:user_becomes])
             record.send("#{assoc}=", record.acting_user)

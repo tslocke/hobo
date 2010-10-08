@@ -23,14 +23,14 @@ module Generators
           end.compact
         end
 
-        def lifecycle_routes
+        def lifecycle_routes(subsite)
           return [] unless defined? model::Lifecycle
           routes = []
-          model::Lifecycle.creators.values.where.publishable?.*.name.each do |creator|
+          model::Lifecycle.creators.values.where.routable_for?(subsite).*.name.each do |creator|
             routes << link("post '#{records}/#{creator}(.:format)' => '#{records}#do_#{creator}', :as => 'do_#{record}_#{creator}'", creator, :post)
             routes << link("get '#{records}/#{creator}(.:format)' => '#{records}##{creator}', :as => '#{record}_#{creator}'", creator)
           end
-          model::Lifecycle.transitions.where.publishable?.*.name.each do |transition|
+          model::Lifecycle.transitions.where.routable_for?(subsite).*.name.each do |transition|
             routes << link("put '#{records}/:id/#{transition}(.:format)' => '#{records}#do_#{transition}', :as => 'do_#{record}_#{transition}'", transition, :put)
             routes << link("get '#{records}/:id/#{transition}(.:format)' => '#{records}##{transition}', :as => '#{record}_#{transition}'", transition)
           end
