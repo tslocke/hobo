@@ -13,5 +13,10 @@ module Hobo
       "rails generate hobo:user_model [NAME=user] [options]"
     end
 
+    class_option :admin_subsite_name,
+                 :type => :string,
+                 :desc => "Admin Subsite Name",
+                 :default => 'admin'
+
   end
 end

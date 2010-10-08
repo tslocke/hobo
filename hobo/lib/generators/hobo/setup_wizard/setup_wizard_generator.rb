@@ -23,6 +23,9 @@ module Hobo
     class_option :front_controller_name, :type => :string,
     :desc => "Front Controller Name", :default => 'front'
 
+    class_option :admin_subsite_name, :type => :string,
+                 :desc => "Admin Subsite Name", :default => 'admin'
+
     class_option :migration_generate, :type => :boolean,
     :desc => "Generate migration only"
 
@@ -102,13 +105,11 @@ Invite-only website
       if wizard?
         say_title 'User Resource'
         @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
-        activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
-        say "Installing '#{@user_resource_name}' resources..."
+        @activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
       else
         @user_resource_name = options[:user_resource_name]
-        activation_email = options[:activation_email]
+        @activation_email = options[:activation_email]
       end
-      invoke 'hobo:user_resource', [@user_resource_name], :invite_only => @invite_only, :activation_email => activation_email
     end
 
     def front_controller
@@ -127,14 +128,25 @@ Invite-only website
         say_title 'Admin Subsite'
         admin = @invite_only ? true : yes_no?("Do you want to add an admin subsite?")
         return unless admin
-        admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
-        say "Installing admin subsite..."
+        @admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
       else
         admin = @invite_only ? true : options[:admin]
         return unless admin
-        admin_subsite_name = options[:admin_subsite_name]
+        @admin_subsite_name = options[:admin_subsite_name]
       end
-      invoke 'hobo:admin_subsite', [admin_subsite_name], :user_resource_name => @user_resource_name, :invite_only => @invite_only
+    end
+
+    def invoking_user_and_admin
+      say "Installing '#{@user_resource_name}' resources..."
+      invoke 'hobo:user_resource', [@user_resource_name],
+                                   :invite_only => @invite_only,
+                                   :activation_email => @activation_email,
+                                   :admin_subsite_name => @admin_subsite_name
+
+      say "Installing admin subsite..."
+      invoke 'hobo:admin_subsite', [@admin_subsite_name],
+                                   :user_resource_name => @user_resource_name,
+                                   :invite_only => @invite_only
     end
 
     def migration

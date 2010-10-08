@@ -34,6 +34,7 @@
 
     create :invite,
            :available_to => "acting_user if acting_user.administrator?",
+           :subsite => "<%= options[:admin_subsite_name] %>",
            :params => [:name, :email_address],
            :new_key => true,
            :become => :invited do
