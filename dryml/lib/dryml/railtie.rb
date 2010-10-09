@@ -12,7 +12,7 @@ module Dryml
     end
 
     ActiveSupport.on_load(:action_view) do
-      ActionView::Template.register_template_handler("dryml", Dryml::TemplateHandler)
+      ActionView::Template.register_template_handler("dryml", Dryml::Railtie::TemplateHandler)
     end
 
   end

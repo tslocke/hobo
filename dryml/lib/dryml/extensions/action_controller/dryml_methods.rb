@@ -1,7 +1,7 @@
 ActionController::Base.class_eval do
 
   before_filter do
-    append_view_path Dryml::PageTagResolver.new(self)
+    append_view_path Dryml::Railtie::PageTagResolver.new(self)
   end
 
   # dryml does not use layouts
