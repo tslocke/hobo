@@ -193,7 +193,7 @@ The standard form tag does not have any parameters, nor does it have any default
       http_method_hidden = hidden_field_tag("_method", "PUT")
       html_attrs[:method] = "post"
     else
-      http_method_hidden = "".html_safe
+      http_method_hidden = ""
       html_attrs[:method] = method
     end
 
@@ -203,7 +203,7 @@ The standard form tag does not have any parameters, nor does it have any default
       html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.safe_join("; ".html_safe)
     end
 
-    hiddens = "".html_safe
+    hiddens = ""
     body = with_form_context do
       # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
       b = parameters.default
