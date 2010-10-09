@@ -8,7 +8,7 @@ module Dryml
     end
 
     ActiveSupport.on_load(:action_controller) do
-      require 'dryml/features/action_controller/dryml_methods'
+      require 'dryml/extensions/action_controller/dryml_methods'
     end
 
     ActiveSupport.on_load(:action_view) do

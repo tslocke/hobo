@@ -2,8 +2,8 @@ require 'hobo_support'
 require 'hobo_fields'
 require 'dryml'
 require 'will_paginate'
-require 'hobo/features/enumerable'
-require 'hobo/features/array'
+require 'hobo/extensions/enumerable'
+require 'hobo/extensions/array'
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
 

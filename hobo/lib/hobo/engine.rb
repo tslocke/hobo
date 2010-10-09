@@ -16,23 +16,23 @@ module Hobo
     end
 
     ActiveSupport.on_load(:action_controller) do
-      require 'hobo/features/action_controller/hobo_methods'
-      require 'hobo/features/action_mailer/helper'
+      require 'hobo/extensions/action_controller/hobo_methods'
+      require 'hobo/extensions/action_mailer/helper'
     end
 
     ActiveSupport.on_load(:active_record) do
-      require 'hobo/features/active_record/association_collection'
-      require 'hobo/features/active_record/association_proxy'
-      require 'hobo/features/active_record/association_reflection'
-      require 'hobo/features/active_record/hobo_methods'
-      require 'hobo/features/active_record/permissions'
-      require 'hobo/features/active_record/scopes'
-      require 'hobo/features/active_model/name'
-      require 'hobo/features/active_model/translation'
+      require 'hobo/extensions/active_record/association_collection'
+      require 'hobo/extensions/active_record/association_proxy'
+      require 'hobo/extensions/active_record/association_reflection'
+      require 'hobo/extensions/active_record/hobo_methods'
+      require 'hobo/extensions/active_record/permissions'
+      require 'hobo/extensions/active_record/scopes'
+      require 'hobo/extensions/active_model/name'
+      require 'hobo/extensions/active_model/translation'
     end
 
     ActiveSupport.on_load(:action_view) do
-      require 'hobo/features/action_view/tag_helper'
+      require 'hobo/extensions/action_view/tag_helper'
     end
 
     ActiveSupport.on_load(:before_initialize) do
