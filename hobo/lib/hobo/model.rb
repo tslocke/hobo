@@ -25,7 +25,6 @@ module Hobo
         include FindFor
         include AccessibleAssociations
         include IncludeInSave
-        include Helper::Translations
       end
 
       class << base
