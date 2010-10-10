@@ -77,7 +77,7 @@ module Dryml
     end
 
     def call_render(view, local_assigns, identifier)
-      page = view.request.request_uri
+      page = view.request.fullpath
       renderer = page_renderer(view, local_assigns.keys, page, identifier)
       this = view.controller.send(:dryml_context) || local_assigns[:this]
       view.instance_variable_set("@this", this)
