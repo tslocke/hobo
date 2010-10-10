@@ -27,13 +27,14 @@ module Hobo
       #         my: "Mitt {{app}}"
       #       The output should be: Mitt Program
       #
-      # The "pluralized" option set the count to the Model.count. The following lines are the same:
+      # The "count" option set the integer passed or to the Model.count if : dynamic is passed.
+      # The following lines are the same:
       #
-      # <ht key="modelname.any.key" pluralized/>
+      # <ht key="modelname.any.key" count="&:dynamic">
       # <ht key="modelname.any.key" count="&model.count">
       #
       # Otherwise with features as the ht method, step 1, 2 and 3 above.
-      def self.ht(key, options={})
+      def ht(key, options={})
 
         # Check if called as a tag, i.e. like this <ht></ht>
         if (key.class == Hash)
@@ -54,7 +55,6 @@ module Hobo
             options[:default] = [options[:default]]
           end
         end
-        pluralized = options.delete(:pluralized)
 
         # assume the first part of the key to be the model
         keys = key.to_s.split(".")
@@ -76,18 +76,17 @@ module Hobo
           # add :"hobo.#{key}" as the first fallback
           options[:default].unshift("hobo.#{subkey}".to_sym)
           # set the count option in order to allow multiple pluralization
-          if pluralized
-            options[:count] = klass.try.count
-          end
-          options[:count] ||= 1
+          count = options.delete(:count)
+          count = default_count if count.blank?
+          c = count.try.to_i || count==:dynamic && klass.try.count
           # translate the model
           # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
           # no default needed because human_name defaults to the model name
           # try because Hobo class is not an ActiveRecord::Base subclass
-          translated_pluralized_model = klass.try.model_name.try.human(:count=>options[:count])
+          translated_pluralized_model = klass.try.model_name.try.human(:count=>c)
           options[:model] = translated_pluralized_model
         end
-        options[:count] ||= 1
+        options[:count] = c
 
         key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
 
@@ -101,15 +100,6 @@ module Hobo
         end
       end
 
-      # if somebody includes us, give them ht as an instance method
-      def self.included(base)
-        translation_class = self
-        base.class_eval do
-          define_method :ht do |*args|
-            translation_class.ht(*args)
-          end
-        end
-      end
     end
   end
 end
