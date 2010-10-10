@@ -10,10 +10,6 @@
   <%- end -%>
   <%- for controller in controllers_for(subsite) -%>
     <%- router = router_for(subsite, controller)
-      #  groups = case
-                 # front controller user routes
-      #           when subsite.blank? && controller.controller_name == Rails.application.config.hobo.user_resource_name
-
         groups = %w[ index_action lifecycle resource owner web_method show_action reorder user ] -%>
 
     <%- for group in groups -%>
