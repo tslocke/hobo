@@ -7,4 +7,5 @@
   def default_count
     100 # fixed plural by default
   end
+  helper_method :default_count
 
