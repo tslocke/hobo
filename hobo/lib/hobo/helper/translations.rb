@@ -75,18 +75,13 @@ module Hobo
                   end
           # add :"hobo.#{key}" as the first fallback
           options[:default].unshift("hobo.#{subkey}".to_sym)
-          # set the count option in order to allow multiple pluralization
-          count = options.delete(:count)
-          count = default_count if count.blank?
-          c = count.try.to_i || count==:dynamic && klass.try.count
           # translate the model
           # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
           # no default needed because human_name defaults to the model name
           # try because Hobo class is not an ActiveRecord::Base subclass
-          translated_pluralized_model = klass.try.model_name.try.human(:count=>c)
+          translated_pluralized_model = klass.try.model_name.try.human(:count=>options[:count])
           options[:model] = translated_pluralized_model
         end
-        options[:count] = c
 
         key_prefix = "<span class='translation-key'>#{key}</span>" if defined?(HOBO_SHOW_LOCALE_KEYS) && HOBO_SHOW_LOCALE_KEYS
 

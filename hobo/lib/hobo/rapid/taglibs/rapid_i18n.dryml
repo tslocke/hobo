@@ -12,7 +12,7 @@ There is a default :count => 1
 -->
 <def tag="t"><%=
   options = {}
-  attributes.each_pair{|k,v| options[k.to_sym] = h(v)}
+  all_attributes.each_pair{|k,v| options[k.to_sym] = h(v)}
   k = options.delete(:key)
   I18n.t(k, {:default=>all_parameters.default}.merge(options)).html_safe
 %></def>
@@ -23,21 +23,16 @@ It dynamically pluralizes the human name by using the implicit model.count.
 #### Attributes
 
  - model - (optional) should be a model class or a record object (default to this)
- - count - (optional) used to pick the inflected string for the model. It should be an integer
-   or the symbol :dynamic if you want to have the pluralization consistent with the model.count.
-   If you don't pass any count it uses the ApplicationHelper#default_count.
+ - count - (optional) used to pick the inflected string for the model. It should be an integer.
  -->
 
 <def tag="model-name-human" attrs="model, count"><%=
   model ||= this
   model = model.class unless model.kind_of? Class
-  # adapted from count tag
-  count = default_count if count.blank?
-  c = count.try.to_int || count==:dynamic && this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
   # prepare symbolized attributes for merging
   attrs = {}
-  attributes.each_pair{|k,v| attrs[k.to_sym] = v}
-  model.model_name.human( {:count=>c}.merge(attrs) )
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.model_name.human( attrs )
 %>
 </def>
 
@@ -57,21 +52,20 @@ It dynamically pluralizes the human name by using the implicit model.count.
   model = model.class unless model.kind_of? Class
   # prepare symbolized attributes for merging
   attrs = {}
-  attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v}
   model.human_attribute_name( attribute.to_sym, attrs )
 %>
 </def>
 
 <!-- Used to localize and pluralize collection names.
-A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them. It does also the default pluralization by calling count on the collection attribute (that you can override passing an explicit `count` attribute).
+A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them.
 
 With the `your` attribute and in the special case the context is a Hobo::Model::User instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
 
 ### Attributes
 
  - collection - the attribute/collection key to lookup in the `activerecord.attributes` namespace. (e.g. 'roles')
- - count - It should be an integer or the symbol :dynamic if you want to have the pluralization
-   consistent with the collection.count. If you don't pass any count it uses the ApplicationHelper#default_count.
+ - count - used to pick the inflected string for the collection. It should be an integer.
  - your - wraps the collection name in a `Your` tag
 
 ### Example
@@ -99,17 +93,17 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
             other: Ruoli di {{name}}"
 
   # context is a Post instance ('your' is ignored)
-  <human-collection-name collection="comments" your/>
+  <human-collection-name collection="comments" count="&user.comments.count" your/>
   I18n.locale = :en => "Comment" or "Comments"
   I18n.locale = :it => "Commento" or "Commenti"
 
   # context is an User instance
-  <human-collection-name collection="roles' your/>
+  <human-collection-name collection="roles' count="&user.roles.count" your/>
   I18n.locale = :en => "Your Role" or "Jim's Role" or "Your Roles" or "Jim's Roles"
   I18n.locale = :it => "Il tuo Ruolo" or "Il Ruolo di Jim" or "I tuoi Ruoli" or "I Ruoli di Jim"
   (output is the same as <Your key="roles" count=>"&user.roles.count"/> )
 
-  <human-collection-name collection="roles"/>
+  <human-collection-name collection="roles" count="&user.roles.count"/>
   I18n.locale = :en => "Role" or "Roles"
   I18n.locale = :it => "Ruolo" or "Ruoli"
 -->
@@ -117,17 +111,15 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
   raise Hobo::Error, "The 'collection' attribute must be defined" if collection.blank?
   belong_class = this.kind_of?(Class) ? this : this.class
   raise Hobo::Error, "The context is not an ActiveRecord::Base instance or class. (this = #{this.typed_id rescue this.inspect})" unless belong_class < ActiveRecord::Base
-  count = default_count if count.blank?
-  c = count.try.to_int || count==:dynamic && this.kind_of?(ActiveRecord::Base) && this.send(collection.to_sym).count
   # prepare symbolized attributes for merging
   attrs = {}
-  attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
 <% if your && belong_class < Hobo::Model::User && this.kind_of?(Hobo::Model::User) && I18n.locale == :en -%>
     <your key="&collection" merge-attrs="&{:count=>c, :name=>this.name}.merge(attrs)" capitalize>
-      <%= belong_class.human_attribute_name(collection.to_sym, {:count=>c}.merge(attrs)) %>
+      <%= belong_class.human_attribute_name(collection.to_sym, attrs) %>
     </your>
 <% else -%>
-    <%= belong_class.human_attribute_name( collection.to_sym, {:count=>c}.merge(attrs) ) %>
+    <%= belong_class.human_attribute_name( collection.to_sym, attrs ) %>
 <% end %>
 </def>
 

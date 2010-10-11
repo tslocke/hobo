@@ -31,13 +31,5 @@ module Hobo
       remove_file 'config/locales/en.yml'
     end
 
-    def add_default_count_helper
-      return if File.read('app/controllers/application_controller.rb') =~ /def default_count\b/
-      inject_into_file 'app/controllers/application_controller.rb',
-        File.read( File.expand_path('../templates/default_count_injection.rb', __FILE__)),
-        :after => "class ApplicationController < ActionController::Base\n"
-    end
-
-
   end
 end

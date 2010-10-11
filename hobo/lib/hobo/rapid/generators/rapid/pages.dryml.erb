@@ -4,7 +4,7 @@
   <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
 <% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
-    <nav-item with="&<%= m.name %>"><ht key="<%= m.name.tableize %>.nav_item"><model-name-human/></ht></nav-item>
+    <nav-item with="&<%= m.name %>"><ht key="<%= m.name.tableize %>.nav_item" count="100"><model-name-human count="100"/></ht></nav-item>
 <% end -%>
   </navigation>
 </def>
@@ -21,7 +21,7 @@ model_key = model.name.tableize
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index.title', :default=>[model.model_name.human(:count=>model.count)] }">
+  <page merge title="#{ht '<%= model_key %>.index.title', :default=>[model.model_name.human(:count=>100)] }">
     <body: class="index-page <%= model_class %>" param/>
 
     <content: param>
@@ -283,7 +283,7 @@ new_link = :new.in?(actions)
 -%>
 <def tag="index-for-<%= owner.dasherize %>-page" polymorphic/>
 <def tag="index-for-<%= owner.dasherize %>-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :default=>['<%= sq_escape(model_name(:plural)) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">
+  <page merge title="#{ht '<%= model_key %>.index_for_owner.title', :count=>100, :default=>['<%= sq_escape(model_name(:plural)) %> for']} #{name :with => @<%= owner %>, :no_wrapper => true}">
     <body: class="index-for-owner-page <%= owner.dasherize %> <%= model_class %>" param/>
     <content: param>
       <header param="content-header">
