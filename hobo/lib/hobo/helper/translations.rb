@@ -27,13 +27,8 @@ module Hobo
       #         my: "Mitt {{app}}"
       #       The output should be: Mitt Program
       #
-      # The "count" option set the integer passed or to the Model.count if : dynamic is passed.
-      # The following lines are the same:
+      # The "count" option is passed to the I18n.t method as is
       #
-      # <ht key="modelname.any.key" count="&:dynamic">
-      # <ht key="modelname.any.key" count="&model.count">
-      #
-      # Otherwise with features as the ht method, step 1, 2 and 3 above.
       def ht(key, options={})
 
         # Check if called as a tag, i.e. like this <ht></ht>
