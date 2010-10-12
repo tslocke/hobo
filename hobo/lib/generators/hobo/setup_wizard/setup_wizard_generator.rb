@@ -27,7 +27,7 @@ module Hobo
                  :desc => "Admin Subsite Name", :default => 'admin'
 
     class_option :private_site, :type => :boolean,
-                 :desc => "Make the site unaccessible to non-mebers"
+                 :desc => "Make the site unaccessible to non-members"
 
     class_option :migration_generate, :type => :boolean,
     :desc => "Generate migration only"
@@ -39,7 +39,7 @@ module Hobo
     :desc => "Sets the default locale"
 
     class_option :locales, :type => :array,
-    :desc => "Choose the locales"
+    :desc => "Choose the locales", :default => %w[en]
 
     class_option :git_repo, :type => :boolean,
     :desc => "Create the git repository with the initial commit"
@@ -64,7 +64,7 @@ module Hobo
         fixture_replacement = ask("Type your preferred fixture replacement or <enter> for no replacement:")
       else
         # return if it is all default so no invoke is needed
-        return if (options[:test_framework] == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
+        return if (options[:test_framework].to_s == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
         test_framework = options[:test_framework]
         fixtures = options[:fixtures]
         fixture_replacement = options[:fixture_replacement]
