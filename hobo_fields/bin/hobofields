@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require 'fileutils'
 
-if ENV["HOBO_DEV_ROOT"]
-  dev_root = File.expand_path ENV["HOBO_DEV_ROOT"], FileUtils.pwd
+if ENV["HOBODEV"]
+  dev_root = File.expand_path ENV["HOBODEV"], FileUtils.pwd
   $:.unshift "#{dev_root}/hobo_support/lib"
 else
   require 'rubygems'
@@ -12,7 +12,7 @@ begin
   require 'hobo_support/command'
 rescue LoadError
   puts "The 'hobo_support' gem is not installed.
-You probably need to set the HOBO_DEV_ROOT environment variable to the local repository path."
+You probably need to set the HOBODEV environment variable to the local repository path."
   exit
 end
 

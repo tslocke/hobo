@@ -13,24 +13,29 @@ module HoboSupport
         Usage:
             hobo new <app_name> [rails_options]   Creates a new Hobo Application
             hobo g <generator> [ARGS] [options]   Fires the hobo:<generator>
-            hobo --help                           This help screen
+            hobo --help|-h                        This help screen
 
         Dev Notes:
-            Set the HOBO_DEV_ROOT ENV variable to the Hobo root path in order
-            to use your local dev version instead of the installed gem.
+            Set the HOBODEV ENV variable to your local hobo git-repository path
+            in order to use your local dev version instead of the installed gem.
 
         )
 
-        command = ARGV.shift
-        if command.nil?
-          puts "\nThe command is missing!\n"
-          puts banner
-          exit
-        end
         # for hobo developers only
         setup_wizard = true
 
+        command = ARGV.shift
+
         case command
+
+        when nil
+          puts "\nThe command is missing!\n"
+          puts banner
+          exit
+
+        when /^--help|-h$/
+          puts banner
+          exit
 
         when 'new'
           app_name = ARGV.shift
@@ -45,8 +50,8 @@ module HoboSupport
           end
           template_path = "/tmp/hobo_app_template"
           File.open(template_path, 'w') do |file|
-            if ENV["HOBO_DEV_ROOT"]
-              dev_root = File.expand_path ENV["HOBO_DEV_ROOT"], FileUtils.pwd
+            if ENV["HOBODEV"]
+              dev_root = File.expand_path ENV["HOBODEV"], FileUtils.pwd
               file.puts %(
         $:.unshift '#{dev_root}/hobo_support/lib'
         gem 'hobo_support', :path => '#{dev_root}/hobo_support'
@@ -81,11 +86,14 @@ You can rerun it at any time with `hobo g setup_wizard` from the application roo
           system "rails new #{app_name} #{ARGV * ' '} -m #{template_path}"
           File.delete template_path
 
-        when /^(g|generate)$/
+        when /^g|generate$/
           if ARGV.empty?
             puts "\nThe generator name is missing!\n"
             puts banner
           else
+            if ARGV.first =~ /^hobo:(\w+)$/
+              puts "NOTICE: You can omit the 'hobo' namespace: e.g. `hobo g #{$1} #{ARGV[1..-1] * ' '}`"
+            end
             exec "rails g hobo:#{ARGV * ' '}"
           end
 
