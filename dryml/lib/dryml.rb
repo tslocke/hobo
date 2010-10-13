@@ -86,10 +86,6 @@ module Dryml
 
 
     def page_renderer(view, local_names=[], page=nil, filename=nil)
-      if Rails.env.development?
-        clear_cache
-        Taglib.clear_cache
-      end
 
       prepare_view!(view)
       included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
