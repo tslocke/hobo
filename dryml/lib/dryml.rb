@@ -90,7 +90,16 @@ module Dryml
       prepare_view!(view)
       included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
 
-      if page.ends_with?(EMPTY_PAGE)
+      # filename is blank when called from controller's ajax_update_response
+      if filename.blank?
+        opt = ActionController::Routing::Routes.recognize_path(page)
+        filename = view.view_paths.find( opt[:action],
+                                         opt[:controller],
+                                         false,
+                                         view.lookup_context.instance_variable_get('@details')).identifier
+      end
+
+      if identifier.starts_with?('dryml-page-tag:') || page_path.ends_with?(EMPTY_PAGE)
         controller_class = view.controller.class
         @tag_page_renderer_classes[controller_class.name] ||=
           make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
@@ -168,7 +177,7 @@ module Dryml
       # Not sure why this isn't done for me...
       # There's probably a button to press round here somewhere
       for var in %w(@flash @cookies @action_name @_session @_request @request_origin
-                    @template @request @ignore_missing_templates @_headers @variables_added
+                    @request @ignore_missing_templates @_headers @variables_added
                     @_flash @response @template_class
                     @_cookies @before_filter_chain_aborted @url
                     @_response @template_root @headers @_params @params @session)
