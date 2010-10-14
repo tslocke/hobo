@@ -70,7 +70,7 @@ module Hobo
 
 
     def ajax_update_response(page_path, render_specs, results={})
-      renderer = Dryml.page_renderer(view_context, [], page_path) if page_path
+      renderer = Dryml.page_renderer(view_context, page_path) if page_path
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"

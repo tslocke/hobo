@@ -73,51 +73,51 @@ module Dryml
 
     def empty_page_renderer(view)
       controller_name = view.controller.class.name.underscore.sub(/_controller$/, "")
-      page_renderer(view, [], "#{controller_name}/#{EMPTY_PAGE}")
+      page_renderer(view, "#{controller_name}/#{EMPTY_PAGE}" )
     end
 
     def call_render(view, local_assigns, identifier)
-      page = view.request.fullpath
-      renderer = page_renderer(view, local_assigns.keys, page, identifier)
+      page_path = view.request.fullpath
+      renderer = page_renderer(view, page_path, local_assigns.keys, identifier)
       this = view.controller.send(:dryml_context) || local_assigns[:this]
       view.instance_variable_set("@this", this)
       renderer.render_page(this, local_assigns).strip
     end
 
 
-    def page_renderer(view, local_names=[], page=nil, filename=nil)
+    def page_renderer(view, page_path, local_names=[], identifier=nil)
 
       prepare_view!(view)
-      included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page)] + controller_taglibs(view.controller.class)).compact
+      included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page_path)] + controller_taglibs(view.controller.class)).compact
 
       # filename is blank when called from controller's ajax_update_response
-      if filename.blank?
-        opt = ActionController::Routing::Routes.recognize_path(page)
-        filename = view.view_paths.find( opt[:action],
-                                         opt[:controller],
-                                         false,
-                                         view.lookup_context.instance_variable_get('@details')).identifier
+      if identifier.blank?
+        opt = ActionController::Routing::Routes.recognize_path(page_path)
+        identifier = view.view_paths.find( opt[:action],
+                                           opt[:controller],
+                                           false,
+                                           view.lookup_context.instance_variable_get('@details')).identifier
       end
 
       if identifier.starts_with?('dryml-page-tag:') || page_path.ends_with?(EMPTY_PAGE)
         controller_class = view.controller.class
         @tag_page_renderer_classes[controller_class.name] ||=
-          make_renderer_class("", page, local_names, DEFAULT_IMPORTS, included_taglibs)
-        @tag_page_renderer_classes[controller_class.name].new(page, view)
+          make_renderer_class("", page_path, local_names, DEFAULT_IMPORTS, included_taglibs)
+        @tag_page_renderer_classes[controller_class.name].new(page_path, view)
       else
-        mtime = File.mtime(filename)
-        renderer_class = @renderer_classes[page]
+        mtime = File.mtime(identifier)
+        renderer_class = @renderer_classes[page_path]
 
         # do we need to recompile?
         if (!renderer_class ||                                          # nothing cached?
             (local_names - renderer_class.compiled_local_names).any? || # any new local names?
             renderer_class.load_time < mtime)                           # cache out of date?
-          renderer_class = make_renderer_class(File.read(filename), filename, local_names,
+          renderer_class = make_renderer_class(File.read(identifier), identifier, local_names,
                                                DEFAULT_IMPORTS, included_taglibs)
           renderer_class.load_time = mtime
-          @renderer_classes[page] = renderer_class
+          @renderer_classes[page_path] = renderer_class
         end
-        renderer_class.new(page, view)
+        renderer_class.new(page_path, view)
       end
     end
 
