@@ -4,6 +4,8 @@ ActionController::Base.class_eval do
     append_view_path Dryml::Railtie::PageTagResolver.new(self)
   end
 
+  attr_accessor :dryml_fallback_tag
+
   # dryml does not use layouts
   def action_has_layout?
     false
@@ -11,10 +13,6 @@ ActionController::Base.class_eval do
 
   def dryml_context
     @this
-  end
-
-  def dryml_fallback_tag(tag_name)
-    @dryml_fallback_tag = tag_name
   end
 
   def call_dryml_tag(tag, options={})
