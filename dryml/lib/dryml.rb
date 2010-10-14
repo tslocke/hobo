@@ -90,16 +90,14 @@ module Dryml
       prepare_view!(view)
       included_taglibs = ([APPLICATION_TAGLIB] + application_taglibs() + [subsite_taglib(page_path)] + controller_taglibs(view.controller.class)).compact
 
-      # filename is blank when called from controller's ajax_update_response
-      if identifier.blank?
+      if identifier.blank? && ! page_path.ends_with?(EMPTY_PAGE)
         opt = ActionController::Routing::Routes.recognize_path(page_path)
         identifier = view.view_paths.find( opt[:action],
                                            opt[:controller],
                                            false,
                                            view.lookup_context.instance_variable_get('@details')).identifier
       end
-
-      if identifier.starts_with?('dryml-page-tag:') || page_path.ends_with?(EMPTY_PAGE)
+      if page_path.ends_with?(EMPTY_PAGE) || identifier.starts_with?('dryml-page-tag:')
         controller_class = view.controller.class
         @tag_page_renderer_classes[controller_class.name] ||=
           make_renderer_class("", page_path, local_names, DEFAULT_IMPORTS, included_taglibs)
