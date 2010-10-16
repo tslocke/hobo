@@ -26,10 +26,9 @@ module Dryml
     include ActionView::Helpers
     include Helper  ## FIXME remove
 
-    def initialize(view_name=nil, view=nil)
-      unless view_name.nil? && view.nil?
+    def initialize(view=nil)
+      unless view.nil?
         @view = view
-        @_view_name = view_name
         @_erb_binding = binding
         @_part_contexts = {}
         @_scoped_variables = ScopedVariables.new
@@ -49,7 +48,7 @@ module Dryml
       end
     end
 
-    for attr in [:erb_binding, :part_contexts, :view_name,
+    for attr in [:erb_binding, :part_contexts,
                  :this, :this_parent, :this_field, :this_key,
                  :form_this, :form_field_path, :form_field_names]
       class_eval "def #{attr}; @_#{attr}; end"

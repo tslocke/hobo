@@ -51,7 +51,7 @@ module Dryml
     def compile(local_names=[], auto_taglibs=[])
       now = Time.now
 
-      unless @template_path.ends_with?(EMPTY_PAGE)
+      unless @template_path.blank?
         p = Pathname.new template_path
         p = Pathname.new(Rails.root) + p unless p.absolute? || !Object.const_defined?(:Rails)
         mtime = p.mtime rescue Time.now

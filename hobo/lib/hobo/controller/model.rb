@@ -358,16 +358,15 @@ module Hobo
         @invalid_record = this
         opt = ActionController::Routing::Routes.recognize_path(params[:page_path])
         controller = opt[:controller]
-        view = opt[:action]
-        view = default_action if view == Dryml::EMPTY_PAGE
+        action = opt[:action]
 
         # Hack fix for Bug 477.  See also bug 489.
-        if self.class.name == "#{controller.camelize}Controller" && view == "index"
+        if self.class.name == "#{controller.camelize}Controller" && action == "index"
           params['action'] = 'index'
           self.action_name = 'index'
           index
         else
-          render :template => "#{controller}/#{view}"
+          render :template => "#{controller}/#{action}"
         end
       else
         render :action => default_action

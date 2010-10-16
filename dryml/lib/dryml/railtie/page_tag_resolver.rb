@@ -9,11 +9,15 @@ module Dryml
 
       def find_templates(name, prefix, partial, details)
         tag_name = @controller.dryml_fallback_tag || name.dasherize + '-page'
-        text = @controller.call_dryml_tag(tag_name)
-        return [] unless text
-        [ActionView::Template.new(text, "dryml-page-tag:#{tag_name}", Dryml::Railtie::PageTagHandler, details)]
+        method_name = tag_name.to_s.gsub('-', '_')
+        if Dryml.empty_page_renderer(@controller.view_context).respond_to?(method_name)
+          [ActionView::Template.new('', Dryml.page_tag_identifier(@controller.controller_name, tag_name),
+                                    Dryml::Railtie::TemplateHandler, details)]
+        else
+          []
+        end
       end
 
-    end
+   end
   end
 end

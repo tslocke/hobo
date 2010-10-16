@@ -223,7 +223,7 @@ The standard form tag does not have any parameters, nor does it have any default
       page_path = if (request.post? || request.put?) && params[:page_path]
                     params[:page_path]
                   else
-                    view_name.sub(Dryml::EMPTY_PAGE, params[:action] || '')
+                    request.fullpath
                   end
       page_path_hidden = hidden_field_tag("page_path", page_path)
     end

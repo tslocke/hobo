@@ -70,7 +70,14 @@ module Hobo
 
 
     def ajax_update_response(page_path, render_specs, results={})
-      renderer = Dryml.page_renderer(view_context, page_path) if page_path
+      if page_path
+        rr = ActionController::Routing::Routes.recognize_path(page_path)
+        identifier = view_context.view_paths.find( rr[:action],
+                                                   rr[:controller],
+                                                   false,
+                                                   view_context.lookup_context.instance_variable_get('@details')).identifier
+        renderer = Dryml.page_renderer(view_context, identifier, [], rr[:controller])
+      end
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
