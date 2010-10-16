@@ -115,7 +115,7 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
   attrs = {}
   all_attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
 <% if your && belong_class < Hobo::Model::User && this.kind_of?(Hobo::Model::User) && I18n.locale == :en -%>
-    <your key="&collection" merge-attrs="&{:count=>c, :name=>this.name}.merge(attrs)" capitalize>
+    <your key="&collection" merge-attrs="&{:name=>this.name}.merge(attrs)" capitalize>
       <%= belong_class.human_attribute_name(collection.to_sym, attrs) %>
     </your>
 <% else -%>
