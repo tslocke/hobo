@@ -7,10 +7,11 @@ module Hobo
     end
 
     def copy_rapid_files
-      template  'application.dryml.erb', 'app/views/taglibs/application.dryml'
-      copy_file 'application.css',       'public/stylesheets/application.css'
-      copy_file 'dryml-support.js',      'public/javascripts/dryml-support.js'
-      copy_file 'guest.rb',              'app/models/guest.rb'
+      template  'application.dryml.erb',        'app/views/taglibs/application.dryml'
+      copy_file 'application.css',              'public/stylesheets/application.css'
+      copy_file 'dryml-support.js',             'public/javascripts/dryml-support.js'
+      copy_file 'dryml_taglibs_initializer.rb', 'config/initializers/dryml_taglibs.rb'
+      copy_file 'guest.rb',                     'app/models/guest.rb'
     end
 
   end
