@@ -15,5 +15,12 @@ module Dryml
       ActionView::Template.register_template_handler("dryml", Dryml::Railtie::TemplateHandler)
     end
 
+    initializer 'dryml' do |app|
+      app.config.to_prepare do
+        Dryml.clear_cache
+        Dryml::Taglib.clear_cache
+      end
+    end
+
   end
 end
