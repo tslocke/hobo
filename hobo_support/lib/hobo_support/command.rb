@@ -10,16 +10,17 @@ module HoboSupport
         puts "#{gem.to_s.capitalize} Command Line Interface #{version}"
 
         banner = %(
-        Usage:
-            hobo new <app_name> [rails_options]   Creates a new Hobo Application
-            hobo g <generator> [ARGS] [options]   Fires the hobo:<generator>
-            hobo --help|-h                        This help screen
+Usage:
+  hobo new <app_name> [rails_options]          Creates a new Hobo Application
+  hobo generate|g <generator> [ARGS] [options] Fires the hobo:<generator>
+  hobo destroy <generator> [ARGS] [options]    Tries to undo generated code
+  hobo --help|-h                               This help screen
 
-        Dev Notes:
-            Set the HOBODEV ENV variable to your local hobo git-repository path
-            in order to use your local dev version instead of the installed gem.
+Dev Notes:
+  Set the HOBODEV ENV variable to your local hobo git-repository path
+  in order to use your local dev version instead of the installed gem.
 
-        )
+)
 
         # for hobo developers only
         setup_wizard = true
@@ -86,15 +87,16 @@ You can rerun it at any time with `hobo g setup_wizard` from the application roo
           system "rails new #{app_name} #{ARGV * ' '} -m #{template_path}"
           File.delete template_path
 
-        when /^g|generate$/
+        when /^(g|generate|destroy)$/
+          cmd = $1
           if ARGV.empty?
             puts "\nThe generator name is missing!\n"
             puts banner
           else
             if ARGV.first =~ /^hobo:(\w+)$/
-              puts "NOTICE: You can omit the 'hobo' namespace: e.g. `hobo g #{$1} #{ARGV[1..-1] * ' '}`"
+              puts "NOTICE: You can omit the 'hobo' namespace: e.g. `hobo #{cmd} #{$1} #{ARGV[1..-1] * ' '}`"
             end
-            exec "rails g hobo:#{ARGV * ' '}"
+            system "rails #{cmd} hobo:#{ARGV * ' '}"
           end
 
         else
