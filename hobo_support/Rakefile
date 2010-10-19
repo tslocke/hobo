@@ -10,7 +10,7 @@ RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    files=Dir['test/*.rdoctest','test/hobo_support/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    files=Dir['test/**/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
     exit(1) if !system("#{RUBYDOCTEST} --single #{files}")
   end
 end

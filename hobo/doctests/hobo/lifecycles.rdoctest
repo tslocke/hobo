@@ -240,4 +240,3 @@ Requester cancels
         => "destroy"
 
 
->> FileUtils.rm_rf  TEST_APP_ROOT

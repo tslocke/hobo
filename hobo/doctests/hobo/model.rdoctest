@@ -325,9 +325,4 @@ This provides a shortcut to the corresponding
     >> Post.view_hints
     => PostHints
 
-Cleanup
-{.hidden}
-
-    >> FileUtils.rm_rf  TEST_APP_ROOT
-{.hidden}
 

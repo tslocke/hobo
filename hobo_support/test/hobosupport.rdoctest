@@ -7,8 +7,6 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
     doctest_require: '../lib/hobo_support'
 {.hidden}
 
-    >> HoboSupport::VERSION
-    => "1.3.0.pre6"
 
 ## Contents
 
@@ -34,7 +32,7 @@ Like `is_a?` but multiple types to be checked in one go
 
 ## Method call extensions
 
-We have the "." operator to call methods on objects. These extensions introduce two "special dots". 
+We have the "." operator to call methods on objects. These extensions introduce two "special dots".
 
 ### `Object#_?`
 

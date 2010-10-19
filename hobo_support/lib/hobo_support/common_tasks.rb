@@ -13,6 +13,8 @@ namespace :test do
   task :prepare_testapp, :force do |t, args|
     if args.force || !File.directory?(TESTAPP_PATH)
       remove_entry_secure( TESTAPP_PATH, true )
+    #  hobodev = %(HOBODEV=#{ENV["HOBODEV"]}) if ENV["HOBODEV"]
+    #  sh %(export #{hobodev})
       sh %(#{BIN} new #{TESTAPP_PATH} --skip-wizard)
       chdir TESTAPP_PATH
       sh %(echo "gem 'irt', :group => :console" >> Gemfile) # to make the bundler happy

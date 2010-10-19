@@ -5,7 +5,7 @@ Our test requires to prepare the testapp for a different environment:
 
     doctest_require: ENV["RAILS_ENV"] = 'mysql_test'; 'prepare_testapp'
 
-    >> system "cd #{TEST_APP_ROOT} && rake db:setup"
+    >> system "cd #{TESTAPP_PATH} && rake db:setup"
     => true
 
     >> p Rails.env
@@ -71,5 +71,5 @@ Cleanup
 
     >> nuke_model_class(Product)
     >> ActiveRecord::Base.connection.execute "drop table `products`;"
-    >> system "cd #{TEST_APP_ROOT} && rake db:drop RAILS_ENV=mysql_test"
+    >> system "cd #{TESTAPP_PATH} && rake db:drop RAILS_ENV=mysql_test"
 {.hidden}

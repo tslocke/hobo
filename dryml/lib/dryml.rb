@@ -90,7 +90,7 @@ module Dryml
 
   def page_renderer(view, identifier, local_names=[], controller_name=nil)
     controller_name ||= view.controller.controller_name
-    prepare_view!(view)
+  #  prepare_view!(view)
     if identifier =~ /#{ID_SEPARATOR}/
       identifier = identifier.split(ID_SEPARATOR).first
       @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_name))
