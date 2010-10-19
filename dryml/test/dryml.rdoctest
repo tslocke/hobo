@@ -7,7 +7,7 @@
         >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../dryml/lib')
         >> require 'hobo_support'
         >> require 'dryml'
-        >> require 'dryml/template_handler'
+        >> require 'dryml/railtie/template_handler'
 
 {.hidden}
 

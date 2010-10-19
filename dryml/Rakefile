@@ -2,22 +2,17 @@ require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
 
-$:.unshift File.expand_path('../lib', __FILE__)
-$:.unshift File.expand_path('../../hobo_support/lib', __FILE__)
-require 'dryml' # to get VERSION
-
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
-desc "Default Task"
-task :default => [ :test ]
-
 # --- Testing --- #
 
-desc "Run all tests"
-task :test do |t|
-  files=Dir['test/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
-  exit(1) if !system("#{RUBYDOCTEST} #{files}")
+namespace "test" do
+  desc "Run the doctests"
+  task :doctest do |t|
+    files=Dir['test/**/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    exit(1) if !system("#{RUBYDOCTEST} #{files}")
+  end
 end
 
 # --- RDOC --- #

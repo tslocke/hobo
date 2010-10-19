@@ -200,15 +200,14 @@ module Dryml
     this = locals.delete(:this) || nil
 
     renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
-      Dryml.make_renderer_class(template_src, template_path, locals.keys)
+      make_renderer_class(template_src, template_path, locals.keys)
     renderer_class.new(view).render_page(this, locals)
   end
 
 private
 
   def taglibs_for(controller_name)
-    ([CORE_TAGLIB] +
-    [APPLICATION_TAGLIB] +
+    ([APPLICATION_TAGLIB] +
     application_taglibs() +
     [subsite_taglib(controller_name)] +
     (controller_name.camelize+"Controller").constantize.try.included_taglibs||[]).compact
@@ -270,7 +269,7 @@ private
     # the sum of all the names we've seen so far - eventually we'll be ready for all of 'em
     all_local_names = renderer_class.compiled_local_names | locals
 
-    template.compile(all_local_names, taglibs)
+    template.compile(all_local_names, [CORE_TAGLIB]+taglibs)
   end
 
 
