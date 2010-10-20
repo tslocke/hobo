@@ -88,7 +88,7 @@ module Dryml
   end
 
 
-  def page_renderer(view, identifier, local_names=[], controller_path=nil )
+  def page_renderer(view, identifier, local_names=[], controller_path=nil)
     controller_path ||= view.controller.controller_path
   #  prepare_view!(view)
     if identifier =~ /#{ID_SEPARATOR}/
