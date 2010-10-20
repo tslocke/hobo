@@ -451,7 +451,7 @@ module Hobo
       do_pagination = options.delete(:paginate) && finder.respond_to?(:paginate)
       finder = Array.wrap(options.delete(:scope)).inject(finder) { |a, v| a.send(*Array.wrap(v).flatten) }
 
-      options[:order] = :default unless options[:order] || finder.send(:scope, :find)._?[:order]
+      options[:order] = finder.default_order unless options[:order] || finder.try.order_values.present?
 
       if do_pagination
         options.reverse_merge!(:page => params[:page] || 1)
@@ -734,7 +734,7 @@ module Hobo
 
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
-      finder = finder.limit(options[:limit]) unless finder.send(:scope, :find, :limit)
+      finder = finder.limit(options[:limit]) unless finder.try.limit_value
 
       begin
         finder = finder.send(options[:query_scope], params[options[:param]])
