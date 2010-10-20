@@ -17,7 +17,7 @@
         routes = gr == 'lifecycle_routes' ? router.send(gr.to_sym, subsite) : router.send(gr.to_sym) -%>
     <%- unless routes.empty? -%>
 
-  <%= "  " if subsite %><%= "# #{gr.humanize} for controller :#{controller.controller_name}" %>
+  <%= "  " if subsite %><%= %(# #{gr.humanize} for controller "#{controller.controller_path}") %>
     <%- end -%>
       <%- for route in routes -%>
   <%= "  " if subsite %><%= route %>

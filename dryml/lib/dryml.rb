@@ -68,11 +68,11 @@ module Dryml
 
 
   def empty_page_renderer(view)
-    page_renderer(view, page_tag_identifier(view.controller.controller_name))
+    page_renderer(view, page_tag_identifier(view.controller.controller_path))
   end
 
-  def page_tag_identifier(controller_name, tag_name='')
-    "controller: #{controller_name}#{ID_SEPARATOR}#{tag_name}"
+  def page_tag_identifier(controller_path, tag_name='')
+    "controller: #{controller_path}#{ID_SEPARATOR}#{tag_name}"
   end
 
   def call_render(view, local_assigns, identifier)
@@ -88,12 +88,12 @@ module Dryml
   end
 
 
-  def page_renderer(view, identifier, local_names=[], controller_name=nil)
-    controller_name ||= view.controller.controller_name
+  def page_renderer(view, identifier, local_names=[], controller_path=nil )
+    controller_path ||= view.controller.controller_path
   #  prepare_view!(view)
     if identifier =~ /#{ID_SEPARATOR}/
       identifier = identifier.split(ID_SEPARATOR).first
-      @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_name))
+      @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_path))
       @cache[identifier].new(view)
     else
       mtime = File.mtime(identifier)
@@ -103,7 +103,7 @@ module Dryml
           (local_names - renderer_class.compiled_local_names).any? || # any new local names?
           renderer_class.load_time < mtime)                           # cache out of date?
         renderer_class = make_renderer_class(File.read(identifier), identifier,
-                                             local_names, taglibs_for(controller_name))
+                                             local_names, taglibs_for(controller_path))
         renderer_class.load_time = mtime
         @cache[identifier] = renderer_class
       end
@@ -206,11 +206,11 @@ module Dryml
 
 private
 
-  def taglibs_for(controller_name)
+  def taglibs_for(controller_path)
     ([APPLICATION_TAGLIB] +
     application_taglibs() +
-    [subsite_taglib(controller_name)] +
-    (controller_name.camelize+"Controller").constantize.try.included_taglibs||[]).compact
+    [subsite_taglib(controller_path)] +
+    (controller_path.camelize+"Controller").constantize.try.included_taglibs||[]).compact
   end
 
   def application_taglibs
@@ -221,8 +221,8 @@ private
     end
   end
 
-  def subsite_taglib(controller_name)
-    parts = controller_name.split("/")
+  def subsite_taglib(controller_path)
+    parts = controller_path.split("/")
     subsite = parts.length >= 2 ? parts[0..-2].join('_') : "front"
     src = "taglibs/#{subsite}_site"
     { :src => src } if Object.const_defined?(:Rails) && File.exists?("#{Rails.root}/app/views/#{src}.dryml")
