@@ -281,7 +281,7 @@
 <!-- given a column in the context and the model as an attribute, returns the comment for the column.  It returns the SQL comment if that is available (using the activerecord-comments plugin).  If that is not available, it returns the HoboFields comment.  -->
 
 <def tag="model-column-comment" attrs="model">
-  <%= this.try.comment || model.try.field_specs.try.get(this.name).try.comment -%>
+  <%= this.try.comment || model.try.field_specs.try.get(this.name).try.first.try.comment -%>
 </def>
 
 <!-- given a model, repeats on the associations -->
