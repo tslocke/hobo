@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
+require 'tmpdir'
 
 require 'active_record'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
@@ -14,7 +15,7 @@ RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
 GEM_ROOT = File.expand_path('../', __FILE__)
-TESTAPP_PATH = '/tmp/hobo_testapp'
+TESTAPP_PATH = File.join Dir.tmpdir, 'hobo_testapp'
 BIN = File.expand_path('../bin/hobo', __FILE__)
 require 'hobo_support/common_tasks'
 include HoboSupport::CommonTasks

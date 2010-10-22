@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'tmpdir'
 
 module HoboSupport
   module Command
@@ -49,8 +50,7 @@ Dev Notes:
             puts banner
             exit
           end
-          FileUtils.mkdir('/tmp') unless File.directory?('/tmp')
-          template_path = "/tmp/hobo_app_template"
+          template_path = File.join Dir.tmpdir, "hobo_app_template"
           File.open(template_path, 'w') do |file|
             if ENV["HOBODEV"]
               dev_root = File.expand_path ENV["HOBODEV"], FileUtils.pwd

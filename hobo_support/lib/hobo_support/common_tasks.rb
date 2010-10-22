@@ -1,5 +1,5 @@
-require 'fileutils'
 require 'hobo_support/module'
+
 module HoboSupport
   CommonTasks = classy_module do
 
@@ -14,8 +14,6 @@ namespace :test do
   task :prepare_testapp, :force do |t, args|
     if args.force || !File.directory?(TESTAPP_PATH)
       remove_entry_secure( TESTAPP_PATH, true )
-      tmp_dir = File.dirname(TESTAPP_PATH)
-      FileUtils.mkdir_p(tmp_dir) unless File.directory?(tmp_dir)
       sh %(#{BIN} new #{TESTAPP_PATH} --skip-wizard)
       chdir TESTAPP_PATH
       sh %(echo "gem 'irt', :group => :console" >> Gemfile) # to make the bundler happy

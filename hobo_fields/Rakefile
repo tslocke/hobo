@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'active_record'
+require 'tmpdir'
+
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
@@ -11,7 +13,7 @@ require 'hobo_support'
 require 'hobo_fields'
 
 GEM_ROOT = File.expand_path('../', __FILE__)
-TESTAPP_PATH = '/tmp/hobo_fields_testapp'
+TESTAPP_PATH = File.join Dir.tmpdir, 'hobo_fields_testapp'
 BIN = File.expand_path('../bin/hobofields', __FILE__)
 require 'hobo_support/common_tasks'
 include HoboSupport::CommonTasks
