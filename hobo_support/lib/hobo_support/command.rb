@@ -49,6 +49,7 @@ Dev Notes:
             puts banner
             exit
           end
+          FileUtils.mkdir('/tmp') unless File.directory?('/tmp')
           template_path = "/tmp/hobo_app_template"
           File.open(template_path, 'w') do |file|
             if ENV["HOBODEV"]
