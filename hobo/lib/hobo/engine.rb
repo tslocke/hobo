@@ -13,6 +13,7 @@ module Hobo
       h.routes_path = Pathname.new File.expand_path('config/hobo_routes.rb', Rails.root)
       h.rapid_generators_path = Pathname.new File.expand_path('lib/hobo/rapid/generators', Hobo.root)
       h.auto_taglibs_path = Pathname.new File.expand_path('app/views/taglibs/auto', Rails.root)
+      h.read_only_file_system = !!ENV['HEROKU_TYPE']
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -48,18 +49,28 @@ module Hobo
     initializer 'hobo.routes' do |app|
       h = app.config.hobo
       # generate at first boot, so no manual generation is required
-      Rails::Generators.invoke('hobo:routes', %w[-f -q]) unless File.exists?(h.routes_path)
+      unless File.exists?(h.routes_path)
+        if h.read_only_file_system
+          raise Hobo::Error, "No #{h.routes_path} found!"
+        else
+          Rails::Generators.invoke('hobo:routes', %w[-f -q])
+        end
+      end
       app.routes_reloader.paths << h.routes_path
-      app.config.to_prepare do
-        Rails::Generators.configure!
-        # generate before each request in development
-        Rails::Generators.invoke('hobo:routes', %w[-f -q])
+      unless h.read_only_file_system
+        app.config.to_prepare do
+          Rails::Generators.configure!
+          # generate before each request in development
+          Rails::Generators.invoke('hobo:routes', %w[-f -q])
+        end
       end
     end
 
     initializer 'hobo.dryml' do |app|
-      app.config.to_prepare do
-        Dryml::DrymlGenerator.run
+      unless app.config.hobo.read_only_file_system
+        app.config.to_prepare do
+          Dryml::DrymlGenerator.run
+        end
       end
     end
 
