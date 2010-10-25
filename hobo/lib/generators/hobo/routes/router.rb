@@ -9,7 +9,7 @@ module Generators
         attr_reader :subsite, :controller, :model, :record, :records
 
         def initialize(subsite, controller)
-          raise "#{controller} is not a Hobo::Controller::Model" unless controller < ::Hobo::Controller::Model
+          raise ::Hobo::Error, "#{controller} is not a Hobo::Controller::Model" unless controller < ::Hobo::Controller::Model
           @subsite = subsite
           @controller = controller
           @model = controller.model
@@ -53,7 +53,7 @@ module Generators
           routes = []
           controller.owner_actions.each_pair do |owner, actions|
             collection_refl = model.reverse_reflection(owner)
-            raise Hobo::Error, "Hob routing error -- can't find reverse association for #{model}##{owner} " +
+            raise ::Hobo::Error, "Hob routing error -- can't find reverse association for #{model}##{owner} " +
                              "(e.g. the :has_many that corresponds to a :belongs_to)" if collection_refl.nil?
             collection         = collection_refl.name
             owner_class        = model.reflections[owner].klass.name.underscore
