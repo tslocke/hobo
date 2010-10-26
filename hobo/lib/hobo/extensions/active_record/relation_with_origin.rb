@@ -8,7 +8,7 @@ module ActiveRecord
     class AssociationCollection
 
       def scoped_with_origin
-        relation = scoped_without_origin
+        relation = scoped_without_origin.clone
         relation.origin = @owner
         relation.origin_attribute = @reflection.name
         relation
