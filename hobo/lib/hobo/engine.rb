@@ -27,6 +27,7 @@ module Hobo
       require 'hobo/extensions/active_record/hobo_methods'
       require 'hobo/extensions/active_record/permissions'
       require 'hobo/extensions/active_record/scopes'
+      require 'hobo/extensions/active_record/relation_with_origin'
       require 'hobo/extensions/active_model/name'
       require 'hobo/extensions/active_model/translation'
     end
