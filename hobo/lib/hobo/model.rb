@@ -333,6 +333,11 @@ module Hobo
         class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::ViewHints; end; #{class_name}")
       end
 
+      def table_exists?
+        @table_exists_cache = super if @table_exists_cache.nil?
+        @table_exists_cache
+      end
+
 
     end # --- of ClassMethods --- #
 
