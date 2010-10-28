@@ -39,30 +39,21 @@ module Hobo
 
     ActiveSupport.on_load(:before_initialize) do
       require 'hobo/undefined'
-
+      HoboFields.never_wrap(Hobo::Undefined)
       h = config.hobo
       Dryml::DrymlGenerator.enable([h.rapid_generators_path], h.auto_taglibs_path)
-
-      HoboFields.never_wrap(Hobo::Undefined)
     end
 
     initializer 'hobo.routes' do |app|
       h = app.config.hobo
       # generate at first boot, so no manual generation is required
       unless File.exists?(h.routes_path)
-        if h.read_only_file_system
-          raise Hobo::Error, "No #{h.routes_path} found!"
-        else
-          Rails::Generators.invoke('hobo:routes', %w[-f -q])
-        end
+        raise Hobo::Error, "No #{h.routes_path} found!" if h.read_only_file_system
+        Rails::Generators.invoke('hobo:routes', %w[-f -q])
       end
       app.routes_reloader.paths << h.routes_path
-      unless h.read_only_file_system
-        app.config.to_prepare do
-          Rails::Generators.configure!
-          # generate before each request in development
-          Rails::Generators.invoke('hobo:routes', %w[-f -q])
-        end
+      app.config.to_prepare do
+        Rails::Generators.invoke('hobo:routes', %w[-f -q])
       end
     end
 

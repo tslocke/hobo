@@ -1,6 +1,7 @@
 module Generators
   module HoboSupport
     Model = classy_module do
+      include EvalTemplate
 
       argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
@@ -15,10 +16,8 @@ module Generators
       end
 
       def inject_hobo_code_into_model_file
-        source  = File.expand_path(find_in_source_paths('model_injection.rb.erb'))
-        context = instance_eval('binding')
         inject_into_class model_path, class_name do
-          ERB.new(::File.binread(source), nil, '-').result(context)
+          eval_template('model_injection.rb.erb')
         end
       end
 
