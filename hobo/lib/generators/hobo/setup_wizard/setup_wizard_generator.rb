@@ -44,6 +44,9 @@ module Hobo
     class_option :git_repo, :type => :boolean,
     :desc => "Create the git repository with the initial commit"
 
+    class_option :gitignore_auto_generated_files, :type => :boolean,
+    :desc => "Add the auto-generated files to .gitignore", :default => true
+
 
     def startup
       if wizard?
@@ -205,16 +208,20 @@ EOI
       if wizard?
         say_title 'Git Repository'
         return unless yes_no?("Do you want to initialize a git repository now?")
+        gitignore_auto_generated = yes_no? "Do you want git to ignore the auto-generated files?\n(Choose 'n' only if you are planning to deploy on a read-only File System like Heroku)"
         say 'Initializing git repository...'
       else
         return unless options[:git_repo]
+        gitignore_auto_generated = options[:gitignore_auto_generated_files]
       end
-      hobo_routes_rel_path = Hobo::Engine.config.hobo.routes_path.relative_path_from Rails.root
-      append_file '.gitignore', "app/views/taglibs/auto/**/*\n#{hobo_routes_rel_path}\n"
+      if gitignore_auto_generated
+        hobo_routes_rel_path = Hobo::Engine.config.hobo.routes_path.relative_path_from Rails.root
+        append_file '.gitignore', "app/views/taglibs/auto/**/*\n#{hobo_routes_rel_path}\n"
+      end
       git :init
       git :add => '.'
       git :commit => '-m "initial commit"'
-      say "NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly.", Color::YELLOW
+      say("NOTICE: If you change the config.hobo.routes_path, you should update the .gitignore file accordingly.", Color::YELLOW) if gitignore_auto_generated
     end
 
     def finalize

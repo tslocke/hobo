@@ -75,7 +75,7 @@ Dev Notes:
 
         say_title "Hobo Setup Wizard"
         if yes_no?("Do you want to start the Setup Wizard now?
-(Choose 'no' if you need to manually customize any file before running the Wizard.
+(Choose 'n' if you need to manually customize any file before running the Wizard.
 You can rerun it at any time with `hobo g setup_wizard` from the application root dir.)")
           exec 'rails g hobo:setup_wizard --no-main-title'
         else
