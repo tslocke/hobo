@@ -15,8 +15,8 @@ module ActiveRecord
       end
       alias_method_chain :scoped, :origin
 
-      def method_missing_with_origin(method, *args)
-        res = method_missing_without_origin(method, *args)
+      def method_missing_with_origin(method, *args, &block)
+        res = method_missing_without_origin(method, *args, &block)
         res.origin = @owner if res.respond_to?(:origin)
         res.origin_attribute = @reflection.name if res.respond_to?(:origin_attribute)
         res
