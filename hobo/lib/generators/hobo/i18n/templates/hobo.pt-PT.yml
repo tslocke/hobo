@@ -178,3 +178,4 @@
 
     boolean_yes: "Sim"
     boolean_no: "Não"
+    password_hidden: "[palavra-chave]"

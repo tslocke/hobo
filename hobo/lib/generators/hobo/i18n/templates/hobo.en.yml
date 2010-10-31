@@ -177,3 +177,4 @@ en:
 
     boolean_yes: "Yes"
     boolean_no: "No"
+    password_hidden: "[password hidden]"

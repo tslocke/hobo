@@ -9,7 +9,7 @@ module HoboFields
       end
 
       def to_html(xmldoctype = true)
-        I18n.t("#{self.class.table_name}.states.#{self}", :default => self)
+        I18n.t("#{self.class.table_name}.states.#{self}", :default => self).html_safe
       end
     end
   end

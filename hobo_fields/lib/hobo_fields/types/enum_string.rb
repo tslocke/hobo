@@ -85,7 +85,7 @@ module HoboFields
       end
 
       def to_html(xmldoctype = true)
-        self.class.translated_values[self]
+        self.class.translated_values[self].html_safe
       end
 
       def ==(other)

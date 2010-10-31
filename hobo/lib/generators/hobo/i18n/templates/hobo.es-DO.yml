@@ -183,3 +183,4 @@
 
     boolean_yes: "Si"
     boolean_no: "No"
+    password_hidden: "[contraseña]"

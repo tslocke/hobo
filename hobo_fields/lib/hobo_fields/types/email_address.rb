@@ -1,3 +1,5 @@
+require 'active_support/core_ext/string/output_safety'
+
 module HoboFields
   module Types
     class EmailAddress < String
@@ -13,7 +15,7 @@ module HoboFields
       end
 
       def to_html(xmldoctype = true)
-        self.sub('@', " at ").gsub('.', ' dot ')
+        ERB::Util.html_escape(self).sub('@', " at ").gsub('.', ' dot ')
       end
 
       HoboFields.register_type(:email_address, self)

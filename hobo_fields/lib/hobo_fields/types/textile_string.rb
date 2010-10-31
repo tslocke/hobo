@@ -12,7 +12,7 @@ module HoboFields
         else
           textilized = RedCloth.new(self, [ :hard_breaks ])
           textilized.hard_breaks = true if textilized.respond_to?("hard_breaks=")
-          textilized.to_html
+          HoboFields::SanitizeHtml.sanitize(textilized.to_html)
         end
       end
 

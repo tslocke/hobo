@@ -3,7 +3,7 @@ module HoboFields
     class RawHtmlString < HoboFields::Types::Text
 
       def to_html(xmldoctype = true)
-        self
+        self.html_safe
       end
 
       HoboFields.register_type(:raw_html, self)
