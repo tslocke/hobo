@@ -97,7 +97,7 @@ module Hobo
         end
         page << renderer.part_contexts_storage if renderer
       end
-   end
+    end
 
 
     def dryml_context

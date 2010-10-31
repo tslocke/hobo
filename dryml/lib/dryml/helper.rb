@@ -31,7 +31,7 @@ module Dryml::Helper
       end
       res
     end
-    
+
     def first_item?
       if scope.repeat_collection.respond_to? :each_pair
         this == scope.repeat_collection.first.try.last
@@ -39,8 +39,8 @@ module Dryml::Helper
         this == scope.repeat_collection.first
       end
     end
-    
-    
+
+
     def last_item?
       if scope.repeat_collection.respond_to? :each_pair
         this == scope.repeat_collection.last.try.last
@@ -49,7 +49,7 @@ module Dryml::Helper
       end
     end
 
-        def param_name_for(path)
+    def param_name_for(path)
       field_path = field_path.to_s.split(".") if field_path.is_one_of?(String, Symbol)
       attrs = path.rest.map{|part| "[#{part.to_s.sub /\?$/, ''}]"}.join
       "#{path.first}#{attrs}"

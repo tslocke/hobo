@@ -44,9 +44,7 @@ module HoboFields
   }
 
   @field_types   = PLAIN_TYPES.with_indifferent_access
-
   @never_wrap_types = Set.new([NilClass, Hobo::Boolean, TrueClass, FalseClass])
-
   attr_reader :field_types
 
   def to_class(type)
@@ -58,11 +56,9 @@ module HoboFields
     end
   end
 
-
   def to_name(type)
     field_types.key(type) || ALIAS_TYPES[type]
   end
-
 
   def can_wrap?(type, val)
     col_type = type::COLUMN_TYPE
@@ -72,21 +68,17 @@ module HoboFields
     (arity == 1 || arity == -1) && !@never_wrap_types.any? { |c| klass <= c }
   end
 
-
   def never_wrap(type)
     @never_wrap_types << type
   end
-
 
   def register_type(name, klass)
     field_types[name] = klass
   end
 
-
   def plain_type?(type_name)
     type_name.in?(PLAIN_TYPES)
   end
-
 
   def standard_class(name)
     class_name = STANDARD_TYPES[name]

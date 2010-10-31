@@ -5,13 +5,13 @@ require 'will_paginate'
 require 'hobo/extensions/enumerable'
 require 'hobo/extensions/array'
 
-ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
 
 
 module Hobo
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
-  @@root = Pathname.new File.expand_path(File.dirname(__FILE__) + "/..")
+  @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
   class Error < RuntimeError; end

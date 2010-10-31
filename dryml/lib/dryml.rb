@@ -4,19 +4,16 @@
 # Copyright:: Copyright (c) 2008
 # License::   Distributes under the same terms as Ruby
 
-
-
-# gem dependencies
 require 'hobo_support'
 require 'action_pack'
 
-ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
 
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
-  @@root = Pathname.new File.expand_path(File.dirname(__FILE__) + "/..")
+  @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
   class DrymlSyntaxError < RuntimeError; end
@@ -32,21 +29,14 @@ module Dryml
   end
 
   TagDef = Struct.new "TagDef", :name, :attrs, :proc
-
   RESERVED_WORDS = %w{if for while do class else elsif unless case when module in}
-
   ID_SEPARATOR = '; dryml-tag: '
   APPLICATION_TAGLIB = { :src => "taglibs/application" }
   CORE_TAGLIB        = { :src => "core", :plugin => "dryml" }
-
   DEFAULT_IMPORTS = defined?(ApplicationHelper) ? [ApplicationHelper] : []
-
   @cache = {}
-
   extend self
-
   attr_accessor :last_if
-
 
   def precompile_taglibs
     Dir.chdir(Rails.root) do
@@ -56,7 +46,6 @@ module Dryml
     end
   end
 
-
   def clear_cache
     @cache = {}
   end
@@ -65,7 +54,6 @@ module Dryml
     renderer = empty_page_renderer(view)
     renderer.render_tag(tag, options)
   end
-
 
   def empty_page_renderer(view)
     page_renderer(view, page_tag_identifier(view.controller.controller_path))
@@ -87,10 +75,8 @@ module Dryml
     end
   end
 
-
   def page_renderer(view, identifier, local_names=[], controller_path=nil)
     controller_path ||= view.controller.controller_path
-  #  prepare_view!(view)
     if identifier =~ /#{ID_SEPARATOR}/
       identifier = identifier.split(ID_SEPARATOR).first
       @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_path))
@@ -111,7 +97,6 @@ module Dryml
     end
   end
 
-
   def get_field(object, field)
     return nil if object.nil?
     field_str = field.to_s
@@ -126,14 +111,21 @@ module Dryml
     end
   end
 
+  def get_field(object, field)
+    return nil if object.nil?
+    field_str = field.to_s
+    case
+    when object.respond_to?(field_str)
+      object.send(field_str)
+    when field_str =~ /^\d+$/
+      object[field.to_i]
+    else
+      object[field]
+    end
+  end
 
   def get_field_path(object, path)
-    path = if path.is_a? String
-             path.split('.')
-           else
-             Array(path)
-           end
-
+    path = path.is_a?(String) ? path.split('.') : Array(path)
     parent = nil
     path.each do |field|
       return nil if object.nil?
@@ -143,17 +135,11 @@ module Dryml
     [parent, path.last, object]
   end
 
-
-
   def unreserve(word)
     word = word.to_s
-    if RESERVED_WORDS.include?(word)
-      word + "_"
-    else
-      word
-    end
+    word += '_' if RESERVED_WORDS.include?(word)
+    word
   end
-
 
   def static_tags
     @static_tags ||= begin
@@ -228,20 +214,6 @@ private
     { :src => src } if Object.const_defined?(:Rails) && File.exists?("#{Rails.root}/app/views/#{src}.dryml")
   end
 
-  def prepare_view!(view)
-    # Not sure why this isn't done for me...
-    # There's probably a button to press round here somewhere
-    for var in %w(@flash @cookies @action_name @_session @_request @request_origin
-                  @request @ignore_missing_templates @_headers @variables_added
-                  @_flash @response @template_class
-                  @_cookies @before_filter_chain_aborted @url
-                  @_response @template_root @headers @_params @params @session)
-      unless @view.instance_variables.include?(var)
-        view.instance_variable_set(var, view.controller.instance_variable_get(var))
-      end
-    end
-  end
-
   # create and compile a renderer class (AKA Dryml::Template::Environment)
   #
   # template_src:: the DRYML source
@@ -261,7 +233,6 @@ private
     renderer_class
   end
 
-
   def compile_renderer_class(renderer_class, template_src, template_path, locals, taglibs=[])
     template = Dryml::Template.new(template_src, renderer_class, template_path)
     DEFAULT_IMPORTS.each {|m| template.import_module(m)}
@@ -271,7 +242,6 @@ private
 
     template.compile(all_local_names, [CORE_TAGLIB]+taglibs)
   end
-
 
 end
 
