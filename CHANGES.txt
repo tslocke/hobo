@@ -14,6 +14,10 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo 1.0.2 ===
+
+This release is identical to 1.0.1 except that it updates the version requirements to exclude Rails3.  Hobo does not currently work with Rails3, although we are working on it.
+
 === Hobo 1.0.1 ===
 
 This version contains two speedups: one fix that reduces the number of
