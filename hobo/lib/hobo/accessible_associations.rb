@@ -9,7 +9,11 @@ module Hobo
 
       array = params_hash_to_array(array_or_hash)
       array.map! do |record_hash_or_string|
-        finder = association.member_class.scoped :conditions => association.conditions
+        if association.conditions.nil?
+          finder = association.member_class
+        else
+          finder = association.member_class.scoped :conditions => association.conditions
+        end
         find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
           # The block is required to either locate find an existing record in the collection, or build a new one
           if id
