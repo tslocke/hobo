@@ -11,7 +11,13 @@ require 'hobosupport'
 require 'action_pack'
 require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
-ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
+if ActiveSupport.const_defined? :Dependencies
+  if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+    ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+  else
+    ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
+  end
+end
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
