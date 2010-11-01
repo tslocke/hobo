@@ -24,7 +24,7 @@ module Hobo
 
       def self.def_state(name, on_enter)
         name = name.to_sym
-        returning(Lifecycles::State.new(name, on_enter)) do |s|
+        Lifecycles::State.new(name, on_enter).tap do |s|
           states[name] = s
           class_eval "def #{name}_state?; state_name == :#{name} end"
         end
@@ -33,7 +33,7 @@ module Hobo
 
       def self.def_creator(name, on_create, options)
         name = name.to_sym
-        returning(Creator.new(self, name, on_create, options)) do |creator|
+        Creator.new(self, name, on_create, options).tap do |creator|
 
           class_eval %{
                        def self.#{name}(user, attributes=nil)
@@ -48,7 +48,7 @@ module Hobo
       end
 
       def self.def_transition(name, start_state, end_states, on_transition, options)
-        returning(Transition.new(self, name.to_s, start_state, end_states, on_transition, options)) do |t|
+        Transition.new(self, name.to_s, start_state, end_states, on_transition, options).tap do |t|
 
           class_eval %{
                        def #{name}!(user, attributes=nil)
