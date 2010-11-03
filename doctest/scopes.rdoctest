@@ -74,6 +74,7 @@ Some load path manipulation:
 And we'll require hobo:
 {.hidden}
 
+    >> gem 'will_paginate', '~> 2'
     >> require 'will_paginate'
     >> require 'will_paginate/finder'
     >> require 'hobosupport'
