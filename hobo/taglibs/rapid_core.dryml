@@ -1,4 +1,3 @@
-<!-- Core Rapid tags and tags that don't belong anywhere else. -->
 
 <!-- Renders a table with one row per field, where each row contains a `<th>` with the field name, and a `<td>` with (by default)
      a `<view>` of the field.

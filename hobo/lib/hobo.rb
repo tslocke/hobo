@@ -2,6 +2,7 @@
 require 'hobosupport'
 require 'hobofields'
 begin
+  gem 'will_paginate', '~> 2'
   require 'will_paginate'
   require 'will_paginate/finder'
 rescue MissingSourceFile

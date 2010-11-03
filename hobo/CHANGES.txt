@@ -16,7 +16,28 @@ subversion.
 
 === Hobo 1.0.2 ===
 
-This release is identical to 1.0.1 except that it updates the version requirements to exclude Rails3.  Hobo does not currently work with Rails3, although we are working on it.
+This release is almost identical to 1.0.1 except that it updates the
+version requirements to exclude Rails3.  Hobo does not currently work
+with Rails3, although we are working on it.
+
+This release silences some warnings produced when running with Rails
+2.3.10.
+
+This release contains preliminary support for Ruby 1.9.2, although you
+may encounter problems if you use Single Type Inheritance (STI)
+models.
+
+A few very minor bug fixes have also been included.  See the [github
+log](http://github.com/tablatom/hobo/tree/v1.0.2) for more details.
+
+=== Hobo 1.0.1 ===
+
+This version contains two speedups: one fix that reduces the number of
+database accesses by Matt Jones and one that speeds up compilation of
+DRYML by Petteri Räty.
+
+This version also contains several bug fixes.  See the [github
+log](http://github.com/tablatom/hobo/tree/v1.0.1) for more details.
 
 === Hobo 1.0.0 ===
 
