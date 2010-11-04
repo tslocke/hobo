@@ -74,7 +74,7 @@ module Hobo
           # the singularize method is used because Hobo does not keep the ActiveRecord convention in its tags
           # no default needed because human_name defaults to the model name
           # try because Hobo class is not an ActiveRecord::Base subclass
-          translated_pluralized_model = klass.try.model_name.try.human(:count=>options[:count])
+          translated_pluralized_model = klass.try.model_name.try.human(:count=>options[:count]||1)
           options[:model] = translated_pluralized_model
         end
 
