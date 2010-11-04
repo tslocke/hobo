@@ -175,6 +175,10 @@ en:
     dev_user_changer:
       guest: "Guest"
 
+    admin:
+      subsite_name: "Admin"
+      invite_new_user: "Invite a new user"
+
     boolean_yes: "Yes"
     boolean_no: "No"
     password_hidden: "[password hidden]"

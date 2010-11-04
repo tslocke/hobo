@@ -7,6 +7,7 @@ module Hobo
 
     include Generators::Hobo::Subsite
     include Generators::Hobo::InviteOnly
+    include Generators::HoboSupport::EvalTemplate
 
     def self.banner
       "rails generate hobo:admin_subsite [NAME=admin] [options]"
@@ -29,14 +30,9 @@ module Hobo
     end
 
     def append_admin_tag_into_application_taglib
-      source  = File.expand_path(find_in_source_paths('admin_tag_injection.erb'))
       destination = File.join(Rails.root, "app/views/taglibs/application.dryml")
-      context = instance_eval('binding')
-      append_file destination do
-        ERB.new(::File.binread(source), nil, '-').result(context)
-      end
+      append_file(destination) { eval_template('admin_tag_injection.erb') }
     end
-
 
   end
 end

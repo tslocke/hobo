@@ -1,5 +1,7 @@
 <index-page without-new-form>
   <after-count:>
-    <a with="&<%= options[:user_resource_name].camelize %>" action="invite">Invite a new user</a>
+    <a with="&<%= options[:user_resource_name].camelize %>" action="invite">
+      <t key="hobo.admin.invite_new_user">Invite a new user</t>
+    </a>
   </after-count:>
 </index-page>

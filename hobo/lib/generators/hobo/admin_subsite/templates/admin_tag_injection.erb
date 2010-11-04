@@ -2,7 +2,9 @@
 <extend tag="page">
   <old-page merge>
     <footer:>
-      <a href="&<%= file_name %>_<%= options[:user_resource_name].underscore.pluralize %>_url" if="&current_user.administrator?">Admin</a>
+      <a href="&<%= file_name %>_<%= options[:user_resource_name].underscore.pluralize %>_url" if="&current_user.administrator?">
+        <t key="hobo.admin.subsite_name"><%= name.titleize %></t>
+      </a>
     </footer:>
   </old-page>
 </extend>

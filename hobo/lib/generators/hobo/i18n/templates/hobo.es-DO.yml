@@ -181,6 +181,10 @@
     dev_user_changer:
       guest: "Invitado"
 
+    admin:
+      subsite_name: "Administración"
+      invite_new_user: "Invitar Nuevo Usuario"
+
     boolean_yes: "Si"
     boolean_no: "No"
     password_hidden: "[contraseña]"
