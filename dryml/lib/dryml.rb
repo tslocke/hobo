@@ -100,20 +100,6 @@ module Dryml
   def get_field(object, field)
     return nil if object.nil?
     field_str = field.to_s
-    begin
-      return object.send(field_str)
-    rescue NoMethodError => ex
-      if field_str =~ /^\d+$/
-        return object[field.to_i]
-      else
-        return object[field]
-      end
-    end
-  end
-
-  def get_field(object, field)
-    return nil if object.nil?
-    field_str = field.to_s
     case
     when object.respond_to?(field_str)
       object.send(field_str)
