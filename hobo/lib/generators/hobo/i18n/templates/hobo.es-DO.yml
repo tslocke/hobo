@@ -185,6 +185,9 @@
       subsite_name: "Administración"
       invite_new_user: "Invitar Nuevo Usuario"
 
+    subsite:
+      back_link: "Sitio Principal"
+
     boolean_yes: "Si"
     boolean_no: "No"
     password_hidden: "[contraseña]"

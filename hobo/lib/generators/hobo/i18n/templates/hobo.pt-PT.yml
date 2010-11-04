@@ -180,6 +180,9 @@
       subsite_name: "Administração"
       invite_new_user: "Invitar Novo Utilizador"
 
+    subsite:
+      back_link: "Sítio Principal"
+
     boolean_yes: "Sim"
     boolean_no: "Não"
     password_hidden: "[palavra-chave]"

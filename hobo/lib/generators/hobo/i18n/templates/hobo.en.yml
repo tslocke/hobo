@@ -179,6 +179,9 @@ en:
       subsite_name: "Admin"
       invite_new_user: "Invite a new user"
 
+    subsite:
+      back_link: "View Site"
+
     boolean_yes: "Yes"
     boolean_no: "No"
     password_hidden: "[password hidden]"
