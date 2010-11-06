@@ -3,7 +3,11 @@ module Hobo
   class ViewHints
     
     def self.enable
-      ActiveSupport::Dependencies.load_paths |= ["#{RAILS_ROOT}/app/viewhints"]
+      if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+        ActiveSupport::Dependencies.autoload_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
+      else
+        ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
+      end
     end
   
     def self.setter(name, default=nil, &block)

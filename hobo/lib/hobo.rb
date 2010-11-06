@@ -2,12 +2,17 @@
 require 'hobosupport'
 require 'hobofields'
 begin
+  gem 'will_paginate', '~> 2'
   require 'will_paginate'
 rescue MissingSourceFile
   # OK, Hobo won't do pagination then
 end
 
-ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
+if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+  ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+else
+  ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
+end
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::HOBO_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -16,7 +21,7 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "1.0.1"
+  VERSION = "1.0.2"
   
   class PermissionDeniedError < RuntimeError; end
 
@@ -161,7 +166,11 @@ module Hobo
 
       HoboFields.never_wrap(Hobo::Undefined) if defined? HoboFields
 
-      ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
+      if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+        ActiveSupport::Dependencies.autoload_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
+      else
+        ActiveSupport::Dependencies.load_paths |= [ "#{RAILS_ROOT}/app/viewhints" ]
+      end
     end
 
   end

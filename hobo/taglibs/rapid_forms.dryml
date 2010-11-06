@@ -102,8 +102,6 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
         <div part="comments"><collection:comments/></div>
         <form with="&Comment.new" update="comments"/>
 
-`<form>` support all of the standard ajax attributes.
-
 ### Additional Notes
 
 - Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
@@ -112,6 +110,19 @@ AJAX based submission can be enabled by simply adding an `update` attribute. e.g
   validation error occurs.
 
 - `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
+
+- `<form>` resets `last_if` if it does not have permission to display the form.   The `<else>` clause may be used to display alternate content.   For example:
+
+    <form>...</form>
+    <else>You do not have permission to edit this form</else>
+
+or on a standard generated page using a default form:
+
+    <some-page>
+      <after-form:>
+        <else>You do not have permission to edit this form</else>
+      </after-form:>
+    </some-page>
   
 ### Attributes
 
@@ -992,8 +1003,8 @@ end
       <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          <ht key="#{this.class.class_name.tableize}.collection.empty_message">          
-            No <%= this.class.class_name.titleize.downcase.pluralize %>.
+          <ht key="#{this.class.name.tableize}.collection.empty_message">          
+            No <%= this.class.name.titleize.downcase.pluralize %>.
           </ht>
         </div>
         <div class="buttons">
