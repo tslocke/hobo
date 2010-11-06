@@ -179,25 +179,26 @@ module Dryml
 private
 
   def taglibs_for(controller_path)
-    ([APPLICATION_TAGLIB] +
-    application_taglibs() +
-    [subsite_taglib(controller_path)] +
-    (controller_path.camelize+"Controller").constantize.try.included_taglibs||[]).compact
+    ( taglibs_in_dir('application').unshift(APPLICATION_TAGLIB) +
+      subsite_taglibs(controller_path) +
+      (controller_path.camelize+"Controller").constantize.try.included_taglibs||[]
+    ).compact
   end
 
-  def application_taglibs
-    Dir.chdir(Rails.root) do
-      Dir["app/views/taglibs/application/**/*.dryml"].map{|f| File.basename f, '.dryml'}.map do |n|
-        { :src => "taglibs/application/#{n}" }
-      end
-    end
-  end
-
-  def subsite_taglib(controller_path)
+  def subsite_taglibs(controller_path)
     parts = controller_path.split("/")
     subsite = parts.length >= 2 ? parts[0..-2].join('_') : "front"
     src = "taglibs/#{subsite}_site"
-    { :src => src } if Object.const_defined?(:Rails) && File.exists?("#{Rails.root}/app/views/#{src}.dryml")
+    Object.const_defined?(:Rails) && File.exists?("#{Rails.root}/app/views/#{src}.dryml") ?
+      taglibs_in_dir("#{subsite}_site").unshift({ :src => src }) : []
+  end
+
+  def taglibs_in_dir(dir_name)
+    Dir.chdir(Rails.root) do
+      Dir["app/views/taglibs/#{dir_name}/**/*.dryml"].map{|f| File.basename f, '.dryml'}.map do |n|
+        { :src => "taglibs/#{dir_name}/#{n}" }
+      end
+    end
   end
 
   # create and compile a renderer class (AKA Dryml::Template::Environment)
