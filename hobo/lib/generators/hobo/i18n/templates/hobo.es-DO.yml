@@ -91,7 +91,7 @@
       previous: "Precedente"
       next: "Proxima"
       add: "Añadir"
-      show_all: "todos..."
+      show_all: "Muestra todos %{model}..."
       delete: "Borrar %{model}"
       save: "Guardar %{model}"
       cancel: "Cancelar"
