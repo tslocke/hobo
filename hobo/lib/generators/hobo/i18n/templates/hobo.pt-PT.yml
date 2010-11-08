@@ -50,7 +50,7 @@
       email_address: &email_address "E-mail"
       name: "Name"
       password: "Palavra-chave"
-      remember_me: "Recordar-se de mim"
+      remember_me: "Gravar Login"
       login: "Login"
       signup: "Resgistar"
       forgot_password: &forgot_password "Esqueceu-se da senha?"
@@ -63,14 +63,14 @@
     forgot_password:
       title: *forgot_password
       heading: *forgot_password
-      text: "Introduza o seu endereço de e-mail, o mesmo com que se registou. Vamos enviar um endereço para gerar uma palavra-chave."
+      text: "Introduza o seu endereço de e-mail, o mesmo com que se registou. Vamos enviar uma mensagem para recuperar a palavra-chave."
       email: "E-mail"
       send: "Enviar"
 
     forgot_password_sent:
       title: "Recuperação da palavra-chave - e-mail enviado"
       heading: "Recuperação da palavra-chave - e-mail enviado"
-      text: "Foram enviadas para o e-mail %{email_address} as instruções de como gerar uma nova palavra-chave. Se não o receber, por favor verifique o filtro de spam."
+      text: "Foi enviada uma mensagem para %{email_address} com as instruções de como gerar uma nova palavra-chave. Se não o receber, por favor verifique o filtro de SPAM."
 
     account_disabled:
       title: "Conta não encontrada"
@@ -119,7 +119,7 @@
         success: "O %{model} foi removido"
       signup:
         success: "Obrigado por efectuar o registo!"
-        must_activate: "Deve ativar o seu registo antes de se identificar. Por favor, verifique na sua caixa de correio electrônico.
+        must_activate: "Deve ativar o seu registo antes de se identificar. Por favor, verifique na sua caixa de correio electrônico."
       login:
         success: "Está indetificado no sistema."
         error: "Não especificou um utilizador válido ({{login}}) e respectiva palavra-chave!"
@@ -178,7 +178,7 @@
 
     admin:
       subsite_name: "Administração"
-      invite_new_user: "Invitar Novo Utilizador"
+      invite_new_user: "Convidar Novo Utilizador"
 
     subsite:
       back_link: "Sítio Principal"
