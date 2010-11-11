@@ -33,7 +33,7 @@ module Hobo
     :desc => "Generate migration only"
 
     class_option :migration_migrate, :type => :boolean,
-    :desc => "Generate migration and migrate"
+    :desc => "Generate migration and migrate", :default => true
 
     class_option :default_locale, :type => :string,
     :desc => "Sets the default locale"
@@ -158,7 +158,7 @@ EOI
                                    :invite_only => @invite_only
     end
 
-    def migration
+    def generate_migration
       if wizard?
         say_title 'DB Migration'
         action = choose('Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate [s|g|m]:', /^(s|g|m)$/)
@@ -172,8 +172,8 @@ EOI
               end
         say action == 'g' ? 'Generating Migration...' : 'Migrating...'
       else
-        return if options[:migration_generate].blank? && options[:migration_migrate].blank?
-        opt = options[:migration_migrate].blank? ? {:generate => true} : {:migrate => true}
+        return if !options[:migration_generate] && !options[:migration_migrate]
+        opt = options[:migration_migrate] ? {:migrate => true} : {:generate => true}
       end
       rake 'db:setup'
       invoke 'hobo:migration', ['initial_migration'], opt
