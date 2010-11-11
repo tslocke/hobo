@@ -87,7 +87,7 @@ module HoboFields
       index_options = {}
       index_options[:name] = options.delete(:index) if options.has_key?(:index)
 
-      belongs_to_without_field_declarations(name, options, &block).tap do
+      returning belongs_to_without_field_declarations(name, options, &block) do
         refl = reflections[name.to_sym]
         fkey = refl.primary_key_name
         declare_field(fkey.to_sym, :integer, column_options)
