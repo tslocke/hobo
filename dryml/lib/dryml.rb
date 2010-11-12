@@ -25,7 +25,7 @@ end
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
-    VERSION = "1.1.0.pre0"
+    VERSION = "1.1.0.pre1"
 
     class DrymlSyntaxError < RuntimeError; end
       
