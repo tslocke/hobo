@@ -32,15 +32,21 @@ require 'rexml/xpath'
 
         def initialize(home, filename, name=nil)
           @name = name || filename.sub(/.dryml$/, '')[home.length+1..-1]
+          @source = File.read(filename)
           @doc = Dryml::Parser::Document.new(File.read(filename), filename)
           parse_tag_defs
         end
-
-        attr_reader :name, :doc, :tag_defs
-
+        
+        attr_reader :name, :doc, :tag_defs, :source
+        
         def comment
           first_node = doc[0][0]
-          doc.restore_erb_scriptlets(first_node.to_s.strip) if first_node.is_a?(REXML::Comment)
+          if first_node.is_a?(REXML::Comment)
+            doc.restore_erb_scriptlets(first_node.to_s.strip)
+          elsif first_node.to_s.strip.starts_with?("[![DRYML-ERB")
+            text = doc.restore_erb_scriptlets(first_node.to_s.strip)
+            text.match(/<%#(.*?)%>/m)[1] rescue nil
+          end
         end
 
         include CommentMethods
@@ -76,8 +82,8 @@ require 'rexml/xpath'
         def source
           doc.restore_erb_scriptlets(node.to_s).strip
         end
-
-        # The contents of the XML comment, if any, immediately above the tag definition
+        
+        # The contents of the XML or ERB comment, if any, immediately above the tag definition
         def comment
           @comment ||= begin
             space = node.previous_sibling and
@@ -86,6 +92,9 @@ require 'rexml/xpath'
 
             if comment_node.is_a?(REXML::Comment)
               doc.restore_erb_scriptlets(comment_node.to_s.strip)
+            elsif space.to_s.strip.starts_with?("[![DRYML-ERB")
+              text = doc.restore_erb_scriptlets(space.to_s.strip)
+              text.match(/.*<%#(.*?)%>$/m)[1] rescue nil
             end
           end
         end
