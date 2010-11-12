@@ -57,7 +57,6 @@ module Hobo
 
         WillPaginate::Finder::ClassMethods.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
-            # using 'returning' here triggers a full load
             collection = paginate_without_hobo_metadata(*args, &block)
             collection.member_class     = self
             collection.origin           = try.proxy_owner

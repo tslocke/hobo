@@ -24,45 +24,36 @@ module Hobo
 
       def self.def_state(name, on_enter)
         name = name.to_sym
-        Lifecycles::State.new(name, on_enter).tap do |s|
-          states[name] = s
-          class_eval "def #{name}_state?; state_name == :#{name} end"
-        end
+        class_eval "def #{name}_state?; state_name == :#{name} end"
+        states[name] = Lifecycles::State.new(name, on_enter)
       end
 
 
       def self.def_creator(name, on_create, options)
-        name = name.to_sym
-        Creator.new(self, name, on_create, options).tap do |creator|
-
-          class_eval %{
-                       def self.#{name}(user, attributes=nil)
-                         create(:#{name}, user, attributes)
-                       end
-                       def self.can_#{name}?(user, attributes=nil)
-                         can_create?(:#{name}, user)
-                       end
-                      }
-
-       end
+        class_eval %{
+                     def self.#{name}(user, attributes=nil)
+                       create(:#{name}, user, attributes)
+                     end
+                     def self.can_#{name}?(user, attributes=nil)
+                       can_create?(:#{name}, user)
+                     end
+                    }
+        Creator.new(self, name.to_s, on_create, options)
       end
 
       def self.def_transition(name, start_state, end_states, on_transition, options)
-        Transition.new(self, name.to_s, start_state, end_states, on_transition, options).tap do |t|
-
-          class_eval %{
-                       def #{name}!(user, attributes=nil)
-                         transition(:#{name}, user, attributes)
-                       end
-                       def can_#{name}?(user, attributes=nil)
-                         can_transition?(:#{name}, user)
-                       end
-                       def valid_for_#{name}?
-                         valid_for_transition?(:#{name})
-                       end
-                      }
-
-        end
+        class_eval %{
+                     def #{name}!(user, attributes=nil)
+                       transition(:#{name}, user, attributes)
+                     end
+                     def can_#{name}?(user, attributes=nil)
+                       can_transition?(:#{name}, user)
+                     end
+                     def valid_for_#{name}?
+                       valid_for_transition?(:#{name})
+                     end
+                    }
+        Transition.new(self, name.to_s, start_state, end_states, on_transition, options)
       end
 
       def self.state_names

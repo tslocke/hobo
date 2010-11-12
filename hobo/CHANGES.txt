@@ -28,7 +28,8 @@ may encounter problems if you use Single Type Inheritance (STI)
 models.
 
 A few very minor bug fixes have also been included.  See the [github
-log](http://github.com/tablatom/hobo/tree/v1.0.2) for more details.
+log](https://github.com/tablatom/hobo/compare/v1.0.1...v1.0.2) for
+more details.
 
 === Hobo 1.0.1 ===
 
