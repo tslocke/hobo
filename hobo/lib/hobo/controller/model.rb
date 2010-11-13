@@ -356,9 +356,7 @@ module Hobo
     def re_render_form(default_action=nil)
       if params[:page_path]
         @invalid_record = this
-        opt = ActionController::Routing::Routes.recognize_path(params[:page_path])
-        controller = opt[:controller]
-        action = opt[:action]
+        controller, action = controller_action_from_page_path
 
         # Hack fix for Bug 477.  See also bug 489.
         if self.class.name == "#{controller.camelize}Controller" && action == "index"
@@ -396,16 +394,6 @@ module Hobo
     def owning_object
       method = @this.class.view_hints.parent
       method ? @this.send(method) : nil
-    end
-
-
-    def url_for_page_path
-      url_for ActionController::Routing::Routes.recognize_path(params[:page_path])
-    end
-
-    # TODO: Get rid of this joke of an idea that fails miserably if you open another browser window.
-    def previous_page_path
-      session[:previous_page_path]
     end
 
 

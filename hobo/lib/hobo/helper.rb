@@ -126,6 +126,18 @@ module Hobo
     end
 
 
+    def recognize_page_path
+      ActionController::Routing::Routes.recognize_path(params[:page_path])
+    end
+
+    def url_for_page_path(options={})
+      url_for recognize_page_path.merge(options)
+    end
+
+    def controller_action_from_page_path
+      recognize_page_path.values_at(:controller,:action)
+    end
+
     def _as_params(name, obj)
       if obj.is_a? Array
         obj.map {|x| _as_params("#{name}[]", x)}.join("&")
