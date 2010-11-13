@@ -28,7 +28,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
-             sort_url = url_for(params.merge(:sort => sort) - [:page])
+             sort_url = url_for_page_path(params.merge(:sort => sort) - [:page])
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
 
           <th param="#{scope.field-name}-heading">
@@ -45,7 +45,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
     </table>
     <empty-collection-message param="empty-message"/>
 
-    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
+    <page-nav param params="&recognize_page_path.slice(:controller,:action)" if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
   </div>
 </def>
 
