@@ -78,12 +78,12 @@ module Hobo
                                     :update => true
     end
 
-    def invite_only_option
+    def site_options
       if wizard?
         say_title 'Invite Only Option'
         return unless (@invite_only = yes_no?("Do you want to add the features for an invite only website?"))
-        private_site = yes_no?("Do you want to prevent all access to the site to non-members?")
-        say %( If you wish to prevent all access to some controller to non-members, add 'before_filter :login_required'
+        private_site = yes_no?("Do you want to prevent all access to the site to non-members?\n(Choose 'y' only if ALL your site will be private, choose 'n' if at least one controller will be public)")
+        say( %( If you wish to prevent all access to some controller to non-members, add 'before_filter :login_required'
 to the relevant controllers:
 
     include Hobo::Controller::AuthenticationSupport
@@ -92,7 +92,7 @@ to the relevant controllers:
 (note that the include statement is not required for hobo_controllers)
 
 NOTE: You might want to sign up as the administrator before adding this!
-), Color::YELLOW
+), Color::YELLOW) unless private_site
       else
         @invite_only = invite_only?
         private_site = options[:private_site]
@@ -113,7 +113,7 @@ EOI
       invoke 'hobo:rapid'
     end
 
-    def user_resource
+    def user_options
       if wizard?
         say_title 'User Resource'
         @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
