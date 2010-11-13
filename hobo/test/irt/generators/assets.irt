@@ -1,8 +1,8 @@
 require File.expand_path('../helper.rb', __FILE__)
 
 
-desc "hobo:basic invoke"
-invoke 'hobo:basic', %w(-q)
+desc "hobo:assets invoke"
+invoke 'hobo:assets', %w(-q)
 
 files_exist? %w[ app/views/taglibs/application.dryml
                  public/stylesheets/application.css

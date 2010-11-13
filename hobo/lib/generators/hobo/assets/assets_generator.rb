@@ -1,9 +1,9 @@
 module Hobo
-  class BasicGenerator < Rails::Generators::Base
+  class AssetsGenerator < Rails::Generators::Base
     source_root File.expand_path('../templates', __FILE__)
 
     def self.banner
-      "rails generate hobo:basic"
+      "rails generate hobo:assets"
     end
 
     def copy_rapid_files

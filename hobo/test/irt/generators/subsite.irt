@@ -21,7 +21,7 @@ eval_file '../partials/_subsite_taglib_noopt.rb'
 
 git_reset_app
 
-invoke 'hobo:basic', %w[ -q ]
+invoke 'hobo:assets', %w[ -q ]
 invoke 'hobo:subsite', %w[ subs -q --make-front-site]
 desc "Subsite with make-front-site files exist"
 files_exist? %w[ app/views/taglibs/front_site.dryml

@@ -51,9 +51,9 @@ module Hobo
     def startup
       if wizard?
         say_title options[:main_title] ? 'Hobo Setup Wizard' : 'Startup'
-        say 'Installing basic Hobo Files...'
+        say 'Installing Hobo assets...'
       end
-      invoke 'hobo:basic'
+      invoke 'hobo:assets'
     end
 
     def choose_test_framework
@@ -161,7 +161,7 @@ EOI
     def generate_migration
       if wizard?
         say_title 'DB Migration'
-        action = choose('Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate [s|g|m]:', /^(s|g|m)$/)
+        action = choose("Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate [s|g|m]:", /^(s|g|m)$/)
         opt = case action
               when 's'
                 return say('Migration skipped!')
