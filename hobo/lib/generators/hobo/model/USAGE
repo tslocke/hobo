@@ -10,7 +10,6 @@ Examples:
             Model:      app/models/account.rb
             Test:       test/unit/account_test.rb
             Fixtures:   test/fixtures/accounts.yml
-            Viewhints:  app/viewhints/account_hints.rb
 
     $ rails generate hobo:model post title:string body:text published:boolean
 

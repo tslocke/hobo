@@ -330,7 +330,15 @@ module Hobo
 
       def view_hints
         class_name = "#{name}Hints"
-        class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::ViewHints; end; #{class_name}")
+        class_name.safe_constantize or Object.class_eval("class #{class_name} < Hobo::Model::ViewHints; end; #{class_name}")
+      end
+
+      def children(*args)
+        view_hints.children *args
+      end
+
+      def inline_booleans(*args)
+        view_hints.inline_booleans *args
       end
 
       def table_exists?
