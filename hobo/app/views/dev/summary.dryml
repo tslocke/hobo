@@ -8,12 +8,11 @@
       <tr> <td>Application Name</td>           <td><app-name/></td>         </tr>
       <tr> <td>Application Location</td>       <td><rails-root/></td>     </tr>
       <tr> <td>Rails Version</td>              <td><rails-version/></td>    </tr>
-      <tr> <td>Rails Location</td>             <td><rails-location/></td>     </tr>
       <tr> <td>Mode</td>                       <td><rails-env/></td> </tr>
     </table>
 
     <h3>Change Control</h3>
-    <table class="app-summary">      
+    <table class="app-summary">
       <tr> <th></th><th></th></tr>
       <tr> <td>Method</td>                 <td><cms-method/></td> </tr>
       <if test="&cms_method.strip=='git'">
@@ -25,15 +24,13 @@
     </table>
 
 
-    <h3>Gems</h3>
+    <h3>Bundled Gems</h3>
     <table class="app-summary">
       <with-gems>
-        <tr if="&first_item?"><th></th><th>Required</th><th>Installed</th><th>Status</th><th>Dependencies</th></tr>
+        <tr if="&first_item?"><th></th><th>Version</th><th>Dependencies</th></tr>
         <tr>
           <td><gem-name/></td>
-          <td><gem-version-required/></td>
-          <td><gem-version/></td>          
-          <td><gem-frozen/></td>
+          <td><gem-version/></td>
           <td><gem-dependencies/></td>
         </tr>
       </with-gems>
@@ -75,8 +72,8 @@
           <td><model-table-comment/></td>
         </tr>
       </with-models>
-    </table>        
-    
+    </table>
+
     <with-models>
       <h3 if="&this.try.table_name"><model-name /></h3>
       <table class="app-summary">

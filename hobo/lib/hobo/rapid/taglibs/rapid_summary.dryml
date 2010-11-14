@@ -5,11 +5,6 @@
   <%= Rails.version -%>
 </def>
 
-<!-- returns "vendor" or "gem" -->
-<def tag="rails-location">
-  <%= Rails.vendor_rails? ? "vendor" : "gem" -%>
-</def>
-
 <!-- `Rails.root` -->
 <def tag="rails-root">
   <%= Rails.root -%>
@@ -84,13 +79,7 @@
 
 <!-- repeats on Rails.configuration.gems, including dependent gems -->
 <def tag="with-gems">
-  <% gems = ActiveSupport::OrderedHash.new -%>
-  <% Rails.configuration.gems.each do |gem|
-       gems[name] ||= gem
-       gem.dependencies.each do |dep|
-         gems[dep] ||= dep
-       end
-     end -%>
+  <% gems = Bundler::LockfileParser.new(File.read('Gemfile.lock')).specs -%>
   <repeat with="&gems">
     <do param="default"/>
   </repeat>
@@ -101,37 +90,19 @@
   <%= this.name -%>
 </def>
 
-<def tag="gem-version-requirement">
-  <unless test="this.nil?"><%=
-    this.requirements.map{|l| l.first+l.second.to_s}.join(",")
--%></unless>
-</def>
-
-<!-- inside `<with-gems>`, returns the version required -->
-<def tag="gem-version-required">
-  <gem-version-requirement:version-requirements />
-</def>
-
 <!-- inside `<with-gems>`, returns the version -->
 <def tag="gem-version">
-  <%= this.specification.version.to_s -%>
-</def>
-
-<!-- inside `<with-gems>`, returns 'frozen', 'installed' or 'missing' -->
-<def tag="gem-frozen">
-  <%= this.frozen? ? "frozen" : (this.installed? ? "installed" : "missing") -%>
+  <%= this.version.to_s -%>
 </def>
 
 <!-- inside `<with-gems>`, returns the gem dependencies -->
 <def tag="gem-dependencies">
-  <repeat with="&this.dependencies">
-    <%= this.name -%><gem-version-requirement with="&this.requirement || this.version_requirements" />
-  </repeat>
+    <%= this.dependencies(&it.to_s).safe_join('<br>'.html_safe) -%>
 </def>
 
 <!-- repeats on the plugins used by the application -->
 <def tag="with-plugins">
-  <% plugins = Rails.configuration.plugin_loader.new(Hobo.rails_initializer).plugins %>
+  <% plugins = Rails.application.railties.plugins %>
   <repeat with="&plugins">
     <do param="default" />
   </repeat>
@@ -139,31 +110,31 @@
 
 <!-- within `<with-plugins>`, returns the plugin name -->
 <def tag="plugin-name">
-  <%= this.name -%>
+  <%= this.name.to_s -%>
 </def>
 
 <!-- within `<with-plugins>`, returns the plugin location (directory) -->
 <def tag="plugin-location">
-  <%= this.directory -%>
+  <%= this.root.to_s -%>
 </def>
 
 <def tag="plugin-git-clean">
-  <git-clean dir="&this.directory"/>
+  <git-clean dir="&this.root.to_s"/>
 </def>
 
 <def tag="plugin-git-version">
-  <git-version dir="&this.directory"/>
+  <git-version dir="&this.root.to_s"/>
 </def>
 
 <!-- within `<with-plugins>`, try and determine the method that was used to install the plugin.   Returns "braid", "symlink", "git-submodule" or "other" -->
 <def tag="plugin-method">
   <%=
       braids = File.open("#{Rails.root}/.braids") {|f| YAML::load(f) } rescue {}
-      if !braids[this.directory.gsub(Rails.root+"/", "")].nil?
+      if !braids[this.root.to_s.gsub(Rails.root+"/", "")].nil?
         "braid"
-      elsif File.lstat(this.directory).symlink?
+      elsif File.lstat(this.root.to_s).symlink?
         "symlink"
-      elsif File.exist?(this.directory+"/.git")
+      elsif File.exist?(this.root.to_s+"/.git")
         "git-submodule"
       else
         "other"

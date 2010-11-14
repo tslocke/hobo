@@ -32,9 +32,8 @@ module Hobo
       template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")
     end
 
-    def generate_index_and_summary
+    def generate_index
       template("index.dryml", File.join('app/views', file_path, "index.dryml"))
-      template("summary.dryml", File.join('app/views', file_path, "summary.dryml"))
     end
 
     def remove_index_html

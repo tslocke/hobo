@@ -18,7 +18,7 @@ class DevController < ActionController::Base
 
   def developer_modes_only
     # Belt and braces. In addition to this check, the routes only get
-    # defined when developer_features? is true
+    # defined when developer_features is true
     render :text => "Permission Denied", :status => 403 unless Rails.application.config.hobo.developer_features
   end
 

@@ -7,8 +7,7 @@ files_exist? %w[ app/controllers/front_controller.rb
                  app/helpers/front_helper.rb
                  test/unit/helpers/front_helper_test.rb
                  test/functional/front_controller_test.rb
-                 app/views/front/index.dryml
-                 app/views/front/summary.dryml ]
+                 app/views/front/index.dryml ]
 test_value_eql? true
 
 desc "public/index.html removed"
@@ -20,7 +19,6 @@ desc "front_controller.rb content matches"
 file_include? 'app/controllers/front_controller.rb',
               'hobo_controller',
               'def index',
-              'def summary',
               'def search'
 test_value_eql? true
 
