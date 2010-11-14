@@ -3,7 +3,7 @@ module Hobo
     source_root File.expand_path('../templates', __FILE__)
 
     def self.banner
-      "rails generate hobo:subsite [options]"
+      "rails generate hobo:subsite NAME [options]"
     end
 
     include Generators::Hobo::Subsite
