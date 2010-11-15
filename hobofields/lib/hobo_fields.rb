@@ -1,6 +1,10 @@
 require 'hobosupport'
 
-ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__) ]
+if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+  ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+else
+  ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
+end
 
 module Hobo
   # Empty class to represent the boolean type.
@@ -9,7 +13,7 @@ end
 
 module HoboFields
 
-  VERSION = "1.1.0.pre0"
+  VERSION = "1.1.0.pre2"
 
   extend self
 
@@ -105,7 +109,11 @@ module HoboFields
     if defined?(::Rails)
       plugins = Rails.configuration.plugin_loader.new(HoboFields.rails_initializer).plugins
       ([::Rails.root] + plugins.map(&:directory)).each do |dir|
-        ActiveSupport::Dependencies.load_paths << File.join(dir, 'app', 'rich_types')
+        if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+          ActiveSupport::Dependencies.autoload_paths << File.join(dir, 'app', 'rich_types')
+        else
+          ActiveSupport::Dependencies.load_paths << File.join(dir, 'app', 'rich_types')
+        end
         Dir[File.join(dir, 'app', 'rich_types', '*.rb')].each do |f|
           # TODO: should we complain if field_types doesn't get a new value? Might be useful to warn people if they're missing a register_type
           require_dependency f

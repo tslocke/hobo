@@ -1,4 +1,3 @@
-<!-- Core Rapid tags and tags that don't belong anywhere else. -->
 
 <!-- Renders a table with one row per field, where each row contains a `<th>` with the field name, and a `<td>` with (by default)
      a `<view>` of the field.
@@ -415,7 +414,7 @@ Assuming the context is a blog post...
         <view:created_at no-wrapper/> -> June 09, 2008 15:36
 -->
 <def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
-  raise HoboError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
+  raise Hobo::PermissionDeniedError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
     can_view?
    
   res = if this.nil? && if_blank.nil?

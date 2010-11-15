@@ -651,7 +651,7 @@ For situations where there are too many target records to practically include in
 
   -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
-  raise HoboError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
+  raise Hobo::PermissionDeniedError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
   blank_message ||= ht("#{this_type.name.tableize}.message.none", :default=>"(No #{this_type.view_hints.model_name})")
   limit ||= 100
@@ -1019,8 +1019,8 @@ end
       <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          <ht key="#{this.class.class_name.tableize}.collection.empty_message">          
-            No <%= this.class.class_name.titleize.downcase.pluralize %>.
+          <ht key="#{this.class.name.tableize}.collection.empty_message">          
+            No <%= this.class.name.titleize.downcase.pluralize %>.
           </ht>
         </div>
         <div class="buttons">

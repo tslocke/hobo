@@ -87,18 +87,17 @@ module HoboFields
 
       index_options = {}
       index_options[:name] = options.delete(:index) if options.has_key?(:index)
-
-      returning belongs_to_without_field_declarations(name, options, &block) do
-        refl = reflections[name.to_sym]
-        fkey = refl.primary_key_name
-        declare_field(fkey.to_sym, :integer, column_options)
-        if refl.options[:polymorphic]
-          declare_polymorphic_type_field(name, column_options)
-          index(["#{name}_type", fkey], index_options) if index_options[:name]!=false
-        else
-          index(fkey, index_options) if index_options[:name]!=false
-        end
+      bt = belongs_to_without_field_declarations(name, options, &block)
+      refl = reflections[name.to_sym]
+      fkey = refl.primary_key_name
+      declare_field(fkey.to_sym, :integer, column_options)
+      if refl.options[:polymorphic]
+        declare_polymorphic_type_field(name, column_options)
+        index(["#{name}_type", fkey], index_options) if index_options[:name]!=false
+      else
+        index(fkey, index_options) if index_options[:name]!=false
       end
+      bt
     end
     class << self
       alias_method_chain :belongs_to, :field_declarations

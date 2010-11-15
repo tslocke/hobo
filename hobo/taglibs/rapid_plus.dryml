@@ -21,6 +21,15 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
         </form>
       </div>
     </div>
+    <%
+      page_path = if (request.post? || request.put?) && params[:page_path]
+                    params[:page_path]
+                  else
+                    view_name.sub(Dryml::EMPTY_PAGE, params[:action] || '')
+                  end
+      controller, action = page_path.split('/')
+    %>
+
 
     <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" empty merge-params>
       <field-heading-row:>
@@ -28,7 +37,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
-             sort_url = url_for(params.merge(:sort => sort) - [:page])
+             sort_url = url_for(params.merge(:sort => sort, :controller => controller, :action => action) - [:page])
              col_heading_name = this.member_class.try.view_hints.try.field_name(scope.field_name) || scope.field_name.titleize %>
                           
           <th param="#{scope.field-name}-heading">
@@ -46,7 +55,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
     <do param="empty-message" if="empty?"><ht key="hobo.table_plus.empty" model="#{name.downcase}">No <collection-name lowercase/> to display</ht></do>
 
    
-    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
+    <page-nav param params="&{:action=>action, :controller=>controller}" if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
   </div>
 </def>
 

@@ -31,6 +31,7 @@ Contents
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobosupport/lib')
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
+    >> gem 'will_paginate', '~> 2'
     >> require 'will_paginate'
     >> require 'will_paginate/finder'
     >> require 'hobosupport'

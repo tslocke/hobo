@@ -14,8 +14,6 @@ module Hobo
 
       register_model(base)
 
-      patch_will_paginate
-
       base.class_eval do
         inheriting_cattr_reader :default_order
         alias_method_chain :attributes=, :hobo_type_conversion
@@ -42,7 +40,9 @@ module Hobo
           end
         end
       end
-      
+
+      # https://hobo.lighthouseapp.com/projects/8324/tickets/762-hobo_model-outside-a-full-rails-env-can-lead-to-stack-level-too-deep
+      raise HoboError, "HoboFields.enable has not been called" unless base.respond_to?(:fields)
       base.fields(false) # force hobofields to load
 
       included_in_class_callbacks(base)
@@ -57,11 +57,11 @@ module Hobo
 
         WillPaginate::Finder::ClassMethods.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
-            returning paginate_without_hobo_metadata(*args, &block) do |collection|
-              collection.member_class     = self
-              collection.origin           = try.proxy_owner
-              collection.origin_attribute = try.proxy_reflection._?.name
-            end
+            collection = paginate_without_hobo_metadata(*args, &block)
+            collection.member_class     = self
+            collection.origin           = try.proxy_owner
+            collection.origin_attribute = try.proxy_reflection._?.name
+            collection
           end
           alias_method_chain :paginate, :hobo_metadata
 
@@ -78,7 +78,7 @@ module Hobo
 
 
     def self.all_models
-      # Load every controller in app/controllers...
+      # Load every model in app/models...
       unless @models_loaded
         Dir.entries("#{RAILS_ROOT}/app/models/").each do |f|
           f =~ /^[a-zA-Z_][a-zA-Z0-9_]*\.rb$/ and f.sub(/.rb$/, '').camelize.constantize
@@ -132,6 +132,8 @@ module Hobo
         
         Hobo::Permissions.enable
       end
+
+      patch_will_paginate
     end
 
 

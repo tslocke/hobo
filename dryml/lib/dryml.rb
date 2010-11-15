@@ -11,7 +11,13 @@ require 'hobosupport'
 require 'action_pack'
 require 'active_record' if ActionPack::VERSION::MAJOR==2 && ActionPack::VERSION::MINOR==2
 
-ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSupport.const_defined? :Dependencies
+if ActiveSupport.const_defined? :Dependencies
+  if ActiveSupport::Dependencies.respond_to?(:autoload_paths)
+    ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__)]
+  else
+    ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)]
+  end
+end
 
 # Hobo can be installed in /vendor/hobo, /vendor/plugins/hobo, vendor/plugins/hobo/hobo, etc.
 ::DRYML_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -19,7 +25,7 @@ ActiveSupport::Dependencies.load_paths |= [ File.dirname(__FILE__)] if ActiveSup
 # The Don't Repeat Yourself Markup Language
 module Dryml
 
-    VERSION = "1.1.0.pre0"
+    VERSION = "1.1.0.pre2"
 
     class DrymlSyntaxError < RuntimeError; end
       
@@ -284,8 +290,8 @@ module Dryml
       this = locals.delete(:this) || nil
 
       renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
-        Dryml.make_renderer_class(template_src, template_path, locals.keys)
-      renderer_class.new(template_path, view).render_page(this, locals)      
+        Dryml.make_renderer_class(template_src, template_path, locals.keys, [], included_taglibs)
+      renderer_class.new(template_path, view).render_page(this, locals)
     end
     
 end

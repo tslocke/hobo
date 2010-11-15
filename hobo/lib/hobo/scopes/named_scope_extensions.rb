@@ -13,7 +13,7 @@ module ActiveRecord
       private
       
       def method_missing(method, *args, &block)
-        if respond_to?(method) && scopes.include?(method)
+        if scopes.include?(method)
           scopes[method].call(self, *args)
         else
           with_scope :find => proxy_options do
