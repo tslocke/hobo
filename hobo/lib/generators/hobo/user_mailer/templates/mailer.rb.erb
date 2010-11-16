@@ -2,31 +2,24 @@ class <%= class_name -%>Mailer < ActionMailer::Base
   default :from => "no-reply@#{host}"
 
   def forgot_password(user, key)
-    set_variables(user, key)
+    @user, @key = user, key
     mail( :subject => "#{app_name} -- forgotten password",
           :to      => user.email_address )
   end
 
 <% if invite_only? -%>
   def invite(user, key)
-    set_variables(user, key)
+    @user, @key = user, key
     mail( :subject => "Invitation to #{app_name}",
           :to      => user.email_address )
   end
 
 <% elsif options[:activation_email] %>
   def activation(user, key)
-    set_variables(user, key)
+    @user, @key = user, key
     mail :subject => "#{app_name} -- activate",
          :to      => user.email_address
   end
 
 <% end -%>
-private
-
-  def set_variables(user, key)
-    @user = user
-    @key = key
-  end
-
 end
