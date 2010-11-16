@@ -21,7 +21,7 @@
   <unless test="&this.member_class.nil?">
     <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
       <ht key="#{this.member_class.name.tableize}.collection.empty_message">
-        No <collection-name lowercase/> to display
+        No <human-collection-name count="0"/> to display
       </ht>
     </div>
   </unless>

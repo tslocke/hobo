@@ -17,8 +17,7 @@ There is a default :count => 1
   I18n.t(k, {:default=>all_parameters.default}.merge(options)).html_safe
 %></def>
 
-<!-- Wrapper around ActiveModel::Name#human with added sugar.
-It dynamically pluralizes the human name by using the implicit model.count.
+<!-- Wrapper around ActiveModel::Name#human
 
 #### Attributes
 

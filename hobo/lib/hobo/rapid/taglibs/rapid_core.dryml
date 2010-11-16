@@ -236,6 +236,8 @@ Provides a short hand way of displaying images in public/images
 
 <!-- Renders a human readable name of a collection
 
+This tag has been deprecated in favour of human-collection-name
+
 ### Details
 
  - Uses `this.origin_attribute` as the name.
@@ -643,6 +645,11 @@ that you add the keys in the correct namespaces.
 ### Attributes
 
  - capitalize: the first letter of the resulting sentence will be capitalized
+
+
+### Additional Notes
+
+The "titleize" attribute is deprecated: use "capitalize" instead.
 
 -->
 <def tag="you" attrs="titleize, capitalize">
