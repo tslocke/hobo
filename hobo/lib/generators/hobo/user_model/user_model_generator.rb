@@ -1,3 +1,4 @@
+require 'generators/hobo_support/model'
 module Hobo
   class UserModelGenerator < Rails::Generators::NamedBase
     source_root File.expand_path('../templates', __FILE__)
@@ -5,7 +6,7 @@ module Hobo
     # overrides the default
     argument :name, :type => :string, :default => 'user', :optional => true
 
-    include Generators::Hobo::Model
+    include Generators::HoboSupport::Model
     include Generators::Hobo::InviteOnly
     include Generators::Hobo::ActivationEmail
 
