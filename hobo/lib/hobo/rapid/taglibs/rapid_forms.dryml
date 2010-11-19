@@ -783,7 +783,7 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
     <h2 param="heading"><t key="activerecord.errors.template.header" model="&this.class.model_name.human" count="&this.errors.size"/></h2>
     <t key="activerecord.errors.template.body"></t>
     <ul param>
-      <% this.errors.each_full do |message| -%>
+      <% this.errors.to_a.each do |message| -%>
       <li param><%= message %></li>
       <% end -%>
     </ul>

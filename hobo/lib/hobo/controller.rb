@@ -71,12 +71,12 @@ module Hobo
 
     def ajax_update_response(page_path, render_specs, results={})
       if page_path
-        rr = ActionController::Routing::Routes.recognize_path(page_path)
-        identifier = view_context.view_paths.find( rr[:action],
-                                                   rr[:controller],
+        controller, action = controller_action_from_page_path(page_path)
+        identifier = view_context.view_paths.find( action,
+                                                   controller,
                                                    false,
                                                    view_context.lookup_context.instance_variable_get('@details')).identifier
-        renderer = Dryml.page_renderer(view_context, identifier, [], rr[:controller])
+        renderer = Dryml.page_renderer(view_context, identifier, [], controller)
       end
 
       render :update do |page|
