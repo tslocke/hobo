@@ -8,7 +8,7 @@ module Hobo
 
     argument :locales,
              :type => :array,
-             :default => ["en"],
+             :default => %w[en],
              :banner => "en it ..."
 
     def check_supported_locales

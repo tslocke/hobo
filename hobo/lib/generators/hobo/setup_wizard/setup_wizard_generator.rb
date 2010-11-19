@@ -188,8 +188,8 @@ EOI
           $1
         end
         say "The Hobo supported locales are #{supported_locales * ' '} (please, contribute to more translations)"
-        locales = ask "Type the locales (space separated) you want to add to your application or <enter> for 'en':", 'en'
-        unless locales == 'en'
+        locales = ask("Type the locales (space separated) you want to add to your application or <enter> for 'en':", 'en').split(/\s/)
+        unless locales.size == 1 && locales.first == 'en'
           default_locale = ask "Do you want to set a default locale? Type the locale or <enter> to skip:"
         end
       else
@@ -200,8 +200,9 @@ EOI
         default_locale.gsub!(/\:/, '')
         environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
       end
-      invoke 'hobo:i18n', locales.split
-      say( "NOTICE: You should manually install in 'config/locales' also the official Rails locale file(s) that your application will use.", Color::YELLOW) unless locales == 'en'
+      ls = (locales - %w[en]).map {|l| ":#{l}" }
+      invoke 'hobo:i18n', locales
+      say( "NOTICE: You should manually install in 'config/locales' also the official Rails locale #{ls.size==1 ? 'file' : 'files'} for #{ls.to_sentence} that your application will use.", Color::YELLOW) unless ls.empty?
     end
 
     def git_repo
