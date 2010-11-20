@@ -28,7 +28,7 @@ problem for most applications.
 
 Secondly, lifecycle keys are now cleared on every transition to avoid
 replay vulnerabilities.  This new behaviour may be avoided by added
-the `:dont_clear_key => true` option to a transition.
+the `:keep_key => true` option to a transition.
 
 More information about the vulnerability can be viewed on the [bug
 report](https://hobo.lighthouseapp.com/projects/8324/tickets/666-user-model-secure-links-have-low-security).
