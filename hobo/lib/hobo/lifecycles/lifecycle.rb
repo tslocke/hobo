@@ -168,7 +168,6 @@ module Hobo
       def become(state_name, validate=true)
         state_name = state_name.to_sym
         record.write_attribute self.class.state_field, state_name.to_s
-
         if state_name == :destroy
           record.destroy
           true
@@ -210,7 +209,7 @@ module Hobo
         timestamp = record.read_attribute(key_timestamp_field)
         if timestamp
           timestamp = timestamp.getutc
-          Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
+          Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}-#{ActionController::Base.session_options[:secret]}")
         end
       end
 
@@ -221,6 +220,10 @@ module Hobo
 
       def valid_key?
         provided_key && provided_key == key && !key_expired?
+      end
+
+      def clear_key
+        record.write_attribute key_timestamp_field, nil
       end
 
       def invariants_satisfied?
