@@ -78,6 +78,17 @@ module Hobo
                                     :update => true
     end
 
+    def user_options
+      if wizard?
+        say_title 'User Resource'
+        @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
+        @activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
+      else
+        @user_resource_name = options[:user_resource_name]
+        @activation_email = options[:activation_email]
+      end
+    end
+
     def site_options
       if wizard?
         say_title 'Invite Only Option'
@@ -99,8 +110,8 @@ NOTE: You might want to sign up as the administrator before adding this!
       end
       inject_into_file 'app/controllers/application_controller.rb', <<EOI, :after => "protect_from_forgery\n" if private_site
   include Hobo::Controller::AuthenticationSupport
-  before_filter :except => :login do
-     login_required unless User.count == 0
+  before_filter :except => [:login, :forgot_password] do
+     login_required unless #{@user_resource_name.camelize}.count == 0
   end
 EOI
     end
@@ -111,17 +122,6 @@ EOI
         say 'Installing Hobo Rapid and default theme...'
       end
       invoke 'hobo:rapid'
-    end
-
-    def user_options
-      if wizard?
-        say_title 'User Resource'
-        @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
-        @activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
-      else
-        @user_resource_name = options[:user_resource_name]
-        @activation_email = options[:activation_email]
-      end
     end
 
     def front_controller
