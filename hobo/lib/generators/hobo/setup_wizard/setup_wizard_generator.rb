@@ -201,8 +201,9 @@ EOI
         environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
       end
       ls = (locales - %w[en]).map {|l| ":#{l}" }
+      lstr = ls.to_sentence
       invoke 'hobo:i18n', locales
-      say( "NOTICE: You should manually install in 'config/locales' also the official Rails locale #{ls.size==1 ? 'file' : 'files'} for #{ls.to_sentence} that your application will use.", Color::YELLOW) unless ls.empty?
+      say( "NOTICE: You should manually install in 'config/locales' also the official Rails locale #{ls.size==1 ? 'file' : 'files'} for #{lstr} that your application will use.", Color::YELLOW) unless ls.empty?
     end
 
     def git_repo
