@@ -15,12 +15,12 @@
 
     EnumString -- now defines constants on the class for each value in
     the enum
-    
+
       Also, won't define an is_foo? method if that already exists
 
     Removing HoboFields::Percentage -- this is better handled as an
     application specific type
-    
+
       For example, is a percentage an fixnum or a float? Is 101% valid
       or invalid?
 
@@ -28,7 +28,7 @@
 
     *Breaking Change* EnumString: Change to automatically defined
      class methods on EnumString classes
-    
+
         It used to be that if you did EnumString.for(:foo, :baa), your
         class had methods foo, baa and the instance got methods foo?
         and baa?. There was a big problem with name clashes with other

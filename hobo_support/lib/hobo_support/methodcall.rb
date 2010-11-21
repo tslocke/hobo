@@ -39,7 +39,7 @@ class NilClass
     SafeNil.instance
   end
 
-  
+
   def try(*args)
     if args.length==0
       # Hobo style try
@@ -49,7 +49,7 @@ class NilClass
       nil
     end
   end
-  
+
 end
 
 

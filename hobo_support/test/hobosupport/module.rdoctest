@@ -21,7 +21,7 @@ When a module is included in a class, it gets a callback on the `included` metho
            alias_method_chain :name, :shouting
          end
        end
-     end 
+     end
 
      module M1
        def self.included(base)
@@ -76,7 +76,7 @@ In Ruby we use modules to factor out features that are shared by more than one c
      module M
        def self.included(base)
          base.send(:extend, ClassMethods)
-       end 
+       end
 
        module ClassMethods
          def foo; 123; end

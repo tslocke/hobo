@@ -22,7 +22,7 @@
 
       undef_method :default
 
-      # Question: does this do anything? -Tom 
+      # Question: does this do anything? -Tom
       def [](param_name)
         fetch(param_name, nil)
       end

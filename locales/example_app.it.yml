@@ -21,7 +21,7 @@ it:
     timetable: "Orario:"
     no_active_membership: "(Nessuna Iscrizione Attiva: qualche Abbonamento non sarà disponiile fino a che non si aggiungerà l'Iscrizine)"
     select_menu_first_option: "-- seleziona --"
-    
+
   subscription_validation:
     subscription_type_needed: "Specificare il tipo di Abbonamento"
     no_quantity_needed: "non necessaria per questo tipo di Abbonamento"
@@ -29,20 +29,20 @@ it:
     price_needed: "necessario per questo tipo di de Abbonamento"
     membership_needed: "Iscrizione necessario per questo tipo di Abbonamento"
     no_membership_needed: "L'Iscrizione del Cliente è ancora attiva"
-    
+
 
   tags:
-  
+
     count:
       default:
         zero: "Non ci sono {{label}}"
         one: "C'è solo 1 {{label}}"
         other: "Ci sono {{count}} {{label}}"
-    
+
     you:
       current_user:
       other_user:
-      
+
     your:
       roles:
         current_user:
@@ -74,7 +74,7 @@ it:
           zero: "{{name}} non ha Commissioni"
           one: "La Commissione di {{name}} è"
           other: "Il totale delle Commissioni di {{name}} es"
-    
+
     filter_menu:
       period:
         no_filter: "Tutti i Periodi"
@@ -92,8 +92,8 @@ it:
         options:
         - [ *active, "active" ]
         - [ *expired, "expired" ]
-     
-      
+
+
   user/locales:
     it: "Italiano"
     "es-DO": "Español"
@@ -139,7 +139,7 @@ it:
         password_confirmation: Conferma Parola Chiave
         email_address: Indirizzo Elettronico
         locale: "Lingua"
-        roles: 
+        roles:
           <<: *roles_all
         subscriptions:
           <<: *subscriptions_all
@@ -155,7 +155,7 @@ it:
         serial: Serie
 
         Customer: *customer
-        subscriptions: 
+        subscriptions:
           <<: *subscriptions_all
 
       contract: &contract_data

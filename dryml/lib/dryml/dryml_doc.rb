@@ -36,9 +36,9 @@ require 'rexml/xpath'
           @doc = Dryml::Parser::Document.new(File.read(filename), filename)
           parse_tag_defs
         end
-        
+
         attr_reader :name, :doc, :tag_defs, :source
-        
+
         def comment
           first_node = doc[0][0]
           if first_node.is_a?(REXML::Comment)
@@ -82,7 +82,7 @@ require 'rexml/xpath'
         def source
           doc.restore_erb_scriptlets(node.to_s).strip
         end
-        
+
         # The contents of the XML or ERB comment, if any, immediately above the tag definition
         def comment
           @comment ||= begin

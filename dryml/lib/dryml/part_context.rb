@@ -21,8 +21,8 @@
           "hoboParts['#{dom_id}'] = (#{code});\n"
         end.join
       end
-      
-      
+
+
       def self.pre_marshal(x)
         if x.is_a?(ActiveRecord::Base) && x.respond_to?(:typed_id)
           TypedId.new(x.typed_id)
@@ -40,19 +40,19 @@
           c.form_field_path = environment.form_field_path
         end
       end
-      
-      
+
+
       def self.for_refresh(encoded_context, page_this, session)
         new do |c|
           c.unmarshal(encoded_context, page_this, session)
         end
       end
-      
-      
+
+
       def initialize
         yield self
       end
-      
+
       attr_accessor :part_name, :locals, :this, :this_field, :this_id, :form_field_path
 
 
@@ -72,20 +72,20 @@
         raise TamperedWithPartContext unless digest == generate_digest(data, session)
 
         context = Marshal.load(Base64.decode64(data))
-        
+
         part_name, this_id, locals, form_field_path = context
 
         if RAILS_DEFAULT_LOGGER
           RAILS_DEFAULT_LOGGER.info "Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}"
           RAILS_DEFAULT_LOGGER.info "         : form_field_path = #{form_field_path.inspect}" if form_field_path
         end
-        
+
         self.part_name             = part_name
         self.this_id               = this_id
         self.locals                = restore_locals(locals)
         self.form_field_path       = form_field_path
-        
-        parse_this_id(page_this)        
+
+        parse_this_id(page_this)
       end
 
 

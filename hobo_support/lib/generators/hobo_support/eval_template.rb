@@ -1,7 +1,7 @@
 module Generators
   module HoboSupport
     EvalTemplate = classy_module do
-      
+
     private
       def eval_template(template_name)
         source  = File.expand_path(find_in_source_paths(template_name))

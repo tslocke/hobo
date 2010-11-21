@@ -1,5 +1,5 @@
 Event.addBehavior({
-    'body:click' : function(event) { 
+    'body:click' : function(event) {
         if (event.shiftKey && event.altKey) {
             Dryml.click(event)
             Event.stop(event)
@@ -122,7 +122,7 @@ var Dryml = {
     },
 
     removeMenu: function() {
-        if (Dryml.menu) { 
+        if (Dryml.menu) {
             $("dryml-menu-style").remove()
             Dryml.menu.remove()
             Dryml.menu = null

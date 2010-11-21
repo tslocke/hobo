@@ -3,10 +3,10 @@ LowPro.Version = '0.5';
 LowPro.CompatibleWithPrototype = '1.6';
 
 if (Prototype.Version.indexOf(LowPro.CompatibleWithPrototype) != 0 && window.console && window.console.warn)
-  console.warn("This version of Low Pro is tested with Prototype " + LowPro.CompatibleWithPrototype + 
+  console.warn("This version of Low Pro is tested with Prototype " + LowPro.CompatibleWithPrototype +
                   " it may not work as expected with this version (" + Prototype.Version + ")");
 
-if (!Element.addMethods) 
+if (!Element.addMethods)
   Element.addMethods = function(o) { Object.extend(Element.Methods, o) };
 
 // Simple utility methods for working with the DOM
@@ -32,9 +32,9 @@ DOM.Builder = {
 	create : function(tag, attrs, children) {
 		attrs = attrs || {}; children = children || []; tag = tag.toLowerCase();
 		var el = new Element(tag, attrs);
-	  
+
 		for (var i=0; i<children.length; i++) {
-			if (typeof children[i] == 'string') 
+			if (typeof children[i] == 'string')
 			  children[i] = document.createTextNode(children[i]);
 			el.appendChild(children[i]);
 		}
@@ -43,14 +43,14 @@ DOM.Builder = {
 };
 
 // Automatically create node builders as $tagName.
-(function() { 
-	var els = ("p|div|span|strong|em|img|table|tr|td|th|thead|tbody|tfoot|pre|code|" + 
-				     "h1|h2|h3|h4|h5|h6|ul|ol|li|form|input|textarea|legend|fieldset|" + 
+(function() {
+	var els = ("p|div|span|strong|em|img|table|tr|td|th|thead|tbody|tfoot|pre|code|" +
+				     "h1|h2|h3|h4|h5|h6|ul|ol|li|form|input|textarea|legend|fieldset|" +
 				     "select|option|blockquote|cite|br|hr|dd|dl|dt|address|a|button|abbr|acronym|" +
-				     "script|link|style|bdo|ins|del|object|param|col|colgroup|optgroup|caption|" + 
+				     "script|link|style|bdo|ins|del|object|param|col|colgroup|optgroup|caption|" +
 				     "label|dfn|kbd|samp|var").split("|");
   var el, i=0;
-	while (el = els[i++]) 
+	while (el = els[i++])
 	  window['$' + el] = DOM.Builder.tagFunc(el);
 })();
 
@@ -92,21 +92,21 @@ Object.extend(Event, {
 Event.addBehavior = function(rules) {
   var ab = this.addBehavior;
   Object.extend(ab.rules, rules);
-  
+
   if (!ab.responderApplied) {
     Ajax.Responders.register({
-      onComplete : function() { 
-        if (Event.addBehavior.reassignAfterAjax) 
+      onComplete : function() {
+        if (Event.addBehavior.reassignAfterAjax)
           setTimeout(function() { ab.reload() }, 10);
       }
     });
     ab.responderApplied = true;
   }
-  
+
   if (ab.autoTrigger) {
     this.onReady(ab.load.bind(ab, rules));
   }
-  
+
 };
 
 Event.delegate = function(rules) {
@@ -121,7 +121,7 @@ Object.extend(Event.addBehavior, {
   rules : {}, cache : [],
   reassignAfterAjax : false,
   autoTrigger : true,
-  
+
   load : function(rules) {
     for (var selector in rules) {
       var observer = rules[selector];
@@ -136,7 +136,7 @@ Object.extend(Event.addBehavior, {
           } else {
             if (!element.$$assigned || !element.$$assigned.include(observer)) {
               if (observer.attach) observer.attach(element);
-              
+
               else observer.call($(element));
               element.$$assigned = element.$$assigned || [];
               element.$$assigned.push(observer);
@@ -146,26 +146,26 @@ Object.extend(Event.addBehavior, {
       });
     }
   },
-  
+
   unload : function() {
     this.cache.each(function(c) {
       Event.stopObserving.apply(Event, c);
     });
     this.cache = [];
   },
-  
+
   reload: function() {
     var ab = Event.addBehavior;
-    ab.unload(); 
+    ab.unload();
     ab.load(ab.rules);
   },
-  
+
   _wrapObserver: function(observer) {
     return function(event) {
-      if (observer.call(this, event) === false) event.stop(); 
+      if (observer.call(this, event) === false) event.stop();
     }
   }
-  
+
 });
 
 Event.observe(window, 'unload', Event.addBehavior.unload.bind(Event.addBehavior));
@@ -177,15 +177,15 @@ $$$ = Event.addBehavior.bind(Event);
 // and their behavior.  Use Behavior.create() to make a new behavior class then use attach() to
 // glue it to an element.  Each element then gets it's own instance of the behavior and any
 // methods called onxxx are bound to the relevent event.
-// 
+//
 // Usage:
-// 
+//
 // var MyBehavior = Behavior.create({
-//   onmouseover : function() { this.element.addClassName('bong') } 
+//   onmouseover : function() { this.element.addClassName('bong') }
 // });
 //
 // Event.addBehavior({ 'a.rollover' : MyBehavior });
-// 
+//
 // If you need to pass additional values to initialize use:
 //
 // Event.addBehavior({ 'a.rollover' : MyBehavior(10, { thing : 15 }) })
@@ -205,7 +205,7 @@ var Behavior = {
     if (Object.isFunction(properties[0]))
       parent = properties.shift();
 
-      var behavior = function() { 
+      var behavior = function() {
         if (!this.initialize) {
           var args = $A(arguments);
 
@@ -214,7 +214,7 @@ var Behavior = {
             behavior.attach.apply(behavior, initArgs);
           };
         } else {
-          var args = (arguments.length == 2 && arguments[1] instanceof Array) ? 
+          var args = (arguments.length == 2 && arguments[1] instanceof Array) ?
                       arguments[1] : Array.prototype.slice.call(arguments, 1);
 
           this.element = $(arguments[0]);
@@ -275,7 +275,7 @@ Remote.Base = {
     this.options = Object.extend({
       evaluateScripts : true
     }, options || {});
-    
+
     this._bindCallbacks();
   },
   _makeRequest : function(options) {
@@ -302,8 +302,8 @@ Remote.Link = Behavior.create(Remote.Base, {
 Remote.Form = Behavior.create(Remote.Base, {
   onclick : function(e) {
     var sourceElement = e.element();
-    
-    if (['input', 'button'].include(sourceElement.nodeName.toLowerCase()) && 
+
+    if (['input', 'button'].include(sourceElement.nodeName.toLowerCase()) &&
         sourceElement.type == 'submit')
       this._submitButton = sourceElement;
   },

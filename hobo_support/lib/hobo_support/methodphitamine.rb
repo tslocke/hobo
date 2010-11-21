@@ -10,7 +10,7 @@ module Kernel
 end
 
 class It
-  
+
   instance_methods.reject { |m| m =~ /^__/ || m.to_s == 'object_id' }.each { |m| undef_method m }
 
   def initialize

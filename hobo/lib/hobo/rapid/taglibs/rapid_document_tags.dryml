@@ -1,6 +1,6 @@
 <!-- Extra tags for semantic markup -->
 
-<!-- Used as a semantic wrapper around a group of sections and asides. CSS layouts can be provided based on this structure. 
+<!-- Used as a semantic wrapper around a group of sections and asides. CSS layouts can be provided based on this structure.
 
 ### Usage
 
@@ -13,7 +13,7 @@
 <def tag="section-group"><div class="section-group"><div class="section-group-inner" merge-attrs param="default"></div></div></def>
 
 <!-- A proposed HTML 5 tag for representing a generic document or application section. Slightly more semantic than `<div>` for indicating document structure. For the time being, `<section>` is output as `<div class="section">`. In Hobo, `<section>` also has one other important behaviour which is different to using `<div>` directly, when the content of the section is empty, the wrapper tag will disappear. e.g.
-  
+
     <section>My Section</section> -> <div class="section">My Section</div>
     <section><% # empty %></section> -> (nothing is generated)
 -->

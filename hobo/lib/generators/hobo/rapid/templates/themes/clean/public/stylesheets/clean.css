@@ -28,7 +28,7 @@ html, body {color: #193440; background: url(../images/300-ACD3E6-fff.png) repeat
 
 
 body {
-	width: 960px;  
+	width: 960px;
 	margin: 0 auto 20px;
 	font: 12px "Lucida Grande", "Trebuchet MS", Arial, sans-serif; line-height: 18px;
 }
@@ -45,11 +45,11 @@ li {margin-left: 20px;}
 a {
 	border-bottom: 1px dotted #ccc;
 	color: #222; background: #fafafa;
-	text-decoration: none; 
+	text-decoration: none;
 }
 a:hover {
 	border-bottom: 1px dotted #aaa;
-	color: black; background: #f2f2f2; 
+	color: black; background: #f2f2f2;
 }
 h1 a, h2 a, h3 a {border: none; background: none;}
 
@@ -116,30 +116,30 @@ form .actions input { margin: 0; }
 .field-list .input-help { color: #888;}
 
 .content-header, .content-body, .content-footer {margin: 0 45px 15px; padding: 0;}
-.content-header {padding: 5px 0;} 
+.content-header {padding: 5px 0;}
 .content-body {padding: 15px 0;}
 .content-footer {padding-bottom: 20px;}
 
 .page-header {margin-top: 25px; padding: 0 0 0;}
 .page-header h1 {
-	margin: 0; padding: 20px 30px 30px; 
+	margin: 0; padding: 20px 30px 30px;
 	font-family: "Arial Black", Tahoma, Arial, sans-serif; font-size: 36px; letter-spacing: -1.5pt;
 }
 .page-header ul {zoom: 1; overflow: hidden;}
 .page-header li {float: left; margin-left: 0; list-style: none;}
 
-.page-header .navigation a, 
+.page-header .navigation a,
 .page-header .navigation a:hover,
-.page-header h1 a, 
+.page-header h1 a,
 .page-header h1 a:hover
  {border: none; color: white; background: none;}
 
 .page-header div.search {
  	float: right;
- 	padding: 0 30px 8px 15px; 
+ 	padding: 0 30px 8px 15px;
  }
 .page-header div.search label {
-	padding-right: 10px; 
+	padding-right: 10px;
 	font: bold 9px Arial, sans-serif; text-transform: uppercase; letter-spacing: 1.0pt;
 }
 .page-header div.search input {
@@ -147,7 +147,7 @@ form .actions input { margin: 0; }
 }
 #search-results-panel {
 	position: absolute; top: 35px; right: 25px; z-index: 50;
-	width: 350px; height: 500px; overflow: auto; 
+	width: 350px; height: 500px; overflow: auto;
 	padding: 0 20px 20px; border: 1px solid #ddd;
 	color: black; background: #f2f2f2;
 }
@@ -168,8 +168,8 @@ form .actions input { margin: 0; }
 	font-size: 11px;
 }
 .account-nav li {
-	float: left; 
-	margin-left: 0; padding-left: 20px; 
+	float: left;
+	margin-left: 0; padding-left: 20px;
 	color: #ddd;
 	list-style: none;
 }
@@ -229,7 +229,7 @@ form .actions {margin: 30px 0; width: 100%; text-align: center;}
 .card h4 {margin-top: 0;}
 .card a {background: #f5f5f5;}
 .card .creation-details {
-	display: block; color: #333; font-size: 11px; 
+	display: block; color: #333; font-size: 11px;
 }
 .card .datetime {color: #666;}
 .card .actions { position:absolute; right: 10px; top: 10px; }
@@ -237,7 +237,7 @@ div.ordering-handle { float: left; background: #ccc; color: white; margin-right:
 
 .card.content.with-owner {
 	padding: 0; margin: 10px 0 30px; border: none;
-	background: none; 
+	background: none;
 	font-size: 11px;
 }
 .card.content .creation-details {
@@ -300,7 +300,7 @@ div.select-many .item .remove-item { float: right; }
 /* you can delete them if you over-ride it             */
 
 .front-page .welcome-message {
-	padding: 10px 20px 20px; border: 1px solid #e8e8e8; 
+	padding: 10px 20px 20px; border: 1px solid #e8e8e8;
 	color: #222;
 	background: url(../images/50-ACD3E6-fff.png) repeat-x #fff;
 }
