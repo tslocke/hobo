@@ -198,7 +198,7 @@ module Hobo
           timestamp = record.read_attribute(key_timestamp_field)
           if timestamp
             timestamp = timestamp.getutc
-            Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}")
+            Digest::SHA1.hexdigest("#{record.id}-#{state_name}-#{timestamp}-#{Rails.application.config.secret_token}")
           end
         end
 
@@ -209,6 +209,10 @@ module Hobo
 
         def valid_key?
           provided_key && provided_key == key && !key_expired?
+        end
+
+        def clear_key
+          record.write_attribute key_timestamp_field, nil
         end
 
         def invariants_satisfied?

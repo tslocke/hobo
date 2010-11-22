@@ -35,6 +35,7 @@ module Hobo
 
         def change_state(record)
           record.lifecycle.become(get_state(record, end_state))
+          record.lifecycle.clear_key unless options[:new_key] || options[:keep_key]
         end
 
 
