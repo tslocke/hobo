@@ -14,6 +14,28 @@ likely to cause conflicts, so it is highly recommended that you have
 your code backed up and in a change control system such as git or
 subversion.
 
+=== Hobo 1.0.3 ===
+
+This is a security release.   All applications that use the reset
+password functionality should upgrade.
+
+To patch the vulnerability, two changes have been made.
+
+First of all, the lifecycle key hash mechanism has been changed.
+Existing lifecycle keys will become invalid after you upgrade.
+Lifecycle keys are typically short lived, so this is unlikely to be a
+problem for most applications.
+
+Secondly, lifecycle keys are now cleared on every transition to avoid
+replay vulnerabilities.  This new behaviour may be avoided by added
+the `:keep_key => true` option to a transition.
+
+More information about the vulnerability can be viewed on the [bug
+report](https://hobo.lighthouseapp.com/projects/8324/tickets/666-user-model-secure-links-have-low-security).
+
+All code changes may viewed on the [github
+log](https://github.com/tablatom/hobo/compare/v1.0.2...v1.0.3)
+
 === Hobo 1.0.2 ===
 
 This release is almost identical to 1.0.1 except that it updates the
