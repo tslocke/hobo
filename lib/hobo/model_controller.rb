@@ -590,10 +590,11 @@ module Hobo
 
       self.this ||= args.first || find_instance
       changes = options[:attributes] || attribute_parameters or raise RuntimeError, ht(:"hobo.messages.update.no_attribute_error", :default=>["No update specified in params"])
-      this.user_update_attributes(current_user, changes)
-
-      # Ensure current_user isn't out of date
-      @current_user = @this if @this == current_user
+      
+      if this.user_update_attributes(current_user, changes)        
+        # Ensure current_user isn't out of date
+        @current_user = @this if @this == current_user
+      end
 
       in_place_edit_field = changes.keys.first if changes.size == 1 && params[:render]
       update_response(in_place_edit_field, options, &b)
