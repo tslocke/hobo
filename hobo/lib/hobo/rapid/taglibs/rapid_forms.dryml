@@ -575,8 +575,8 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
                                   else
                                     { :type => "button" }
                                   end)
-    label ||= I18n.t("hobo.actions.remove", :default=>"Remove")
-    confirm = I18n.t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
+    label ||= t("hobo.actions.remove", :default=>"Remove")
+    confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
 
     add_classes!(attributes,
                  image ? "image-button" : "button",
@@ -623,7 +623,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
   if can_create?(new)
-    label ||= ht("#{new.class.name.tableize}.actions.new", :default=>"New #{new.class.model_name.human}")
+    label ||= ht("#{new.class.to_s.underscore}.actions.new", :default=>"New #{new.class.model_name.human}")
     ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
@@ -652,7 +652,7 @@ For situations where there are too many target records to practically include in
 
   -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
-  raise Hobo::PermissionDeniedError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
+  raise Hobo::PermissionDeniedError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit?
   blank_message ||= ht("#{this_type.name.tableize}.message.no", :default=>"(No #{this_type.model_name.human})")
   limit ||= 100
 
@@ -797,12 +797,12 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
-  prompt ||= ht("#{this_field.tableize}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
+  prompt ||= ht("#{this_field.underscore}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
   options ||= this_field_reflection.klass.all(:conditions =>this.send(:conditions)).select {|x| can_view?(x)}
   name ||= param_name_for_this
 
   values = this
-  remove_label ||= I18n.t("hobo.actions.remove", :default=>'Remove')
+  remove_label ||= t("hobo.actions.remove", :default=>'Remove')
   -%>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">
@@ -883,7 +883,7 @@ Use the `uri` option to specify a redirect location:
 <def tag="select-menu" attrs="options, selected, first-option, first-value, key">
 <% key ||= 'default'
    %w[options first_option first_value].each do |a|
-     str = I18n.t("tags.select_menu.#{key}.#{a}", :default=>'')
+     str = t("tags.select_menu.#{key}.#{a}", :default=>'')
      eval "#{a} = str unless str.blank?"
    end
 -%>
@@ -1026,7 +1026,7 @@ end
       <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          <ht key="#{this.class.name.tableize}.collection.empty_message">
+          <ht key="#{this.class.to_s.underscore}.collection.empty_message">
             No <%= this.class.name.titleize.downcase.pluralize %>.
           </ht>
         </div>

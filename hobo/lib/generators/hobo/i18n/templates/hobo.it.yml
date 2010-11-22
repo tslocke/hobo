@@ -52,7 +52,7 @@ it:
       remember_me: "Ricorda i miei dati"
       login: "Identificazione"
       signup: "Iscrizione"
-      forgot_password: &forgot_password "Parola Chiave dimentivata?"
+      forgot_password: &forgot_password "Parola Chiave dimenticata?"
 
     signup:
       title: "Iscrizione"

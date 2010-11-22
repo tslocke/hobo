@@ -1,22 +1,5 @@
 <!-- Rapid i18n provides tags related with the Rails-I18n project -->
 
-<!-- Simple wrapper around I18n.t.
-The tag content is used as the :default option. It is overridden by an explicit 'default' attribute.
-There is a default :count => 1
-
-### Attributes
-
- - key: the key to lookup
- - all the attributes accepted by the wrapped method
-
--->
-<def tag="t"><%=
-  options = {}
-  all_attributes.each_pair{|k,v| options[k.to_sym] = h(v)}
-  k = options.delete(:key)
-  I18n.t(k, {:default=>all_parameters.default}.merge(options)).html_safe
-%></def>
-
 <!-- Wrapper around ActiveModel::Name#human
 
 #### Attributes

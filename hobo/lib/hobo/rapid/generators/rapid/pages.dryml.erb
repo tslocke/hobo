@@ -4,7 +4,7 @@
   <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
 <% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
-    <nav-item with="&<%= m.name %>"><ht key="<%= m.name.tableize %>.nav_item" count="100"><model-name-human count="100"/></ht></nav-item>
+    <nav-item with="&<%= m.name %>"><ht key="<%= m.to_s.underscore %>.nav_item" count="100"><model-name-human count="100"/></ht></nav-item>
 <% end -%>
   </navigation>
 </def>
@@ -17,7 +17,7 @@
 <%
 new_link = linkable?(:new)
 new_form = !new_link && linkable?(model, :create, :method => :post)
-model_key = model.name.tableize
+model_key = model.to_s.underscore
 -%>
 
 <def tag="index-page" for="<%= model.name %>">
@@ -177,7 +177,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= collection.to_s.tableize %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
+                <ht key="<%= collection.to_s.underscore %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
                   <human-collection-name collection="<%= collection %>" your/>
                 </ht>
               </h3>
@@ -190,7 +190,7 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)" param="new-link">
-                <ht key="<%= collection.to_s.tableize %>.actions.new" count="1">
+                <ht key="<%= collection.to_s.underscore %>.actions.new" count="1">
                   New <%= collection.to_s.singularize.titleize %>
                 </ht>
               </a:<%= collection %>>
@@ -198,13 +198,13 @@ end
 
               <section param="add-to-collection" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <ht key="<%= collection.to_s.pluralize %>.collection.add_form_heading" count="1">
+                  <ht key="<%= collection.to_s.underscore %>.collection.add_form_heading" count="1">
                     Add <%= a_or_an collection.to_s.singularize.titleize %>
                   </ht>
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model.name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
                   <field-list: skip="<%= owner %>"/>
-                  <submit: label="#{ht '<%= sq_escape collection.to_s.pluralize %>.actions.add', :default=>['Add'] }"/>
+                  <submit: label="#{ht '<%= sq_escape collection.to_s.underscore %>.actions.add', :default=>['Add'] }"/>
                 </form>
               </section>
 <%   end -%>
@@ -223,7 +223,7 @@ end
 <%     else -%>
           <section param="<%= refl.name %>-collection-section">
             <h3 param="<%= refl.name %>-collection-heading">
-              <ht key="<%= refl.name.to_s.tableize %>.collection.heading" count="&this.<%= refl.name.to_s %>.count" >
+              <ht key="<%= refl.klass.to_s.underscore %>.collection.heading" count="&this.<%= refl.name.to_s %>.count" >
                 <human-collection-name collection="<%= refl.name %>" your/>
               </ht>
             </h3>

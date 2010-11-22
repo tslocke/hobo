@@ -14,6 +14,7 @@ module Hobo
       h.rapid_generators_path = Pathname.new File.expand_path('lib/hobo/rapid/generators', Hobo.root)
       h.auto_taglibs_path = Pathname.new File.expand_path('app/views/taglibs/auto', Rails.root)
       h.read_only_file_system = !!ENV['HEROKU_TYPE']
+      h.show_translation_keys = false
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -35,6 +36,7 @@ module Hobo
 
     ActiveSupport.on_load(:action_view) do
       require 'hobo/extensions/action_view/tag_helper'
+      require 'hobo/extensions/action_view/translation_helper'
     end
 
     ActiveSupport.on_load(:before_initialize) do
@@ -42,6 +44,10 @@ module Hobo
       HoboFields.never_wrap(Hobo::Undefined)
       h = config.hobo
       Dryml::DrymlGenerator.enable([h.rapid_generators_path], h.auto_taglibs_path)
+    end
+
+    initializer 'hobo.i18n' do |app|
+      require 'hobo/extensions/i18n' if app.config.hobo.show_translation_keys
     end
 
     initializer 'hobo.routes' do |app|

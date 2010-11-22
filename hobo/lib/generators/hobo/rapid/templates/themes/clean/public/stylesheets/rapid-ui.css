@@ -8,13 +8,13 @@
 	background-repeat: no-repeat;
 }
 
-.inplaceeditor-form input, .inplaceeditor-form textarea, 
+.inplaceeditor-form input, .inplaceeditor-form textarea,
 table.new-record textarea, table.new-record input {
 	border: 1px dotted #666;
 	padding: 3px;	width: 100%;
 }
 .inplaceeditor-form, .inplaceeditor-form input {
-	display: inline;	
+	display: inline;
 }
 
 /**** Admin ****/

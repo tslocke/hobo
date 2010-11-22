@@ -17,7 +17,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <hidden-fields for-query-string skip="page, search"/>
           <span><t key="hobo.table_plus.search">Search</t></span>
           <input class="search" type="search" name="search" value="&params[:search]"/>
-          <submit label="&I18n.t('hobo.table_plus.submit_label', :default=>'Go')" class="search-button" param="search-submit"/>
+          <submit label="&t('hobo.table_plus.submit_label', :default=>'Go')" class="search-button" param="search-submit"/>
         </form>
       </div>
     </div>
@@ -105,16 +105,16 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
      name ||= model_class.name.downcase.pluralize -%>
   <section class="#{name.dasherize} collection-preview" param="default">
     <h3 param="heading">
-      <ht key="#{name.to_s.tableize}.collection.heading" count="&this.size">
+      <ht key="#{model_class.to_s.underscore}.collection.heading" count="&this.size">
         <do param="heading-content"><%= name.pluralize.titleize %></do>
       </ht>
     </h3>
     <a with="&model_class" action="new" if="&can_create?(model_class.new)" param="new-link">
-      <ht key="#{model_class.to_s.tableize}.actions.new">New <%= model_class.model_name.human %></ht>
+      <ht key="#{model_class.to_s.underscore}.actions.new">New <%= model_class.model_name.human %></ht>
     </a>
     <collection param/>
     <unless test="&this.empty? || this.size <= model_class.count">
-      <a param="show-all"><ht key="#{model_class.to_s.tableize}.actions.show_all" count="100">Show all <%= name.pluralize.titleize %>...</ht></a>
+      <a param="show-all"><ht key="#{model_class.to_s.underscore}.actions.show_all" count="100">Show all <%= name.pluralize.titleize %>...</ht></a>
     </unless>
   </section>
 </def>
@@ -210,9 +210,9 @@ Besides the "tags.filter_menu.default.no_filter" key is used as default of the a
 
   -->
 <def tag="filter-menu" attrs="param-name, options, no-filter, id">
-  <% opt = I18n.t("tags.filter_menu.#{param_name}.options", :default=>'')
+  <% opt = t("tags.filter_menu.#{param_name}.options", :default=>'')
      options = opt unless opt.blank?
-     no_filter = I18n.t("tags.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
+     no_filter = t("tags.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
   <form action="&request.fullpath" method="get" class="filter-menu" merge-attrs="id">
     <div>
       <% opt = options.first.kind_of?(Array) ? options.*.last : options

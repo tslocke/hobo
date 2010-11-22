@@ -552,7 +552,7 @@ module Hobo
 
 
     def create_response(new_action, options={}, &b)
-      flash_notice (ht( :"#{@this.class.name.tableize}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
+      flash_notice (ht( :"#{@this.class.to_s.underscore}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
 
       response_block(&b) or
         if valid?
@@ -566,7 +566,7 @@ module Hobo
 			errors = this.errors.full_messages.join("\n")
             wants.html { re_render_form(new_action) }
             wants.js   { render(:status => 500,
-                                :text => ht( :"#{this.class.name.pluralize.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
+                                :text => ht( :"#{this.class.to_s.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
                                )}
           end
         end
@@ -577,7 +577,7 @@ module Hobo
       options = args.extract_options!
 
       self.this ||= args.first || find_instance
-      changes = options[:attributes] || attribute_parameters or raise RuntimeError, I18n.t("hobo.messages.update.no_attribute_error", :default=>["No update specified in params"])
+      changes = options[:attributes] || attribute_parameters or raise RuntimeError, t("hobo.messages.update.no_attribute_error", :default=>["No update specified in params"])
       this.user_update_attributes(current_user, changes)
 
       # Ensure current_user isn't out of date
@@ -590,7 +590,7 @@ module Hobo
 
     def update_response(in_place_edit_field=nil, options={}, &b)
 
-      flash_notice (ht(:"#{@this.class.name.pluralize.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
+      flash_notice (ht(:"#{@this.class.name.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
 
       response_block(&b) or
         if valid?
@@ -617,7 +617,7 @@ module Hobo
             errors = @this.errors.full_messages.join("\n")
             wants.html { re_render_form(:edit) }
             wants.js { render(:status => 500,
-                              :text => ht(:"#{@this.class.name.pluralize.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
+                              :text => ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
                              ) }
           end
         end
@@ -628,7 +628,7 @@ module Hobo
       options = args.extract_options!
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
-      flash_notice ht( :"#{model.name.pluralize.underscore}.messages.destroy.success", :default=>["The #{model.name.titleize.downcase} was deleted"])
+      flash_notice ht( :"#{model.to_s.underscore}.messages.destroy.success", :default=>["The #{model.name.titleize.downcase} was deleted"])
       destroy_response(options, &b)
     end
 
@@ -669,7 +669,7 @@ module Hobo
 			errors = this.errors.full_messages.join("\n")
             wants.html { re_render_form(name) }
             wants.js   { render(:status => 500,
-                                :text => ht(:"#{@this.class.name.pluralize.underscore}.messages.creator.error", :default=>["Couldn't do creator #{name}.\n#{errors}"], :name=>name, :errors=>errors)
+                                :text => ht(:"#{@this.class.to_s.underscore}.messages.creator.error", :default=>["Couldn't do creator #{name}.\n#{errors}"], :name=>name, :errors=>errors)
                                )}
           end
         end
@@ -711,7 +711,7 @@ module Hobo
 			errors = this.errors.full_messages.join("\n")
             wants.html { re_render_form(name) }
             wants.js   { render(:status => 500,
-                                :text => ht(:"#{@this.class.name.pluralize.underscore}.messages.transition.error", :default=>["Couldn't do transition #{name}.\n#{errors}"], :name=>name, :errors=>errors)
+                                :text => ht(:"#{@this.class.to_s.underscore}.messages.transition.error", :default=>["Couldn't do transition #{name}.\n#{errors}"], :name=>name, :errors=>errors)
                                )}
           end
         end
@@ -767,11 +767,11 @@ module Hobo
             if render :permission_denied, :status => 403
               # job done
             else
-              render :text => I18n.t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
+              render :text => t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
             end
           end
           wants.js do
-            render :text => I18n.t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
+            render :text => t("hobo.messages.permission_denied", :default=>["Permission Denied"]), :status => 403
           end
         end
       end

@@ -131,7 +131,7 @@ module Hobo
       results_hash = Hobo.find_by_search(query)
       all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
       if all_results.empty?
-        render :text => "<p>"+ I18n.t("hobo.live_search.no_results", :default=>["Your search returned no matches."]) + "</p>"
+        render :text => "<p>"+ t("hobo.live_search.no_results", :default=>["Your search returned no matches."]) + "</p>"
       else
         # TODO: call one tag that renders all the search results with headings for each model
         render_tags(all_results, :search_card, :for_type => true)
@@ -156,7 +156,7 @@ module Hobo
       elsif render :not_found, :status => 404
         # cool
       else
-        render(:text => I18n.t("hobo.messages.not_found", :default=>["The page you requested cannot be found."]) , :status => 404)
+        render(:text => t("hobo.messages.not_found", :default=>["The page you requested cannot be found."]) , :status => 404)
       end
     end
 

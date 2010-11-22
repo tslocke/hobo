@@ -21,7 +21,7 @@ ActiveModel::Translation.class_eval do
     # otherwise it returns "".
     def attribute_help(attribute, options = {})
       defaults = lookup_ancestors.map do |klass|
-        :"#{self.i18n_scope}.attribute_help.#{klass.model_name.underscore}.#{attribute}"
+        :"#{self.i18n_scope}.attribute_help.#{klass.to_s.underscore}.#{attribute}"
       end
 
       defaults << :"attribute_help.#{attribute}"

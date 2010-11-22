@@ -493,7 +493,7 @@ Assuming the context is a blog post...
 %></def>
 
 <!-- Renders 'Yes' for true and 'No' for false -->
-<def tag="view" for="boolean"><%= this ? I18n.t('hobo.boolean_yes', :default => 'Yes') : I18n.t('hobo.boolean_no', :default => 'No') %></def>
+<def tag="view" for="boolean"><%= this ? t('hobo.boolean_yes', :default => 'Yes') : t('hobo.boolean_no', :default => 'No') %></def>
 
 <!-- Renders a link (`<a>`) to `this` -->
 <def tag="view" for="ActiveRecord::Base"><a merge-attrs/></def>
@@ -591,7 +591,7 @@ You can pass a summary attribute, which will generate a complete localized sente
     else
       key = summary.kind_of?(String) ? summary : "default"
       default = c == 1 ? "There is 1 #{label}" : "There are #{c} #{label}"
-      I18n.t "tags.count.#{key}", {:count=>c, :label=>label, :default=>default}.merge(attributes)
+      t "tags.count.#{key}", {:count=>c, :label=>label, :default=>default}.merge(attributes)
     end
   end
 %></span></def>
@@ -661,12 +661,12 @@ The "titleize" attribute is deprecated: use "capitalize" instead.
          when attributes[:do] then 'do'
          end -%>
   <if test="&this == current_user">
-    <%= s = I18n.t("tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
+    <%= s = t("tags.you.current_user.#{k || attributes.keys.first || 'default'}",:default=>"you #{k}")
        (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
   </if>
   <else>
     <do param="default">
-      <%= s = I18n.t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name,
+      <%= s = t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name,
           :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}")
           (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
     </do>
@@ -738,14 +738,14 @@ Notes
    options = {:default=>[d], :count=>(attrs[:count]||1), :name=>this.name}
    your_key = key.split('.').last
    unless key.eql?(your_key) || attrs.has_key?(your_key.to_sym)
-     options[your_key.to_sym] = I18n.t(key, :count=>options[:count], :default=>your_key.titleize)
+     options[your_key.to_sym] = t(key, :count=>options[:count], :default=>your_key.titleize)
    end
    s = if this == current_user
          options[:default].unshift :"tags.your.default.current_user"
-         I18n.t("tags.your.#{your_key}.current_user", options.merge(attrs))
+         t("tags.your.#{your_key}.current_user", options.merge(attrs))
        else
          options[:default].unshift :"tags.your.default.other_user"
-         I18n.t("tags.your.#{your_key}.other_user", options.merge(attrs))
+         t("tags.your.#{your_key}.other_user", options.merge(attrs))
        end
    capitalize ? s.sub(/^./){|c| c.upcase} : s
 %></def>
@@ -774,7 +774,7 @@ Notes
 <def tag="dev-user-changer">
   <set user="&Hobo::Model::User.default_user_model"/>
   <select-menu if="&user && Rails.env.development?"
-               first-option="#{I18n.t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
+               first-option="#{t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
                onchange="location.href = '#{dev_support_path :action=>:set_current_user}?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"
                selected="#{current_user.login}"
                class="dev-user-changer"

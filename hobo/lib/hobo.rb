@@ -17,6 +17,7 @@ module Hobo
   class Error < RuntimeError; end
   class PermissionDeniedError < RuntimeError; end
   class UndefinedAccessError < RuntimeError; end
+  class I18nError < RuntimeError; end
 
   # Empty class to represent the boolean type.
   class Boolean; end

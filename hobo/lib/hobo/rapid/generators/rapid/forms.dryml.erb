@@ -4,7 +4,7 @@ form_fields = standard_fields :belongs_to, :has_many
 
 cancel_to_show_page  = linkable?(:show)
 cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
-model_key = model.name.tableize
+model_key = model.to_s.underscore
 -%>
 <def tag="form" for="<%= model.name %>">
   <form merge param="default">
