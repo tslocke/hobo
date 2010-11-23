@@ -121,8 +121,12 @@ module Hobo
 
       ActiveRecord::Base.class_eval do
         def self.hobo_model
-          include Hobo::Model
-          fields(false) # force hobofields to load
+          if self.ancestors.include?(Hobo::Model)
+            Rails.logger.error "#{self}: Do not call hobo_model in derived classes."
+          else
+            include Hobo::Model
+            fields(false) # force hobofields to load
+          end
         end
         def self.hobo_user_model
           include Hobo::Model
