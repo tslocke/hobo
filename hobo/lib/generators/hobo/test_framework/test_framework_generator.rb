@@ -42,7 +42,7 @@ private
     end
 
     def setup_rspec
-      gem 'rspec-rails', '>= 2.0.0.beta.10', :group => :test
+      gem 'rspec-rails', '>= 2.0.0', :group => [:test, :development]
       @should_update = true
       return unless options[:update]
       @finalize_hooks << lambda {say "Finalizing rspec installation..."; invoke 'rspec:install'}
