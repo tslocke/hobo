@@ -89,7 +89,7 @@ This is a simple tag - just look at the source if you need to know more detail.
     <ul class="navigation account-nav" param>
       <li if="&Rails.env.development?" param="dev-user-changer"><dev-user-changer/></li>
       <if test="&logged_in?">
-        <li class='nav-item' param="logged-in-as"><a to="&current_user"><t key="hobo.actions.logged_in_as_html" name="&name">Logged in as <name/></t></a></li>
+        <li class='nav-item' param="logged-in-as"><a to="&current_user"><t key="hobo.actions.logged_in_as" name="&name">Logged in as <name/></t></a></li>
         <li class='nav-item' param="account"><a action="account"><t key="hobo.actions.account">Account</t></a></li>
         <li class='nav-item' param="log-out"><a href="&logout_url"><t key="hobo.actions.logout">Log out</t></a></li>
       </if>

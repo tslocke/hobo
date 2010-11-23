@@ -1,12 +1,15 @@
 ActionView::Helpers::TranslationHelper.module_eval do
 
-  # we need to remove the <span> tag because it will mess up
-  # the dryml tags when ht is used in some place
-  # we redefine the method since we cannot catch the rescued exception
-  # although the only difference is the rescue block
+  # Improved security escaping interpolated variables
+  # Improved management: when it returns a string it is always html_safe
+  # It assumes the base translation string is html_safe
+  # It removes the <span> tag when the key is missing, because it would mess up
+  # the dryml tags when ht or t is used in some place
+
   def translate(key, options = {})
+    options.each_pair { |k,v| options[k] = h(v) }
     translation = I18n.translate(scope_key_by_partial(key), options.merge!(:raise => true))
-    if html_safe_translation_key?(key) && translation.respond_to?(:html_safe)
+    if translation.respond_to?(:html_safe)
       translation.html_safe
     else
       translation
