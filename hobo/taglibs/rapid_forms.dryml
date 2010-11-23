@@ -51,7 +51,8 @@ executed at various points in the ajax request cycle:
             hiddens = case fields
                       when '*', nil
                         # TODO: Need a better (i.e. extensible) way to eleminate certain fields
-                        this.class.column_names - ['type', 'created_at', 'updated_at']
+                        # marking a field as attr_protected is one way to eliminate a field
+                        this.class.column_names - [this.class.inheritance_column, 'created_at', 'updated_at']
                       else
                         comma_split(fields)
                       end
