@@ -590,7 +590,7 @@ module Hobo
 
     def update_response(in_place_edit_field=nil, options={}, &b)
 
-      flash_notice (ht(:"#{@this.class.name.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
+      flash_notice (ht(:"#{@this.class.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
 
       response_block(&b) or
         if valid?
