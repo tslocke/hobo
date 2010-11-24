@@ -151,7 +151,7 @@ EOI
                                    :invite_only => @invite_only,
                                    :activation_email => @activation_email,
                                    :admin_subsite_name => @admin_subsite_name
-
+      return unless @invite_only
       say "Installing admin subsite..."
       invoke 'hobo:admin_subsite', [@admin_subsite_name],
                                    :user_resource_name => @user_resource_name,
