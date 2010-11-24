@@ -39,7 +39,7 @@ en:
         model_name = keys.shift
         model_class = begin model_name.camelize.constantize; rescue; end
         unless model_class && model_class < ActiveRecord::Base
-          raise Hobo::I18nError, %(wrong model name: "#{model_name}" (extracted from translation key). You might want to use the translate/t tag/method instead.)
+          raise Hobo::I18nError, %(wrong model name: "#{model_name}" (extracted from translation key: "#{key}"). You might want to use the translate/t tag/method instead.)
         end
         options[:default].unshift("hobo.#{keys.join(".")}".to_sym)
         options[:model] = model_class.model_name.human(:count=>options[:count]||1)
