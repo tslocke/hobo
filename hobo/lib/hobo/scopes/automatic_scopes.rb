@@ -267,7 +267,14 @@ module Hobo
               field, asc = args
               type = klass.attr_type(field)
               if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
-                colspec = "#{field}" # don't prepend the table name 
+                # can be also assoc.count let's check
+                _, assoc, count = *field._?.match(/^([a-z_]+)(?:\.([a-z_]+))?/)
+                type = klass.attr_type(assoc)
+                if type.respond_to?(:primary_key_name) && type.macro == :has_many && count._?.upcase == 'COUNT'
+                  colspec = "(SELECT COUNT(*) FROM #{type.klass.table_name} WHERE #{type.klass.table_name}.#{type.primary_key_name} = #{klass.table_name}.id)"
+                else
+                  colspec = "#{field}" # don't prepend the table name
+                end
               elsif type.respond_to?(:name_attribute) && (name = type.name_attribute)
                 include = field
                 colspec = "#{type.table_name}.#{name}"
