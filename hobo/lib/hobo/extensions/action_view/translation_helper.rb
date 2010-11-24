@@ -10,8 +10,8 @@ ActionView::Helpers::TranslationHelper.module_eval do
   # It removes the <span> tag when the key is missing, because it would mess up
   # the dryml tags when ht or t is used in some place
 
-  def translate(key, options={}, normalize=true)
-    key, options = normalize_args(key, options) if normalize
+  def translate(key, options={})
+    key, options = normalize_args(key, options)
     translation = I18n.translate(scope_key_by_partial(key), options.merge!(:raise => true))
     if translation.respond_to?(:html_safe)
       translation.html_safe

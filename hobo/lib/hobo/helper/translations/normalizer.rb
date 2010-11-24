@@ -1,3 +1,4 @@
+require 'active_support/core_ext/string/output_safety'
 module Hobo
   module Helper
     module Translations
@@ -16,11 +17,21 @@ module Hobo
             # Set options[:default] to complete the tag-argument-conversion process.
             options[:default] = defaults.call(options) if defaults.class == Proc
           end
-          options.each_pair { |k,v| options[k] = h(v) }
+          escape_options(options)
           options[:default] = Array.wrap options[:default]
           [key, options]
         end
 
+        def escape_options(options)
+          options.each_pair do |k,v|
+            options[k] = case v
+                         when Array
+                            v.map {|i| i.respond_to?(:html_safe) ? ERB::Util.html_escape(i) : i}
+                         else
+                           v.respond_to?(:html_safe) ? ERB::Util.html_escape(v) : v
+                         end
+          end
+        end
 
       end
     end

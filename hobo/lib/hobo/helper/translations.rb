@@ -43,7 +43,7 @@ en:
         end
         options[:default].unshift("hobo.#{keys.join(".")}".to_sym)
         options[:model] = model_class.model_name.human(:count=>options[:count]||1)
-        translate key.to_sym, options, false
+        translate key.to_sym, options
       end
       alias_method :ht, :hobo_translate
 
