@@ -56,14 +56,14 @@ module Hobo
 
         end
 
-
+      eval %(
         def valid?(context=nil)
           if context.nil? && self.class.has_lifecycle? && (step = lifecycle.active_step)
             context = step.name
           end
           super(context)
         end
-
+      )
 
         def lifecycle
           @lifecycle ||=  if self.class.const_defined?(:Lifecycle)
