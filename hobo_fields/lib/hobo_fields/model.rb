@@ -21,15 +21,18 @@ module HoboFields
     # index_specs holds IndexSpec objects for all the declared indexes.
     inheriting_cattr_reader :index_specs => []
     inheriting_cattr_reader :ignore_indexes => []
-eval %(
-    def self.inherited(klass)
-      fields do |f|
-        f.field(inheritance_column, :string)
+
+    # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+    eval %(
+      def self.inherited(klass)
+        fields do |f|
+          f.field(inheritance_column, :string)
+        end
+        index(inheritance_column)
+        super
       end
-      index(inheritance_column)
-      super
-    end
-)
+    )
+
     def self.index(fields, options = {})
       # don't double-index fields
       index_specs << HoboFields::Model::IndexSpec.new(self, fields, options) unless index_specs.*.fields.include?(Array.wrap(fields).*.to_s)

@@ -56,14 +56,15 @@ module Hobo
 
         end
 
-      eval %(
-        def valid?(context=nil)
-          if context.nil? && self.class.has_lifecycle? && (step = lifecycle.active_step)
-            context = step.name
+        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+        eval %(
+          def valid?(context=nil)
+            if context.nil? && self.class.has_lifecycle? && (step = lifecycle.active_step)
+              context = step.name
+            end
+            super(context)
           end
-          super(context)
-        end
-      )
+        )
 
         def lifecycle
           @lifecycle ||=  if self.class.const_defined?(:Lifecycle)
