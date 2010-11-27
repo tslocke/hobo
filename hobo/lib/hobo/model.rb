@@ -32,13 +32,17 @@ module Hobo
 
         alias_method_chain :has_one, :new_method
 
-        def inherited(klass)
-          super
-          fields(false) do
-            Hobo.register_model(klass)
-            field(klass.inheritance_column, :string)
+        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+        # see LH#840
+        eval %(
+          def inherited(klass)
+            super
+            fields(false) do
+              Hobo.register_model(klass)
+              field(klass.inheritance_column, :string)
+            end
           end
-        end
+        )
       end
 
       # https://hobo.lighthouseapp.com/projects/8324/tickets/762-hobo_model-outside-a-full-rails-env-can-lead-to-stack-level-too-deep
