@@ -6,21 +6,18 @@ module ActiveRecord
 
       include Hobo::Scopes::ApplyScopes
 
-      def respond_to?(method, include_private=false)
-        super || scopes.include?(method) || proxy_scope.respond_to?(method, include_private)
+      def respond_to_with_hobo_scopes?(method, include_private=false)
+        scopes.include?(method) || proxy_scope.respond_to?(method, include_private) || respond_to_without_hobo_scopes?(method, include_private)
       end
+      alias_method_chain :respond_to?, :hobo_scopes
       
       private
       
-      def method_missing(method, *args, &block)
-        if scopes.include?(method)
-          scopes[method].call(self, *args)
-        else
-          with_scope :find => proxy_options do
-            proxy_scope.send(method, *args, &block)
-          end
-        end
+      def method_missing_with_hobo_scopes(method, *args, &block)
+        respond_to?(method) # required for side effects, see LH#839
+        method_missing_without_hobo_scopes(method, *args, &block)
       end
+      alias_method_chain :method_missing, :hobo_scopes
 
     end
   end
