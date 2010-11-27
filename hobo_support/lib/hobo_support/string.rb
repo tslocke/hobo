@@ -22,9 +22,7 @@ class String
   def safe_constantize
     Object.class_eval self
   rescue NameError => e
-    # Unfortunately we have to rely on the error message to figure out which constant was missing.
-    # NameError has a #name method but it is always nil
-    if e.message !~ /\b#{self}$/
+    if e.missing_name != self
       # oops - some other name error
       raise
     else
