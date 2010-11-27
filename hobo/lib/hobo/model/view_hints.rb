@@ -25,7 +25,7 @@ module Hobo
 
       setter :children,    [] do |*args|
         # Setting children also gives a default parent using the reverse association
-        child_model = model.reflections[args.first].klass
+        child_model = model.reflect_on_association(args.first).klass
         if child_model.view_hints.parent.nil? and !child_model.view_hints.parent_defined
           parent = model.reverse_reflection(args.first)
           child_model.view_hints.parent(parent.name, :undefined => true) if parent
