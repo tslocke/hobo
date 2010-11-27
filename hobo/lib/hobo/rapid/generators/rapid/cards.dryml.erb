@@ -53,7 +53,7 @@ model_key = model.to_s.underscore
       <view:<%= creator_attribute %> param="creator"/>
 <% end -%>
 <% if primary_collection -%>
-      <ht key="<%= primary_collection.to_s.underscore %>.collection.count" count="&this.<%= primary_collection %>.size">
+      <ht key="<%= model.reflect_on_association(primary_collection).klass.to_s.underscore %>.collection.count" count="&this.<%= primary_collection %>.size">
          <count:<%= primary_collection%> param/>
       </ht>
 <% end -%>

@@ -177,7 +177,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= collection.to_s.underscore %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
+                <ht key="<%= collection_class.to_s.underscore %>.collection.heading" count="&this.<%= collection.to_s %>.count" >
                   <human-collection-name collection="<%= collection %>" your/>
                 </ht>
               </h3>
@@ -190,21 +190,21 @@ end
 <%   if add_link -%>
 
               <a:<%= collection %> action="new" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)" param="new-link">
-                <ht key="<%= collection.to_s.underscore %>.actions.new" count="1">
-                  New <%= collection.to_s.singularize.titleize %>
+                <ht key="<%= collection_class.to_s.underscore %>.actions.new" count="1">
+                  New <%= collection_class.to_s.titleize %>
                 </ht>
               </a:<%= collection %>>
 <%   elsif add_form -%>
 
               <section param="add-to-collection" if="&can_create?(@<%= model.name.underscore %>.<%= collection %>)">
                 <h3 param="add-form-heading">
-                  <ht key="<%= collection.to_s.underscore %>.collection.add_form_heading" count="1">
-                    Add <%= a_or_an collection.to_s.singularize.titleize %>
+                  <ht key="<%= collection_class.to_s.underscore %>.collection.add_form_heading" count="1">
+                    Add <%= a_or_an collection_class.to_s.titleize %>
                   </ht>
                 </h3>
                 <form with="&@<%= collection_class.name.underscore %> || new_for_current_user(@<%= model.name.underscore %>.<%= collection %>)" owner="<%= owner %>" without-cancel param>
                   <field-list: skip="<%= owner %>"/>
-                  <submit: label="#{ht '<%= sq_escape collection.to_s.underscore %>.actions.add', :default=>['Add'] }"/>
+                  <submit: label="#{ht '<%= sq_escape collection_class.to_s.underscore %>.actions.add', :default=>['Add'] }"/>
                 </form>
               </section>
 <%   end -%>
