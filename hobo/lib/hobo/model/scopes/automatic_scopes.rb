@@ -310,6 +310,16 @@ module Hobo
 
 
             when "include"
+              # DEPRECATED: it clashes with Module.include when called on an ActiveRecord::Relation
+              # after a scope chain, if you didn't call it on the class itself first
+              Rails.logger.warn "Automatic scope :include has been deprecated: use :including instead."
+              return true if check_only
+
+              def_scope do |inclusions|
+                @klass.includes(inclusions)
+              end
+
+            when "including"
               return true if check_only
 
               def_scope do |inclusions|
