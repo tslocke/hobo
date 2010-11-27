@@ -23,12 +23,12 @@ module Hobo
     end
 
     ActiveSupport.on_load(:active_record) do
-      require 'hobo/extensions/active_record/association_collection'
-      require 'hobo/extensions/active_record/association_proxy'
-      require 'hobo/extensions/active_record/association_reflection'
+      require 'hobo/extensions/active_record/associations/collection'
+      require 'hobo/extensions/active_record/associations/proxy'
+      require 'hobo/extensions/active_record/associations/reflection'
       require 'hobo/extensions/active_record/hobo_methods'
       require 'hobo/extensions/active_record/permissions'
-      require 'hobo/extensions/active_record/scopes'
+      require 'hobo/extensions/active_record/associations/scope'
       require 'hobo/extensions/active_record/relation_with_origin'
       require 'hobo/extensions/active_model/name'
       require 'hobo/extensions/active_model/translation'
