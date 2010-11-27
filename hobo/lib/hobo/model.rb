@@ -34,6 +34,8 @@ module Hobo
 
         alias_method_chain :has_one, :new_method
 
+        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+        eval %(
         def inherited(klass)
           super
           fields(false) do
@@ -41,6 +43,7 @@ module Hobo
             field(klass.inheritance_column, :string)
           end
         end
+        )
       end
 
       base.fields(false) # force hobo_fields to load
