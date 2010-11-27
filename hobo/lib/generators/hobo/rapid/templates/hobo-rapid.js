@@ -691,7 +691,7 @@ HoboInputMany = {
       Event.stop(ev);
       var ul = el.up('ul.input-many'), li = el.up('li.input-many-li');
 
-      if(li.id.search(/_-1$/ && ul.immediateDescendants().length>2)>=0) {
+      if(li.id.search(/_-1$/)>=0 && ul.immediateDescendants().length>2) {
           /* if(console) console.log("IE7 messed up again (bug 605)"); */
           return;
       }
