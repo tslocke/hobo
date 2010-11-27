@@ -34,13 +34,17 @@ module Hobo
 
         alias_method_chain :has_one, :new_method
 
-        def inherited(klass)
-          super
-          fields(false) do
-            Hobo.register_model(klass)
-            field(klass.inheritance_column, :string)
+        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+        # see LH#840
+        eval %(
+          def inherited(klass)
+            super
+            fields(false) do
+              Hobo.register_model(klass)
+              field(klass.inheritance_column, :string)
+            end
           end
-        end
+        )
       end
       
       base.fields(false) # force hobofields to load
@@ -121,8 +125,12 @@ module Hobo
 
       ActiveRecord::Base.class_eval do
         def self.hobo_model
-          include Hobo::Model
-          fields(false) # force hobofields to load
+          if self.ancestors.include?(Hobo::Model)
+            Rails.logger.error "#{self}: Do not call hobo_model in derived classes."
+          else
+            include Hobo::Model
+            fields(false) # force hobofields to load
+          end
         end
         def self.hobo_user_model
           include Hobo::Model

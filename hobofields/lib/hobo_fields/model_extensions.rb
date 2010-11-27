@@ -22,13 +22,17 @@ module HoboFields
     inheriting_cattr_reader :index_specs => []
     inheriting_cattr_reader :ignore_indexes => []
 
-    def self.inherited(klass)
-      fields do |f|
-        f.field(inheritance_column, :string)
+    # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+    # see LH#840
+    eval %(
+      def self.inherited(klass)
+        fields do |f|
+          f.field(inheritance_column, :string)
+        end
+        index(inheritance_column)
+        super
       end
-      index(inheritance_column)
-      super
-    end
+    )
 
     def self.index(fields, options = {})
       # don't double-index fields
