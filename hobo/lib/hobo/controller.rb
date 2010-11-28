@@ -58,10 +58,9 @@ module Hobo
 
     def hobo_ajax_response(*args)
       results = args.extract_options!
-      page_path = params[:page_path]
       r = params[:render]
       if r
-        ajax_update_response(page_path, r.values, results)
+        ajax_update_response(r.values, results)
         true
       else
         false
@@ -69,15 +68,13 @@ module Hobo
     end
 
 
-    def ajax_update_response(page_path, render_specs, results={})
-      if page_path
-        controller, action = controller_action_from_page_path(page_path)
-        identifier = view_context.view_paths.find( action,
-                                                   controller,
-                                                   false,
-                                                   view_context.lookup_context.instance_variable_get('@details')).identifier
-        renderer = Dryml.page_renderer(view_context, identifier, [], controller)
-      end
+    def ajax_update_response(render_specs, results={})
+      controller, action = controller_action_from_page_path
+      identifier = view_context.view_paths.find( action,
+                                                 controller,
+                                                 false,
+                                                 view_context.lookup_context.instance_variable_get('@details')).identifier
+      renderer = Dryml.page_renderer(view_context, identifier, [], controller)
 
       render :update do |page|
         page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
