@@ -285,18 +285,14 @@ Gives the N most recent items:
 
 ## include
 
-DEPRECATED: Automatic scope :include has been deprecated: use :including instead.
+DEPRECATED: Automatic scope :include has been deprecated: use :includes instead.
 
-## including
+## includes
 
-Adding the including function to your query chain has the same effect as
-the `:include` option to the `find` method.
-
-    >> Person.search("B", :name).including(:friends).*.name  # test LH#839
+    >> Person.search("B", :name).includes(:friends).*.name  # test LH#839
     => ["Bryan", "Bethany"]
-.hidden
 
-    >> Person.including(:friends).*.name
+    >> Person.includes(:friends).*.name
     => ["Bryan", "Bethany"]
 
 ## search

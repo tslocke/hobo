@@ -31,11 +31,11 @@ module Hobo
         def create_scope(check_only=false)
           matched_scope = true
 
-
+          case
           # --- Association Queries --- #
 
           # with_players(player1, player2)
-          if name =~ /^with_(.*)/ && (refl = reflection($1))
+          when name =~ /^with_(.*)/ && (refl = reflection($1))
             return true if check_only
 
             def_scope do |*records|
@@ -49,7 +49,7 @@ module Hobo
             end
 
           # with_player(a_player)
-          elsif name =~ /^with_(.*)/ && (refl = reflection($1.pluralize))
+          when name =~ /^with_(.*)/ && (refl = reflection($1.pluralize))
             return true if check_only
 
             exists_sql = exists_sql_condition(refl)
@@ -59,7 +59,7 @@ module Hobo
             end
 
           # any_of_players(player1, player2)
-          elsif name =~ /^any_of_(.*)/ && (refl = reflection($1))
+          when name =~ /^any_of_(.*)/ && (refl = reflection($1))
             return true if check_only
 
             def_scope do |*records|
@@ -73,7 +73,7 @@ module Hobo
             end
 
           # without_players(player1, player2)
-          elsif name =~ /^without_(.*)/ && (refl = reflection($1))
+          when name =~ /^without_(.*)/ && (refl = reflection($1))
             return true if check_only
 
             def_scope do |*records|
@@ -87,7 +87,7 @@ module Hobo
             end
 
           # without_player(a_player)
-          elsif name =~ /^without_(.*)/ && (refl = reflection($1.pluralize))
+          when name =~ /^without_(.*)/ && (refl = reflection($1.pluralize))
             return true if check_only
 
             exists_sql = exists_sql_condition(refl)
@@ -97,7 +97,7 @@ module Hobo
             end
 
           # team_is(a_team)
-          elsif name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
+          when name =~ /^(.*)_is$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
             return true if check_only
 
             if refl.options[:polymorphic]
@@ -113,7 +113,7 @@ module Hobo
             end
 
           # team_is_not(a_team)
-          elsif name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
+          when name =~ /^(.*)_is_not$/ && (refl = reflection($1)) && refl.macro.in?([:has_one, :belongs_to])
             return true if check_only
 
             if refl.options[:polymorphic]
@@ -132,7 +132,7 @@ module Hobo
           # --- Column Queries --- #
 
           # name_is(str)
-          elsif name =~ /^(.*)_is$/ && (col = column($1))
+          when name =~ /^(.*)_is$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -140,7 +140,7 @@ module Hobo
             end
 
           # name_is_not(str)
-          elsif name =~ /^(.*)_is_not$/ && (col = column($1))
+          when name =~ /^(.*)_is_not$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -148,7 +148,7 @@ module Hobo
             end
 
           # name_contains(str)
-          elsif name =~ /^(.*)_contains$/ && (col = column($1))
+          when name =~ /^(.*)_contains$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -156,7 +156,7 @@ module Hobo
             end
 
           # name_does_not_contain
-          elsif name =~ /^(.*)_does_not_contain$/ && (col = column($1))
+          when name =~ /^(.*)_does_not_contain$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -164,7 +164,7 @@ module Hobo
             end
 
           # name_starts(str)
-          elsif name =~ /^(.*)_starts$/ && (col = column($1))
+          when name =~ /^(.*)_starts$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -172,7 +172,7 @@ module Hobo
             end
 
           # name_does_not_start
-          elsif name =~ /^(.*)_does_not_start$/ && (col = column($1))
+          when name =~ /^(.*)_does_not_start$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -180,7 +180,7 @@ module Hobo
             end
 
           # name_ends(str)
-          elsif name =~ /^(.*)_ends$/ && (col = column($1))
+          when name =~ /^(.*)_ends$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -188,7 +188,7 @@ module Hobo
             end
 
           # name_does_not_end(str)
-          elsif name =~ /^(.*)_does_not_end$/ && (col = column($1))
+          when name =~ /^(.*)_does_not_end$/ && (col = column($1))
             return true if check_only
 
             def_scope do |str|
@@ -196,7 +196,7 @@ module Hobo
             end
 
           # published (a boolean column)
-          elsif (col = column(name)) && (col.type == :boolean)
+          when (col = column(name)) && (col.type == :boolean)
             return true if check_only
 
             def_scope do
@@ -204,7 +204,7 @@ module Hobo
             end
 
           # not_published
-          elsif name =~ /^not_(.*)$/ && (col = column($1)) && (col.type == :boolean)
+          when name =~ /^not_(.*)$/ && (col = column($1)) && (col.type == :boolean)
             return true if check_only
 
             def_scope do
@@ -212,7 +212,7 @@ module Hobo
             end
 
           # published_before(time)
-          elsif name =~ /^(.*)_before$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
+          when name =~ /^(.*)_before$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
             return true if check_only
 
             def_scope do |time|
@@ -220,7 +220,7 @@ module Hobo
             end
 
           # published_after(time)
-          elsif name =~ /^(.*)_after$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
+          when name =~ /^(.*)_after$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
             return true if check_only
 
             def_scope do |time|
@@ -228,7 +228,7 @@ module Hobo
             end
 
           # published_between(time1, time2)
-          elsif name =~ /^(.*)_between$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
+          when name =~ /^(.*)_between$/ && (col = column("#{$1}_at") || column("#{$1}_date") || column("#{$1}_on")) && col.type.in?([:date, :datetime, :time, :timestamp])
             return true if check_only
 
             def_scope do |time1, time2|
@@ -236,12 +236,12 @@ module Hobo
             end
 
            # active (a lifecycle state)
-          elsif @klass.has_lifecycle? && name.to_sym.in?(@klass::Lifecycle.state_names)
+          when @klass.has_lifecycle? && name.to_sym.in?(@klass::Lifecycle.state_names)
             return true if check_only
 
             if @klass::Lifecycle.state_names.length == 1
               # nothing to check for - create a dummy scope
-              def_scope { @klass.where '' }
+              def_scope { @klass.scoped }
               true
             else
               def_scope do
@@ -250,104 +250,94 @@ module Hobo
             end
 
           # self is / is not
-          elsif name == "is"
+          when name == "is"
             return true if check_only
 
             def_scope do |record|
               @klass.where "#{@klass.table_name}.#{@klass.primary_key} = ?", record
             end
 
-          elsif name == "is_not"
+          when name == "is_not"
             return true if check_only
 
             def_scope do |record|
               @klass.where "#{@klass.table_name}.#{@klass.primary_key} <> ?", record
             end
 
-          else
 
-            case name
+          when name == "by_most_recent"
+            return true if check_only
 
-            when "by_most_recent"
-              return true if check_only
-
-              def_scope do
-                @klass.order "#{@klass.table_name}.created_at DESC"
-              end
-
-            when "recent"
-              return true if check_only
-
-              if "created_at".in?(@klass.columns.*.name)
-                def_scope do |*args|
-                  count = args.first || 6
-                  @klass.order("#{@klass.table_name}.created_at DESC").limit(count)
-                end
-              else
-                def_scope do |*args|
-                  count = args.first || 6
-                  limit(count)
-                end
-              end
-
-            when "order_by"
-              return true if check_only
-
-              klass = @klass
-              def_scope do |*args|
-                field, asc = args
-                type = klass.attr_type(field)
-                if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
-                  colspec = "#{field}" # don't prepend the table name
-                elsif type.respond_to?(:name_attribute) && (name = type.name_attribute)
-                  include = field
-                  colspec = "#{type.table_name}.#{name}"
-                else
-                  colspec = "#{klass.table_name}.#{field}"
-                end
-                @klass.includes(include).order("#{colspec} #{asc._?.upcase}")
-              end
-
-
-            when "include"
-              # DEPRECATED: it clashes with Module.include when called on an ActiveRecord::Relation
-              # after a scope chain, if you didn't call it on the class itself first
-              Rails.logger.warn "Automatic scope :include has been deprecated: use :including instead."
-              return true if check_only
-
-              def_scope do |inclusions|
-                @klass.includes(inclusions)
-              end
-
-            when "including"
-              return true if check_only
-
-              def_scope do |inclusions|
-                @klass.includes(inclusions)
-              end
-
-            when "search"
-              return true if check_only
-
-              def_scope do |query, *fields|
-                match_keyword = ::ActiveRecord::Base.connection.adapter_name == "PostgreSQL" ? "ILIKE" : "LIKE"
-
-                words = query.split
-                args = []
-                word_queries = words.map do |word|
-                  field_query = '(' + fields.map { |field| "(#{@klass.table_name}.#{field} #{match_keyword} ?)" }.join(" OR ") + ')'
-                  args += ["%#{word}%"] * fields.length
-                  field_query
-                end
-
-                @klass.where *([word_queries.join(" AND ")] + args)
-              end
-
-            else
-              matched_scope = false
+            def_scope do
+              @klass.order "#{@klass.table_name}.created_at DESC"
             end
 
+          when name == "recent"
+            return true if check_only
+
+            if "created_at".in?(@klass.columns.*.name)
+              def_scope do |*args|
+                count = args.first || 6
+                @klass.order("#{@klass.table_name}.created_at DESC").limit(count)
+              end
+            else
+              def_scope do |*args|
+                count = args.first || 6
+                limit(count)
+              end
+            end
+
+          when name == "order_by"
+            # DEPRECATED: use :order instead.
+            Rails.logger.warn "Automatic scope :order_by has been deprecated: use :order instead."
+            return true if check_only
+
+            klass = @klass
+            def_scope do |*args|
+              field, asc = args
+              type = klass.attr_type(field)
+              if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
+                colspec = "#{field}" # don't prepend the table name
+              elsif type.respond_to?(:name_attribute) && (name = type.name_attribute)
+                include = field
+                colspec = "#{type.table_name}.#{name}"
+              else
+                colspec = "#{klass.table_name}.#{field}"
+              end
+              @klass.includes(include).order("#{colspec} #{asc._?.upcase}")
+            end
+
+          when name == "include"
+            # DEPRECATED: it clashes with Module.include when called on an ActiveRecord::Relation
+            # after a scope chain, if you didn't call it on the class itself first
+            Rails.logger.warn "Automatic scope :include has been deprecated: use :includes instead."
+            return true if check_only
+
+            def_scope do |inclusions|
+              @klass.includes(inclusions)
+            end
+
+          when name == "search"
+            return true if check_only
+
+            def_scope do |query, *fields|
+              match_keyword = ::ActiveRecord::Base.connection.adapter_name == "PostgreSQL" ? "ILIKE" : "LIKE"
+
+              words = query.split
+              args = []
+              word_queries = words.map do |word|
+                field_query = '(' + fields.map { |field| "(#{@klass.table_name}.#{field} #{match_keyword} ?)" }.join(" OR ") + ')'
+                args += ["%#{word}%"] * fields.length
+                field_query
+              end
+
+              @klass.where *([word_queries.join(" AND ")] + args)
+            end
+
+          else
+            matched_scope = false
           end
+
           matched_scope
         end
 
