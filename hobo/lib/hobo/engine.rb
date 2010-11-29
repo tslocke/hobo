@@ -15,6 +15,7 @@ module Hobo
       h.auto_taglibs_path = Pathname.new File.expand_path('app/views/taglibs/auto', Rails.root)
       h.read_only_file_system = !!ENV['HEROKU_TYPE']
       h.show_translation_keys = false
+      h.dryml_only_templates = false
     end
 
     ActiveSupport.on_load(:action_controller) do

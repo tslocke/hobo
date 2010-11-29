@@ -47,6 +47,9 @@ module Hobo
     class_option :gitignore_auto_generated_files, :type => :boolean,
     :desc => "Add the auto-generated files to .gitignore", :default => true
 
+    class_option :dryml_only_templates, :type => :boolean,
+    :desc => "The application uses only dryml templates",
+    :default => Rails.application.config.hobo.dryml_only_templates
 
     def startup
       if wizard?
@@ -115,6 +118,22 @@ NOTE: You might want to sign up as the administrator before adding this!
   end
 EOI
     end
+
+
+    def dryml_only_templates_option
+      if wizard?
+        say_title 'Templates Option'
+        dryml_only_templates = yes_no?("Will you application use only dryml templates?\n(Choose 'n' only if you plan to use plain rails/erb templates)")
+      else
+        dryml_only_templates = options[:dryml_only_templates]
+      end
+      if dryml_only_templates
+        remove_file 'app/views/layouts/application.html.erb'
+        remove_file 'app/helpers/application_helper.rb'
+        environment "\n  config.hobo.dryml_only_templates = true\n"
+      end
+    end
+
 
     def rapid
       if wizard?

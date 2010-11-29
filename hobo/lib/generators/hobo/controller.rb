@@ -4,6 +4,10 @@ module Generators
 
       check_class_collision :suffix => 'Controller'
 
+      class_option :helpers, :type => :boolean,
+      :desc => "Generates helper files",
+      :default => !Rails.application.config.hobo.dryml_only_templates
+
       def self.banner
       "rails generate hobo:controller #{self.arguments.map(&:usage).join(' ')}"
       end
@@ -18,6 +22,7 @@ module Generators
       end
 
       def generate_helper
+        return unless options[:helpers]
         invoke 'helper', [name], options
       end
 
