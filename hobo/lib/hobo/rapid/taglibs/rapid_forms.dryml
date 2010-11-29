@@ -797,7 +797,7 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
-  prompt ||= ht("#{this_field.underscore}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
+  prompt ||= ht("#{this_field_reflection.klass.to_s.underscore}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
   options ||= this_field_reflection.klass.all(:conditions =>this.send(:conditions)).select {|x| can_view?(x)}
   name ||= param_name_for_this
 
