@@ -36,6 +36,10 @@ report](https://hobo.lighthouseapp.com/projects/8324/tickets/666-user-model-secu
 All code changes may viewed on the [github
 log](https://github.com/tablatom/hobo/compare/v1.0.2...v1.0.3)
 
+The "include" automatic scope has been aliased to "includes" to
+increase future compatibility with Rails 3.  Future versions of Hobo
+will remove support for "include".
+
 === Hobo 1.0.2 ===
 
 This release is almost identical to 1.0.1 except that it updates the
