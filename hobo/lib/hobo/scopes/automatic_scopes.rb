@@ -283,6 +283,11 @@ module Hobo
               { :include => inclusions }
             end
 
+          when "includes"
+            def_scope do |inclusions|
+              { :include => inclusions }
+            end
+
           when "search"
             def_scope do |query, *fields|
               match_keyword = ::ActiveRecord::Base.connection.adapter_name == "PostgreSQL" ? "ILIKE" : "LIKE"

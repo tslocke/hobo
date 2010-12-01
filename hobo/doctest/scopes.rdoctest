@@ -288,16 +288,16 @@ Gives the N most recent items:
     >> Person.order_by(:code).*.name
     => ["Bryan", "Bethany"]
 
-## include
+## includes
 
-Adding the include function to your query chain has the same effect as
+Adding the includes function to your query chain has the same effect as
 the `:include` option to the `find` method.  
 
     >> Person.search("B", :name).include(:friends).*.name  # test LH#839
     => ["Bryan", "Bethany"]
 .hidden
 
-    >> Person.include(:friends).*.name
+    >> Person.includes(:friends).*.name
     => ["Bryan", "Bethany"]
 
 ## search
