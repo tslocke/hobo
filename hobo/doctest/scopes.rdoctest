@@ -95,6 +95,7 @@ Let's set up a few models for our testing:
          born_at :date
          code :integer
          male :boolean
+         foo :string
          timestamps
        end
 
@@ -119,19 +120,19 @@ Generate a migration and run it:
 
     >> ActiveRecord::Migration.class_eval(HoboFields::MigrationGenerator.run[0])
     >> Person.columns.*.name
-    => ["id", "name", "born_at", "code", "male", "created_at", "updated_at", "state"]
+    => ["id", "name", "born_at", "code", "male", "foo", "created_at", "updated_at", "state"]
 {.hidden}
 
 And create a couple of fixtures:
 
     >> 
      Bryan = Person.new(:name => "Bryan", :code => 17, 
-        :born_at => Date.new(1973,4,8), :male => true)
+        :born_at => Date.new(1973,4,8), :male => true, :foo => "common")
     >> Bryan.state = "active"
     >> Bryan.save!
     >> 
      Bethany = Person.new(:name => "Bethany", :code => 42, 
-        :born_at => Date.new(1975,5,13), :male => false)
+        :born_at => Date.new(1975,5,13), :male => false, :foo => "common")
     >> Bethany.state = "inactive"
     >> Bethany.save!
     >> Friendship.new(:person => Bryan, :friend => Bethany).save!
@@ -400,6 +401,15 @@ Like named scopes, Hobo scopes can be chained:
 
     >> Bryan.inactive_friends.inactive.*.name
     => ["Bethany"]
+
+    >> Person.scoped(:conditions => {:state => "active"}).scoped(:conditions => {:foo => "common"}).*.name
+    => ["Bryan"]
+
+    >> Person.with_friendship(Friendship.first).born_before(Date.new(1974)).*.name
+    => ["Bryan"]
+
+    >> Person.born_after(Date.new(1974)).with_friendship(Friendship.first).*.name
+    => []
 
 Clean up our test database:
 {.hidden}
