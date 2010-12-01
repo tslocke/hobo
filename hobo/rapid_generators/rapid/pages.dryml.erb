@@ -140,7 +140,7 @@ end
             <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back" to="<%= back_link %>"><name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
-              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:to_s) ? this.to_s : ''">
                 <name/>
               </ht>
             </h2>
@@ -175,7 +175,7 @@ end
 <% if collection -%>
             <section param="collection-section">
               <h3 param="collection-heading">
-                <ht key="<%= model_key %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
+                <ht key="<%= collection.to_s.tableize %>.collection.heading.<%= (is_user_model ? 'your':'other') %>" >
                   <%= '<Your/>' if is_user_model %><%= collection.to_s.titleize %>
                 </ht>
               </h3>

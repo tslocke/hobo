@@ -575,7 +575,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
                                   else
                                     { :type => "button" }
                                   end)
-    label ||= ht("hobo.actions.remove", :default=>"Remove") 
+    label ||= ht("#{this.class.name.tableize}.actions.remove", :default=>"Remove") 
     confirm = ht("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
     
     add_classes!(attributes,
@@ -623,7 +623,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   new = class_or_assoc.new(fields)
   new.set_creator(current_user)
   if can_create?(new)
-    label ||= ht("#{new.class.name.pluralize.underscore}.actions.new", :default=>"New #{new.class.name.titleize}")  
+    label ||= ht("#{new.class.name.tableize}.actions.new", :default=>"New #{new.class.name.titleize}")  
     ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
     ajax_attributes[:params] = { class_name => fields } unless fields.empty?
@@ -654,7 +654,7 @@ For situations where there are too many target records to practically include in
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise Hobo::PermissionDeniedError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit? 
 
-  blank_message ||= ht("#{this_type.name.underscore}.message.no", :default=>"(No #{this_type.view_hints.model_name})")
+  blank_message ||= ht("#{this_type.name.tableize}.message.none", :default=>"(No #{this_type.view_hints.model_name})")
   limit ||= 100
    
   options ||= begin
@@ -781,10 +781,10 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
   -->
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
-    <h2 param="heading">To proceed please correct the following:</h2>
+      <h2 param="heading"><ht key="hobo.messages.error_correct_following">To proceed please correct the following:</ht></h2>
     <ul param>
       <% this.errors.each do |attr, message|; next if message == "..." -%>
-        <li param><%= this.class.human_attribute_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
+        <li param><%= this.class.view_hints.field_name(attr) unless attr.to_s == 'base' %> <%= message %></li>
       <% end -%>
     </ul>
   </section>
@@ -797,12 +797,12 @@ An input for `has_many :through` associations that lets the user chose the items
 To use this tag, the model of the items the user is chosing *must* have unique names, and the 
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
-  prompt ||= "Add #{this_field.titleize.singularize}"
+  prompt ||= ht("#{this.name.tableize}.message.none", :default=>"Add #{this.view_hints.model_name}")
   options ||= this_field_reflection.klass.all(:conditions =>this.conditions).select {|x| can_view?(x)}
   name ||= param_name_for_this
                 
   values = this
-  remove_label ||= ht("hobo.actions.remove", :default=>'Remove')
+  remove_label ||= ht("#{this.name.tableize}.actions.remove", :default=>'Remove')
   -%>
   <div class="input select-many" merge-attrs>
     <div style="display:none" class="item-proto">

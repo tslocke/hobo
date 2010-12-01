@@ -165,8 +165,8 @@ if a given email is associated with an account or not. -->
         <error-messages param/>
         <form class="change-password" param>
           <field-list fields="email_address, current_password, password, password_confirmation" param>
-            <password-label:>New Password</password-label:>
-            <password-confirmation-label:>Confirm New Password</password-confirmation-label:>
+              <password-label:><ht key="users.new_password">"New Password</ht></password-label:>
+              <password-confirmation-label:><ht key="users.confirm_new_password">Confirm New Password</ht></password-confirmation-label:>
           </field-list>
 
           <div class="actions" param="actions">
