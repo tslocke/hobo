@@ -1,24 +1,32 @@
 module ActiveRecord
   module NamedScope
-    class Scope
+    
+    class Scope      
+      delegate :member_class, :to => :proxy_found      
+      include Hobo::Scopes::ApplyScopes      
+    end
 
-      delegate :member_class, :to => :proxy_found
+    module ClassMethods
+      def scopes
+        hash = read_inheritable_attribute(:scopes)
+        if hash.nil?
+          write_inheritable_attribute(:scopes, new_automatic_scoping_hash(self))
+        elsif hash.default_proc.nil?
+          write_inheritable_attribute(:scopes, new_automatic_scoping_hash(self).merge!(hash))
+        else
+          hash
+        end
 
-      include Hobo::Scopes::ApplyScopes
-
-      def respond_to_with_hobo_scopes?(method, include_private=false)
-        scopes.include?(method) || proxy_scope.respond_to?(method, include_private) || respond_to_without_hobo_scopes?(method, include_private)
+        def new_automatic_scoping_hash(o)
+        hash = Hash.new { |hash, key| o.create_automatic_scope(key) && hash[key] }
+        hash.meta_eval do
+          define_method :include? do |key, *args|
+            super(key, *args) || o.create_automatic_scope(key)
+          end
+        end
+        hash
       end
-      alias_method_chain :respond_to?, :hobo_scopes
-      
-      private
-      
-      def method_missing_with_hobo_scopes(method, *args, &block)
-        respond_to?(method) # required for side effects, see LH#839
-        method_missing_without_hobo_scopes(method, *args, &block)
-      end
-      alias_method_chain :method_missing, :hobo_scopes
-
     end
   end
 end
+
