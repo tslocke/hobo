@@ -128,6 +128,7 @@
       permission_denied: "Sem autorização!"
       not_found: "A página solicitada não foi encontrada"
       unauthenticated: "Não foi possível indentificá-lo(a)."
+      validate_password: "tem que ter pelo menos 6 caracteres, letras maiúsculas e minúsculas"
       current_password_is_not_correct: "não está correta."
       you_are_site_admin: "Agora é o administrador do site"
       you_signed_up: "Acabou de se registar"

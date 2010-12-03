@@ -133,6 +133,7 @@ it:
       permission_denied: "Permesso negato!"
       not_found: "La pagina richiesta non è stata trovata."
       unauthenticated: "La tua utenticazione è fallita."
+      validate_password: "deve contenere almeno 6 caratteri, sia maiuscoli che minuscoli"
       current_password_is_not_correct: "non è esatta"
       you_are_site_admin: "Adesso sei amministratore del sito."
       you_signed_up: "Ti sei iscritto."

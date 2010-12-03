@@ -127,6 +127,7 @@ en:
       permission_denied: "Permission Denied"
       not_found: "The page you requested cannot be found."
       unauthenticated: "Couldn't authenticate you"
+      validate_password: "must be at least 6 characters long and must not consist solely of lowercase letters"
       current_password_is_not_correct: "is not correct"
       you_are_site_admin: "You are now the site administrator"
       you_signed_up: "You have signed up"

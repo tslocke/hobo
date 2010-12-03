@@ -133,6 +133,7 @@
       permission_denied: "¡Permiso denegado!"
       not_found: "La pagina solicitada no se encuentra."
       unauthenticated: "No se pudo autenticar."
+      validate_password: "debe contener tansiquiera 6 caracteres, letras mayúsculas y minúsculas"
       current_password_is_not_correct: "no está correcta"
       you_are_site_admin: "Ahora usted es el administrador del sitio."
       you_signed_up: "Usted se inscribió."

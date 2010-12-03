@@ -32,7 +32,7 @@ module Hobo
           end
 
           validates_confirmation_of :password,              :if => :new_password_required?
-          password_validations
+          validate :validate_password
           validate :validate_current_password_when_changing_password
 
           # Virtual attributes for setting and changing the password
@@ -56,10 +56,6 @@ module Hobo
       # Additional classmethods for authentication
       module ClassMethods
 
-        # Validation of the plaintext password
-        def password_validations
-          validates_length_of :password, :within => 4..40, :if => :new_password_required?
-        end
 
         def login_attribute=(attr, validate=true)
           @login_attribute = attr = attr.to_sym
@@ -172,9 +168,15 @@ module Hobo
         (new_record? && password) || lifecycle_changing_password? || changing_password?
       end
 
+      # Validation of the plaintext password. Override this function to change your validation.
+      def validate_password
+        errors.add(:password, I18n.t("hobo.messages.validate_password", :default => "must be at least 6 characters long and must not consist solely of lowercase letters")) \
+          if new_password_required? && (password.nil? || password.length<6 || /^[[:lower:]]*$/.match(password))
+      end
 
       def validate_current_password_when_changing_password
-        changing_password? && !authenticated?(current_password) and errors.add :current_password, I18n.t("hobo.messages.current_password_is_not_correct", :default => "is not correct")
+        errors.add :current_password, I18n.t("hobo.messages.current_password_is_not_correct", :default => "is not correct") \
+          if changing_password? && !authenticated?(current_password)
       end
 
     end
