@@ -119,11 +119,10 @@ NOTE: You might want to sign up as the administrator before adding this!
 EOI
     end
 
-
     def dryml_only_templates_option
       if wizard?
         say_title 'Templates Option'
-        dryml_only_templates = yes_no?("Will you application use only dryml templates?\n(Choose 'n' only if you plan to use plain rails/erb templates)")
+        dryml_only_templates = yes_no?("Will you application use only hobo/dryml web page templates?\n(Choose 'n' only if you also plan to use plain rails/erb web page templates)")
       else
         dryml_only_templates = options[:dryml_only_templates]
       end
@@ -133,7 +132,6 @@ EOI
         environment "\n  config.hobo.dryml_only_templates = true\n"
       end
     end
-
 
     def rapid
       if wizard?
