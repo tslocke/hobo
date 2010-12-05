@@ -72,7 +72,7 @@ en:
 
     account_page:
       title: "Your Account"
-      heading: "Your Accunt"
+      heading: "Your Account"
       new_password: "New Password"
       confirm_new_password: "Confirm New Password"
 
