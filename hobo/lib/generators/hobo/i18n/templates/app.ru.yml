@@ -1,0 +1,23 @@
+# Hobo application translation file for Russian.
+# Please, add the specific models and attributes for your application.
+
+ru:
+
+  attributes:
+    created_at: Создано
+    updated_at: Обновлено
+
+  activerecord:
+    models:
+      user:
+        one: Пользователь
+        other: Пользователи
+    attributes:
+      user:
+        name: Имя
+        password: Пароль
+        password_confirmation: Подтверждение пароля
+        email_address: Электронный адрес
+#    attribute_help:
+#      user:
+#        email_address: We will never share your address with third parties

@@ -1,0 +1,193 @@
+# Hobo internals translation file for Russian
+# Based on russian translations by Nick Gorbikoff
+# https://github.com/konung/hobo-i18n-locales
+# Adapted by Paul Shepel (http://github.com/tacid)
+#
+# If you find any error, please post it to http://hobousers.googlegroups.com.
+# Thank you!
+ru:
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Index"
+      heading: "Список %{model}"
+
+    new:
+      title: "Создать %{model}"
+      heading: "Создать %{model}"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Назад"
+      edit_link: "Изменить %{model}"
+      new_link: "Создать %{model}"
+      add_form_heading: "Добавить %{model}"
+
+    edit:
+      title: "Изменить %{model}"
+      heading: "Изменить %{model}"
+
+    index_for_owner:
+      title: "%{model} для"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "Для:"
+
+    new_for_owner:
+      title: "Создать %{model} для"
+      heading: "Создать %{model}"
+      subheading: "Для:"
+
+    login:
+      title: "Логин"
+      heading: "Логин"
+      email_address: &email_address "E-mail"
+      name: "Имя"
+      password: "Пароль"
+      remember_me: "Запомнить меня"
+      login: "Войти"
+      signup: "Регистрация"
+      forgot_password: &forgot_password "Забыли пароль?"
+
+    signup:
+      title: "Регистрация"
+      heading: "Регистрация нового пользователя"
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Введите адрес электроной почты, который Вы использовали при регистрации. Мы вышлем Вам на него инструкции для изменения пароля."
+      email_address: *email_address
+      send: "Выслать"
+
+    forgot_password_sent:
+      title: "Забытый пароль - Письмо отправлено"
+      heading: "Забытый пароль - Письмо с инструкциями отправлено"
+      text: "Письмо с инструкциями для восстановления пароля было выслано на %{email_address}. Если Вы не получили письмо, проверьте Ваш спам-фильтр."
+
+    account_disabled_page:
+      title: "Учётная запись не найдена"
+      heading: "Учётная запись не найдена"
+      text: "Мы не можем найти учётную  запись соответствующую данному адресу электроной почты. Проверте, что он введён правельно."
+
+    account_page:
+      title: "Моя учётная запись"
+      heading: "Моя учётная запись"
+      new_password: "Новый пароль"
+      confirm_new_password: "Подверждение нового пароля"
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "Добавить %{model}"
+      create: "Создать %{model}"
+      previous: "Предыдущая"
+      next: "Следующая"
+      add: "Добавить"
+      show_all: "Показать все %{model}и..."
+      delete: "Удалить %{model}"
+      save: "Сохранить"
+      cancel: "Отменить"
+      edit: "Изменить %{model}"
+      back: "Назад к"
+      back_to_parent: "Назад к %{parent} %{name}"
+      send: "Отослать"
+      remove: "Убрать"
+      signup: "Подписаться"
+      login: "Войти"
+      logout: "Выйти"
+      logged_in_as: "Вы вошли как %{name}"
+      account: "Моя учетная запись"
+      save_account: "Сохранить данные"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "%{model} была создана без ошибок"
+        error: "Нельзя создать %{model}.\n%{errors}"
+      creator:
+        error: "Не могу исполнить указазания создателя %{name}.\n%{errors}"
+      transition:
+        error: "Не могу исполнить указазания изменителя %{name}.\n%{errors}"
+      update:
+        no_attribute_error: "Изменения не указаны в аттрибутах."
+        success: "Изменения сохранены."
+        error: "Не могу сохранить изменения. \n%{errors}"
+      destroy:
+        success: "Удаление %{model} было завершено без ошибок."
+      signup:
+        success: "Спасибо за регистрацию"
+        must_activate: "Вы должны активировать вашу учётную запись. Пожалуйста, проверте вашу электроную почту."
+      login:
+        success: "Вы зашли в систему."
+        error: "Имя пользователя (%{login}) и пароль предоставленные вами - неправильны!"
+      logout: "Вы вышли из системы."
+      reset_password: "Ваш пароль был изменён."
+      permission_denied: "Доступ закрыт!"
+      not_found: "Страницы, запрошеной вами, не существует."
+      unauthenticated: "Система не может подтвердить аутентичность вашой учётной записи."
+      validate_password: "должен быть не меньше 6 символов и НЕ должен состоять только из маленьких букв"
+      current_password_is_not_correct: "неправильно"
+      you_are_site_admin: "Вы получили права администратора сайта."
+      you_signed_up: "Вы зарегестрировались."
+      no: "Нет доступных %{model}ей."
+      confirm: "Вы уверены?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: "Нет %{model}ей"
+        one: "В базе только одна %{model}."
+        other: "В базе %{count} %{model}ей"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "Добавить %{model}"
+      empty_message: "Нет записей для отображения."
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "Создать %{model}"
+      error:
+        heading: "Произошла ошибка:"
+      select_many:
+            prompt: "Добавить %{model}"
+
+    # hobo support
+    support:
+      or: "или"
+      a: ""
+      an: ""
+
+    table_plus:
+      search: "Поиск"
+      submit_label: "Искать"
+
+    live_search:
+      label: "Найти"
+      results_label: "Результаты поиска"
+      close_button: "закрыть"
+      no_results: "Не найдено записей удовлетворяюих критериям поиска"
+
+    dev_user_changer:
+      guest: "Гость"
+
+    admin:
+      subsite_name: "Админ"
+      invite_new_user: "Пригласить нового пользователя"
+
+    subsite:
+      back_link: "Показать сайт"
+
+    boolean_yes: "Да"
+    boolean_no: "Нет"
+    password_hidden: "[пароль скрыт]"
