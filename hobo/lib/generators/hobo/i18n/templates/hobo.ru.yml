@@ -99,7 +99,7 @@ ru:
       back_to_parent: "Назад к %{parent} %{name}"
       send: "Отослать"
       remove: "Убрать"
-      signup: "Подписаться"
+      signup: "Регистрация"
       login: "Войти"
       logout: "Выйти"
       logged_in_as: "Вы вошли как %{name}"
