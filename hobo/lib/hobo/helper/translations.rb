@@ -43,7 +43,11 @@ en:
         end
         options[:default].unshift("hobo.#{keys.join(".")}".to_sym)
         options[:model] = model_class.model_name.human(:count=>options[:count]||1)
-        translate key.to_sym, options
+
+        Rails.logger.info "..translate(#{key}, #{options.inspect}) to #{I18n.locale}" if defined?(HOBO_VERBOSE_TRANSLATIONS)
+
+        translation = translate key.to_sym, options
+        defined?(HOBO_SHOW_LOCALE_KEYS) ? translation.to_s + " [#{key}] " : translation
       end
       alias_method :ht, :hobo_translate
 
