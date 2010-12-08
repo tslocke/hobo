@@ -6,14 +6,14 @@ module Generators
 
       private
 
-      def ask(statement, default='', color=Thor::Shell::Color::MAGENTA)
+      def ask(statement, default='', color=:magenta)
         result = super(statement, color)
         result = default if result.blank?
         say PREFIX + result.inspect
         result
       end
 
-      def yes_no?(statement, color=Thor::Shell::Color::MAGENTA)
+      def yes_no?(statement, color=:magenta)
         result = choose(statement + ' [y|n]', /^(y|n)$/i)
         result == 'y' ? true : false
       end
@@ -26,21 +26,13 @@ module Generators
         when choice.blank? && !default.blank?
           default
         else
-          say 'Unknown choice! ', Thor::Shell::Color::RED
+          say 'Unknown choice! ', :red
           choose(prompt, format)
         end
       end
 
       def say_title(title)
         say "\n #{title} \n", "\e[37;44m"
-      end
-
-      def multi_ask(statement)
-        result = []
-        while (r = ask(statement)) && !r.blank?
-          result << r
-        end
-        result
       end
 
     end

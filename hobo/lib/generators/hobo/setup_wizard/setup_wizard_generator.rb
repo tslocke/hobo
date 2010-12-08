@@ -84,7 +84,7 @@ module Hobo
     def user_options
       if wizard?
         say_title 'User Resource'
-        @user_resource_name = ask("Choose a name for the user resource [<enter>=user|<custom_name>]:", 'user')
+        @user_resource_name = ask("Choose a name for the user resource: [<enter>=user|<custom_name>]", 'user')
         @activation_email = @invite_only ? false : yes_no?("Do you want to send an activation email to activate the user?")
       else
         @user_resource_name = options[:user_resource_name]
@@ -144,7 +144,7 @@ EOI
     def front_controller
       if wizard?
         say_title 'Front Controller'
-        front_controller_name = ask("Choose a name for the front controller [<enter>=front|<custom_name>]:", 'front')
+        front_controller_name = ask("Choose a name for the front controller: [<enter>=front|<custom_name>]", 'front')
         say "Installing #{front_controller_name} controller..."
       else
         front_controller_name = options[:front_controller_name]
@@ -156,7 +156,7 @@ EOI
       return unless @invite_only
       if wizard?
         say_title 'Admin Subsite'
-        @admin_subsite_name = ask("Choose a name for the admin subsite [<enter>=admin|<custom_name>]:", 'admin')
+        @admin_subsite_name = ask("Choose a name for the admin subsite: [<enter>=admin|<custom_name>]", 'admin')
       else
         @admin_subsite_name = options[:admin_subsite_name]
       end
@@ -178,7 +178,7 @@ EOI
     def generate_migration
       if wizard?
         say_title 'DB Migration'
-        action = choose("Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate [s|g|m]:", /^(s|g|m)$/)
+        action = choose("Initial Migration: [s]kip, [g]enerate migration file only, generate and [m]igrate: [s|g|m]", /^(s|g|m)$/)
         opt = case action
               when 's'
                 return say('Migration skipped!')

@@ -118,12 +118,12 @@ if yes_no?("Do you want to start the Setup Wizard now?
 You can rerun it at any time with `hobo g setup_wizard` from the application root dir.)")
   exec 'rails g hobo:setup_wizard --no-main-title'
 else
-  say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", Thor::Shell::Color::YELLOW
+  say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", :yellow
 end
 )
               when :skip
                 file.puts %(
-say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", Thor::Shell::Color::YELLOW
+say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", :yellow
 )
               end
             end
