@@ -1,11 +1,12 @@
-# Hobo internals translation file for Spanish (Dominican Republic).
+# Hobo internals translation file for Spanish (Mexico).
 # Translated by Domizio Demichelis (dd.nexus@gmail.com)
+# Corrections by Ricardo Pacheco
 
 # This file might be used for other Latin America Spanish Countries without any change
 # It might be ok also for Spain. If you find any error, or if you have any more specific translation,
 # please post it to http://hobousers.googlegroups.com. Thank you!
 
-"es-DO":
+es:
   hobo:
     # default hobo pages translations
     index:
@@ -62,8 +63,8 @@
     forgot_password:
       title: *forgot_password
       heading: *forgot_password
-      text: "Ingresa la dirección de tu Correo Eléctronico que utilizaste cuando te inscribste.
-             Te enviaremos un Correo Eléctronico que podras utilizar para generar una nueva contraseña."
+      text: "Ingresa la dirección de tu Correo Eléctronico que utilizaste cuando te inscribiste.
+             Te enviaremos un Correo Eléctronico que podrás utilizar para generar una nueva contraseña."
       email_address: *email_address
       send: "Enviar"
 
@@ -89,7 +90,7 @@
       new: "Nuevo Registro de %{model}"
       create: "Crear %{model}"
       previous: "Precedente"
-      next: "Proxima"
+      next: "Próxima"
       add: "Añadir"
       show_all: "Muestra todos %{model}..."
       delete: "Borrar %{model}"
@@ -127,11 +128,11 @@
         must_activate: "Tiene que activar la cuenta antes de iniciar la sesión. Por favor verifique su correo eléctronico."
       login:
         success: "La sesión ha iniciado."
-        error: "¡No se ingresaron %{login} y Contraseña validos!"
+        error: "¡No se ingresaron %{login} y Contraseña válidos!"
       logout: "La sesión ha terminado."
       reset_password: "Tu contraseña ha sido reiniciada."
       permission_denied: "¡Permiso denegado!"
-      not_found: "La pagina solicitada no se encuentra."
+      not_found: "La página solicitada no se encuentra."
       unauthenticated: "No se pudo autenticar."
       validate_password: "debe contener tansiquiera 6 caracteres, letras mayúsculas y minúsculas"
       current_password_is_not_correct: "no está correcta"
