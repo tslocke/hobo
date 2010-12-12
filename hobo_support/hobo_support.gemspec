@@ -1,5 +1,6 @@
 name = File.basename( __FILE__, '.gemspec' )
 version = File.read(File.expand_path('../VERSION', __FILE__)).strip
+require 'date'
 
 Gem::Specification.new do |s|
 
