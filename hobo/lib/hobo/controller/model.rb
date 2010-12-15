@@ -509,7 +509,7 @@ module Hobo
         this.user_update_attributes(current_user, attributes)
       else
         self.this = new_for_create(attributes)
-        this.save
+        this.user_save(current_user)
       end
       create_response(:new, options, &b)
     end
