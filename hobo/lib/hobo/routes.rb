@@ -23,7 +23,7 @@ module Hobo
     def models_with(wanted_action)
       @linkable_keys.map do |k|
         subsite, class_name, action, method = k.split('/')
-        (action == wanted_action) ? class_name.constantize : nil
+        (action == wanted_action.to_s) ? class_name.constantize : nil
       end.compact
     end
 

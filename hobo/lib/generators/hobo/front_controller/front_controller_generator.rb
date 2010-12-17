@@ -43,7 +43,7 @@ module Hobo
 
     def add_routes
       return unless options[:add_routes]
-      route "match 'search' => '#{file_path}#search', :as => 'search'"
+      route "match 'search' => '#{file_path}#search', :as => 'site_search'"
       if class_path.empty?
         route "root :to => '#{file_path}#index'"
       else

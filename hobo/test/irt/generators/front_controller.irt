@@ -25,6 +25,6 @@ test_value_eql? true
 
 desc "Routes added"
 file_include? 'config/routes.rb',
-              %(match 'search' => 'front#search', :as => 'search'),
+              %(match 'search' => 'front#search', :as => 'site_search'),
               %(root :to => 'front#index')
 test_value_eql? true
