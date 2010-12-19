@@ -1,8 +1,8 @@
-<%%= @user %>,
+<%%= @<%= name.underscore -%> %>,
 
 To activate your account for <%%= @app_name %>, click on this link:
 
-  <%%= user_activate_url :id => @user, :key => @key %>
+  <%%= <%= name.underscore -%>_activate_url :id => @<%= name.underscore -%>, :key => @key %>
 
 Thank you,
 

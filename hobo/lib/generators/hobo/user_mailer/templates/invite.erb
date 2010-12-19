@@ -1,8 +1,8 @@
-<%%= @user %>,
+<%%= @<%= name.underscore %> %>,
 
 You have been invited to join <%%= @app_name %>. If you wish to accept, please click on the following link
 
-  <%%= user_accept_invitation_url :id => @user, :key => @key %>
+  <%%= <%= name.underscore %>_accept_invitation_url :id => @<%= name.underscore %>, :key => @key %>
 
 Thank you,
 
