@@ -49,7 +49,7 @@ task :gems, :action, :force do |t, args|
 
       gem_name = "#{name}-#{version}.gem"
       sh %(gem build #{name}.gemspec)
-      sh %(gem #{args.action} #{gem_name} #{args.action == 'install' && '--local'})
+      sh %(gem #{args.action} #{gem_name} #{args.action == 'install' ? '--local' : ''})
 
     ensure
       rm gem_name
