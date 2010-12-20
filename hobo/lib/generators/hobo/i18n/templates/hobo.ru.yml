@@ -191,3 +191,6 @@ ru:
     boolean_yes: "Да"
     boolean_no: "Нет"
     password_hidden: "[пароль скрыт]"
+
+    in_place_editor:
+      click_to_edit: "(нажмите для изменения)"

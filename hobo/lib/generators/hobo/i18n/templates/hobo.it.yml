@@ -193,3 +193,6 @@ it:
     boolean_yes: "Si"
     boolean_no: "No"
     password_hidden: "[parola chiave]"
+
+    in_place_editor:
+      click_to_edit: "cliccare per modificare"

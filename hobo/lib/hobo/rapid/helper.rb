@@ -106,7 +106,8 @@ module Hobo
 
 
       def in_place_editor(attributes, this=nil)
-        blank_message = attributes.delete(:blank_message) || "(click to edit)"
+        blank_message = attributes.delete(:blank_message) ||
+                        t('hobo.in_place_editor.click_to_edit', :default => '(click to edit)')
 
         attributes = add_classes(attributes, "in-place-edit", model_id_class(this_parent, this_field))
         attributes.update(:hobo_blank_message => blank_message,

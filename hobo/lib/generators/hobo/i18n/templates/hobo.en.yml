@@ -186,3 +186,6 @@ en:
     boolean_yes: "Yes"
     boolean_no: "No"
     password_hidden: "[password hidden]"
+
+    in_place_editor:
+      click_to_edit: "(click to edit)"

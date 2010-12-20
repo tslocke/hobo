@@ -187,3 +187,6 @@
     boolean_yes: "Sim"
     boolean_no: "Não"
     password_hidden: "[palavra-chave]"
+
+    in_place_editor:
+      click_to_edit: "(clique para editar)"
