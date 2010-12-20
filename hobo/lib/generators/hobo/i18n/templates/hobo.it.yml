@@ -143,7 +143,7 @@ it:
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "Non ci sono %{model}"
+        zero: &no_model "Non ci sono %{model}"
         one: "C'è solo 1 %{model}"
         other: "Ci sono %{count} %{model}"
 
@@ -196,3 +196,6 @@ it:
 
     in_place_editor:
       click_to_edit: "cliccare per modificare"
+
+    select_one_editor:
+      blank_message: *no_model

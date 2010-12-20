@@ -138,9 +138,9 @@
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "Não há %{model}s"
+        zero: &no_model "Não há %{model}"
         one: "Só existe um(a) #{model} do momento"
-        other: "Já existem %{count} %{model}s"
+        other: "Já existem %{count} %{model}"
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
@@ -190,3 +190,6 @@
 
     in_place_editor:
       click_to_edit: "(clique para editar)"
+
+    select_one_editor:
+      blank_message: *no_model

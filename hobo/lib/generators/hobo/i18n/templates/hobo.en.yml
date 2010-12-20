@@ -137,7 +137,7 @@ en:
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "No %{model}"
+        zero: &no_model "No %{model}"
         one: "There is only one %{model} at the moment"
         other: "There are already %{count} %{model}"
       # you can use the following to completely override the collection heading
@@ -155,7 +155,7 @@ en:
       error:
         heading: "The following error occured:"
       select_many:
-            prompt: "Add %{model}"
+        prompt: "Add %{model}"
 
     # hobo support
     support:
@@ -189,3 +189,6 @@ en:
 
     in_place_editor:
       click_to_edit: "(click to edit)"
+
+    select_one_editor:
+      blank_message: *no_model

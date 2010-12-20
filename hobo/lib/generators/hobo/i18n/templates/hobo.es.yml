@@ -144,7 +144,7 @@ es:
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "No hay %{model}"
+        zero: &no_model "No hay %{model}"
         one: "Hay solo 1 %{model}"
         other: "Hay %{count} %{model}"
       # you can use the following to completely override the collection heading
@@ -196,3 +196,6 @@ es:
 
     in_place_editor:
       click_to_edit: "(haga clic para editar)"
+
+    select_one_editor:
+      blank_message: *no_model

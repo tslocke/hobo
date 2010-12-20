@@ -94,7 +94,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
   -->
 <def tag="select-one-editor" attrs="include-none, blank-message, sort, update, options"><%
   raise Hobo::Error.new("Not allowed to edit") unless can_edit?
-  blank_message ||= "(No #{this_type.name.to_s.titleize})"
+  blank_message ||= ht("#{this_type.name.to_s.underscore}.select_one_editor.blank_message", :count => 0, :default => "(No #{this_type.name.to_s.titleize})")
   options ||= this_field_reflection.klass.all.select {|x| can_view?(x)}.map {|x|
             [ name(:with => x, :no_wrapper => true), x.id ]
           }

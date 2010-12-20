@@ -142,9 +142,9 @@ ru:
     # default hobo collection translation
     collection:
       count: &collection_count
-        zero: "Нет %{model}ей"
+        zero: &no_model "Нет %{model}"
         one: "В базе только одна %{model}."
-        other: "В базе %{count} %{model}ей"
+        other: "В базе %{count} %{model}"
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models
@@ -194,3 +194,6 @@ ru:
 
     in_place_editor:
       click_to_edit: "(нажмите для изменения)"
+
+    select_one_editor:
+      blank_message: *no_model
