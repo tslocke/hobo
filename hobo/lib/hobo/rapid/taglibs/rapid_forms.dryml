@@ -780,8 +780,16 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
   -->
 <def tag="error-messages">
   <section class="error-messages" merge-attrs if="&this.errors.length > 0">
-    <h2 param="heading"><t key="activerecord.errors.template.header" model="&this.class.model_name.human" count="&this.errors.size"/></h2>
-    <t key="activerecord.errors.template.body"></t>
+    <h2 param="heading">
+      <t key="activerecord.errors.template.header" model="&this.class.model_name.human" count="&this.errors.size">
+        <%= model = this.class.model_name.human
+            count = this.errors.size
+        count==1 ? "1 error prohibited this #{model} from being saved" :
+                   "#{count} errors prohibited this #{model} from being saved"
+        %>
+      </t>
+    </h2>
+    <t key="activerecord.errors.template.body">There were problems with the following fields:</t>
     <ul param>
       <% this.errors.to_a.each do |message| -%>
       <li param><%= message %></li>
