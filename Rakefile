@@ -40,7 +40,7 @@ task :gems, :action, :force do |t, args|
     begin
       # add the commit ID to the version, since it might not be the real gem version that will be published
       if args.action == 'install'
-        commit_id = `git show-branch --sha1-name HEAD`.match(/^\[([a-z0-9]+)\]/).captures[0]
+        commit_id = `git log -1 --format="%h" HEAD`.strip
         version = "#{orig_version}.#{commit_id}"
         File.open('VERSION', 'w') do |f|
           f.puts version
