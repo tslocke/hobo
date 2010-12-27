@@ -122,7 +122,7 @@ EOI
     def dryml_only_templates_option
       if wizard?
         say_title 'Templates Option'
-        dryml_only_templates = yes_no?("Will you application use only hobo/dryml web page templates?\n(Choose 'n' only if you also plan to use plain rails/erb web page templates)")
+        dryml_only_templates = yes_no?("Will your application use only hobo/dryml web page templates?\n(Choose 'n' only if you also plan to use plain rails/erb web page templates)")
       else
         dryml_only_templates = options[:dryml_only_templates]
       end
