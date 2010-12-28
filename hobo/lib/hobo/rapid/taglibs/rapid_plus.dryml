@@ -113,7 +113,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
       <ht key="#{model_class.to_s.underscore}.actions.new">New <%= model_class.model_name.human %></ht>
     </a>
     <collection param/>
-    <unless test="&this.empty? || this.size <= model_class.count">
+    <unless test="&this.empty? || this.size == model_class.count">
       <a param="show-all"><ht key="#{model_class.to_s.underscore}.actions.show_all" count="100">Show all <%= name.pluralize.titleize %>...</ht></a>
     </unless>
   </section>
