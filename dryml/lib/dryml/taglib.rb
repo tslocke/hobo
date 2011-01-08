@@ -31,6 +31,8 @@
                    "#{Dryml.root}/taglibs"
                  elsif plugin == "hobo"
                    "#{Hobo.root}/lib/hobo/rapid/taglibs"
+                 elsif not plugin.blank?
+                   "#{rails_root}/vendor/plugins/#{plugin}/taglibs"
                  elsif options[:src] =~ /\//
                    "#{rails_root}/app/views"
                  elsif options[:template_dir] =~ /^#{Hobo.root}/
