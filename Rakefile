@@ -52,7 +52,7 @@ task :gems, :action, :force do |t, args|
       sh %(gem #{args.action} #{gem_name} #{args.action == 'install' ? '--local' : ''})
 
     ensure
-      rm gem_name
+      remove_entry_secure gem_name, true
       if args.action == 'install'
         File.open('VERSION', 'w') do |f|
           f.puts orig_version
