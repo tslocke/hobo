@@ -1,0 +1,30 @@
+# Hobo application translation file for German.
+# Translated by Matthias Wächter (matthias@waechter.wiz.at)
+
+# Please, add the specific models and attributes for your application.
+
+# If you find any error, or if you have any more specific translation,
+# please post it to http://hobousers.googlegroups.com. Thank you!
+
+de:
+
+  attributes:
+    created_at: Erzeugt
+    updated_at: Geändert
+
+  activerecord:
+    models:
+      user:
+        one: Benutzer
+        other: Benutzer
+    attributes:
+      user:
+        name: Name
+        password: Passwort
+        current_password: Derzeitiges Passwort
+        password_confirmation: Passwort Bestätigt
+        email_address: Email-Adresse
+    attribute_help:
+      user:
+        email_address: Ihre e-mail-Adresse wird nie an Andere weiter gegeben
+

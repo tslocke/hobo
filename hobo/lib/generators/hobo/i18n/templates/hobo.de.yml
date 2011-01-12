@@ -1,0 +1,203 @@
+# Hobo internals translation file for German
+# Translated by Matthias Wächter (matthias@waechter.wiz.at)
+
+# If you find any error, please post it to http://hobousers.googlegroups.com.
+# Thank you!
+
+de:
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Index"
+      heading: "%{model} Übersicht"
+
+    new:
+      title: "%{model} anlegen"
+      heading: "%{model} anlegen"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Zurück"
+      edit_link: "%{model} bearbeiten"
+      new_link: "%{model} anlegen"
+      add_form_heading: "%{model} hinzufügen"
+
+    edit:
+      title: "%{model} bearbeiten"
+      heading: "%{model} bearbeiten"
+
+    index_for_owner:
+      title: "%{model} für"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "Für:"
+
+    new_for_owner:
+      title: "%{model} anlegen für"
+      heading: "%{model} anlegen"
+      subheading: "Für:"
+
+    login:
+      title: "Login"
+      heading: "Login"
+      email_address: &email_address "E-Mail-Adresse"
+      name: "Name"
+      password: "Passwort"
+      remember_me: "Remember me"
+      login: "Login"
+      signup: "Konto anlegen"
+      forgot_password: &forgot_password "Passwort vergessen?"
+
+    signup:
+      title: "Benutzerkonto anlegen"
+      heading: "Neuen Benutzer anlegen"
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Geben Sie die E-Mail-Adresse ein, die Sie bei der Anmeldung verwendet haben.
+             Im Anschluss erhalten Sie ein E-Mail, mit dem Sie Ihr Passwort zurücksetzen können."
+      email_address: *email_address
+      send: "Abschicken"
+
+    forgot_password_sent:
+      title: "Passwort vergessen – E-Mail abgeschickt"
+      heading: "Passwort vergessen – E-Mail abgeschickt"
+      text: "Es wurde ein E-Mail an %{email_address} verschickt, das Anweisungen zum Rücksetzen
+             des Passworts enthält. Wenn Sie es nicht erhalten, überprüfen Sie bitte Ihren
+             Spam-Filter."
+
+    account_disabled_page:
+      title: "Benutzerkonto deaktiviert"
+      heading: "Benutzerkonto deaktiviert"
+      text: "Ihr Benutzerkonto ist derzeit deaktiviert"
+
+    account_page:
+      title: "Ihr Benutzerkonto"
+      heading: "Ihr Benutzerkonto"
+      new_password: "Neues Passwort"
+      confirm_new_password: "Neues Passwort (wiederholen)"
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "%{model} anlegen"
+      create: "%{model} erzeugen"
+      previous: "Voriges"
+      next: "Nächstes"
+      add: "Hinzufügen"
+      show_all: "Alle anzeigen: %{model}"
+      delete: "%{model} löschen"
+      save: "%{model} speichern"
+      cancel: "Abbrechen"
+      edit: "%{model} bearbeiten"
+      back: "Zurück zu"
+      back_to_parent: "Zurück zu %{parent} %{name}"
+      send: "Abschicken"
+      remove: "Entfernen"
+      signup: "Konto anlegen"
+      login: "Anmelden"
+      logout: "Abmelden"
+      logged_in_as: "Angemeldet als %{name}"
+      account: "Benutzerkonto"
+      save_account: "Daten abspeichern"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "%{model} erfolgreich angelegt"
+        error: "%{model} konnte nicht angelegt werden.\n%{errors}"
+      creator:
+        error: "Konnte %{name}-Creator nicht ausführen.\n%{errors}"
+      transition:
+        error: "Konnte %{name}-Transition nicht ausführen.\n%{errors}"
+      update:
+        no_attribute_error: "Keine Aktualisierung in params spezifiziert"
+        success: "Änderungen an %{model} gesichert"
+        error: "Mit dieser Änderung gab es Probleme.\n%{errors}"
+      destroy:
+        success: "%{model} wurde gelöscht"
+      signup:
+        success: "Vielen Dank für Ihre Anmeldung!"
+        must_activate: "Sie müssen Ihr Konto erst aktivieren, bevor Sie sich damit anmelden können.
+                        Bitte schauen Sie in Ihr Postfach."
+      login:
+        success: "Sie haben sich angemeldet."
+        error: "You did not provide a valid %{login} and Password!"
+      logout: "Sie haben sich abgemeldet."
+      reset_password: "Ihr Passwort wurde zurückgesetzt."
+      permission_denied: "Zugriff verweigert"
+      not_found: "Die angeforderte Seite konnte nicht gefunden werden."
+      unauthenticated: "Sie konnten nicht Authentifiziert werden"
+      validate_password: "muss mindestens 6 Buchstaben lang sein und darf nicht nur aus
+                          Kleinbuchstaben bestehen"
+      current_password_is_not_correct: "ist nicht korrekt"
+      you_are_site_admin: "Sie sind jetzt der Administrator"
+      you_signed_up: "Sie haben sich angemeldet"
+      no: "Kein %{model}-Objekt gefunden."
+      confirm: "Sind Sie sich sicher?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: &no_model "Kein %{model}-Objekt"
+        one: "Es gibt derzeit nur ein %{model}-Objekt"
+        other: "Es gibt bereits %{count} %{model}-Objekte"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "%{model} hinzufügen"
+      empty_message: "Keine Enträge"
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "%{model} anlegen"
+      error:
+        heading: "Die folgenden Fehler sind aufgetreten:"
+      select_many:
+        prompt: "%{model} anlegen"
+
+    # hobo support
+    support:
+      or: "oder"
+      a: "ein/e"
+      an: "ein/e"
+
+    table_plus:
+      search: "Suche"
+      submit_label: "Go"
+
+    live_search:
+      label: "Suche"
+      results_label: "Suchergebnisse"
+      close_button: "Schließen"
+      no_results: "Die Suche ergab keine Treffer."
+
+    dev_user_changer:
+      guest: "Gast"
+
+    admin:
+      subsite_name: "Admin"
+      invite_new_user: "Neuen Benutzer einladen"
+
+    subsite:
+      back_link: "Zur Hauptseite"
+
+    boolean_yes: "Ja"
+    boolean_no: "Nein"
+    password_hidden: "[Passwort versteckt]"
+
+    in_place_editor:
+      click_to_edit: "(Zum Bearbeiten anklicken)"
+
+    select_one_editor:
+      blank_message: *no_model
