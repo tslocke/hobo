@@ -16,6 +16,7 @@ ru:
       user:
         name: Имя
         password: Пароль
+        current_password: Текущий пароль
         password_confirmation: Подтверждение пароля
         email_address: Электронный адрес
 #    attribute_help:

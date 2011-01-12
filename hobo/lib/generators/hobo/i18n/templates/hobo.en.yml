@@ -63,7 +63,7 @@ en:
     forgot_password_sent:
       title: "Forgotten password - E-mail sent"
       heading: "Forgotten password - E-mail sent"
-      text: "En e-mail with instructions on how you generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spamfilter."
+      text: "An e-mail with instructions on how you generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spamfilter."
 
     account_disabled_page:
       title: "Account disabled"

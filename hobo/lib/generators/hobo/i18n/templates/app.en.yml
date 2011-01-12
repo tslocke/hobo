@@ -17,6 +17,7 @@ en:
 #      user:
 #        name: Name
 #        password: Password
+#        current_password: Current Password
 #        password_confirmation: Password Confirmation
 #        email_address: Email Address
 #    attribute_help:

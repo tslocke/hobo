@@ -1,6 +1,9 @@
 # Hobo application translation file for Italian.
 # Please, add the specific models and attributes for your application.
 
+# If you find any error, or if you have any more specific translation,
+# please post it to http://hobousers.googlegroups.com. Thank you!
+
 it:
 
   attributes:
@@ -15,7 +18,8 @@ it:
     attributes:
       user:
         name: Nome
-        password: Parola chiave
+        password: Parola Chiave
+        current_password: Parola Chiave Attuale
         password_confirmation: Conferma Parola Chiave
         email_address: Indirizzo Elettronico
 #    attribute_help:

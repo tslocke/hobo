@@ -16,6 +16,7 @@
       user:
         name: Nome
         password: Palavra-chave
+        current_password: Palavra-chave actual
         password_confirmation: Confirmação da Palavra-chave
         email_address: Enderesso de correio electrônico
     attribute_help:

@@ -23,6 +23,7 @@ es:
       user:
         name: Nombre
         password: Contraseña
+        current_password: Contraseña Actual
         password_confirmation: Confirmación Contraseña
         email_address: Correo Electrónico
 #    attribute_help:
