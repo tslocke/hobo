@@ -169,7 +169,7 @@ In your HoboFields models you can also give type information to "virtual fields"
 
 ## Field validations
 
-HoboFields gives you some shorthands for declaring some common validations right in the field declaration
+HoboFields gives you some shorthands for declaring some common validations right in the field declaration.  HoboFields also supports all of the options supported by the [Rails column declaration](http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html#method-i-column)
 
 ### Required fields
 
