@@ -165,8 +165,52 @@ Provides validation of correct email address format.
 
 ### `HoboFields::PasswordString`
 
-`HoboFields::PasswordString` provides a simple `to_html` to prevent accidental display of a password. It simply returns "`[password hidden]`". The type is also used to indicate the need for an `<input type='password'>`
+`HoboFields::PasswordString` provides a simple `to_html` to prevent
+accidental display of a password. It simply returns "`[password
+hidden]`". The type is also used to indicate the need for an `<input
+type='password'>`
 
+### `HoboFields::Serialized`
+
+This type lets you store an arbitrary object as serialized text into
+the database column.   You can optionally pass the :class option to
+restrict the column type.
+
+    >>
+     def migrate(renames={})
+       up, down = HoboFields::MigrationGenerator.run(renames)
+       ActiveRecord::Migration.class_eval(up)
+       ActiveRecord::Base.send(:subclasses).each { |model| model.reset_column_information }
+       [up, down]
+     end
+{.hidden}
+
+    >>
+     class Vault1 < ActiveRecord::Base
+       fields do
+         content :serialized
+       end
+     end
+
+    >> migrate
+    >> Vault1.create!(:content => {:key => "in Vault"})
+    >> Vault1.first.content
+    => {:key => "in Vault"}
+
+    >>
+     class Vault2 < ActiveRecord::Base
+       fields do
+         content :serialized, :class => Hash
+       end
+     end
+
+    >> migrate
+    >> Vault2.create!(:content => {:key => "in Vault"})
+    >> Vault2.first.content
+    => {:key => "in Vault"}
+    >> Vault2.create!(:content => 17) rescue ActiveRecord::SerializationTypeMismatch
+    >> Vault2.all.size
+    => 1   # second record not created because of type mismatch
 
 ## Enum Strings
 
