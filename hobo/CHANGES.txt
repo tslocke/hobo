@@ -55,6 +55,9 @@ will remove support for "include".
 
 This release increases compatibility with Ruby v1.9.2.
 
+Hobo 1.0.2 introduced a major problem with chained scopes.   This has
+been fixed.
+
 All code changes may viewed on the [github
 log](https://github.com/tablatom/hobo/compare/v1.0.2...v1.0.3)
 
