@@ -23,9 +23,9 @@ though we don't need it for this test:
         >> mysql_database = "hobofields_doctest"
         >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
         >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-        >> ActiveRecord::Base.establish_connection(:adapter => "mysql",
+        >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
                                                :database => mysql_database,
-                                               :host => "localhost", :user => mysql_user, :password => mysql_password)
+                                               :host => "localhost", :username => mysql_user, :password => mysql_password)
 {.hidden}
 
 Some load path manipulation you shouldn't need:
