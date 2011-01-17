@@ -24,10 +24,11 @@ more information.
 
 === Hobo 1.0.3 ===
 
-This is a security release.   All applications that use the reset
-password functionality should upgrade.
+This is a security release.  All applications that use the reset
+password functionality or are on versions of Rails prior to version
+2.3.4 should upgrade.
 
-To patch the vulnerability, two changes have been made.
+To patch the reset password vulnerability, two changes have been made.
 
 First of all, the lifecycle key hash mechanism has been changed.
 Existing lifecycle keys will become invalid after you upgrade.
@@ -41,12 +42,19 @@ the `:keep_key => true` option to a transition.
 More information about the vulnerability can be viewed on the [bug
 report](https://hobo.lighthouseapp.com/projects/8324/tickets/666-user-model-secure-links-have-low-security).
 
-All code changes may viewed on the [github
-log](https://github.com/tablatom/hobo/compare/v1.0.2...v1.0.3)
+Other changes:
+
+The text input tag (`<textarea>`) has a security hole with versions of
+Rails prior to 2.3.4.  This release makes these old versions of Rails
+safe again.   N.B.  This release has seen its most extensive testing
+against Rails versions 2.3.5 and 2.3.10.
 
 The "include" automatic scope has been aliased to "includes" to
 increase future compatibility with Rails 3.  Future versions of Hobo
 will remove support for "include".
+
+All code changes may viewed on the [github
+log](https://github.com/tablatom/hobo/compare/v1.0.2...v1.0.3)
 
 === Hobo 1.0.2 ===
 
