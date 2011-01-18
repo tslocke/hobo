@@ -68,14 +68,27 @@ module HoboFields
   end
 
 
-  def can_wrap?(type, val)
-    col_type = type::COLUMN_TYPE
-    return false if val.blank? && (col_type == :integer || col_type == :float || col_type == :decimal)
-    klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
-    init_method = type.instance_method(:initialize)
-    [-1,1].include?(init_method.arity) &&
-      init_method.owner != Object.instance_method(:initialize).owner &&
-      !@never_wrap_types.any? { |c| klass <= c }
+  if Object.instance_method(:initialize).arity!=0
+    # version for Ruby 1.9.
+    def can_wrap?(type, val)
+      col_type = type::COLUMN_TYPE
+      return false if val.blank? && (col_type == :integer || col_type == :float || col_type == :decimal)
+      klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
+      init_method = type.instance_method(:initialize)
+      [-1,1].include?(init_method.arity) &&
+        init_method.owner != Object.instance_method(:initialize).owner &&
+        !@never_wrap_types.any? { |c| klass <= c }
+    end
+  else
+    # Ruby 1.8.  1.8.6 doesn't include Method#owner.   1.8.7 could use
+    # the 1.9 function, but this one is faster.
+    def can_wrap?(type, val)
+      col_type = type::COLUMN_TYPE
+      return false if val.blank? && (col_type == :integer || col_type == :float || col_type == :decimal)
+      klass = Object.instance_method(:class).bind(val).call # Make sure we get the *real* class
+      init_method = type.instance_method(:initialize)
+      [-1,1].include?(init_method.arity) && !@never_wrap_types.any? { |c| klass <= c }
+    end
   end
 
 
