@@ -20,7 +20,7 @@
 <def tag="empty-collection-message">
   <unless test="&this.member_class.nil?">
     <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
-      <ht key="#{this.member_class.to_s.underscore}.collection.empty_message">
+      <ht key="#{this.member_class.name.underscore}.collection.empty_message">
         No <collection-name/> to display
       </ht>
     </div>
