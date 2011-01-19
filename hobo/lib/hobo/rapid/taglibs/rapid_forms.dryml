@@ -589,7 +589,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
       else
         fade = true if fade.nil?
         attributes[:value] = label
-        attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: #{confirm.inspect}})"
+        attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: '#{confirm}'})"
         element(:input, attributes, nil, true, true)
       end
     end
