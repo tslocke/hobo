@@ -68,7 +68,7 @@ module Hobo
     end
 
 
-    def ajax_update_response(render_specs, results={})
+    def ajax_update_response(render_specs, results={}, options={})
       controller, action = controller_action_from_page_path
       identifier = view_context.view_paths.find( action,
                                                  controller,
@@ -77,7 +77,7 @@ module Hobo
       renderer = Dryml.page_renderer(view_context, identifier, [], controller)
 
       render :update do |page|
-        page << "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
+        page << options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
         for spec in render_specs
           function = spec[:function] || "_update"
           dom_id = spec[:id]
@@ -93,6 +93,7 @@ module Hobo
           end
         end
         page << renderer.part_contexts_storage if renderer
+        page << options[:postamble] if options[:postamble]
       end
     end
 
