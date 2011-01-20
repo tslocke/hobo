@@ -1,3 +1,5 @@
+require 'generators/hobo_support/eval_template'
+
 module Generators
   module HoboSupport
     Model = classy_module do
