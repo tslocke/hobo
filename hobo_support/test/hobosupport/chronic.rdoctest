@@ -1,0 +1,18 @@
+# HoboSupport - Chronic extensions
+
+    doctest_require: '../../lib/hobo_support'
+{.hidden}
+
+## `Chronic.parse`
+
+Chronic.parse can't parse 'M/D/Y H:S', so convert it to 'M/D/Y @ H:S'.
+
+    >> Chronic.parse('1/1/2008 1:00') == Chronic.parse('1/1/2008 @ 1:00')
+
+    => true
+
+Chronic.parse takes additional options (see Chronic.parse).
+
+    >> Chronic.parse('today', :guess => false).instance_of? Chronic::Span
+
+    => true
