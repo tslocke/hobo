@@ -2,62 +2,75 @@ module Hobo
   module Model
     class ViewHints
 
-      def self.setter(name, default=nil, &block)
-        ivname = name.to_s.remove(/\?$/)
-        metaclass.send :define_method, name do |*args|
-          if args.empty?
-            val = instance_variable_get("@#{ivname}")
-            if val.nil?
-              val = default.is_a?(Proc) ? instance_eval(&default) : default
-              instance_variable_set("@#{ivname}", val)
+      class << self
+
+        # allows delayed set of children in order to avoid circular references
+        # triggered by declaring children in the model
+        def children(*args)
+          if args.empty? # reader
+            if @children_args.nil? # value already set
+              @children ||= []
+            else # set
+              child_model = model.reflect_on_association(@children_args.first).klass
+              if child_model.view_hints.parent.nil? and !child_model.view_hints.parent_defined
+                parent = model.reverse_reflection(@children_args.first)
+                child_model.view_hints.parent(parent.name, :undefined => true) if parent
+              end
+              @children_args = nil
+              @children = args
             end
-            val
-          else
-            arg = if block
-                    instance_exec(*args, &block)
-                  else
-                    args.first
-                  end
-            instance_variable_set("@#{ivname}", arg)
+          else # writer (only stores the args for delayed setting)
+            @children_args = args
           end
         end
-      end
 
-      setter :children,    [] do |*args|
-        # Setting children also gives a default parent using the reverse association
-        child_model = model.reflect_on_association(args.first).klass
-        if child_model.view_hints.parent.nil? and !child_model.view_hints.parent_defined
-          parent = model.reverse_reflection(args.first)
-          child_model.view_hints.parent(parent.name, :undefined => true) if parent
+        def inline_booleans(*args)
+          if args.empty? # reader
+            @inline_booleans ||= []
+          else # writer
+            @inline_booleans = if args[0] == true
+                                 model.columns.select { |c| c.type == :boolean }.*.name
+                               else
+                                 args.*.to_s
+                               end
+          end
         end
-        args
-      end
 
-      setter :parent,         nil do |*args|
-        options = args.extract_options!
-        parent_defined(true) unless options[:undefined]
-        args.first
-      end
+        def parent(*args)
+          if args.empty? #reader
+            @parent
+          else # writer
+            options = args.extract_options!
+            parent_defined(true) unless options[:undefined]
+            @parent = args.first
+          end
+        end
 
-      setter :parent_defined, nil
+        def parent_defined(arg=nil)
+          if arg.nil?
+            @parent_defined
+          else
+            @parent_defined = arg
+          end
+        end
 
-      setter :paginate?,    proc { !sortable? }
+        def paginate?(arg=nil)
+          if arg.nil?
+            @paginate ||= !sortable?
+          else
+            @paginate = arg
+          end
+        end
 
-      setter :sortable?,    proc { defined?(ActiveRecord::Acts::List::InstanceMethods) &&
-                                   model < ActiveRecord::Acts::List::InstanceMethods &&
-                                   model.new.try.scope_condition == "1 = 1" }
-
-      setter :inline_booleans, [] do |*args|
-       if args[0] == true
-         model.columns.select { |c| c.type == :boolean }.*.name
-       else
-         args.*.to_s
-       end
-      end
-
-      # Accessors
-
-      class << self
+        def sortable?(arg=nil)
+          if arg.nil?
+            @sortable ||= defined?(ActiveRecord::Acts::List::InstanceMethods) &&
+                          model < ActiveRecord::Acts::List::InstanceMethods &&
+                          model.new.try.scope_condition == "1 = 1"
+          else
+            @sortable = arg
+          end
+        end
 
         def _name
           @_name ||= name.sub(/Hints$/, '')
