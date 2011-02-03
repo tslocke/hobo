@@ -77,7 +77,7 @@ module Hobo
       renderer = Dryml.page_renderer(view_context, identifier, [], controller)
 
       render :update do |page|
-        page << options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;"
+        page << (options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;")
         for spec in render_specs
           function = spec[:function] || "_update"
           dom_id = spec[:id]
