@@ -1,4 +1,4 @@
-ActionView::Helpers::TranslationHelper.module_eval do
+module Hobo::Extensions::ActionView::TranslationHelper
 
   include Hobo::Helper::Translations::Normalizer
 

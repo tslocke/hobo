@@ -37,7 +37,7 @@ module Hobo
 
     ActiveSupport.on_load(:action_view) do
       require 'hobo/extensions/action_view/tag_helper'
-      require 'hobo/extensions/action_view/translation_helper'
+      include Hobo::Extensions::ActionView::TranslationHelper
     end
 
     ActiveSupport.on_load(:before_initialize) do
