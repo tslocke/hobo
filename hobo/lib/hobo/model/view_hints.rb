@@ -26,13 +26,19 @@ module Hobo
 
         def inline_booleans(*args)
           if args.empty? # reader
-            @inline_booleans ||= []
+            if @inline_booleans_args.nil?
+              @inline_booleans ||= []
+            else
+              @inline_booleans = if @inline_booleans_args.first == true
+                                   model.columns.select { |c| c.type == :boolean }.*.name
+                                 else
+                                   @inline_booleans_args.*.to_s
+                                 end
+              @inline_booleans_args = nil
+              @inline_booleans
+            end
           else # writer
-            @inline_booleans = if args[0] == true
-                                 model.columns.select { |c| c.type == :boolean }.*.name
-                               else
-                                 args.*.to_s
-                               end
+            @inline_booleans_args = args
           end
         end
 
