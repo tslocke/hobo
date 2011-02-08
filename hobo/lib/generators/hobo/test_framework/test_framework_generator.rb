@@ -63,7 +63,7 @@ private
       block = "\n  config.generators do |g|"
       block << "\n      g.test_framework :#{n}, :fixtures => #{options[:fixtures].inspect}" if !options[:fixtures] || name != 'test_unit'
       block << "\n      g.fallbacks[:#{n}] = :test_unit" unless name == 'test_unit'
-      block << "\n      g.fixture_replacement => :#{options[:fixture_replacement]}" unless options[:fixture_replacement].blank?
+      block << "\n      g.fixture_replacement = :#{options[:fixture_replacement]}" unless options[:fixture_replacement].blank?
       block << "\n    end\n"
       environment block
     end
