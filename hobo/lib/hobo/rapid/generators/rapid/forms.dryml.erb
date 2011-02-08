@@ -37,7 +37,7 @@ model_key = model.to_s.underscore
     <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
     <field-list fields="<%= transition.parameters * ', ' %>" param/>
     <div param="actions">
-      <submit label="#{ht '<%= model_key %>.actions.<%= transition.name.to_s %>', :default=>['<%= transition.name.to_s.titleize %>']}" param/><or-cancel param="cancel"/>
+      <submit label="#{t 'activerecord.attributes.<%= model_key %>.lifecycle.transitions.<%= transition.name.to_s %>', :default=>['<%= transition.name.to_s.titleize %>']}" param/><or-cancel param="cancel"/>
     </div>
   </form>
 </def>

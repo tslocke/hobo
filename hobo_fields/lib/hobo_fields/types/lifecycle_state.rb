@@ -5,11 +5,11 @@ module HoboFields
       COLUMN_TYPE = :string
 
       class << self
-        attr_accessor :table_name
+        attr_accessor :model_name
       end
 
       def to_html(xmldoctype = true)
-        I18n.t("#{self.class.table_name}.states.#{self}", :default => self).html_safe
+        I18n.t("activerecord.attributes.#{self.model_name.underscore}.lifecycle.states.#{self}", :default => self).html_safe
       end
     end
   end
