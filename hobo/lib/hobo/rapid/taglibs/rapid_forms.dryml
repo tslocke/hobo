@@ -779,7 +779,7 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
 <!-- Renders a localized list of error messages following a form submission. Expects the errors to be in `this.errors`. Renders nothing if there are no errors.
   -->
 <def tag="error-messages">
-  <section class="error-messages" merge-attrs if="&this.errors.length > 0">
+  <section class="error-messages" merge-attrs if="&this.errors.size > 0">
     <h2 param="heading">
       <t key="activerecord.errors.template.header" model="&this.class.model_name.human" count="&this.errors.size">
         <%= model = this.class.model_name.human
