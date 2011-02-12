@@ -27,7 +27,7 @@ module Hobo
           end
           before_filter :set_mailer_default_url_options
           @included_taglibs = []
-          rescue_from ActionController::RoutingError, :with => :not_found
+          rescue_from ActionController::RoutingError, :with => :not_found unless Rails.env.development?
         end
         Hobo::Helper.add_to_controller(klass)
       end
