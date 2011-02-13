@@ -121,7 +121,7 @@
       def restore_locals(locals)
         locals.map do |l|
           if l.is_a?(TypedId)
-            Hobo::Model.find_by_typed_id(this_id)
+            Hobo::Model.find_by_typed_id(l)
           else
             l
           end
