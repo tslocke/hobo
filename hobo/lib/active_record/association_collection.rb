@@ -29,6 +29,22 @@ module ActiveRecord
         proxy_reflection.klass
       end
 
+      # DO NOT call super here - AssociationProxy's version loads the collection, and that's bad.
+      # TODO: this really belongs in Rails; migrate it there ASAP
+      def respond_to?(*args)
+        return super if has_one_collection?
+        proxy_respond_to?(*args) || [].respond_to?(*args)
+      end
+
+      def is_a?(klass)
+        if has_one_collection?
+          load_target
+          @target.is_a?(klass)
+        else
+          [].is_a?(klass)
+        end
+      end
+
       private
 
         def set_reverse_association(object)
@@ -39,6 +55,10 @@ module ActiveRecord
             bta.replace(@owner)
             object.instance_variable_set("@#{refl.name}", bta)
           end
+        end
+
+        def has_one_collection?
+          proxy_reflection.macro == :has_one
         end
 
     end
