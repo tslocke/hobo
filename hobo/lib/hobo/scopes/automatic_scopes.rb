@@ -181,7 +181,7 @@ module Hobo
           end
 
         # published (a boolean column)
-        elsif (col = column(name)) && (col.type == :boolean)
+        elsif name =~ /^is_(.*)$/ && (col = column($1)) && (col.type == :boolean)
 
           def_scope :conditions => ["#{column_sql(col)} = ?", true]
 
@@ -212,14 +212,14 @@ module Hobo
           end
 
          # active (a lifecycle state)
-        elsif @klass.has_lifecycle? && name.to_sym.in?(@klass::Lifecycle.state_names)
+        elsif @klass.has_lifecycle? && name =~ /^state_is_(.*)$/ && $1.to_sym.in?(@klass::Lifecycle.state_names)
 
           if @klass::Lifecycle.state_names.length == 1
             # nothing to check for - create a dummy scope
             def_scope :conditions => ""
             true
           else
-            def_scope :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", name]
+            def_scope :conditions => ["#{@klass.table_name}.#{@klass::Lifecycle.state_field} = ?", $1]
           end
 
         # self is / is not
