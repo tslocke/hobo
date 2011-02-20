@@ -104,7 +104,7 @@ The easiest way to see what this tag does is to look at the source.
 
   -->
 <def tag="not-found-page" attrs="message">
-  <% message ||= "The page you were looking for could not be found" %>
+  <% message ||= t("hobo.messages.not_found", :default=>["The page you requested cannot be found."]) %>
   <page merge>
     <body: class="not-found"/>
     <content: param>

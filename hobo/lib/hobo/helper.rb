@@ -127,7 +127,7 @@ module Hobo
 
 
     def recognize_page_path
-      Rails.application.routes.recognize_path(params[:page_path])
+      Rails.application.routes.recognize_path(params[:page_path]||request.fullpath)
     end
 
     def url_for_page_path(options={})

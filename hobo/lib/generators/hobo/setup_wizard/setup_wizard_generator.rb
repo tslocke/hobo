@@ -113,7 +113,7 @@ NOTE: You might want to sign up as the administrator before adding this!
       end
       inject_into_file 'app/controllers/application_controller.rb', <<EOI, :after => "protect_from_forgery\n" if private_site
   include Hobo::Controller::AuthenticationSupport
-  before_filter :except => [:login, :forgot_password] do
+  before_filter :except => [:login, :forgot_password, :accept_invitation, :do_accept_invitation] do
      login_required unless #{@user_resource_name.camelize}.count == 0
   end
 EOI

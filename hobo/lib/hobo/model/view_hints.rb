@@ -16,8 +16,9 @@ module Hobo
                 parent = model.reverse_reflection(@children_args.first)
                 child_model.view_hints.parent(parent.name, :undefined => true) if parent
               end
+              @children = @children_args
               @children_args = nil
-              @children = args
+              @children
             end
           else # writer (only stores the args for delayed setting)
             @children_args = args

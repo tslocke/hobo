@@ -27,7 +27,7 @@ module Hobo
           helper_method :model, :current_user
           before_filter :set_no_cache_headers
 
-          rescue_from ActiveRecord::RecordNotFound, :with => :not_found
+          rescue_from ActiveRecord::RecordNotFound, :with => :not_found unless Rails.env.development?
 
           rescue_from Hobo::PermissionDeniedError,         :with => :permission_denied
           rescue_from Hobo::Model::Lifecycles::LifecycleKeyError, :with => :permission_denied
