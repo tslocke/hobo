@@ -18,6 +18,10 @@ module Generators
           self.join_table
         end
 
+        def table_exists?
+          ActiveRecord::Migration.table_exists? table_name
+        end
+
         def field_specs
           i = 0
           foreign_keys.inject({}) do |h, v|
