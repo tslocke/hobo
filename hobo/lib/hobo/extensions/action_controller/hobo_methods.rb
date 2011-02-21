@@ -5,7 +5,8 @@ ActionController::Base.class_eval do
     include Hobo::Controller::User
   end
 
-  def self.hobo_model_controller
+  def self.hobo_model_controller(model=nil)
+    @model = model
     include Hobo::Controller::Model
   end
 
