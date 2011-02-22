@@ -174,7 +174,7 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
     <div>
       <% selected = options.detect {|o| o.is_a?(Array) ? o[1].to_s==params[param_name.gsub('-', '_')] : o.to_s==params[param_name.gsub('-', '_')] } %>
       <select-menu name="&param_name" options="&options" selected="&selected"
-                   first-option="&no_filter" first-value="&first_value"/>
+                   first-option="&no_filter" first-value="&first_value" merge-params/>
     </div>
   </form>
 </def>
