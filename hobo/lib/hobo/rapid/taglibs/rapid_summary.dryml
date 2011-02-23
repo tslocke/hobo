@@ -130,7 +130,7 @@
 <def tag="plugin-method">
   <%=
       braids = File.open("#{Rails.root}/.braids") {|f| YAML::load(f) } rescue {}
-      if !braids[this.root.to_s.gsub(Rails.root+"/", "")].nil?
+      if !braids[this.root.to_s.gsub(Rails.root.to_s+"/", "")].nil?
         "braid"
       elsif File.lstat(this.root.to_s).symlink?
         "symlink"
