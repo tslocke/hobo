@@ -42,6 +42,3 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.add_dependency("actionpack", [">= 2.2.2", "< 3.0.0"])
 end
 Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end

@@ -67,6 +67,3 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.files.include %w(tasks/environments.rake tasks/hobo_tasks.rake)
 end
 Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end

@@ -38,6 +38,3 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.add_dependency("hobosupport", ["= #{HoboFields::VERSION}"])    
 end
 Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end
