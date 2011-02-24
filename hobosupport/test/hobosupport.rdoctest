@@ -8,7 +8,7 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 {.hidden}
 
     >> HoboSupport::VERSION
-    => "1.1.0.pre3"
+    => "1.1.0.pre4"
 
 ## Contents
 
