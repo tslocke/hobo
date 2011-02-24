@@ -271,7 +271,7 @@ module Dryml
                       # It's a symbolic type name - look up the Ruby type name
                       klass = HoboFields.to_class(for_type) or
                         dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el)
-                      klass.name
+                      for_type
                     else
                       for_type
                     end.underscore.gsub('/', '__')
