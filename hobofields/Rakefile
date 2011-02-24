@@ -3,7 +3,11 @@ require 'active_record'
 ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
-RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+if defined?(Bundler)
+  RUBYDOCTEST = 'bundle exec rubydoctest'
+else
+  RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+end
 
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobofields/lib')
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/lib')
