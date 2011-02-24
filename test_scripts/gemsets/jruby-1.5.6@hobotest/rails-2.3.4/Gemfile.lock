@@ -1,0 +1,67 @@
+GIT
+  remote: git://github.com/bryanlarsen/activerecord-comments.git
+  revision: 104ee09d69f59c5a3a3ff48e1f07946bfdf3b67d
+  branch: master
+  specs:
+    activerecord-comments (0.1.1)
+
+GIT
+  remote: git://github.com/tablatom/rubydoctest.git
+  revision: 900d6c30ed4e6261208f095b97c2b2f1e460dcb9
+  branch: master
+  specs:
+    rubydoctest (1.1.3)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    BlueCloth (1.0.1)
+    RedCloth (4.2.2-java)
+    actionmailer (2.3.4)
+      actionpack (= 2.3.4)
+    actionpack (2.3.4)
+      activesupport (= 2.3.4)
+      rack (~> 1.0.0)
+    activerecord (2.3.4)
+      activesupport (= 2.3.4)
+    activerecord-jdbc-adapter (1.1.1)
+    activerecord-jdbcmysql-adapter (1.1.1)
+      activerecord-jdbc-adapter (= 1.1.1)
+      jdbc-mysql (~> 5.1.0)
+    activeresource (2.3.4)
+      activesupport (= 2.3.4)
+    activesupport (2.3.4)
+    git (1.2.5)
+    jdbc-mysql (5.1.13)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    rack (1.0.1)
+    rails (2.3.4)
+      actionmailer (= 2.3.4)
+      actionpack (= 2.3.4)
+      activerecord (= 2.3.4)
+      activeresource (= 2.3.4)
+      activesupport (= 2.3.4)
+      rake (>= 0.8.3)
+    rake (0.8.7)
+    rubigen (1.3.4)
+      activesupport (>= 1.4.4)
+    will_paginate (2.3.12)
+    yard (0.6.4)
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  BlueCloth (= 1.0.1)
+  RedCloth (= 4.2.2)
+  activerecord-comments!
+  activerecord-jdbcmysql-adapter (~> 1.1)
+  jeweler
+  rails (= 2.3.4)
+  rubigen (= 1.3.4)
+  rubydoctest!
+  will_paginate (= 2.3.12)
+  yard
