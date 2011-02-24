@@ -18,6 +18,14 @@ task :test_all do |t|
   exit($?.exitstatus)
 end
 
+desc "Build all gems."
+task :build_all do |t|
+  ['hobosupport', 'hobofields', 'dryml', 'hobo'].each do |dir|
+    system("cd #{dir} ; #{RAKE} build")
+    exit($?.exitstatus) if $?.exitstatus != 0
+  end
+end
+
 require 'yard'
 YARD::Rake::YardocTask.new do |t|
   t.files = ['*/lib/**/*.rb', '-', 'hobo/README', 'hobo/CHANGES.txt', 'hobo/LICENSE.txt', 'dryml/README', 'dryml/CHANGES.txt']
