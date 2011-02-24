@@ -3,7 +3,11 @@ ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/proje
 require File.dirname(__FILE__) + '/lib/hobo_support.rb'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
-RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+if defined?(Bundler)
+  RUBYDOCTEST = 'bundle exec rubydoctest'
+else
+  RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+end
 
 namespace "test" do
   desc "Run the doctests"
