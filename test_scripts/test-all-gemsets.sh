@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+cd `dirname $0`
 for gemsetd in gemsets/* ; do
     echo "*****************************************************"
     echo `basename $gemsetd`
@@ -16,5 +17,7 @@ for gemsetd in gemsets/* ; do
         )
     done
 done
+
+( cd .. ; rm -f Gemfile Gemfile.lock )
 
 echo "TESTS SUCCESSFUL."
