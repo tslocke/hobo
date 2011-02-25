@@ -21,8 +21,8 @@ class HoboError < RuntimeError; end
 
 module Hobo
 
-  VERSION = "1.0.2"
-  
+  VERSION = "1.0.3"
+
   class PermissionDeniedError < RuntimeError; end
 
   class RawJs < String; end

@@ -20,6 +20,8 @@ end
 desc "Build all gems."
 task :build_all do |t|
   ['hobosupport', 'hobofields', 'hobo'].each do |dir|
+    system("cd #{dir} ; #{RAKE} gemspec")
+    exit($?.exitstatus) if $?.exitstatus != 0
     system("cd #{dir} ; #{RAKE} build")
     exit($?.exitstatus) if $?.exitstatus != 0
   end
