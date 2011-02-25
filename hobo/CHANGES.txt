@@ -69,8 +69,9 @@ Other changes:
 
 The text input tag (`<textarea>`) has a security hole with versions of
 Rails prior to 2.3.4.  This release makes these old versions of Rails
-safe again.   N.B.  This release has seen its most extensive testing
-against Rails versions 2.3.5 and 2.3.10.
+safe again, although it is highly recommended that you upgrade to
+Rails 2.3.11 because of other security vulnerabilities on earlier versions
+of Rails.
 
 The "include" automatic scope has been aliased to "includes" to
 increase future compatibility with Rails 3.  Future versions of Hobo
