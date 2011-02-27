@@ -53,7 +53,7 @@ var Hobo = {
                     i += 1
                 }
             })
-            params.push("page_path=" + hoboPagePath)
+            params.push("page_path=" + encodeURIComponent(hoboPagePath))
         }
 
         if (resultUpdates) {

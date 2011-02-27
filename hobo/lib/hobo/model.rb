@@ -450,7 +450,7 @@ module Hobo
           if parts[0..2].include?(0)
             nil
           else
-            Time.zone ? Time.zone.local(*parts) : Time.local(*parts)
+            field_type <= Time ? Time.utc(*parts) : Time.zone.local(*parts)
           end
         else
           value

@@ -205,11 +205,12 @@ module Dryml
 
     def find_polymorphic_tag(name, call_type=nil)
       call_type ||= (this.respond_to?(:member_class) && this.member_class) || this_type
-
       begin
         found = nil
         while true
-          if respond_to?(poly_name = "#{name}__for_#{call_type.name.to_s.underscore.gsub('/', '__')}")
+          type_name = (defined?(HoboFields) && HoboFields.to_name(call_type) || call_type.name).underscore.gsub('/', '__')
+
+          if respond_to?(poly_name = "#{name}__for_#{type_name}")
             found = poly_name
             break
           else
