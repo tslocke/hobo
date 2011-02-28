@@ -42,10 +42,10 @@ private
     end
 
     def setup_rspec
-      gem 'rspec-rails', '>= 2.0.0', :group => [:test, :development]
+      gem 'rspec-rails', '>= 2.5.0', :group => [:test, :development]
       @should_update = true
       return unless options[:update]
-      @finalize_hooks << lambda {say "Finalizing rspec installation..."; invoke 'rspec:install'}
+      @finalize_hooks << lambda {say "Finalizing rspec installation..."; system 'rails g rspec:install'}
     end
 
     def setup_shoulda
@@ -60,7 +60,7 @@ private
 
     def add_generators_block
       n = name == 'rspec_with_shoulda' ? 'rspec' : name
-      block = "\n  config.generators do |g|"
+      block = "\n    config.generators do |g|"
       block << "\n      g.test_framework :#{n}, :fixtures => #{options[:fixtures].inspect}" if !options[:fixtures] || name != 'test_unit'
       block << "\n      g.fallbacks[:#{n}] = :test_unit" unless name == 'test_unit'
       block << "\n      g.fixture_replacement = :#{options[:fixture_replacement]}" unless options[:fixture_replacement].blank?
