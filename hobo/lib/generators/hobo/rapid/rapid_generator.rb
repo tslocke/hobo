@@ -16,6 +16,8 @@ module Hobo
       copy_file "hobo-rapid.css",     "public/stylesheets/hobo-rapid.css"
       directory "themes/clean/public","public/hobothemes/clean"
       directory "themes/clean/views", "app/views/taglibs/themes/clean"
+      directory "themes/clean-sidemenu/public","public/hobothemes/clean-sidemenu"
+      directory "themes/clean-sidemenu/views", "app/views/taglibs/themes/clean-sidemenu"
     end
 
   end
