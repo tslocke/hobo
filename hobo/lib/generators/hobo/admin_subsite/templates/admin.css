@@ -1,2 +1,20 @@
-html, body { background: #333;}
-.page-header { background: #555; }
+body {
+  background-color: #333;
+  background-image: none;
+}
+
+.page-header {
+  background: #555;
+}
+
+.page-header.sidemenu {
+  background: none;
+}
+
+.page-header h1 a {
+  color:#FCFFF5;
+}
+
+#main-nav-container {
+  background:#555555
+}
