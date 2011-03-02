@@ -10,7 +10,7 @@ module Generators
                  :type => :boolean,
                  :desc => "Rename application.dryml to front_site.dryml"
 
-      check_class_collision :suffix => 'SiteController'
+      # check_class_collision :suffix => 'SiteController'
 
       def move_and_generate_files
         if options[:make_front_site]
