@@ -18,15 +18,12 @@ module Hobo
     end
 
     def generate_admin_user_controller
-      invoke "hobo:controller", ["#{file_name}/#{options[:user_resource_name].pluralize.underscore}"]
+      invoke "hobo:controller", ["#{file_name}/#{options[:user_resource_name].pluralize.underscore}"], options
       template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
     end
 
     def generate_site_taglib
-      invoke 'hobo:subsite_taglib', [name],
-                                    :user_resource_name => options[:user_resource_name],
-                                    :admin => true,
-                                    :invite_only => invite_only?
+      invoke 'hobo:subsite_taglib', [name], options.merge(:admin => true)
     end
 
     def append_admin_tag_into_application_taglib
