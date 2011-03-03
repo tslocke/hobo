@@ -2,7 +2,7 @@ module Generators
   module Hobo
     Controller = classy_module do
 
-      check_class_collision :suffix => 'Controller'
+      # check_class_collision :suffix => 'Controller'
 
       class_option :helpers, :type => :boolean,
       :desc => "Generates helper files",

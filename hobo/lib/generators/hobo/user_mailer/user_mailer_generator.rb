@@ -12,7 +12,7 @@ module Hobo
       "rails generate hobo:user_mailer [NAME=user] [options]"
     end
 
-    check_class_collision :suffix => 'Mailer'
+    # check_class_collision :suffix => 'Mailer'
 
     def generate_mailer
       template 'mailer.rb.erb', File.join('app/mailers', "#{file_path}_mailer.rb")
