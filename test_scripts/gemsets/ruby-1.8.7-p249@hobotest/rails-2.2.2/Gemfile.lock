@@ -1,0 +1,61 @@
+GIT
+  remote: git://github.com/bryanlarsen/activerecord-comments.git
+  revision: 104ee09d69f59c5a3a3ff48e1f07946bfdf3b67d
+  branch: master
+  specs:
+    activerecord-comments (0.1.1)
+
+GIT
+  remote: git://github.com/tablatom/rubydoctest.git
+  revision: 900d6c30ed4e6261208f095b97c2b2f1e460dcb9
+  branch: master
+  specs:
+    rubydoctest (1.1.3)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    RedCloth (4.1.1)
+    actionmailer (2.2.2)
+      actionpack (= 2.2.2)
+    actionpack (2.2.2)
+      activesupport (= 2.2.2)
+    activerecord (2.2.2)
+      activesupport (= 2.2.2)
+    activeresource (2.2.2)
+      activesupport (= 2.2.2)
+    activesupport (2.2.2)
+    bluecloth (2.0.1)
+    git (1.2.5)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    mysql (2.8.1)
+    rails (2.2.2)
+      actionmailer (= 2.2.2)
+      actionpack (= 2.2.2)
+      activerecord (= 2.2.2)
+      activeresource (= 2.2.2)
+      activesupport (= 2.2.2)
+      rake (>= 0.8.3)
+    rake (0.8.7)
+    rubigen (1.3.4)
+      activesupport (>= 1.4.4)
+    will_paginate (2.3.12)
+    yard (0.6.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  RedCloth (= 4.1.1)
+  activerecord-comments!
+  bluecloth (= 2.0.1)
+  jeweler
+  mysql (= 2.8.1)
+  rails (= 2.2.2)
+  rubigen (= 1.3.4)
+  rubydoctest!
+  will_paginate (= 2.3.12)
+  yard

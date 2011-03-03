@@ -1,0 +1,39 @@
+This directory contains a little script that works with RVM and
+bundler to allow you to easily run the Hobo unit tests under a variety
+of versions of Ruby and Rails.
+
+It's pretty simple.  There are a number of `Gemfile`'s under
+test_scripts/gemsets/GEMSET/RAILS_VERSION/Gemfile where GEMSET is a
+the name of a Ruby with the hobotest gemset in an RVM compatible form
+(ie. ruby-1.8.7-p249@hobotest) and RAILS_VERSION descibes which rails
+the Gemfile includes (ie rails-2.3.11).
+
+You'll have to install all the rubies and the gems for each bundle
+before you can run the script.
+
+Step 1:   install the rubies.  For example:
+
+    rvm install ruby-1.8.7-p249
+    rvm use ruby-1.8.7-p249
+
+I suggest just installing a single ruby to start and then removing all
+of the other directories until you have things working.  You can
+always get them back by checking them out from git.
+
+Step 2:   create the gemsets.
+
+    rvm gemset use hobotest --create
+
+Step 3:  populate the gemsets
+
+for each RAILS_VERSION:
+
+    cd RAILS_VERSION
+    bundle install
+
+Step 4:  run the test script:
+
+    test_scripts/test_all_gemsets.sh
+
+If it runs successfully, it will print "TESTS SUCCESSFUL."  If it
+fails, it will stop at the failure point.

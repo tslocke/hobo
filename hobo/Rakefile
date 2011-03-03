@@ -10,7 +10,11 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '/../hobosupport/
 require 'hobo'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
-RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+if defined?(Bundler)
+  RUBYDOCTEST = 'bundle exec rubydoctest'
+else
+  RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
+end
 
 desc "Default Task"
 task :default => [ :test ]
@@ -67,6 +71,3 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.files.include %w(tasks/environments.rake tasks/hobo_tasks.rake)
 end
 Jeweler::GemcutterTasks.new
-Jeweler::RubyforgeTasks.new do |rubyforge|
-  rubyforge.doc_task = false
-end
