@@ -271,7 +271,9 @@ module Dryml
                       # It's a symbolic type name - look up the Ruby type name
                       klass = HoboFields.to_class(for_type) or
                         dryml_exception("No such type in polymorphic tag definition: '#{for_type}'", el)
-                      for_type
+                      # ActiveSupport::TimeWithZone.name would return 'Time'
+                      # so we add an exception to pick the right datetime type
+                      klass == ActiveSupport::TimeWithZone ? 'datetime' : klass.name
                     else
                       for_type
                     end.underscore.gsub('/', '__')
