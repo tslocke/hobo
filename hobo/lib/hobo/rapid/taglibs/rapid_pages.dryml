@@ -100,7 +100,7 @@ The easiest way to see what this tag does is to look at the source.
 
 ### Attributes
 
- - `message` - The main message to display. Defaults to "The page you were looking for could not be found"
+ - `message` - The main message to display. Defaults to "The page you requested cannot be found."
 
   -->
 <def tag="not-found-page" attrs="message">
