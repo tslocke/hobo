@@ -208,8 +208,9 @@ module Dryml
       begin
         found = nil
         while true
-          type_name = (defined?(HoboFields) && HoboFields.to_name(call_type) || call_type.name).underscore.gsub('/', '__')
-
+          # ActiveSupport::TimeWithZone.name would return 'Time'
+          # so we add an exception to pick the right datetime type
+          type_name = ( call_type == ActiveSupport::TimeWithZone ? 'datetime' : call_type.name).underscore.gsub('/', '__')
           if respond_to?(poly_name = "#{name}__for_#{type_name}")
             found = poly_name
             break
