@@ -3,7 +3,7 @@
 <def tag="main-nav">
   <navigation class="main-nav" merge-attrs param="default">
     <nav-item href="#{base_url}/">Home</nav-item>
-<% models.select { |m| linkable?(m, :index) }[0..4].each do |m| -%>
+<% models.select { |m| linkable?(m, :index) }.each do |m| -%>
     <nav-item with="&<%= m.name %>"><ht key="<%= m.to_s.underscore %>.nav_item" count="100"><model-name-human count="100"/></ht></nav-item>
 <% end -%>
   </navigation>
