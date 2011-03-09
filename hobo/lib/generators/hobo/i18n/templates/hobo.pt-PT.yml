@@ -121,7 +121,7 @@
         success: "Obrigado por efectuar o registo!"
         must_activate: "Deve ativar o seu registo antes de se identificar. Por favor, verifique na sua caixa de correio electrônico."
       login:
-        success: "Está indetificado no sistema."
+        success: "Está identificado no sistema."
         error: "Não especificou um utilizador válido ({{login}}) e respectiva palavra-chave!"
       logout: "Saiu do sistema."
       reset_password: "A sua palavra-chave foi apagada."
