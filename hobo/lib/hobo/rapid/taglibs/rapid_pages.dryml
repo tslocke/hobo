@@ -24,7 +24,7 @@ The easiest way to see what this tag does is to look at the source.
       </do>
 
       <do param="scripts">
-        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid"/>
+        <javascript param name="prototype, effects, dragdrop, controls, rails, lowpro, hobo-rapid"/>
         <if-ie version="lt IE 7" param="fix-ie6">
           <javascript name="IE7"/>
           <javascript name="ie7-recalc"/>
@@ -32,6 +32,7 @@ The easiest way to see what this tag does is to look at the source.
         <do param="custom-scripts"/>
         <javascript param="application-javascript" name="application"/>
       </do>
+      <%= csrf_meta_tag %>
     </head>
 
     <body param>
