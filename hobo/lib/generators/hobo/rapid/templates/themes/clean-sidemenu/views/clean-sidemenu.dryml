@@ -9,7 +9,7 @@
 
     <header: class="sidemenu" param>
       <live-search param if="&defined_route? :site_search"/>
-      <account-nav if="&login_url(Hobo::Model::User.default_user_model)" param/>
+      <account-nav if="&login_url(Hobo::Model::UserBase.default_user_model)" param/>
       <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
     </header:>
 

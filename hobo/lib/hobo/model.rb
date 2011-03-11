@@ -142,7 +142,7 @@ module Hobo
         self.creator_attribute         = name.to_sym if options.delete(:creator)
         validate = options.delete(:validate) {true}
 
-        #FIXME - this should be in Hobo::Model::User
+        #FIXME - this should be in Hobo::Model::UserBase
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
       end
 
