@@ -203,6 +203,49 @@ Provides validation of correct email address format.
         >> HoboFields::Types::PasswordString.new("pass<word>").to_html.html_safe?
         => true
 
+### `HoboFields::Serialized`
+
+This type lets you store an arbitrary object as serialized text into
+the database column.   You can optionally pass the :class option to
+restrict the column type.
+
+    >>
+    >>
+     def migrate(renames={})
+       up, down = Generators::Hobo::Migration::Migrator.run(renames)
+       ActiveRecord::Migration.class_eval(up)
+       ActiveRecord::Base.send(:descendants).each { |model| model.reset_column_information }
+       [up, down]
+     end
+{.hidden}
+
+    >>
+     class Vault1 < ActiveRecord::Base
+       fields do
+         content :serialized
+       end
+     end
+
+    >> migrate
+    >> Vault1.create!(:content => {:key => "in Vault"})
+    >> Vault1.first.content
+    => {:key => "in Vault"}
+
+    >>
+     class Vault2 < ActiveRecord::Base
+       fields do
+         content :serialized, :class => Hash
+       end
+     end
+
+    >> migrate
+    >> Vault2.create!(:content => {:key => "in Vault"})
+    >> Vault2.first.content
+    => {:key => "in Vault"}
+    >> Vault2.create!(:content => 17) rescue ActiveRecord::SerializationTypeMismatch
+    >> Vault2.all.size
+    => 1   # second record not created because of type mismatch
+
 ## Enum Strings
 
 `HoboFields::Types::EnumString` is not a rich type that you use directly. It's a "type generator", rather like Ruby's `Struct`. It's used for the common situation in database driven apps that you want an enumerated type, but it's not worth going to the extra bother of a separate table enumerating the values. For example you could create a type to represent the status of an article:
@@ -349,6 +392,3 @@ Translations only work with named EnumString's.  The recommended way of naming t
         >> markdown.to_html.html_safe?
         => true
 
-### `HoboFields::Types::SerializedObject`
-
-        # `SerializedObject` doesn't have `to_html`
