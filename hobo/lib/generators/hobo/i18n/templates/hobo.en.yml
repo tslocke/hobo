@@ -131,7 +131,7 @@ en:
       current_password_is_not_correct: "is not correct"
       you_are_site_admin: "You are now the site administrator"
       you_signed_up: "You have signed up"
-      no: "No %{model} available."
+      none: "No %{model} available."
       confirm: "Are you sure?"
 
     # default hobo collection translation
