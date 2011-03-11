@@ -564,7 +564,7 @@ You can pass a summary attribute, which will generate a complete localized sente
   raise Exception.new("asked for count of a string") if this.is_a?(String)
   Rails.logger.warn('The "prefix" attribute is deprecated: please, use a locale string') unless prefix.blank?
 
-  c = this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+  c = collection_count
 
   # generated label will be pluralized
   label ||= case
