@@ -63,7 +63,7 @@ en:
     forgot_password_sent:
       title: "Forgotten password - E-mail sent"
       heading: "Forgotten password - E-mail sent"
-      text: "An e-mail with instructions on how you generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spamfilter."
+      text: "An e-mail with instructions on how to generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spam folder."
 
     account_disabled_page:
       title: "Account disabled"
@@ -138,8 +138,8 @@ en:
     collection:
       count: &collection_count
         zero: &no_model "No %{model}"
-        one: "There is only one %{model} at the moment"
-        other: "There are already %{count} %{model}"
+        one: "There is one %{model}."
+        other: "There are %{count} %{model}."
       # you can use the following to completely override the collection heading
       # be aware that you will loose the automatic Your <collection> / Jom's <collection>
       # default output for User models

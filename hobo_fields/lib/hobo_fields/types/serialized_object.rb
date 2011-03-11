@@ -5,7 +5,7 @@ module HoboFields
       COLUMN_TYPE = :text
 
       def self.declared(model, name, options)
-        model.serialize name, options.delete(:class)
+        model.serialize name, options.delete(:class) || Object
       end
 
       HoboFields.register_type(:serialized, self)
