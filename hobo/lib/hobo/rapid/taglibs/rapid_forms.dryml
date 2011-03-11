@@ -659,7 +659,7 @@ For situations where there are too many target records to practically include in
   -->
 <def tag="select-one" attrs="include-none, blank-message, options, sort, limit, text-method"><%
   raise Hobo::PermissionDeniedError.new("Not allowed to edit #{this_field}") if !attributes[:disabled] && !can_edit?
-  blank_message ||= ht("#{this_type.name.underscore}.messages.none", :default=>"(No #{this_type.model_name.human})")
+  blank_message ||= ht("#{this_type.name.underscore}.messages.none", :default=>"No #{this_type.model_name.human} available.")
   limit ||= 100
 
   options ||= begin

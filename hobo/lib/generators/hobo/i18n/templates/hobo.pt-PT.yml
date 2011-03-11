@@ -132,7 +132,7 @@
       current_password_is_not_correct: "não está correta."
       you_are_site_admin: "Agora é o administrador do site"
       you_signed_up: "Acabou de se registar"
-      no: "Nenhum #{model} disponível."
+      none: "Nenhum #{model} disponível."
       confirm: "Tem a certeza?"
 
     # default hobo collection translation
