@@ -210,7 +210,7 @@ module Dryml
         while true
           # ActiveSupport::TimeWithZone.name would return 'Time'
           # so we add an exception to pick the right datetime type
-          type_name = ( call_type == ActiveSupport::TimeWithZone ? 'datetime' : call_type.name).underscore.gsub('/', '__')
+          type_name = ( call_type == ActiveSupport::TimeWithZone ? 'datetime' : call_type.name.to_s).underscore.gsub('/', '__')
           if respond_to?(poly_name = "#{name}__for_#{type_name}")
             found = poly_name
             break

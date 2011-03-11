@@ -137,7 +137,7 @@ it:
       current_password_is_not_correct: "non è esatta"
       you_are_site_admin: "Adesso sei amministratore del sito."
       you_signed_up: "Ti sei iscritto."
-      no: "Nessun record %{model} disponibile."
+      none: "Nessun record %{model} disponibile."
       confirm: "Sei sicuro?"
 
     # default hobo collection translation

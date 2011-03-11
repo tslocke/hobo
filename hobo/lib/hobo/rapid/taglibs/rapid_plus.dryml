@@ -171,6 +171,7 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
  - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
    It can be omitted if you provide the options as an array or array of arrays in the locale file.
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+ - `first-value` -the value to be used with the first option. Typically not used, meaning the option has a blank value.
 
 ### I18n
 
@@ -209,7 +210,7 @@ Besides the "tags.filter_menu.default.no_filter" key is used as default of the a
    </select>
 
   -->
-<def tag="filter-menu" attrs="param-name, options, no-filter, id">
+<def tag="filter-menu" attrs="param-name, options, no-filter, id, first-value">
   <% opt = t("tags.filter_menu.#{param_name}.options", :default=>'')
      options = opt unless opt.blank?
      no_filter = t("tags.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
@@ -218,7 +219,7 @@ Besides the "tags.filter_menu.default.no_filter" key is used as default of the a
       <% opt = options.first.kind_of?(Array) ? options.*.last : options
          selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
       <select-menu name="&param_name" options="&options" selected="&selected"
-                   first-option="&no_filter" key="&param_name" merge-params/>
+                   first-option="&no_filter" first-value="&first_value" key="&param_name" merge-params/>
     </div>
   </form>
 </def>
