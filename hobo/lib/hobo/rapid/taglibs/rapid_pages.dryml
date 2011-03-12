@@ -24,7 +24,7 @@ The easiest way to see what this tag does is to look at the source.
       </do>
 
       <do param="scripts">
-        <javascript param name="prototype, effects, dragdrop, controls, lowpro, hobo-rapid"/>
+        <javascript param name="prototype, effects, dragdrop, controls, rails, lowpro, hobo-rapid"/>
         <if-ie version="lt IE 7" param="fix-ie6">
           <javascript name="IE7"/>
           <javascript name="ie7-recalc"/>
@@ -32,13 +32,14 @@ The easiest way to see what this tag does is to look at the source.
         <do param="custom-scripts"/>
         <javascript param="application-javascript" name="application"/>
       </do>
+      <%= csrf_meta_tag %>
     </head>
 
     <body param>
       <set-scoped flash-rendered="&false">
         <ajax-progress param/>
         <header class="page-header" param>
-          <account-nav if="&login_url(Hobo::Model::User.default_user_model)" param/>
+          <account-nav if="&login_url(Hobo::Model::UserBase.default_user_model)" param/>
           <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
           <live-search param if="&defined_route? :site_search"/>
           <main-nav current="&title" param/>

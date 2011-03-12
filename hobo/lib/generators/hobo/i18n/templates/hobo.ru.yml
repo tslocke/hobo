@@ -136,7 +136,7 @@ ru:
       current_password_is_not_correct: "неправильно"
       you_are_site_admin: "Вы получили права администратора сайта."
       you_signed_up: "Вы зарегестрировались."
-      no: "Нет доступных %{model}ей."
+      none: "Нет доступных %{model}ей."
       confirm: "Вы уверены?"
 
     # default hobo collection translation

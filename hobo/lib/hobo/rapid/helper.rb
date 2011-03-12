@@ -102,7 +102,10 @@ module Hobo
         s.gsub(' ', '&nbsp;')
       end
 
-
+      # returns the number of items in the collection.  See LH #889
+      def collection_count
+        this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+      end
 
 
       def in_place_editor(attributes, this=nil)

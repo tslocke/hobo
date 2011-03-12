@@ -33,7 +33,7 @@ model_key = model.to_s.underscore
         </h2>
 
         <p param="count" if>
-          <ht key="<%= model_key %>.collection.count" count="&this.size">
+          <ht key="<%= model_key %>.collection.count" count="&collection_count">
             <count summary/>
           </ht>
         </p>
@@ -110,7 +110,7 @@ edit_link      = linkable?(:edit)
 main_content   = model.primary_content_attribute
 show_fields    = standard_fields(:belongs_to).*.to_s - [model.name_attribute, main_content, creator, back_link, *boolean_fields].*.to_s
 
-is_user_model = model < Hobo::Model::User
+is_user_model = model < Hobo::Model::UserBase
 
 collection     = model.view_hints.primary_children
 if collection
@@ -273,7 +273,7 @@ owner_model     = model.reflections[owner].klass
 linkable_owner  = linkable?(owner_model, :show)
 owner_tag       = linkable_owner ? "a" : "name"
 
-owner_is_user = owner_model < Hobo::Model::User
+owner_is_user = owner_model < Hobo::Model::UserBase
 
 owner = model.reflections[owner].macro == :has_many ? owner.to_s.singularize : owner.to_s
 -%>
@@ -306,7 +306,7 @@ new_link = :new.in?(actions)
         </h3>
 <% end -%>
         <p param="count" if>
-          <ht key="<%= model_key %>.collection.count" count="&this.size">
+          <ht key="<%= model_key %>.collection.count" count="&collection_count">
             <count summary/>
           </ht>
         </p>

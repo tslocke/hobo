@@ -5,7 +5,7 @@ class DevController < ActionController::Base
   before_filter :developer_modes_only
 
   def set_current_user
-    model = params[:model] || Hobo::Model::User.default_user_model
+    model = params[:model] || Hobo::Model::UserBase.default_user_model
     self.current_user = if params[:login]
                           model.where(model.login_attribute => params[:login]).first
                         else

@@ -5,7 +5,7 @@ ActiveRecord::Base.class_eval do
   end
   def self.hobo_user_model
     include Hobo::Model
-    include Hobo::Model::User
+    include Hobo::Model::UserBase
   end
   alias_method :has_hobo_method?, :respond_to_without_attributes?
 end
