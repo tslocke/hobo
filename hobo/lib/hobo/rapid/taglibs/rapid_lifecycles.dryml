@@ -25,7 +25,9 @@ Transitions with parameters are implemented using a form.  HTML does not allow f
 
     html_attributes[:method] ||= has_params ? :get : :put
     add_classes!(html_attributes, "transition-button #{transition_name}-button")
-    label = ht("#{this.class.to_s.underscore}.actions.#{transition_name}", :default => (label || transition_name.to_s.titleize))
+    label = t("activerecord.attributes.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}", :default => (label || transition_name.to_s.titleize))
+    title = t("activerecord.attribute_help.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}")
+    html_attributes.update(:title => title) unless title.empty? 
     url = object_url(this, transition_name, :method => html_attributes[:method])
 
     if (update || !ajax_attributes.empty?) && !has_params
