@@ -42,7 +42,7 @@
 <!-- Used to localize and pluralize collection names.
 A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them.
 
-With the `your` attribute and in the special case the context is a Hobo::Model::User instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
+With the `your` attribute and in the special case the context is a Hobo::Model::UserMixin instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
 
 ### Attributes
 
@@ -96,7 +96,7 @@ With the `your` attribute and in the special case the context is a Hobo::Model::
   # prepare symbolized attributes for merging
   attrs = {}
   all_attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
-<% if your && belong_class < Hobo::Model::User && this.kind_of?(Hobo::Model::User) && I18n.locale == :en -%>
+<% if your && belong_class < Hobo::Model::UserBase && this.kind_of?(Hobo::Model::UserBase) && I18n.locale == :en -%>
     <your key="&collection" merge-attrs="&{:name=>this.name}.merge(attrs)" capitalize>
       <%= belong_class.human_attribute_name(collection.to_sym, attrs) %>
     </your>

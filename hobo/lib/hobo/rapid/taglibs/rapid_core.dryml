@@ -772,7 +772,7 @@ Notes
 
 <!-- Development mode only - a menu to change the `current_user` -->
 <def tag="dev-user-changer">
-  <set user="&Hobo::Model::User.default_user_model"/>
+  <set user="&Hobo::Model::UserBase.default_user_model"/>
   <select-menu if="&user && Rails.env.development?"
                first-option="#{t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
                onchange="location.href = '#{dev_support_path :action=>:set_current_user}?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"

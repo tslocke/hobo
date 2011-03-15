@@ -25,7 +25,7 @@ module Hobo
 
   class << self
 
-    attr_accessor :current_theme
+    attr_accessor :current_theme, :engines
 
     def raw_js(s)
       RawJs.new(s)
@@ -64,12 +64,17 @@ module Hobo
 
     def subsites
       # Any directory inside app/controllers defines a subsite
-      @subsites ||= Dir["#{Rails.root}/app/controllers/*"].map do |f|
-                      File.basename(f) if File.directory?(f)
-                    end.compact
+      app_dirs = ["#{Rails.root}/app"] + Hobo.engines.map { |e| "#{e}/app" }
+      @subsites ||= app_dirs.map do |app|
+                      Dir["#{app}/controllers/*"].map do |f|
+                        File.basename(f) if File.directory?(f)
+                      end.compact
+                    end.flatten
     end
 
   end
+
+  self.engines = []
 
 end
 

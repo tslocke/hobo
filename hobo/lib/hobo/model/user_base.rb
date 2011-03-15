@@ -2,7 +2,7 @@ require 'digest/sha1'
 
 module Hobo
   module Model
-    module User
+    module UserBase
 
       @user_models = []
 
