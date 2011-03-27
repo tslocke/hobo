@@ -6,11 +6,6 @@ ActionController::Base.class_eval do
 
   attr_accessor :dryml_fallback_tag
 
-  # dryml does not use layouts
-  def action_has_layout?
-    false
-  end
-
   def dryml_context
     @this
   end
