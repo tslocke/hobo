@@ -133,7 +133,7 @@ module Dryml
        when scriplet_rex
          t
        when /\S+/
-         t.gsub!(/(\(|\))/, {'('=>'\(', ')'=>'\)'})
+         t.gsub!(/(\(|\))/){"\\#{$1}"}
          "<% safe_concat %(#{t}) %>"
        else
          t
