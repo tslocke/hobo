@@ -149,7 +149,11 @@ module Hobo
         end
 
         def publishable_transitions_for(user)
-          available_transitions_for(user).select {|t| t.publishable_by(user, t.available_to, record)}
+          record.with_acting_user(user) do
+            available_transitions_for(user).select do |t|
+              t.publishable_by(user, t.available_to, record)
+            end
+          end
         end
 
 

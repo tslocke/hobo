@@ -161,6 +161,7 @@ module Hobo
 
 
       def with_acting_user(user)
+        return yield if user == acting_user
         old = acting_user
         self.acting_user = user
         result = yield
