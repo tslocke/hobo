@@ -133,6 +133,7 @@ module Dryml
        when scriplet_rex
          t
        when /\S+/
+         t.gsub!(/(\(|\))/){"\\#{$1}"}
          "<% safe_concat %(#{t}) %>"
        else
          t
@@ -549,7 +550,7 @@ module Dryml
         'this_type'
       elsif t =~ /^[A-Z]/
         t
-      elsif t =~ /^[a-z]/ && defined? HoboFields.to_class
+      elsif t =~ /^[a-z]/ && defined?(HoboFields.to_class)
         klass = HoboFields.to_class(t)
         klass.name
       elsif is_code_attribute?(t)

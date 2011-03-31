@@ -111,10 +111,10 @@ module Dryml
   end
 
   def get_field_path(object, path)
+    return nil if object.nil?
     path = path.is_a?(String) ? path.split('.') : Array(path)
     parent = nil
     path.each do |field|
-      return nil if object.nil?
       parent = object
       object = get_field(parent, field)
     end

@@ -357,7 +357,7 @@ module Hobo
 
 
     def to_url_path
-      "#{self.class.to_url_path}/#{to_param}" unless new_record?
+      "#{self.class.to_url_path}/#{to_param}"
     end
 
 

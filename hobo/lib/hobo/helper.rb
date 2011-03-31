@@ -395,6 +395,7 @@ module Hobo
       options = args.extract_options!
       target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift
       action = args.first
+      return false if action.nil? && target.try.new_record?
 
       if target.respond_to?(:member_class) && (origin = target.try.origin)
         klass = origin.class

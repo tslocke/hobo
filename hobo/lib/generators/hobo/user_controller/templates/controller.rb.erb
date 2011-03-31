@@ -17,8 +17,10 @@ class <%= class_name %>Controller < ApplicationController
 
   def do_accept_invitation
     do_transition_action :accept_invitation do
-      self.current_user = this
-      flash[:notice] = t("hobo.messages.you_signed_up", :default=>"You have signed up")
+      if this.valid?
+        self.current_user = this
+        flash[:notice] = t("hobo.messages.you_signed_up", :default=>"You have signed up")
+      end
     end
   end
 <% end -%>

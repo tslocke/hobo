@@ -368,7 +368,7 @@ Or a new page if the context is a class:
 
       content = name if content.blank?
 
-      href = object_url(target, action, (params || {}).merge(:subsite => subsite))
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite)) unless (action.nil? && target.try.new_record?)
       if href.nil?
         # This target is registered with Hobo::Routes as not linkable
         content
