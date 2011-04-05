@@ -124,7 +124,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
                 <td param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
               </with-fields>
               <td class="controls" param="controls" if="&all_parameters[:controls]">
-                <a param="edit-link" action="edit" if="&can_edit?"><t key="hobo.action.edit">Edit</t></a>
+                <a param="edit-link" action="edit" if="&can_edit?"><t key="hobo.actions.edit">Edit</t></a>
                 <delete-button param/>
               </td>
             </if>
