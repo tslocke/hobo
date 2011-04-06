@@ -271,20 +271,23 @@ module Hobo
                 _, assoc, count = *field._?.match(/^([a-z_]+)(?:\.([a-z_]+))?/)
                 refl = klass.attr_type(assoc)
 
-                if refl.respond_to?(:primary_key_name) && refl.macro == :has_many && count._?.upcase == 'COUNT'
+                if refl.respond_to?(:primary_key_name) && refl.macro == :has_many && (count._?.upcase == 'COUNT' || count._?.upcase == 'SIZE')
                   owner_primary_key = "#{klass.quoted_table_name}.#{klass.primary_key}"
                   # now we have :has_many association in refl, is this a through association?
                   if (through = refl.through_reflection) && (source = refl.source_reflection)
                     # has_many through association was found and now we have a few variants:
                     # 1) owner.has_many -> through.belongs_to <- source.has_many (many to many, source.macro == :belongs_to )
                     # 2) owner.has_many -> through.has_many -> source.belongs_to (many to one through table, source.macro == :has_many)
-                    colspec = "(SELECT COUNT(*) AS count_all FROM #{refl.quoted_table_name} INNER JOIN #{through.quoted_table_name}" +
+                    klass_assoc_name = klass.name.send(source.macro == :belongs_to ? :tableize : :underscore).to_sym
+                    counter_cache_column = refl.klass.reflections[klass_assoc_name]._?.counter_cache_column
+                    colspec = counter_cache_column || "(SELECT COUNT(*) AS count_all FROM #{refl.quoted_table_name} INNER JOIN #{through.quoted_table_name}" +
                       " ON #{source.quoted_table_name}.#{source.macro == :belongs_to ? source.klass.primary_key : through.association_foreign_key}" +
                       " = #{through.quoted_table_name}.#{source.macro == :belongs_to ? source.association_foreign_key : through.klass.primary_key}" +
                       " WHERE #{through.quoted_table_name}.#{through.primary_key_name} = #{owner_primary_key} )"
                   else
                     # simple many to one (has_many -> belongs_to) association
-                    colspec = "(SELECT COUNT(*) as count_all FROM #{refl.quoted_table_name}" +
+                    counter_cache_column = refl.klass.reflections[klass.name.underscore.to_sym]._?.counter_cache_column
+                    colspec = counter_cache_column || "(SELECT COUNT(*) as count_all FROM #{refl.quoted_table_name}" +
                       " WHERE #{refl.quoted_table_name}.#{refl.primary_key_name} = #{owner_primary_key})"
                   end
 
