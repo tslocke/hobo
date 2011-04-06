@@ -664,7 +664,8 @@ For situations where there are too many target records to practically include in
 
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
-    this_field_reflection.klass.all(:conditions => conditions, :limit => limit).select {|x| can_view?(x)}
+    order = this_field_reflection.klass.default_order
+    this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
   end
 
   if text_method.nil?
