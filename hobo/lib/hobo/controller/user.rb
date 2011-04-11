@@ -62,8 +62,7 @@ module Hobo
       end
 
       login_attr = model.human_attribute_name(model.login_attribute)
-      options.reverse_merge!(:success_notice => ht(:"#{model.to_s.underscore}.messages.login.success", :default=>["You have logged in."]),
-                             :failure_notice => ht(:"#{model.to_s.underscore}.messages.login.error", :login=>login_attr, :default=>["You did not provide a valid #{login_attr} and password."]))
+      options.reverse_merge!(:failure_notice => ht(:"#{model.to_s.underscore}.messages.login.error", :login=>login_attr, :default=>["You did not provide a valid #{login_attr} and password."]))
 
       if request.post?
         user = model.authenticate(params[:login], params[:password])
@@ -71,7 +70,6 @@ module Hobo
           flash[:error] = options[:failure_notice]
           hobo_ajax_response if request.xhr? && !performed?
         else
-
           self.sign_user_in(user, options){ yield if block_given?}
         end
       end
@@ -164,7 +162,9 @@ module Hobo
     # user - user that you want to sign in
     # options - hash with messages (:success_notice, :redirect_to)
     # block - (optional) will be called after assigning current_user
-    def sign_user_in(user, options, &block)
+    def sign_user_in(user, options={}, &block)
+      options.reverse_merge!(:success_notice => ht(:"#{model.to_s.underscore}.messages.login.success", :default=>["You have logged in."]))
+
       old_user = current_user
       self.current_user = user
 
