@@ -55,7 +55,7 @@ fr:
     forgot_password:
       title: *forgot_password
       heading: *forgot_password
-      text: "Veuillez saisir l'adresse email que vous avez utilisée lors de votre inscription. 
+      text: "Veuillez saisir l'adresse email que vous avez utilisée lors de votre inscription.
             Nous vous enverrons un email vous permettant de générer un nouveau mot de passe."
       email_address: *email_address
       send: "Envoyer"
