@@ -3,7 +3,7 @@ en:
   hobo:
     # default hobo pages translations
     index:
-      # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
+      # if you uncomment the following you will loose the automatic selection of dynamically pluralized nav-tabs
       # if you need a different title you should implement a different way to select the tab on your own
       #title: "%{model} Index"
       heading: "%{model} Index"
@@ -154,7 +154,7 @@ en:
       new:
         heading: "New %{model}"
       error:
-        heading: "The following error occured:"
+        heading: "The following error occurred:"
       select_many:
         prompt: "Add %{model}"
 
