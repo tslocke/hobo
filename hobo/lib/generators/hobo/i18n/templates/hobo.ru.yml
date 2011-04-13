@@ -95,6 +95,7 @@ ru:
       save: "Сохранить"
       cancel: "Отменить"
       edit: "Изменить %{model}"
+      edit_control: "Изменить"
       back: "Назад к"
       back_to_parent: "Назад к %{parent} %{name}"
       send: "Отослать"

@@ -91,6 +91,7 @@
       save: "Gravar %{model}"
       cancel: "Cancelar"
       edit: "Editar %{model}"
+      edit_control: "Editar"
       back: "Voltar para"
       back_to_parent: "Voltar para %{parent} %{name}"
       send: "Enviar"

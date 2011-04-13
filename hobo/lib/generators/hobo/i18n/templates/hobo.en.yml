@@ -90,6 +90,7 @@ en:
       save: "Save %{model}"
       cancel: "Cancel"
       edit: "Edit %{model}"
+      edit_control: "Edit"
       back: "Back to"
       back_to_parent: "Back to %{parent} %{name}"
       send: "Send"

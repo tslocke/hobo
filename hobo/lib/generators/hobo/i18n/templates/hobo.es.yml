@@ -97,6 +97,7 @@ es:
       save: "Guardar %{model}"
       cancel: "Cancelar"
       edit: "Actualizar %{model}"
+      edit_control: "Actualizar"
       back: "Volver a"
       back_to_parent: "Volver a %{parent} %{name}"
       send: "Enviar"
