@@ -601,7 +601,7 @@ HoboInputMany = {
           constraint: 'vertical',
           handle: 'ordering-handle',
           overlap: 'vertical',
-          scroll: 'window',
+          scroll: window,
           onUpdate: function(list) {
               HoboInputMany.fixIndices.call(list);
           }
