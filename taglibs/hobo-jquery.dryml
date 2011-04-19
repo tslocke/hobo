@@ -38,7 +38,7 @@ To use it, invoke this tag directly before the tag to annotate.  To get the anno
     });
 -->
 <def tag="annotate-tag">
-  <%= "<!-- json_annotation (#{attributes.to_json}); -->" %>
+  <%= "<!-- json_annotation (#{attributes.to_json}); -->".html_safe %>
 </def>
 
 <!--
