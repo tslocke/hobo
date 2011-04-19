@@ -25,8 +25,8 @@
 <html>
   <head>
     <link type="text/css" href="stylesheets/themes/smoothness/ui.all.css" rel="stylesheet" />
-    <script type="text/javascript" src="javascripts/jquery-1.4.4.min.js"></script>
-    <script type="text/javascript" src="javascripts/jquery-ui-1.8.6.custom.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery-ui-1.8.11.custom.min.js"></script>
     <script type="text/javascript">
       jQuery(document).ready(function(){
         jQuery("#tabs-top").tabs();
