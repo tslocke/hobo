@@ -10,7 +10,7 @@ UI](http://jqueryui.com) widgets.
 
 Install with
 
-    ruby script/plugin install git://github.com/bryanlarsen/hobo-jquery.git
+    rails plugin install git://github.com/bryanlarsen/hobo-jquery.git
 
 Link jQuery, jQuery-UI, and hobo-jQuery assets into your public directory:
 
@@ -31,10 +31,6 @@ To use, you need to include hobo-jquery and add the assets to your page.  In you
       </old-page>
     </extend>
 
-To install local documentation:
-
-    git submodule update --init
-
 ## Notes
 
 Hobo Jquery calls
@@ -43,7 +39,5 @@ to avoid conflicts with prototype.  `$` is still bound to
 prototype.js.  To use jQuery, use `jQuery` instead of `$`.
 
 ## Documentation
-
-[Auto generated documentation on GitHub](http://bryanlarsen.github.com/hobo-jquery/documentation.html).
 
 [Auto generated documentation on HoboCentral](http://cookbook.hobocentral.net/api_taglibs/hobo-jquery).
