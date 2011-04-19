@@ -411,6 +411,10 @@ or
 
 Because Ruby Hash's do not preserve order, you may use a list of pairs instead of a Hash.
 
+JQuery UI is sometimes picky about types.   For instance, the width option must be a number, not a string.  By default Hobo options are strings, but you can easily send a number by using the ampersand to switch to ruby mode:
+
+    <hjq-dialog width="&640"/>
+
 The following functions are predefined for use in dialog buttons:
 
  * `hjq.dialog.close`:  close the dialog box
