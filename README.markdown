@@ -24,7 +24,15 @@ Install the javascript and css files with
 
 To use, you need to include hobo-jquery and add the assets to your page.  In your application.dryml:
 
-    <include src="hobo-jquery" plugin="hobo-jquery" />
+if you installed it as a plugin:
+
+    <include plugin="hobo-jquery" />
+
+if you installed it as a gem:
+
+    <include gem="hobo-jquery" />
+
+in both cases you must add also:
 
     <extend tag="page">
       <old-page merge>
@@ -37,7 +45,7 @@ To use, you need to include hobo-jquery and add the assets to your page.  In you
 ## Notes
 
 Hobo Jquery calls
-[jQuery.noConflict()](http://docs.jquery.com/Core/jQuery.noConflict) 
+[jQuery.noConflict()](http://docs.jquery.com/Core/jQuery.noConflict)
 to avoid conflicts with prototype.  `$` is still bound to
 prototype.js.  To use jQuery, use `jQuery` instead of `$`.
 
