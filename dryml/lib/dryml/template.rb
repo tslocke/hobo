@@ -190,7 +190,7 @@ module Dryml
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       options = {}
-      %w(src module plugin as).each do |attr|
+      %w(src module plugin gem as).each do |attr|
         options[attr.to_sym] = el.attributes[attr] if el.attributes[attr]
       end
       @builder.add_build_instruction(:include, options)
