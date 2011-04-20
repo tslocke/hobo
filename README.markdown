@@ -12,12 +12,15 @@ Install with
 
     rails plugin install git://github.com/bryanlarsen/hobo-jquery.git
 
-Link jQuery, jQuery-UI, and hobo-jQuery assets into your public directory:
+or add
 
-    rake hobo_jquery:link_jquery
-    rake hobo_jquery:link_assets
+    gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "rails3"
 
-If you're on Windows, you can use the install\_jquery and update\_assets tasks instead.
+to your Gemfile.
+
+Install the javascript and css files with
+
+    rails generate hobo_jquery:install
 
 To use, you need to include hobo-jquery and add the assets to your page.  In your application.dryml:
 
