@@ -332,13 +332,14 @@ module Dryml
 
 
     def with_form_context(form_this=this, form_field_path=[form_this.class.name.underscore])
+      ctx = [@_form_this, @_form_field_path, @_form_field_paths_by_object]
       @_form_this = form_this
       @_form_field_path = form_field_path
       @_form_field_paths_by_object = { form_this => form_field_path }
       res = scope.new_scope :in_form => true, :form_field_names => [] do
         yield
       end
-      @_form_this = @_form_field_path = @_form_field_paths_by_object = nil
+      @_form_this, @_form_field_path, @_form_field_paths_by_object = ctx
       res
     end
 
