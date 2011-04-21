@@ -571,17 +571,21 @@ HoboInputMany = {
 
   initialize: function(ev) {
       /* the second clause should be sufficient, but it isn't in IE7.  See bug 603  */
-      Element.select(ev.target, ".input-many-template input:hidden, .input-many-template select:hidden, .input-many-template textarea:hidden, .input-many-template button:hidden").each(function(input) {
-          if(!input.disabled) {
-              input.disabled = true;
-              input.addClassName("input_many_template_input");
-          }
+      Element.select(ev.target, ".input-many-template").each(function  (templ) {
+          templ.select("input:hidden,select:hidden,textarea:hidden,button:hidden").each(function(input) {
+              if(!input.disabled) {
+                  input.disabled = true;
+                  input.addClassName("input_many_template_input");
+              }
+          })
       });
 
       // disable all elements inside our template, and mark them so we can find them later.
-      Element.select(ev.target, ".input-many-template input:enabled, .input-many-template select:enabled, .input-many-template textarea:enabled, .input-many-template button:enabled").each(function(input) {
-          input.disabled = true;
-          input.addClassName("input_many_template_input");
+      Element.select(ev.target, ".input-many-template").each(function (templ) {
+          templ.select("input:enabled,select:enabled,textarea:enabled,button:enabled").each(function(input) {
+              input.disabled = true;
+              input.addClassName("input_many_template_input");
+          });
       });
 
       Element.select(ev.target, ".sortable-input-many").each(function(el) {
