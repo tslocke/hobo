@@ -73,6 +73,7 @@ module Hobo
           if arg.nil?
             @sortable ||= defined?(ActiveRecord::Acts::List::InstanceMethods) &&
                           model < ActiveRecord::Acts::List::InstanceMethods &&
+                          model.table_exists? &&
                           model.new.try.scope_condition == "1 = 1"
           else
             @sortable = arg
