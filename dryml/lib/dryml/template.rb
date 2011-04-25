@@ -398,16 +398,18 @@ module Dryml
         "<% output_buffer; end"
     end
 
+    require 'json'
 
     def wrap_source_with_metadata(content, kind, name, *args)
       if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
         content
       else
         metadata = [kind, name] + args + [@template_path]
-        "<!--[DRYML|#{metadata * '|'}[-->" + content + "<!--]DRYML]-->"
+        "<% safe_concat(%(<!--[DRYML|#{metadata * '|'}[-->)) %>" +
+        content +
+        "<% safe_concat(%(<!--]DRYML]-->)) %>"
       end
     end
-
 
     def wrap_tag_method_body_with_metadata(content)
       name   = @def_element.attributes['tag']
@@ -1026,10 +1028,8 @@ module Dryml
     end
 
     def include_source_metadata
-      # disabled for now -- we're still getting broken rendering with this feature on
-      return false
       @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
-      @include_source_metadata
+      @include_source_metadata = true
     end
 
   end
