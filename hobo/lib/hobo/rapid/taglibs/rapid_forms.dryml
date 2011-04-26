@@ -373,15 +373,27 @@ edit collections a `Category` model in your application:
 
 ### Attributes
 
- - order: The order of the year, month and day menus. A comma separated string or an array. Default: "year, month, day"
- - date-separator, discard-type, prompt and prefix are passed to the select_date helper as options
+ - all the options of select_date and date_select are passed to the select_date Rails
+ helper
 
 All the other attributes are passed to the `select_date` helper as the html-options hash.
 
 The menus default to the current date if the current value is nil.
 
+Examples:
+
+   - override the input for date tag in a form
+   <my-special-date-view:>
+      <input start-year="&1940" order="day,month,year" />
+   </my-special-date-view:>
+
+   - override the tag application-wide
+   <extend tag='input' for='date'>
+     <old-input merge order="day,month,year" start-year="&1940" />
+   </extend>
+
   -->
-<def tag="input" for="date" attrs="order, date-separator, discard-type, prompt, prefix">
+<def tag="input" for="date" attrs="use-month-numbers, use-short-month, add-month-numbers, use-month-names, date-separator, start-year, end-year, discard-day, discard-month, discard-year, order, include-blank, default, disabled, prompt, prefix">
   <% order = order.nil? ? [:year, :month, :day] : comma_split(order).*.to_sym -%>
   <%= select_date(this || current_time,
                   (all_attributes - attributes.keys).reverse_merge(:prefix => param_name_for_this).merge(:order => order),
