@@ -398,8 +398,6 @@ module Dryml
         "<% output_buffer; end"
     end
 
-    require 'json'
-
     def wrap_source_with_metadata(content, kind, name, *args)
       if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
         content
@@ -1029,7 +1027,7 @@ module Dryml
 
     def include_source_metadata
       @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
-      @include_source_metadata = true
+      @include_source_metadata
     end
 
   end
