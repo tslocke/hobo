@@ -751,8 +751,8 @@ module Dryml
     end
 
 
-    def param_proc(el, metadata_name_prefix)
-      metadata_name = "#{metadata_name_prefix}><#{el.name}"
+    def param_proc(el, metadata_name_suffix)
+      metadata_name = "#{el.name} < #{metadata_name_suffix}"
 
       nl = tag_newlines(el)
 
