@@ -159,24 +159,35 @@ Provides a short hand way of displaying images in public/images
 
 
 <!-- Renders some standard JavaScript code that various features of the Rapid library rely on. This tag would typicallu be called from your `<page>` tag. The default Rapid pages include this already. -->
-<def tag="hobo-rapid-javascripts"><%=
-   res = 'var hoboParts = {};'
-   # FIXME: This should interrogate the model-router - not the models
-   unless Hobo::Model.all_models.empty?
-     # Tell JS code how to pluralize names, unless they follow the simple rule
-     names = Hobo::Model.all_models.map do |m|
-                                          m = m.name.underscore
-                                          "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
-                                        end.compact
-     res << "var pluralisations = {#{names * ', '}}; "
-   end
-   base = [base_url, subsite].compact.join("/")
-   res << "urlBase = '#{base}'; hoboPagePath = '#{request.fullpath}'"
-   if protect_against_forgery?
-     res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
-   end
-   res
-%></def>
+<def tag="hobo-rapid-javascripts">
+  <script type="text/javascript" param="default"><%=
+     res = 'var hoboParts = {};'
+     # FIXME: This should interrogate the model-router - not the models
+     unless Hobo::Model.all_models.empty?
+       # Tell JS code how to pluralize names, unless they follow the simple rule
+       names = Hobo::Model.all_models.map do |m|
+                 m = m.name.underscore
+                 "#{m}: '#{m.pluralize}'" unless m.pluralize == m + 's'
+               end.compact
+       res << "var pluralisations = {#{names * ', '}}; "
+     end
+     base = [base_url, subsite].compact.join("/")
+     res << "urlBase = '#{base}'; hoboPagePath = '#{request.fullpath}'"
+     if protect_against_forgery?
+       res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
+     end
+     res
+  %></script>
+</def>
+
+
+<def tag="part-contexts-javascripts">
+  <% unless (storage = part_contexts_storage).blank? %>
+    <script type="text/javascript"><%=
+      storage
+    %></script>
+  <% end %>
+</def>
 
 <!-- Renders the name of the current context using a variety of methods.
 

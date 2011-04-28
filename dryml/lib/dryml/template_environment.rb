@@ -527,14 +527,6 @@ module Dryml
     end
 
 
-
-
-    def part_contexts_javascripts
-      storage = part_contexts_storage
-      storage.blank? ? "" : "<script type=\"text/javascript\">\n#{storage}</script>\n"
-    end
-
-
     def part_contexts_storage
       PartContext.client_side_storage(@_part_contexts, session)
     end
