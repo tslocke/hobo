@@ -1,0 +1,26 @@
+# Hobo application translation file for French.
+# Please, add the specific models and attributes for your application.
+
+# If you find any error, or if you have any more specific translation,
+# please post it to http://hobousers.googlegroups.com. Thank you!
+
+fr:
+ attributes:
+   created_at: Créé à
+   updated_at: Mis à jour à
+
+ activerecord:
+   models:
+     user:
+       one: Utilisateur
+       other: Utilisateurs
+   attributes:
+     user:
+       name: Nom
+       password: Mot de passe
+       current_password: Mot de passe actuel
+       password_confirmation: Confirmation du mot de passe
+       email_address: Adresse email
+   attribute_help:
+     user:
+       email_address: Nous ne transmettrons jamais votre adresse à des tiers

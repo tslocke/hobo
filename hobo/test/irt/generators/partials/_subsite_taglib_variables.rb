@@ -1,6 +1,6 @@
 tags = %(<!-- Tag definitions for the subs subsite -->
 
-<include src="rapid" plugin="hobo"/>
+<include src="rapid" gem="hobo"/>
 
 <include src="taglibs/auto/subs/rapid/cards"/>
 <include src="taglibs/auto/subs/rapid/pages"/>

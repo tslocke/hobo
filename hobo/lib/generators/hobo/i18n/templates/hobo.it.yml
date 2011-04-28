@@ -96,6 +96,7 @@ it:
       save: "Registra %{model}"
       cancel: "Annulla"
       edit: "Modifica %{model}"
+      edit_control: "Modifica"
       back: "Ritorna a"
       back_to_parent: "Ritorna a %{parent} %{name}"
       send: "Invia"

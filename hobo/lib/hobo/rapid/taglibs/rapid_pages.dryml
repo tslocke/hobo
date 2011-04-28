@@ -55,10 +55,10 @@ The easiest way to see what this tag does is to look at the source.
 
 <!-- Renderes dynamically generated JavaScript required by `hobo-rapid.js`, including the information required to perform automatic part updates -->
 <def tag="page-scripts">
-  <script type="text/javascript" param="default">
+  <do param="default">
     <hobo-rapid-javascripts/>
-    <part-contexts-storage/>
-  </script>
+    <part-contexts-javascripts/>
+  </do>
 </def>
 
 

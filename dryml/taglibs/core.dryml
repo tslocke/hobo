@@ -4,7 +4,9 @@
   It's the DRYML equivalent of Ruby's `send` method.
 -->
 <def tag="call-tag" attrs="tag">
-  <%= send(tag.gsub('-', '_'), attributes, parameters) %>
+  <%= Dryml.static_tags.include?(tag) ?
+      content_tag(tag, parameters.default, attributes) :
+      send(tag.gsub('-', '_'), attributes, parameters) %>
 </def>
 
 
@@ -21,7 +23,15 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
 -->
 <def tag="wrap" attrs="tag, when, parameter">
   <% parameter ||= :default %>
-  <%= when_ ? send(tag, attributes, { parameter.to_sym => parameters[:default] }) : parameters.default %>
+  <%= if when_
+        if Dryml.static_tags.include?(tag)
+          content_tag(tag, parameters.default, attributes)
+        else
+          send(tag.gsub('-', '_'), attributes, { parameter.to_sym => parameters[:default] })
+        end
+      else
+        parameters.default
+      end %>
 </def>
 
 

@@ -31,9 +31,9 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
              sort_url = url_for_page_path(params.merge(:sort => sort) - [:page])
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
 
-          <th param="#{scope.field-name}-heading">
+          <th param="#{scope.field_name}-heading">
             <a href="&sort_url" class="column-sort"
-               param="#{scope.field-name}-heading-link"><%= col_heading_name %></a>
+               param="#{scope.field_name}-heading-link"><%= col_heading_name %></a>
             <if test="&col == sort_field">
               <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
               <do param="down-arrow" if="&sort_direction == 'asc'">&darr;</do>

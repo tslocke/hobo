@@ -24,29 +24,40 @@
 
         private
 
-        def taglib_filename(options)
-          plugin = options[:plugin]
-          rails_root = Object.const_defined?(:Rails) ? Rails.root : "."
-          base = if plugin == "dryml"
-                   "#{Dryml.root}/taglibs"
-                 elsif plugin == "hobo"
-                   "#{Hobo.root}/lib/hobo/rapid/taglibs"
-                 elsif not plugin.blank?
-                   "#{rails_root}/vendor/plugins/#{plugin}/taglibs"
-                 elsif options[:src] =~ /\//
-                   "#{rails_root}/app/views"
-                 elsif options[:template_dir] =~ /^#{Hobo.root}/
-                   options[:template_dir]
-                 elsif options[:absolute_template_path]
-                    options[:absolute_template_path]
-                 else
-                   "#{rails_root}/#{options[:template_dir].gsub(/^\//, '')}" # remove leading / if there is one
-                 end
+        # Requirements for  hobo-plugin for loading a taglib when the plugin is loaded as a gem:
+        # - the plugin must define the <gem_name>.camelize.constantize.root() method
+        # - the root() method must return a Pathname object (like Hobo.root, Dryml.root, Rails.root, etc.)
+        # - the taglibs must be available in the 'taglibs' dir in the gem root
+        # You can include the taglib with <include gem='gem_name'/> if the taglib name has the same gem name.
+        # If the plugin defines different taglibs you must also specify the src attribute of the taglib that you want
+        # to include: <include gem='gem_name' src='taglib_name'/>'
 
-          src = options[:src] || plugin
-          filename = "#{base}/#{src}.dryml"
-          raise DrymlException, "No such taglib: #{base} #{options.inspect} #{filename}" unless File.exists?(filename)
-          filename
+        def taglib_filename(options)
+          plugin       = options[:plugin]
+          gem          = options[:gem]
+          app_root     = Object.const_defined?(:Rails) ? Rails.root : Pathname.new(File.expand_path('.'))
+          taglibs_path = case
+                         when plugin == 'dryml'
+                           Dryml.root.join 'taglibs'
+                         when plugin == 'hobo', gem == 'hobo'
+                           Hobo.root.join 'lib/hobo/rapid/taglibs'
+                         when !plugin.blank?
+                           app_root.join 'vendor/plugins', plugin, 'taglibs'
+                         when !gem.blank?
+                           gem.tr('-','_').camelize.constantize.root.join 'taglibs'
+                         when options[:src] =~ /\//
+                           app_root.join 'app/views'
+                         when options[:template_dir] =~ /^#{Hobo.root}/
+                           Pathname.new(options[:template_dir])
+                         when options[:absolute_template_path]
+                           Pathname.new(options[:absolute_template_path])
+                         else
+                           app_root.join options[:template_dir].gsub(/^\//, '') # remove leading / if there is one
+                         end
+          src          = options[:src] || gem || plugin
+          taglib_file  = taglibs_path.join "#{src}.dryml"
+          raise DrymlException, "No such taglib: #{src} #{options.inspect} #{taglib_file}" unless taglib_file.exist?
+          taglib_file.to_s
         end
 
       end
