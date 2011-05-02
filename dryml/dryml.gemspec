@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
 
+  s.extensions = 'ext/mkrf_conf.rb'
 end
