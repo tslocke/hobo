@@ -378,13 +378,37 @@ Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` 
 <def tag="formlet-submit" attrs="label, image, method">
   <% label ||= 'submit' %>
   <if test='&image'>
-    <input class='image-button formlet-submit-button' type='image' src='&image' merge-attrs />
+    <input class='image-button formlet-submit-button' type='image' src='&image' onClick='hjq.formlet.submit.call(this)' merge-attrs />
   </if>
   <else>
     <input class='button formlet-submit-button' type='button' value='#{label}' onClick='hjq.formlet.submit.call(this)' merge-attrs />
   </else>
 </def>
 
+<!--
+Submit button for use with the `<form>`.  This uses hjq.form.submit to
+submit the form via jquery form plugin ajax, rather than using the
+standard HTTP or Hobo form submission mechanisms.  The main advantage
+this has is that the jquery form plugin supports ajax submission of
+attachments.
+
+You must have the jquery form plugin installed.  It is not installed
+automatically by hobo-jquery.
+
+FIXME: this function HARD CODES it's ajax options, in particular
+update="attachments-div".  It does not (yet) get the parameters from
+the form, nor does it get them through the standard hobo-jquery
+mechanism.   update in hobo-jquery.js.
+-->
+<def tag="hjq-submit" attrs="label, image, method">
+  <% label ||= 'submit' %>
+  <if test='&image'>
+    <input class='image-button hjq-form-submit-button' type='image' src='&image' onClick='hjq.form.submit.call(this)' merge-attrs />
+  </if>
+  <else>
+    <input class='button hjq-form-submit-button' type='button' value='#{label}' onClick='hjq.form.submit.call(this)' merge-attrs />
+  </else>
+</def>
 
 <!--
 The JQuery UI [dialog](http://jqueryui.com/demos/dialog/).  All options and methods are supported.

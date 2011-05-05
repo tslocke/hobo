@@ -294,6 +294,53 @@ var hjq = (function() {
 
         },
 
+        form: {
+            /* this function uses the jquery form plugin to submit the
+            form via jquery form plugin ajax, rather than using the
+            standard HTTP or Hobo form submission mechanisms.  The
+            main advantage this has is that the jquery form plugin
+            supports ajax submission of attachments.
+
+            You must have the jquery form plugin installed.   It is
+            not installed automatically by hobo-jquery.
+
+            FIXME:  this function HARD CODES it's ajax options, in
+            particular update="attachments-div".  It does not (yet)
+            get the parameters from the form, nor does it get them
+            through the standard hobo-jquery mechanism.
+            */
+          submit: function() {
+            var attrs = {
+              update: ['attachments-div']
+            };
+            var options = {
+              complete: Hobo.hideSpinner,
+              data: {},
+              dataType: 'script',
+              beforeSend: function(xhr) { xhr.setRequestHeader("Accept", "text/javascript"); }
+            };
+            var form = jQuery(this).closest("form");
+
+            for(i=0; i<attrs.update.length; i++) {
+              var id = attrs.update[i];
+              if(id=="self") {
+                for(var el=jQuery(this); el.length && !hoboParts[el.attr("id")]; el=el.parent());
+                id = ( el.length ? el.attr("id") : undefined) ;
+              }
+              if(id) {
+                options.data["render["+i+"][part_context]"] = hoboParts[id];
+                options.data["render["+i+"][id]"] = id;
+              }
+            }
+
+            Hobo.showSpinner(attrs.message || "Saving...", attrs.spinner_next_to);
+            form.ajaxSubmit(options);
+
+            //prevent bubbling
+            return false;
+          }
+        },
+
         formlet: {
             // call with this==the formlet or a child of the formlet to submit the formlet
             submit: function(extra_callbacks, extra_options) {
