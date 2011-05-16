@@ -1,0 +1,5 @@
+Description:
+
+    This generator copies the files `application.dryml`,
+    `application.css`, `dryml-support.js`,
+    `config/initializers/dryml_taglibs.rb`, `app/models/guest.rb`.
