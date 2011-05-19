@@ -10,7 +10,7 @@ UI](http://jqueryui.com) widgets.
 
 Install with
 
-    rails plugin install git://github.com/bryanlarsen/hobo-jquery.git
+    rails plugin install git://github.com/bryanlarsen/hobo-jquery.git -r rails3
 
 or add
 
