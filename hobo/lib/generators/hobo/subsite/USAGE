@@ -9,15 +9,16 @@ Description:
 
     The subsite will use app/views/taglibs/<subsite_name>_site.dryml
     as well as app/views/taglibs/application.dryml.  This allows you
-    to easily set different themes and choose different CSS files for
-    the subsite.  The remaining views of your application that are not
-    under a subsite load both application.dryml and front_site.dryml.
+    to customize the look and feel of a portion of your site.  The
+    remaining views of your application that are not under a subsite
+    load both application.dryml and front_site.dryml.
 
     It is thus recommended that you ensure that
     <subsite_name>_site.dryml and application.dryml do not repeat
     code, such as the inclusion of rapid or the setting of the theme.
     One easy way of ensuring this is to use the --make-front-site
-    option.
+    option.  If you have already accounted for this, use
+    --make-front-site=false.
 
     The difference between hobo:admin_site and hobo:subsite is that
     hobo:admin_site limits the subsite to use by administrators only.
