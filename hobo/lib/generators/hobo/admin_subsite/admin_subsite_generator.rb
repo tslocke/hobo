@@ -5,7 +5,6 @@ module Hobo
     # overrides the default
     argument :name, :type => :string, :default => 'admin', :optional => true
 
-    include Generators::Hobo::Subsite
     include Generators::Hobo::InviteOnly
     include Generators::HoboSupport::EvalTemplate
 
@@ -30,6 +29,8 @@ module Hobo
       destination = File.join(Rails.root, "app/views/taglibs/application.dryml")
       append_file(destination) { eval_template('admin_tag_injection.erb') }
     end
+
+    include Generators::Hobo::Subsite
 
   end
 end

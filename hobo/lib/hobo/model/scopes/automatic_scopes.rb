@@ -288,8 +288,6 @@ module Hobo
             end
 
           when name == "order_by"
-            # DEPRECATED: use :order instead.
-            Rails.logger.warn "Automatic scope :order_by has been deprecated: use :order instead."
             return true if check_only
 
             klass = @klass

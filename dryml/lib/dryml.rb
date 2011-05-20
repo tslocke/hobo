@@ -6,6 +6,7 @@
 
 require 'hobo_support'
 require 'action_pack'
+require 'openssl'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
 

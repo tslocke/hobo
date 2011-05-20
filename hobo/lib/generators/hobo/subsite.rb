@@ -1,4 +1,14 @@
 require 'fileutils'
+require 'thor/parser/option'
+
+# we want the option :make_front_site required even if it is boolean
+# Thor does not allow it, so we patch it
+class  Thor
+  class Option
+    def validate!; end
+  end
+end
+
 module Generators
   module Hobo
     Subsite = classy_module do
@@ -7,8 +17,9 @@ module Generators
       include Generators::Hobo::Taglib
 
       class_option :make_front_site,
-                 :type => :boolean,
-                 :desc => "Rename application.dryml to front_site.dryml"
+                   :type => :boolean,
+                   :required => true,
+                   :desc => "Rename application.dryml to front_site.dryml"
 
       # check_class_collision :suffix => 'SiteController'
 

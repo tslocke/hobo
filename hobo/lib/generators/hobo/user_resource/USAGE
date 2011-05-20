@@ -1,0 +1,10 @@
+Description:
+
+    This generator invokes the user_model, user_mailer and
+    user_controller generators.  It is invoked by the setup_wizard
+    generator.
+
+Usage:
+
+    rails generate hobo:user_resource [NAME=user] [options]
+
