@@ -49,7 +49,8 @@ module Hobo
 
           attr_protected *AUTHENTICATION_FIELDS
 
-
+          # Scope to retrieve all administrators
+          scope :administrators, :conditions => {:administrator => true}
         end
       end
 
