@@ -383,14 +383,16 @@ The menus default to the current date if the current value is nil.
 Examples:
 
    - override the input for date tag in a form
-   <my-special-date-view:>
-      <input start-year="&1940" order="day,month,year" />
-   </my-special-date-view:>
+
+     <my-special-date-view:>
+        <input start-year="&1940" order="day,month,year" />
+     </my-special-date-view:>
 
    - override the tag application-wide
-   <extend tag='input' for='date'>
-     <old-input merge order="day,month,year" start-year="&1940" />
-   </extend>
+
+     <extend tag='input' for='date'>
+       <old-input merge order="day,month,year" start-year="&1940" />
+     </extend>
 
   -->
 <def tag="input" for="date" attrs="use-month-numbers, use-short-month, add-month-numbers, use-month-names, date-separator, start-year, end-year, discard-day, discard-month, discard-year, order, include-blank, default, disabled, prompt, prefix">

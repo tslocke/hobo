@@ -177,55 +177,58 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 
 ### I18n
 
-It lookups the options attributes in "activerecord.attributes.#{model}.filter_menu.#{param\_name}.options"
-with fallback to "filter_menu.#{param_name}.options".
+It lookups the options attributes in `activerecord.attributes.#{model}.filter_menu.#{param\_name}.options`
+with fallback to `filter_menu.#{param_name}.options`.
 The passed options are used as a default in case the lookup fails.
-Besides the "activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter" or
-"tags.filter_menu.default.no_filter" key is used as default of the attribute "no-filter"
+Besides the `activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter` or
+`tags.filter_menu.default.no_filter` key is used as default of the attribute "no-filter"
 (or "All" if no default is found)
 
 ### I18n Example
 
 
-  es:
-    activerecord:
-      attributes:
-        <model_name>:
-          filter_menu:
-            period:
-              no_filter: Todos Períodos
-              options:
-              - [ "Hoy", "today" ]
-              - [ "Ayer", "yesterday" ]
+    es:
+      activerecord:
+        attributes:
+          <model_name>:
+            filter_menu:
+              period:
+                no_filter: Todos Períodos
+                options:
+                - [ "Hoy", "today" ]
+                - [ "Ayer", "yesterday" ]
 
 or
 
-  es:
-    tags:
-      filter_menu:
-        period:
-          no_filter: Todos Períodos
-          options:
-          - [ "Hoy", "today" ]
-          - [ "Ayer", "yesterday" ]
+    es:
+      tags:
+        filter_menu:
+          period:
+            no_filter: Todos Períodos
+            options:
+            - [ "Hoy", "today" ]
+            - [ "Ayer", "yesterday" ]
 
-   TIME_PERIODS = %w[today yesterday]
 
-   <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+     TIME_PERIODS = %w[today yesterday]
 
-   with I18n.locale == :es
-   <select name="period">
-     <option value="">Todos Períodos</option>
-     <option value="today">Hoy</option>
-     <option value="yesterday">Ayer</option>
-   </select>
+     <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
 
-   with I18n.locale == :en (i.e no locale file)
-   <select name="period">
-     <option value="">All Periods</option>
-     <option value="today">today</option>
-     <option value="yesterday">yesterday</option>
-   </select>
+  with I18n.locale == :es
+
+     <select name="period">
+       <option value="">Todos Períodos</option>
+       <option value="today">Hoy</option>
+       <option value="yesterday">Ayer</option>
+     </select>
+
+  with I18n.locale == :en (i.e no locale file)
+
+     <select name="period">
+       <option value="">All Periods</option>
+       <option value="today">today</option>
+       <option value="yesterday">yesterday</option>
+     </select>
 
   -->
 <def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
