@@ -10,12 +10,14 @@ HoboSupport is a mixed bag of core ruby extensions that have been extracted from
 
 ## Contents
 
+ * [Chronic](/manual/hobo_support/chronic)
  * [Enumerable](/manual/hobo_support/enumerable)
  * [Hash](/manual/hobo_support/hash)
  * [Implies](/manual/hobo_support/implies)
  * [Metaid](/manual/hobo_support/metaid)
  * [Methodphitamine](/manual/hobo_support/methodphitamine)
  * [Module](/manual/hobo_support/module)
+ * [XSS](/manual/hobo_support/xss)
 
 ## Object extensions
 
