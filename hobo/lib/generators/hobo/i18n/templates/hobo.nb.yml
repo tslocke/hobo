@@ -1,0 +1,198 @@
+# Hobo internals translation file for Norwegian
+# Translated by Ronny Hanssen (super.ronny@gmail.com)
+# If you find an error or if you have suggestions on improvements, please post it to http://hobousers.googlegroups.com.
+
+nb:
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dynamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Index"
+      heading: "%{model}liste"
+
+    new:
+      title: "Ny %{model}"
+      heading: "Ny %{model}"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Tilbake"
+      edit_link: "Endre %{model}"
+      new_link: "Ny %{model}"
+      add_form_heading: "Legg til %{model}"
+
+    edit:
+      title: "Endre %{model}"
+      heading: "Endre %{model}"
+
+    index_for_owner:
+      title: "%{model} for"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "For:"
+
+    new_for_owner:
+      title: "Ny %{model} for"
+      heading: "Ny %{model}"
+      subheading: "For:"
+
+    login:
+      title: "Logg på"
+      heading: "Logg på"
+      email_address: &email_address "E-post adresse"
+      name: "Navn"
+      password: "Passord"
+      remember_me: "Husk meg"
+      login: "Logg på"
+      signup: "Opprett konto"
+      forgot_password: &forgot_password "Glemt passordet?"
+
+    signup:
+      title: "Opprett Konto"
+      heading: "Opprett Konto"
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Skriv inn epost-adressen du brukte når du registrerte deg.
+             Vi sender deg en epost som du kan bruke for å generere et nytt passord."
+      email_address: *email_address
+      send: "Send"
+
+    forgot_password_sent:
+      title: "Gjenopprettelse av passord - Epost sendt."
+      heading: "Gjenopprettelse av passord - Epost sendt."
+      text: "En epost med instruksjoner om hvordan du kan opprette nytt passsord har blitt sendt til %{email_address}. Hvis du ikke mottar denne mailen så vennligst sjekk søppelpostfilter o.l."
+
+    account_disabled_page:
+      title: "Konto inaktiv"
+      heading: "Konto inaktiv"
+      text: "Kontoen din er inaktiv for øyeblikket."
+
+    account_page:
+      title: "Din Konto"
+      heading: "Din Konto"
+      new_password: "Nytt passord"
+      confirm_new_password: "Bekreft nytt passord"
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "Ny %{model}"
+      create: "Opprett %{model}"
+      previous: "Forrige"
+      next: "Neste"
+      add: "Legg til"
+      show_all: "Vis alle %{model}..."
+      delete: "Slett %{model}"
+      save: "Lagre %{model}"
+      cancel: "Avbryt"
+      edit: "Endre %{model}"
+      edit_control: "Endre"
+      back: "Tilbake til"
+      back_to_parent: "Tilbake til %{parent} %{name}"
+      send: "Send"
+      remove: "Fjern"
+      signup: "Opprett konto"
+      login: "Logg på"
+      logout: "Logg av"
+      logged_in_as: "Logget på som %{name}"
+      account: "Konto"
+      save_account: "Lagre Dine Innstillinger"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "%{model} ble opprettet"
+        error: "Klarte ikke å opprette %{model}.\n%{errors}"
+      creator:
+        error: "Kunne ikke utføre oppretteren; %{name}.\n%{errors}"
+      transition:
+        error: "Kunne ikke utføre transisjonen; %{name}.\n%{errors}"
+      update:
+        no_attribute_error: "Ingen oppdatering spesifisert i 'params'"
+        success: "Endringene for %{model} ble lagret"
+        error: "Det oppsto et problem med å gjennomføre denne endringen.\n%{errors}"
+      destroy:
+        success: "%{model} ble slettet"
+      signup:
+        success: "Takk for at du opprettet en konto!"
+        must_activate: "Du må aktivere kontoen din før du kan logge på. Vennligst sjekk eposten din."
+      login:
+        success: "Du er nå logget på."
+        error: "Du oppga ikke et gyldig %{login} og passord!"
+      logout: "Du er nå logget av."
+      reset_password: "Passordet ditt har blitt tilbakestilt."
+      permission_denied: "Ingen Tilgang"
+      not_found: "Finner ikke siden du ba om."
+      unauthenticated: "Kunne ikke autentisere deg"
+      validate_password: "må være minst 6 tegn langt og kan ikke være bare små bokstaver"
+      current_password_is_not_correct: "er ikke riktig"
+      you_are_site_admin: "Du har nå admininstrator-rettigheter for dette webstedet"
+      you_signed_up: "Du har opprettet konto"
+      none: "Ingen %{model} tilgjengelig."
+      confirm: "Er du sikker?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: "Ingen %{model}"
+        one: "Viser %{count} %{model}"
+        other: "Viser %{count} %{model}"
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "Legg til %{model}"
+      empty_message: "Ingen poster å vise"
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "Ny %{model}"
+      error:
+        heading: "Følgende feil oppstod:"
+      select_many:
+            prompt: "Legg til %{model}"
+
+    # hobo support
+    support:
+      or: "eller"
+      a: "en"
+      an: "en"
+
+    table_plus:
+      search: "Søk"
+      submit_label: "Søk"
+
+    live_search:
+      label: "Søk"
+      results_label: "Søkeresultater"
+      close_button: "lukk"
+      no_results: "Ingen resultater for søket ditt."
+
+    dev_user_changer:
+      guest: "Gjest"
+
+    admin:
+      subsite_name: "Admin"
+      invite_new_user: "Invitér en ny bruker"
+
+    subsite:
+      back_link: "Tlbake til nettstedet"
+
+    boolean_yes: "Ja"
+    boolean_no: "Nei"
+    password_hidden: "[passordet er skjult]"
+
+    in_place_editor:
+      click_to_edit: "(klikk her for å endre)"
+
+    select_one_editor:
+      blank_message: *no_model
