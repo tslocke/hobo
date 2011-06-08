@@ -34,7 +34,7 @@ module Generators
             routes << link("put '#{records}/:id/#{transition}(.:format)' => '#{records}#do_#{transition}', :as => 'do_#{record}_#{transition}'", transition, :put)
             routes << link("get '#{records}/:id/#{transition}(.:format)' => '#{records}##{transition}', :as => '#{record}_#{transition}'", transition)
           end
-          routes.compact
+          routes.compact.uniq
         end
 
         def resource_routes
