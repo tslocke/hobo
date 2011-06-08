@@ -144,7 +144,7 @@ module Dryml
 
       id = if (typed_id = object.try.typed_id)
              typed_id
-           elsif object == @this
+           elsif object == this
              "this"
            end
       attribute ? "#{id}:#{attribute}" : id
@@ -162,7 +162,7 @@ module Dryml
 
 
     def refresh_part(encoded_context, session, dom_id)
-      context = Dryml::PartContext.for_refresh(encoded_context, @this, session)
+      context = Dryml::PartContext.for_refresh(encoded_context, this, session)
 
       with_part_context(context) do
         send("#{context.part_name}_part", *context.locals)
@@ -332,13 +332,14 @@ module Dryml
 
 
     def with_form_context(form_this=this, form_field_path=[form_this.class.name.underscore])
+      ctx = [@_form_this, @_form_field_path, @_form_field_paths_by_object]
       @_form_this = form_this
       @_form_field_path = form_field_path
       @_form_field_paths_by_object = { form_this => form_field_path }
       res = scope.new_scope :in_form => true, :form_field_names => [] do
         yield
       end
-      @_form_this = @_form_field_path = @_form_field_paths_by_object = nil
+      @_form_this, @_form_field_path, @_form_field_paths_by_object = ctx
       res
     end
 
@@ -523,14 +524,6 @@ module Dryml
       to_merge.each { |k| result[k] = merge_tag_parameter(given_parameters[k], overriding_parameters[k])}
 
       result
-    end
-
-
-
-
-    def part_contexts_javascripts
-      storage = part_contexts_storage
-      storage.blank? ? "" : "<script type=\"text/javascript\">\n#{storage}</script>\n"
     end
 
 

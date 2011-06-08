@@ -69,7 +69,7 @@ Dev Notes:
                            when /^--skip-wizard|--skip-setup$/
                              ARGV.shift
                              :skip
-                           when /^--setup$/
+                           when /^--setup|--default$/
                              ARGV.shift
                              :setup
                            when /^--wizard$/

@@ -97,6 +97,7 @@ de:
       save: "%{model} speichern"
       cancel: "Abbrechen"
       edit: "%{model} bearbeiten"
+      edit_control: "Bearbeiten"
       back: "Zurück zu"
       back_to_parent: "Zurück zu %{parent} %{name}"
       send: "Abschicken"

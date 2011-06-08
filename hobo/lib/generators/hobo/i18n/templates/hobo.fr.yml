@@ -1,0 +1,195 @@
+# Hobo internals translation file for French
+fr:
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dynamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Index"
+      heading: "Index des %{model}"
+
+    new:
+      title: "Ajout de %{model}"
+      heading: "Ajout de %{model}"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Retour"
+      edit_link: "Editer %{model}"
+      new_link: "Ajout de %{model}"
+      add_form_heading: "Ajout de %{model}"
+
+    edit:
+      title: "Edition de %{model}"
+      heading: "Edition de %{model}"
+
+    index_for_owner:
+      title: "%{model} pour"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "Pour:"
+
+    new_for_owner:
+      title: "Ajout de %{model} pour"
+      heading: "Ajout de %{model}"
+      subheading: "Pour:"
+
+    login:
+      title: "Login"
+      heading: "Login"
+      email_address: &email_address "Email"
+      name: "Nom"
+      password: "Mot de passe"
+      remember_me: "Mémoriser"
+      login: "Login"
+      signup: "Inscription"
+      forgot_password: &forgot_password "Mot de passe oublié?"
+
+    signup:
+      title: "Inscription"
+      heading: "Inscription d'un nouvel utilisateur"
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Veuillez saisir l'adresse email que vous avez utilisée lors de votre inscription.
+            Nous vous enverrons un email vous permettant de générer un nouveau mot de passe."
+      email_address: *email_address
+      send: "Envoyer"
+
+    forgot_password_sent:
+      title: "Mot de passe oublié - Email envoyé"
+      heading: "Mot de passe oublié - Email envoyé"
+      text: "Un email contenant les instructions nécessaires pour générer un nouveau mot de passe ont été envoyées à %{email_address}. Si vous ne recevez pas cet email, merci de bien vouloir vérfier vos spams."
+
+    account_disabled_page:
+      title: "Compte désactivé"
+      heading: "Compte désactivé"
+      text: "Votre compte est actuellement désactivé."
+
+    account_page:
+      title: "Votre compte"
+      heading: "Votre compte"
+      new_password: "Nouveau mot de passe"
+      confirm_new_password: "Confirmer le mot de passe"
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "Ajout de %{model}"
+      create: "Creation de %{model}"
+      previous: "Précédent"
+      next: "Suivant"
+      add: "Ajouter"
+      show_all: "Lister tous les %{model}..."
+      delete: "Effacement de %{model}"
+      save: "Sauvegarde de %{model}"
+      cancel: "Annuler"
+      edit: "Edition de %{model}"
+      edit_control: "Editer"
+      back: "Retour à"
+      back_to_parent: "Retour à %{parent} %{name}"
+      send: "Envoyer"
+      remove: "Effacer"
+      signup: "Inscription"
+      login: "Login"
+      logout: "Quitter"
+      logged_in_as: "%{name}"
+      account: "Compte"
+      save_account: "Sauvegarder vos données"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "La création de %{model} a été réalisée avec succès"
+        error: "Echec de la création de %{model}.\n%{errors}"
+      creator:
+        error: "Le createur %{name} a échoué.\n%{errors}"
+      transition:
+        error: "La transition %{name} a échoué.\n%{errors}"
+      update:
+        no_attribute_error: "Pas de mise à jour spécifiée dans les paramètres"
+        success: "Les modifications de %{model} ont été sauvegardés"
+        error: "Problème avec la modification.\n%{errors}"
+      destroy:
+        success: "L'effacement de %{model} a été réalisé avec succès"
+      signup:
+        success: "Merci de votre inscription!"
+        must_activate: "Vous devez activer votre compte avant de pouvoir vous logger. L'activation devrait être dans vos emails."
+      login:
+        success: "Vous êtes loggé."
+        error: "Erreur de %{login} et de mot de passe!"
+      logout: "Vous avez quitté votre session."
+      reset_password: "Votre mot de passe a été réinitialisé."
+      permission_denied: "Accès refusé"
+      not_found: "Page non trouvée."
+      unauthenticated: "Echec de l'authentification"
+      validate_password: "doit être long d'au moins 6 caractères et ne peut contenir que des lettres minuscules"
+      current_password_is_not_correct: "n'est pas correct"
+      you_are_site_admin: "Vous êtes désormais administrateur du site"
+      you_signed_up: "Vous vous êtes inscrit"
+      none: "Pas de %{model} disponible."
+      confirm: "Etes-vous certain?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: &no_model "Pas de %{model}"
+        one: "Il y a 1 %{model}."
+        other: "Il y a %{count} %{model}."
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "Ajouter %{model}"
+      empty_message: "Aucun enregistrement à afficher"
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "Ajout de %{model}"
+      error:
+        heading: "L'erreur suivante s'est produite:"
+      select_many:
+        prompt: "Ajouter %{model}"
+
+    # hobo support
+    support:
+      or: "ou"
+      a: "un(e)"
+      an: "un(e)"
+
+    table_plus:
+      search: "Rechercher"
+      submit_label: "OK"
+
+    live_search:
+      label: "Rechercher"
+      results_label: "Résultats de recherche"
+      close_button: "fermer"
+      no_results: "Votre recherche n'a pas produit de résultat."
+
+    dev_user_changer:
+      guest: "Invité"
+
+    admin:
+      subsite_name: "Administration"
+      invite_new_user: "Inviter un nouvel utilisateur"
+
+    subsite:
+      back_link: "Retour au site"
+
+    boolean_yes: "Oui"
+    boolean_no: "Non"
+    password_hidden: "[mot de passe caché]"
+
+    in_place_editor:
+      click_to_edit: "(cliquez pour éditer)"
+
+    select_one_editor:
+      blank_message: *no_model

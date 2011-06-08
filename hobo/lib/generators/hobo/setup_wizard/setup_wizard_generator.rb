@@ -23,8 +23,14 @@ module Hobo
     class_option :front_controller_name, :type => :string,
     :desc => "Front Controller Name", :default => 'front'
 
+    class_option :add_admin_subsite, :type => :boolean,
+                 :desc => "Add an Admin Subsite"
+
     class_option :admin_subsite_name, :type => :string,
                  :desc => "Admin Subsite Name", :default => 'admin'
+
+    class_option :make_front_site, :type => :boolean,
+                 :desc => "Rename application.dryml to front_site.dryml", :default => 'true'
 
     class_option :private_site, :type => :boolean,
                  :desc => "Make the site unaccessible to non-members"
@@ -113,7 +119,8 @@ NOTE: You might want to sign up as the administrator before adding this!
       end
       inject_into_file 'app/controllers/application_controller.rb', <<EOI, :after => "protect_from_forgery\n" if private_site
   include Hobo::Controller::AuthenticationSupport
-  before_filter :except => [:login, :forgot_password, :accept_invitation, :do_accept_invitation, :reset_password] do
+  before_filter :except => [:login, :forgot_password, :accept_invitation, :do_accept_invitation, :reset_password,
+:do_reset_password] do
      login_required unless #{@user_resource_name.camelize}.count == 0
   end
 EOI
@@ -153,12 +160,17 @@ EOI
     end
 
     def admin_subsite
-      return unless @invite_only
       if wizard?
         say_title 'Admin Subsite'
-        @admin_subsite_name = ask("Choose a name for the admin subsite: [<enter>=admin|<custom_name>]", 'admin')
+        if @invite_only || (@add_admin_subsite = yes_no?("Do you want an admin subsite?"))
+          @admin_subsite_name = ask("Choose a name for the admin subsite: [<enter>=admin|<custom_name>]", 'admin')
+          @make_front_site    = yes_no?("Do you want to use a separate front_site.dryml?")
+        end
       else
-        @admin_subsite_name = options[:admin_subsite_name]
+        if @invite_only || (@add_admin_subsite = options[:add_admin_subsite])
+          @admin_subsite_name = options[:admin_subsite_name]
+          @make_front_site    = options[:make_front_site]
+        end
       end
     end
 
@@ -168,11 +180,13 @@ EOI
                                    :invite_only => @invite_only,
                                    :activation_email => @activation_email,
                                    :admin_subsite_name => @admin_subsite_name
-      return unless @invite_only
-      say "Installing admin subsite..."
-      invoke 'hobo:admin_subsite', [@admin_subsite_name],
-                                   :user_resource_name => @user_resource_name,
-                                   :invite_only => @invite_only
+      if @invite_only || @add_admin_subsite
+        say "Installing admin subsite..."
+        invoke 'hobo:admin_subsite', [@admin_subsite_name],
+                                     :user_resource_name => @user_resource_name,
+                                     :invite_only => @invite_only,
+                                     :make_front_site => @make_front_site
+      end
     end
 
     def generate_migration

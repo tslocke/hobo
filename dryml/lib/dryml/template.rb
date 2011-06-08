@@ -133,6 +133,7 @@ module Dryml
        when scriplet_rex
          t
        when /\S+/
+         t.gsub!(/(\(|\))/){"\\#{$1}"}
          "<% safe_concat %(#{t}) %>"
        else
          t
@@ -189,7 +190,7 @@ module Dryml
       require_toplevel(el)
       require_attribute(el, "as", /^#{DRYML_NAME}$/, true)
       options = {}
-      %w(src module plugin as).each do |attr|
+      %w(src module plugin gem as).each do |attr|
         options[attr.to_sym] = el.attributes[attr] if el.attributes[attr]
       end
       @builder.add_build_instruction(:include, options)
@@ -397,16 +398,16 @@ module Dryml
         "<% output_buffer; end"
     end
 
-
     def wrap_source_with_metadata(content, kind, name, *args)
       if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
         content
       else
         metadata = [kind, name] + args + [@template_path]
-        "<!--[DRYML|#{metadata * '|'}[-->" + content + "<!--]DRYML]-->"
+        "<% safe_concat(%(<!--[DRYML|#{metadata * '|'}[-->)) %>" +
+        content +
+        "<% safe_concat(%(<!--]DRYML]-->)) %>"
       end
     end
-
 
     def wrap_tag_method_body_with_metadata(content)
       name   = @def_element.attributes['tag']
@@ -549,7 +550,7 @@ module Dryml
         'this_type'
       elsif t =~ /^[A-Z]/
         t
-      elsif t =~ /^[a-z]/ && defined? HoboFields.to_class
+      elsif t =~ /^[a-z]/ && defined?(HoboFields.to_class)
         klass = HoboFields.to_class(t)
         klass.name
       elsif is_code_attribute?(t)
@@ -750,8 +751,8 @@ module Dryml
     end
 
 
-    def param_proc(el, metadata_name_prefix)
-      metadata_name = "#{metadata_name_prefix}><#{el.name}"
+    def param_proc(el, metadata_name_suffix)
+      metadata_name = "#{el.name} < #{metadata_name_suffix}"
 
       nl = tag_newlines(el)
 
@@ -1025,8 +1026,6 @@ module Dryml
     end
 
     def include_source_metadata
-      # disabled for now -- we're still getting broken rendering with this feature on
-      return false
       @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
       @include_source_metadata
     end

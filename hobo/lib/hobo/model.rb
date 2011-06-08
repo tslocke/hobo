@@ -60,8 +60,11 @@ module Hobo
 
         WillPaginate::Finders::Base.class_eval do
           def paginate_with_hobo_metadata(*args, &block)
+            klass = Object.instance_method(:class).bind(self).call
+            is_relation = klass <= ActiveRecord::Relation
+            is_association_proxy = klass <= ActiveRecord::Associations::AssociationProxy
             collection = paginate_without_hobo_metadata(*args, &block)
-            collection.member_class     = self.is_a?(ActiveRecord::Relation) ? member_class : self
+            collection.member_class     = (is_relation || is_association_proxy) ? member_class : self
             collection.origin           = try.proxy_owner
             collection.origin_attribute = try.proxy_reflection._?.name
             collection
@@ -357,7 +360,7 @@ module Hobo
 
 
     def to_url_path
-      "#{self.class.to_url_path}/#{to_param}" unless new_record?
+      "#{self.class.to_url_path}/#{to_param}"
     end
 
 

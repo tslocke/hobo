@@ -52,7 +52,7 @@ module Hobo
 
     private
 
-    def hobo_login(options={})
+    def hobo_login(options={}, &block)
       if logged_in?
         respond_to do |wants|
           wants.html { redirect_to home_page }
@@ -62,8 +62,7 @@ module Hobo
       end
 
       login_attr = model.human_attribute_name(model.login_attribute)
-      options.reverse_merge!(:success_notice => ht(:"#{model.to_s.underscore}.messages.login.success", :default=>["You have logged in."]),
-                             :failure_notice => ht(:"#{model.to_s.underscore}.messages.login.error", :login=>login_attr, :default=>["You did not provide a valid #{login_attr} and password."]))
+      options.reverse_merge!(:failure_notice => ht(:"#{model.to_s.underscore}.messages.login.error", :login=>login_attr, :default=>["You did not provide a valid #{login_attr} and password."]))
 
       if request.post?
         user = model.authenticate(params[:login], params[:password])
@@ -71,33 +70,7 @@ module Hobo
           flash[:error] = options[:failure_notice]
           hobo_ajax_response if request.xhr? && !performed?
         else
-          old_user = current_user
-          self.current_user = user
-
-          yield if block_given?
-
-          if !user.account_active?
-            # account not activate - cancel this login
-            self.current_user = old_user
-            unless performed?
-              respond_to do |wants|
-                wants.html {render :action => :account_disabled}
-                wants.js {hobo_ajax_response}
-              end
-            end
-          else
-            if params[:remember_me].present?
-              current_user.remember_me
-              create_auth_cookie
-            end
-            flash[:notice] ||= options[:success_notice]
-            unless performed?
-              respond_to do |wants|
-                wants.html {redirect_back_or_default(options[:redirect_to] || home_page) }
-                wants.js {hobo_ajax_response}
-              end
-            end
-          end
+          self.sign_user_in(user, options){ yield if block_given?}
         end
       end
     end
@@ -180,6 +153,44 @@ module Hobo
         cookies.delete :auth_token
         reset_session
         self.current_user = nil
+      end
+    end
+
+    protected
+    # If you are authenticating user on your own call this method -
+    # hobo will remember signed-in user this way. Arguments:
+    # user - user that you want to sign in
+    # options - hash with messages (:success_notice, :redirect_to)
+    # block - (optional) will be called after assigning current_user
+    def sign_user_in(user, options={}, &block)
+      options.reverse_merge!(:success_notice => ht(:"#{model.to_s.underscore}.messages.login.success", :default=>["You have logged in."]))
+
+      old_user = current_user
+      self.current_user = user
+
+      yield if block_given?
+
+      if !user.account_active?
+        # account not activate - cancel this login
+        self.current_user = old_user
+        unless performed?
+          respond_to do |wants|
+            wants.html {render :action => :account_disabled}
+            wants.js {hobo_ajax_response}
+          end
+        end
+      else
+        if params[:remember_me].present?
+          current_user.remember_me
+          create_auth_cookie
+        end
+        flash[:notice] ||= options[:success_notice]
+        unless performed?
+          respond_to do |wants|
+            wants.html {redirect_back_or_default(options[:redirect_to] || home_page) }
+            wants.js {hobo_ajax_response}
+          end
+        end
       end
     end
 

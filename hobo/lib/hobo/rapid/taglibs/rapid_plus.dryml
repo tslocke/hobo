@@ -31,9 +31,9 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
              sort_url = url_for_page_path(params.merge(:sort => sort) - [:page])
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
 
-          <th param="#{scope.field-name}-heading">
+          <th param="#{scope.field_name}-heading">
             <a href="&sort_url" class="column-sort"
-               param="#{scope.field-name}-heading-link"><%= col_heading_name %></a>
+               param="#{scope.field_name}-heading-link"><%= col_heading_name %></a>
             <if test="&col == sort_field">
               <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
               <do param="down-arrow" if="&sort_direction == 'asc'">&darr;</do>
@@ -171,49 +171,71 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
  - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
    It can be omitted if you provide the options as an array or array of arrays in the locale file.
  - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
- - `first-value` -the value to be used with the first option. Typically not used, meaning the option has a blank value.
+ - `first-value` - the value to be used with the first option. Typically not used,
+ meaning the option has a blank value.
+ - model - the model name (optional: needed if you use the "activerecord.attributes" namespace.
 
 ### I18n
 
-It lookups the options attributes in filter_menu.#{param_name}.options.
+It lookups the options attributes in `activerecord.attributes.#{model}.filter_menu.#{param\_name}.options`
+with fallback to `filter_menu.#{param_name}.options`.
 The passed options are used as a default in case the lookup fails.
-Besides the "tags.filter_menu.default.no_filter" key is used as default of the attribute "no-filter"
+Besides the `activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter` or
+`tags.filter_menu.default.no_filter` key is used as default of the attribute "no-filter"
 (or "All" if no default is found)
 
 ### I18n Example
 
-  es:
-    tags:
-      filter_menu:
-        period:
-          no_filter: Todos Períodos
-          options:
-          - [ "Hoy", "today" ]
-          - [ "Ayer", "yesterday" ]
 
-   TIME_PERIODS = %w[today yesterday]
+    es:
+      activerecord:
+        attributes:
+          <model_name>:
+            filter_menu:
+              period:
+                no_filter: Todos Períodos
+                options:
+                - [ "Hoy", "today" ]
+                - [ "Ayer", "yesterday" ]
 
-   <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+or
 
-   with I18n.locale == :es
-   <select name="period">
-     <option value="">Todos Períodos</option>
-     <option value="today">Hoy</option>
-     <option value="yesterday">Ayer</option>
-   </select>
+    es:
+      tags:
+        filter_menu:
+          period:
+            no_filter: Todos Períodos
+            options:
+            - [ "Hoy", "today" ]
+            - [ "Ayer", "yesterday" ]
 
-   with I18n.locale == :en (i.e no locale file)
-   <select name="period">
-     <option value="">All Periods</option>
-     <option value="today">today</option>
-     <option value="yesterday">yesterday</option>
-   </select>
+
+     TIME_PERIODS = %w[today yesterday]
+
+     <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+
+  with I18n.locale == :es
+
+     <select name="period">
+       <option value="">Todos Períodos</option>
+       <option value="today">Hoy</option>
+       <option value="yesterday">Ayer</option>
+     </select>
+
+  with I18n.locale == :en (i.e no locale file)
+
+     <select name="period">
+       <option value="">All Periods</option>
+       <option value="today">today</option>
+       <option value="yesterday">yesterday</option>
+     </select>
 
   -->
-<def tag="filter-menu" attrs="param-name, options, no-filter, id, first-value">
-  <% opt = t("tags.filter_menu.#{param_name}.options", :default=>'')
-     options = opt unless opt.blank?
-     no_filter = t("tags.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
+<def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
+  <% options = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.options", :default=>[:"tags.filter_menu.#{param_name}.options", options])
+     raise ArgumentError, %(You must provide an "options" attribute, or set "activerecord.attributes.#{model}.filter_menu.#{param_name}.options" or "tags.filter_menu.#{param_name}.options" to an Array or to an Array of Arrays
+     in your locale file(s)) unless options.is_a?(Array)
+     no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"]) %>
   <form action="&request.fullpath" method="get" class="filter-menu" merge-attrs="id">
     <div>
       <% opt = options.first.kind_of?(Array) ? options.*.last : options

@@ -19,8 +19,6 @@ module Hobo
           attr_accessor :acting_user, :origin, :origin_attribute
 
           bool_attr_accessor :exempt_from_edit_checks
-
-          define_callbacks :after_user_new
         end
       end
 
@@ -48,7 +46,7 @@ module Hobo
             r.set_creator user
             yield r if block_given?
             r.user_view(user)
-            r.with_acting_user(user) { r.send :run_callbacks, :after_user_new }
+            r.with_acting_user(user) { r.try.after_user_new }
           end
         end
 
@@ -163,6 +161,7 @@ module Hobo
 
 
       def with_acting_user(user)
+        return yield if user == acting_user
         old = acting_user
         self.acting_user = user
         result = yield

@@ -195,6 +195,7 @@ require 'fileutils'
           refl = model.reflections[collection]
           klass = refl.klass
           klass < ActiveRecord::Acts::List::InstanceMethods &&
+            klass.table_exists? &&
             klass.new.position_column == refl.options[:order].to_s
         end
       end
