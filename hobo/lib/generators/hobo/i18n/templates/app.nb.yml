@@ -1,7 +1,7 @@
 # Even if you only support one language, you can use this file to customise the names that appear in the UI
 # e.g.
 
-en:
+nb:
   hello: "Hei verden"
 
 #  attributes:
