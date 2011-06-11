@@ -103,10 +103,10 @@ module Hobo
         end
 
         def transition(name, change, options={}, &block)
-		  change.each do |k,v| 
-		    h = {k=>v}
-		    @lifecycle.def_transition(name, Array(h.keys.first), h.values.first, block, options)
-		  end 
+          change.each do |k,v|
+            h = {k=>v}
+            @lifecycle.def_transition(name, Array(h.keys.first), h.values.first, block, options)
+          end
         end
 
         def invariant(&block)
