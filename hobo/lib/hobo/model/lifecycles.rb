@@ -104,8 +104,7 @@ module Hobo
 
         def transition(name, change, options={}, &block)
           change.each do |k,v| 
-            h = {k=>v}
-            @lifecycle.def_transition(name, Array(h.keys.first), h.values.first, block, options)
+		    @lifecycle.def_transition(name, Array(k), v, block, options)
           end 
         end
 
