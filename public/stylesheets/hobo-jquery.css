@@ -8,3 +8,9 @@ ul.hjq-input-many .item {float:left;}
 ul.hjq-input-many div.buttons {float:left; margin-left:10px;}
 
 li.input-many-template { display:none; }
+
+.hjq-combobox .ui-button { margin-left: -1px; }
+.hjq-combobox .ui-button-icon-only .ui-button-text { padding: 0; }
+.hjq-combobox button.ui-button-icon-only { width: 20px; }
+.hjq-combobox .ui-autocomplete-input { margin-right: 0; }
+.hjq-combobox {white-space: nowrap;}

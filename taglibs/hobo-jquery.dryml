@@ -66,6 +66,7 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
 <def tag="hobo-jquery-assets">
   <stylesheet name='hobo-jquery.css' />
   <javascript name="hobo-jquery.js" />
+  <javascript name="event.simulate.js" />
   <script type="text/javascript">
     jQuery.noConflict();
     jQuery(document).ready(function() {
@@ -123,8 +124,8 @@ And add something like this to your controller:
 -->
 <def tag="hjq-autocomplete">
 <%
-  options, attrs = attributes.partition_hash(['disabled', 'delay', 'minLength', 'source'])
-  events, html_attrs = attrs.partition_hash(['search', 'open', 'focus', 'select', 'close', 'change'])
+  options, attrs = attributes.partition_hash(['disabled', 'appendTo', 'autoFocus', 'delay', 'minLength', 'position', 'source'])
+  events, html_attrs = attrs.partition_hash(['create', 'search', 'open', 'focus', 'select', 'close', 'change'])
   options["source"] ||= begin
                           complete_target = this_field_reflection.klass
                           complete_target.find(:all, :limit => 5000).*.send(complete_target.name_attribute)
@@ -138,6 +139,61 @@ And add something like this to your controller:
  %>
  <%= text_field_tag(name, this, html_attrs) %>
 
+</def>
+
+
+<!-- Creates an enhanced version of the [jQuery-UI demo combobox](http://jqueryui.com/demos/autocomplete/#combobox).  This will turn any select (even a select-many) into a combobox.
+
+NOTE:  backwards compatibility with the Hobo&Rails prototype/lowpro handlers requires event.simulate.js.   You may need to rerun your hobo_query:install generator to copy this file into your application.
+
+Standard usage:
+
+    <hjq-combobox>
+      <select .../>
+    </hjq-combobox>
+
+If you don't supply the select, it will use Hobo's `<input>` tag.  This is usually the right default.
+
+You can tell Hobo to always use a combobox for select-one, select-many, select-input and/or select-menu.
+
+    <extend tag="select-one">
+      <hjq-combobox tag="select-one">
+        <old-select-one merge/>
+      </hjq-combobox>
+    </extend>
+
+To make the behavior more like the demo's, turn off autoFill & clearButton:
+
+    <hjq-combobox autoFill="&false" clearButton="&false"/>
+
+Combobox is a new control that is built on autocomplete.   The autocomplete options may not be used directly.   If you need any of them let me know -- they shouldn't be too hard to add if you volunteer to test them.
+
+### Attributes
+
+- `autoFill` (default: true):  select first value rather than clearing if there's a match
+
+- `clearButton` (default: true): add a "clear" button
+
+- `adjustWidth` (default: true): if true, will set the autocomplete width the same as the old select.  (requires jQuery 1.4.4 to work on IE8)
+
+- uiStyle (default: false): if true, will add classes so that the autocomplete input takes a jQuery-UI style.  If false, the standard Hobo style is used.
+
+### Events
+
+- `selected` (default: `$(this).simulate('change');`):  this is a jQuery-UI event handler.  The default value for this option fires the `onchange` handler on the underlying `select` in a manner compatible with both prototype.js and jQuery.  For this to work, event.simulate.js must be loaded, and jQuery must be put into noConflict mode.  hobo-jquery should be doing both of these for you if you are using it as recommended in the README.
+
+-->
+
+<def tag="hjq-combobox" options="tag">
+<%
+  options, attrs = attributes.partition_hash(['autoFill', 'clearButton', 'adjustWidth', 'uiStyle'])
+  events, html_attrs = attrs.partition_hash(['selected'])
+%>
+  <annotate-tag tag="hjq-combobox" init="hjq.combobox.init" options="&options" events="&events"/>
+  <% tag ||= 'input' %>
+  <span class="hjq-combobox hjq-annotated" param="default">
+    <input merge param />
+  </span>
 </def>
 
 
