@@ -162,11 +162,11 @@ You can tell Hobo to always use a combobox for select-one, select-many, select-i
       </hjq-combobox>
     </extend>
 
-To make the behavior more like the demo's, turn off autoFill & clearButton:
+To make the behavior more like the demo's, turn off autoFill and clearButton:
 
     <hjq-combobox autoFill="&false" clearButton="&false"/>
 
-Combobox is a new control that is built on autocomplete.   The autocomplete options may not be used directly.   If you need any of them let me know -- they shouldn't be too hard to add if you volunteer to test them.
+Combobox is a new control that is built on autocomplete.   The autocomplete options may not be used directly.   If you need any of them let me know, they should not be too hard to add if you volunteer to test them.
 
 ### Attributes
 
