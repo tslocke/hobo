@@ -96,7 +96,7 @@ gem 'hobo', :path => '#{dev_root}/hobo'
               end
             else
               file.puts %(
-gem '#{gem}', '>= #{version}'
+gem '#{gem}', '= #{version}'
 )
             end
             if is_hobo
