@@ -550,7 +550,7 @@ Because the select-one is a part, it cannot be parameterized.  However, you can 
 <def tag="select-one-or-new-dialog">
   <% dialog_id="hjq-dialog-#{typed_id.gsub(':', '-')}" %>
   <% part_id = "select-one-#{typed_id.gsub(':', '-')}" %>
-  <input part="select-one-or-new-dialog-select" id="&part_id"/>
+  <input part="select-one-or-new-dialog-select" id="#{part_id}"/>
   <hjq-dialog-open-button dialog="##{dialog_id}" param>
     New <% this_field.humanize %>
   </hjq-dialog-open-button>
