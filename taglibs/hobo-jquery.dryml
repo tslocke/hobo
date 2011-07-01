@@ -154,7 +154,7 @@ Standard usage:
 
 If you don't supply the select, it will use Hobo's `<input>` tag.  This is usually the right default.
 
-You can tell Hobo to always use a combobox for select-one, select-many, select-input and/or select-menu.   Notice that we also changed the limit -- 100 is the default, which makes sense for a select, but not for a combobox.
+You can tell Hobo to always use a combobox for select-one, select-many, select-input and/or select-menu.   Notice that we also changed the limit - 100 is the default, which makes sense for a select, but not for a combobox.
 
     <extend tag="select-one">
       <hjq-combobox tag="select-one">
