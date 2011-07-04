@@ -144,7 +144,7 @@ module Dryml
 
       id = if (typed_id = object.try.typed_id)
              typed_id
-           elsif object == this
+           elsif object == @this
              "this"
            end
       attribute ? "#{id}:#{attribute}" : id
@@ -162,7 +162,7 @@ module Dryml
 
 
     def refresh_part(encoded_context, session, dom_id)
-      context = Dryml::PartContext.for_refresh(encoded_context, this, session)
+      context = Dryml::PartContext.for_refresh(encoded_context, @this, session)
 
       with_part_context(context) do
         send("#{context.part_name}_part", *context.locals)
