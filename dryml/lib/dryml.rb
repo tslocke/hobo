@@ -182,7 +182,7 @@ private
   def taglibs_for(controller_path)
     ( taglibs_in_dir('application').unshift(APPLICATION_TAGLIB) +
       subsite_taglibs(controller_path) +
-      (controller_path.camelize+"Controller").constantize.try.included_taglibs||[]
+      ((controller_path.camelize+"Controller").constantize.try.included_taglibs||[])
     ).compact
   end
 
