@@ -55,7 +55,12 @@ module HoboFields
       end
 
       def null
-        :null.in?(options) ? options[:null] : true
+        if Rails.application.config.hobo.null_false_by_default
+          return options[:null] if options.include? :null
+          return (not [:text, :string, :boolean].include? sql_type)
+        else
+          :null.in?(options) ? options[:null] : true
+        end
       end
 
       def default

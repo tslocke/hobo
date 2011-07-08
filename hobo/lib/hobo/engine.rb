@@ -16,6 +16,7 @@ module Hobo
       h.read_only_file_system = !!ENV['HEROKU_TYPE']
       h.show_translation_keys = false
       h.dryml_only_templates = false
+      h.null_false_by_default = false
     end
 
     ActiveSupport.on_load(:action_controller) do
