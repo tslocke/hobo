@@ -41,7 +41,7 @@ module Hobo
           Creator.new(self, name.to_s, on_create, options)
         end
 
-        def self.def_transition(name, start_state, end_states, on_transition, options)
+        def self.def_transition(name, start_states, end_state, on_transition, options)
           class_eval %{
                        def #{name}!(user, attributes=nil)
                          transition(:#{name}, user, attributes)
@@ -50,7 +50,7 @@ module Hobo
                          can_transition?(:#{name}, user)
                        end
                       }
-          Transition.new(self, name.to_s, start_state, end_states, on_transition, options)
+          Transition.new(self, name.to_s, start_states, end_state, on_transition, options)
         end
 
         def self.state_names
