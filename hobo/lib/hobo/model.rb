@@ -347,8 +347,8 @@ module Hobo
         view_hints.inline_booleans *args
       end
 
-      def table_exists?
-        @table_exists_cache = super if @table_exists_cache.nil?
+      def table_exists?(refresh = false)
+        @table_exists_cache = super() if (refresh or @table_exists_cache.nil?)
         @table_exists_cache
       end
 
