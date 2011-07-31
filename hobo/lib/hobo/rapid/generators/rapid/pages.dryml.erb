@@ -314,7 +314,7 @@ new_link = :new.in?(actions)
 
       <section param="content-body">
 <% if new_link -%>
-        <a action="new" to="&model" param="new-link">
+        <a action="new" to="&@<%= owner %>.<%= collection_name %>" param="new-link">
           <ht key="<%= model_key %>.actions.new" >New <%=model_name %></ht>
         </a>
 
