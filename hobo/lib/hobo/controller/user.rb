@@ -87,6 +87,9 @@ module Hobo
       do_creator_action(:signup) do
         if valid?
           flash[:notice] = ht(:"#{model.to_s.underscore}.messages.signup.success", :default=>["Thanks for signing up!"])
+        else
+          this.password = HoboFields::Types::PasswordString.new
+          this.password_confirmation = HoboFields::Types::PasswordString.new
         end
         response_block(&b) or if valid?
                                 self.current_user = this if this.account_active?
