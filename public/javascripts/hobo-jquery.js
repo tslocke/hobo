@@ -56,10 +56,10 @@ jQuery.fn.hjq_show = function(options, callback) {
 // Our monkey patches to Prototype
 
 // the Hobo part mechanism uses Element.update to do it's work
-Element.update = Element.update.hjq_chain(function(id, content) {
+Element.addMethods({update: Element.Methods.update.hjq_chain(function(id, content) {
     if(!id.nodeType) id="#"+id;  // assume it's a string
     hjq.initialize.apply(jQuery(id));
-});
+})});
 
 var hjq = (function() {
     return {
