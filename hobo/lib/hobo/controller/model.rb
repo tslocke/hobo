@@ -785,16 +785,16 @@ module Hobo
 
 
     def this
-      @this ||= (instance_variable_get("@#{model.name.underscore}") ||
-                 instance_variable_get("@#{model.name.underscore.pluralize}"))
+      @this ||= (instance_variable_get("@#{model.name.demodulize.underscore}") ||
+                 instance_variable_get("@#{model.name.demodulize.underscore.pluralize}"))
     end
 
 
     def this=(object)
-      ivar = if object.is_a?(Array)
-               (object.try.member_class || model).name.underscore.pluralize
+      ivar = if object.is_a?(Array) || object.respond_to?(:member_class)
+               (object.try.member_class || model).name.demodulize.underscore.pluralize
              else
-               object.class.name.underscore
+               object.class.name.demodulize.underscore
              end
       @this = instance_variable_set("@#{ivar}", object)
     end
