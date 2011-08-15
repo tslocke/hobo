@@ -570,7 +570,7 @@ var hjq = (function() {
                                 if(!self.options.autoFill || input.data("autocomplete").term=="") found=false;
                                 if(found) {
                                     suggestion = jQuery(input.data("autocomplete").widget()).find("li:first");
-                                    var option = select.find("option[text="+suggestion.text()+"]").attr('selected', true);
+                                    var option = select.find("option:contains('"+suggestion.text()+"')").attr('selected', true);
                                     $(this).val(suggestion.text());
 		        	    input.data("autocomplete").term = suggestion.text();
 		                    self._trigger( "selected", event, { item: option[0] });
