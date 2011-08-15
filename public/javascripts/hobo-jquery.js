@@ -569,13 +569,12 @@ var hjq = (function() {
                                 var suggestion;
                                 if(!self.options.autoFill || input.data("autocomplete").term=="") found=false;
                                 if(found) {
-                                    suggestion = jQuery(input.data("autocomplete").widget()).find("li:first")[0];
-                                    var option = select.find("option[text="+suggestion.innerText+"]").attr('selected', true);
-                                    $(this).val(suggestion.innerText);
-		        	    input.data("autocomplete").term = suggestion.innerText;
+                                    suggestion = jQuery(input.data("autocomplete").widget()).find("li:first");
+                                    var option = select.find("option[text="+suggestion.text()+"]").attr('selected', true);
+                                    $(this).val(suggestion.text());
+		        	    input.data("autocomplete").term = suggestion.text();
 		                    self._trigger( "selected", event, { item: option[0] });
                                 } else {
-                                    suggestion={innerText: ''};
                                     select.find("option:selected").removeAttr("selected");
                                     $(this).val('');
 		        	    input.data( "autocomplete" ).term = '';
