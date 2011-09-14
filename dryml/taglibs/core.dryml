@@ -61,10 +61,10 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
 
 ### Usage
 
-    <if test="&current_user.administrtator?">Logged in as administrator</if>
+    <if test="&current_user.administrator?">Logged in as administrator</if>
     <else>Logged in as normal user</else>
     
-**IMPORTANT NOTE**: `<if>` tests for non-blank vs. blank (as defined by ActiveSuport), not true vs. false. 
+**IMPORTANT NOTE**: `<if>` tests for non-blank vs. blank (as defined by ActiveSupport), not true vs. false. 
 
 If you do not give the `test` attribute, uses the current context instead. This allows a nice trick like this:
 
