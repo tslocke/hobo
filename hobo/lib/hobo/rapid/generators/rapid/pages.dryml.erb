@@ -128,7 +128,7 @@ unless model.view_hints.secondary_children.empty?
 end
 -%>
 <def tag="show-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=sq_escape model_name %>'] }">
+  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=sq_escape model_name %>'], :name => name(:no_wrapper => true) }">
 
     <body: class="show-page <%= model_class %>" param/>
 
@@ -142,8 +142,8 @@ end
             <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="<%= back_link_human_name %>" name="&this">Back to <name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
-              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
-                <name/>
+              <ht key="<%= model_key %>.show.heading" name="#{name(:no_wrapper => true)}">
+                <%= model_name %> <name/>
               </ht>
             </h2>
 <% if boolean_fields -%>
@@ -160,7 +160,7 @@ end
 <% if edit_link -%>
 
             <a action="edit" if="&can_edit?" param="edit-link">
-              <ht key="<%= model_key %>.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.actions.edit" name="#{name(:no_wrapper => true)}">
                 Edit <%= model_name %>
               </ht>
             </a>
@@ -244,14 +244,14 @@ end
 name_attribute = model.name_attribute
 -%>
 <def tag="edit-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%= sq_escape model_name %>'] }">
+  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%= sq_escape model_name %>'], :name => name(:no_wrapper => true) }">
 
     <body: class="edit-page <%= model_class %>" param/>
 
     <content:>
       <section param="content-header">
         <h2 param="heading">
-          <ht key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
+          <ht key="<%= model_key %>.edit.heading" name="#{name(:no_wrapper => true)}">
             Edit <%= model_name %>
           </ht>
         </h2>
