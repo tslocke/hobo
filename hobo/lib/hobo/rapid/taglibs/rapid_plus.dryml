@@ -13,7 +13,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
-        <form param="search-form" method="get" action="">
+        <form param="search-form" method="get" action="" with="&nil">
           <hidden-fields for-query-string skip="page, search"/>
           <span><t key="hobo.table_plus.search">Search</t></span>
           <input class="search" type="search" name="search" value="&params[:search]"/>
