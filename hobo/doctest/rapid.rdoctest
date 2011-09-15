@@ -1,0 +1,65 @@
+    doctest_require: 'rubygems'
+    >> require 'active_record'
+    >> require 'active_support'
+
+https://rails.lighthouseapp.com/projects/8994/tickets/2577-when-using-activerecordassociations-outside-of-rails-a-nameerror-is-thrown
+
+    >> ActiveRecord::ActiveRecordError
+    >> require 'rexml/document'
+    >> require 'rexml/xpath'
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../dryml/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobo/lib')
+    >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../hobofields/lib')
+    >> require 'dryml'
+    >> require 'hobo'
+    >> require 'hobo/model'
+    >> require 'hobofields'
+    >> HoboFields.enable
+    >> ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+    >> ddl = 'CREATE TABLE "models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" text)'
+    >> ActiveRecord::Base.connection.execute(ddl)
+    >>
+     class Guest
+     end
+
+     class Model < ActiveRecord::Base
+       hobo_model
+       fields do
+         name :string
+       end
+
+       mattr_accessor :editable
+       self.editable = true
+
+       def edit_permitted?(attr=nil)
+         Model.editable
+       end
+     end
+
+     def render(src)
+       # core depends on support but interdependencies are not declared
+       # so just load everything
+       libs = [{ :src => 'rapid', :plugin => 'hobo'},]
+       REXML::Document.new Dryml.render(src,{:this => Model.new},nil,libs)
+     end
+
+     def first_label(src)
+       html = render("#{src}")
+       [REXML::XPath.first(html,'//label/@for'), REXML::XPath.first(html,'//label/text()')]
+     end
+
+    >> first_label('<field-list fields="name"/>')
+    => [nil, nil]
+
+Get is needed to not trigger protect_against_forgery?
+
+    >> first_label('<form action="/" method="get"><field-list fields="name"><label:>CustomLabel</label:></field-list></form>')
+    => [for='model_name', "CustomLabel"]
+
+    >> first_label('<form action="/" method="get"><field-list fields="name"/></form>')
+    => [for='model_name', "Name"]
+
+    >> Model.editable = false
+    >> first_label('<field-list fields="name" tag="input" no-edit="view"/>')
+    => [nil, nil]
+

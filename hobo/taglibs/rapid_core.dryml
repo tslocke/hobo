@@ -36,7 +36,13 @@
     -%>
       <labelled-item unless="&tag == 'input' && no_edit == 'skip' && !can_edit?">
         <item-label param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-label" unless="&field_name.blank?">
-          <do param="label"><%= field_name %></do>
+          <if test="&tag == 'input' && can_edit?">
+            <%# Need to inline render in order to pass to label_tag %>
+            <%= label_tag(param_name_for_this, call_tag_parameter(:do_,{}, {:default => Proc.new { field_name }}, all_parameters, :label)) %>
+          </if>
+          <else>
+            <do param="label"><%= field_name %></do>
+          </else>
         </item-label>
         <item-value param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view" colspan="&2 if field_name.blank?">
           <do param="view"><call-tag tag="&tag" param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-tag" merge-attrs="&input_attrs"/></do>
