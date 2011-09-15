@@ -33,17 +33,6 @@ module Hobo
         alias_method_chain :attr_accessor, :creator_metadata
 
         alias_method_chain :has_one, :new_method
-
-        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
-        eval %(
-        def inherited(klass)
-          super
-          fields(false) do
-            Hobo.register_model(klass)
-            field(klass.inheritance_column, :string)
-          end
-        end
-        )
       end
 
       base.fields(false) # force hobo_fields to load
@@ -171,6 +160,18 @@ module Hobo
         #FIXME - this should be in Hobo::Model::UserBase
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
       end
+
+      # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+      eval %(
+        def inherited(klass)
+          super
+          Hobo::Model.register_model(klass)
+          # TODO: figure out when this is needed, as Hobofields already does this
+          fields(false) do
+            field(klass.inheritance_column, :string)
+          end
+        end
+      )
 
       private
 
