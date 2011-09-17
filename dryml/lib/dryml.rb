@@ -65,9 +65,10 @@ module Dryml
   end
 
   def call_render(view, local_assigns, identifier)
-    renderer = page_renderer(view, identifier, local_assigns.keys)
     this = view.controller.send(:dryml_context) || local_assigns[:this]
     view.instance_variable_set("@this", this)
+    # do this last, as TemplateEnvironment copies instance variables in initalize
+    renderer = page_renderer(view, identifier, local_assigns.keys)
     if identifier =~ /#{ID_SEPARATOR}/
       tag_name = identifier.split(ID_SEPARATOR).last
       renderer.render_tag(tag_name, {:with => this} )
