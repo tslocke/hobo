@@ -129,13 +129,15 @@ module Hobo
       def auto_actions(*args)
         options = args.extract_options!
 
-        @auto_actions = case args.first
+        @auto_actions = args.map do |arg|
+                          case arg
                           when :all        then available_auto_actions
-                          when :write_only then available_auto_write_actions     + args.rest
-                          when :read_only  then available_auto_read_actions      + args.rest
-                          when :lifecycle  then available_auto_lifecycle_actions + args.rest
-                          else args
-                        end
+                          when :write_only then available_auto_write_actions
+                          when :read_only  then available_auto_read_actions
+                          when :lifecycle  then available_auto_lifecycle_actions
+                          else arg
+                          end
+                        end.flatten.uniq
 
         except = Array(options[:except])
         except_actions = except.map do |arg|
@@ -143,9 +145,9 @@ module Hobo
             when :lifecycle   then available_auto_lifecycle_actions
             else arg
           end
-        end
+        end.flatten.uniq
 
-        @auto_actions -= except_actions.flatten
+        @auto_actions -= except_actions
 
         def_auto_actions
       end
