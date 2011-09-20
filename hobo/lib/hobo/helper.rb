@@ -248,7 +248,8 @@ module Hobo
       # TODO: Man does this need a big cleanup!
 
       if args.empty?
-        if this_parent && this_field
+        # if we're repeating over an array, this_field ends up with the current index. Is this useful to anybody?
+        if this_parent && this_field && !this_field.is_a?(Integer)
           object = this_parent
           field = this_field
         else
