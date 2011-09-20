@@ -95,8 +95,10 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 <def tag="select-one-editor" attrs="include-none, blank-message, sort, update, options"><%
   raise Hobo::Error.new("Not allowed to edit") unless can_edit?
   blank_message ||= ht("#{this_type.name.to_s.underscore}.select_one_editor.blank_message", :count => 0, :default => "(No #{this_type.name.to_s.titleize})")
+
+  id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
   options ||= this_field_reflection.klass.all.select {|x| can_view?(x)}.map {|x|
-            [ name(:with => x, :no_wrapper => true), x.id ]
+            [ name(:with => x, :no_wrapper => true), x.send(id_method) ]
           }
    options = options.sort if sort
    options.insert(0, [blank_message, ""]) if this.nil? || include_none
@@ -108,7 +110,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
                       } })
     %>
   <select onchange="#{f}" merge-attrs>
-     <%= options_for_select(options, this ? this.id : "") %>
+     <%= options_for_select(options, this ? this.send(id_method) : "") %>
   </select>
 </def>
 

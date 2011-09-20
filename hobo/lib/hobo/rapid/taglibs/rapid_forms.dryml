@@ -635,7 +635,8 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   class_or_assoc = if model
                      model.is_a?(String) ? model.constantize : model
                    elsif Hobo.simple_has_many_association?(this)
-                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.id
+                     id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
+                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.send(id_method)
                      this
                    else
                      raise Hobo::Error.new("invalid context for <create-button>")
@@ -682,12 +683,13 @@ For situations where there are too many target records to practically include in
     this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
   end
 
+  id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
   if text_method.nil?
-    select_options = options.map { |x| [x.to_s, x.id] }
+    select_options = options.map { |x| [x.to_s, x.send(id_method)] }
   else
     select_options = options.map do |x|
       [ text_method.split(".").inject(x) { |v, method| v.send(method) },
-           x.id ]
+           x.send(id_method) ]
     end
   end
   select_options = select_options.sort if sort
@@ -695,7 +697,7 @@ For situations where there are too many target records to practically include in
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
   -%>
   <select name="#{param_name_for_this(true)}" merge-attrs="&attributes.except :name">
-    <%= options_for_select(select_options, this ? this.id : "") %>
+    <%= options_for_select(select_options, this ? this.send(id_method) : "") %>
   </select>
 </def>
 

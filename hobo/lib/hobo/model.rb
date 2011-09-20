@@ -189,13 +189,14 @@ module Hobo
       def belongs_to_with_test_methods(name, options={}, &block)
         belongs_to_without_test_methods(name, options, &block)
         refl = reflections[name]
+        id_method = refl.options[:primary_key] || refl.klass.primary_key
         if options[:polymorphic]
           # TODO: the class lookup in _is? below is incomplete; a polymorphic association to an STI base class
           #       will fail to match an object of a derived type
           #       (ie X belongs_to Y (polymorphic), Z is a subclass of Y; @x.y_is?(some_z) will never pass)
           class_eval %{
             def #{name}_is?(target)
-              target.class.name == self.#{refl.options[:foreign_type]} && target.id == self.#{refl.primary_key_name}
+              target.class.name == self.#{refl.options[:foreign_type]} && target.#{id_method} == self.#{refl.primary_key_name}
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed? || #{refl.options[:foreign_type]}_changed?
@@ -204,7 +205,7 @@ module Hobo
         else
           class_eval %{
             def #{name}_is?(target)
-              target.class <= ::#{refl.klass.name} && target.id == self.#{refl.primary_key_name}
+              target.class <= ::#{refl.klass.name} && target.#{id_method} == self.#{refl.primary_key_name}
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed?
