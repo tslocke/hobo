@@ -14,6 +14,7 @@ body {color: #193440; background: url(../images/300-ACD3E6-fff.png) repeat-x #ff
 .section.content {background: #FCFFF5;}
 .button {color: white; background: #5B8BA0;}
 .button:hover {background-color: #193440;}
+.button[disabled] { background-color: #CCCCCC; }
 .add-to-collection {background: #E6E7DE;}
 .aside { background: #E5E5E5;}
 
