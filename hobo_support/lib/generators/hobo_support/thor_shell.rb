@@ -27,7 +27,7 @@ module Generators
           default
         else
           say 'Unknown choice! ', :red
-          choose(prompt, format)
+          choose(prompt, format, default)
         end
       end
 
