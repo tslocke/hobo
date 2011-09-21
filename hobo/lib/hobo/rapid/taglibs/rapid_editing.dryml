@@ -81,27 +81,45 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
 ### Attributes
 
- - include-none: Should the menu include a "none" option (true/false). Defaults: false, or true if the association is nil at render-time.
-
- - blank-message: The text for the "none" option. Default: "(No Product)" (or whatever the model name is)
-
- - sort: Sort the options (true/false)? Default: false
-
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call.
+  - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null).   If this value is not supplied, the default is "true" if the current value is nil; otherwise the default is "false".  One implication of this is that the default may change when the form is re-rendered due to a validation failure.  Setting this value explicitly is recommended.
+  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
+  - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
+  - `sort` - whether to sort the array of options. Defaults to no sorting.
+  - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
+  - `text_method` - The method to call on each record to get the text for the option.  Multiple methods are supported ie "institution.name"
+  - `update` - one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call.
 
    NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are the same.
 
   -->
-<def tag="select-one-editor" attrs="include-none, blank-message, sort, update, options"><%
+<def tag="select-one-editor" attrs="include-none, blank-message, options, sort, limit, text-method, update"><%
   raise Hobo::Error.new("Not allowed to edit") unless can_edit?
   blank_message ||= ht("#{this_type.name.to_s.underscore}.select_one_editor.blank_message", :count => 0, :default => "(No #{this_type.name.to_s.titleize})")
+  limit ||= 100
 
-  id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
-  options ||= this_field_reflection.klass.all.select {|x| can_view?(x)}.map {|x|
-            [ name(:with => x, :no_wrapper => true), x.send(id_method) ]
-          }
-   options = options.sort if sort
-   options.insert(0, [blank_message, ""]) if this.nil? || include_none
+  if options.blank? || !options.first.respond_to?(:first)
+    options ||= begin
+      conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
+      order = this_field_reflection.klass.default_order
+      this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
+    end
+
+    id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
+    if text_method.nil?
+      select_options = options.map { |x| [name(:with => x, :no_wrapper => true), x.send(id_method)] }
+    else
+      select_options = options.map do |x|
+        [ text_method.split(".").inject(x) { |v, method| v.send(method) },
+             x.send(id_method) ]
+      end
+    end
+  else
+    # handle the old style, where options could be passed an options_for_select style array
+    select_options = options
+  end
+  select_options = select_options.sort if sort
+  select_options.insert(0, [blank_message, ""]) if include_none || (this.nil? && include_none != false)
+
    f = ajax_updater(object_url(this_parent, :method => :put),
                     update,
                     :method => "put",
@@ -110,7 +128,7 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
                       } })
     %>
   <select onchange="#{f}" merge-attrs>
-     <%= options_for_select(options, this ? this.send(id_method) : "") %>
+     <%= options_for_select(select_options, this ? this.send(id_method) : "") %>
   </select>
 </def>
 
