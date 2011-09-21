@@ -170,7 +170,11 @@ module HoboFields
 
     def self.add_index_for_field(name, args, options)
       to_name = options.delete(:index)
-      return unless to_name
+      unless to_name
+        # passing :unique => true doesn't do anything without an index
+        Rails.logger.error('ERROR: passing :unique => true without :index => true does nothing. Use :unique instead.') if options[:unique]
+        return
+      end
       index_opts = {}
       index_opts[:unique] = :unique.in?(args) || options.delete(:unique)
       # support :index => true declaration
