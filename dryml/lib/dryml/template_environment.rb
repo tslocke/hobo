@@ -188,6 +188,20 @@ module Dryml
       end
     end
 
+    def parse_for_type(attributes)
+      t = attributes[:for_type]
+      if t.nil?
+        nil
+      elsif t.is_a?(Class)
+        t
+      elsif t =~ /^[A-Z]/
+        t.constantize
+      elsif t =~ /^[a-z]/ && defined?(HoboFields.to_class)
+        HoboFields.to_class(t)
+      else
+        nil
+      end
+    end
 
     def call_polymorphic_tag(name, *args)
       name = name.to_s.gsub('-', '_')

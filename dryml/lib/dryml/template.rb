@@ -251,7 +251,11 @@ module Dryml
         _tag_context(attributes) do
           attributes.delete :with
           attributes.delete :field
-          call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          if for_klass = parse_for_type(attributes)
+            call_polymorphic_tag('#{name}', for_klass, attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          else
+            call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          end
         end
       end
       )
@@ -813,7 +817,7 @@ module Dryml
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}' (remember to use '-' rather than '_')", el) unless n =~ DRYML_NAME_RX
 
-        next if n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
+        next if n.in?(SPECIAL_ATTRIBUTES-['for-type']) || n =~ /^without-/
         next if el.attributes['part'] && n == 'id' # The id is rendered on the <div class="part-wrapper"> instead
 
         ":#{ruby_name n} => #{attribute_to_ruby(v)}"
