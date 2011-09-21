@@ -92,7 +92,7 @@ module Generators
         end
 
         def user_routes
-          return [] unless controller < ::Hobo::Controller::User
+          return [] unless controller < ::Hobo::Controller::UserBase
           prefix = records == "users" ? "" : "#{record}_"
           [
           link("match '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),

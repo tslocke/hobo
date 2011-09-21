@@ -1,6 +1,6 @@
 module Hobo
   module Controller
- 	 module User
+  module UserBase
 
     class << self
       def included(base)

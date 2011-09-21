@@ -2,7 +2,7 @@ ActionController::Base.class_eval do
 
   def self.hobo_user_controller
     include Hobo::Controller::Model
-    include Hobo::Controller::User
+    include Hobo::Controller::UserBase
   end
 
   def self.hobo_model_controller
