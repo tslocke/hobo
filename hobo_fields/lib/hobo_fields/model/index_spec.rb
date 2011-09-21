@@ -28,7 +28,17 @@ module HoboFields
       def to_add_statement(new_table_name)
         r = "add_index :#{new_table_name}, #{fields.*.to_sym.inspect}"
         r += ", :unique => true" if unique
-        r += ", :name => '#{name}'" unless default_name?
+        if default_name?
+          check_name = @model.connection.index_name(self.table, :column => self.fields)
+        else
+          check_name = name
+        end
+        if check_name.length > @model.connection.index_name_length
+          r += ", :name => '#{name[0,@model.connection.index_name_length]}'"
+          $stderr.puts("WARNING: index name #{check_name} too long, trimming")
+        else
+          r += ", :name => '#{name}'" unless default_name?
+        end
         r
       end
 

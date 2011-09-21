@@ -391,6 +391,8 @@ module Generators
         def drop_index(table, name)
           # see https://hobo.lighthouseapp.com/projects/8324/tickets/566
           # for why the rescue exists
+          max_length = connection.index_name_length
+          name = name[0,max_length] if name.length > max_length
           "remove_index :#{table}, :name => :#{name} rescue ActiveRecord::StatementInvalid"
         end
 
