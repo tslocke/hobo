@@ -129,7 +129,7 @@ module Hobo
 
 
 
-      AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
+      AJAX_CALLBACKS = [ :success, :failure, :complete ]
 
       AJAX_ATTRS = AJAX_CALLBACKS + [ :update, :type, :method,
                                       :script, :form, :params, :confirm, :message,
