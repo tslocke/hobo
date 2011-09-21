@@ -179,6 +179,10 @@ module Hobo
       object.respond_to?(:typed_id) ? "model::#{typed_id(object, attribute).to_s.dasherize}" : ""
     end
 
+    def update_elements_class(updates)
+      'update::'+comma_split(updates).join(':') unless updates.blank?
+    end
+
     def can_create?(object=this)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new

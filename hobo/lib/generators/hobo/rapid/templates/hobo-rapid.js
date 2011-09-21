@@ -34,6 +34,7 @@ var Hobo = {
         var params = Hobo.fieldSetParam(el, val)
         var p = el.getAttribute("hobo-ajax-params")
         if (p) params = params + "&" + p
+        params = params + '&_method=PUT'
 
         var opts = Object.merge(options || {}, { params: params, message: el.getAttribute("hobo-ajax-message")})
         Hobo.ajaxRequest(Hobo.putUrl(el), updates, opts)
@@ -257,8 +258,9 @@ var Hobo = {
 
 
     putUrl: function(el) {
+        /* we used to append _method=put here, but it doesn't work in Rails 3 */
         var spec = Hobo.modelSpecForElement(el)
-        return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
+        return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id
     },
 
 
