@@ -203,9 +203,13 @@ module Hobo
             end
           }
         else
+          id_method = refl.options[:primary_key] || refl.klass.primary_key
           class_eval %{
             def #{name}_is?(target)
-              target.class <= ::#{refl.klass.name} && target.#{id_method} == self.#{refl.primary_key_name}
+              our_id = self.#{refl.primary_key_name}
+              # if our_id is nil, only return true if target is nil
+              return target.nil? unless our_id
+              target.class <= ::#{refl.klass.name} && target.#{id_method} == our_id
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed?
