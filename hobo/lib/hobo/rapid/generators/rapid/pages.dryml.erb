@@ -124,7 +124,6 @@ end
 
 unless model.view_hints.secondary_children.empty?
   aside_collections = model.view_hints.secondary_children.map { |c| [model.reflections[c], model.reverse_reflection(c)] }
-  aside_collections.reject! { |refl, reverse| reverse.nil? }
 end
 -%>
 <def tag="show-page" for="<%= model.name %>">
@@ -216,7 +215,7 @@ end
 
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
-<%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
+<%     if reverse_refl && linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
          <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
            <heading-content:><human-collection-name with="&this.origin" collection="<%= refl.name %>" your/></heading-content:>
          </collection-preview:<%= refl.name %>.recent>
