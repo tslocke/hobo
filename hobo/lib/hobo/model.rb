@@ -470,7 +470,11 @@ module Hobo
           if parts.include?(0)
             nil
           else
-            Date.new(*parts)
+            begin
+              Date.new(*parts)
+            rescue ArgumentError => ex
+              Time.time_with_datetime_fallback(ActiveRecord::Base.default_timezone, *parts).to_date
+            end
           end
         else
           value
