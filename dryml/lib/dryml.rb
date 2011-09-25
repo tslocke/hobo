@@ -9,6 +9,7 @@ require 'action_pack'
 require 'openssl'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
+ActiveSupport::Dependencies.autoload_once_paths |= [File.dirname(__FILE__)]
 
 # The Don't Repeat Yourself Markup Language
 module Dryml
