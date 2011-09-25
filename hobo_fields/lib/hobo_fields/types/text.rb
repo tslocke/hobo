@@ -6,7 +6,7 @@ module HoboFields
       COLUMN_TYPE = :text
 
       def to_html(xmldoctype = true)
-        ERB::Util.html_escape(self).gsub("\n", "<br#{xmldoctype ? ' /' : ''}>\n")
+        ERB::Util.html_escape(self).gsub("\n", "<br#{xmldoctype ? ' /' : ''}>\n").html_safe
       end
 
       HoboFields.register_type(:text, self)
