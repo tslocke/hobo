@@ -130,7 +130,7 @@ module Generators
           all_models = table_model_classes
           hobo_models = all_models.select { |m| m.try.include_in_migration && m.name.underscore.not_in?(ignore_model_names) }
           non_hobo_models = all_models - hobo_models
-          db_tables = connection.tables - Migrator.ignore_tables.*.to_s - non_hobo_models.*.table_name
+          db_tables = connection.tables - Migrator.ignore_tables.*.to_s - non_hobo_models.reject { |t| t.try.hobo_shim? }.*.table_name
           [hobo_models, db_tables]
         end
 
