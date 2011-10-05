@@ -93,7 +93,15 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
         <table fields="name, created_at, description">
           <controls:/>
         </table>
-    The controls can be further customised using the "edit-link" and "delete-button" parameters or by providing completely new content for the control column, e.g.
+
+    The controls can be further customised using the "edit-link" and "delete-button" parameters:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+          <delete-button: label="Nuke Me"/>
+        </table>
+
+    or by providing completely new content for the control column:
 
         <table fields="name, created_at, description">
           <controls:>my controls!</controls:>
