@@ -259,10 +259,9 @@ module Dryml
       ctx = [ @_this, @_this_parent, @_this_field, @_this_type,
               @_form_field_path, @_form_field_paths_by_object ]
       @_this_type = nil
-      # TODO: remove THE HAX! We depend on the return value of this in some places, on the output buffer in others
-      inner_res = nil
-      outer_res = @view.with_output_buffer { inner_res = yield }
-      res = outer_res.blank? ? inner_res : outer_res
+      res = nil
+      outer_res = @view.with_output_buffer { res = yield }
+      Rails.logger.error("new_context: #{caller.first}") if !outer_res.blank? && outer_res.to_s != res.to_s
       @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path, @_form_field_paths_by_object = ctx
       res.to_s
     end
