@@ -72,9 +72,9 @@ module Dryml
 
       def add_expr_literal(src, code)
         if code =~ BLOCK_EXPR
-          src << 'self.output_buffer.append= ' << code
+          src << 'self.output_buffer.append= ' << code << ";\nself.output_buffer;"
         else
-          src << 'self.output_buffer.append= (' << code << ');'
+          src << 'self.output_buffer.append= (' << code << ");\nself.output_buffer;"
         end
       end
 
@@ -85,14 +85,15 @@ module Dryml
 
       def add_expr_escaped(src, code)
         if code =~ BLOCK_EXPR
-          src << "self.output_buffer.safe_append= " << code
+          src << "self.output_buffer.safe_append= " << code << ";\nself.output_buffer;"
         else
           src << "self.output_buffer.safe_concat((" << code << ").to_s);"
         end
       end
 
       def add_postamble(src)
-
+        # NOTE: we can't just add a 'self.output_buffer' here because this parser
+        # is used to compile taglibs which don't HAVE one
       end
     end
 
