@@ -259,8 +259,10 @@ module Dryml
       ctx = [ @_this, @_this_parent, @_this_field, @_this_type,
               @_form_field_path, @_form_field_paths_by_object ]
       @_this_type = nil
-      res = nil
-      @view.with_output_buffer { res = yield }
+      # TODO: remove THE HAX! We depend on the return value of this in some places, on the output buffer in others
+      inner_res = nil
+      outer_res = @view.with_output_buffer { inner_res = yield }
+      res = outer_res.blank? ? inner_res : outer_res
       @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path, @_form_field_paths_by_object = ctx
       res.to_s
     end
