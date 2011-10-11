@@ -1,5 +1,6 @@
 <% each_controller do -%>
 <%
+next unless @controller < Hobo::Controller::Model
 form_fields = standard_fields :belongs_to, :has_many
 
 cancel_to_show_page  = linkable?(:show)

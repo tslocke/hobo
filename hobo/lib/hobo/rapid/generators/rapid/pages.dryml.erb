@@ -12,7 +12,7 @@
 
 
 <% each_controller do -%>
-
+<% next unless @controller < Hobo::Controller::Model %>
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
 new_link = linkable?(:new)
