@@ -928,7 +928,7 @@ Use the `uri` option to specify a redirect location:
   <select merge-attrs param="default">
     <% selected=this if selected.nil? %>
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
-    <do param="options"><% options_for_select(options, selected) %></do>
+    <do param="options"><%= options_for_select(options, selected) %></do>
   </select>
 </def>
 
