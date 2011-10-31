@@ -1,3 +1,5 @@
+require 'erubis'
+
 module Dryml
 
   class DRYMLBuilder
