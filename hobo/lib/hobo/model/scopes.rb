@@ -5,9 +5,9 @@ module Hobo
       def self.included_in_class(klass)
         klass.class_eval do
           extend ClassMethods
-          metaclass.alias_method_chain :valid_keys_for_has_many_association,   :scopes
-          metaclass.alias_method_chain :valid_keys_for_has_one_association,    :scopes
-          metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :scopes
+          #metaclass.alias_method_chain :valid_keys_for_has_many_association,   :scopes
+          #metaclass.alias_method_chain :valid_keys_for_has_one_association,    :scopes
+          #metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :scopes
         end
       end
 

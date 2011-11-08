@@ -162,15 +162,15 @@ module Hobo
 
       # Add :accessible to the valid keys so AR doesn't complain
 
-      def self.valid_keys_for_has_many_association_with_accessible
-        valid_keys_for_has_many_association_without_accessible + [:accessible]
-      end
-      metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
+      #def self.valid_keys_for_has_many_association_with_accessible
+      #  valid_keys_for_has_many_association_without_accessible + [:accessible]
+      #end
+      #metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
 
-      def self.valid_keys_for_belongs_to_association_with_accessible
-        valid_keys_for_belongs_to_association_without_accessible + [:accessible]
-      end
-      metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
+      #def self.valid_keys_for_belongs_to_association_with_accessible
+      #  valid_keys_for_belongs_to_association_without_accessible + [:accessible]
+      #end
+      #metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
 
 
     end
