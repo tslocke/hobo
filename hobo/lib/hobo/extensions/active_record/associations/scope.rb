@@ -2,7 +2,7 @@
 
 module ActiveRecord
   module Associations
-    module ThroughAssociationScope
+    module ThroughAssociationScope # No such module in ActiveRecord any more - there is only ThroughAssociation
 
       def construct_scope_with_scope
         s = construct_scope_without_scope
@@ -12,7 +12,7 @@ module ActiveRecord
       alias_method_chain :construct_scope, :scope
 
       end
-    end
+    end if false # DISABLED Getting Rails 3.1 working
 
   module SpawnMethods
 
