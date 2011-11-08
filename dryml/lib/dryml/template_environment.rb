@@ -583,15 +583,10 @@ module Dryml
         attr_string = " #{attrs.sort * ' '}" unless attrs.empty?
       end
       content = capture { new_context &block } if block_given?
-      res = if empty
-              "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>".html_safe
-            else
-              "<#{name}#{attr_string}>".html_safe + content + "</#{name}>".html_safe
-            end
-      if content.is_a? ActionView::NonConcattingString
-        concat res
+      if empty
+        "<#{name}#{attr_string}#{scope.xmldoctype ? ' /' : ''}>".html_safe
       else
-        res
+        "<#{name}#{attr_string}>".html_safe + content + "</#{name}>".html_safe
       end
     end
 
