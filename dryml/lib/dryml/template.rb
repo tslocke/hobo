@@ -14,8 +14,6 @@ module Dryml
 
     CODE_ATTRIBUTE_CHAR = "&"
 
-    NO_METADATA_TAGS = %w(doctype if else unless repeat do with name type-name)
-
     SPECIAL_ATTRIBUTES = %w(param merge merge-params merge-attrs
                             for-type
                             if unless repeat
@@ -397,43 +395,8 @@ module Dryml
 
       "#{start} " +
         # reproduce any line breaks in the start-tag so that line numbers are preserved
-        tag_newlines(el) + "%>" +
-        wrap_tag_method_body_with_metadata(children_to_erb(el)) +
-        "<% output_buffer; end"
+        tag_newlines(el) + "%>" + children_to_erb(el) + "<% output_buffer; end"
     end
-
-    def wrap_source_with_metadata(content, kind, name, *args)
-      if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
-        content
-      else
-        metadata = [kind, name] + args + [@template_path]
-        "<% safe_concat(%(<!--[DRYML|#{metadata * '|'}[-->)) %>" +
-        content +
-        "<% safe_concat(%(<!--]DRYML]-->)) %>"
-      end
-    end
-
-    def wrap_tag_method_body_with_metadata(content)
-      name   = @def_element.attributes['tag']
-      for_   = @def_element.attributes['for']
-      name += " for #{for_}" if for_
-      wrap_source_with_metadata(content, "def", name, element_line_num(@def_element))
-    end
-
-
-    def wrap_tag_call_with_metadata(el, content)
-      name = el.expanded_name
-      param = el.attributes['param']
-
-      if param == "&true"
-        name += " param"
-      elsif param
-        name += " param='#{param}'"
-      end
-
-      wrap_source_with_metadata(content, "call", name, element_line_num(el))
-    end
-
 
     def param_content_local_name(name)
       "_#{ruby_name name}__default_content"
@@ -608,8 +571,7 @@ module Dryml
              end
 
       call = apply_control_attributes(call, el)
-      call = maybe_make_part_call(el, "<% concat(#{call}) %>")
-      wrap_tag_call_with_metadata(el, call)
+      maybe_make_part_call(el, "<% concat(#{call}) %>")
     end
 
 
@@ -622,8 +584,6 @@ module Dryml
 
     def parameter_tags_hash(el, containing_tag_name=nil)
       call_type = nil
-
-      metadata_name = containing_tag_name || el.expanded_name
 
       param_items = el.map do |node|
         case node
@@ -649,7 +609,7 @@ module Dryml
           end
 
           if is_parameter_tag
-            parameter_tag_hash_item(e, metadata_name) + ", "
+            parameter_tag_hash_item(e) + ", "
           end
         end
       end.join
@@ -685,52 +645,52 @@ module Dryml
     end
 
 
-    def parameter_tag_hash_item(el, metadata_name)
+    def parameter_tag_hash_item(el)
       name = el.name.dup
       if name.sub!(/^before-/, "")
-        before_parameter_tag_hash_item(name, el, metadata_name)
+        before_parameter_tag_hash_item(name, el)
       elsif name.sub!(/^after-/, "")
-        after_parameter_tag_hash_item(name, el, metadata_name)
+        after_parameter_tag_hash_item(name, el)
       elsif name.sub!(/^prepend-/, "")
-        prepend_parameter_tag_hash_item(name, el, metadata_name)
+        prepend_parameter_tag_hash_item(name, el)
       elsif name.sub!(/^append-/, "")
-        append_parameter_tag_hash_item(name, el, metadata_name)
+        append_parameter_tag_hash_item(name, el)
       else
         hash_key = ruby_name name
         hash_key += "_replacement" if el.attribute("replace")
         if (param_name = get_param_name(el))
-          ":#{hash_key} => merge_tag_parameter(#{param_proc(el, metadata_name)}, all_parameters[:#{param_name}])"
+          ":#{hash_key} => merge_tag_parameter(#{param_proc(el)}, all_parameters[:#{param_name}])"
         else
-          ":#{hash_key} => #{param_proc(el, metadata_name)}"
+          ":#{hash_key} => #{param_proc(el)}"
         end
       end
     end
 
 
-    def before_parameter_tag_hash_item(name, el, metadata_name)
+    def before_parameter_tag_hash_item(name, el)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'before' parameters", el) if param_name
       content = children_to_erb(el) + "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>"
-      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
+      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, content)}"
     end
 
 
-    def after_parameter_tag_hash_item(name, el, metadata_name)
+    def after_parameter_tag_hash_item(name, el)
       param_name = get_param_name(el)
       dryml_exception("param declaration not allowed on 'after' parameters", el) if param_name
       content = "<% concat(#{param_restore_local_name(name)}.call({}, {})) %>" + children_to_erb(el)
-      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, metadata_name, content)}"
+      ":#{ruby_name name}_replacement => #{replace_parameter_proc(el, content)}"
     end
 
 
-    def append_parameter_tag_hash_item(name, el, metadata_name)
+    def append_parameter_tag_hash_item(name, el)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" +
         param_content_element(name) + children_to_erb(el) +
         "<% ; output_buffer } } } ] }"
     end
 
 
-    def prepend_parameter_tag_hash_item(name, el, metadata_name)
+    def prepend_parameter_tag_hash_item(name, el)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" +
         children_to_erb(el) + param_content_element(name) +
         "<% ; output_buffer } } } ] }"
@@ -739,8 +699,6 @@ module Dryml
 
     def default_param_proc(el, containing_param_name=nil)
       content = children_to_erb(el)
-      content = wrap_source_with_metadata(content, "param", containing_param_name,
-                                          element_line_num(el)) if containing_param_name
       "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{content}<% ; output_buffer } #{tag_newlines(el)}}"
     end
 
@@ -750,21 +708,14 @@ module Dryml
     end
 
 
-    def wrap_replace_parameter(el, name)
-      wrap_source_with_metadata(children_to_erb(el), "replace", name, element_line_num(el))
-    end
-
-
-    def param_proc(el, metadata_name_suffix)
-      metadata_name = "#{el.name} < #{metadata_name_suffix}"
-
+    def param_proc(el)
       nl = tag_newlines(el)
 
       if (repl = el.attribute("replace"))
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
 
-        replace_parameter_proc(el, metadata_name)
+        replace_parameter_proc(el)
       else
         attributes = el.attributes.dup
         # Providing one of 'with' or 'field' but not the other should cancel out the other
@@ -780,14 +731,13 @@ module Dryml
           end
         end.compact
 
-        nested_parameters_hash = parameter_tags_hash(el, metadata_name)
+        nested_parameters_hash = parameter_tags_hash(el)
         "proc { [{#{attribute_items * ', '}}, #{nested_parameters_hash}] #{nl}}"
       end
     end
 
 
-    def replace_parameter_proc(el, metadata_name, content=nil)
-      content ||= wrap_replace_parameter(el, metadata_name)
+    def replace_parameter_proc(el, content=nil)
       param_name = el.dryml_name.sub(/^(before|after|append|prepend)-/, "")
       "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{content}<% ; output_buffer } #{tag_newlines(el)}}"
     end
@@ -1027,11 +977,6 @@ module Dryml
       @gensym_counter ||= 0
       @gensym_counter += 1
       "#{name}_#{@gensym_counter}"
-    end
-
-    def include_source_metadata
-      @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
-      @include_source_metadata
     end
 
   end
