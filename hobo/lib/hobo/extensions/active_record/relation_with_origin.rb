@@ -9,7 +9,7 @@ module ActiveRecord
   end
 
   module Associations
-    class AssociationCollection
+    class CollectionProxy
 
       def scoped_with_origin
         relation = scoped_without_origin.clone

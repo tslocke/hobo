@@ -1,6 +1,6 @@
 module ActiveRecord
   module Associations
-    class AssociationCollection
+    class CollectionProxy
 
       include Hobo::Model::Scopes::ApplyScopes
 
