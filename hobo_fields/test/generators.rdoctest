@@ -28,11 +28,18 @@ doctest: test file exists
 
 doctest: test content matches
 >> File.read 'test/unit/alpha/beta_test.rb'
-=> "require 'test_helper'\n\nclass Alpha::BetaTest < ActiveSupport::TestCase\n  # Replace this with your real tests.\n  test \"the truth\" do\n    assert true\n  end\nend\n"
+=> <<-X
+require 'test_helper'
 
+class Alpha::BetaTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end
+X
 
 doctest: fixture file exists
->> File.exist? 'test/fixtures/alpha/betas.yml'
+>> File.exist? 'test/fixtures/alpha/beta.yml'
 => true
 
 
