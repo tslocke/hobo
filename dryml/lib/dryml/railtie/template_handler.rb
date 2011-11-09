@@ -1,8 +1,6 @@
 module Dryml
   class Railtie
-    class TemplateHandler < ActionView::Template::Handler
-
-      self.default_format = Mime::HTML
+    class TemplateHandler
 
       def self.call(template)
         "Dryml.call_render(self, local_assigns, '#{template.identifier}')"
