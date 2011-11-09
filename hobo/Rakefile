@@ -1,5 +1,5 @@
 require 'rake'
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'rake/testtask'
 require 'tmpdir'
 
@@ -9,7 +9,10 @@ $:.unshift File.expand_path('../lib', __FILE__)
 $:.unshift File.expand_path('../../hobo_support/lib', __FILE__)
 $:.unshift File.expand_path('../../hobo_fields/lib', __FILE__)
 $:.unshift File.expand_path('../../dryml/lib', __FILE__)
+
 require 'hobo'
+
+include Rake::DSL
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
@@ -37,7 +40,7 @@ Rake::TestTask.new(:test) { |t|
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    files=Dir['doctests/**/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    files=Dir['test/doctest/**/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
     exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
 end
