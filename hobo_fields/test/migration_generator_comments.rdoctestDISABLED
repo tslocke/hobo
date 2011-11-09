@@ -5,7 +5,7 @@ Our test requires to prepare the testapp for a different environment:
 
     doctest_require: ENV["RAILS_ENV"] = 'mysql_test'; 'prepare_testapp'
 
-    >> system "cd #{TESTAPP_PATH} && rake db:setup"
+    >> system "cd #{TESTAPP_PATH} && rake --trace db:setup"
     => true
 
     >> p Rails.env
