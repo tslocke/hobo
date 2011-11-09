@@ -14,6 +14,7 @@ task :test_all do |t|
   exit($?.exitstatus)
 end
 
+require 'rubygems'
 require 'yard'
 YARD::Rake::YardocTask.new do |t|
   t.files = ['*/lib/**/*.rb', '-', 'hobo/README', 'hobo/CHANGES.txt', 'hobo/LICENSE.txt', 'dryml/README', 'dryml/CHANGES.txt']
