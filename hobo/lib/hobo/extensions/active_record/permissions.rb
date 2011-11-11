@@ -6,15 +6,19 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
   end
 
 
-  def delete_records(records)
-    case @reflection.options[:dependent]
-      when :destroy
-        records.each { |r| r.is_a?(Hobo::Model) ? r.user_destroy(acting_user) : r.destroy }
-      when :delete_all
-        # No destroy permission check if the :delete_all option has been chosen
-        @reflection.klass.delete(records.map(&:id))
+  def delete_records(records, method)
+    if method == :destroy
+      records.each { |r| r.is_a?(Hobo::Model) ? r.user_destroy(acting_user) : r.destroy }
+      update_counter(-records.length) unless inverse_updates_counter_cache?
+    else
+      keys  = records.map { |r| r[reflection.association_primary_key] }
+      scope = scoped.where(reflection.association_primary_key => keys)
+
+      if method == :delete_all
+        update_counter(-scope.delete_all)
       else
-        nullify_keys(records)
+        update_counter(-scope.update_all(reflection.foreign_key => nil))
+      end
     end
   end
 
@@ -36,7 +40,7 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
 
 
   def insert_record(record, force = false, validate = true)
-    set_belongs_to_association_for(record)
+    set_owner_attributes(record)
     if (user = acting_user) && record.is_a?(Hobo::Model)
       if force
         record.user_save!(user)
@@ -128,7 +132,7 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
 
 end
 
-ActiveRecord::Associations::AssociationCollection.class_eval do
+ActiveRecord::Associations::AssociationProxy.class_eval do
 
   # Helper - the user acting on the owner (if there is one)
   def acting_user

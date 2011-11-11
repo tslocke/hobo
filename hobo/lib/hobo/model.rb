@@ -1,3 +1,5 @@
+require 'will_paginate/active_record'
+
 module Hobo
 
   module Model
@@ -206,13 +208,13 @@ module Hobo
           id_method = refl.options[:primary_key] || refl.klass.primary_key
           class_eval %{
             def #{name}_is?(target)
-              our_id = self.#{refl.primary_key_name}
+              our_id = self.#{refl.foreign_key}
               # if our_id is nil, only return true if target is nil
               return target.nil? unless our_id
               target.class <= ::#{refl.klass.name} && target.#{id_method} == our_id
             end
             def #{name}_changed?
-              #{refl.primary_key_name}_changed?
+              #{refl.foreign_key}_changed?
             end
           }
         end
@@ -406,7 +408,12 @@ module Hobo
 
     def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
       converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.attr_type(k), v) }
-      send(:attributes_without_hobo_type_conversion=, converted, guard_protected_attributes)
+      # Avoid passing this third argument if possible, to avoid a deprecation warning in Rails 3.1
+      if guard_protected_attributes
+        send(:attributes_without_hobo_type_conversion=, converted)
+      else
+        send(:attributes_without_hobo_type_conversion=, converted, true)
+      end
     end
 
 

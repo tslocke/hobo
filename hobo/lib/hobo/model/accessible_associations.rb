@@ -5,11 +5,13 @@ module Hobo
       extend self
 
       def prepare_has_many_assignment(association, association_name, array_or_hash)
-        owner = association.proxy_owner
+        owner = association.proxy_association.owner
 
         array = params_hash_to_array(array_or_hash)
         array.map! do |record_hash_or_string|
-          finder = association.member_class.scoped :conditions => association.send(:conditions)
+          finder = association.member_class
+          conditions = association.proxy_association.reflection.conditions
+          finder = finder.scoped :conditions => condition unless conditions == [[]]
           find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
             # The block is required to either locate find an existing record in the collection, or build a new one
             if id
@@ -109,7 +111,7 @@ module Hobo
               __items = Hobo::Model::AccessibleAssociations.prepare_has_many_assignment(#{name}, :#{name}, array_or_hash)
               self.#{name}_without_accessible = __items
               # ensure the loaded array contains any changed records
-              self.#{name}.proxy_target[0..-1] = __items
+              self.association(:#{name}).target[0..-1] = __items
             end
           }, __FILE__, __LINE__ - 7
           alias_method_chain :"#{name}=", :accessible
@@ -160,18 +162,9 @@ module Hobo
       metaclass.alias_method_chain :belongs_to, :accessible
 
 
-      # Add :accessible to the valid keys so AR doesn't complain
-
-      #def self.valid_keys_for_has_many_association_with_accessible
-      #  valid_keys_for_has_many_association_without_accessible + [:accessible]
-      #end
-      #metaclass.alias_method_chain :valid_keys_for_has_many_association, :accessible
-
-      #def self.valid_keys_for_belongs_to_association_with_accessible
-      #  valid_keys_for_belongs_to_association_without_accessible + [:accessible]
-      #end
-      #metaclass.alias_method_chain :valid_keys_for_belongs_to_association, :accessible
-
+      # Add :accessible to the valid options so AR doesn't complain
+      ::ActiveRecord::Associations::Builder::BelongsTo.valid_options << :accessible
+      ::ActiveRecord::Associations::Builder::HasMany.valid_options << :accessible
 
     end
   end

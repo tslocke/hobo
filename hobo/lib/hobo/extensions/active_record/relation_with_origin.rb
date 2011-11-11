@@ -13,16 +13,17 @@ module ActiveRecord
 
       def scoped_with_origin
         relation = scoped_without_origin.clone
-        relation.origin = @owner
-        relation.origin_attribute = @reflection.name
+        relation.origin = proxy_association.owner
+        relation.origin_attribute = proxy_association.reflection.name
         relation
       end
       alias_method_chain :scoped, :origin
 
       def method_missing_with_origin(method, *args, &block)
+        p caller
         res = method_missing_without_origin(method, *args, &block)
-        res.origin = @owner if res.respond_to?(:origin)
-        res.origin_attribute = @reflection.name if res.respond_to?(:origin_attribute)
+        res.origin = proxy_association.owner if res.respond_to?(:origin)
+        res.origin_attribute = proxy_association.reflection.name if res.respond_to?(:origin_attribute)
         res
       end
       alias_method_chain :method_missing, :origin
