@@ -1,6 +1,7 @@
 require 'hobo_support'
 require 'hobo_fields'
 require 'dryml'
+gem 'will_paginate', ">= 3.0"
 require 'will_paginate'
 require 'hobo/extensions/enumerable'
 require 'hobo/extensions/array'
