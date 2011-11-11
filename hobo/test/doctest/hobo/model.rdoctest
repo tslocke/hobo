@@ -52,10 +52,8 @@ declaration:
 
      end
 
-    $ rails generate hobo:migration -n -m
-
     >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
-    >> Post.all
+    >> Post.connection.execute 'select * from posts'  # Post.all was breaking : /
     => []
 {.hidden}
 
@@ -133,7 +131,7 @@ object.  In this case, you can provide your own name method instead:
     $ rails generate hobo:migration -n -m
 
     >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
-    >> Person.all
+    >> Person.connection.execute 'select * from people'
     => []
 {.hidden}
 
