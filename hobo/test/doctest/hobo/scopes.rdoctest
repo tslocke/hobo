@@ -67,16 +67,15 @@ We also need to get ActiveRecord set up with a database connection
 Some load path manipulation:
 {.hidden}
 
-    >> $:.unshift File.expand_path('../../../../hobo_support/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../hobo_fields/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../dryml/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../hobo_support/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../hobo_fields/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../dryml/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../lib', __FILE__)
 {.hidden}
 
 And we'll require hobo:
 {.hidden}
 
-    >> require 'will_paginate'
     >> require 'hobo'
 {.hidden}
 

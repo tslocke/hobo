@@ -28,10 +28,10 @@ Contents
                                                :host => "localhost",
                                                :username => mysql_user,
                                                :password => mysql_password)
-    >> $:.unshift File.expand_path('../../../../hobo_support/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../hobo_fields/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../dryml/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../hobo_support/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../hobo_fields/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../../dryml/lib', __FILE__)
+    >> $:.unshift File.expand_path('../../../../lib', __FILE__)
     >> gem 'will_paginate', ">= 3.0.pre"
     >> require 'will_paginate'
     >> require 'hobo'
