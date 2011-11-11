@@ -22,19 +22,11 @@ Create a mock view layer:
              def base_url; "" ;end
            end
          end
-        >> Rails.root = "test-app"
 
 Useful stuff
 
         >> def init_mocha; $stubba = Mocha::Central.new; end
-        >>
-         class Thing
-           class Mocks; extend Mocha::AutoVerify; end
-             def self.mock(hash)
-             Mocks.mock(hash.update(:class => self))
-           end
-         end
-
+        >> def mock; Mocha::Mockery.instance.named_mock 'mock'; end
 
 ## `object_url`
 
@@ -45,7 +37,9 @@ Note that `object_url` doesn't perform "reverse routing". It knows nothing about
 Something to link to:
 
         >> init_mocha
-        >> thing = Thing.mock(:to_url_path => "things/1")
+        >> class Thing; end
+        >> thing = Thing.new
+        >> thing.expects(:to_url_path).at_least_once.returns("things/1")
 
 ### Simple 'show' URLs
 
@@ -64,29 +58,5 @@ A URL to the 'edit' page:
         >> Hobo::Routes.expects(:linkable?).with(Thing, :edit, {:subsite => ''}).returns(true)
         >> View.object_url(thing, :edit)
         => "/things/1/edit"
-
-
-### POST URLs for creating new items in collections:
-
-        >> collection = mock(:origin => thing, :origin_attribute => "parts")
-        >> Hobo::Routes.expects(:linkable?).with(Thing, :create_part, {:subsite => '', :method => :post}).returns(true)
-        >> View.object_url(collection, :method => :post)
-        => "/things/1/parts"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
