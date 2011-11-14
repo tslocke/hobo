@@ -536,10 +536,9 @@ The label can be customised using the `label` attribute, e.g.
     <count:comments label="blog post comment"/> -> <span class="count">12 blog post comments</span>
 
 You can pass a summary attribute, which will generate a complete localized sentence. It allows 2 options:
-  - boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file.
-    If the lookup fails, it will fallback to the english default sentences consistent with the count.
-  - String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file.
-    If the lookup fails, it will fallback to the english default sentences consistent with the count.
+
+- boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file. If the lookup fails, it will fallback to the english default sentences consistent with the count.
+- String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file.  If the lookup fails, it will fallback to the english default sentences consistent with the count.
 
 ### Examples
 
@@ -555,18 +554,22 @@ You can pass a summary attribute, which will generate a complete localized sente
             one: "Puoi scegliere solo una {{label}}"
             other: "Puoi scegliere tra {{count}} {{label}}"
 
-    with :en locale and boolean summary (internal defaults)
+with :en locale and boolean summary (internal defaults)
+
     <count:comments summary/> -> <span class="count">There is 1 Comment</span>
     <count:viewings summary/> -> <span class="count">There are 3 Viewings</span>
-    (note: just add the locale english strings to use like the following examples)
 
-    with :it locale and boolean summary (key "tags.count.default")
+(note: just add the locale english strings to use like the following examples)
+
+with :it locale and boolean summary (key "tags.count.default")
+
     <count:comments summary/>
     -> count => 0 -> <span class="count">Non ci sono Commenti</span>
     -> count => 1 -> <span class="count">C'è solo 1 Commento</span>
     -> count => 5 -> <span class="count">Ci sono 5 Commenti</span>
 
-    with :it locale and summary="choice" (key "tags.count.choice")
+with :it locale and summary="choice" (key "tags.count.choice")
+
     <count:comments summary="choice"/>
     -> count => 0 -> <span class="count">Non ci sono Commenti da scegliere</span>
     -> count => 1 -> <span class="count">Puoi scegliere solo 1 Commento</span>
@@ -619,6 +622,8 @@ You can pass a summary attribute, which will generate a complete localized sente
   end
 %></span></def>
 
+<!-- Equivalent to `<you capitalize/>`-->
+<def tag="You"><you merge capitalize/></def>
 
 <!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages.
 -->
@@ -634,9 +639,9 @@ You can pass a summary attribute, which will generate a complete localized sente
 
 The context should be a user object. If `this == current_user` the "you" form is rendered, otherwise the form with the user's name:
 
- - `<you have/> new mail` -> "you have new mail" or "Jim has new mail"
- - `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
- - `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
+- `<you have/> new mail` -> "you have new mail" or "Jim has new mail"
+- `<you are/> now an admin` -> "you are now an admin" or "Jim is now an admin"
+- `<you do/>n't want to go there` -> "you don't want to go there" or "Jim doesn't want to go there"
 
 The tag is also localized in the namespaces "tags.you.current_user" and "tags.you.other_user".
 Each namespace can contain the legacy keys "have", "are", "do" used for the respective attributes,
@@ -659,15 +664,15 @@ that you add the keys in the correct namespaces.
             are: "{{name}} è"
             can: "{{name}} può"
 
- - `<you have/> un nuovo messaggio.` -> "Hai un nuovo messaggio." or "Jim ha un nuovo messaggio."
- - `Adesso <you are/> amministratore.` -> "Adesso sei amministratore." or "Adesso Jim è amministratore."
- - `<you can/> scrivere.` -> "Puoi scrivere." or "Jim può scrivere."
+- `<you have/> un nuovo messaggio.` -> "Hai un nuovo messaggio." or "Jim ha un nuovo messaggio."
+- `Adesso <you are/> amministratore.` -> "Adesso sei amministratore." or "Adesso Jim è amministratore."
+- `<you can/> scrivere.` -> "Puoi scrivere." or "Jim può scrivere."
 
 (note: :name is added by default as an interpolable variable)
 
 ### Attributes
 
- - capitalize: the first letter of the resulting sentence will be capitalized
+- capitalize: the first letter of the resulting sentence will be capitalized
 
 
 ### Additional Notes
@@ -696,29 +701,29 @@ The "titleize" attribute is deprecated: use "capitalize" instead.
   </else>
 </def>
 
-<!-- Equivalent to `<you capitalize/>`-->
-<def tag="You"><you merge capitalize/></def>
+<!-- Equivalent to `<your ... capitalize/>`-->
+<def tag="Your"><your merge capitalize/></def>
 
 <!-- Similar to `<you>`, but renders "Your" or "Fred's" or equivalent localized strings
 
 ### Attributes
 
- - capitalize: the first letter of the resulting sentence will be capitalized
- - count: used in pluralization. If omitted it will be set to 1.
- - key: used to lookup the translation in the locale file. It allows 3 different options:
+- capitalize: the first letter of the resulting sentence will be capitalized
+- count: used in pluralization. If omitted it will be set to 1.
+- key: used to lookup the translation in the locale file. It allows 3 different options:
    - single key like 'message': simple translation in 'tags.your.message.current_user'
      or 'tags.your.message.other_user'
    - composite key like 'any.namespace.message': translation as for the previous case, but it will
-     translate also the 'any.namespace.message' and will interpolate the variable <key> (in this case :message)
+     translate also the 'any.namespace.message' and will interpolate the variable `<key>` (in this case :message)
      in the translation
    - when key is omitted it will be set to "default" and will do the translation with that key.
      Pass other meaningful attributes to achieve a dynamic usage
- - any other attribute passed to the tag will be used as a variable for interpolation
+- any other attribute passed to the tag will be used as a variable for interpolation
 
 Notes
 
- - The :name variable is added by default as an interpolable variable
- - If no translation is found an automatic (only english) default is generated:
+- The :name variable is added by default as an interpolable variable
+- If no translation is found an automatic (only english) default is generated:
    the Your/Jim's string, joined to the tag content.
    If you pass an explicit 'default' attribute you will override the automatic default.
 
@@ -741,17 +746,18 @@ Notes
               other: "Tue {{entry}}"
             other_user: "{{entry}} di {{name}}"
 
- - `<your key="message" count=>"&messages.count"/>`
-   -> count => 1 -> "Tuo Messaggio" or "Messaggio di Jim"
-   -> count => 5 -> "Tuoi Messaggi" or "Messaggi di Jim"
+- `<your key="message" count=>"&messages.count"/>`:
 
- - `<your key="activerecord.models.entry" count=>"&this.entries.count"/>`
-   -> count => 1 -> "Tua Entrata" or "Entrata di Jim"
-   -> count => 5 -> "Tue Entrate" or "Entrate di Jim"
+ - count => 1: "Tuo Messaggio" or "Messaggio di Jim"
+ - count => 5: "Tuoi Messaggi" or "Messaggi di Jim"
 
- - `<your>Posts</your>` -> "your Posts" or "Jim's Posts"
+- `<your key="activerecord.models.entry" count=>"&this.entries.count"/>`:
+
+ - count => 1: "Tua Entrata" or "Entrata di Jim"
+ - count => 5: "Tue Entrate" or "Entrate di Jim"
+
+- `<your>Posts</your>`: "your Posts" or "Jim's Posts"
  -->
-
 <def tag="your" attrs="key, capitalize"><%=
    key ||= 'default'
    # prepare symbolized attributes for merging
@@ -773,19 +779,15 @@ Notes
    capitalize ? s.sub(/^./){|c| c.upcase} : s
 %></def>
 
-<!-- Equivalent to `<your ... capitalize/>`-->
-<def tag="Your"><your merge capitalize/></def>
+<!-- Capitalised version of `<a-or-an>` -->
+<def tag="A-or-An" attrs="word"><%=
+  (word =~ /^[aeiou]/i ? "An " : "A ") + word
+%></def>
 
 <!-- Deprecated. It's harder than you think to do this (e.g. an umbrealla, an user)
 -->
 <def tag="a-or-an" attrs="word"><%=
   (word =~ /^[aeiou]/i ? "an " : "a ") + word
-%></def>
-
-
-<!-- Capitalised version of `<a-or-an>` -->
-<def tag="A-or-An" attrs="word"><%=
-  (word =~ /^[aeiou]/i ? "An " : "A ") + word
 %></def>
 
 
