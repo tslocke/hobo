@@ -602,31 +602,28 @@ module Hobo
 
       response_block(&b) or
         if valid?
-          respond_to do |wants|
-            wants.html do
-              redirect_after_submit options
+          if request.xhr? || params[:render]
+            if in_place_edit_field
+              # Decreasingly hacky support for the scriptaculous in-place-editor
+              new_val = call_dryml_tag("view", :field => in_place_edit_field, :no_wrapper => true)
+              hobo_ajax_response(this, :new_field_value => new_val)
+            else
+              hobo_ajax_response(this)
             end
-            wants.js do
-              if in_place_edit_field
-                # Decreasingly hacky support for the scriptaculous in-place-editor
-                new_val = call_dryml_tag("view", :field => in_place_edit_field, :no_wrapper => true)
-                hobo_ajax_response(this, :new_field_value => new_val)
-              else
-                hobo_ajax_response(this)
-              end
 
-              # Maybe no ajax requests were made
-              render :nothing => true unless performed?
-            end
+            # Maybe no ajax requests were made
+            render :nothing => true unless performed?
+          else
+            redirect_after_submit options
           end
         else
-          respond_to do |wants|
-			# errors is used by the translation helper, ht, below.
-            errors = @this.errors.full_messages.join("\n")
-            wants.html { re_render_form(:edit) }
-            wants.js { render(:status => 500,
-                              :text => ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
-                             ) }
+          errors = @this.errors.full_messages.join("\n")
+          if request.xhr? || params[:render]
+            render(:status => 500,
+                   :text => ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
+                             )
+          else
+            re_render_form(:edit)
           end
         end
     end
