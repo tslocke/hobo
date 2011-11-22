@@ -5,7 +5,6 @@ hobo/taglib-docs
 */pkg
 
 dryml/lib/doc
-dryml/tmp
 doc
 dryml/doc
 .yardoc

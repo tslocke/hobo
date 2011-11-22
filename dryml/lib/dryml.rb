@@ -175,7 +175,7 @@ module Dryml
     this = locals.delete(:this) || nil
 
     renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
-      make_renderer_class(template_src, template_path, locals.keys, included_taglibs)
+      make_renderer_class(template_src, template_path, locals.keys)
     renderer_class.new(view).render_page(this, locals)
   end
 

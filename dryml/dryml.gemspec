@@ -14,8 +14,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency('actionpack', ["~> 3.1.0"])
   s.add_runtime_dependency('hobo_support', ["= #{version}"])
   s.add_development_dependency('rubydoctest', [">= 0"])
-  s.add_development_dependency('cucumber', '~> 1.1.0')
-  s.add_development_dependency('aruba', '~> 0.4.6')
 
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
 
