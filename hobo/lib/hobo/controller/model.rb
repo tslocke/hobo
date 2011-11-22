@@ -600,34 +600,28 @@ module Hobo
 
       flash_notice (ht(:"#{@this.class.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
 
-      response_block(&b) or
-        if valid?
-          if request.xhr? || params[:render]
-            if in_place_edit_field
-              # Decreasingly hacky support for the scriptaculous in-place-editor
-              new_val = call_dryml_tag("view", :field => in_place_edit_field, :no_wrapper => true)
-              hobo_ajax_response(this, :new_field_value => new_val)
-            else
-              hobo_ajax_response(this)
-            end
+      response_block(&b) or begin
+                              valid = valid?  # valid? can be expensive
+                              if params[:render]
+                                if (params[:render_options] && params[:render_options][:errors_ok]) || valid
+                                  hobo_ajax_response(this)
 
-            # Maybe no ajax requests were made
-            render :nothing => true unless performed?
-          else
-            redirect_after_submit options
-          end
-        else
-          errors = @this.errors.full_messages.join("\n")
-          if request.xhr? || params[:render]
-            render(:status => 500,
-                   :text => ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
-                             )
-          else
-            re_render_form(:edit)
-          end
-        end
+                                  # Maybe no ajax requests were made
+                                  render :nothing => true unless performed?
+                                else
+                                  errors = @this.errors.full_messages.join('\n')
+                                  message = ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change\\n#{errors}"], :errors=>errors)
+                                  ajax_response("alert('#{message}');", params[:render_options])
+                                end
+                              else
+                                if valid
+                                  redirect_after_submit options
+                                else
+                                  re_render_form(:edit)
+                                end
+                              end
+                            end
     end
-
 
     def hobo_destroy(*args, &b)
       options = args.extract_options!
