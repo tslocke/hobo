@@ -60,7 +60,7 @@ module Hobo
       results = args.extract_options!
       r = params[:render]
       if r
-        ajax_update_response(r.values, results)
+        ajax_update_response(r.values, results, params[:render_options])
         true
       else
         false
