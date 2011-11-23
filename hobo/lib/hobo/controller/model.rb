@@ -495,6 +495,9 @@ module Hobo
       response_block(&b)
     end
 
+    def hobo_edit(*args, &b)
+      hobo_show(*args, &b)
+    end
 
     def hobo_new(record=nil, &b)
       self.this = record || model.user_new(current_user)
