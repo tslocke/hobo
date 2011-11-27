@@ -6,7 +6,7 @@ module Dryml::Helper
       local=local.strip
       locals[local] = eval(local, binding)
     end
-    key2=[this, locals]
+    key2=[typed_id, locals.to_yaml]
     @part_ids ||= {}
     if @part_ids[part_name]
       @part_ids[part_name][key2] ||= "#{part_name}-#{@part_ids[part_name].length.to_s}"
