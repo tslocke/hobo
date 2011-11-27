@@ -14,7 +14,7 @@ The Rapid tag library makes web development go fast. The Rapid tag library is yo
 <include src="rapid_support"/>
 <include src="rapid_document_tags"/>
 <include src="rapid_pages"/>
-<include src="rapid_editing"/>
+<%# <include src="rapid_editing"/> #>
 <include src="rapid_forms"/>
 <include src="rapid_navigation"/>
 <include src="rapid_plus"/>
