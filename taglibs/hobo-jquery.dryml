@@ -760,7 +760,10 @@ field that is automatically saved via Ajax onchange.
   <hjq-datepicker merge/>
 </def>
 
-<def tag="editor" polymorphic/>
+<def tag="editor" polymorphic>
+  <%# if polymorphism fails %>
+  <live-editor merge/>
+</def>
 <def tag="editor" for="string"><click-editor merge /></def>
 <def tag="editor" for="text"><click-editor merge /></def>
 <def tag="editor" for="html"><click-editor merge /></def>
@@ -772,22 +775,43 @@ field that is automatically saved via Ajax onchange.
 <def tag="editor" for="boolean"><live-editor merge /></def>
 <def tag="editor" for="HoboFields::Types::EnumString"><live-editor merge /></def>
 
+<!-- An enhanced version of Rapid's `<collection>` tag that supports drag-and-drop re-ordering.
+
+Each item in the collection has a `<div class="ordering-handle" param="handle">` added, which can be used to drag the item up and down.
+
+### Attributes
+
+`sortable-collection` supports all of the options and events defined by [jQuery UI's Sortable](http://jqueryui.com/demos/sortable/).
+
+Sortable also supports all of the standard [Hobo AJAX callbacks](http://cookbook.hobocentral.net/api_taglibs/rapid_forms).
+
+The jQuery UI option `update` is used internally to save the new order via Ajax.   If you use this option, your function may call `hjq.sortable_collection.update` to retain this functionality.
+
+### Controller support
+
+This tag assumes the controller has a `reorder` action and the model has a `position_column` method. This action is added automatically by Hobo's model-controller if the model declares `acts_as_list`. See also [Drag and Drop Reordering](/manual/controllers#drag_and_drop_reordering) in the [Controllers and Routing](/manual/controllers) chapter of the manual.
+-->
 <def tag="sortable-collection">
 <%
   options, attrs = attributes.partition_hash(['disabled', 'appendTo', 'axis', 'cancel', 'connectWith', 'containment', 'cursor', 'cursorAt', 'delay', 'distance', 'dropOnEmpty', 'forceHelperSize', 'forcePlaceholderSize', 'grid', 'handle', 'helper', 'items', 'opacity', 'placeholder', 'revert', 'scroll', 'scrollSensitivity', 'scrollSpeed', 'tolerance', 'zIndex'])
   events, html_attrs = attrs.partition_hash(['create', 'start', 'sort', 'change', 'beforeStop', 'stop', 'update', 'receive', 'remove', 'over', 'out', 'activate', 'deactivate'])
+  ajax_attrs, html_attrs = attrs.partition_hash(Hobo::Rapid::Helper::AJAX_CALLBACKS)
 
   singular_name = this.member_class.name.underscore
   route_method = subsite ? "#{subsite}_reorder_#{singular_name.pluralize}_url" : "reorder_#{singular_name.pluralize}_url"
   reorder_url = send(route_method)
 
   add_classes!(html_attrs, "rapid-annotated")
-  add_data_rapid!(html_attrs, "sortable-collection", :options => options, :events => events)
+  add_data_rapid!(html_attrs, "sortable-collection", :options => options, :events => events, :ajax_attrs => ajax_attrs, :reorder_url => reorder_url, :reorder_parameter => "#{singular_name}_ordering")
 %>
   <collection class="sortable" merge-attrs="&html_attrs" merge-params>
-    <item: id="#{singular_name}_#{this.id}" param>
+    <item: data-model-id="&this.id" param>
       <div class="ordering-handle" param="handle" if="&can_edit?(this.position_column)">&uarr;<br/>&darr;</div>
       <do param="default"><card param/></do>
     </item:>
   </collection>
 </def>
+
+<extend tag="select-many">
+  <old-select-many data-rapid="&data_rapid('select-many')" merge/>
+</extend>

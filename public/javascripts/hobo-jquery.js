@@ -174,7 +174,7 @@ var hjq = (function() {
                     this.disabled = true;
                     jQuery(this).addClass("input_many_template_input");
                 });
-              
+
                 // bind event handlers
                 me.find(".remove-item").click(hjq.input_many.removeOne);
                 me.find(".add-item").click(hjq.input_many.addOne);
@@ -396,6 +396,70 @@ var hjq = (function() {
                 if(!this.disabled) {
                     jQuery(this).datepicker(hjq.getOptions(annotations));
                 }
+            }
+        },
+
+        sortable_collection: {
+            init: function(annotations) {
+                var options = jQuery.extend({update: hjq.sortable_collection.update}, hjq.getOptions(annotations));
+                jQuery(this).sortable(options);
+            },
+
+            update: function() {
+                var annotations = jQuery(this).data('rapid')['sortable-collection'];
+                var roptions = hjq.ajax.buildRequest({type: 'post',
+                                                      attrs: annotations.ajax_attrs
+                                                     });
+                roptions.data['authenticity_token']=hjq.data.form_auth_token.value;
+                roptions.data=jQuery.param(roptions.data);
+                jQuery(this).children("li[data-model-id]").each(function(i) {
+                    roptions.data = roptions.data+"&"+annotations.reorder_parameter+"[]="+jQuery(this).data('model-id').toString();
+                });
+
+                jQuery.ajax(annotations.reorder_url, roptions);
+            }
+        },
+
+        select_many: {
+            init: function(annotations) {
+                jQuery(this).children('select').on('change', hjq.select_many.addOne);
+                jQuery(this).on('click', 'input.remove-item', hjq.select_many.removeOne);
+            },
+
+            addOne: function() {
+                var top=$(this).parents(".select-many");
+                var selected=$(this).find("option:selected");
+                if(selected.val()) {
+                    var clone=top.find(".item-proto .item").clone().removeClass("proto-item");
+                    clone.find("span").text(selected.text());
+                    clone.find("input[type=hidden]").val(selected.val()).removeClass("proto-hidden");
+                    clone.css('display', 'none');
+                    top.find(".items").append(clone);
+                    clone.slideDown('fast');
+
+                    var optgroup = jQuery("<optgroup/>").
+                        attr('alt', selected.val()).
+                        attr('label', selected.text()).
+                        addClass("disabled-option");
+                    selected.replaceWith(optgroup);
+                    selected.parent().val("");
+
+                    clone.trigger("rapid:add", clone);
+                    clone.trigger("rapid:change", clone);
+                }
+            },
+
+            removeOne: function() {
+                var element = jQuery(this).parent();
+                var top = element.parents('.select-many');
+                var label = element.children("span").text();
+                var optgroup = top.find("optgroup").filter(function() {return this.label==label;});
+                optgroup.replaceWith(jQuery("<option/>").text(label).val(optgroup.attr('alt')));
+                element.slideUp(function() {
+                    element.trigger("rapid:remove", element);
+                    element.trigger("rapid:change", element);
+                    element.remove();
+                });
             }
         },
 

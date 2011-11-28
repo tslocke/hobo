@@ -220,6 +220,20 @@ The alternative is to use `<form>`.   Since this implementation of
 editor starts with an input and switches to a view via Javascript,
 using a form will allow reasonable javascript-disabled behaviour.
 
+## Missing items
+
+ * search
+ * remove button
+ * sortable-input-many
+ * name-many
+ * autocomplete
+ * spinner-next-to fixup
+
+It's quite likely that some of the new tag definitions are missing
+id, class, merge or param attributes.  This doesn't impact core
+functionality, but it does limit your ability to extend the tags.  If
+you notice any such omissions, please let us know, it is easy to fix..
+
 ## Changes behind the scenes
 
 ### reloading of part context
