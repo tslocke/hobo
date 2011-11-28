@@ -1,4 +1,4 @@
-<!--
+!--
 
 This is the jQuery plugin for Hobo.  This plugin provides the jQuery UI widgets in a Hobo friendly manner, provides useful tags and functions for jQuery javascript coding, and provides additional composite tags.
 
@@ -27,12 +27,12 @@ To use it, invoke this tag directly before the tag to annotate.  To get the anno
 
     <def tag="mytag">
       <annotate-tag option_a="42"/>
-      <div class="hjq-annotated">
+      <div class="rapid-annotated">
         ...
       </div>
     </def>
 
-    jQuery(this).find('.hjq-annotated').each(function() {
+    jQuery(this).find('.rapid-annotated').each(function() {
       var annotations = hjq.getAnnotations.call(this);
       ...
     });
@@ -59,16 +59,14 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
 
 <def tag="jquery-assets">
   <stylesheet name='smoothness/jquery-ui-1.8.11.custom.css' />
-  <javascript name="jquery-1.5.2.min.js" />
-  <javascript name="jquery-ui-1.8.11.custom.min.js" />
+  <javascript name="jquery.min.js" />
+  <javascript name="jquery-ui.min.js" />
 </def>
 
 <def tag="hobo-jquery-assets">
   <stylesheet name='hobo-jquery.css' />
   <javascript name="hobo-jquery.js" />
-  <javascript name="event.simulate.js" />
   <script type="text/javascript">
-    jQuery.noConflict();
     jQuery(document).ready(function() {
       hjq.initialize.call(document);
     });
@@ -89,14 +87,38 @@ It's probably useful to set global options such as dateFormat in application.dry
 
     <input:birthdate yearRange="1900:#{Date.today.year}" />
 
+New in version 1.4:
+
+If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.formats.default") from strftime format into the format that the JQuery-UI datepicker likes.
+
 -->
 <def attrs="name" tag="hjq-datepicker">
 <%
   options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'selectOtherMonths','shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
+  options["dateFormat"]||=begin
+                            d=I18n.t(:"date.formats.default")
+                            {"%Y" => "yy",
+                             "%y" => "y",
+                             "%m" => "mm",
+                             "%_m" => "m",
+                             "%-m" => "m",
+                             "%B" => "MM",
+                             "%^B" => "MM",
+                             "%b" => "M",
+                             "%^b" => "M",
+                             "%h" => "M",
+                             "%d" => "dd",
+                             "%-d" => "d",
+                             "%j" => "oo",
+                             "%D" => "mm/dd/y",
+                             "%F" => "yy-mm-dd",
+                             "%x" => "mm/dd/y"}.each {|rb, js| d.gsub!(rb,js)}
+                           d
+                         end
   events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
+  add_classes!(html_attrs, "rapid-annotated")
+  add_data_rapid!(html_attrs, "datepicker", :options => options, :events => events)
 %>
- <annotate-tag tag="hjq-datepicker" init="hjq.datepicker.init" options="&options" events="&events" />
- <% html_attrs = add_classes(html_attrs, "hjq-annotated"); %>
  <%= text_field_tag(name, this, html_attrs) %>
 </def>
 
@@ -133,7 +155,7 @@ And add something like this to your controller:
 
 %>
  <annotate-tag tag="hjq-autocomplete" init="hjq.autocomplete.init" options="&options" events="&events" />
- <% html_attrs = add_classes(html_attrs, "hjq-annotated") 
+ <% html_attrs = add_classes(html_attrs, "rapid-annotated") 
     html_attrs["name"] ||= param_name_for_this
     html_attrs["value"] ||= name(:no_wrapper => true, :if_present => true)
  %>
@@ -191,7 +213,7 @@ Combobox is a new control that is built on autocomplete.   The autocomplete opti
 %>
   <annotate-tag tag="hjq-combobox" init="hjq.combobox.init" options="&options" events="&events"/>
   <% tag ||= 'input' %>
-  <span class="hjq-combobox hjq-annotated" param="default">
+  <span class="hjq-combobox rapid-annotated" param="default">
     <input merge param />
   </span>
 </def>
@@ -241,7 +263,7 @@ end
 %>
   <set empty="&this.empty?"/>
   <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum, add-hook, remove-hook" />
-  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} hjq-annotated" merge-attrs="&attributes - attrs_for(:hjq_input_many_item)">
+  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} rapid-annotated" merge-attrs="&attributes - attrs_for(:hjq_input_many_item)">
     <% template ||= this.try.new_candidate || this.member_class.new %>
     <% minimum ||= 0 ; minimum = minimum.to_i %>
     <fake-field-context fake-field="-1" context="&template">
@@ -334,99 +356,121 @@ end
 
    - `owner`
 -->
-<def tag="formlet" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner">
+<def tag="formlet" polymorphic attrs="element">
 <%
-#FIXME: code very similar to <form>.  refactor out common code.
-
-  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
-
-  ajax_options = {}
-
-  new_record = this.try.new_record?
-
-  method = if method.nil?
-             (action || web_method || new_record) ? "post" : "put"
-           else
-             method.downcase
-           end
-
-  ajax_options[:url] = action || begin
-     target = if owner
-                collection_name = this.class.reverse_reflection(owner).name
-                this.send(owner).send(collection_name)
-              else
-                this
-              end
-     action = web_method || lifecycle
-     object_url(target, action, :method => "post")
-  end
-
-  if action.nil? && (ajax_options[:url].nil? ||
-                     (lifecycle.nil? && new_record && !this.creatable_by?(current_user)) ||
-                     (lifecycle.nil? && !new_record && !can_edit?))
-    Dryml.last_if = false
-    logger.info("blank!!!")
-    ""
-  else
-    if method == "put"
-      # browsers don't support put -- use post and add the Rails _method hack
-      http_method_hidden = hidden_field_tag("_method", "PUT") 
-      ajax_options[:type] = "post"
-    else
-      ajax_options[:type] = method
-    end
-
-    ajax_attrs[:update] = if update 
-                            update.split(/,\s*/) 
-                          else
-                            []
-                          end
-
-    hiddens = nil
-    body = with_form_context do
-      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
-      b = parameters.default
-      hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
-      b
-    end
-
-    auth_token = if method.nil? || method == 'get' || !protect_against_forgery?
-                   ''
-                 else
-                   element(:input, {:type => "hidden", 
-                           :name => request_forgery_protection_token.to_s,
-                           :value => form_authenticity_token}, nil, true, true)
-                 end
-     
-    unless method == "get"
-      page_path = if (request.post? || request.put?) && params[:page_path]
-                    params[:page_path]
-                  else
-                    request.fullpath
-                  end
-      page_path_hidden = hidden_field_tag("page_path", page_path) 
-    end
-
-    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].safe_join)
-
-    body = [hiddens_div, body].safe_join
-
-    if action.nil? # don't add automatic css classes if the action was specified
-      if web_method
-        add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
-      else
-        add_classes!(html_attrs, "#{'new ' if new_record}#{type_id.dasherize}")
-      end
-    end
-
-    Dryml.last_if = true
-  end
-
-  add_classes!(html_attrs, "formlet")
+  body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
+  element ||= 'div'
+  unless body.nil?
+    add_classes!(html_attrs, "formlet")
+    add_data_rapid!(html_attrs, :formlet, :form_attrs => form_attrs, :ajax_attrs => ajax_attrs)
 %>
-<annotate-tag tag="formlet" ajax-attrs="&ajax_attrs" ajax-options="&ajax_options" />
-  <%= element("div", html_attrs, body) %>
+    <%= element(element, html_attrs, body) %>
+<%
+  end
+%>
 </def>
+
+
+<!--
+`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base
+`<form>` tag, a form with contents is generated for each Hobo model. These are found in
+`app/views/taglibs/auto/rapid/forms.dryml`.
+
+### Usage
+
+`<form>` can be used as a regular HTML tag:
+
+        <form action="/blog_posts/1" method="POST">...</form>
+
+If no `action` attribute is provided then the context is used to construct an appropriate action using restful routing:
+
+* If the context is a new record then the form action will be a `POST` to the create action:
+
+        <form with="&BlogPost.new">...</form> -> <form action="/blog_posts" method="POST">...</form>
+
+* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special
+  way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method`
+  with a value of `PUT`. Hobo adds this automatically:
+
+        <% blog_post = BlogPost.find(1) %>
+        <form with="&blog_post">...</form> ->
+        <form action="/blog_posts/1" method="POST">
+          <input id="_method" type="hidden" value="PUT" name="_method"/>
+          ...
+        </form>
+
+AJAX based submission can be enabled by simply adding an `update` attribute. e.g.
+
+        <div part="comments"><collection:comments/></div>
+        <form with="&Comment.new" update="comments"/>
+
+More information on Ajax can be viewed in the [manual](/manual/ajax#forms) or in the [Rapid Forms index](/api_taglibs/rapid_forms).
+
+### Additional Notes
+
+- Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
+
+- Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a
+  validation error occurs.
+
+- `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
+
+- `<form>` resets `last_if` if it does not have permission to display the form.   The `<else>` clause may be used to display alternate content.   For example:
+
+    <form>...</form>
+    <else>You do not have permission to edit this form</else>
+
+or on a standard generated page using a default form:
+
+    <some-page>
+      <after-form:>
+        <else>You do not have permission to edit this form</else>
+      </after-form:>
+    </some-page>
+
+### Attributes
+
+ - [all AJAX attributes](/api_taglibs/rapid_forms)
+
+ - action: the controller action.  Default is create or update as appropriate
+
+ - method: PUT or POST
+
+ - web-method
+
+ - lifecycle
+
+ - owner
+
+ - multipart: if set, the encoding is set to multipart/form-data.  The default is x-www-form-urlencoded
+
+ - reset-form: Clear the form after submission (only makes sense for ajax forms)
+
+ - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
+
+### Parameters
+
+The standard form tag does not have any parameters, nor does it have any default content.   However, Hobo does autogenerate polymorphic form tags for each of your models into `app/views/taglibs/auto/rapid/forms.dryml`.  These forms have the following parameters:
+
+ - error-messages
+
+ - field-list
+
+ - actions
+
+ - submit
+
+ - cancel
+
+-->
+<def tag="form" polymorphic >
+<%
+  body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
+  add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?
+%>
+  <%= element("form", html_attrs.merge(form_attrs), body) if body %>
+</def>
+
 
 <!--
 Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` isn't a form.
@@ -495,8 +539,8 @@ JQuery UI is sometimes picky about types.   For instance, the width option must 
 The following functions are predefined for use in dialog buttons:
 
  * `hjq.dialog.close`:  close the dialog box
- * `hjq.dialog.submit_formlet`:  submits all formlets inside the dialog
- * `hjq.dialog.submit_formlet_and_close`: submits any enclosed formlets, then closes the dialog.
+ * `hjq.dialog.submitFormlet`:  submits all formlets inside the dialog
+ * `hjq.dialog.submitFormletAndClose`: submits any enclosed formlets, then closes the dialog.
 -->
 <def tag="hjq-dialog" attrs="buttons">
 <% #FIXME: dry these names
@@ -506,7 +550,7 @@ The following functions are predefined for use in dialog buttons:
 %>
  <span class="hjq-dialog-position"></span>
  <annotate-tag tag="hjq-dialog" init="hjq.dialog.init" options="&options" events="&events" buttons="&buttons" />
- <% html_attrs = add_classes(html_attrs, "hjq-annotated hidden hjq-dialog"); %>
+ <% html_attrs = add_classes(html_attrs, "rapid-annotated hidden hjq-dialog"); %>
  <div merge-attrs="&html_attrs" param="default" />
 </def>
 
@@ -605,9 +649,145 @@ app/controllers/story_statuses_controller.rb:
   <hjq-dialog-open-button dialog="##{dialog_id}" param>
     New <% this_field.humanize %>
   </hjq-dialog-open-button>
-  <hjq-dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submit_formlet_and_close"]]' title="New #{this_field.humanize}" id="&dialog_id" >
+  <hjq-dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submitFormletAndClose"]]' title="New #{this_field.humanize}" id="&dialog_id" >
     <formlet with="&this_type.new" update="&part_id" success="jQuery('##{part_id} select').val(jQuery('##{part_id} option:last').val())">
       <field-list />
     </formlet>
   </hjq-dialog>
-</def>  
+</def>
+
+
+<def tag="hjq-rapid-json">
+  <%
+     # FIXME: This should interrogate the model-router - not the models
+     unless Hobo::Model.all_models.empty?
+       # Tell JS code how to pluralize names, unless they follow the simple rule
+       names = {}
+       Hobo::Model.all_models.each do |m|
+         m = m.name.underscore
+         names[m] = m.pluralize unless m.pluralize == m + 's'
+       end.compact
+     end
+               %>
+  <annotate-tag  pluralisations="&names"
+                 url-base="&[base_url, subsite].compact.join('/')"
+                 hobo-page-path="&request.fullpath"
+                 form-auth-token="&{ 'name' => request_forgery_protection_token, 'value' => form_authenticity_token}"
+                 hobo-parts="&part_contexts_storage_uncoded"/>
+
+  <span class="rapid-data"/>
+</def>
+
+<!--
+-->
+<def tag="toggle-edit" attrs="view">
+<%
+  options, attrs = attributes.partition_hash(['copyCss', 'eventsEnabled', 'stickyFocus', 'defaultText', 'events'])
+  events, html_attrs = attrs.partition_hash(['onedit', 'onpreview', 'oncanceledit', 'oncancelpreview'])
+  html_attrs = add_classes(html_attrs, "rapid-annotated toggle-edit");
+%>
+ <annotate-tag tag="toggle-edit" view="&view" options="&options" events="&events" />
+ <input param="default" merge-attrs="&html_attrs" />
+</def>
+
+<!--
+An in-place-editor type control.  Displays the `view` view of a field
+until it's clicked on, when it switches to the `input` view.  Onchange
+the field is saved via Ajax, and onblur the view switches back to the
+`view` view.
+
+Due to the way the DRYML part system works, `<click-editor>` may not
+be parameterized.  If you wish to parameterize it, see
+`<click-editor-innards>`.
+-->
+<def tag='click-editor'>
+  <div part="editor-part">
+    <click-editor-innards/>
+  </div>
+</def>
+
+<!--
+When placed inside of a part, provides a complete parameterizable `<click-editor>`.
+
+### Usage
+
+    <part name="my-part">
+      <click-editor-innards>
+        <before-view:>My</before-view:>
+        <view: replace>
+          My <view restore/>
+        </view: replace>
+      </click-editor-innads>
+    </part>
+
+### Attributes
+
+blank-message: the message to display if the field is blank.  Note
+that you're probably better off changing this via translations
+(hobo.in_place_editor.click_to_edit).
+
+-->
+<def tag='click-editor-innards' attrs="blank-message">
+  <% blank_message ||= t('hobo.in_place_editor.click_to_edit', :default => '(click to edit)') %>
+    <if>
+      <view class="in-place-edit hidden" data-rapid="&data_rapid(:click_editor)" param/>
+    </if>
+    <else>
+      <view with="&blank_message" class="in-place-edit hidden" data-rapid="&data_rapid(:click_editor)" param="blank-view"/>
+    </else>
+    <set my-field="&this_field"/>
+    <formlet with="&this_parent" class="in-place-form" ajax errors-ok param>
+      <error-messages param/><%# TODO: replace with something more compact, maybe even transient %>
+      <input field="&my_field" param/>
+    </formlet>
+</def>
+
+<!--
+A simpler in-place-editor type control.  Renders an `input` of the
+field that is automatically saved via Ajax onchange.
+-->
+<def tag='live-editor'>
+  <div part="live-editor-part">
+    <set my-field="&this_field"/>
+    <formlet with="&this_parent" class="in-place-form" ajax errors-ok data-rapid="&data_rapid(:live_editor)">
+      <error-messages/><%# TODO: replace with something more compact, maybe even transient %>
+      <input field="&my_field"/>
+    </formlet>
+  </div>
+</def>
+
+<def tag="input" for="Date">
+  <hjq-datepicker merge/>
+</def>
+
+<def tag="editor" polymorphic/>
+<def tag="editor" for="string"><click-editor merge /></def>
+<def tag="editor" for="text"><click-editor merge /></def>
+<def tag="editor" for="html"><click-editor merge /></def>
+<def tag="editor" for="datetime"><click-editor merge /></def>
+<def tag="editor" for="date"><click-editor merge /></def>
+<def tag="editor" for="integer"><click-editor merge /></def>
+<def tag="editor" for="BigDecimal"><click-editor merge /></def>
+<def tag="editor" for="float"><click-editor merge /></def>
+<def tag="editor" for="boolean"><live-editor merge /></def>
+<def tag="editor" for="HoboFields::Types::EnumString"><live-editor merge /></def>
+
+<def tag="sortable-collection">
+<%
+  options, attrs = attributes.partition_hash(['disabled', 'appendTo', 'axis', 'cancel', 'connectWith', 'containment', 'cursor', 'cursorAt', 'delay', 'distance', 'dropOnEmpty', 'forceHelperSize', 'forcePlaceholderSize', 'grid', 'handle', 'helper', 'items', 'opacity', 'placeholder', 'revert', 'scroll', 'scrollSensitivity', 'scrollSpeed', 'tolerance', 'zIndex'])
+  events, html_attrs = attrs.partition_hash(['create', 'start', 'sort', 'change', 'beforeStop', 'stop', 'update', 'receive', 'remove', 'over', 'out', 'activate', 'deactivate'])
+
+  singular_name = this.member_class.name.underscore
+  route_method = subsite ? "#{subsite}_reorder_#{singular_name.pluralize}_url" : "reorder_#{singular_name.pluralize}_url"
+  reorder_url = send(route_method)
+
+  add_classes!(html_attrs, "rapid-annotated")
+  add_data_rapid!(html_attrs, "sortable-collection", :options => options, :events => events)
+%>
+  <collection class="sortable" merge-attrs="&html_attrs" merge-params>
+    <item: id="#{singular_name}_#{this.id}" param>
+      <div class="ordering-handle" param="handle" if="&can_edit?(this.position_column)">&uarr;<br/>&darr;</div>
+      <do param="default"><card param/></do>
+    </item:>
+  </collection>
+</def>
