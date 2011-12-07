@@ -229,7 +229,7 @@
                 // if we've been removed, all event handlers on us
                 // have already been removed and we don't bubble
                 // up, so triggering on that won't do any good
-                if(that.parent().length==0) $(document).trigger('rapid:ajax:success', [that]);
+                if(that.parents("body").length==0) $(document).trigger('rapid:ajax:success', [that]);
                 else  that.trigger('rapid:ajax:success', [that]);
             });
             options.success = success_dfd.resolve;
@@ -238,7 +238,7 @@
             if(o.attrs.error) error_dfd.done(methods.createFunction.call(that, o.attrs.error));
             if(o.extra_callbacks.error) error_dfd.done(methods.createFunction.call(that, o.extra_callbacks.error));
             error_dfd.done(function() {
-                if(that.parent().length==0) $(document).trigger('rapid:ajax:error', [that]);
+                if(that.parents("body").length==0) $(document).trigger('rapid:ajax:error', [that]);
                 else  that.trigger('rapid:ajax:error', [that]);
             });
             options.error = error_dfd.resolve;
@@ -247,7 +247,7 @@
             if(o.attrs.complete) complete_dfd.done(methods.createFunction.call(that, o.attrs.complete));
             if(o.extra_callbacks.complete) complete_dfd.done(methods.createFunction.call(that, o.extra_callbacks.complete));
             complete_dfd.done(function() {
-                if(that.parent().length==0) $(document).trigger('rapid:ajax:complete', [that]);
+                if(that.parents("body").length==0) $(document).trigger('rapid:ajax:complete', [that]);
                 else  that.trigger('rapid:ajax:complete', [that]);
                 that.hjq_spinner('remove');
                 if(o.attrs.refocus_form) that.find(":input[type!=hidden]:first").focus();
