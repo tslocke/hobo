@@ -1,3 +1,46 @@
+# Installing
+
+Modify or add the following lines in your Gemfile:
+
+    gem 'hobo', :git => 'git://github.com/tablatom/hobo.git', :branch => 'jquery'
+    gem "jquery-rails"
+    gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "no-prototype"
+
+And then run
+
+    bundle install
+    rails generate jquery:install --ui
+    rails generate hobo_jquery:install
+
+Add the following to your application.dryml:
+
+    <include gem="hobo-jquery"/>
+
+If you previously had hobo-jquery installed, remove the
+`<hjq-assets/>` call you previously added.
+
+## Running the integration tests:
+
+Unfortunately, 2 of the integration tests fails on firefox, which
+works out of the box, so we also have to install capybara-webkit and
+selenium-chrome.
+
+     $ git clone -b jquery git://github.com/Hobo/agility-gitorial.git
+     $ cd agility-gitorial
+
+Make sure you have the prerequisites for capybara-webkit:
+https://github.com/thoughtbot/capybara-webkit/wiki/Installing-QT
+
+     $ bundle install
+     $ rake db:migrate
+
+Download the selenium-chrome server and place in your path:
+http://code.google.com/p/chromium/downloads/list
+
+     $ rake test:integration
+
+Email the list and/or bryan@larsen.st if you get any failures.
+
 ## Retention of Prototype
 
 Currently the jquery branch of github.com:/tablatom/hobo is a 1.3
