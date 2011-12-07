@@ -6,4 +6,5 @@ spec = Gem::Specification.new do |s|
   s.author = "Bryan Larsen"
   s.email = "bryan@larsen.st"
   s.files = `git ls-files -z`.split("\0")
+  s.add_runtime_dependency('jquery-rails', [">= 0"])
 end
