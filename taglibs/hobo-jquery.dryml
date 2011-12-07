@@ -1006,7 +1006,7 @@ Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-contex
       <javascript param="application-javascript" name="application"/>
     </scripts:>
 
-    <page-scripts: hide="&['slide',{:direction => :up}, 'slow']" show="&['slide',{:direction => :up},'slow']"/>
+    <%# page-scripts: hide="&['slide',{:direction => :up}, 'slow']" show="&['slide',{:direction => :up},'slow']"/ %>
 
     <ajax-progress: class="ajax-progress"/>
   </old-page>
