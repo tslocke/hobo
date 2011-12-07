@@ -51,9 +51,9 @@ Hobo::Rapid::Helper.module_eval do
       logger.info("unable to render form")
       return nil
     else
-      if method == "put"
+      if method == "put" || method == "delete"
         # browsers don't support put -- use post and add the Rails _method hack
-        http_method_hidden = hidden_field_tag("_method", "PUT")
+        http_method_hidden = hidden_field_tag("_method", method.upcase)
         form_attrs[:method] = "post"
       else
         http_method_hidden = ""
@@ -77,7 +77,7 @@ Hobo::Rapid::Helper.module_eval do
                    end
 
       unless method == "get"
-        page_path = if (request.post? || request.put?) && params[:page_path]
+        page_path = if (request.post? || request.put? || request.delete?) && params[:page_path]
                       params[:page_path]
                     else
                       request.fullpath
@@ -109,6 +109,11 @@ Hobo::Rapid::Helper.module_eval do
     {tag => options}.to_json
   end
 
+  def data_rapid_page_data(options)
+    { 'form_auth_token' => { 'name' => request_forgery_protection_token, 'value' => form_authenticity_token},
+      'hobo_parts' => part_contexts_storage_uncoded }.merge(options).to_json
+
+  end
 end
 
 Dryml::PartContext.module_eval do

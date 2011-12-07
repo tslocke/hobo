@@ -59,16 +59,21 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
 
 <def tag="jquery-assets">
   <stylesheet name='smoothness/jquery-ui-1.8.11.custom.css' />
-  <javascript name="jquery.min.js" />
-  <javascript name="jquery-ui.min.js" />
+  <javascript name="jquery.js" />
+  <javascript name="jquery-ui.js" />
+  <javascript name="jquery_ujs.js" />
 </def>
 
 <def tag="hobo-jquery-assets">
   <stylesheet name='hobo-jquery.css' />
-  <javascript name="hobo-jquery.js" />
+  <javascript name="hobo-jquery/hjq.js" />
+  <repeat with="&%w(form formlet select-many live-editor click-editor datepicker sortable-collection delete-button spinner filter-menu autocomplete input-many dialog live-search search-results combobox)">
+    <javascript name="hobo-jquery/hjq-#{this}.js"/>
+  </repeat>
+  <javascript name="combobox.js"/>
   <script type="text/javascript">
     jQuery(document).ready(function() {
-      hjq.initialize.call(document);
+      $(this).hjq();
     });
   </script>
 </def>
@@ -126,25 +131,35 @@ If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.forma
 <!--
 This is the [jQuery-UI autocompleter](http://jqueryui.com/demos/autocomplete/).  All options and events provided by the jQuery autocompleter are supported in this Hobo tag.   Refer to the jquery autocomplete documentation for more details.
 
-This tag works very similarly to the `name-one` tag used in Hobo.  The main reason I use `hjq-autocomplete` is that the scriptaculous widget used by Hobo for `name-one` does not work well in Internet Explorer:  https://prototype.lighthouseapp.com/projects/8887/tickets/33
-
 If you do not provide a `source` option, this tag will essentially provide a default similar to this:
 
     <hjq-autocomplete:project source="&Project.find(:all, :limit => 5000).map {|p| p.name}" />
 
 This will provide a local autocomplete, putting all possible options into your HTML.  This is useful when you have too many options to make a `select-one` infeasible, but will overload your server and crash your browser if you have millions of options.
 
-To do a server side autocomplete, use a path for your source option:
+To do server side autocomplete, you need a controller action like:
+
+    class FoosController < ActionController:Base
+      hobo_user_controller
+      autocomplete :bar
+    end
+
+    <hjq-autocomplete:foo source="&complete_bar_foos_path" />
+
+The argument to the controller's `autocomplete` is optional.  If not supplied the name attribute for the model should be used in the source attribute.
+
+If you do not wish to use the Hobo autocomplete or hobo_completions functions in your controller, it is very easy to roll your own.   For example:
 
     <hjq-autocomplete:project source="&query_projects_path" delay="500" minLength="3" />
 
-And add something like this to your controller:
+Could be served by:
 
     index_action :query do
       render :json => Project.name_contains(params[:term]).limit(100).*.name
     end
+
 -->
-<def tag="hjq-autocomplete">
+<def tag="autocomplete" attrs="nil-value">
 <%
   options, attrs = attributes.partition_hash(['disabled', 'appendTo', 'autoFocus', 'delay', 'minLength', 'position', 'source'])
   events, html_attrs = attrs.partition_hash(['create', 'search', 'open', 'focus', 'select', 'close', 'change'])
@@ -153,40 +168,43 @@ And add something like this to your controller:
                           complete_target.find(:all, :limit => 5000).*.send(complete_target.name_attribute)
                         end
 
-%>
- <annotate-tag tag="hjq-autocomplete" init="hjq.autocomplete.init" options="&options" events="&events" />
- <% html_attrs = add_classes(html_attrs, "rapid-annotated") 
-    html_attrs["name"] ||= param_name_for_this
-    html_attrs["value"] ||= name(:no_wrapper => true, :if_present => true)
- %>
- <%= text_field_tag(name, this, html_attrs) %>
+  html_attrs["name"] ||= param_name_for_this
+  html_attrs["value"] ||= name(:no_wrapper => true, :if_present => true)
 
+  if(html_attrs["value"].empty?)
+    add_classes!(html_attrs, "nil-value")
+    html_attrs["value"] = nil_value
+  end
+
+  add_data_rapid!(html_attrs, "autocomplete", :options => options, :events => events)
+ %>
+  <wrap tag="span" class="field-with-errors" when="&!this_parent.errors[this_field].empty?">
+    <input type="text" merge-attrs="&html_attrs"/>
+  </wrap>
 </def>
 
 
 <!-- Creates an enhanced version of the [jQuery-UI demo combobox](http://jqueryui.com/demos/autocomplete/#combobox).  This will turn any select (even a select-many) into a combobox.
 
-NOTE:  backwards compatibility with the Hobo&Rails prototype/lowpro handlers requires event.simulate.js.   You may need to rerun your hobo_query:install generator to copy this file into your application.
-
 Standard usage:
 
-    <hjq-combobox>
+    <combobox>
       <select .../>
-    </hjq-combobox>
+    </combobox>
 
 If you don't supply the select, it will use Hobo's `<input>` tag.  This is usually the right default.
 
 You can tell Hobo to always use a combobox for select-one, select-many, select-input and/or select-menu.   Notice that we also changed the limit - 100 is the default, which makes sense for a select, but not for a combobox.
 
     <extend tag="select-one">
-      <hjq-combobox tag="select-one">
+      <combobox tag="select-one">
         <old-select-one limit="5000" merge/>
-      </hjq-combobox>
+      </combobox>
     </extend>
 
 To make the behavior more like the demo's, turn off autoFill and clearButton:
 
-    <hjq-combobox autoFill="&false" clearButton="&false"/>
+    <combobox autoFill="&false" clearButton="&false"/>
 
 Combobox is a new control that is built on autocomplete.   The autocomplete options may not be used directly.   If you need any of them let me know, they should not be too hard to add if you volunteer to test them.
 
@@ -202,11 +220,10 @@ Combobox is a new control that is built on autocomplete.   The autocomplete opti
 
 ### Events
 
-- `selected` (default: `$(this).simulate('change');`):  this is a jQuery-UI event handler.  The default value for this option fires the `onchange` handler on the underlying `select` in a manner compatible with both prototype.js and jQuery.  For this to work, event.simulate.js must be loaded, and jQuery must be put into noConflict mode.  hobo-jquery should be doing both of these for you if you are using it as recommended in the README.
-
+- `selected` (default: `$(this).trigger('change');`):
 -->
 
-<def tag="hjq-combobox" options="tag">
+<def tag="combobox" options="tag">
 <%
   options, attrs = attributes.partition_hash(['autoFill', 'clearButton', 'adjustWidth', 'uiStyle'])
   events, html_attrs = attrs.partition_hash(['selected'])
@@ -221,19 +238,69 @@ Combobox is a new control that is built on autocomplete.   The autocomplete opti
 
 <!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
 
+This tag is very different from tags like `<select-many>` and `<check-many>` in that:
+
+ - Those tags are used to *choose existing records* to include in the association, while `<input-many>` is used to actually create or edit the records in the association.
+
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <input-many:products fields="name, price"/>
+
+which is the same as
+
+    <input-many:products><field-list fields="name, price"/></input-many>
+
+The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+
+### Attributes
+
+ - fields:  If you do not specify any content for the input-many, a `<field-list>` is rendered.   This attribute is passed through to the `<field-list>`
+
+ - skip:  Passed through to the `<field-list>`.  If not specified, it defaults to the parent association.
+
+ - `minimum`: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
+
+ - `template`: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
+
+ - `add-hook`, `remove-hook`: javascript hooks which work similarly to the events described below.
+
+### Events
+
+ - `rapid:add`: fired after the element is inserted
+
+ - `rapid:remove`: fired before the element is inserted.  Returning false will cancel the removal.
+
+ - `rapid:change`: fired after an element has been removed or inserted.
+
+Example javascript:
+
+      var last_added;
+      var last_removed;
+      $(document).ready(function() {
+        $('.stories').on('rapid:add', function(ev) {
+          last_added = this;
+        });
+        $('.stories').on('rapid:remove', function(ev) {
+          last_removed = this;
+          if(!confirm("really?")) return false;
+        });
+      });
+
 Most of the enhancements from hjq-input-many have been folded back into hjq-input-many, but there are a few remaining differences:
 
  - it supports delayed initialization, required for some Javascript elements like the jQuery UI datepicker
  - the name of the main parameter is `item` rather than `default`
  - hjq-input-many allows you to provide javascript callbacks.  input-many fires
     rapid:add, rapid:change and rapid:remove events that can be hooked.
- 
+
 ### Example
 
 Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
 
     <hjq-input-many:products fields="name, price" />
-    
+
 You'll often want to provide the `item` parameter:
 
     <hjq-input-many:products><item:><field-list fields="name, price" /></item:></hjq-input-many>
@@ -254,7 +321,7 @@ A fully worked up example of nested hjq-input-many's may be found in [agility/jq
 
 
   -->
-<def tag="hjq-input-many" attrs="minimum, fields, template, add-hook, remove-hook" polymorphic >
+<def tag="input-many" attrs="minimum, fields, skip, more-skip, template, add-hook, remove-hook, hide, show" polymorphic >
 <%
 # helper function to create id's on buttons to facilitate testing
 def underize(s)
@@ -262,25 +329,30 @@ def underize(s)
 end
 %>
   <set empty="&this.empty?"/>
-  <annotate-tag tag="hjq-input-many" init="hjq.input_many.init" merge-attrs="minimum, add-hook, remove-hook" />
-  <ul class="hjq-input-many #{this_field.dasherize} #{css_data :input_many_prefix, param_name_for_this} rapid-annotated" merge-attrs="&attributes - attrs_for(:hjq_input_many_item)">
-    <% template ||= this.try.new_candidate || this.member_class.new %>
-    <% minimum ||= 0 ; minimum = minimum.to_i %>
+  <% template ||= this.try.new_candidate || this.member_class.new -%>
+  <% minimum ||= 0 ; minimum = minimum.to_i -%>
+  <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection -%>
+  <% skip += ",#{more_skip}" if more_skip -%>
+  <% js_attrs = all_attributes.slice(:minimum, :add_hook, :remove_hook, :hide, :show) %>
+  <% js_attrs[:prefix] = param_name_for_this %>
+  <ul class="input-many #{this_field.dasherize}" data-rapid="#{data_rapid('input-many', js_attrs)}" merge-attrs>
     <fake-field-context fake-field="-1" context="&template">
-      <li class="input-many-template" id="#{param_name_for_this}">
-        <hjq-input-many-item param="item" merge-attrs="fields" />
+      <li class="input-many-li input-many-template" id="#{underize param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
         <div class="buttons">
           <button param="remove-item" id="#{underize param_name_for_this}_remove">-</button>
           <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
         </div>
       </li>
     </fake-field-context>
-    <li class="empty #{'hidden' unless this.empty? and minimum==0}" id="#{param_name_for_this}[-1]_empty">
+    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{underize param_name_for_this}_-1_empty">
       <!-- HACK way to signal an empty collection to the controller -->
-      <input type="hidden" class="empty-input" id="#{param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
+      <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
         <div param="empty-message">
-          <ht key="#{this.class.to_s.underscore}.collection.empty_message">          
+          <ht key="#{this.class.to_s.underscore}.collection.empty_message">
             No <%= this.class.name.titleize.downcase.pluralize %>.
           </ht>
         </div>
@@ -288,21 +360,25 @@ end
           <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
           <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
         </div>
-      </fake-field-context>      
+      </fake-field-context>
     </li>
     <fake-field-context fake-field="0" context="&template">
-      <li if="&(this_parent.empty? && minimum>0)" id="#{param_name_for_this}">
-        <hjq-input-many-item param="item" merge-attrs="fields" />
+      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{underize param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
         <div class="buttons">
           <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
           <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
         </div>
       </li>
-    </fake-field-context>       
-    <li repeat class="#{'record-with-errors' unless this.errors.empty?}" id="#{param_name_for_this}">
+    </fake-field-context>
+    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{underize param_name_for_this}">
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
-      <hjq-input-many-item param="item" merge-attrs="fields" />
+      <div class="input-many-item" param="default">
+        <field-list param merge-attrs="fields" skip="&skip" />
+      </div>
       <div class="buttons">
         <button param="remove-item" class="#{'hidden' if this_parent.length<=minimum}" id="#{underize param_name_for_this}_remove">-</button>
         <button param="add-item" class="#{'hidden' if not last_item?}" id="#{underize param_name_for_this}_add">+</button>
@@ -466,14 +542,17 @@ The standard form tag does not have any parameters, nor does it have any default
 <def tag="form" polymorphic >
 <%
   body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
-  add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?
+  unless body.nil?
+    add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?
 %>
-  <%= element("form", html_attrs.merge(form_attrs), body) if body %>
+    <%= element("form", html_attrs.merge(form_attrs), body) if body %>
+<% end %>
 </def>
 
 
 <!--
-Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` isn't a form.
+Submit button for use with `<formlet>`.  DEPRECATED: This tag is no longer needed in current versions of hobo-jquery:  the standard `<submit>` will work in a formlet now.
+
 -->
 <def tag="formlet-submit" attrs="label, image, method">
   <% label ||= 'submit' %>
@@ -486,104 +565,78 @@ Submit button for use with `<formlet>`.  Submit won't work, because `<formlet>` 
 </def>
 
 <!--
-Submit button for use with the `<form>`.  This uses hjq.form.submit to
-submit the form via jquery form plugin ajax, rather than using the
-standard HTTP or Hobo form submission mechanisms.  The main advantage
-this has is that the jquery form plugin supports ajax submission of
-attachments.
-
-You must have the jquery form plugin installed.  It is not installed
-automatically by hobo-jquery.
-
-FIXME: this function HARD CODES it's ajax options, in particular
-update="attachments-div".  It does not (yet) get the parameters from
-the form, nor does it get them through the standard hobo-jquery
-mechanism.   update in hobo-jquery.js.
--->
-<def tag="hjq-submit" attrs="label, image, method">
-  <% label ||= 'submit' %>
-  <if test='&image'>
-    <input class='image-button hjq-form-submit-button' type='image' src='&image' onClick='hjq.form.submit.call(this)' merge-attrs />
-  </if>
-  <else>
-    <input class='button hjq-form-submit-button' type='button' value='#{label}' onClick='hjq.form.submit.call(this)' merge-attrs />
-  </else>
-</def>
-
-<!--
 The JQuery UI [dialog](http://jqueryui.com/demos/dialog/).  All options and methods are supported.
 
-The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to `"&false"`.  To display the dialog set autoOpen to `"&true"`, use a `<hjq-dialog-open-button>`, use the [jQuery dialog open method](http://jqueryui.com/demos/dialog/#method-open), or use an `<hjq-dialog-and-button>` instead.
+The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to `"&false"`.  To display the dialog set autoOpen to `"&true"`, use a `<dialog-open-button>`, use `<dialog-and-button>` or use javascript (`$('#foo-dialog').hjq_dialog('open');`).
 
-The default for [position](http://jqueryui.com/demos/dialog/#option-position) is also set so that the dialog appears where it is defined.
-
-The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Instead of an Hash, it expects a list of pairs.  (Unlike Javascript Objects, Ruby Hash's do not preserve order).  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
+The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
 
     <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
-    <hjq-dialog buttons="&buttons" />
+    <dialog buttons="&buttons">My dialog text</dialog>
 
 or
 
-    <hjq-dialog id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' />
+    <dialog id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog>
 
 or
 
-    <hjq-dialog id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' />
+    <dialog id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
 
-Because Ruby Hash's do not preserve order, you may use a list of pairs instead of a Hash.
+Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
+
+If you do not set [position](http://jqueryui.com/demos/dialog/#option-position) the dialog will appear where it is defined in your DRYML.
 
 JQuery UI is sometimes picky about types.   For instance, the width option must be a number, not a string.  By default Hobo options are strings, but you can easily send a number by using the ampersand to switch to ruby mode:
 
-    <hjq-dialog width="&640"/>
+    <dialog width="&640"/>
 
-The following functions are predefined for use in dialog buttons:
+The following functions are predefined for use in dialog buttons:  FIXME
 
  * `hjq.dialog.close`:  close the dialog box
  * `hjq.dialog.submitFormlet`:  submits all formlets inside the dialog
  * `hjq.dialog.submitFormletAndClose`: submits any enclosed formlets, then closes the dialog.
 -->
-<def tag="hjq-dialog" attrs="buttons">
-<% #FIXME: dry these names
+<def tag="dialog-box" attrs="buttons">
+<%
  options, attrs = attributes.partition_hash(["autoOpen", "bgiframe", "closeOnEscape", "dialogClass", "draggable", "height", "hide", "maxHeight", "maxWidth", "minWidth", "modal", "position", "resizable", "show", "stack", "title", "width", "zIndex"])
  events, html_attrs = attrs.partition_hash(["beforeclose", "open", "focus", "dragStart", "drag", "dragStop", "resizeStart", "resize", "resizeStop", "close"])
  options["autoOpen"]=false unless options.has_key?("autoOpen")
 %>
- <span class="hjq-dialog-position"></span>
- <annotate-tag tag="hjq-dialog" init="hjq.dialog.init" options="&options" events="&events" buttons="&buttons" />
- <% html_attrs = add_classes(html_attrs, "rapid-annotated hidden hjq-dialog"); %>
- <div merge-attrs="&html_attrs" param="default" />
+ <span class="dialog-position"></span>
+ <% html_attrs = add_classes(html_attrs, "hidden dialog-box") %>
+ <div merge-attrs="&html_attrs" data-rapid="&data_rapid('dialog-box', :options => options, :events => events, :buttons => buttons)" param="default" />
 </def>
 
 <!--
-When pressed, will open a `<hjq-dialog>`.
+When pressed, will open a `<dialog-box>`.
 
 ### Attributes
  * `dialog` (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
- * supports all `<button>` attributes except for `onclick`
+ * supports all `<button>` attributes
 
 ### Example
-    <hjq-dialog id="hello-dialog">Hello!</hjq-dialog>
-    <hjq-dialog-open-button dialog="#hello-dialog">Press Me!</hjq-dialog-open-button>
+    <dialog id="hello-dialog">Hello!</dialog>
+    <dialog-open-button dialog="#hello-dialog">Press Me!</dialog-open-button>
 -->
-<def tag="hjq-dialog-open-button" attrs="dialog">
-  <button onclick="hjq.dialog_opener.click(this, jQuery('#{dialog}')); return false;" param="default" class="hjq-dialog-open-button" merge />
+<def tag="dialog-open-button" attrs="dialog">
+  <button data-rapid="&data_rapid('dialog-open-button', :selector => dialog)" param="default" class="dialog-open-button" merge />
 </def>
 
 <!--
-Defines an `<hjq-dialog>` and a `<hjq-dialog-open-button>` and links the two together.
+Defines an `<dialog-box>` and a `<dialog-open-button>` and links the two together.
 
 ### Attributes
  * `id` (optional): the DOM id to use for the dialog
 -->
-<def tag="hjq-dialog-and-button">
+<def tag="dialog-and-button">
   <% # we can't use jQuery traversal functions since the dialog will move around in the DOM %>
-  <% attributes["id"]="hjq-dialog-#{(rand*1000000000).to_i}" unless attributes.has_key?("id") %>
-  <hjq-dialog param merge />
-  <hjq-dialog-open-button dialog="##{attributes['id']}" param />
+  <% attributes["id"]="dialog-#{(rand*1000000000).to_i}" unless attributes.has_key?("id") %>
+  <dialog-box param merge />
+  <dialog-open-button dialog="##{attributes['id']}" param />
 </def>
 
 <!--
-Defines a `<select-one>` and a button that brings up an `<hjq-dialog>` containing a form allowing you to enter a new item.  After the form is filled in and closed, the `<select-one>` is changed to select the new item.
+Defines a `<select-one>` and a button that brings up an `<dialog>` containing a form allowing you to enter a new item.  After the form is filled in and closed, the `<select-one>` is changed to select the new item.
 
 ### Caveats
 
@@ -643,40 +696,19 @@ app/controllers/story_statuses_controller.rb:
 
 -->
 <def tag="select-one-or-new-dialog">
-  <% dialog_id="hjq-dialog-#{typed_id.gsub(':', '-')}" %>
+  <% dialog_id="dialog-#{typed_id.gsub(':', '-')}" %>
   <% part_id = "select-one-#{typed_id.gsub(':', '-')}" %>
   <input part="select-one-or-new-dialog-select" id="#{part_id}"/>
-  <hjq-dialog-open-button dialog="##{dialog_id}" param>
+  <dialog-open-button dialog="##{dialog_id}" param>
     New <% this_field.humanize %>
-  </hjq-dialog-open-button>
-  <hjq-dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submitFormletAndClose"]]' title="New #{this_field.humanize}" id="&dialog_id" >
+  </dialog-open-button>
+  <dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submitFormletAndClose"]]' title="New #{this_field.humanize}" id="&dialog_id" >
     <formlet with="&this_type.new" update="&part_id" success="jQuery('##{part_id} select').val(jQuery('##{part_id} option:last').val())">
       <field-list />
     </formlet>
-  </hjq-dialog>
+  </dialog>
 </def>
 
-
-<def tag="hjq-rapid-json">
-  <%
-     # FIXME: This should interrogate the model-router - not the models
-     unless Hobo::Model.all_models.empty?
-       # Tell JS code how to pluralize names, unless they follow the simple rule
-       names = {}
-       Hobo::Model.all_models.each do |m|
-         m = m.name.underscore
-         names[m] = m.pluralize unless m.pluralize == m + 's'
-       end.compact
-     end
-               %>
-  <annotate-tag  pluralisations="&names"
-                 url-base="&[base_url, subsite].compact.join('/')"
-                 hobo-page-path="&request.fullpath"
-                 form-auth-token="&{ 'name' => request_forgery_protection_token, 'value' => form_authenticity_token}"
-                 hobo-parts="&part_contexts_storage_uncoded"/>
-
-  <span class="rapid-data"/>
-</def>
 
 <!--
 -->
@@ -722,21 +754,30 @@ When placed inside of a part, provides a complete parameterizable `<click-editor
 
 ### Attributes
 
+The ajax effect options `hide` and `show` adjust the effects used when clicking on the element.  To adjust the effects on update, set `hide` and `show` on the `formlet:` parameter.
+
+All other ajax options are also supported.
+
 blank-message: the message to display if the field is blank.  Note
 that you're probably better off changing this via translations
 (hobo.in_place_editor.click_to_edit).
 
 -->
 <def tag='click-editor-innards' attrs="blank-message">
-  <% blank_message ||= t('hobo.in_place_editor.click_to_edit', :default => '(click to edit)') %>
+  <%
+  blank_message ||= t('hobo.in_place_editor.click_to_edit', :default => '(click to edit)')
+  effect_attrs,attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_EFFECT_ATTRS)
+  ajax_attrs,attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+  data = data_rapid('click-editor', effect_attrs)
+  %>
     <if>
-      <view class="in-place-edit hidden" data-rapid="&data_rapid(:click_editor)" param/>
+      <view class="in-place-edit hidden" data-rapid="&data" param/>
     </if>
     <else>
-      <view with="&blank_message" class="in-place-edit hidden" data-rapid="&data_rapid(:click_editor)" param="blank-view"/>
+      <view with="&blank_message" class="in-place-edit hidden" data-rapid="&data" param="blank-view"/>
     </else>
     <set my-field="&this_field"/>
-    <formlet with="&this_parent" class="in-place-form" ajax errors-ok param>
+    <formlet with="&this_parent" class="in-place-form" ajax errors-ok merge-attrs="&ajax_attrs" param>
       <error-messages param/><%# TODO: replace with something more compact, maybe even transient %>
       <input field="&my_field" param/>
     </formlet>
@@ -745,15 +786,39 @@ that you're probably better off changing this via translations
 <!--
 A simpler in-place-editor type control.  Renders an `input` of the
 field that is automatically saved via Ajax onchange.
+
+Due to the way the DRYML part system works, `<live-editor>` may not
+be parameterized.  If you wish to parameterize it, see
+`<live-editor-innards>`.
 -->
 <def tag='live-editor'>
   <div part="live-editor-part">
-    <set my-field="&this_field"/>
-    <formlet with="&this_parent" class="in-place-form" ajax errors-ok data-rapid="&data_rapid(:live_editor)">
-      <error-messages/><%# TODO: replace with something more compact, maybe even transient %>
-      <input field="&my_field"/>
-    </formlet>
+    <live-editor-innards/>
   </div>
+</def>
+
+<!--
+When placed inside of a part, provides a complete parameterizable `<click-editor>`.
+
+### Usage
+
+    <part name="my-part">
+      <live-editor-innards hide="puff"/>
+    </part>
+
+### Attributes
+
+Attributes are merged onto the supporting formlet, so all formlet
+attributes are supported.  Many don't make sense to customize, but
+others such as `hide` and `show`, do.
+
+-->
+<def tag='live-editor-innards'>
+  <set my-field="&this_field"/>
+  <formlet with="&this_parent" class="in-place-form" ajax errors-ok data-rapid="&data_rapid('live-editor')" param merge>
+    <error-messages param/><%# TODO: replace with something more compact, maybe even transient %>
+    <input field="&my_field" param/>
+  </formlet>
 </def>
 
 <def tag="input" for="Date">
@@ -785,7 +850,7 @@ Each item in the collection has a `<div class="ordering-handle" param="handle">`
 
 Sortable also supports all of the standard [Hobo AJAX callbacks](http://cookbook.hobocentral.net/api_taglibs/rapid_forms).
 
-The jQuery UI option `update` is used internally to save the new order via Ajax.   If you use this option, your function may call `hjq.sortable_collection.update` to retain this functionality.
+The jQuery UI option `update` is used internally to save the new order via Ajax.   If you modify this option, your function may call `$(this).hjq_sortable_collection('update')` to retain this functionality.
 
 ### Controller support
 
@@ -805,13 +870,398 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
   add_data_rapid!(html_attrs, "sortable-collection", :options => options, :events => events, :ajax_attrs => ajax_attrs, :reorder_url => reorder_url, :reorder_parameter => "#{singular_name}_ordering")
 %>
   <collection class="sortable" merge-attrs="&html_attrs" merge-params>
-    <item: data-model-id="&this.id" param>
+    <item: param>
       <div class="ordering-handle" param="handle" if="&can_edit?(this.position_column)">&uarr;<br/>&darr;</div>
       <do param="default"><card param/></do>
     </item:>
   </collection>
 </def>
 
+<!-- adds support for hide, show attrs -->
 <extend tag="select-many">
-  <old-select-many data-rapid="&data_rapid('select-many')" merge/>
+  <% effect_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_EFFECT_ATTRS)
+  %>
+  <old-select-many data-rapid="&data_rapid('select-many', effect_attrs)" merge/>
 </extend>
+
+<!-- Provides either an ajax or non-ajax delete button to send a
+     RESTful "DELETE". The context should be a record for which you to
+     want provide a delete button.
+
+There are three possible types of `delete-button` created.
+
+### Non-Ajax
+
+No Ajax is used if
+
+ - the `update`, `updates` and `ajax` attributes are not set AND EITHER
+ - `in-place` is explicitly set false OR
+ - the context for the delete is the same as the top-level context for the page.   In other words, if you're trying to delete the entire page.
+
+### Standard form Ajax
+
+If you set the `update`, `updates` or `ajax` attributes, standard form/part AJAX is used.   It's assumed that the part you're specifying includes the item to be deleted so that it will be removed from the page by the update.
+
+### "Magic" Ajax
+
+If:
+
+ - the `update`, `updates` and `ajax` attributes are not set AND EITHER
+ - `in-place` is explicitly set true OR
+ - the context for the delete is not the same as the top-level context for the page.   In other words, if you're not trying to delete the entire page.
+
+then `delete-button` performs an Ajax delete and then attempts to fix up the page.   It does this by removing all items on the page that have their hobo-rapid-context set to the item being deleted.   If said deletion results in an empty list, it shows the `.empty-collection-message`.   This procedure should work with `<collection>`, `<table>` and their children (`<sortable-collection>`, `<table-plus>`, etc.).
+
+### Attributes
+
+All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
+
+ - label: The label for the button. Default: "Remove".  (Alternately, use the hobo.actions.remove translation to customize)
+
+ - in-place: see above
+
+ - image: URL of an image for the button.
+
+ - fade: Perform the fade effect (true/false)? Default: true
+
+ - confirm: has a default value of "Are you sure?" or hobo.messages.confirm translated.  You must explicitly set this to false if you don't want a confirm message.
+
+  -->
+<def tag="delete-button" attrs="label, in-place, image, confirm, fade, subsite"><%
+  url = object_url(this, :method => :delete, :subsite => subsite)
+  if url && can_delete?
+    in_place = !(this == @this && request.method.downcase == "get") if in_place.nil?
+    update_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_UPDATE_ATTRS)
+    ajax_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+    attributes[src] = "#{base_url}/images/#{image}" if image
+    label ||= t("hobo.actions.remove", :default=>"Remove")
+    confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
+
+    add_classes!(attributes,
+                 image ? "image-button" : "button",
+                 "delete-button delete-#{this.class.name.underscore.dasherize}-button")
+
+    if in_place && update_attrs.blank?
+      data_rapid = data_rapid(:delete_button)
+      ajax_attrs[:update] ||= ""   # force form ajax
+      ajax_attrs[:confirm] = confirm
+    elsif !update_attrs.blank?
+      ajax_attrs.merge!(update_attrs)
+      ajax_attrs[:confirm] = confirm
+      data_rapid = nil
+    else
+      data_rapid = nil
+    end
+  end
+%>
+  <if test="&url && can_delete?">
+    <form method="delete" action="&url" class="button_to" merge-attrs="&ajax_attrs" data-rapid="&data_rapid" data-rapid-context="&typed_id" data-confirm="&confirm">
+      <input type="submit" value="&label" merge/>
+    </form>
+  </if>
+</def>
+
+
+<!-- Repeats the body of the tag inside a `<ul>` list with one item for each object in the collection (`this`). If no body is given, renders a `<card>` inside the `<li>`.
+
+Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-context attribute.
+ -->
+<def tag="collection" attrs="list-tag">
+  <% list_tag ||= 'ul' %>
+  <call-tag tag="&list_tag" class="collection #{collection_name :dasherize => true}" merge-attrs unless="empty?">
+    <li param="item" class="#{scope.even_odd}" data-rapid-context="&typed_id" repeat="&select_viewable">
+      <do param="default"><card param/></do>
+    </li>
+  </call-tag>
+  <empty-collection-message param="empty-message"/>
+  <if/><%# set last-if so <else/> works %>
+</def>
+
+<def tag="qunit-includes">
+  <stylesheet name="qunit"/>
+  <javascript name="qunit"/>
+</def>
+
+<def tag="qunit-banner">
+  <h1 id="qunit-header">QUnit</h1>
+  <h2 id="qunit-banner"></h2>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests">
+  </ol>
+</def>
+
+<extend tag="page">
+  <old-page merge>
+    <scripts:>
+      <if-ie version="lt IE 7" param="fix-ie6">
+        <javascript name="IE7"/>
+        <javascript name="ie7-recalc"/>
+      </if-ie>
+
+      <hjq-assets/>
+      <qunit-includes/>
+      <javascript name="jquery.form"/>
+
+      <do param="custom-scripts"/>
+
+      <javascript param="application-javascript" name="application"/>
+    </scripts:>
+
+    <before-header:>
+      <qunit-banner/>
+    </before-header:>
+
+    <page-scripts: hide="&['slide',{:direction => :up}, 'slow']" show="&['slide',{:direction => :up},'slow']"/>
+
+    <ajax-progress: class="ajax-progress"/>
+  </old-page>
+</extend>
+
+<def tag="page-scripts">
+  <do param="default">
+    <%= tag("span", :style => "display: none;", "data-rapid-page-data" => data_rapid_page_data(attributes)) %>
+  </do>
+</def>
+
+
+<!-- A `<select>` menu intended to act as a filter for index pages.
+
+### Example
+
+Filtering on state is a common use.   Here's the dryml for Order:
+
+    <filter-menu param-name="state" options="&Order::Lifecycle.states.keys" />
+
+And the controller action:
+
+    def index
+      # always validate data given in URL's!!!
+      params[:state]=nil unless Order::Lifecycle.states.include?(params[:state]._?.to_sym)
+      finder = params[:state] ? Order.send(params[:state]) : Order
+      hobo_index finder
+    end
+
+See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status) in the [Agility Tutorial](/tutorials/agility) for an example.
+
+### Attributes
+
+ - `param-name` - the name of the HTTP parameter to use for the filter
+ - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
+   It can be omitted if you provide the options as an array or array of arrays in the locale file.
+ - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+ - `first-value` - the value to be used with the first option. Typically not used,
+ meaning the option has a blank value.
+ - model - the model name (optional: needed if you use the "activerecord.attributes" namespace.
+
+### I18n
+
+It lookups the options attributes in `activerecord.attributes.#{model}.filter_menu.#{param\_name}.options`
+with fallback to `filter_menu.#{param_name}.options`.
+The passed options are used as a default in case the lookup fails.
+Besides the `activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter` or
+`tags.filter_menu.default.no_filter` key is used as default of the attribute "no-filter"
+(or "All" if no default is found)
+
+### I18n Example
+
+
+    es:
+      activerecord:
+        attributes:
+          <model_name>:
+            filter_menu:
+              period:
+                no_filter: Todos Períodos
+                options:
+                - [ "Hoy", "today" ]
+                - [ "Ayer", "yesterday" ]
+
+or
+
+    es:
+      tags:
+        filter_menu:
+          period:
+            no_filter: Todos Períodos
+            options:
+            - [ "Hoy", "today" ]
+            - [ "Ayer", "yesterday" ]
+
+
+     TIME_PERIODS = %w[today yesterday]
+
+     <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+
+  with I18n.locale == :es
+
+     <select name="period">
+       <option value="">Todos Períodos</option>
+       <option value="today">Hoy</option>
+       <option value="yesterday">Ayer</option>
+     </select>
+
+  with I18n.locale == :en (i.e no locale file)
+
+     <select name="period">
+       <option value="">All Periods</option>
+       <option value="today">today</option>
+       <option value="yesterday">yesterday</option>
+     </select>
+
+  -->
+<def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
+  <% options = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.options", :default=>[:"tags.filter_menu.#{param_name}.options", options])
+     raise ArgumentError, %(You must provide an "options" attribute, or set "activerecord.attributes.#{model}.filter_menu.#{param_name}.options" or "tags.filter_menu.#{param_name}.options" to an Array or to an Array of Arrays
+     in your locale file(s)) unless options.is_a?(Array)
+     no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
+     %>
+  <form action="&request.fullpath" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
+    <div>
+      <% opt = options.first.kind_of?(Array) ? options.*.last : options
+         selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
+      <select-menu name="&param_name" options="&options" selected="&selected"
+                   first-option="&no_filter" first-value="&first_value" key="&param_name" merge-params/>
+      <repeat with="&request.query_parameters - [:page, param_name]">
+        <input type="hidden" name="&this_key" value="&this"/>
+      </repeat>
+    </div>
+  </form>
+</def>
+
+<def tag="name-one" attrs="complete-target, completer, min-chars">
+<%
+  complete_target ||= this_field_reflection.klass
+  completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
+  source = polymorphic_url(complete_target, :action => "complete_#{completer}", :routing_type => :path)
+  value = name(:no_wrapper => true, :if_present => true)
+-%>
+  <autocomplete source="&source" minLength="&min_chars || 1" merge/>
+</def>
+
+
+<!-- Provides an ajax-powered *find-as-you-type* live search field which is hooked up to Hobo's site-side search feature.
+
+Customizing the display of results can be done through customizing the "box" param and the `search-results` tag.  The current definition of `<search-results>` expects results to be returned in `@search_results`.
+
+TODO: currently you have to press 'return' to initiate the search.  This should be easy to fix in hjq-live-search.js - the hard part will probably be in doing it in a way that works in all possible browsers.
+
+### attributes
+
+- action: the path to send the query.  Default is "/search" (actually, site_search_path)
+- query_param: the name of the param to use for the search.  Default is "query"
+
+All other attributes are merged into the form, so standard form attributes are supported.
+ -->
+<def tag="live-search" attrs="query-param, panel-tag">
+  <% attributes[:action] ||= site_search_path %>
+  <% attributes[:update] ||= "search-results-part" %>
+  <% attributes[:message] ||= t("hobo.live_search.spinner_message", :default => "Querying...") %>
+  <% query_param ||= "query" %>
+  <div class="search" data-rapid='{"live-search": {}}'>
+    <form merge-attrs param refocus-form>
+      <input type="hidden" value="2" name="search_version"/>
+      <label for="&query_param" param><t key="hobo.live_search.label">Search</t></label><input type="search" name="&query_param" class="live-search" param/>
+    </form>
+    <% panel_tag ||= 'dialog-box' %>
+    <% title = t("hobo.live_search.results_label", :default => "Search Results") %>
+    <call-tag tag="&panel_tag" position="&{:my => 'right top'}" width="&600" height="&800" id="search-results-box" with="&nil" title="&title" param="box">
+      <do part="search-results-part">
+        <search-results/>
+      </do>
+    </call-tag>
+  </div>
+</def>
+
+<!-- redefining or extending this tag will allow you to customize the display of search results -->
+<def tag="search-results">
+  <section with="&@search_results || []" data-rapid='{"search-results": {}}'>
+    <collection/>
+    <else><t key="hobo.live_search.no_results">Your search returned no matches.</t></else>
+  </section>
+</def>
+
+<!--
+`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute (without the `field` attribute this is just the regular HTML `<table>` tag)
+
+### Usage
+
+If the context is an array of blog posts...
+
+    <table fields="name, created_at, description"/>
+
+This will output a header row containing "Name", "Created At" and "Description" followed by a row for each record in the collection. By default, the `<view/>` tag is called for each field in the row. This can be altered with the `field-tag` attribute, e.g.
+
+    <table fields="name, created_at, description" field-tag="input"/>
+
+This will use `<input/>` as the tag in each table cell instead of `<view/>`
+
+### Additional Notes
+
+* `<table>` provides parameters based on the names of the fields which can be used to further customise the output. For each field a heading parameter is provided, e.g. name-heading, created-at-heading, description-heading. These can be used to customise the headings:
+
+        <table fields="name, created_at, description">
+          <created-at-heading:>Creation Date</created-at-heading:>
+        </table>
+* Similarly, "view" parameters are provided as an additional way to customise the table cells of the table body, e.g. `name-view`, `created-at-view`, `description-view`:
+
+        <table fields="name, created_at, description">
+          <created-at-view:><view format="%d %B %Y"/></created-at-view:>
+        </table>
+* By adding an empty `control` parameter, the default control column is enable adding an edit link and delete button for each table row:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+        </table>
+
+    The controls can be further customised using the "edit-link" and "delete-button" parameters:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+          <delete-button: label="Nuke Me"/>
+        </table>
+
+    or by providing completely new content for the control column:
+
+        <table fields="name, created_at, description">
+          <controls:>my controls!</controls:>
+        </table>
+-->
+<def tag="table" attrs="fields, field-tag, empty">
+  <if test="&!(fields || all_parameters.tr?)">
+    <%= element("table", attributes, all_parameters.default) %>
+  </if>
+  <else>
+    <% field_tag ||= "view" %>
+    <unless test="&this.empty? && !empty">
+      <% element "table", attributes - attrs_for(:with_fields) do %>
+      <thead if="&all_parameters[:thead] || fields" param>
+        <tr param="field-heading-row">
+          <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
+            <th param="#{scope.field_name}-heading"><%= this.member_class.human_attribute_name(scope.field_name) if scope %></th>
+          </with-field-names>
+          <th if="&all_parameters[:controls]" class="controls"/>
+        </tr>
+      </thead>
+      <tbody param>
+        <repeat>
+          <tr param if="&can_view?"
+              class="#{scope.even_odd} #{this_type.name.underscore}" data-rapid-context="&typed_id">
+            <if test="&fields">
+              <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
+                <td param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+              </with-fields>
+              <td class="controls" param="controls" if="&all_parameters[:controls]">
+                <a param="edit-link" action="edit" if="&can_edit?">
+                  <t key="hobo.actions.edit_control">Edit</t>
+                </a>
+                <delete-button param/>
+              </td>
+            </if>
+          </tr>
+        </repeat>
+      </tbody>
+      <tfoot if="&all_parameters[:tfoot]" param/>
+      <% end %>
+    </unless>
+  </else>
+</def>
