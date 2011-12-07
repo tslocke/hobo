@@ -999,17 +999,12 @@ Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-contex
       </if-ie>
 
       <hjq-assets/>
-      <qunit-includes/>
       <javascript name="jquery.form"/>
 
       <do param="custom-scripts"/>
 
       <javascript param="application-javascript" name="application"/>
     </scripts:>
-
-    <before-header:>
-      <qunit-banner/>
-    </before-header:>
 
     <page-scripts: hide="&['slide',{:direction => :up}, 'slow']" show="&['slide',{:direction => :up},'slow']"/>
 
