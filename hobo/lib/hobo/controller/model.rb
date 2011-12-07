@@ -723,7 +723,8 @@ module Hobo
     # --- Miscelaneous Actions --- #
 
     def hobo_completions(attribute, finder, options={})
-      options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
+      options = options.reverse_merge(:limit => 10, :query_scope => "#{attribute}_contains")
+      options[:param] ||= params[:query].nil? ? :term : :query
       finder = finder.limit(options[:limit]) unless finder.try.limit_value
 
       begin
@@ -736,7 +737,11 @@ module Hobo
           items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
         end
       end
-      render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
+      if request.xhr?
+        render :json => items.map {|i| i.send(attribute)}
+      else
+        render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
+      end
     end
 
 
