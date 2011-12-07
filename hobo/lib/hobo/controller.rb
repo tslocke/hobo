@@ -156,7 +156,10 @@ module Hobo
     def site_search(query)
       results_hash = Hobo.find_by_search(query)
       all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
-      if all_results.empty?
+      if params["search_version"]
+        @search_results = all_results
+        hobo_ajax_response
+      elsif all_results.empty?
         render :text => "<p>"+ t("hobo.live_search.no_results", :default=>["Your search returned no matches."]) + "</p>"
       else
         # TODO: call one tag that renders all the search results with headings for each model
