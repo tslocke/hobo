@@ -364,18 +364,18 @@ the change is one I could do myself...)
 
 Due to limitations on Ajax file uploads, multipart forms are not sent with the proper Ajax headers.   If your controller action may receive multipart forms, rather than using:
 
-   respond_to do |wants|
+    respond_to do |wants|
       wants.js { hobo_ajax_response }
       wants.html {...}
-   end
+    end
 
 use
 
-   if request.params[:render]
+    if request.params[:render]
       hobo_ajax_response
-   else
+    else
       ....
-   end
+    end
 
 for more information see http://jquery.malsup.com/form/#file-upload
 
