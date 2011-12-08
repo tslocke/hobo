@@ -1,5 +1,6 @@
 <% each_controller do -%>
 <%
+next unless @controller < Hobo::Controller::Model
 form_fields = standard_fields :belongs_to, :has_many
 
 cancel_to_show_page  = linkable?(:show)
@@ -29,7 +30,7 @@ model_key = model.to_s.underscore
 </def>
 <% end -%>
 
-<% transitions.each do |transition| -%>
+<% transitions.uniq{|s| s.name}.each do |transition| -%>
 <def tag="<%= transition.name.to_s.dasherize %>-form" polymorphic/>
 <def tag="<%= transition.name.to_s.dasherize %>-form" for="<%= model.name %>">
   <form lifecycle="<%= transition.name %>" merge param="default">

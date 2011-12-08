@@ -2,6 +2,10 @@ module ActiveRecord
 
   class Relation
     attr_accessor :origin, :origin_attribute
+
+    def member_class
+      @klass
+    end
   end
 
   module Associations

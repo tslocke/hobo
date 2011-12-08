@@ -1,3 +1,5 @@
+require 'erubis'
+
 module Dryml
 
   class DRYMLBuilder
@@ -58,10 +60,49 @@ module Dryml
     end
 
 
+    class Erubis < ::Erubis::Eruby
+      def add_preamble(src)
+
+      end
+
+      def add_text(src, text)
+        return if text.empty?
+        src << "self.output_buffer.safe_concat('" << escape_text(text) << "');"
+      end
+
+      BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
+
+      def add_expr_literal(src, code)
+        if code =~ BLOCK_EXPR
+          src << 'self.output_buffer.append= ' << code << ";\nself.output_buffer;"
+        else
+          src << 'self.output_buffer.append= (' << code << ");\nself.output_buffer;"
+        end
+      end
+
+      def add_stmt(src, code)
+        # skip fallback code - it utterly destroys DRYML-generated ERB
+        super
+      end
+
+      def add_expr_escaped(src, code)
+        if code =~ BLOCK_EXPR
+          src << "self.output_buffer.safe_append= " << code << ";\nself.output_buffer;"
+        else
+          src << "self.output_buffer.safe_concat((" << code << ").to_s);"
+        end
+      end
+
+      def add_postamble(src)
+        # NOTE: we can't just add a 'self.output_buffer' here because this parser
+        # is used to compile taglibs which don't HAVE one
+      end
+    end
+
     def erb_process(erb_src)
       trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
-      erb = ERB.new(erb_src, nil, trim_mode, "output_buffer")
-      res = erb.src.split(';')[1..-2].join(';')
+      erb = Erubis.new(erb_src, :trim_mode => trim_mode)
+      res = erb.src
       if res.respond_to? :force_encoding
         res.force_encoding(erb_src.encoding)
       end

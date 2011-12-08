@@ -34,6 +34,7 @@ var Hobo = {
         var params = Hobo.fieldSetParam(el, val)
         var p = el.getAttribute("hobo-ajax-params")
         if (p) params = params + "&" + p
+        params = params + '&_method=PUT'
 
         var opts = Object.merge(options || {}, { params: params, message: el.getAttribute("hobo-ajax-message")})
         Hobo.ajaxRequest(Hobo.putUrl(el), updates, opts)
@@ -257,8 +258,9 @@ var Hobo = {
 
 
     putUrl: function(el) {
+        /* we used to append _method=put here, but it doesn't work in Rails 3 */
         var spec = Hobo.modelSpecForElement(el)
-        return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id + "?_method=PUT"
+        return urlBase + "/" + Hobo.pluralise(spec.name) + "/" + spec.id
     },
 
 
@@ -443,23 +445,6 @@ var Hobo = {
         return window.location.href.sub(/(\?.*|$)/, "?" + params.toQueryString())
     },
 
-
-    fixSectionGroup: function(e) {
-	    rows = e.childElements().map(function(e, i) {
-    	    cells = e.childElements().map(function(e, i) {
-        	    return e.outerHTML.sub("<DIV", "<td  valign='top'").sub(/<\/DIV>$/i, "</td>")
-            }).join('')
-
-            var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
-            return "<tr" + attrs + ">" + cells + "</tr>"
-	    }).join("\n")
-
-        var attrs = e.outerHTML.match(/<DIV([^>]+)/)[1]
-
-	    var table= "<table cellpadding='0' cellspacing='0' border='0' style='border-collapse: collapse; border-spacing: 0'" + attrs + ">" +
-	               rows + "</table>"
-	    e.outerHTML = table
-    },
 
     makeHtmlEditor: function(textarea) {
         // do nothing - plugins can overwrite this method
@@ -912,10 +897,6 @@ AutocompleteBehavior = Behavior.create({
 
 Event.addBehavior.reassignAfterAjax = true;
 Event.addBehavior({
-
-    'div.section-group' : function() {
-        if (Prototype.Browser.IE) Hobo.fixSectionGroup(this);
-    },
 
     'div.select-many.input' : SelectManyInput(),
 

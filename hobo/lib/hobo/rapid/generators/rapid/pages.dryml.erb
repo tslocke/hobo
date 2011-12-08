@@ -12,7 +12,7 @@
 
 
 <% each_controller do -%>
-
+<% next unless @controller < Hobo::Controller::Model %>
 <!-- ====== <%= model.name %> Pages ====== -->
 <%
 new_link = linkable?(:new)
@@ -124,11 +124,10 @@ end
 
 unless model.view_hints.secondary_children.empty?
   aside_collections = model.view_hints.secondary_children.map { |c| [model.reflections[c], model.reverse_reflection(c)] }
-  aside_collections.reject! { |refl, reverse| reverse.nil? }
 end
 -%>
 <def tag="show-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=sq_escape model_name %>'] }">
+  <page merge title="#{ht '<%=model_key %>.show.title', :default=>['<%=sq_escape model_name %>'], :name => name(:no_wrapper => true) }">
 
     <body: class="show-page <%= model_class %>" param/>
 
@@ -142,8 +141,8 @@ end
             <a:<%= back_link %> param="parent-link">&laquo; <ht key="<%= model_key %>.actions.back_to_parent" parent="<%= back_link_human_name %>" name="&this">Back to <name/></ht></a:<%= back_link %>>
 <% end -%>
             <h2 param="heading">
-              <ht key="<%= model_key %>.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
-                <name/>
+              <ht key="<%= model_key %>.show.heading" name="#{name(:no_wrapper => true)}">
+                <%= model_name %> <name/>
               </ht>
             </h2>
 <% if boolean_fields -%>
@@ -160,7 +159,7 @@ end
 <% if edit_link -%>
 
             <a action="edit" if="&can_edit?" param="edit-link">
-              <ht key="<%= model_key %>.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
+              <ht key="<%= model_key %>.actions.edit" name="#{name(:no_wrapper => true)}">
                 Edit <%= model_name %>
               </ht>
             </a>
@@ -169,7 +168,7 @@ end
 
           <section param="content-body">
 <% if main_content -%>
-            <view:<%= main_content %> param="description"/>
+            <view:<%= main_content %> param="description" />
 <% end -%>
 <% if show_fields.any? -%>
             <field-list fields="<%= show_fields * ', ' %>" param/>
@@ -216,7 +215,7 @@ end
 
         <aside param>
 <%   for refl, reverse_refl in aside_collections -%>
-<%     if linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
+<%     if reverse_refl && linkable?(refl.klass, :"index_for_#{reverse_refl.name}") -%>
          <collection-preview:<%= refl.name %>.recent param="<%= refl.name %>-preview">
            <heading-content:><human-collection-name with="&this.origin" collection="<%= refl.name %>" your/></heading-content:>
          </collection-preview:<%= refl.name %>.recent>
@@ -244,14 +243,14 @@ end
 name_attribute = model.name_attribute
 -%>
 <def tag="edit-page" for="<%= model.name %>">
-  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%= sq_escape model_name %>'] }">
+  <page merge title="#{ht '<%= model_key %>.edit.title', :default=>['Edit <%= sq_escape model_name %>'], :name => name(:no_wrapper => true) }">
 
     <body: class="edit-page <%= model_class %>" param/>
 
     <content:>
       <section param="content-header">
         <h2 param="heading">
-          <ht key="<%= model_key %>.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
+          <ht key="<%= model_key %>.edit.heading" name="#{name(:no_wrapper => true)}">
             Edit <%= model_name %>
           </ht>
         </h2>
@@ -314,7 +313,7 @@ new_link = :new.in?(actions)
 
       <section param="content-body">
 <% if new_link -%>
-        <a action="new" to="&model" param="new-link">
+        <a action="new" to="&@<%= owner %>.<%= collection_name %>" param="new-link">
           <ht key="<%= model_key %>.actions.new" >New <%=model_name %></ht>
         </a>
 

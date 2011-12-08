@@ -251,7 +251,11 @@ module Dryml
         _tag_context(attributes) do
           attributes.delete :with
           attributes.delete :field
-          call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          if for_klass = parse_for_type(attributes)
+            call_polymorphic_tag('#{name}', for_klass, attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          else
+            call_polymorphic_tag('#{name}', attributes, parameters) { #{name}__base(attributes.except, parameters) }
+          end
         end
       end
       )
@@ -722,14 +726,14 @@ module Dryml
     def append_parameter_tag_hash_item(name, el, metadata_name)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" +
         param_content_element(name) + children_to_erb(el) +
-        "<% } } } ] }"
+        "<% ; output_buffer } } } ] }"
     end
 
 
     def prepend_parameter_tag_hash_item(name, el, metadata_name)
       ":#{ruby_name name} => proc { [{}, { :default => proc { |#{param_content_local_name(name)}| new_context { %>" +
         children_to_erb(el) + param_content_element(name) +
-        "<% } } } ] }"
+        "<% ; output_buffer } } } ] }"
     end
 
 
@@ -737,7 +741,7 @@ module Dryml
       content = children_to_erb(el)
       content = wrap_source_with_metadata(content, "param", containing_param_name,
                                           element_line_num(el)) if containing_param_name
-      "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{content}<% } #{tag_newlines(el)}}"
+      "proc { |#{param_content_local_name(el.dryml_name)}| new_context { %>#{content}<% ; output_buffer } #{tag_newlines(el)}}"
     end
 
 
@@ -785,7 +789,7 @@ module Dryml
     def replace_parameter_proc(el, metadata_name, content=nil)
       content ||= wrap_replace_parameter(el, metadata_name)
       param_name = el.dryml_name.sub(/^(before|after|append|prepend)-/, "")
-      "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{content}<% } #{tag_newlines(el)}}"
+      "proc { |#{param_restore_local_name(param_name)}| new_context { %>#{content}<% ; output_buffer } #{tag_newlines(el)}}"
     end
 
 
@@ -813,7 +817,7 @@ module Dryml
       items = attributes.map do |n,v|
         dryml_exception("invalid attribute name '#{n}' (remember to use '-' rather than '_')", el) unless n =~ DRYML_NAME_RX
 
-        next if n.in?(SPECIAL_ATTRIBUTES) || n =~ /^without-/
+        next if n.in?(SPECIAL_ATTRIBUTES-['for-type']) || n =~ /^without-/
         next if el.attributes['part'] && n == 'id' # The id is rendered on the <div class="part-wrapper"> instead
 
         ":#{ruby_name n} => #{attribute_to_ruby(v)}"

@@ -6,7 +6,7 @@ require 'hobo/extensions/enumerable'
 require 'hobo/extensions/array'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
-
+ActiveSupport::Dependencies.autoload_once_paths |= [File.dirname(__FILE__)]
 
 module Hobo
 

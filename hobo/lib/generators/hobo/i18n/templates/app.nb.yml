@@ -1,0 +1,25 @@
+# Even if you only support one language, you can use this file to customise the names that appear in the UI
+# e.g.
+
+nb:
+  hello: "Hei verden"
+
+#  attributes:
+#    created_at: Opprettet
+#    updated_at: Endret
+#
+#  activerecord:
+#    models:
+#      user:
+#        one: Bruker
+#        other: Brukere
+#    attributes:
+#      user:
+#        name: Navn
+#        password: Passord
+#        current_password: Gjeldende Password
+#        password_confirmation: Bekreft Passord
+#        email_address: E-post
+#    attribute_help:
+#      user:
+#        email_address: Vi kommer aldri til å dele mailadressen din med tredjepart

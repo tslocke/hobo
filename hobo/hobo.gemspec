@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency('hobo_support', ["= #{version}"])
   s.add_runtime_dependency('hobo_fields', ["= #{version}"])
   s.add_runtime_dependency('dryml', ["= #{version}"])
-  s.add_runtime_dependency('will_paginate', [">= 3.0.pre"])
+  s.add_runtime_dependency('will_paginate', [">= 3.0.0"])
 
   s.add_development_dependency('rubydoctest', [">= 0"])
   s.add_development_dependency('shoulda', [">= 0"])

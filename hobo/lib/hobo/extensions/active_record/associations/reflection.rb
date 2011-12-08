@@ -9,7 +9,7 @@ module ActiveRecord
           begin
             klass_without_create_polymorphic_class
           rescue NameError => e
-            Object.class_eval "class #{e.missing_name} < ActiveRecord::Base; set_table_name '#{active_record.name.tableize}'; end"
+            Object.class_eval "class #{e.missing_name} < ActiveRecord::Base; set_table_name '#{active_record.name.tableize}'; def self.hobo_shim?; true; end; end"
             e.missing_name.constantize
           end
         else

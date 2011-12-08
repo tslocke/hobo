@@ -21,5 +21,7 @@ require 'hobo_support/kernel'
 module HoboSupport
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
+  @@root = Pathname.new File.expand_path('../..', __FILE__)
+  def self.root; @@root; end
 
 end

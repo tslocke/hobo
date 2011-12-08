@@ -9,6 +9,7 @@ require 'action_pack'
 require 'openssl'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
+ActiveSupport::Dependencies.autoload_once_paths |= [File.dirname(__FILE__)]
 
 # The Don't Repeat Yourself Markup Language
 module Dryml
@@ -65,9 +66,10 @@ module Dryml
   end
 
   def call_render(view, local_assigns, identifier)
-    renderer = page_renderer(view, identifier, local_assigns.keys)
     this = view.controller.send(:dryml_context) || local_assigns[:this]
     view.instance_variable_set("@this", this)
+    # do this last, as TemplateEnvironment copies instance variables in initalize
+    renderer = page_renderer(view, identifier, local_assigns.keys)
     if identifier =~ /#{ID_SEPARATOR}/
       tag_name = identifier.split(ID_SEPARATOR).last
       renderer.render_tag(tag_name, {:with => this} )
@@ -182,7 +184,7 @@ private
   def taglibs_for(controller_path)
     ( taglibs_in_dir('application').unshift(APPLICATION_TAGLIB) +
       subsite_taglibs(controller_path) +
-      (controller_path.camelize+"Controller").constantize.try.included_taglibs||[]
+      ((controller_path.camelize+"Controller").constantize.try.included_taglibs||[])
     ).compact
   end
 

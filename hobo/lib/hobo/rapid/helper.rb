@@ -120,15 +120,16 @@ module Hobo
         edit_text = this._?.to_s
         attributes.update(:hobo_edit_text => edit_text) unless edit_text.nil?
 
-        update = attributes.delete(:update)
-        attributes[:hobo_update] = update if update
+        if update = attributes.delete(:update)
+          attributes = add_classes(attributes, update_elements_class(update))
+        end
 
         view(attributes)
       end
 
 
 
-      AJAX_CALLBACKS = [ :before, :success, :failure, :complete ]
+      AJAX_CALLBACKS = [ :success, :failure, :complete ]
 
       AJAX_ATTRS = AJAX_CALLBACKS + [ :update, :type, :method,
                                       :script, :form, :params, :confirm, :message,

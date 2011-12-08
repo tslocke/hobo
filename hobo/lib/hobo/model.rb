@@ -33,17 +33,6 @@ module Hobo
         alias_method_chain :attr_accessor, :creator_metadata
 
         alias_method_chain :has_one, :new_method
-
-        # eval avoids the ruby 1.9.2 "super from singleton method ..." error
-        eval %(
-        def inherited(klass)
-          super
-          fields(false) do
-            Hobo.register_model(klass)
-            field(klass.inheritance_column, :string)
-          end
-        end
-        )
       end
 
       base.fields(false) # force hobo_fields to load
@@ -56,17 +45,44 @@ module Hobo
 
         WillPaginate::Collection.class_eval do
           attr_accessor :member_class, :origin, :origin_attribute
+
+          # make paginate_by_sql, etc. carry metadata
+          def replace_with_hobo_metadata(array)
+            result = replace_without_hobo_metadata(array)
+            self.member_class = array.try.member_class
+            self.origin = array.try.origin
+            self.origin_attribute = array.try.origin_attribute
+            result
+          end
+          alias_method_chain :replace, :hobo_metadata
         end
 
-        WillPaginate::Finders::Base.class_eval do
-          def paginate_with_hobo_metadata(*args, &block)
-            collection = paginate_without_hobo_metadata(*args, &block)
-            collection.member_class     = self.is_a?(ActiveRecord::Relation) ? member_class : self
+        WillPaginate::ActiveRecord::Pagination.class_eval do
+
+          def apply_hobo_metadata(collection)
+            klass = Object.instance_method(:class).bind(self).call
+            is_relation = klass <= ActiveRecord::Relation
+            is_association_proxy = klass <= ActiveRecord::Associations::AssociationProxy
+            collection.member_class     = (is_relation || is_association_proxy) ? member_class : self
             collection.origin           = try.proxy_owner
             collection.origin_attribute = try.proxy_reflection._?.name
             collection
           end
+
+          # NOTE: as of will_paginate 3.0.0, the standard paginate method calls the page method.
+          # However, it converts an association proxy into a relation first (via adding a limit clause),
+          # which causes the proxy_owner and proxy_reflection methods to disappear.
+          def paginate_with_hobo_metadata(*args, &block)
+            collection = paginate_without_hobo_metadata(*args, &block)
+            apply_hobo_metadata(collection)
+          end
           alias_method_chain :paginate, :hobo_metadata
+
+          def page_with_hobo_metadata(*args, &block)
+            collection = page_without_hobo_metadata(*args, &block)
+            apply_hobo_metadata(collection)
+          end
+          alias_method_chain :page, :hobo_metadata
 
         end
 
@@ -116,7 +132,6 @@ module Hobo
       end
     end
 
-
     module ClassMethods
 
       # TODO: should this be an inheriting_cattr_accessor as well? Probably.
@@ -146,6 +161,18 @@ module Hobo
         send(:login_attribute=, name.to_sym, validate) if options.delete(:login) && respond_to?(:login_attribute=)
       end
 
+      # eval avoids the ruby 1.9.2 "super from singleton method ..." error
+      eval %(
+        def inherited(klass)
+          super
+          Hobo::Model.register_model(klass)
+          # TODO: figure out when this is needed, as Hobofields already does this
+          fields(false) do
+            field(klass.inheritance_column, :string)
+          end
+        end
+      )
+
       private
 
       def attrib_names
@@ -162,22 +189,27 @@ module Hobo
       def belongs_to_with_test_methods(name, options={}, &block)
         belongs_to_without_test_methods(name, options, &block)
         refl = reflections[name]
+        id_method = refl.options[:primary_key] || refl.klass.primary_key
         if options[:polymorphic]
           # TODO: the class lookup in _is? below is incomplete; a polymorphic association to an STI base class
           #       will fail to match an object of a derived type
           #       (ie X belongs_to Y (polymorphic), Z is a subclass of Y; @x.y_is?(some_z) will never pass)
           class_eval %{
             def #{name}_is?(target)
-              target.class.name == self.#{refl.options[:foreign_type]} && target.id == self.#{refl.primary_key_name}
+              target.class.name == self.#{refl.options[:foreign_type]} && target.#{id_method} == self.#{refl.primary_key_name}
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed? || #{refl.options[:foreign_type]}_changed?
             end
           }
         else
+          id_method = refl.options[:primary_key] || refl.klass.primary_key
           class_eval %{
             def #{name}_is?(target)
-              target.class <= ::#{refl.klass.name} && target.id == self.#{refl.primary_key_name}
+              our_id = self.#{refl.primary_key_name}
+              # if our_id is nil, only return true if target is nil
+              return target.nil? unless our_id
+              target.class <= ::#{refl.klass.name} && target.#{id_method} == our_id
             end
             def #{name}_changed?
               #{refl.primary_key_name}_changed?
@@ -438,7 +470,11 @@ module Hobo
           if parts.include?(0)
             nil
           else
-            Date.new(*parts)
+            begin
+              Date.new(*parts)
+            rescue ArgumentError => ex
+              Time.time_with_datetime_fallback(ActiveRecord::Base.default_timezone, *parts).to_date
+            end
           end
         else
           value

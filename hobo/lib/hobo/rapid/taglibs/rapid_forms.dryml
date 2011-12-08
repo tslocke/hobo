@@ -32,8 +32,6 @@ Several of the tags in this taglib support the following set of ajax attributes:
 The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script
 executed at various points in the ajax request cycle:
 
- - before: script to run before the request
-
  - success: script to run on successful completion of the request
 
  - failure: script to run on a request failure
@@ -383,14 +381,16 @@ The menus default to the current date if the current value is nil.
 Examples:
 
    - override the input for date tag in a form
-   <my-special-date-view:>
-      <input start-year="&1940" order="day,month,year" />
-   </my-special-date-view:>
+
+     <my-special-date-view:>
+        <input start-year="&1940" order="day,month,year" />
+     </my-special-date-view:>
 
    - override the tag application-wide
-   <extend tag='input' for='date'>
-     <old-input merge order="day,month,year" start-year="&1940" />
-   </extend>
+
+     <extend tag='input' for='date'>
+       <old-input merge order="day,month,year" start-year="&1940" />
+     </extend>
 
   -->
 <def tag="input" for="date" attrs="use-month-numbers, use-short-month, add-month-numbers, use-month-names, date-separator, start-year, end-year, discard-day, discard-month, discard-year, order, include-blank, default, disabled, prompt, prefix">
@@ -633,7 +633,8 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   class_or_assoc = if model
                      model.is_a?(String) ? model.constantize : model
                    elsif Hobo.simple_has_many_association?(this)
-                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.id
+                     id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
+                     fields[this_field_reflection.primary_key_name] = this.proxy_owner.send(id_method)
                      this
                    else
                      raise Hobo::Error.new("invalid context for <create-button>")
@@ -642,11 +643,17 @@ All of the standard ajax attributes are supported (see the main taglib documenti
   new.set_creator(current_user)
   if can_create?(new)
     label ||= ht("#{new.class.to_s.underscore}.actions.new", :default=>"New #{new.class.model_name.human}")
-    ajax_attributes = { :message => message }
     class_name = new.class.name.underscore
-    ajax_attributes[:params] = { class_name => fields } unless fields.empty?
+    params ||= params || {}
+    params = params.merge(class_name => fields) unless fields.blank?
+
+    ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+
+    ajax_attributes.reverse_merge!(:message => message, :params => params)
     func = ajax_updater(object_url(new.class, :method => :post), update, ajax_attributes)
-    element :input, add_classes(attributes.merge(:type =>'button', :onclick => func, :value => label),
+    html_attributes.reverse_merge!(:type =>'button', :onclick => func, :value => label)
+
+    element :input, add_classes(html_attributes,
                                 "button create-button create-#{class_name}-button"), nil, true, true
   end
 %></def>
@@ -661,6 +668,7 @@ This is the default input that Rapid uses for `belongs_to` associations. The men
  - `include-none` - whether to include a 'none' option (i.e. set the foreign key to null).   If this value is not supplied, the default is "true" if the current value is nil; otherwise the default is "false".  One implication of this is that the default may change when the form is re-rendered due to a validation failure.  Setting this value explicitly is recommended.
  - `blank-message` - the message for the 'none' option. Defaults to "(No `<model-name>`)", e.g. "(No Product)"
  - `options` - an array of records to include in the menu. Defaults to the all the records in the target table that match any `:conditions` declared on the `belongs_to` (subject to `limit`)
+ - `sort` - whether to sort the array of options. Defaults to no sorting.
  - `limit` - if `options` is not specified, this limits the number of records.  Default: 100
  - `text_method` - The method to call on each record to get the text for the option.  Multiple methods are supported ie "institution.name"
 
@@ -680,12 +688,13 @@ For situations where there are too many target records to practically include in
     this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
   end
 
+  id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
   if text_method.nil?
-    select_options = options.map { |x| [x.to_s, x.id] }
+    select_options = options.map { |x| [name(:with => x, :no_wrapper => true), x.send(id_method)] }
   else
     select_options = options.map do |x|
       [ text_method.split(".").inject(x) { |v, method| v.send(method) },
-           x.id ]
+           x.send(id_method) ]
     end
   end
   select_options = select_options.sort if sort
@@ -693,7 +702,7 @@ For situations where there are too many target records to practically include in
   attributes = add_classes(attributes, "input", "belongs_to", type_and_field)
   -%>
   <select name="#{param_name_for_this(true)}" merge-attrs="&attributes.except :name">
-    <%= options_for_select(select_options, this ? this.id : "") %>
+    <%= options_for_select(select_options, this ? this.send(id_method) : "") %>
   </select>
 </def>
 
@@ -764,11 +773,13 @@ If you wish to set `min-chars` to 0, you will require this [patch to controls.js
   min_chars ||= 1
   value = name(:no_wrapper => true, :if_present => true)
   -%>
-  <input type="text" name="#{param_name_for_this}"
-         class="autocompleter #{type_and_field._?.dasherize} #{css_data :complete_on, typed_id(complete_target), completer} #{css_data :min_chars, min_chars} #{'nil-value' if value==''}"
-         value="#{value=='' ? nil_value : value}"
-         merge-attrs/>
-  <div class="completions-popup" style="display:none"></div>
+  <wrap tag="span" class="field-with-errors" when="&!this_parent.errors[this_field].empty?">
+    <input type="text" name="#{param_name_for_this}"
+           class="autocompleter #{type_and_field._?.dasherize} #{css_data :complete_on, typed_id(complete_target), completer} #{css_data :min_chars, min_chars} #{'nil-value' if value==''}"
+           value="#{value=='' ? nil_value : value}"
+           merge-attrs/>
+    <div class="completions-popup" style="display:none"></div>
+  </wrap>
 </def>
 
 
@@ -875,7 +886,7 @@ Use the `stay-here` attribute to remain on the current page:
       ...
     </form>
 
-Use the `go-back` option to return to the previous page:
+Use the `go-back` option to return to the page in `session[:previous_uri]`:
 
     <form>
       <after-submit go-back/>
@@ -917,7 +928,7 @@ Use the `uri` option to specify a redirect location:
   <select merge-attrs param="default">
     <% selected=this if selected.nil? %>
     <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
-    <do param="options"><% options_for_select(options, selected) %></do>
+    <do param="options"><%= options_for_select(options, selected) %></do>
   </select>
 </def>
 
@@ -942,8 +953,8 @@ Use the `uri` option to specify a redirect location:
     <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked
     %>
     <li repeat="&options" param>
-      <input type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
-      <name param/>
+      <input id="#{dom_id(this, :check_many)}" type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
+      <label for="#{dom_id(this, :check_many)}"><name param/></label>
     </li>
   </ul>
 </def>

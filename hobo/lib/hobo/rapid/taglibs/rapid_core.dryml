@@ -93,7 +93,15 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
         <table fields="name, created_at, description">
           <controls:/>
         </table>
-    The controls can be further customised using the "edit-link" and "delete-button" parameters or by providing completely new content for the control column, e.g.
+
+    The controls can be further customised using the "edit-link" and "delete-button" parameters:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+          <delete-button: label="Nuke Me"/>
+        </table>
+
+    or by providing completely new content for the control column:
 
         <table fields="name, created_at, description">
           <controls:>my controls!</controls:>
@@ -458,7 +466,7 @@ Assuming the context is a blog post...
 
             truncate = 30 if truncate == true
             the_view = self.truncate(the_view, :length => truncate.to_i) if truncate
-            the_view = the_view.strip
+            the_view = the_view.html_safe? ? the_view.strip.html_safe : the_view.strip
 
             if no_wrapper
               the_view
@@ -496,12 +504,14 @@ Assuming the context is a blog post...
 <!-- Renders localized `number_with_delimiter this`, or `format % this` if the `format` attribute is given -->
 <def tag="view" for="Numeric" attrs="format"><%= format ? format % this : number_with_delimiter(this) %></def>
 
-<!-- Renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
+<!-- If `this.html_safe?`, returns this unchanged.  Otherwise renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
 <def tag="view" for="string"><%=
-  if !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
+  if this.html_safe?
+    this
+  elsif !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
     this.to_html(scope.xmldoctype)
   else
-    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>")
+    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>").html_safe
   end
 %></def>
 
@@ -679,8 +689,8 @@ The "titleize" attribute is deprecated: use "capitalize" instead.
   </if>
   <else>
     <do param="default">
-      <%= s = t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>this.name,
-          :default=>"#{this.name} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}")
+      <%= s = t("tags.you.other_user.#{k || attributes.keys.first || 'default'}", :name=>name(:no_wrapper => true),
+          :default=>"#{name(:no_wrapper => true)} #{'has' if attributes[:have]}#{'is' if attributes[:are]}#{'does' if attributes[:do]}")
           (titleize||capitalize) ? s.sub(/^./){|c| c.upcase} : s %>
     </do>
   </else>
@@ -748,7 +758,7 @@ Notes
    attrs = {}
    attributes.each_pair{|k,v| attrs[k.to_sym] = v}
    d = "#{your_default} #{all_parameters.default}"
-   options = {:default=>[d], :count=>(attrs[:count]||1), :name=>this.name}
+   options = {:default=>[d], :count=>(attrs[:count]||1), :name=>name(:no_wrapper => true)}
    your_key = key.split('.').last
    unless key.eql?(your_key) || attrs.has_key?(your_key.to_sym)
      options[your_key.to_sym] = t(key, :count=>options[:count], :default=>your_key.titleize)

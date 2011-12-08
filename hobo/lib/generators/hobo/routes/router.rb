@@ -34,7 +34,7 @@ module Generators
             routes << link("put '#{records}/:id/#{transition}(.:format)' => '#{records}#do_#{transition}', :as => 'do_#{record}_#{transition}'", transition, :put)
             routes << link("get '#{records}/:id/#{transition}(.:format)' => '#{records}##{transition}', :as => '#{record}_#{transition}'", transition)
           end
-          routes.compact
+          routes.compact.uniq
         end
 
         def resource_routes
@@ -92,7 +92,7 @@ module Generators
         end
 
         def user_routes
-          return [] unless controller < ::Hobo::Controller::User
+          return [] unless controller < ::Hobo::Controller::UserBase
           prefix = records == "users" ? "" : "#{record}_"
           [
           link("match '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),

@@ -179,6 +179,10 @@ module Hobo
       object.respond_to?(:typed_id) ? "model::#{typed_id(object, attribute).to_s.dasherize}" : ""
     end
 
+    def update_elements_class(updates)
+      'update::'+comma_split(updates).join(':') unless updates.blank?
+    end
+
     def can_create?(object=this)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
@@ -248,7 +252,8 @@ module Hobo
       # TODO: Man does this need a big cleanup!
 
       if args.empty?
-        if this_parent && this_field
+        # if we're repeating over an array, this_field ends up with the current index. Is this useful to anybody?
+        if this_parent && this_field && !this_field.is_a?(Integer)
           object = this_parent
           field = this_field
         else

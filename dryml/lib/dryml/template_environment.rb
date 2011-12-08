@@ -144,7 +144,7 @@ module Dryml
 
       id = if (typed_id = object.try.typed_id)
              typed_id
-           elsif object == this
+           elsif object == @this
              "this"
            end
       attribute ? "#{id}:#{attribute}" : id
@@ -162,7 +162,7 @@ module Dryml
 
 
     def refresh_part(encoded_context, session, dom_id)
-      context = Dryml::PartContext.for_refresh(encoded_context, this, session)
+      context = Dryml::PartContext.for_refresh(encoded_context, @this, session)
 
       with_part_context(context) do
         send("#{context.part_name}_part", *context.locals)
@@ -188,6 +188,20 @@ module Dryml
       end
     end
 
+    def parse_for_type(attributes)
+      t = attributes[:for_type]
+      if t.nil?
+        nil
+      elsif t.is_a?(Class)
+        t
+      elsif t =~ /^[A-Z]/
+        t.constantize
+      elsif t =~ /^[a-z]/ && defined?(HoboFields.to_class)
+        HoboFields.to_class(t)
+      else
+        nil
+      end
+    end
 
     def call_polymorphic_tag(name, *args)
       name = name.to_s.gsub('-', '_')
@@ -246,7 +260,8 @@ module Dryml
               @_form_field_path, @_form_field_paths_by_object ]
       @_this_type = nil
       res = nil
-      @view.with_output_buffer { res = yield }
+      outer_res = @view.with_output_buffer { res = yield }
+      Rails.logger.error("new_context: #{caller.first}") if !outer_res.blank? && outer_res.to_s != res.to_s
       @_this, @_this_parent, @_this_field, @_this_type, @_form_field_path, @_form_field_paths_by_object = ctx
       res.to_s
     end

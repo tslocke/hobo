@@ -1,6 +1,7 @@
 require 'hobo_support'
 
 ActiveSupport::Dependencies.autoload_paths |= [ File.dirname(__FILE__) ]
+ActiveSupport::Dependencies.autoload_once_paths |= [ File.dirname(__FILE__) ]
 
 module Hobo
   # Empty class to represent the boolean type.
@@ -10,6 +11,8 @@ end
 module HoboFields
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
+  @@root = Pathname.new File.expand_path('../..', __FILE__)
+  def self.root; @@root; end
 
   extend self
 

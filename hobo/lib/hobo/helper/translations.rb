@@ -42,7 +42,7 @@ en:
           raise Hobo::I18nError, %(wrong model name: "#{model_name}" (extracted from translation key: "#{key}"). You might want to use the translate/t tag/method instead.)
         end
         options[:default].unshift("hobo.#{keys.join(".")}".to_sym)
-        options[:model] = model_class.model_name.human(:count=>options[:count]||1)
+        options[:model] = model_class.model_name.human(:count=>(options[:count] || 1).to_i)
         translate key.to_sym, options
       end
       alias_method :ht, :hobo_translate
