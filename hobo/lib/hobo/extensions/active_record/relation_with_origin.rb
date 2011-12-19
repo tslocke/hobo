@@ -20,7 +20,6 @@ module ActiveRecord
       alias_method_chain :scoped, :origin
 
       def method_missing_with_origin(method, *args, &block)
-        p caller
         res = method_missing_without_origin(method, *args, &block)
         res.origin = proxy_association.owner if res.respond_to?(:origin)
         res.origin_attribute = proxy_association.reflection.name if res.respond_to?(:origin_attribute)
