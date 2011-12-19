@@ -436,13 +436,6 @@ module Hobo
       this_parent.class.try.attribute_help(this_field.to_sym) || ""
     end
 
-
-    # --- default Helpers --- #
-
-    def your_default
-      this == current_user ? "Your" : (this.name.ends_with?('s') ? "#{this.name}'" : "#{this.name}'s")
-    end
-
     # --- Debugging Helpers ---- #
 
     def abort_with(*args)

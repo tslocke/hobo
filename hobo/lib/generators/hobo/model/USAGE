@@ -15,5 +15,5 @@ Examples:
 
         creates a Post model with a string title, text body, and published flag.
 
-After the model is created, and the fields are specified, use hobo:migration
-to create the migrations incrementally.
+    After the model is created, and the fields are specified, use hobo:migration
+    to create the migrations incrementally.
