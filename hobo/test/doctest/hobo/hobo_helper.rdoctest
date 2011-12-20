@@ -2,8 +2,6 @@
 
 Various view helpers
 
-        doctest_require: 'rubygems'
-        doctest_require: 'active_support'
         doctest_require: 'mocha'
         doctest_require: '../../../hobo_support/lib/hobo_support'
         doctest_require: '../../../hobo_fields/lib/hobo_fields'
