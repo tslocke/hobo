@@ -491,8 +491,14 @@ module Hobo
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this ||= args.first || find_instance(options)
-      response_block(&b)
+      self.this ||= args.first
+      if this.nil?
+        self.this = find_instance(options)
+        unless (parms=attribute_parameters).blank?
+          this.with_acting_user(current_user) { this.attributes = parms }
+        end
+      end
+      show_response(&b)
     end
 
     def hobo_edit(*args, &b)
@@ -500,15 +506,24 @@ module Hobo
     end
 
     def hobo_new(record=nil, &b)
-      self.this = record || model.user_new(current_user)
-      response_block(&b)
+      self.this = record || model.user_new(current_user, attribute_parameters)
+      show_response(&b)
     end
 
+    def show_response(&b)
+      response_block(&b) or
+        begin
+          if request.xhr? && params[:render]
+            hobo_ajax_response
+            render :nothing => true unless performed?
+          end
+        end
+    end
 
     def hobo_new_for(owner, record=nil, &b)
       owner, association = find_owner_and_association(owner)
-      self.this = record || association.user_new(current_user)
-      response_block(&b)
+      self.this = record || association.user_new(current_user, attribute_parameters)
+      show_response(&b)
     end
 
 
