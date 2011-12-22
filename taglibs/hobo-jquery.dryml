@@ -6,40 +6,17 @@ To use, see the [installation instructions](http://cookbook.hobocentral.net/plug
 
 The jQuery UI tags support all of the [options that the corresponding jQuery UI widgets provide](http://docs.jquery.com/UI).  For example:
 
-    <hjq-datepicker dateFormat="yy-mm-dd" />
+    <datepicker dateFormat="yy-mm-dd" />
 
 Options that expect a type other than string can be provided by passing a ruby object:
 
-    <hjq-datepicker dayNamesMin="&['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa']" />
+    <datepicker dayNamesMin="&['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa']" />
 
 Events are also supported.  Pass in a global Javascript function name:
 
-    <hjq-datepicker onSelect="hjq.util.log" />
+    <datepicker onSelect="hjq.util.log" />
 
 -->
-
-<!--
-This is Hobo jQuery's standard tag annotation method.   This annotation is automatically added to Hobo jQuery tags, but you may wish to use it in your own tag definitions.
-
-The current implementation uses HTML comments for annotation.  This may change in the future, if somebody can suggest a better mechanism.  [Here is a good discussion of the alternatives.](http://www.1729.com/blog/HtmlAnnotations.html).  Two more possibilities are http://www.w3.org/TR/xhtml-rdfa-primer and http://ejohn.org/blog/html-5-data-attributes/.
-
-To use it, invoke this tag directly before the tag to annotate.  To get the annotations, call hjq.getAnnotations with _this_ set to the element that has been annotated.  For example:
-
-    <def tag="mytag">
-      <annotate-tag option_a="42"/>
-      <div class="rapid-annotated">
-        ...
-      </div>
-    </def>
-
-    jQuery(this).find('.rapid-annotated').each(function() {
-      var annotations = hjq.getAnnotations.call(this);
-      ...
-    });
--->
-<def tag="annotate-tag">
-  <%= "<!-- json_annotation (#{attributes.to_json}); -->".html_safe %>
-</def>
 
 <!--
 These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will probably wish to add this to your page definition:
@@ -85,7 +62,7 @@ This is the [jQuery-UI datepicker](http://docs.jquery.com/UI/Datepicker).  All o
 It's probably easiest to add this to your application.dryml:
 
     <def tag="input" for="Date">
-      <hjq-datepicker dateFormat="yy-mm-dd" merge />
+      <datepicker dateFormat="yy-mm-dd" merge />
     </def>
 
 It's probably useful to set global options such as dateFormat in application.dryml and set local options such as yearRange in the tag invocation:
@@ -97,7 +74,7 @@ New in version 1.4:
 If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.formats.default") from strftime format into the format that the JQuery-UI datepicker likes.
 
 -->
-<def attrs="name" tag="hjq-datepicker">
+<def attrs="name" tag="datepicker">
 <%
   options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'selectOtherMonths','shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
   options["dateFormat"]||=begin
@@ -121,7 +98,6 @@ If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.forma
                            d
                          end
   events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
-  add_classes!(html_attrs, "rapid-annotated")
   add_data_rapid!(html_attrs, "datepicker", :options => options, :events => events)
 %>
  <%= text_field_tag(name, this, html_attrs) %>
@@ -223,14 +199,13 @@ Combobox is a new control that is built on autocomplete.   The autocomplete opti
 - `selected` (default: `$(this).trigger('change');`):
 -->
 
-<def tag="combobox" options="tag">
+<def tag="combobox">
 <%
   options, attrs = attributes.partition_hash(['autoFill', 'clearButton', 'adjustWidth', 'uiStyle'])
   events, html_attrs = attrs.partition_hash(['selected'])
+  add_data_rapid!(html_attrs, "combobox", :options => options, :events => events)
 %>
-  <annotate-tag tag="hjq-combobox" init="hjq.combobox.init" options="&options" events="&events"/>
-  <% tag ||= 'input' %>
-  <span class="hjq-combobox rapid-annotated" param="default">
+  <span class="combobox" param="default" merge-attrs="&html_attrs">
     <input merge param />
   </span>
 </def>
@@ -716,9 +691,8 @@ app/controllers/story_statuses_controller.rb:
 <%
   options, attrs = attributes.partition_hash(['copyCss', 'eventsEnabled', 'stickyFocus', 'defaultText', 'events'])
   events, html_attrs = attrs.partition_hash(['onedit', 'onpreview', 'oncanceledit', 'oncancelpreview'])
-  html_attrs = add_classes(html_attrs, "rapid-annotated toggle-edit");
+  html_attrs = add_classes(html_attrs, "toggle-edit");
 %>
- <annotate-tag tag="toggle-edit" view="&view" options="&options" events="&events" />
  <input param="default" merge-attrs="&html_attrs" />
 </def>
 
@@ -821,8 +795,10 @@ others such as `hide` and `show`, do.
   </formlet>
 </def>
 
+
+<%# FIXME: rename old input, make sure it's still available if anybody wants it %>
 <def tag="input" for="Date">
-  <hjq-datepicker merge/>
+  <datepicker merge/>
 </def>
 
 <def tag="editor" polymorphic>
@@ -866,7 +842,7 @@ This tag assumes the controller has a `reorder` action and the model has a `posi
   route_method = subsite ? "#{subsite}_reorder_#{singular_name.pluralize}_url" : "reorder_#{singular_name.pluralize}_url"
   reorder_url = send(route_method)
 
-  add_classes!(html_attrs, "rapid-annotated")
+  add_classes!(html_attrs, "sortable-collection")
   add_data_rapid!(html_attrs, "sortable-collection", :options => options, :events => events, :ajax_attrs => ajax_attrs, :reorder_url => reorder_url, :reorder_parameter => "#{singular_name}_ordering")
 %>
   <collection class="sortable" merge-attrs="&html_attrs" merge-params>

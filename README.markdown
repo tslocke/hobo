@@ -1,3 +1,10 @@
+# TODO
+
+ * create_response: mirror update_response
+ * sortable-input-many
+ * name-many
+ * live-search works, but it's not 'live'
+
 # Installing
 
 Modify or add the following lines in your Gemfile:
@@ -305,6 +312,10 @@ Hobo techniques.   See the documentation for `<live-search>` and
 to press 'return' to initiate the search.  This should be easy to fix
 in hjq-live-search.js -- the hard part will probably be in doing it in
 a way that works in all possible browsers.
+
+### hot-input
+
+see tag documentation
 
 ## Editors
 
