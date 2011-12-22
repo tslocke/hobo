@@ -285,7 +285,18 @@ module Dryml
     def new_object_context(new_this)
       new_context do
         if new_this.respond_to?(:origin)
-          @_this_parent, @_this_field = new_this.origin, new_this.origin_attribute
+          refl = (new_this.origin && new_this.origin_attribute.is_a?(Symbol) && new_this.origin.class.respond_to?(:reflections) && new_this.origin.class.reflections[new_this.origin_attribute])
+          if refl.nil? || refl.macro==:belongs_to || refl.macro==:has_one
+            @_this_parent, @_this_field = new_this.origin, new_this.origin_attribute
+          else
+            # See bug #989 for more discussion.   The commented out
+            # section is more 'correct', but it is expensive and since
+            # nobody really ran into this before, setting to nil seems
+            # more appropriate.
+            @_this_parent, @_this_field = nil, nil
+            #@_this_parent = new_this.origin.send(new_this.origin_attribute)
+            #@_this_field = @_this_parent.index(new_this) || @_this_parent.length
+          end
         else
           @_this_parent, @_this_field = [nil, nil]
         end
