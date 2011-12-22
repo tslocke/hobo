@@ -33,7 +33,7 @@
         /* given annotations, turns the values in the _events_ object into functions, merges them into _options_ and returns _options_ */
         getOptions: function(annotations) {
             for(var key in annotations.events) {
-                if(annotations.event.hasOwnProperty(key)) {
+                if(annotations.events.hasOwnProperty(key)) {
                     annotations.options[key] = methods.createFunction.call(this, annotations.events[key]);
                 }
             }
