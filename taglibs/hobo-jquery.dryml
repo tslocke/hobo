@@ -941,6 +941,17 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
 <!-- Repeats the body of the tag inside a `<ul>` list with one item for each object in the collection (`this`). If no body is given, renders a `<card>` inside the `<li>`.
 
 Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-context attribute.
+
+`empty-collection-message` is called from this tag.   To suppress you can use the `without-empty-message` pseudo-attribute:
+
+    <collection without-empty-message/>
+
+If your collection is an ActiveRecord result set (and in Hobo it most likely is), the best way to customize the empty message is via translations.   Example: for product models, the key to customize would be `products.collection.empty_message`.
+
+If your collection is a generic array, empty-collection-message doesn't work.   `<collection>` also sets the last_if flag, so you can use the `<else>` tag to display a message:
+
+    <collection with="&[]"/>
+    <else>No items.</else>
  -->
 <def tag="collection" attrs="list-tag">
   <% list_tag ||= 'ul' %>
@@ -951,6 +962,20 @@ Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-contex
   </call-tag>
   <empty-collection-message param="empty-message"/>
   <if/><%# set last-if so <else/> works %>
+</def>
+
+<!-- Renders a message such as "No products to display". If the collection (`this`) is empty, `style="display:none"` is added. This means the message is still present and can be revealed with JavaScript if all items in the collection are removed via ajax remove buttons.
+
+The message can be customized via the `empty-collection-message` parameter or by changing the `products.collection.empty_message` translation.
+  -->
+<def tag="empty-collection-message">
+  <unless test="&this._?.member_class.nil?">
+    <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
+      <ht key="#{this.member_class.name.underscore}.collection.empty_message">
+        No <collection-name/> to display
+      </ht>
+    </div>
+  </unless>
 </def>
 
 <def tag="qunit-includes">
@@ -1206,7 +1231,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">
           <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-            <th param="#{scope.field_name}-heading"><%= this.member_class.human_attribute_name(scope.field_name) if scope %></th>
+            <th param="#{scope.field_name}-heading"><%= this.member_class.human_attribute_name(scope.field_name) if this.member_class && scope %></th>
           </with-field-names>
           <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
