@@ -44,7 +44,7 @@ These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will p
 <def tag="hobo-jquery-assets">
   <stylesheet name='hobo-jquery.css' />
   <javascript name="hobo-jquery/hjq.js" />
-  <repeat with="&%w(form formlet select-many live-editor click-editor datepicker sortable-collection delete-button spinner filter-menu autocomplete input-many dialog live-search search-results combobox hot-input)">
+  <repeat with="&%w(form formlet select-many live-editor click-editor datepicker sortable-collection delete-button spinner filter-menu autocomplete input-many dialog live-search search-results combobox hot-input accordion tabs)">
     <javascript name="hobo-jquery/hjq-#{this}.js"/>
   </repeat>
   <javascript name="combobox.js"/>
@@ -1286,4 +1286,161 @@ Note that `event` and `selector` are passed straight to `$.on()`  See [its docum
   <span class="hot-input" param="default" merge-attrs="&html_attrs">
     <input merge param />
   </span>
+</def>
+
+
+<!-- This tag, when given a list, chunks the list using the [jQuery-UI accordion](jqueryui.com/demos/accordion).
+
+If you do not specify the `chunker` attribute, the list is chunked into sections of equal length.   The default is 20 items, but that may be adjusted by setting the `per-section` attribute.
+
+The `chunker` may be passed a block to specify custom chunking.   This block is passed to (Enumerable#chunk)[http://www.ruby-doc.org/core-1.9.3/Enumerable.html#method-i-chunk]  For example, to divide a sorted list of users based on the first letter of their name:
+
+    <accordion-collection:users chunker="&Proc.new{|u| u.name[0..1]}"/>
+
+The scoped variable `chunk` is set to the chunker output.   If you didn't specify the chunker, it's set to the chunk number.   In the example above, it would be set to the first letter of the user's name.   Here's an example of it being used to customize the chunk heading:
+
+    <heading:>Section <%= scope.chunk %></heading:>
+
+The context is set to the chunked list for all parameters.   This allows us to further customize the heading:
+
+    <header:><name:first/> &mdash; <name:last/></header:>
+
+Replacing the collection with a table is easy:
+
+    <default:><table fields="this,email"/></default:>
+
+Remember that the default parameter is a list, even if you set per-section="1".   The easiest way to explode a list is with `<repeat>`:
+
+    <accordion-collection per-section="1">
+      <header:><name:first/></header:>
+      <default:>
+        <repeat>
+          This is my content: <view/>
+        </repeat>
+      </default:>
+    </accordion-collection>
+
+
+### Note:
+
+This tag uses Enumerable#chunk, which is only available with Ruby 1.9.2 and later.   If you are using Ruby 1.8.7, you must include the `backports` gem in your project.
+
+-->
+<def tag="accordion-collection" attrs="per-section,chunker,sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'header', 'icons', 'navigation'])
+     events, html_attrs = attrs.partition_hash(['navigationFilter', 'create', 'change', 'changestart'])
+     add_classes!(html_attrs, "accordion-collection")
+     add_data_rapid!(html_attrs, "accordion", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+  <% per_section ||= 20 %>
+  <% per_section = per_section.to_i %>
+  <% counter = 0 %>
+  <% chunker ||= Proc.new{|el| counter=counter+1; (counter-1)/per_section+1} %>
+  <repeat with="&this.to_a.chunk(&chunker)">
+    <% chunk, list = this %>
+    <% list.member_class = this.member_class if this._?.member_class%>
+    <set-scoped chunk="&chunk">
+      <do with="&list">
+        <div class="hjq-accordion-element">
+          <h3 param="header-wrapper">
+            <a param="header" href="#"><%= scope.chunk %></a>
+          </h3>
+          <div param="default">
+            <collection without-empty-message param/>
+          </div>
+        </div>
+      </do>
+    </set-scoped>
+  </repeat>
+  </div>
+</def>
+
+<% This tag allows you to easily use [jQuery-UI tabs](http://jqueryui.com/demos/tabs/)
+
+    <tabs>
+      <first:>tab 1 content</first:>
+      <tab2:>tab 2 content</tab2:>
+    </tabs>
+
+If you don't specify any attributes to the parameters, the parameter name is used for the tab name and ID.   You can adjust this behaviour by specifying attributes to your parameters:
+
+    <tabs>
+      <tab1: name="1" id="id1">tab 1 content</tab1:>
+    </tabs:>
+
+If you specify an href rather than an id, the tab content is loaded dynamically:
+
+    <tabs>
+      <remote: href="/front/hello"/>
+    </tabs>
+
+Attributes are passed through to jQuery-UI, so options and events defined in the [jQuery-ui tabs documentation](http://jqueryui.com/demos/tabs/) may be used:
+
+    <tabs collapsible selected="2">
+      ...
+    </tabs>
+
+### Attributes
+
+Note that `tabs` supports attributes both on the `tabs` tag as well as on the parameters.
+
+The parameters support three attributes:  `id`, `name`, `href`, described above.
+
+The `tabs` tag supports all options and events supported in jQuery-UI, plus one additional attribute:
+
+* sortable:  if set, the tabs are sortable rather than fixed.
+
+### Notes
+
+Usage of Ruby 1.8 will result in an undefined tab order.   Ruby 1.9 is recommended.
+
+%>
+<def tag="tabs" attrs="sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'ajaxOptions', 'cache', 'collapsible', 'cookie', 'deselectable', 'disabled', 'event', 'fx', 'idPrefix', 'panelTemplate', 'selected', 'spinner', 'tabTemplate'])
+     events, html_attrs = attrs.partition_hash(['create', 'select', 'load', 'show', 'add', 'remove', 'enable', 'disable'])
+     add_classes!(html_attrs, "tabs")
+     add_data_rapid!(html_attrs, "tabs", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+    <ul>
+      <repeat with="&parameters">
+        <% attrs, params = this.call %>
+        <li><a href="#{attrs[:href] || '#'+(attrs[:id] || this_key.to_s)}"><%= attrs[:name] || this_key.to_s.titleize %></a></li>
+      </repeat>
+    </ul>
+
+    <repeat with="&parameters">
+      <% attrs, params = this.call %>
+      <% merge_attrs = attrs - [:id, :href, :name] %>
+      <div id="#{attrs[:id] || this_key}" merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
+    </repeat>
+  </div>
+</def>
+
+<% The `<accordion>` tag implements the [jQuery-UI accordion](http://jqueryui.com/demos/accordion/).  It works the same as the `<tabs>` tag, so see the [tabs documentation](/api_tag_defs/tabs) for more information
+
+     <accordion>
+       <section1:>Hello</section1:>
+       <section2:>Hey</section2:>
+     </accordion>
+
+There are two differences:  accordion does not support the `href` option.
+%>
+<def tag="accordion" attrs="sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'icons', 'navigation'])
+     events, html_attrs = attrs.partition_hash(['navigationFilter', 'create', 'change', 'changestart'])
+     add_classes!(html_attrs, "accordion")
+     add_data_rapid!(html_attrs, "accordion", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+    <repeat with="&parameters">
+      <div class="hjq-accordion-element">
+        <% attrs, params = this.call %>
+        <% merge_attrs = attrs - [:name] %>
+        <h3><a href="#"><%= attrs[:name] || this_key.to_s.titleize %></a></h3>
+        <div merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
+      </div>
+    </repeat>
+  </div>
 </def>
