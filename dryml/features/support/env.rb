@@ -16,6 +16,13 @@ def aruba_path(file_or_dir)
   File.expand_path("../../../tmp/aruba/#{file_or_dir}", __FILE__)
 end
 
+After do
+  # muck out the caches
+  Dryml::Taglib.clear_cache
+  Dryml::Template.clear_build_cache
+  Dryml.clear_cache
+end
+
 # stub this
 module Hobo
   def self.root
