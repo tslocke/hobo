@@ -133,3 +133,55 @@ Feature: Doctest examples
     <p>Hello New World</p>
     """
 
+  Scenario: extending a tag with a non-default param
+    Given a file named "doctest_taglib.dryml" with:
+    """
+    <def tag="myp">
+      <p param="foo" />
+    </def>
+    """
+    And a file named "doctest_extend.dryml" with:
+    """
+    <extend tag="myp">
+      <old-myp merge>
+        <foo:>
+          Hello <param-content for="foo" />
+        </foo:>
+      </old-myp>
+    </extend>
+    """
+    And a file named "doctest.dryml" with:
+    """
+    <myp><foo:>New World</foo:></myp>
+    """
+    When I include the taglib "doctest_taglib"
+    And I include the taglib "doctest_extend"
+    When I render "doctest.dryml"
+    Then the output DOM should be:
+    """
+    <p class="foo">Hello New World</p>
+    """
+
+  Scenario: param-content-restore from an output context
+    Given a file named "doctest_taglib.dryml" with:
+    """
+    <def tag="myp">
+      <p param="foo">World</p>
+    </def>
+    """
+    And a file named "doctest.dryml" with:
+    """
+    <myp>
+      <foo:>
+        Hello <param-content for="foo" />
+      </foo:>
+    </myp>
+    """
+    When I include the taglib "doctest_taglib"
+    When I render "doctest.dryml"
+    Then the output DOM should be:
+    """
+    <p class="foo">Hello World</p>
+    """
+
+
