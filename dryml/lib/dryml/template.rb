@@ -629,7 +629,7 @@ module Dryml
                        elsif is_code_attribute?(merge_params)
                          merge_params[1..-1]
                        else
-                         merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_")
+                         merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_").*.to_sym
                          "all_parameters & #{merge_param_names.inspect}"
                        end
         "merge_parameter_hashes({#{param_items}}, (#{extra_params}) || {})"
