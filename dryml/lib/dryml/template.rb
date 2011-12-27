@@ -715,7 +715,7 @@ module Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
 
-        replace_parameter_proc(el)
+        replace_parameter_proc(el, children_to_erb(el))
       else
         attributes = el.attributes.dup
         # Providing one of 'with' or 'field' but not the other should cancel out the other
