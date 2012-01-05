@@ -144,3 +144,6 @@ collection is considered blank)
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
 <def tag="link"><%=raw "<link#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</link>" -%></def>
 
+<!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
+<def tag="img"><%=raw "<img#{tag_options(attributes, true)} />" -%></def>
+
