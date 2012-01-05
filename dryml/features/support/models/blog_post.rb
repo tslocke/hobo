@@ -21,5 +21,10 @@ class BlogPost
   def url
     "/blog_posts/#{id}"
   end
+
+  def name
+    title
+  end
+
 end
 
