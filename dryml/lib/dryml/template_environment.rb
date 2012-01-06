@@ -229,7 +229,7 @@ module Dryml
             found = poly_name
             break
           else
-            if call_type == ActiveRecord::Base || call_type == Object
+            if call_type == Object
               found = name
               break
             else
