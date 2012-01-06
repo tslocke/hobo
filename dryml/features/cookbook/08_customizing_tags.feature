@@ -257,3 +257,51 @@ Feature: Customizing tags
       </div>
       """
 
+  Scenario: extending a tag and using attributes (fails)
+    Given a file named "example_taglib.dryml" with:
+      """
+      <def tag="help-link" attrs="file">
+        <a class="help" href="/help/#{file}.html" param="default"/>
+      </def>
+
+      <extend tag="help-link">
+        <old-help-link merge>
+          <img src="/images/#{file}.png" /><do param="default" />
+        </old-help-link>
+      </extend>
+      """
+    And a file named "example.dryml" with:
+      """
+      <help-link file="intro">Intro Help</help-link>
+      """
+    When I include the taglib "example_taglib"
+    And I render "example.dryml"
+    Then the output DOM should be:
+      """
+      <a class="help" href="/help/intro.html"><img src="/images/intro.png" />Intro Help</a>
+      """
+
+  Scenario: extending a tag and using attributes take 2 (fails)
+    Given a file named "example_taglib.dryml" with:
+      """
+      <def tag="help-link" attrs="file">
+        <a class="help" href="/help/#{file}.html" param="default"/>
+      </def>
+
+      <extend tag="help-link" attrs="file">
+        <old-help-link merge>
+          <img src="/images/#{file}.png" /><do param="default" />
+        </old-help-link>
+      </extend>
+      """
+    And a file named "example.dryml" with:
+      """
+      <help-link file="intro">Intro Help</help-link>
+      """
+    When I include the taglib "example_taglib"
+    And I render "example.dryml"
+    Then the output DOM should be:
+      """
+      <a class="help" href="/help/intro.html"><img src="/images/intro.png" />Intro Help</a>
+      """
+
