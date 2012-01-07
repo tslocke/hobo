@@ -1,8 +1,6 @@
-require 'will_paginate/active_record'
-
 module Hobo
-
   module Model
+    require 'will_paginate/active_record'
 
     class NoNameError < RuntimeError; end
 
