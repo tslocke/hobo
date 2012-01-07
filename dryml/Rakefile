@@ -1,5 +1,5 @@
 require 'rake'
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'rake/testtask'
 
 RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
