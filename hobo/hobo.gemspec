@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('rubydoctest', [">= 0"])
   s.add_development_dependency('shoulda', [">= 0"])
-  s.add_development_dependency('irt', [">= 0.7.5"])
+  s.add_development_dependency('irt', [">= 1.2.10"])
 
   s.executables = ["hobo"]
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
