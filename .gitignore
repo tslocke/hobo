@@ -8,3 +8,4 @@ dryml/lib/doc
 doc
 dryml/doc
 .yardoc
+.rvmrc
