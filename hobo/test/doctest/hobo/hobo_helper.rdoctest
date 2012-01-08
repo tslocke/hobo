@@ -1,11 +1,7 @@
+    doctest: prepare testapp environment
+    doctest_require: '../prepare_testapp'
+
 # Hobo::Helper
-
-Various view helpers
-
-        doctest_require: 'mocha'
-        doctest_require: '../../../hobo_support/lib/hobo_support'
-        doctest_require: '../../../hobo_fields/lib/hobo_fields'
-        doctest_require: '../../lib/hobo'
 
 Create a mock view layer:
 
