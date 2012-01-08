@@ -6,18 +6,3 @@ eval_file '../partials/_subsite_taglib_variables.rb'
 
 invoke 'hobo:subsite_taglib', %w[ subs -q]
 eval_file '../partials/_subsite_taglib_noopt.rb'
-
-git_reset_app
-invoke 'hobo:subsite_taglib', %w[ subs -q --admin]
-eval_file '../partials/_subsite_taglib_admin.rb'
-
-git_reset_app
-invoke 'hobo:subsite_taglib', %w[ subs -q --admin --invite-only]
-eval_file '../partials/_subsite_taglib_admin_invite_only.rb'
-
-git_reset_app
-invoke 'hobo:subsite_taglib', %w[ subs --user-resource-name=account -q --admin --invite-only]
-user_resource_name = 'Account'
-eval_file '../partials/_subsite_taglib_variables.rb'
-eval_file '../partials/_subsite_taglib_admin_invite_only.rb'
-

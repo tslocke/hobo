@@ -9,10 +9,7 @@ invoke 'hobo:model', %w(nest/ed alpha:string -q)
 
 desc "Nested files exist"
 files_exist? %w[ app/models/nest/ed.rb
-        app/models/nest.rb
-        test/unit/nest/ed_test.rb
-        test/fixtures/nest/eds.yml
-        app/viewhints/nest/ed_hints.rb ]
+        app/models/nest.rb ]
 test_value_eql? true
 
 desc "Nested injection matches"
@@ -20,9 +17,4 @@ file_include? 'app/models/nest/ed.rb',
               'hobo_model',
               'fields do',
               /alpha\s+\:string/
-test_value_eql? true
-
-desc "Nested hint content matches"
-file_include? 'app/viewhints/nest/ed_hints.rb',
-              'class Nest::EdHints'
 test_value_eql? true

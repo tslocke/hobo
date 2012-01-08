@@ -5,8 +5,6 @@ invoke 'hobo:front_controller', %w[ -q ]
 desc "All files exist"
 files_exist? %w[ app/controllers/front_controller.rb
                  app/helpers/front_helper.rb
-                 test/unit/helpers/front_helper_test.rb
-                 test/functional/front_controller_test.rb
                  app/views/front/index.dryml ]
 test_value_eql? true
 

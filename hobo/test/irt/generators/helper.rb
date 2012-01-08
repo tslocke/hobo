@@ -20,7 +20,7 @@ end
 def file_content(path, action, *strings)
   f = File.read(path)
   wrong = strings.send(action) do |s|
-            re = s.is_a?(Regexp) ? s : /#{Regexp.escape(s)}/
+            re = s.is_a?(Regexp) ? s : /#{Regexp.escape(s)}/m
             !(f =~ re)
           end
   wrong.empty? || wrong
