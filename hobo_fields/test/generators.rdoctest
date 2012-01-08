@@ -28,7 +28,7 @@ doctest: test file exists
 
 doctest: test content matches
 >> File.read 'test/unit/alpha/beta_test.rb'
-=> <<-X
+=>
 require 'test_helper'
 
 class Alpha::BetaTest < ActiveSupport::TestCase
@@ -36,7 +36,6 @@ class Alpha::BetaTest < ActiveSupport::TestCase
   #   assert true
   # end
 end
-X
 
 doctest: fixture file exists
 >> File.exist? 'test/fixtures/alpha/beta.yml'
