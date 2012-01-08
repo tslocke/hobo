@@ -1,3 +1,6 @@
+    doctest: prepare testapp environment
+    doctest_require: '../prepare_testapp'
+
 Hobo Scopes
 {: .document-title}
 
@@ -29,54 +32,6 @@ The idea behind rubydoctest is that you should be able to recreate
 everything in this document from an irb console.  It is recommended
 that you skip down to the [fixture definitions](#fixture_definition).
 Nobody but the computer needs to read the rest of this section.
-{.hidden}
-
-To test Hobo scopes, we're going to need a connection to the database
-and some sample data.  This takes a few lines of code to set up when
-starting from a blank irb session.
-{.hidden}
-
-First off we need to configure ActiveSupport for auto-loading
-{.hidden}
-
-    >> require 'rubygems'
-    >> require 'active_support'
-    >> require 'active_record'
-    >> require 'action_pack'
-    >> require 'action_view'
-    >> require 'action_controller'
-{.hidden}
-
-We also need to get ActiveRecord set up with a database connection
-{.hidden}
-
-    >> mysql_adapter = defined?(JRUBY_VERSION) ? 'jdbcmysql' : 'mysql'
-    >> mysql_user = 'root'; mysql_password = ''
-    >> mysql_login = "-u #{mysql_user} --password='#{mysql_password}'"
-    >> mysql_database = "hobo_fields_doctest"
-    >> system "mysqladmin #{mysql_login} --force drop #{mysql_database} 2> /dev/null"
-    >> system("mysqladmin #{mysql_login} create #{mysql_database}") or raise "could not create database"
-    >> ActiveRecord::Base.establish_connection(:adapter => mysql_adapter,
-                                               :database => mysql_database,
-                                               :host => "localhost",
-                                               :username => mysql_user,
-                                               :password => mysql_password)
-    >> ActiveRecord::Base.logger = ActiveSupport::BufferedLogger::new(StringIO.new(''))
-{.hidden}
-
-Some load path manipulation:
-{.hidden}
-
-    >> $:.unshift File.expand_path('../../../../../hobo_support/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../../hobo_fields/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../../dryml/lib', __FILE__)
-    >> $:.unshift File.expand_path('../../../../lib', __FILE__)
-{.hidden}
-
-And we'll require hobo:
-{.hidden}
-
-    >> require 'hobo'
 {.hidden}
 
 Let's set up a few models for our testing:
@@ -396,8 +351,4 @@ Like named scopes, Hobo scopes can be chained:
     >> Bryan.inactive_friends.inactive.*.name
     => ["Bethany"]
 
-Clean up our test database:
-{.hidden}
-
-    >> system  "mysqladmin --force drop #{mysql_database} 2> /dev/null"
 {.hidden}
