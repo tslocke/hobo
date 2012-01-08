@@ -629,7 +629,7 @@ module Dryml
                        elsif is_code_attribute?(merge_params)
                          merge_params[1..-1]
                        else
-                         merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_")
+                         merge_param_names = merge_params.split(/\s*,\s*/).*.gsub("-", "_").*.to_sym
                          "all_parameters & #{merge_param_names.inspect}"
                        end
         "merge_parameter_hashes({#{param_items}}, (#{extra_params}) || {})"
@@ -715,7 +715,7 @@ module Dryml
         dryml_exception("replace attribute must not have a value", el) if repl.has_rhs?
         dryml_exception("replace parameters must not have attributes", el) if el.attributes.length > 1
 
-        replace_parameter_proc(el)
+        replace_parameter_proc(el, children_to_erb(el))
       else
         attributes = el.attributes.dup
         # Providing one of 'with' or 'field' but not the other should cancel out the other
