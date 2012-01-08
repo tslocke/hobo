@@ -1,4 +1,4 @@
-irt_at_exit{git_reset_app}
+IRT::Directives.irt_at_exit {git_reset_app}
 
 def invoke(*args)
   Rails::Generators.invoke *args
