@@ -60,7 +60,7 @@ module Hobo
       results = args.extract_options!
       r = params[:render]
       if r
-        ajax_update_response(r.values, results)
+        ajax_update_response(r.values, results, params[:render_options])
         true
       else
         false
@@ -76,6 +76,8 @@ module Hobo
                                                  view_context.lookup_context.instance_variable_get('@details')).identifier
       renderer = Dryml.page_renderer(view_context, identifier, [], controller)
 
+      headers["Content-Type"] = options['content_type'] if options['content_type']
+
       render :update do |page|
         page << (options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;")
         for spec in render_specs
@@ -84,7 +86,11 @@ module Hobo
 
           if spec[:part_context]
             part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
-            page.call(function, dom_id, part_content)
+            if options['content_type']
+              page << "#{function}(#{dom_id.to_json}, #{part_content.to_json.gsub('&', '&amp;')})"
+            else
+              page.call(function, dom_id, part_content)
+            end
           elsif spec[:result]
             result = results[spec[:result].to_sym]
             page.call(function, dom_id, result)
@@ -92,7 +98,23 @@ module Hobo
             # spec didn't specify any action :-/
           end
         end
-        page << renderer.part_contexts_storage if renderer
+        if renderer
+          if options[:contexts_function]
+            storage = renderer.part_contexts_storage_uncoded
+            page << "#{options[:contexts_function]}(#{storage.to_json});"
+          else
+            page << renderer.part_contexts_storage
+          end
+        end
+        page << options[:postamble] if options[:postamble]
+      end
+    end
+
+    # use this function to send arbitrary bits of javascript
+    def ajax_response(response, options)
+      render :update do |page|
+        page << (options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;")
+        page << response
         page << options[:postamble] if options[:postamble]
       end
     end
@@ -134,7 +156,10 @@ module Hobo
     def site_search(query)
       results_hash = Hobo.find_by_search(query)
       all_results = results_hash.values.flatten.select { |r| r.viewable_by?(current_user) }
-      if all_results.empty?
+      if params["search_version"]
+        @search_results = all_results
+        hobo_ajax_response
+      elsif all_results.empty?
         render :text => "<p>"+ t("hobo.live_search.no_results", :default=>["Your search returned no matches."]) + "</p>"
       else
         # TODO: call one tag that renders all the search results with headings for each model

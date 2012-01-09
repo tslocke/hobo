@@ -428,9 +428,11 @@ module Dryml
 
     def simple_part_element(el, content)
       part_name  = el.attributes['part']
-      dom_id = el.attributes['id'] || part_name
       part_name = ruby_name(part_name)
       part_locals = el.attributes["part-locals"]
+      dom_id = el.attributes['id']
+
+      raise 'id should have been added elsewhere' if dom_id.nil?
 
       part_src = "<% def #{part_name}_part(#{part_locals._?.gsub('@', '')}) #{tag_newlines(el)}; new_context do %>" +
         content +
@@ -526,7 +528,6 @@ module Dryml
         dryml_exception("invalid for-type attribute", el)
       end
     end
-
 
     def tag_call(el)
       name = call_name(el)
@@ -746,7 +747,7 @@ module Dryml
     def maybe_make_part_call(el, call)
       part_name = el.attributes['part']
       if part_name
-        part_id = el.attributes['id'] || part_name
+        part_id=(el.attributes['id'] ||= "\#{create_part_id('#{part_name}', '#{el.attributes['part-locals']}', binding)}")
 
         "<% safe_concat(\"<div class='part-wrapper' id='#{attribute_to_ruby(part_id)[1..-2]}'>\") %>" +
           part_element(el, call) +
@@ -804,16 +805,14 @@ module Dryml
 
     def static_tag_to_method_call(el)
       part = el.attributes["part"]
+      if part && !el.attributes["id"]
+        el.attributes["id"] = "\#{create_part_id('#{part}', '#{el.attributes['part-locals']}', binding)}"
+      end
       attrs = el.attributes.map do |n, v|
         next if n.in? SPECIAL_ATTRIBUTES
         val = restore_erb_scriptlets(v).gsub('"', '\"').gsub(/<%=(.*?)%>/, '#{\1}')
         %('#{n}' => "#{val}")
       end.compact
-
-      # If there's a part but no id, the id defaults to the part name
-      if part && !el.attributes["id"]
-        attrs << ":id => '#{part}'"
-      end
 
       # Convert the attributes hash to a call to merge_attrs if
       # there's a merge-attrs attribute

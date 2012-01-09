@@ -99,13 +99,13 @@
 
 
       def parse_this_id(page_this)
-        if this_id == "this"
-          self.this = page_this
-        elsif this_id =~ /^this:(.*)/
-          self.this = page_this
-          self.this_field = $1
-        elsif this_id == "nil"
+        if this_id.nil? || this_id =="nil"
           nil
+        elsif this_id == "this" || this_id == page_this.typed_id
+          self.this = page_this
+        elsif page_this.typed_id && this_id =~ /^(this)|(#{page_this.typed_id}):(.*)/
+          self.this = page_this
+          self.this_field = $3
         else
           parts = this_id.split(':')
           if parts.length == 3
