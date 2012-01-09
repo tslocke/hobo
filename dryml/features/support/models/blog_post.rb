@@ -28,3 +28,10 @@ class BlogPost
 
 end
 
+class SpecialBlogPost < BlogPost
+
+  def url
+    "/special_blog_posts/#{id}"
+  end
+
+end

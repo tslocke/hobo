@@ -106,7 +106,7 @@ Feature: Doctest examples
     </p>
     """
 
-  Scenario: extending a tag
+  Scenario: extending a tag (fails)
     Given a file named "doctest_taglib.dryml" with:
     """
     <def tag="myp">
@@ -133,7 +133,7 @@ Feature: Doctest examples
     <p>Hello New World</p>
     """
 
-  Scenario: extending a tag with a non-default param
+  Scenario: extending a tag with a non-default param (fails)
     Given a file named "doctest_taglib.dryml" with:
     """
     <def tag="myp">
