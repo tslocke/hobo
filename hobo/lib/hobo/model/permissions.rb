@@ -339,9 +339,9 @@ module Hobo
       def with_attribute_or_belongs_to_keys(attribute)
         if (refl = self.class.reflections[attribute.to_sym]) && refl.macro == :belongs_to
           if refl.options[:polymorphic]
-            yield refl.primary_key_name, refl.options[:foreign_type]
+            yield refl.foreign_key, refl.options[:foreign_type]
           else
-            yield refl.primary_key_name, nil
+            yield refl.foreign_key, nil
           end
         else
           yield attribute.to_s, nil
@@ -387,7 +387,7 @@ module Hobo
 
         if (refl = self.class.reflections[attr.to_sym]) && refl.macro == :belongs_to
           # A belongs_to -- also unknownify the underlying fields
-          unknownify_attribute refl.primary_key_name
+          unknownify_attribute refl.foreign_key
           unknownify_attribute refl.options[:foreign_type] if refl.options[:polymorphic]
         else
           # A regular field -- hack the dirty tracking methods
@@ -430,7 +430,7 @@ module Hobo
 
         if (refl = self.class.reflections[attr]) && refl.macro == :belongs_to
           # A belongs_to -- restore the underlying fields
-          deunknownify_attribute refl.primary_key_name
+          deunknownify_attribute refl.foreign_key
           deunknownify_attribute(refl.options[:foreign_type], false) if refl.options[:polymorphic]
         else
           # A regular field -- restore the dirty tracking methods

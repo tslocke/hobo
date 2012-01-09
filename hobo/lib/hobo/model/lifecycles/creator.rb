@@ -32,7 +32,7 @@ module Hobo
           allowed = params.dup
           params.each do |p|
             if (refl = model.reflections[p]) && refl.macro == :belongs_to
-              allowed << refl.primary_key_name.to_s
+              allowed << refl.foreign_key.to_s
               allowed << refl.options[:foreign_type] if refl.options[:polymorphic]
             end
           end
