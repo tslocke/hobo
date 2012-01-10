@@ -491,8 +491,14 @@ module Hobo
 
     def hobo_show(*args, &b)
       options = args.extract_options!
-      self.this ||= args.first || find_instance(options)
-      response_block(&b)
+      self.this ||= args.first
+      if this.nil?
+        self.this = find_instance(options)
+        unless (parms=attribute_parameters).blank?
+          this.with_acting_user(current_user) { this.attributes = parms }
+        end
+      end
+      show_response(&b)
     end
 
     def hobo_edit(*args, &b)
@@ -500,15 +506,24 @@ module Hobo
     end
 
     def hobo_new(record=nil, &b)
-      self.this = record || model.user_new(current_user)
-      response_block(&b)
+      self.this = record || model.user_new(current_user, attribute_parameters)
+      show_response(&b)
     end
 
+    def show_response(&b)
+      response_block(&b) or
+        begin
+          if request.xhr? && params[:render]
+            hobo_ajax_response
+            render :nothing => true unless performed?
+          end
+        end
+    end
 
     def hobo_new_for(owner, record=nil, &b)
       owner, association = find_owner_and_association(owner)
-      self.this = record || association.user_new(current_user)
-      response_block(&b)
+      self.this = record || association.user_new(current_user, attribute_parameters)
+      show_response(&b)
     end
 
 
@@ -603,37 +618,28 @@ module Hobo
 
       flash_notice (ht(:"#{@this.class.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"])) if valid?
 
-      response_block(&b) or
-        if valid?
-          respond_to do |wants|
-            wants.html do
-              redirect_after_submit options
-            end
-            wants.js do
-              if in_place_edit_field
-                # Decreasingly hacky support for the scriptaculous in-place-editor
-                new_val = call_dryml_tag("view", :field => in_place_edit_field, :no_wrapper => true)
-                hobo_ajax_response(this, :new_field_value => new_val)
-              else
-                hobo_ajax_response(this)
-              end
+      response_block(&b) or begin
+                              valid = valid?  # valid? can be expensive
+                              if params[:render]
+                                if (params[:render_options] && params[:render_options][:errors_ok]) || valid
+                                  hobo_ajax_response(this)
 
-              # Maybe no ajax requests were made
-              render :nothing => true unless performed?
-            end
-          end
-        else
-          respond_to do |wants|
-			# errors is used by the translation helper, ht, below.
-            errors = @this.errors.full_messages.join("\n")
-            wants.html { re_render_form(:edit) }
-            wants.js { render(:status => 500,
-                              :text => ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change.\n#{errors}"], :errors=>errors)
-                             ) }
-          end
-        end
+                                  # Maybe no ajax requests were made
+                                  render :nothing => true unless performed?
+                                else
+                                  errors = @this.errors.full_messages.join('\n')
+                                  message = ht(:"#{@this.class.to_s.underscore}.messages.update.error",:default=>["There was a problem with that change\\n#{errors}"], :errors=>errors)
+                                  ajax_response("alert('#{message}');", params[:render_options])
+                                end
+                              else
+                                if valid
+                                  redirect_after_submit options
+                                else
+                                  re_render_form(:edit)
+                                end
+                              end
+                            end
     end
-
 
     def hobo_destroy(*args, &b)
       options = args.extract_options!
@@ -732,7 +738,8 @@ module Hobo
     # --- Miscelaneous Actions --- #
 
     def hobo_completions(attribute, finder, options={})
-      options = options.reverse_merge(:limit => 10, :param => :query, :query_scope => "#{attribute}_contains")
+      options = options.reverse_merge(:limit => 10, :query_scope => "#{attribute}_contains")
+      options[:param] ||= params[:query].nil? ? :term : :query
       finder = finder.limit(options[:limit]) unless finder.try.limit_value
 
       begin
@@ -745,7 +752,11 @@ module Hobo
           items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
         end
       end
-      render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
+      if request.xhr?
+        render :json => items.map {|i| i.send(attribute)}
+      else
+        render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
+      end
     end
 
 

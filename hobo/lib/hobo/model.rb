@@ -1,8 +1,6 @@
-require 'will_paginate/active_record'
-
 module Hobo
-
   module Model
+    require 'will_paginate/active_record'
 
     class NoNameError < RuntimeError; end
 
@@ -198,10 +196,10 @@ module Hobo
           #       (ie X belongs_to Y (polymorphic), Z is a subclass of Y; @x.y_is?(some_z) will never pass)
           class_eval %{
             def #{name}_is?(target)
-              target.class.name == self.#{refl.options[:foreign_type]} && target.#{id_method} == self.#{refl.primary_key_name}
+              target.class.name == self.#{refl.options[:foreign_type]} && target.#{id_method} == self.#{refl.foreign_key}
             end
             def #{name}_changed?
-              #{refl.primary_key_name}_changed? || #{refl.options[:foreign_type]}_changed?
+              #{refl.foreign_key}_changed? || #{refl.options[:foreign_type]}_changed?
             end
           }
         else
@@ -329,7 +327,7 @@ module Hobo
               r.klass >= self &&
               !r.options[:conditions] &&
               !r.options[:scope] &&
-              r.primary_key_name == refl.primary_key_name
+              r.foreign_key == refl.foreign_key
           end
         end
       end

@@ -27,14 +27,14 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
   # and record in question are Hobo models
   def nullify_keys(records)
     if (user = acting_user)
-      records.each { |r| r.user_update_attributes!(user, @reflection.primary_key_name => nil) if r.is_a?(Hobo::Model) }
+      records.each { |r| r.user_update_attributes!(user, @reflection.foreign_key => nil) if r.is_a?(Hobo::Model) }
     end
 
     # Normal ActiveRecord implementatin
     ids = records.map { |record| record.quoted_id }.join(',')
     @reflection.klass.update_all(
-      "#{@reflection.primary_key_name} = NULL",
-      "#{@reflection.primary_key_name} = #{@owner.quoted_id} AND #{@reflection.klass.primary_key} IN (#{ids})"
+      "#{@reflection.foreign_key} = NULL",
+      "#{@reflection.foreign_key} = #{@owner.quoted_id} AND #{@reflection.klass.primary_key} IN (#{ids})"
     )
   end
 

@@ -129,12 +129,19 @@ module Hobo
 
 
 
-      AJAX_CALLBACKS = [ :success, :failure, :complete ]
+      AJAX_CALLBACKS = [ :success, :failure, :complete, :before ]
 
-      AJAX_ATTRS = AJAX_CALLBACKS + [ :update, :type, :method,
-                                      :script, :form, :params, :confirm, :message,
-                                      :reset_form, :refocus_form, :result_update, :spinner_next_to ]
+      AJAX_UPDATE_ATTRS = [  :update, :updates, :ajax ]
 
+      AJAX_EFFECT_ATTRS = [ :hide, :show ]
+
+      AJAX_SPINNER_ATTRS = [:spinner_next_to, :spinner_options, :spinner_at, :no_spinner, :message]
+
+      AJAX_ATTRS = AJAX_CALLBACKS + AJAX_UPDATE_ATTRS + AJAX_EFFECT_ATTRS + AJAX_SPINNER_ATTRS +
+        [
+         :type, :method, :script, :form, :result_update, # FIXME: these 5 are not required/used by hobo-jquery: delete when prototype.js support is dropped
+         :params, :confirm, :errors_ok,
+         :reset_form, :refocus_form ]
 
       def through_collection_names(object=this)
         object.class.reflections.values.select do |refl|

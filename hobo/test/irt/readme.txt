@@ -1,7 +1,10 @@
 In order to run the tests, you need git and irt installed, then run:
 
-    $ rake irt_test_all
+    $ rake test:irt
 
-or if you are testing a local repo of hobo, from the hobo repo root:
+or if you are testing a local repo of hobo, you need to set the:
 
-    $ rake HOBO_DEV_ROOT=. irt_test_all
+    $ export HOBODEV=<hobo_repo_root_path>
+
+With HOBODEV set, if you are using rvm, the <hobo_repo_root_path>/.rvmrc file will be duplicated into
+the created testapp, so your test will use the same rvm settings.

@@ -1,5 +1,21 @@
 # An ActionView Helper
 module Dryml::Helper
+  def create_part_id(part_name, part_locals, binding)
+    locals={}
+    part_locals.split(',').each do |local|
+      local=local.strip
+      locals[local] = eval(local, binding)
+    end
+    key2=[typed_id, locals.to_yaml]
+    @part_ids ||= {}
+    if @part_ids[part_name]
+      @part_ids[part_name][key2] ||= "#{part_name}-#{@part_ids[part_name].length.to_s}"
+    else
+      @part_ids[part_name] = {key2 => part_name}
+      part_name
+    end
+  end
+
   def context_map(enum = this)
       # TODO: Calls to respond_to? in here can cause the full collection hiding behind a scoped collection to get loaded
       res = []
@@ -59,7 +75,7 @@ module Dryml::Helper
     def param_name_for_this(foreign_key=false)
       return "" unless form_this
       name = if foreign_key && (refl = this_field_reflection) && refl.macro == :belongs_to
-               param_name_for(path_for_form_field[0..-2] + [refl.primary_key_name])
+               param_name_for(path_for_form_field[0..-2] + [refl.foreign_key])
              else
                param_name_for(path_for_form_field)
              end

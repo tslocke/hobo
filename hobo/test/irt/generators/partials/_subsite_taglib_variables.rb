@@ -15,7 +15,7 @@ admin_tag = '<extend tag="page">
       <stylesheet name="subs"/>
     </append-stylesheets:>
     <footer:>
-      <a href="#{base_url}/">View Site</a> |
+      <a href="#{base_url}/"><t key="hobo.subsite.back_link">View Site</t></a>
     </footer:>
   </old-page>
 </extend>'
