@@ -1,4 +1,4 @@
-!--
+<!--
 
 This is the jQuery plugin for Hobo.  This plugin provides the jQuery UI widgets in a Hobo friendly manner, provides useful tags and functions for jQuery javascript coding, and provides additional composite tags.
 
@@ -20,14 +20,6 @@ Events are also supported.  Pass in a global Javascript function name:
 
 <!--
 These are the Hobo jQuery and jQuery assets required by Hobo jQuery.  You will probably wish to add this to your page definition:
-
-    <extend tag="page">
-      <old-page merge>
-        <custom-scripts:>
-          <hjq-assets/>
-        </custom-scripts>
-      </old-page>
-    </extend>
 -->
 <def tag="hjq-assets">
   <jquery-assets/>
@@ -1231,7 +1223,7 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">
           <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
-            <th param="#{scope.field_name}-heading"><%= this.member_class.human_attribute_name(scope.field_name) if this.member_class && scope %></th>
+            <th param="#{scope.field_name}-heading"><%= this.member_class ? this.member_class.human_attribute_name(scope.field_name) : scope.field_name.to_s.titleize %></th>
           </with-field-names>
           <th if="&all_parameters[:controls]" class="controls"/>
         </tr>
@@ -1381,7 +1373,7 @@ This tag uses Enumerable#chunk, which is only available with Ruby 1.9.2 and late
   </div>
 </def>
 
-<% This tag allows you to easily use [jQuery-UI tabs](http://jqueryui.com/demos/tabs/)
+<%# This tag allows you to easily use [jQuery-UI tabs](http://jqueryui.com/demos/tabs/)
 
     <tabs>
       <first:>tab 1 content</first:>
@@ -1443,14 +1435,15 @@ Usage of Ruby 1.8 will result in an undefined tab order.   Ruby 1.9 is recommend
   </div>
 </def>
 
-<% The `<accordion>` tag implements the [jQuery-UI accordion](http://jqueryui.com/demos/accordion/).  It works the same as the `<tabs>` tag, so see the [tabs documentation](/api_tag_defs/tabs) for more information
+<%#
+ The `<accordion>` tag implements the [jQuery-UI accordion](http://jqueryui.com/demos/accordion/).  It works the same as the `<tabs>` tag, so see the [tabs documentation](/api_tag_defs/tabs) for more information
 
      <accordion>
        <section1:>Hello</section1:>
        <section2:>Hey</section2:>
      </accordion>
 
-There are two differences:  accordion does not support the `href` option.
+There is one difference:  accordion does not support the `href` option.
 %>
 <def tag="accordion" attrs="sortable">
   <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'icons', 'navigation'])

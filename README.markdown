@@ -4,6 +4,8 @@
  * sortable-input-many
  * name-many
  * live-search works, but it's not 'live'
+ * select-one-or-new-dialog
+ * display:inline for remove-button and friends
 
 # Installing
 
