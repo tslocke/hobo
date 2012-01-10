@@ -660,33 +660,24 @@ app/controllers/story_statuses_controller.rb:
       end
     end
 
+FIXME: translate 'or', 'New', 'cancel', 'ok'.
 
 -->
 <def tag="select-one-or-new-dialog">
   <% dialog_id="dialog-#{typed_id.gsub(':', '-')}" %>
   <% part_id = "select-one-#{typed_id.gsub(':', '-')}" %>
-  <input part="select-one-or-new-dialog-select" id="#{part_id}"/>
+  <input part="select-one-or-new-dialog-select" id="#{part_id}" />
+  <span param="or">or</span>
   <dialog-open-button dialog="##{dialog_id}" param>
-    New <% this_field.humanize %>
+    New <%= this_field_name %>
   </dialog-open-button>
-  <dialog param buttons='&[["cancel", "hjq.dialog.close"], ["ok", "hjq.dialog.submitFormletAndClose"]]' title="New #{this_field.humanize}" id="&dialog_id" >
+  <dialog-box param buttons='&[["cancel", "hjq_dialog_box.close"], ["ok", "hjq_dialog_box.submitAndClose"]]' title="New #{this_field.humanize}" id="&dialog_id" > 
     <formlet with="&this_type.new" update="&part_id" success="jQuery('##{part_id} select').val(jQuery('##{part_id} option:last').val())">
-      <field-list />
+      <field-list param/>
     </formlet>
-  </dialog>
+  </dialog-box>
 </def>
 
-
-<!--
--->
-<def tag="toggle-edit" attrs="view">
-<%
-  options, attrs = attributes.partition_hash(['copyCss', 'eventsEnabled', 'stickyFocus', 'defaultText', 'events'])
-  events, html_attrs = attrs.partition_hash(['onedit', 'onpreview', 'oncanceledit', 'oncancelpreview'])
-  html_attrs = add_classes(html_attrs, "toggle-edit");
-%>
- <input param="default" merge-attrs="&html_attrs" />
-</def>
 
 <!--
 An in-place-editor type control.  Displays the `view` view of a field
