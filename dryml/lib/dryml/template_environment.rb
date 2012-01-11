@@ -105,6 +105,10 @@ module Dryml
     end
 
 
+    def deunderscore_attributes(attrs)
+      HashWithIndifferentAccess[attrs.map{ |attr, value| [attr.to_s.gsub('_', '-'), value]}]
+    end
+
     def add_classes!(attributes, *classes)
       classes = classes.flatten.select{|x|x}
       current = attributes[:class]
@@ -118,8 +122,8 @@ module Dryml
     end
 
     def add_data_rapid!(attrs, tag, options)
-      data_rapid = ActiveSupport::JSON.decode(attrs["data-rapid"] || attrs["data_rapid"] || "{}")
-      attrs["data-rapid"] = data_rapid.update(tag => options).to_json
+      data_rapid = ActiveSupport::JSON.decode(attrs["data_rapid"] || "{}")
+      attrs["data_rapid"] = data_rapid.update(tag => options).to_json
       attrs
     end
 

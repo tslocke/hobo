@@ -5,7 +5,7 @@
 -->
 <def tag="call-tag" attrs="tag">
   <%= Dryml.static_tags.include?(tag) ?
-      content_tag(tag, parameters.default, attributes) :
+      content_tag(tag, parameters.default, deunderscore_attributes(attributes)) :
       send(tag.gsub('-', '_'), attributes, parameters) %>
 </def>
 
@@ -25,7 +25,7 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
   <% parameter ||= :default %>
   <%= if when_
         if Dryml.static_tags.include?(tag)
-          content_tag(tag, parameters.default, attributes)
+          content_tag(tag, parameters.default, deunderscore_attributes(attributes))
         else
           send(tag.gsub('-', '_'), attributes, { parameter.to_sym => parameters[:default] })
         end
@@ -115,32 +115,32 @@ collection is considered blank)
 
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="html"><%=raw "<html#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</html>" -%></def>
+<def tag="html"><%=raw "<html#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</html>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="table"><%=raw "<table#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</table>" -%></def>
+<def tag="table"><%=raw "<table#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</table>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="a"><%=raw "<a#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</a>" -%></def>
+<def tag="a"><%=raw "<a#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</a>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="section"><%=raw "<section#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</section>" -%></def>
+<def tag="section"><%=raw "<section#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</section>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="header"><%=raw "<header#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</header>" -%></def>
+<def tag="header"><%=raw "<header#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</header>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="footer"><%=raw "<footer#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</footer>" -%></def>
+<def tag="footer"><%=raw "<footer#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</footer>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="form"><%=raw "<form#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</form>" -%></def>
+<def tag="form"><%=raw "<form#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</form>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="submit"><%=raw "<submit#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</submit>" -%></def>
+<def tag="submit"><%=raw "<submit#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</submit>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="input"><%=raw "<input#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</input>" -%></def>
+<def tag="input"><%=raw "<input#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</input>" -%></def>
 
 <!-- nodoc.  Define core HTML tags defined in Rapid so that DRYML can be used without Rapid. -->
-<def tag="link"><%=raw "<link#{tag_options(attributes, true)}>" -%><do param="default"/><%= raw "</link>" -%></def>
+<def tag="link"><%=raw "<link#{tag_options(deunderscore_attributes(attributes), true)}>" -%><do param="default"/><%= raw "</link>" -%></def>
 
