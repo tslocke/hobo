@@ -71,6 +71,7 @@
     $.fn.hjq_dialog_open_button = function(annotations) {
         this.on('click', function() {
             $(annotations.selector).hjq_dialog_box('toggle');
+            return false;
         });
     };
 
