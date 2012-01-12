@@ -660,6 +660,11 @@ app/controllers/story_statuses_controller.rb:
       end
     end
 
+Just to be clear, you shouldn't need any special controller actions if
+you are using inside of edit forms.  It's only when you're using it
+inside of a new form that Hobo cannot load the object from the
+database so you have to tell it the context.
+
 FIXME: translate 'or', 'New', 'cancel', 'ok'.
 
 -->
