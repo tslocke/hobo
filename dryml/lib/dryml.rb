@@ -137,7 +137,7 @@ module Dryml
                               else
                                   File.join(File.dirname(__FILE__), "dryml/static_tags")
                               end
-                       File.readlines(path).*.chop
+                       File.read(path).split
                      end
   end
 
