@@ -57,35 +57,6 @@ module Hobo
           alias_method_chain :replace, :hobo_metadata
         end
 
-        WillPaginate::ActiveRecord::Pagination.class_eval do
-
-          def apply_hobo_metadata(collection)
-            klass = Object.instance_method(:class).bind(self).call
-            is_relation = klass <= ActiveRecord::Relation
-            is_association_proxy = klass <= ActiveRecord::Associations::AssociationProxy
-            collection.member_class     = (is_relation || is_association_proxy) ? member_class : self
-            collection.origin           = try.proxy_owner
-            collection.origin_attribute = try.proxy_reflection._?.name
-            collection
-          end
-
-          # NOTE: as of will_paginate 3.0.0, the standard paginate method calls the page method.
-          # However, it converts an association proxy into a relation first (via adding a limit clause),
-          # which causes the proxy_owner and proxy_reflection methods to disappear.
-          def paginate_with_hobo_metadata(*args, &block)
-            collection = paginate_without_hobo_metadata(*args, &block)
-            apply_hobo_metadata(collection)
-          end
-          alias_method_chain :paginate, :hobo_metadata
-
-          def page_with_hobo_metadata(*args, &block)
-            collection = page_without_hobo_metadata(*args, &block)
-            apply_hobo_metadata(collection)
-          end
-          alias_method_chain :page, :hobo_metadata
-
-        end
-
       end
     end
 
