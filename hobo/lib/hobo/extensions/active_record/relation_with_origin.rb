@@ -8,6 +8,17 @@ module ActiveRecord
     end
   end
 
+  module SpawnMethods
+    def merge_with_origin(r)
+      merged = merge_without_origin(r)
+      merged.origin ||= r.respond_to?(:origin) && r.origin
+      merged.origin_attribute ||= r.respond_to?(:origin_attribute) && r.origin_attribute
+      merged
+    end
+
+    alias_method_chain :merge, :origin
+  end
+
   module Associations
     class CollectionProxy
 
