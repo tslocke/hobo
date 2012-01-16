@@ -91,10 +91,12 @@ We mostly use a single attribute: `data-rapid`.  This is a JSON hash
 where the keys are the tag names and the values are options hashes.
 DRYML has been modified to appropriately merge this tag in a fashion
 similar to what it currently does for the `class` tag.  For example,
-live-search will have the attribute `data-rapid='{"live-search":{}}'`.
-When hobo-jquery initializes, it will then attempt to initialize a
-jQuery plugin named `hjq_live_search`, which we provide in
-public/javascripts/hobo-jquery/hjq-live-search.js.
+live-search will have the attribute
+`data-rapid='{"live-search":{"foo": 17}}'`.  When hobo-jquery
+initializes, it will then attempt to initialize a jQuery plugin named
+`hjq_live_search`, which we provide in
+public/javascripts/hobo-jquery/hjq-live-search.js.   The plugin will
+get passed the options hash {"foo": 17}.
 
 `data-rapid-page-data` contains data required by the javascript
 library, such as the part information.
