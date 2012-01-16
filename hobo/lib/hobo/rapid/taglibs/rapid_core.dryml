@@ -597,7 +597,7 @@ with :it locale and summary="choice" (key "tags.count.choice")
             when this.is_a?(Class)
               this.model_name.human(:count=>c)
             when (attr = this.try.origin_attribute)
-              this_parent.class.human_attribute_name(attr, :count=>c)
+              (this_parent || this.origin).class.human_attribute_name(attr, :count=>c)
             else
               this.member_class.model_name.human(:count=>c)
             end
