@@ -51,7 +51,7 @@ module Dryml
 
       unless @template_path.blank?
         p = Pathname.new template_path
-        p = Pathname.new(Rails.root) + p unless p.absolute? || !Object.const_defined?(:Rails)
+        p = Pathname.new(Rails.root) + p unless p.absolute? || !Object.const_defined?(:Rails) || Rails.root.nil?
         mtime = p.mtime rescue Time.now
 
         if !@builder.ready?(mtime)

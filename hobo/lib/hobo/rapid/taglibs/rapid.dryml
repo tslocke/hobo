@@ -10,16 +10,16 @@ The Rapid tag library makes web development go fast. The Rapid tag library is yo
 <include module="Hobo::Rapid::Helper"/>
 <include module="Hobo::Helper::Translations"/>
 
-<include src="rapid_core"/>
-<include src="rapid_support"/>
-<include src="rapid_document_tags"/>
-<include src="rapid_pages"/>
-<%# <include src="rapid_editing"/> #>
-<include src="rapid_forms"/>
-<include src="rapid_navigation"/>
-<include src="rapid_plus"/>
-<include src="rapid_generics"/>
-<include src="rapid_lifecycles"/>
-<include src="rapid_summary"/>
-<include src="rapid_user_pages"/>
-<include src="rapid_i18n"/>
+<include src="rapid_core" gem="hobo"/>
+<include src="rapid_support" gem="hobo"/>
+<include src="rapid_document_tags" gem="hobo"/>
+<include src="rapid_pages" gem="hobo"/>
+<%# <include src="rapid_editing" gem="hobo"/> #>
+<include src="rapid_forms" gem="hobo"/>
+<include src="rapid_navigation" gem="hobo"/>
+<include src="rapid_plus" gem="hobo"/>
+<include src="rapid_generics" gem="hobo"/>
+<include src="rapid_lifecycles" gem="hobo"/>
+<include src="rapid_summary" gem="hobo"/>
+<include src="rapid_user_pages" gem="hobo"/>
+<include src="rapid_i18n" gem="hobo"/>

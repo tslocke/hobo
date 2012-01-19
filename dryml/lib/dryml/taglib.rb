@@ -52,6 +52,7 @@
                          when options[:absolute_template_path]
                            Pathname.new(options[:absolute_template_path])
                          else
+                           fail if app_root.nil?
                            app_root.join options[:template_dir].gsub(/^\//, '') # remove leading / if there is one
                          end
           src          = options[:src] || gem || plugin
