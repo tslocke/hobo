@@ -1,6 +1,7 @@
 # HoboSupport - Chronic extensions
 
     doctest_require: '../../lib/hobo_support'
+    doctest_require: 'chronic'
 {.hidden}
 
 ## `Chronic.parse`

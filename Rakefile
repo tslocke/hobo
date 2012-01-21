@@ -4,8 +4,8 @@ GEMS_ROOT = File.expand_path('../')
 
 desc "Run tests and doctests for all components."
 task :test_all do |t|
-  puts "These are a small fraction of the tests available for Hobo.   Run the rest from http://github.com/bryanlarsen/hobo-test-environment"
-  system("cd dryml ; #{RUBY} -S rake test") &&
+  puts 'You probably want to set the HOBODEV variable before running rake test_all' if ENV['HOBODEV'].nil?
+  system("cd dryml ; #{RUBY} -S rake test:doctest") &&
     system("cd hobo_fields ; #{RUBY} -S rake test:doctest") &&
     system("cd hobo_fields ; #{RUBY} -S rake test:unit") &&
     system("cd hobo_support ; #{RUBY} -S rake test:doctest") &&
