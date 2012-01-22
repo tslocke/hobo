@@ -10,6 +10,7 @@ task :test_all do |t|
     system("cd hobo_fields ; #{RUBY} -S rake test:unit") &&
     system("cd hobo_support ; #{RUBY} -S rake test:doctest") &&
     system("cd hobo ; #{RUBY} -S rake test:doctest") &&
+    system("cd hobo ; #{RUBY} -S rake test:irt") &&
     system("cd hobo ; #{RUBY} -S rake test")
   exit($?.exitstatus)
 end
