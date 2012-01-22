@@ -4,11 +4,6 @@ module HoboSupport
   CommonTasks = classy_module do
 
 namespace :test do
-  desc "Run the irt tests"
-  task :irt => :prepare_testapp do |t|
-    chdir TESTAPP_PATH
-    sh %(irt #{File.expand_path('.',GEM_ROOT)})
-  end
 
   desc "Prepare a rails application for testing"
   task :prepare_testapp, :force do |t, args|

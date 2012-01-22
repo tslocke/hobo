@@ -43,6 +43,13 @@ namespace "test" do
     files=Dir['test/doctest/**/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
     exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
+
+  desc "Run the irt tests"
+  task :irt => :prepare_testapp do |t|
+    chdir TESTAPP_PATH
+    sh %(irt #{File.expand_path('.',GEM_ROOT)})
+  end
+
 end
 
 # --- RDoc --- #
