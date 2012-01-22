@@ -31,6 +31,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
     class Foo < ActiveRecord::Base
       set_primary_key "id"
     end
+    puts "\n\e[45m Please enter 'id' (no quotes) at the next prompt \e[0m"
    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
    >> Foo.primary_key
    => 'id'
@@ -42,6 +43,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
     class Foo < ActiveRecord::Base
       set_primary_key "foo_id"
     end
+    puts "\n\e[45m Please enter 'drop id' (no quotes) at the next prompt \e[0m"
    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
    >> Foo.primary_key
    => 'foo_id'
