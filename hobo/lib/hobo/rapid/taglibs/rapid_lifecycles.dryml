@@ -14,10 +14,20 @@ All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also support
 
 Transitions with parameters are implemented using a form.  HTML does not allow forms to be nested, so a transitions with parameters should not be placed inside of a form.
 
+### Invalid transitions
+
+If the transition could not be found, the user does not have permissions for the transition or the object is not in the correct state for the transition, the transition-button displays nothing.  You can use an `<else>` to display an appropriate message.
+
+     <transition-button transition="mogrify"/><else>Cannot mogrify</else>
+
   -->
 <def tag="transition-button" attrs="transition, update, label"><%=
     if transition.is_a?(String)
       transition = this.lifecycle.find_transition(transition, current_user)
+    end
+    if transition.nil?
+      Dryml.last_if = false
+      return ""
     end
     transition_name = transition.name
     has_params = !transition.options[:params].blank?
@@ -42,6 +52,28 @@ Transitions with parameters are implemented using a form.  HTML does not allow f
   %>
 </def>
 
+
+<!-- Displays a link to a lifecycle transition page if the transition is valid.  If the transition is valid, this is equivalent to:
+
+    <a action="&transition" ...
+
+If the transition is invalid, you may use the `<else>` tag to display an appropriate message:
+
+    <transition-link transition="mogrify">Mogrify</transition-link>
+    <else>Cannot mogrify</else>
+
+### Attributes
+
+All attributes and parameters for the `<a>` tag are also valid.
+
+ - `transition` - the name of the transition to invoke. Required
+  -->
+<def tag="transition-link" attrs="transition"><%
+    trans = this.lifecycle.find_transition(transition, current_user) %>
+    <if test="&trans">
+      <a action="&transition" merge/>
+    </if>
+</def>
 
 <!-- Renders a div containing transition buttons for every transition available to the current user.
 
