@@ -44,9 +44,7 @@ module ActiveRecord
           if proxy_association.owner.new_record? &&
               (refl = proxy_association.owner.class.reverse_reflection(proxy_association.reflection.name)) &&
               refl.macro == :belongs_to
-            bta = ActiveRecord::Associations::BelongsToAssociation.new(object, refl)
-            bta.replace(proxy_association.owner)
-            object.instance_variable_set("@#{refl.name}", bta)
+            object.send("#{refl.name}=", proxy_association.owner)
           end
         end
 
