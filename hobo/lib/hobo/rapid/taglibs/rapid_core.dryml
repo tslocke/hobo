@@ -371,7 +371,7 @@ Or a new page if the context is a class:
 
       if href && (force || can_create?(new_record))
         new_class_name = if target.respond_to?(:proxy_reflection)
-                           target.proxy_reflection.klass.name
+                           target.proxy_association.reflection.klass.name
                          else
                            target.name
                          end
