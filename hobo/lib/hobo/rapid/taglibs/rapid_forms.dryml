@@ -683,7 +683,7 @@ For situations where there are too many target records to practically include in
   limit ||= 100
 
   options ||= begin
-    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).options[:conditions]
     order = this_field_reflection.klass.default_order
     this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
   end
@@ -836,7 +836,7 @@ To use this tag, the model of the items the user is chosing *must* have unique n
 -->
 <def tag="select-many" attrs="options, targets, remove-label, prompt, disabled, name"><%
   prompt ||= ht("#{this_field_reflection.klass.to_s.underscore}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
-  options ||= this_field_reflection.klass.all(:conditions =>this.send(:conditions)).select {|x| can_view?(x)}
+  options ||= this_field_reflection.klass.all(:conditions => this_field_reflection.options[:conditions]).select {|x| can_view?(x)}
   name ||= param_name_for_this
 
   values = this
