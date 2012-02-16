@@ -982,14 +982,6 @@ The message can be customized via the `empty-collection-message` parameter or by
 <extend tag="page">
   <old-page merge>
     <scripts:>
-      <if-ie version="lt IE 7" param="fix-ie6">
-        <javascript name="IE7"/>
-        <javascript name="ie7-recalc"/>
-      </if-ie>
-
-      <hjq-assets/>
-      <javascript name="jquery.form"/>
-
       <do param="custom-scripts"/>
 
       <javascript param="application-javascript" name="application"/>
