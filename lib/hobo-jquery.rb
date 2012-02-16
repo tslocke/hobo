@@ -3,6 +3,9 @@ module HoboJquery
   def self.root; @@root; end
 
   require 'hobo-jquery/railtie' if defined?(Rails)
+
+  class Engine < ::Rails::Engine
+  end
 end
 
 Hobo::Rapid::Helper.module_eval do
