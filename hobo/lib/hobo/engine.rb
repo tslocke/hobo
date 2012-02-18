@@ -28,7 +28,6 @@ module Hobo
       require 'hobo/extensions/active_record/associations/collection'
       require 'hobo/extensions/active_record/associations/proxy'
       require 'hobo/extensions/active_record/associations/reflection'
-      require 'hobo/extensions/active_record/associations/join_helper'
       require 'hobo/extensions/active_record/hobo_methods'
       require 'hobo/extensions/active_record/permissions'
       require 'hobo/extensions/active_record/associations/scope'

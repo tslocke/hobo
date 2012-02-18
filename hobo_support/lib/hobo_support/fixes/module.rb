@@ -16,22 +16,8 @@ class Module
     end
   end
 
-
-  # Fix delegate so it doesn't go bang if 'to' is nil
-  def delegate(*methods)
-    options = methods.pop
-    unless options.is_a?(Hash) && to = options[:to]
-      raise ArgumentError, ("Delegation needs a target. Supply an options hash with a :to key"  +
-                            "as the last argument (e.g. delegate :hello, :to => :greeter).")
-    end
-
-    methods.each do |method|
-      module_eval(<<-EOS, "(__DELEGATION__)", 1)
-        def #{method}(*args, &block)
-          (_to = #{to}) && _to.__send__(#{method.inspect}, *args, &block)
-        end
-      EOS
-    end
-  end
+  # we used to have a delegate in here that didn't go bang if 'to' is
+  # nil.  If you relied on it, use the new :allow_nil option with
+  # active_support's delegate
 
 end
