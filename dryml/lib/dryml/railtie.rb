@@ -5,6 +5,7 @@ module Dryml
       require 'dryml'
       require 'dryml/template'
       require 'dryml/dryml_generator'
+      require 'dryml/railtie/page_tag_resolver'
     end
 
     ActiveSupport.on_load(:action_controller) do
