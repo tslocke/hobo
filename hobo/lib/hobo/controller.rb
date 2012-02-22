@@ -56,11 +56,10 @@ module Hobo
     end
 
 
-    def hobo_ajax_response(*args)
-      results = args.extract_options!
+    def hobo_ajax_response(options={})
       r = params[:render]
       if r
-        ajax_update_response(r.values, results, params[:render_options])
+        ajax_update_response(r.values, options[:results] || {}, options | params[:render_options])
         true
       else
         false
@@ -78,45 +77,39 @@ module Hobo
 
       headers["Content-Type"] = options['content_type'] if options['content_type']
 
-      render :update do |page|
-        page << (options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;")
-        for spec in render_specs
-          function = spec[:function] || "_update"
-          dom_id = spec[:id]
+      page = options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;\n"
+      for spec in render_specs
+        function = spec[:function] || "_update"
+        dom_id = spec[:id]
 
-          if spec[:part_context]
-            part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
-            if options['content_type']
-              page << "#{function}(#{dom_id.to_json}, #{part_content.to_json.gsub('&', '&amp;')})"
-            else
-              page.call(function, dom_id, part_content)
-            end
-          elsif spec[:result]
-            result = results[spec[:result].to_sym]
-            page.call(function, dom_id, result)
-          else
-            # spec didn't specify any action :-/
-          end
+        if spec[:part_context]
+          part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
+          page << "#{function}(#{dom_id.to_json}, #{part_content.to_json.gsub('&', '&amp;')})\n"
+        elsif spec[:result]
+          result = results[spec[:result].to_sym]
+          page << "#{function}(#{dom_id.to_json}, #{result.to_json.gsub('&', '&amp;')})\n"
+        else
+          page << "alert('ajax_update_response: render_spec did not provide action');\n"
         end
-        if renderer
-          if options[:contexts_function]
-            storage = renderer.part_contexts_storage_uncoded
-            page << "#{options[:contexts_function]}(#{storage.to_json});"
-          else
-            page << renderer.part_contexts_storage
-          end
-        end
-        page << options[:postamble] if options[:postamble]
       end
+      if renderer
+        if options[:contexts_function]
+          storage = renderer.part_contexts_storage_uncoded
+          page << "#{options[:contexts_function]}(#{storage.to_json});\n"
+        else
+          page << renderer.part_contexts_storage
+        end
+      end
+      page << options[:postamble] if options[:postamble]
+      render :js => page
     end
 
     # use this function to send arbitrary bits of javascript
     def ajax_response(response, options)
-      render :update do |page|
-        page << (options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;")
-        page << response
-        page << options[:postamble] if options[:postamble]
-      end
+      page = options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;\n"
+      page << response
+      page << options[:postamble] if options[:postamble]
+      render :js => page
     end
 
 
