@@ -475,8 +475,8 @@ module Hobo
     def hobo_index(*args, &b)
       options = args.extract_options!
       finder = args.first || model
-      self.this = find_or_paginate(finder, options)
-      response_block(&b)
+      self.this ||= find_or_paginate(finder, options)
+      index_response(&b)
     end
 
 
@@ -484,8 +484,8 @@ module Hobo
       options = args.extract_options!
       owner, association = find_owner_and_association(owner)
       finder = args.first || association
-      self.this = find_or_paginate(finder, options)
-      response_block(&b)
+      self.this ||= find_or_paginate(finder, options)
+      index_response(&b)
     end
 
 
@@ -515,6 +515,16 @@ module Hobo
         begin
           if request.xhr? && params[:render]
             hobo_ajax_response
+            render :nothing => true unless performed?
+          end
+        end
+    end
+
+    def index_response(&b)
+      response_block(&b) or
+        begin
+          if request.xhr? && params[:render]
+            hobo_ajax_response(:page => :blah)
             render :nothing => true unless performed?
           end
         end
