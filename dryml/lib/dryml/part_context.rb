@@ -75,9 +75,9 @@
 
         part_name, this_id, locals, form_field_path = context
 
-        if RAILS_DEFAULT_LOGGER
-          RAILS_DEFAULT_LOGGER.info "Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}"
-          RAILS_DEFAULT_LOGGER.info "         : form_field_path = #{form_field_path.inspect}" if form_field_path
+        if Rails
+          Rails.logger.info "Call part: #{part_name}. this-id = #{this_id}, locals = #{locals.inspect}"
+          Rails.logger.info "         : form_field_path = #{form_field_path.inspect}" if form_field_path
         end
 
         self.part_name             = part_name
