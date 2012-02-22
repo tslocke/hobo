@@ -180,7 +180,7 @@ Provides a short hand way of displaying images in public/images
        res << "var pluralisations = {#{names * ', '}}; "
      end
      base = [base_url, subsite].compact.join("/")
-     res << "urlBase = '#{base}'; hoboPagePath = '#{request.fullpath}'"
+     res << "urlBase = '#{base}'; hoboPagePath = '#{CGI.escape(request.fullpath)}'"
      if protect_against_forgery?
        res << "; formAuthToken = { name: '#{request_forgery_protection_token}', value: '#{form_authenticity_token}' }"
      end
