@@ -1019,6 +1019,8 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 
 ### Attributes
 
+Standard AJAX attributes such as 'update' are supported.   If any are supplied, filter-menu uses Ajax rather than a page refresh.
+
  - `param-name` - the name of the HTTP parameter to use for the filter
  - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
    It can be omitted if you provide the options as an array or array of arrays in the locale file.

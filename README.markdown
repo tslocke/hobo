@@ -7,6 +7,8 @@
  * select-one-or-new-dialog
  * display:inline for remove-button and friends
 
+ * document asset pipeline
+
 # Installing
 
 Modify or add the following lines in your Gemfile:
@@ -292,6 +294,10 @@ Differences from `hjq-input-many`:
 - rapid:add, rapid:change and rapid:remove events added.
 - new attributes: hide, show
 
+### filter-menu
+
+filter-menu now accepts AJAX attributes.
+
 ### dialog-box
 
 `hjq-dialog` has been renamed to `dialog-box`.  (`dialog` has already
@@ -393,6 +399,17 @@ use
     end
 
 for more information see http://jquery.malsup.com/form/#file-upload
+
+### hobo_ajax_response
+
+the `hobo_ajax_response` function now has a different signature.
+Standard usage doesn't supply any arguments to hobo_ajax_response.
+This use case has not changed.
+
+However, if you have code that supplied arguments to
+hobo_ajax_response, that code likely will need to be updated for 1.4.
+
+FIXME: pointer to AJAX background documentation.
 
 ## Testing
 
