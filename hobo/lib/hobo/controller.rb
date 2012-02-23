@@ -84,10 +84,10 @@ module Hobo
 
         if spec[:part_context]
           part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
-          page << "#{function}(#{dom_id.to_json}, #{part_content.to_json.gsub('&', '&amp;')})\n"
+          page << "#{function}(#{dom_id.to_json}, #{part_content.to_json})\n"
         elsif spec[:result]
           result = results[spec[:result].to_sym]
-          page << "#{function}(#{dom_id.to_json}, #{result.to_json.gsub('&', '&amp;')})\n"
+          page << "#{function}(#{dom_id.to_json}, #{result.to_json})\n"
         else
           page << "alert('ajax_update_response: render_spec did not provide action');\n"
         end
