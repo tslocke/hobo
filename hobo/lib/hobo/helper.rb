@@ -128,7 +128,7 @@ module Hobo
 
     def recognize_page_path
       if params[:page_path]
-        Rails.application.routes.recognize_path(params[:page_path])
+        Rails.application.routes.recognize_path(params[:page_path].gsub(/^#{Rails.configuration.action_controller.relative_url_root}/,''))
       else
         params
       end
