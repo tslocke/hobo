@@ -103,9 +103,9 @@
           nil
         elsif this_id == "this" || this_id == page_this.typed_id
           self.this = page_this
-        elsif page_this.typed_id && this_id =~ /^(this)|(#{page_this.typed_id}):(.*)/
+        elsif this_id =~ /^this:(.*)/ || (page_this.typed_id && this_id =~ /^#{page_this.typed_id}:(.*)/)
           self.this = page_this
-          self.this_field = $3
+          self.this_field = $1
         else
           parts = this_id.split(':')
           if parts.length == 3
