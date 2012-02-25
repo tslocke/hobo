@@ -137,7 +137,9 @@ module Hobo
 
       AJAX_SPINNER_ATTRS = [:spinner_next_to, :spinner_options, :spinner_at, :no_spinner, :message]
 
-      AJAX_ATTRS = AJAX_CALLBACKS + AJAX_UPDATE_ATTRS + AJAX_EFFECT_ATTRS + AJAX_SPINNER_ATTRS +
+      AJAX_PUSHSTATE_ATTRS = [:push_state, :new_title]
+
+      AJAX_ATTRS = AJAX_CALLBACKS + AJAX_UPDATE_ATTRS + AJAX_EFFECT_ATTRS + AJAX_SPINNER_ATTRS + AJAX_PUSHSTATE_ATTRS
         [
          :type, :method, :script, :form, :result_update, # FIXME: these 5 are not required/used by hobo-jquery: delete when prototype.js support is dropped
          :params, :confirm, :errors_ok,
