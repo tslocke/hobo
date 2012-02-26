@@ -117,6 +117,65 @@ switched to using a more standard jQuery plugin style.
 
 ## Enhancements
 
+### push-state
+
+AJAX now supports a new AJAX option 'push-state' if you have
+History.js installed.   It was inspired by [this
+post](http://37signals.com/svn/posts/3112-how-basecamp-next-got-to-be-so-damn-fast-without-using-much-client-side-ui)
+which uses push-state and fragment caching to create a very responsive
+rails application.    Hobo has always supported fragment caching
+through Rails, but push-state support is new.
+
+The easiest way to install History.js is to use the [jquery-historyjs](https://github.com/wweidendorf/jquery-historyjs)
+gem.  Follow the instructions in the [README at the
+link](https://github.com/wweidendorf/jquery-historyjs).
+
+push-state blurs the line between AJAX and non-AJAX techniques,
+bringing the advantages of both to the table.   It's considerably more
+responsive than a page refresh, yet provides allows browser bookmarks
+and history navigation to work correctly.
+
+For example, if the foos and the bars pages have exactly the same
+headers but different content, you can speed up links between the
+pages by only refreshing the content:
+
+    <%# foos/index.dryml %>
+    <index-page>
+      <content:>
+        <do part="content">
+          <a href="&bars_page" ajax push-state new-title="Bars">Bars</a>
+          ...
+        </do>
+      </content:>
+    <index-page>
+
+Note to Hobo 1.3 users: We're using the new `ajax` attribute instead of
+`update="content"` because the link is inside the part.  Outside of the
+part we'd use `update="content"` instead of `ajax`.
+
+The `new-title` attribute may be used with push state to update the
+title.  If you want to update any other section in your headers, you
+can put that into a part and list it in the update list as well.
+However the new page cannot have new javascript or stylesheets.
+Avoiding the refresh of these assets is one of the major reasons to
+use push-state!
+
+push-state is well suited for tasks that refreshed the current page
+with new query parameters in Hobo 1.3, like `filter-menu`, pagination and
+sorting on a `table-plus`.  Thus these tags have been updated to
+support all of the standard ajax attributes.
+
+Of course, ajax requests that update only a small portion of the page
+will update faster than those that update most of the page.   However,
+a small update may mean that a change to the URL is warranted, so you
+may want to use standard Ajax rather than push-state in those cases.
+Also, push-state generally should not be used for requests that modify
+state
+
+push-state works best in an HTML5 browser.  It works in older browsers
+such as IE8, IE9 or Firefox 3, but results in strange looking URL's.   See
+the README for History.js for more details on that behaviour.
+
 ### multiple parts
 
 I've updated DRYML so that it emits a different DOM ID if you re-instantiate a part.   (The first use of a part retains the DOM ID=partname convention for backwards compatibility)  "update=" requires a DOM ID, so I've also added 2 new AJAX attributes that can be used instead of "update=".
@@ -298,6 +357,11 @@ Differences from `hjq-input-many`:
 
 filter-menu now accepts AJAX attributes.
 
+### a
+
+the a tag now accepts AJAX attributes.  This is especially useful with
+the new 'push-state' option.
+
 ### dialog-box
 
 `hjq-dialog` has been renamed to `dialog-box`.  (`dialog` has already
@@ -326,6 +390,10 @@ a way that works in all possible browsers.
 ### hot-input
 
 see tag documentation
+
+### page-nav
+
+FIXME: update.  The params attribute now defaults to recognize_page_path.slice(:controller,:action,:id).
 
 ## Editors
 
