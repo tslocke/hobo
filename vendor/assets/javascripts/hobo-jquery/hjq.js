@@ -216,7 +216,7 @@
                 if(part_data) $("#"+ids[i]).data('hjq-ajax', part_data);
                 options.data["render["+i+"][part_context]"] = page_data.hobo_parts[ids[i]];
                 options.data["render["+i+"][id]"] = ids[i];
-                options.data["render["+i+"][function]"] = o.function || 'hjq.ajax.update';
+                options.data["render["+i+"][function]"] = o['function'] || 'hjq.ajax.update';
             }
 
             this.hjq_spinner(o.attrs, "Saving...");
