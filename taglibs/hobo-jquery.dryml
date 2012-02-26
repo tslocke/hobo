@@ -92,7 +92,7 @@ If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.forma
   events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
   add_data_rapid!(html_attrs, "datepicker", :options => options, :events => events)
 %>
- <%= text_field_tag(name, this, html_attrs) %>
+ <%= text_field_tag(name, this, deunderscore_attributes(html_attrs)) %>
 </def>
 
 
