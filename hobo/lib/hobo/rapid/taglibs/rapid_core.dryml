@@ -515,6 +515,22 @@ Assuming the context is a blog post...
   end
 %></def>
 
+<!-- This tag add internationalization support to EnumString fields -->
+<def tag="view" for="HoboFields::Types::EnumString">
+  <%=
+  content = this
+  model = this_parent.class
+  for column in model.content_columns.*.name
+    if model.attr_type(column) == this_type
+      content = I18n.t(
+        "activerecord.attributes.#{model.to_s.downcase}/#{column}s.#{content}",
+        :default => content.titleize)
+    end
+  end
+  content
+  %>
+</def>
+
 <!-- Renders 'Yes' for true and 'No' for false -->
 <def tag="view" for="boolean"><%= this ? t('hobo.boolean_yes', :default => 'Yes') : t('hobo.boolean_no', :default => 'No') %></def>
 
