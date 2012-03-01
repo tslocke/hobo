@@ -153,8 +153,10 @@ module Dryml
         tag_newlines(el)
 
       when "set-theme"
+        require_toplevel(el)
         require_attribute(el, "name", /^#{DRYML_NAME}$/)
-        @builder.add_build_instruction(:set_theme, :name => el.attributes['name'])
+        Rails.logger.debug "set-theme has been deprecated.   Please use <include gem='hobo_#{el.attributes['name']}'/> instead."
+        @builder.add_build_instruction(:include, :gem => "hobo_#{el.attributes['name']}")
 
         # return nothing - set_theme has no presence in the erb source
         tag_newlines(el)

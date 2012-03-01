@@ -134,9 +134,6 @@ module Dryml
         when :module
           import_module(name.constantize, instruction[:as])
 
-        when :set_theme
-          set_theme(name)
-
         when :alias_method
           @environment.send(:alias_method, instruction[:new], instruction[:old])
 
@@ -165,14 +162,6 @@ module Dryml
     def import_module(mod, as=nil)
       raise NotImplementedError if as
       @environment.send(:include, mod)
-    end
-
-
-    def set_theme(name)
-      if Hobo.current_theme.nil? or Hobo.current_theme == name
-        Hobo.current_theme = name
-        import_taglib(:src => "taglibs/themes/#{name}/#{name}")
-      end
     end
   end
 end

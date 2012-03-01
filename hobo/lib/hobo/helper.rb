@@ -299,12 +299,6 @@ module Hobo
       collection.select {|x| can_view?(x)}
     end
 
-
-    def theme_asset(path)
-      theme_path = Hobo.current_theme ? "hobothemes/#{Hobo.current_theme}/" : ""
-      "#{base_url}/#{theme_path}#{path}"
-    end
-
     def js_str(s)
       if s.is_a? Hobo::RawJs
         s.to_s

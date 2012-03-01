@@ -26,7 +26,7 @@ module Hobo
 
   class << self
 
-    attr_accessor :current_theme, :engines
+    attr_accessor :engines
 
     def raw_js(s)
       RawJs.new(s)
