@@ -1778,3 +1778,335 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
 
 
 
+<!--
+
+If used without nesting, this is a simple wrapper for Rails' fragment
+caching.  See (Caching with
+Rails)[http://guides.rubyonrails.org/caching_with_rails.html] for more
+information on fragment caching.
+
+If used in a nested manner, 2 items are stored in the cache: the
+fragment, and the list of keys used by the inner caches.  This allows
+the outer cache to generate new fragments if any of the inner elements
+have changed.
+
+### Example
+
+    <def tag="card" for="Foo">
+      <nested-cache route-on suffix="card" methods="id,updated_at">
+        <card without-header>
+          <body:><view:body/></body>
+        </card>
+      </nested-cache>
+    </def>
+
+    <show-page>
+      <collection: replace>
+        <nested-cache suffix="collection" methods="count">
+          <collection restore/>
+        </nested-cache>
+      </collection:>
+    </show-page>
+
+The collection cache will now be regenerated when either the count or
+the updated_field on any foo changes.  This will work even if the
+collection is a heterogeneous array of foos and bars each with
+different cache keys.
+
+### Caveats
+
+The context (aka this) for the inner caches must be accessible from
+the outer cache.  In other words, you have to use field= and its
+abbreviation, the colon form to switch contexts rather than using
+with=.
+
+Also, all caches must fully enclose or be fully enclosed by any forms.
+
+This is illegal for both reasons:
+
+    <nested-cache suffix="outer">
+      <form with="&this.comments.new">
+        <nested-cache suffix="inner">
+          ....
+
+replace with:
+
+    <nested-cache suffix="outer">
+      <do field="comments">
+        <nested-cache:new suffix="inner">
+          <form ...>
+
+### Attributes
+
+All extra attributes are used as non-hierarchical cache keys, so for
+inner caches these should be constants.
+
+`methods`: A comma separated list of methods or fields that can be
+called on the context (aka this) to produce cache keys.  Example:
+methods="id,updated_at".  Inner methods may be accessed by using dots.
+Example: methods="comments.first.updated_at".  If the method throws an
+ArgumentError, it is retried passing in `current_user`.  This allows
+permission functions to be used: methods="updatable_by?".
+
+`query-params`: A comma separated list of query (or post) parameters
+that should be cache keys.  Example: query-params="sort,search,page"
+
+`route-on`: Rails fragment caching uses the the current route to build
+its cache key.  If you are caching an item that will be used in
+multiple different actions, you can specify route-on to ensure that
+the different actions can share the cache.  You can pass either an
+object or a path to route-on.  If you pass an object, it is converted
+to a path with `url_for`.  If you specify route-on with a value,
+`this` is used.  An alternative to using `route-on` is to specify
+`controller`, `action` and any other required path parameters
+explicitly.  For example route-on="&posts_path" is identical to
+controller="posts" action="index".  If you do not specify route-on or
+controller, action, etc., `params[:page_path]` or the current action
+is used.  route-on is a non-hierarchical key: if any of its parameters
+are significant (id often is), make sure to add them to the `methods`
+attribute.
+
+### Hints
+
+If you are using an LRU cache such as memory-cache, memcached or redis
+you typically specify `updated_at` in the methods attribute.
+
+If you are using a cache with manual expiration, `typed_id` is a
+convenient unique id that is available on all Hobo models that have
+been saved in the database.  You can then add this to your FooSweeper:
+
+    def after_update(foo)
+      Rails.cache.delete_matched(/typed_id\=#{CGI.escape foo.typed_id}(&|$)/)
+    end
+
+This will delete the fragment, along will all fragments that contain
+that fragment.
+
+Another thing to keep in mind is that any Hobo tag that can generate a
+page refresh, such as filter-menu, table-plus or page-nav stores query
+parameters such as search, sort & page so that these are not lost when
+refreshed.  So they will need to be added to the query-params for any
+cache containing such tags.
+
+-->
+<def tag="nested-cache" attrs="methods,query-params,route-on">
+<%
+   unless Rails.configuration.action_controller.perform_caching
+     %><%= parameters.default %><%
+   else
+     methods ||= ""
+     query_params ||= ""
+     key_key = {}
+
+     # first we generate our own key, assuming that we don't have any inner nested caches.
+
+     comma_split(methods).each do |field|
+       val = this
+       field.split('.').each do |p|
+         begin
+           val = val.send(p)
+         rescue ArgumentError => e
+           val = val.send(p, current_user)
+         end
+       end
+       key_key[field] = val
+     end
+
+     comma_split(query_params).each do |qp|
+       key_key["@#{qp}"] = params[qp]
+     end
+
+     if route_on == true
+       route_on = this
+     end
+
+     if route_on.is_a?(ActiveRecord::Base)
+       route_on = url_for(route_on)
+     end
+
+     if route_on
+       attributes.reverse_merge!(Rails.application.routes.recognize_path(route_on))
+     end
+
+     # it's quite possible that our page was rendered by a different action, so normalize
+     if params[:page_path]
+       attributes.reverse_merge!(Rails.application.routes.recognize_path(params[:page_path]))
+     end
+
+     key_attrs = attributes.merge(key_key)
+     key_attrs[:only_path] = false
+     key_key_s = ActiveSupport::Cache.expand_cache_key(url_for(key_attrs).split('://').last, :views)
+
+     cache_content = Rails.cache.read key_key_s
+
+     if cache_content.is_a?(Hash)
+       # OK, our cache is valid, but it turns out that we have children, so we have to check their keys too.
+       Rails.logger.debug "CACHE KEY FOUND #{key_key_s}"
+       cache_paths = cache_content
+
+       # this thunk does a recursive descent of cache_keys, filling in its values
+       thunk = lambda do |my_this, key, hash|
+         if key.nil?
+           hash.each do |k, v|
+             if k[0]=="@"
+               hash[k] = params[k[1..-1]]
+             else
+               hash[k] = my_this
+               k.split('.').each do |p|
+                 begin
+                   hash[k] = hash[k].send(p)
+                 rescue ArgumentError => e
+                   hash[k] = hash[k].send(p, current_user)
+                 end
+               end
+             end
+           end
+         else
+           if key.is_a?(Integer) || key =~ /^\d/
+             my_this = my_this[key.to_i]
+           else
+             my_this = my_this.send(key)
+           end
+           hash.each do |k,h|
+             thunk.call(my_this, k, h)
+           end
+         end
+       end
+       cache_valid = true
+       cache_paths.each do |key, hash|
+         thunk.call(this, key, hash)
+       end
+
+       content_attrs = attributes.merge(cache_paths)
+       content_attrs[:only_path] = false
+       content_key_s = ActiveSupport::Cache.expand_cache_key(url_for(content_attrs).split('://').last, :views)
+       cache_content = Rails.cache.read content_key_s
+       Rails.logger.debug "CACHE #{cache_content.nil? ? 'MISS' : 'HIT'} #{content_key_s}"
+     elsif cache_content.nil?
+       Rails.logger.debug "CACHE MISS #{key_key_s}"
+       content_key_s = nil  # needs to be generated
+     elsif cache_content.is_a?(Array)
+       # cache valid, no children
+       cache_content, cache_paths = cache_content
+       Rails.logger.debug "CACHE HIT #{key_key_s}"
+     else
+       fail "huh?"
+     end
+
+     if cache_content
+
+       if scope.cache_paths
+         # we have parent caches trying to generate their keys, so oblige them
+         my_cp = scope.cache_paths
+         form_field_path[scope.cache_path_root.length..-1].each do |p|
+           my_cp = (my_cp[p] ||= {})
+         end
+         my_cp.merge!(cache_paths)
+       end
+
+       %><%= raw cache_content %><%
+     else
+       # darn, cache is invalid.  Now we have to generate our content and (re)generate our keys.
+
+       unless scope.cache_paths
+         # no parent caches so we need to set up the scope.
+         cache_path_root = nil
+         cache_paths = {}
+         scope.new_scope(:cache_paths => {}, :cache_paths_stack => [], :cache_path_root => nil) do
+           # form_field_path is how Hobo keeps track of the context path so that forms can be generated.  Hijack it that it keeps track of the context path for us, too.
+           if form_field_path.nil?
+             with_form_context do
+               scope.cache_path_root = cache_path_root = form_field_path
+               %><%= cache_content=parameters.default %><%
+             end
+           else
+             scope.cache_path_root = cache_path_root = form_field_path
+             %><%= cache_content=parameters.default %><%
+           end
+           cache_paths = scope.cache_paths
+           fail if scope.cache_paths_stack.length>0
+         end
+       else
+         # we have a parent cache, so it's set up the scope.
+         if form_field_path.nil? || form_field_path[0...scope.cache_path_root.length] != scope.cache_path_root
+           fail "nested caching error:  form_field_path has been corrupted via with= or form"
+         end
+         scope.cache_paths_stack.push([scope.cache_path_root, scope.cache_paths])
+         scope.cache_paths = {}
+         scope.cache_path_root = cache_path_root = form_field_path
+         %><%= cache_content=parameters.default %><%
+         cache_paths = scope.cache_paths
+       end
+
+       have_children = !cache_paths.empty?
+
+       # merge our key with our children's keys
+       cp = (cache_paths[nil] ||= {})   # a nil key means we're done with the hierarchy and are now getting to methods
+       key_key.each do |path, val|
+         if !cp[path].nil? && cp[path]!=val
+           fail "Conflicting cache keys:  #{form_field_path} #{path}: #{cp[path]} != #{val}"
+         end
+         cp[path] = val
+       end
+
+       if scope.cache_paths
+         # we have parents, so merge our key with that of the other children they've already discovered.
+         scope.cache_path_root, scope.cache_paths = scope.cache_paths_stack.pop
+         my_cp = scope.cache_paths
+         form_field_path[scope.cache_path_root.length..-1].each do |p|
+           my_cp = (my_cp[p] ||= {})
+         end
+         cache_paths.each do |path, val|
+           if !my_cp[path].nil? && my_cp[path]!=val
+             fail "Conflicting cache keys:  #{form_field_path} #{path}: #{my_cp[path]} != #{val}"
+           end
+           my_cp[path] = val
+         end
+       end
+
+       # our map of keys to value gets transformed into a string and used as the cache key, but we also need a map of keys without values to be stored against key_key_s.
+       cache_keys = {}
+       thunk2 = lambda do |key, hash_in, hash_out|
+         if key.nil?
+           hash_in.each do |k, v|
+             hash_out[k] = nil
+           end
+         else
+           hash_in.each do |k,v|
+             hash_out[k] = {}
+             thunk2.call(k, v, hash_out[k])
+           end
+         end
+       end
+       cache_paths.each do |k,v|
+         cache_keys[k] = {}
+         thunk2.call(k,v,cache_keys[k])
+       end
+
+       if content_key_s.nil?
+         if !have_children
+           # if we don't have any children, then we can store the content against key_key_s.  We also store cache_keys in case we ever have a parent who needs to regenerate their keys.  We can give then them ours without regenerating.
+           Rails.logger.debug "CACHE: #{key_key_s} -> content + key #{cache_keys}"
+           Rails.cache.write(key_key_s, [cache_content, cache_keys])
+           content_key_s = ""
+         else
+           # if we do have children, we only store our keys against key_key_s, the content will be stored against the full key.
+           Rails.logger.debug "CACHE: #{key_key_s} -> #{cache_keys}"
+           Rails.cache.write(key_key_s, cache_keys)
+         end
+       end
+
+       if have_children
+         if content_key_s.nil?
+           content_attrs = attributes.merge(cache_paths)
+           content_attrs[:only_path] = false
+           content_key_s = ActiveSupport::Cache.expand_cache_key(url_for(content_attrs).split('://').last, :views)
+         end
+         Rails.logger.debug "CACHE: #{content_key_s} -> content"
+         Rails.cache.write(content_key_s, cache_content)
+       end
+
+     end
+   end
+%>
+</def>
