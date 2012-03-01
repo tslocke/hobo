@@ -40,7 +40,7 @@
                 roptions.data = $.param(roptions.data) + "&" + data;
 
                 if (options.attrs.push_state) {
-                    window.History.pushState(null, options.attrs.new_title, form[0].action+"?"+data);
+                    window.History.pushState(null, options.attrs.new_title || null, form[0].action+"?"+data);
                 }
                 $.ajax(form[0].action, roptions);
             }
