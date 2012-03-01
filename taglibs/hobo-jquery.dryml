@@ -979,17 +979,6 @@ The message can be customized via the `empty-collection-message` parameter or by
   </ol>
 </def>
 
-<extend tag="page">
-  <old-page merge>
-    <scripts:>
-      <do param="custom-scripts"/>
-
-      <javascript param="application-javascript" name="application"/>
-    </scripts:>
-
-    <ajax-progress: class="ajax-progress"/>
-  </old-page>
-</extend>
 
 <def tag="page-scripts">
   <do param="default">
