@@ -1097,7 +1097,7 @@ or
          selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
       <select-menu name="&param_name" options="&options" selected="&selected"
                    first-option="&no_filter" first-value="&first_value" key="&param_name" merge-params/>
-      <hidden-query-parameters except="page,#{param_name}"/>
+      <hidden-fields for-query-string skip="page"/>
     </div>
   </form>
 </def>
@@ -1613,7 +1613,9 @@ The standard AJAX attributes are supported.
 
 * to:  Use this item as the target instead of the current context.
 
-* params, query-params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{id=>17, name=>'joe'}"`
+* params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{id=>17, name=>'joe'}"`
+
+* query-params: if set, current query parameters are mirrored onto the link.   If true or blank, all non-ajax query parameters are used.   (`query-params`, `query-params="&true"` or `query-params=""`)  Otherwise, the specified query parameters are used.   (`query-params="page,sort,search"`)
 
 * href, name:  If either of these attributes are present, the smart features of this tag are turned off.
 
@@ -1629,11 +1631,19 @@ The standard AJAX attributes are supported.
 <def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
   content = parameters.default
 
-  params = self.query_params.merge(params || HashWithIndifferentAccess.new) if query_params
-
   ajax_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
   unless ajax_attrs.blank?
     add_data_rapid!(attributes, "a", :ajax_attrs => ajax_attrs)
+  end
+
+
+  if query_params
+    if query_params==true || query_params.blank?
+      query_params = query_parameters_filtered
+    else
+      query_params = query_parameters_filtered(:only => comma_split(query_params))
+    end
+    params = query_params.merge(params || HashWithIndifferentAccess.new)
   end
 
   if href || attributes[:name]
@@ -1745,33 +1755,11 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
 </def>
 
 
-<!-- this tag adds hidden inputs for the query parameters.   This is used in tags like filter-menu which refresh the page without losing the current sorting and searching options.
-
-### Attributes
-
-- `only`: a comma seperated list of query parameters.   Example:  only="sort,search,page"
-
-- `except`: use all parameters except the listed ones.  Example:  except="page,comment".   The ajax part query parameters (render, render_options) are always excepted.
-
-If you specify neither `except` or `only`, all query parameters are used except for the ajax part query parameters.
-
-If you specify both `only` and `except`, `except` is ignored.
--->
-<def tag="hidden-query-parameters" attrs="except, only">
-  <% if only
-       query_params = request.query_parameters & only.split(',')
-     else
-       query_params = request.query_parameters - [:render, :render_options]
-       query_params -= except.split(',') if except
-     end %>
-  <repeat with="&query_params">
-    <input type="hidden" name="&this_key" value="&this"/>
-  </repeat>
-</def>
-
-
 <!--- A simple wrapper around the `will_paginate` helper. All options to `will_paginate` are available as attributes.  If you do not specify `params`, it will be guessed. -->
 <def tag="page-nav" attrs="params">
   <%  ajax_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS) %>
-  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :previous_label => translate("hobo.actions.previous", :default=>"« Prev"), :next_label =>translate("hobo.actions.next", :default=>"Next »"), :params => recognize_page_path.slice(:controller,:action,:id), :extra_attributes => (ajax_attrs.empty? ? {} : {"data-rapid" => {"a" => {"ajax_attrs" => ajax_attrs}}.to_json}), :specified_params_only => (ajax_attrs.empty? ? false :true)) %>
+  <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :previous_label => translate("hobo.actions.previous", :default=>"« Prev"), :next_label =>translate("hobo.actions.next", :default=>"Next »"), :params => recognize_page_path.slice(:controller,:action,:id), :extra_attributes => (ajax_attrs.empty? ? {} : {"data-rapid" => {"a" => {"ajax_attrs" => ajax_attrs}}.to_json}), :ignore_params => [:render, :render_options, :"_"]) %>
 </def>
+
+
+
