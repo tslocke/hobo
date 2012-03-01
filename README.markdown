@@ -121,6 +121,26 @@ http://edgeguides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-version
 
 FIXME: more
 
+## set-theme deprecated
+
+The old Hobo theme support has never worked well, and has been
+replaced.   Themes are now Hobo plugins and work like every other Hobo
+1.4 plugin.
+
+Replace:
+
+    <set-theme name="clean"/>
+
+with
+
+    <include gem="hobo_clean"/>
+
+and add
+
+    *= require hobo_clean
+
+to your app/assets/stylesheets/application.css
+
 ## Enhancements
 
 ### Nested caching
