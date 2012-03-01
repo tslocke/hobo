@@ -384,20 +384,6 @@ module Hobo
       request.fullpath.match(/^([^?]*)/)._?[1]
     end
 
-    def query_params
-      query = request.fullpath =~ /\?([^?]+)/ && $1
-      result = HashWithIndifferentAccess.new
-      if query
-        query.gsub!('+', ' ')
-        query.split('&').each do |param|
-          name, val = param.split('=', 2)
-          result[URI.unescape(name)] = val ? URI.unescape(val) : ''
-        end
-      end
-      result
-    end
-
-
     def linkable?(*args)
       options = args.extract_options!
       target = args.empty? || args.first.is_a?(Symbol) ? this : args.shift

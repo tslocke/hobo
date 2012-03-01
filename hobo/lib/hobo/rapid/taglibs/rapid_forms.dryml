@@ -41,14 +41,23 @@ executed at various points in the ajax request cycle:
 -->
 
 
-<!-- nodoc. -->
-<def tag="hidden-fields" attrs="fields, for-query-string, skip"><%=
+<#!-- creates hidden inputs for the specified fields.
+
+### Attributes
+
+- `fields`: the fields to create hidden inputs for.   If neither fields nor for-query-string is specified, all fields except for `type`, `created_at` and `updated_at` are used.
+
+- `for-query-string`:
+<def tag="hidden-fields" attrs="fields, skip, for-query-string"><%=
   pairs = if for_query_string
-            query_params.to_a
+            if for_query_string.blank? || for_query_string==true
+              query_parameters_filtered
+            else
+              query_parameters_filtered(:only => comma_split(for_query_string))
+            end
           else
             hiddens = case fields
                       when '*', nil
-                        # TODO: Need a better (i.e. extensible) way to eleminate certain fields
                         this.class.column_names - ['type', 'created_at', 'updated_at']
                       else
                         comma_split(fields)
