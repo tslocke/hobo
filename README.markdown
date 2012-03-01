@@ -115,7 +115,17 @@ maintained, since that's written in prototype.
 The internal structure of hobo-jquery has changed completely.  We have
 switched to using a more standard jQuery plugin style.
 
+## The Asset Pipeline
+
+http://edgeguides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
+
+FIXME: more
+
 ## Enhancements
+
+### Nested caching
+
+See the docs for `<nested-cache>` and the blog post I'm going to write...
 
 ### push-state
 
@@ -394,6 +404,15 @@ see tag documentation
 ### page-nav
 
 FIXME: update.  The params attribute now defaults to recognize_page_path.slice(:controller,:action,:id).
+
+### query_params
+
+The old query_params helper has been removed.   You can use
+Rails (request.query_parameters | request.request_parameters) instead
+if you still need it.
+
+There's a new helper function called query_parameters_filtered that
+returns query parameters with the ajax parameters removed.
 
 ## Editors
 
