@@ -1,11 +1,12 @@
-body {color: #193440; background: url(../images/300-ACD3E6-fff.png) repeat-x #fff; }
-.page-header {color: white; background: url(../images/101-3B5F87-ACD3E6.png) repeat-x #3F606E;}
+<% image_path = "" %>
+body {color: #193440; background: url(<%=image_path%>300-ACD3E6-fff.png) repeat-x #fff; }
+.page-header {color: white; background: url(<%=image_path%>101-3B5F87-ACD3E6.png) repeat-x #3F606E;}
 .page-header .navigation.main-nav a {
-  background: url(../images/30-3E547A-242E42.png) repeat-x #242E42;
+  background: url(<%=image_path%>30-3E547A-242E42.png) repeat-x #242E42;
 }
 .page-header .navigation.main-nav li.current a {
   color: #222;
-  background: url(../images/30-DBE1E5-FCFEF5.png) repeat-x #FCFEF5;
+  background: url(<%=image_path%>30-DBE1E5-FCFEF5.png) repeat-x #FCFEF5;
   border-top: 1px solid white;
   border-left: 1px solid white;
   border-right: 1px solid white;
@@ -63,7 +64,7 @@ input.text, input.string, input.email-address, input.password, input.search, inp
 	border-left:1px solid #c3c3c3;
 	border-right:1px solid #c3c3c3;
 	border-bottom:1px solid #ddd;
-	background: #fff url(../images/fieldbg.gif) repeat-x top;
+	background: #fff url(<%=image_path%>fieldbg.gif) repeat-x top;
 	font-size: 1.1em; line-height: 1.3em;
 }
 
@@ -108,7 +109,7 @@ form .actions input { margin: 0; }
 #ajax-progress {
 	padding: 8px 20px 8px 40px;
 	border: 1px solid #444;
-	background: black url(../images/spinner.gif) no-repeat 10px 8px;
+	background: black url(<%=image_path%>spinner.gif) no-repeat 10px 8px;
 	color: white;
 }
 
@@ -303,7 +304,7 @@ div.select-many .item .remove-item { float: right; }
 .front-page .welcome-message {
 	padding: 10px 20px 20px; border: 1px solid #e8e8e8;
 	color: #222;
-	background: url(../images/50-ACD3E6-fff.png) repeat-x #fff;
+	background: url(<%=image_path%>50-ACD3E6-fff.png) repeat-x #fff;
 }
 .front-page .welcome-message h2 {
 	font-size: 18px; line-height: 27px;
