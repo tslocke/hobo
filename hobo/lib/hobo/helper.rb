@@ -127,11 +127,9 @@ module Hobo
 
 
     def recognize_page_path
-      if params[:page_path]
-        Rails.application.routes.recognize_path(params[:page_path])
-      else
-        params
-      end
+      # round tripping params through the router will remove
+      # unnecessary params
+      Rails.application.routes.recognize_path(params[:page_path] || url_for(params))
     end
 
     def url_for_page_path(options={})
