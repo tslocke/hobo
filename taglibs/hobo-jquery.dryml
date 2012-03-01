@@ -1097,7 +1097,7 @@ or
          selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
       <select-menu name="&param_name" options="&options" selected="&selected"
                    first-option="&no_filter" first-value="&first_value" key="&param_name" merge-params/>
-      <hidden-fields for-query-string skip="page"/>
+      <hidden-fields for-query-string skip="page,#{param_name}"/>
     </div>
   </form>
 </def>
@@ -1704,16 +1704,31 @@ The standard AJAX attributes are supported.
 
 This tag calls `<table merge-params>`, so the parameters for `<table>` are also available.
 
+The enhancements made available in this tag require controller support.
+
 An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchable_sortable_table) of this tag is available in the [Agility Tutorial](/tutorials/agility)
+
+### Attributes
+
+All attributes supported by `<table>` and `<with-fields>` are supported.
+
+AJAX attributes are passed through to the sort links and the search form.
+
+sort-field: defaults to @sort_field, if that is available.  `parse_sort_params` sets this variable
+
+sort-direction: 'asc' or 'dec'.   defaults to @sort_direction, if that is available.   `parse_sort_params` sets this variable
+
+sort-columns: a hash that allow you to map fields to sortable columns.   The default is {"this" => "name"} (or whatever column that has the :name option set on it).
 
 -->
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
   <% sort_columns['this'] ||= this.member_class.try.name_attribute %>
+  <% ajax_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS) %>
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
-        <form param="search-form" method="get" action="" with="&nil">
+        <form param="search-form" method="get" action="" with="&nil" merge-attrs="&ajax_attrs" >
           <hidden-fields for-query-string skip="page, search"/>
           <span><t key="hobo.table_plus.search">Search</t></span>
           <input class="search" type="search" name="search" value="&params[:search]"/>
@@ -1728,12 +1743,12 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
-             sort_url = url_for_page_path(params.merge(:sort => sort) - [:page])
+             sort_url = url_for_page_path(query_parameters_filtered('except' => 'page').merge(:sort => sort))
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
 
           <th param="#{scope.field_name}-heading">
             <a href="&sort_url" class="column-sort"
-               param="#{scope.field_name}-heading-link"><%= col_heading_name %></a>
+               param="#{scope.field_name}-heading-link" merge-attrs="&ajax_attrs" ><%= col_heading_name %></a>
             <if test="&col == sort_field">
               <do param="up-arrow" if="&sort_direction == 'desc'">&uarr;</do>
               <do param="down-arrow" if="&sort_direction == 'asc'">&darr;</do>
@@ -1745,7 +1760,7 @@ An [worked example](/tutorials/agility#improve_the_project_page_with_a_searchabl
     </table>
     <empty-collection-message param="empty-message"/>
 
-    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)"/>
+    <page-nav param if="&this.respond_to?(:page_count) || this.respond_to?(:total_pages)" merge-attrs="&ajax_attrs" />
   </div>
 </def>
 
