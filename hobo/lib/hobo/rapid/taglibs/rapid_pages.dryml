@@ -1,66 +1,5 @@
-<!-- Rapid-Pages provides tags for working with entire pages. It includes the main `<page>` tag which is the starting point for all pages in Rapid, various supporting tags for things such as stylesheet and javascript includes. Also defines the standard error pages for permission-denied and not-found.
+<!-- Rapid-Pages provides tags for working with entire pages. It includes various supporting tags for things such as stylesheet and javascript includes. Also defines the standard error pages for permission-denied and not-found.
 -->
-
-<!-- The basic page structure for all the pages in a Hobo Rapid application. Providing the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
-
-The easiest way to see what this tag does is to look at the source.
-
-### Attributes
-
- - `title` - the page title, will have ": `<app-name>`" appended
- - `full-title` - the full page title. Set this if you do not want the app name suffix.
-
--->
-<def tag="page" attrs="title, full-title">
-  <% full_title ||= "#{title} : #{app_name}" %>
-  <html merge-attrs>
-    <head param>
-      <title param><%= strip_tags full_title %></title>
-      <do param="stylesheets">
-        <!-- note that this is probably overridden in your app/views/taglibs/themes/xxx/xxx.dryml -->
-        <stylesheet name="reset, hobo-rapid"/>
-        <theme-stylesheet />
-        <stylesheet name="application" param="app-stylesheet"/>
-      </do>
-
-      <do param="scripts">
-        <javascript param name="prototype, effects, dragdrop, controls, rails, lowpro, hobo-rapid"/>
-        <if-ie version="lt IE 7" param="fix-ie6">
-          <javascript name="IE7"/>
-          <javascript name="ie7-recalc"/>
-        </if-ie>
-        <do param="custom-scripts"/>
-        <javascript param="application-javascript" name="application"/>
-      </do>
-      <%= csrf_meta_tag %>
-    </head>
-
-    <body param>
-      <set-scoped flash-rendered="&false">
-        <ajax-progress param/>
-        <header class="page-header" param>
-          <account-nav if="&login_url(Hobo::Model::UserBase.default_user_model)" param/>
-          <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
-          <live-search param if="&defined_route? :site_search"/>
-          <main-nav current="&title" param/>
-        </header>
-        <section with-flash-messages param="content"/>
-        <footer class="page-footer" param/>
-        <page-scripts param/>
-      </set-scoped>
-    </body>
-  </html>
-</def>
-
-
-<!-- Renderes dynamically generated JavaScript required by `hobo-rapid.js`, including the information required to perform automatic part updates -->
-<def tag="page-scripts">
-  <do param="default">
-    <hobo-rapid-javascripts/>
-    <part-contexts-javascripts/>
-  </do>
-</def>
-
 
 <!-- nodoc. -->
 <def tag="index-page" polymorphic/>
@@ -249,9 +188,9 @@ The flash is output in a `<div class="flash notice">`, where `notice` is the `ty
   names.map { |name| flash_message :type => name }.safe_join
 %></def>
 
-<!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`. The theme will style this as an ajax progress 'spinner' -->
+<!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`.  -->
 <def tag="ajax-progress">
-  <div id="ajax-progress" merge-attrs>
+  <div id="ajax-progress" class="ajax-progress" merge-attrs>
     <div>
       <span id="ajax-progress-text"></span>
     </div>

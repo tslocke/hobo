@@ -159,13 +159,6 @@ Provides a short hand way of displaying images in public/images
   <img src="#{base_url}/images/#{src}" merge-attrs/>
 </def>
 
-
-<!-- Renders an ajax-progress 'spinner' using `spinner.gif` from the current theme, with a `class='hidden'` -->
-<def tag="spinner">
-  <img src="#{base_url}/hobothemes/#{Hobo.current_theme}/images/spinner.gif" class="hidden" merge-attrs/>
-</def>
-
-
 <!-- Renders some standard JavaScript code that various features of the Rapid library rely on. This tag would typicallu be called from your `<page>` tag. The default Rapid pages include this already. -->
 <def tag="hobo-rapid-javascripts">
   <script type="text/javascript" param="default"><%=
@@ -624,14 +617,6 @@ with :it locale and summary="choice" (key "tags.count.choice")
 
 <!-- Equivalent to `<you capitalize/>`-->
 <def tag="You"><you merge capitalize/></def>
-
-<!-- Renders a `<link rel="Stylesheet" type="text/css">` to include the default stylesheet for the selected theme (select with `<set-theme>`). Included in the default pages.
--->
-<def tag="theme-stylesheet" attrs="name">
-  <% name ||= Hobo.current_theme -%>
-  <link href="#{base_url}/hobothemes/#{Hobo.current_theme}/stylesheets/#{name}.css"
-        media="all" rel="Stylesheet" type="text/css" merge/>
-</def>
 
 <!-- Convenience tag to help with the common situation where you need to address the current user as "you", and refer to other users by name
 

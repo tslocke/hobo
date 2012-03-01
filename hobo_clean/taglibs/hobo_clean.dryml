@@ -1,0 +1,46 @@
+<!-- Renders an ajax-progress 'spinner' with a `class='hidden'` -->
+<def tag="spinner">
+  <img src="spinner.gif" class="hidden" merge-attrs/>
+</def>
+
+<!-- The basic page structure for all the pages in a Hobo Rapid application. Providing the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
+
+The easiest way to see what this tag does is to look at the source.
+
+### Attributes
+
+ - `title` - the page title, will have ": `<app-name>`" appended
+ - `full-title` - the full page title. Set this if you do not want the app name suffix.
+
+-->
+<def tag="page" attrs="title, full-title">
+  <% full_title ||= "#{title} : #{app_name}" %>
+  <html merge-attrs>
+    <head param>
+      <title param><%= strip_tags full_title %></title>
+      <do param="stylesheets"><%# in Hobo <= 1.3, we had other stylesheets here.   Now the asset pipeline is preferred. %>
+        <stylesheet name="application" param="app-stylesheet"/>
+      </do>
+
+      <do param="scripts"><%# in Hobo <= 1.3, we had other javascripts here.   Now the asset pipeline is preferred. %>
+        <javascript param="application-javascript" name="application"/>
+      </do>
+      <%= csrf_meta_tag %>
+    </head>
+
+    <body param>
+      <set-scoped flash-rendered="&false">
+        <ajax-progress param/>
+        <header class="page-header" param>
+          <account-nav if="&login_url(Hobo::Model::UserBase.default_user_model)" param/>
+          <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
+          <live-search param if="&defined_route? :site_search"/>
+          <main-nav current="&title" param/>
+        </header>
+        <section with-flash-messages param="content"/>
+        <footer class="page-footer" param/>
+        <page-scripts param/>
+      </set-scoped>
+    </body>
+  </html>
+</def>
