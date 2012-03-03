@@ -140,14 +140,6 @@ EOI
       end
     end
 
-    def rapid
-      if wizard?
-        say_title 'Hobo Rapid'
-        say 'Installing Hobo Rapid and default theme...'
-      end
-      invoke 'hobo:rapid'
-    end
-
     def front_controller
       if wizard?
         say_title 'Front Controller'

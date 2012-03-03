@@ -8,6 +8,8 @@
  * display:inline for remove-button and friends
 
  * document asset pipeline
+ * taglib cleanup
+ * clean_sidemenu
 
 # Installing
 
