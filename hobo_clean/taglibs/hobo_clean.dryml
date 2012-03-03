@@ -24,6 +24,7 @@ The easiest way to see what this tag does is to look at the source.
 
       <do param="scripts"><%# in Hobo <= 1.3, we had other javascripts here.   Now the asset pipeline is preferred. %>
         <javascript param="application-javascript" name="application"/>
+        <do param="custom-scripts"/>
       </do>
       <%= csrf_meta_tag %>
     </head>
