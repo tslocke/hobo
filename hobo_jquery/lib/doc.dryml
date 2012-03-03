@@ -1,0 +1,75 @@
+<def tag="param-list" >
+  <ul if="&this.any?">
+    <% this.each {|param| %>
+      <li><%= param.first %>
+        <param-list with="&param.last"/>
+      </li>
+    <% } %>
+  </ul>
+</def>
+
+<def tag="tag-link" attrs="link, content">
+  <li>
+    <a href="##{link}">
+      <span>
+        <%= content %>
+      </span>
+    </a>
+  </li>
+</def>
+  
+
+<html>
+  <head>
+    <link type="text/css" href="stylesheets/themes/smoothness/ui.all.css" rel="stylesheet" />
+    <script type="text/javascript" src="javascripts/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery-ui-1.8.11.custom.min.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function(){
+        jQuery("#tabs-top").tabs();
+        jQuery(".taglib").tabs();
+        jQuery(".source").accordion({collapsible: true, active: false, autoHeight: false });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="tabs-top">
+      <ul>
+        <repeat with="&this">
+          <tag-link content="&this.name" link="#{this.name}-taglib"/>
+        </repeat>
+      </ul>
+      <repeat>
+        <div class="taglib" id="#{this.name}-taglib">
+          <%= this.comment_html %>
+          <ul>
+            <repeat:tag_defs>
+              <tag-link content="&this.name" link="#{this.name}-tag"/>
+            </repeat>
+          </ul>
+          <repeat:tag_defs>
+            <div id="#{this.name}-tag">
+          
+              <h2><%= this.name %></h2>
+              
+              <%= this.comment_intro_html %>
+          
+              <unless test="&this.parameters.empty?">
+                <h3>Parameters</h3>
+                <param-list with="&this.parameters"/>
+              </unless>
+          
+              <%= this.comment_rest_html %>
+
+              <div class="source">
+                <h3><a href="#">Source</a></h3>
+                <pre><code><%= h this.source %></code></pre>
+              </div>
+          
+            </div>
+          </repeat>
+        </div>
+      </repeat>
+    </div>
+  </body>
+</html>
