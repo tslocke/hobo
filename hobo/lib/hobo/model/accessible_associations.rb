@@ -11,7 +11,7 @@ module Hobo
         array.map! do |record_hash_or_string|
           finder = association.member_class
           conditions = association.proxy_association.reflection.conditions
-          finder = finder.scoped :conditions => condition unless conditions == [[]]
+          finder = finder.scoped :conditions => conditions unless conditions == [[]] || conditions == [[],[]]
           find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
             # The block is required to either locate find an existing record in the collection, or build a new one
             if id
