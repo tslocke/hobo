@@ -28,13 +28,15 @@ end
 # loaded after ActiveRecord::Associations::CollectionProxy.  There's
 # probably a way to satisfy both requirements, but I haven't found it
 # yet.
-class ActiveRecord::Associations::CollectionProxy
-  def _?()
-    self
-  end
+if defined? ActiveRecord::Associations::CollectionProxy
+  class ActiveRecord::Associations::CollectionProxy
+    def _?()
+      self
+    end
 
-  def try(*args, &block)
-    HoboSupport.hobo_try(self, *args, &block)
+    def try(*args, &block)
+      HoboSupport.hobo_try(self, *args, &block)
+    end
   end
 end
 
