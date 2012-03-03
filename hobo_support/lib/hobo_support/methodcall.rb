@@ -21,6 +21,24 @@ module HoboSupport
   end
 end
 
+# CollectionProxy undef's most of it's methods, so put them back.
+
+# FIXME: We don't want to create the ActiveRecord namespace if it
+# isn't included.  We also need to make sure that this snippet is
+# loaded after ActiveRecord::Associations::CollectionProxy.  There's
+# probably a way to satisfy both requirements, but I haven't found it
+# yet.
+class ActiveRecord::Associations::CollectionProxy
+  def _?()
+    self
+  end
+
+  def try(*args, &block)
+    HoboSupport.hobo_try(self, *args, &block)
+  end
+end
+
+
 class Object
 
   def _?()
