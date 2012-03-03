@@ -1,4 +1,4 @@
-require 'hobo-jquery'
+require 'hobo_jquery'
 require 'rails'
 module HoboJquery
   class Railtie < Rails::Railtie
