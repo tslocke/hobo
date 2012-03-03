@@ -285,7 +285,11 @@ module Hobo
         elsif object.viewable_by?(current_user, field)
           # If possible, we also check if the current *value* of the field is viewable
           if field.is_one_of?(Symbol, String) && (v = object.send(field)) && v.respond_to?(:viewable_by?)
-            v.viewable_by?(current_user, nil)
+            if v.is_a?(Array)
+              v.new_candidate.viewable_by?(current_user, nil)
+            else
+              v.viewable_by?(current_user, nil)
+            end
           else
             true
           end
