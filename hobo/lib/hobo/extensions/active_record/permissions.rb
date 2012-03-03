@@ -39,22 +39,15 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
   end
 
 
-  def insert_record(record, force = false, validate = true)
+  def insert_record_with_owner_attributes(record, force = true, raise = false)
     set_owner_attributes(record)
     if (user = acting_user) && record.is_a?(Hobo::Model)
-      if force
-        record.user_save!(user)
-      else
-        record.user_save(user, validate)
-      end
+      with_acting_user(user) { insert_record_without_owner_attributes(record, force, raise) }
     else
-       if force
-         record.save!
-       else
-         record.save(:validate => validate)
-       end
+      insert_record_without_owner_attributes(record, force, raise)
     end
   end
+  alias_method_chain :insert_record, :owner_attributes
 
   def viewable_by?(user, field=nil)
     # view check on an example member record is not supported on associations with conditions
@@ -101,20 +94,17 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   end
 
 
-  def insert_record(record, force=true, validate=true)
-    user = acting_user if record.is_a?(Hobo::Model)
-    if record.new_record?
-      if force
-        user ? record.user_save!(user) : record.save!
-      else
-        return false unless (user ? record.user_save(user, validate) : record.save(validate))
-      end
+  def insert_record_with_owner_attributes(record, force = true, raise = false)
+    if (user = acting_user) && record.is_a?(Hobo::Model)
+      with_acting_user(user) { insert_record_without_owner_attributes(record, force, raise) }
+    else
+      insert_record_without_owner_attributes(record, force, raise)
     end
-    klass = @reflection.through_reflection.klass
-    @owner.send(@reflection.through_reflection.name).proxy_target <<
-      klass.send(:with_scope, :create => construct_join_attributes(record)) { user ? klass.user_create!(user) : klass.create! }
+    # the following code was in Hobo 1.3, but isn't required if you have the :inverse_of option set
+    # klass = @reflection.through_reflection.klass
+    # @owner.send(@reflection.through_reflection.name).proxy_target << klass.send(:with_scope, :create => construct_join_attributes(record)) { user ? klass.user_create!(user) : klass.create! }
   end
-
+  alias_method_chain :insert_record, :owner_attributes
 
   # TODO - add dependent option support
   def delete_records_with_hobo_permission_check(records)
