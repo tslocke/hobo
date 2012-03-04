@@ -1,0 +1,9 @@
+<include gem="hobo_clean"/>
+
+<extend tag="page">
+  <old-page merge>
+    <footer:>
+      <a href="#{base_url}/"><t key="hobo.subsite.back_link">View Site</t></a>
+    </footer:>
+  </old-page>
+</extend>
