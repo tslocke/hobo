@@ -6,31 +6,15 @@
  * live-search works, but it's not 'live'
  * select-one-or-new-dialog
  * display:inline for remove-button and friends
-
  * document asset pipeline
  * taglib cleanup
- * clean_sidemenu
+ * clean_sidemenu -> plugin
+ * jquery-ui themes need to be installed
 
 # Installing
 
-Modify or add the following lines in your Gemfile:
-
-    gem 'hobo', :git => 'git://github.com/tablatom/hobo.git', :branch => 'jquery'
-    gem "jquery-rails"
-    gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "no-prototype"
-
-And then run
-
-    bundle install
-    rails generate jquery:install --ui
-    rails generate hobo_jquery:install
-
-Add the following to your application.dryml:
-
-    <include gem="hobo-jquery"/>
-
-If you previously had hobo-jquery installed, remove the
-`<hjq-assets/>` call you previously added.
+Generate a new app, and then use Gemfile, public/, app/views/taglibs
+and assets/ as examples for what you should have in your app.
 
 ## Running the integration tests:
 
