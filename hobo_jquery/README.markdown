@@ -1,5 +1,6 @@
 # TODO
 
+ * fixup deprecation warnings
  * create_response: mirror update_response
  * sortable-input-many
  * name-many
