@@ -1,5 +1,5 @@
 desc "Taglib admin file matches inclusions"
-file_include?( "app/views/taglibs/subs_site.dryml", tags, admin_tag )
+file_include?( "app/views/taglibs/subs_site.dryml", tags )
 test_value_eql? true
 
 desc "Taglib admin file matches exclusions"

@@ -2,23 +2,8 @@ invoke 'hobo:assets', %w[ -q ]
 invoke 'hobo:admin_subsite', %w[ -q --make-front-site=false ]
 desc "Admin Subsite files exist"
 files_exist? %w[ app/controllers/admin/admin_site_controller.rb
-                 public/stylesheets/admin.css
                  app/controllers/admin/users_controller.rb
                  app/helpers/admin/users_helper.rb
                  app/views/taglibs/admin_site.dryml
 ]
-test_value_eql? true
-
-desc "application.dryml injection matches"
-file_include? "app/views/taglibs/application.dryml",
-%(<extend tag="page">
-  <old-page merge>
-    <footer:>
-      <a href="&admin_users_url" if="&current_user.administrator?">
-        <t key="hobo.admin.subsite_name">Admin</t>
-      </a>
-    </footer:>
-  </old-page>
-</extend>
-)
 test_value_eql? true

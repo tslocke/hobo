@@ -2,12 +2,10 @@ desc "hobo:assets invoke"
 invoke 'hobo:assets', %w(-q)
 
 files_exist? %w[ app/views/taglibs/application.dryml
-                 public/stylesheets/application.css
-                 public/javascripts/dryml-support.js
+                 app/assets/stylesheets/application.css
+                 app/assets/stylesheets/front.css
+                 app/assets/javascripts/application.js
+                 app/assets/javascripts/front.js
                  app/models/guest.rb
 ]
-test_value_eql? true
-
-desc "Application.dryml content matches"
-file_include? 'app/views/taglibs/application.dryml', '<set-theme name="clean"/>'
 test_value_eql? true
