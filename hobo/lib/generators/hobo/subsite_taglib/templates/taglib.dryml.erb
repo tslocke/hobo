@@ -1,26 +1,9 @@
 <!-- Tag definitions for the <%= file_name %> subsite -->
 
-<include src="rapid" gem="hobo"/>
-
 <include src="taglibs/auto/<%= file_name %>/rapid/cards"/>
 <include src="taglibs/auto/<%= file_name %>/rapid/pages"/>
 <include src="taglibs/auto/<%= file_name %>/rapid/forms"/>
 
-<set-theme name="clean"/>
-
-<% if options[:admin]%>
-
-<extend tag="page">
-  <old-page merge>
-    <append-stylesheets:>
-      <stylesheet name="<%= file_name %>"/>
-    </append-stylesheets:>
-    <footer:>
-      <a href="#{base_url}/"><t key="hobo.subsite.back_link">View Site</t></a>
-    </footer:>
-  </old-page>
-</extend>
-<% end -%>
 <% if invite_only? -%>
 
 <extend tag="card" for="<%= options[:user_resource_name].camelcase %>">

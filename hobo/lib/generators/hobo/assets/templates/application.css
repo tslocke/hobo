@@ -1,0 +1,9 @@
+/*
+ * This is the global stylesheet manifest file.  Files or plugins
+ * referenced from here or placed in the application/ directory will be
+ * included in all subsites.  This file is included by front.css and all
+ * subsites.
+ *
+ *= require_self
+ *= require_tree ./application
+*/

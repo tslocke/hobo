@@ -29,9 +29,6 @@ module Hobo
     class_option :admin_subsite_name, :type => :string,
                  :desc => "Admin Subsite Name", :default => 'admin'
 
-    class_option :make_front_site, :type => :boolean,
-                 :desc => "Rename application.dryml to front_site.dryml", :default => 'true'
-
     class_option :private_site, :type => :boolean,
                  :desc => "Make the site unaccessible to non-members"
 
@@ -156,12 +153,10 @@ EOI
         say_title 'Admin Subsite'
         if @invite_only || (@add_admin_subsite = yes_no?("Do you want an admin subsite?"))
           @admin_subsite_name = ask("Choose a name for the admin subsite: [<enter>=admin|<custom_name>]", 'admin')
-          @make_front_site    = yes_no?("Do you want to use a separate front_site.dryml?")
         end
       else
         if @invite_only || (@add_admin_subsite = options[:add_admin_subsite])
           @admin_subsite_name = options[:admin_subsite_name]
-          @make_front_site    = options[:make_front_site]
         end
       end
     end
@@ -177,7 +172,21 @@ EOI
         invoke 'hobo:admin_subsite', [@admin_subsite_name],
                                      :user_resource_name => @user_resource_name,
                                      :invite_only => @invite_only,
-                                     :make_front_site => @make_front_site
+                                     :make_front_site => true
+      end
+    end
+
+    def installing_plugins
+      say "Installing hobo_rapid plugin..."
+      Rails::Generators.invoke 'hobo:install_plugin', ["hobo_rapid", "--skip-gem"]
+      say "Installing hobo_jquery plugin..."
+      Rails::Generators.invoke 'hobo:install_plugin', ["hobo_jquery", "--skip-gem"]
+      say "Installing hobo_clean theme..."
+      if @add_admin_subsite
+        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean", "--skip-gem", "--subsite=front"]
+        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean_admin", "--skip-gem", "--subsite=#{@admin_subsite_name}"]
+      else
+        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean", "--skip-gem"]
       end
     end
 

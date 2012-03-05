@@ -1,1 +1,3 @@
 <!-- Global taglib - these tags are shared across all subsites -->
+
+<include src="rapid" gem="hobo"/>

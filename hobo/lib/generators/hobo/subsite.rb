@@ -29,13 +29,25 @@ module Generators
             say "Cannot rename application.dryml to #{file_name}_site.dryml"
             exit 1
           end
-          say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml" \
-              unless options[:quiet]
+          say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml"  unless options[:quiet]
           unless options[:pretend]
             FileUtils.mv('app/views/taglibs/application.dryml', "app/views/taglibs/front_site.dryml")
             copy_file "application.dryml", 'app/views/taglibs/application.dryml'
+
+            # remove lines from front_site.dryml that exist in both front_site.dryml & application.dryml
+            front_site = File.readlines('app/views/taglibs/front_site.dryml') - File.readlines('app/views/taglibs/application.dryml').reject{|l| l.blank?}
+            File.open('app/views/taglibs/front_site.dryml', 'wb') do |file|
+              front_site.each do
+                |line| file.write(line)
+              end
+            end
           end
         end
+
+        template "site.css.erb", File.join('app/assets/stylesheets', "#{file_name}.css")
+        copy_file "gitkeep", "app/assets/stylesheets/#{file_name}/.gitkeep"
+        template "site.js.erb", File.join('app/assets/javascripts', "#{file_name}.js")
+        copy_file "gitkeep", "app/assets/javascripts/#{file_name}/.gitkeep"
 
         template "controller.rb.erb", File.join('app/controllers', file_name, "#{file_name}_site_controller.rb")
       end
