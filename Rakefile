@@ -36,7 +36,7 @@ task :gems, :action, :force do |t, args|
   end
 
 
-  %w[hobo_support hobo_fields dryml hobo].each do |name|
+  %w[hobo_support hobo_fields dryml hobo hobo_rapid hobo_jquery hobo_clean hobo_clean_admin].each do |name|
     chdir(File.expand_path("../#{name}", __FILE__)) do
       orig_version = version = File.read('VERSION').strip
     begin
