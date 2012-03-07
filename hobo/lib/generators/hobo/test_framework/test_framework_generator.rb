@@ -32,7 +32,7 @@ module Hobo
     def finalize_installation
       # add the block only if it's not the default
       add_generators_block unless (name == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
-      invoke Bundler::CLI, :update if options[:update] && @should_update
+      invoke(Bundler::CLI, :update, [], {}) if options[:update] && @should_update
       @finalize_hooks.each {|h| h.call }
     end
 

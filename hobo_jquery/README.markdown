@@ -11,10 +11,18 @@
  * taglib cleanup
  * clean_sidemenu -> plugin
  * jquery-ui themes need to be installed
+ * port to 3.2
+ * cookbook
+ * nuke any remaining prototype code
+ * railtie hook for .try. in collections
+ * add a sane default for non-AJAX JSON requests.
+ * document themes/plugins.  Probably easier to create generator & document that
 
 # Installing
 
-Generate a new app, and then use Gemfile, public/, app/views/taglibs
+apt-get install nodejs-dev
+
+Generate a new app, and then use Gemfile, config/, public/, app/views/taglibs
 and assets/ as examples for what you should have in your app.
 
 ## Running the integration tests:

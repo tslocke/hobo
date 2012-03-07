@@ -1,4 +1,5 @@
 require 'generators/hobo_support/thor_shell'
+require 'bundler/cli'
 module Hobo
   class SetupWizardGenerator < Rails::Generators::Base
 
@@ -9,6 +10,7 @@ module Hobo
     include Generators::Hobo::ActivationEmail
     include Generators::Hobo::TestOptions
     include Generators::Hobo::Taglib
+    include Generators::Hobo::Plugin
 
     def self.banner
       "rails generate hobo:setup_wizard [options]"
@@ -178,16 +180,21 @@ EOI
 
     def installing_plugins
       say "Installing hobo_rapid plugin..."
-      Rails::Generators.invoke 'hobo:install_plugin', ["hobo_rapid", "--skip-gem"]
+      install_plugin_helper('hobo_rapid', nil, :version => Hobo::VERSION)
       say "Installing hobo_jquery plugin..."
-      Rails::Generators.invoke 'hobo:install_plugin', ["hobo_jquery", "--skip-gem"]
+      install_plugin_helper('hobo_jquery', nil, :version => Hobo::VERSION)
       say "Installing hobo_clean theme..."
       if @add_admin_subsite
-        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean", "--skip-gem", "--subsite=front"]
-        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean_admin", "--skip-gem", "--subsite=#{@admin_subsite_name}"]
+        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :subsite => "front", :comments => "The default Hobo theme")
+        install_plugin_helper('hobo_clean_admin', nil, :version => Hobo::VERSION, :subsite => @admin_subsite_name)
       else
-        Rails::Generators.invoke 'hobo:install_plugin', ["hobo_clean", "--skip-gem"]
+        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :comments => "The default Hobo theme")
       end
+      invoke(Bundler::CLI, :update, [], {})
+    end
+
+    def add_dev_tweaks
+      invoke 'hobo:dev_tweaks'
     end
 
     def generate_migration
