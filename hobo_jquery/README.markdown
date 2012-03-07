@@ -1,120 +1,122 @@
-# TODO
-
- * fixup deprecation warnings
- * create_response: mirror update_response
- * sortable-input-many
- * name-many
- * live-search works, but it's not 'live'
- * select-one-or-new-dialog
- * display:inline for remove-button and friends
- * document asset pipeline
- * taglib cleanup
- * clean_sidemenu -> plugin
- * jquery-ui themes need to be installed
- * port to 3.2
- * cookbook
- * nuke any remaining prototype code
- * railtie hook for .try. in collections
- * add a sane default for non-AJAX JSON requests.
- * document themes/plugins.  Probably easier to create generator & document that
 
 # Installing
 
-apt-get install nodejs-dev
+## Creating a new application
 
-Generate a new app, and then use Gemfile, config/, public/, app/views/taglibs
-and assets/ as examples for what you should have in your app.
+Hobo 1.4 gems have not yet been released, so the standard instructions
+of "gem install hobo; hobo new foo" do not yet work.
 
-## Running the integration tests:
+If you're on Linux you'll have to install a javascript runtime.
+On Ubuntu 11.10 you can get one by typing `apt-get install
+nodejs-dev`.  Other Linuxes should be similar.  Windows & OS X users
+should already have a javascript scripting host installed.  The list
+of compa
 
-Unfortunately, 2 of the integration tests fails on firefox, which
-works out of the box, so we also have to install capybara-webkit and
-selenium-chrome.
+Next you'll need to download the hobo source
 
-     $ git clone -b jquery git://github.com/Hobo/agility-gitorial.git
-     $ cd agility-gitorial
+    git clone git://github.com/tablatom/hobo
 
-Make sure you have the prerequisites for capybara-webkit:
-https://github.com/thoughtbot/capybara-webkit/wiki/Installing-QT
+Now you have two options: create gems, or use the source.
 
-     $ bundle install
-     $ rake db:migrate
+### Via gems
 
-Download the selenium-chrome server and place in your path:
-http://code.google.com/p/chromium/downloads/list
+    cd hobo
+    rake gems[install]
+    cd wherever-you-want-to-generate-your-app
+    hobo new foo
 
-     $ rake test:integration
+### Via source
 
-Email the list and/or bryan@larsen.st if you get any failures.
+(This won't work on Windows)
+
+    export HOBODEV=`pwd`/hobo
+    $HOBODEV/hobo/bin/hobo new foo
+
+## Updating an existing installation
+
+There are several changes that need to be made to your application to
+upgrade from Hobo 1.3 to Hobo 1.4.   Most of these changes are
+required by the addition of the asset pipeline which was introduced in
+Rails 3.1.
+
+Follow the asset pipeline upgrade steps outlined here:
+http://stackoverflow.com/questions/7574400/why-bundle-install-fails-in-rails-generator
+
+The easiest way to upgrade an existing Hobo 1.3 application is to
+generate a new Hobo 1.4 application and copy differences from the new
+app into your existing app.
+
+### Gemfile
+
+You'll need to add the gems required for the asset pipeline, add the
+jquery-rails gem, and adjust the version numbers for rails, hobo and
+perhaps others.
+
+Hobo has also gained several additional gems, so you will have to add
+dependencies for those.  hobo_rapid is the Hobo tag library,
+hobo_jquery is the javascript for hobo_rapid, and hobo_clean is the
+default theme.   Instead of or as well as hobo_clean you can use
+hobo_clean_admin or hobo_clean_sidemenu.  Hopefully there will be
+additional themes available soon.
+
+### config/
+
+All of the changes in config/ are due to the assets pipeline.  See
+http://stackoverflow.com/questions/7574400/why-bundle-install-fails-in-rails-generator
+
+Additionally, the Hobo 1.4 generator installs the
+[rails-dev-tweaks](https://github.com/wavii/rails-dev-tweaks) gem.  We
+adjust the configuration so that rails-dev-tweaks applies only to
+assets, not to XHR.
+
+### application.dryml
+
+Replace
+
+    <set-theme name="clean"/>
+
+with
+
+    <include gem='hobo_rapid'/>
+    <include gem='hobo_jquery'/>
+    <include gem='hobo_clean'/>
+
+### move public/ to app/assets/
+
+In Rails 3.1, images, javascripts and stylesheets are loaded from
+app/assets/ rather than from public/ so you'll have to move them.
+Note that the following are Rails and/or Hobo assets that are now
+included via the pipeline and can be deleted rather than moved:
+
+    images/rails.png
+    hobothemes/**
+    javascripts/controls.js,dryml-support.js,hobo-rapid.js,ie7-recalc.js,prototype.js,blank.gif,dragdrop.js,effects.js,IE7.js,lowpro.js,rails.js
+    stylesheets/reset.css,hobo-rapid.css
+
+Note how Hobo organizes the app/assets directory.   There will be a
+directory called app/assets/javascripts/application/ and a directory
+called app/assets/javascripts/front/.   If you have added a subsite
+called admin there will also be a directory called
+app/assets/javascripts/admin/.   Any files in application/ will always
+be included, and the files in front/ or admin/ will be included only
+on the corresponding subsite.
 
 # Changes from Hobo 1.3 & hobo-jquery 1.3
 
-## Retention of Prototype
+## Javascript framework changed to jQuery
 
-Currently the jquery branch of github.com:/tablatom/hobo is a 1.3
-variant that should actually still works with prototype.js with the
-exception of editors.
+Hobo 1.3 and earlier versions used prototype.js for its Ajax support.
+In Hobo 1.4 all of our javascript code has been rewritten to use
+jQuery instead of prototype.js.
 
-The current plan is also to drop prototype.js support in Hobo 1.4.  It
-could be maintained if there was sufficient demand, but we don't
-believe that the demand is there.
-
-## Framework Agnosticism
-
-jQuery support is being written in a manner that should make it easier to support other frameworks if we ever decide to do so.   Basically all this means is that we're annotating our HTML and the javascript is picking up the information from the annotations rather than calling functions or setting variables.
-
-## Unobtrusiveness
-
-The agnosticism is a side benefit -- really the main reason its written this way is so that we're coding using "unobtrusive javascript" techniques.
-
-Hobo currently many different mechanisms to pass data to javascript:
-
-- classdata ex class="model::story:2"
-- non-HTML5-compliant element attributes: ex hobo-blank-message="(click to edit)"
-- variable assignment: ex hoboParts = ...;
-- function calls: ex onclick="Hobo.ajaxRequest(url, {spinnerNextTo: 'foo'})"
-
-hobo-jquery currently uses JSON inside of comments:
-
-    <!-- json_annotation ({"tag":"datepicker","options":{},"events":{}}); -->
-
-We are switching all 5 of these mechanisms to use HTML5 data
-attributes.  HTML5 data attributes are technically illegal in HTML4
-but work in all browsers future and past (even IE6).  The illegality
-of them is the reason that I didn't choose them in Hobo-jQuery, but
-it's now 2011.
-
-We mostly use a single attribute: `data-rapid`.  This is a JSON hash
-where the keys are the tag names and the values are options hashes.
-DRYML has been modified to appropriately merge this tag in a fashion
-similar to what it currently does for the `class` tag.  For example,
-live-search will have the attribute
-`data-rapid='{"live-search":{"foo": 17}}'`.  When hobo-jquery
-initializes, it will then attempt to initialize a jQuery plugin named
-`hjq_live_search`, which we provide in
-public/javascripts/hobo-jquery/hjq-live-search.js.   The plugin will
-get passed the options hash {"foo": 17}.
-
-`data-rapid-page-data` contains data required by the javascript
-library, such as the part information.
-
-One last attribute that may be set is `data-rapid-context`.  This
-contains a typed_id of the current context.  This is used to assist
-tags like `delete-button` with DOM manipulation.
-
-## Compatibility
-
-Obviously compatibility with hobo-rapid.js is not going to be
-maintained, since that's written in prototype.
-
-The internal structure of hobo-jquery has changed completely.  We have
-switched to using a more standard jQuery plugin style.
+In the process of rewriting the code many tags have been updated to
+add AJAX support, and tags that used non-standard AJAX mechanisms have
+been updated to use standard Hobo form AJAX.   The most visible of
+these changes have been to the editors.
 
 ## The Asset Pipeline
 
-http://edgeguides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
-
-FIXME: more
+Hobo 1.4 uses the asset pipeline features introduced in Rails 3.1.
 
 ## set-theme deprecated
 
@@ -134,7 +136,9 @@ and add
 
     *= require hobo_clean
 
-to your app/assets/stylesheets/application.css
+to your app/assets/stylesheets/front.css.  Some themes may also
+include javascript which would require them to be added to front.js as
+well.
 
 ## Enhancements
 
@@ -203,12 +207,17 @@ the README for History.js for more details on that behaviour.
 
 ### multiple parts
 
-I've updated DRYML so that it emits a different DOM ID if you re-instantiate a part.   (The first use of a part retains the DOM ID=partname convention for backwards compatibility)  "update=" requires a DOM ID, so I've also added 2 new AJAX attributes that can be used instead of "update=".
+I've updated DRYML so that it emits a different DOM ID if you
+re-instantiate a part.  (The first use of a part retains the DOM
+ID=partname convention for backwards compatibility) "update=" requires
+a DOM ID, so I've also added 2 new AJAX attributes that can be used
+instead of "update=".
 
-The first one is "updates=".  (name TBD).  Instead of a comma separated list of DOM ID's, it takes a CSS selector.
+The first one is "updates=".  Instead of a comma separated list of DOM
+ID's, it takes a CSS selector.
 
-The other one is "ajax".  (name TBD).   If used inside of a part, it
-indicates that part should be updated.   If used outside of a part,
+The other one is "ajax".  If used inside of a part, it indicates that
+the containing part should be updated.  If used outside of a part,
 AJAX will be used but no parts will be updated.
 
 These three Ajax attributes may be used simultaneously.
@@ -239,15 +248,15 @@ implementing this functionality yourself.
 ### AJAX file uploads
 
 If you have malsup's form plugin installed, Ajax file uploads should
-"just work", as long as you have debug_rjs turned off in your
-config/initiailizers/development.rb.
+"just work", as long as you don't have debug_rjs turned on in your
+config/initializers/development.rb.
 
 ### AJAX events
 
 The standard 'before', 'success', 'done' and 'error' callbacks may
 still be used.   Additionally, the AJAX code now triggers
 'rapid:ajax:before', 'rapid:ajax:success', 'rapid:ajax:done' and
-'rapid:ajax:error' events to unable you to code more unobtrusively.
+'rapid:ajax:error' events to enable you to code more unobtrusively.
 
 If your form is inside of a part, it's quite likely that the form will
 be replaced before the rapid:ajax:success and rapid:ajax:done events
@@ -312,7 +321,7 @@ These two options have global defaults which are TBD.  They may be overridden by
        </old-page>
      </extend>
 
-To disable effects entirely:
+To disable effects entirely:  FIXME.
 
 ### spinner options
 
@@ -418,7 +427,11 @@ see tag documentation
 
 ### page-nav
 
-FIXME: update.  The params attribute now defaults to recognize_page_path.slice(:controller,:action,:id).
+The params attribute now defaults to
+recognize_page_path.slice(:controller,:action,:id).
+
+Standard form ajax attributes are now also supported, and behave
+similar to `<a>`.
 
 ### query_params
 
@@ -454,19 +467,6 @@ seem like something people might do by accident.
 The alternative is to use `<form>`.   Since this implementation of
 editor starts with an input and switches to a view via Javascript,
 using a form would allow reasonable javascript-disabled behaviour.
-
-## Missing items
-
-TODO
-
- * sortable-input-many
- * name-many
- * live-search works, but it's not 'live'
-
-It's quite likely that some of the new tag definitions are missing
-id, class, merge or param attributes.  This doesn't impact core
-functionality, but it does limit your ability to extend the tags.  If
-you notice any such omissions, please let us know, it is easy to fix..
 
 ## Changes behind the scenes
 
@@ -513,6 +513,105 @@ hobo_ajax_response, that code likely will need to be updated for 1.4.
 
 FIXME: pointer to AJAX background documentation.
 
-## Testing
+# jQuery rewrite
+
+FIXME: pull into separate document, along with interface specs
+
+## Framework Agnosticism
+
+jQuery support is being written in a manner that should make it easier to support other frameworks if we ever decide to do so.   Basically all this means is that we're annotating our HTML and the javascript is picking up the information from the annotations rather than calling functions or setting variables.
+
+## Unobtrusiveness
+
+The agnosticism is a side benefit -- really the main reason its written this way is so that we're coding using "unobtrusive javascript" techniques.
+
+Hobo currently many different mechanisms to pass data to javascript:
+
+- classdata ex class="model::story:2"
+- non-HTML5-compliant element attributes: ex hobo-blank-message="(click to edit)"
+- variable assignment: ex hoboParts = ...;
+- function calls: ex onclick="Hobo.ajaxRequest(url, {spinnerNextTo: 'foo'})"
+
+hobo-jquery currently uses JSON inside of comments:
+
+    <!-- json_annotation ({"tag":"datepicker","options":{},"events":{}}); -->
+
+We are switching all 5 of these mechanisms to use HTML5 data
+attributes.  HTML5 data attributes are technically illegal in HTML4
+but work in all browsers future and past (even IE6).  The illegality
+of them is the reason that I didn't choose them in Hobo-jQuery, but
+it's now 2011.
+
+We mostly use a single attribute: `data-rapid`.  This is a JSON hash
+where the keys are the tag names and the values are options hashes.
+DRYML has been modified to appropriately merge this tag in a fashion
+similar to what it currently does for the `class` tag.  For example,
+live-search will have the attribute
+`data-rapid='{"live-search":{"foo": 17}}'`.  When hobo-jquery
+initializes, it will then attempt to initialize a jQuery plugin named
+`hjq_live_search`, which we provide in
+public/javascripts/hobo-jquery/hjq-live-search.js.   The plugin will
+get passed the options hash {"foo": 17}.
+
+`data-rapid-page-data` contains data required by the javascript
+library, such as the part information.
+
+One last attribute that may be set is `data-rapid-context`.  This
+contains a typed_id of the current context.  This is used to assist
+tags like `delete-button` with DOM manipulation.
+
+## Compatibility
+
+Obviously compatibility with hobo-rapid.js is not going to be
+maintained, since that's written in prototype.
+
+The internal structure of hobo-jquery has changed completely.  We have
+switched to using a more standard jQuery plugin style.
+
+# Running the integration tests:
 
 hobo-jquery is being tested using capybara & qunit.js.
+
+Unfortunately, 2 of the integration tests fails on firefox, which
+works out of the box, so we also have to install capybara-webkit and
+selenium-chrome.
+
+     $ git clone -b jquery git://github.com/Hobo/agility-gitorial.git
+     $ cd agility-gitorial
+
+Make sure you have the prerequisites for capybara-webkit:
+https://github.com/thoughtbot/capybara-webkit/wiki/Installing-QT
+
+     $ bundle install
+     $ rake db:migrate
+
+Download the selenium-chrome server and place in your path:
+http://code.google.com/p/chromium/downloads/list
+
+     $ rake test:integration
+
+Email the list and/or bryan@larsen.st if you get any failures.
+
+# TODO
+
+ * fixup deprecation warnings
+ * create_response: mirror update_response
+ * sortable-input-many
+ * name-many
+ * live-search works, but it's not 'live'
+ * select-one-or-new-dialog
+ * display:inline for remove-button and friends
+ * taglib cleanup
+ * clean_sidemenu -> plugin
+ * jquery-ui themes need to be installed
+ * port to 3.2
+ * cookbook
+ * nuke any remaining prototype code
+ * railtie hook for .try. in collections
+ * add a sane default for non-AJAX JSON requests.
+ * document themes/plugins.  Probably easier to create generator & document that
+
+It's quite likely that some of the new tag definitions are missing
+id, class, merge or param attributes.  This doesn't impact core
+functionality, but it does limit your ability to extend the tags.  If
+you notice any such omissions, please let us know, it is easy to fix..

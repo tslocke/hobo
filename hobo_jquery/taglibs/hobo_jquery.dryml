@@ -1759,7 +1759,7 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
 </def>
 
 
-<!--- A simple wrapper around the `will_paginate` helper. All options to `will_paginate` are available as attributes.  If you do not specify `params`, it will be guessed. -->
+<!--- A wrapper around the `will_paginate` helper. All options to `will_paginate` are available as attributes.  If you do not specify `params`, it will be guessed.  Standard Ajax form attributes are also supported.   See the `<a/>` tag for more information on using AJAX with links.-->
 <def tag="page-nav" attrs="params">
   <%  ajax_attrs, attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS) %>
   <%= will_paginate this, attributes.symbolize_keys.reverse_merge(:inner_window => 2, :previous_label => translate("hobo.actions.previous", :default=>"« Prev"), :next_label =>translate("hobo.actions.next", :default=>"Next »"), :params => recognize_page_path.slice(:controller,:action,:id), :extra_attributes => (ajax_attrs.empty? ? {} : {"data-rapid" => {"a" => {"ajax_attrs" => ajax_attrs}}.to_json}), :ignore_params => [:render, :render_options, :"_"]) %>
