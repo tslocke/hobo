@@ -190,7 +190,9 @@ EOI
       else
         install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :comments => "The default Hobo theme")
       end
-      invoke(Bundler::CLI, :update, [], {})
+      Bundler.with_clean_env do
+        run "bundle install"
+      end
     end
 
     def add_dev_tweaks

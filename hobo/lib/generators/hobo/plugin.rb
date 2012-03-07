@@ -20,12 +20,13 @@ module Generators
       end
 
       def install_plugin_helper(name, git_path, options)
+        plugin = name.dup
         unless options[:skip_gem]
           gem_options = {}
           gem_options[:version] = options[:version] if options[:version]
           gem_options[:git] = git_path if git_path
           gem_options[:comments] = "# #{options[:comments]}" if options[:comments]
-          need_update = gem_with_comments(name, gem_options)
+          need_update = gem_with_comments(plugin, gem_options[:version], gem_options)
         end
 
         if options[:subsite] == "all"
