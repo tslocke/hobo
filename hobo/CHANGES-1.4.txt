@@ -25,6 +25,9 @@ Now you have two options: create gems, or use the source.
     cd wherever-you-want-to-generate-your-app
     hobo new foo
 
+Once you've generated an app, you may wish to go in and replace the
+version strings for the hobo_* gems with `:git => "git://github.com/tablatom/hobo"
+
 ### Via source
 
 (This won't work on Windows)
