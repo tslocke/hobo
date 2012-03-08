@@ -10,7 +10,7 @@ If you're on Linux you'll have to install a javascript runtime.
 On Ubuntu 11.10 you can get one by typing `apt-get install
 nodejs-dev`.  Other Linuxes should be similar.  Windows & OS X users
 should already have a javascript scripting host installed.  The list
-of compa
+of compatible javascript runtimes is [here](https://github.com/sstephenson/execjs).
 
 Next you'll need to download the hobo source
 
