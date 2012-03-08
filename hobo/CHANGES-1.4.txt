@@ -49,8 +49,8 @@ app into your existing app.
 ### Gemfile
 
 You'll need to add the gems required for the asset pipeline, add the
-jquery-rails gem, and adjust the version numbers for rails, hobo and
-perhaps others.
+jquery-rails and jquery-ui-themes gem, and adjust the version numbers
+for rails, hobo and perhaps others.
 
 Hobo has also gained several additional gems, so you will have to add
 dependencies for those.  hobo_rapid is the Hobo tag library,
@@ -117,6 +117,11 @@ these changes have been to the editors.
 ## The Asset Pipeline
 
 Hobo 1.4 uses the asset pipeline features introduced in Rails 3.1.
+
+## :inverse_of recommended
+
+For correct behaviour, please ensure that all accessible associations
+have their :inverse_of option set in both directions.
 
 ## set-theme deprecated
 
@@ -603,12 +608,12 @@ Email the list and/or bryan@larsen.st if you get any failures.
  * display:inline for remove-button and friends
  * taglib cleanup
  * clean_sidemenu -> plugin
- * jquery-ui themes need to be installed
  * port to 3.2
  * cookbook
  * nuke any remaining prototype code
  * railtie hook for .try. in collections
  * add a sane default for non-AJAX JSON requests.
+ * admin_subsite generator doesn't pull in everything the wizard does
  * document themes/plugins.  Probably easier to create generator & document that
 
 It's quite likely that some of the new tag definitions are missing

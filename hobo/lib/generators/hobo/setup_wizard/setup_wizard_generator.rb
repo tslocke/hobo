@@ -184,12 +184,17 @@ EOI
       say "Installing hobo_jquery plugin..."
       install_plugin_helper('hobo_jquery', nil, :version => Hobo::VERSION)
       say "Installing hobo_clean theme..."
+
       if @add_admin_subsite
         install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :subsite => "front", :comments => "The default Hobo theme")
         install_plugin_helper('hobo_clean_admin', nil, :version => Hobo::VERSION, :subsite => @admin_subsite_name)
       else
-        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :comments => "The default Hobo theme")
+        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :comments => "The default Hobo theme", :subsite => "front")
       end
+
+      gem_with_comments("jquery-ui-themes", "~> 0.0.4")
+      inject_css_require("jquery-ui/redmond", "front", nil)
+      inject_css_require("jquery-ui/flick", "admin", nil) if @add_admin_subsite
       Bundler.with_clean_env do
         run "bundle install"
       end
