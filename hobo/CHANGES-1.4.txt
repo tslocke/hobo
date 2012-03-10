@@ -43,7 +43,7 @@ required by the addition of the asset pipeline which was introduced in
 Rails 3.1.
 
 Follow the asset pipeline upgrade steps outlined here:
-http://stackoverflow.com/questions/7574400/why-bundle-install-fails-in-rails-generator
+http://guides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
 
 The easiest way to upgrade an existing Hobo 1.3 application is to
 generate a new Hobo 1.4 application and copy differences from the new
@@ -65,14 +65,14 @@ additional themes available soon.
 ### config/
 
 All of the changes in config/ are due to the assets pipeline.  See
-http://stackoverflow.com/questions/7574400/why-bundle-install-fails-in-rails-generator
+http://guides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
 
 Additionally, the Hobo 1.4 generator installs the
 [rails-dev-tweaks](https://github.com/wavii/rails-dev-tweaks) gem.  We
 adjust the configuration so that rails-dev-tweaks applies only to
 assets, not to XHR.
 
-### application.dryml
+### application.dryml or front_site.dryml
 
 Replace
 
@@ -83,6 +83,10 @@ with
     <include gem='hobo_rapid'/>
     <include gem='hobo_jquery'/>
     <include gem='hobo_clean'/>
+
+Note that the default Hobo generation now always creates both a
+front_site.dryml and an application.dryml, even if you don't create
+any subsites.
 
 ### move public/ to app/assets/
 
@@ -120,6 +124,9 @@ these changes have been to the editors.
 ## The Asset Pipeline
 
 Hobo 1.4 uses the asset pipeline features introduced in Rails 3.1.
+Hobo 1.4 does not work out of the box with the asset pipeline turned
+off.  It'd certainly be possible to copy all Hobo assets into public/,
+but you would have to do that manually.
 
 ## :inverse_of recommended
 
@@ -212,6 +219,19 @@ state
 push-state works best in an HTML5 browser.  It works in older browsers
 such as IE8, IE9 or Firefox 3, but results in strange looking URL's.   See
 the README for History.js for more details on that behaviour.
+
+### plugin generators
+
+Hobo has gained two new generators.
+
+`hobo generate install_plugin` may be used from inside a Hobo
+application to install a Hobo plugin.   It modifies the Gemfile,
+application.dryml or X_site.dryml and adds the plugin to
+app/assets/javascripts and app/assets/stylesheets.
+
+`hobo plugin` is used from outside of a Hobo application to create the
+skeleton for a new plugin.   See [the plugin manual page](FIXME) for
+more details.
 
 ### multiple parts
 
@@ -602,6 +622,7 @@ Email the list and/or bryan@larsen.st if you get any failures.
 
 # TODO
 
+ * front.css: require application should come after plugins
  * fixup deprecation warnings
  * create_response: mirror update_response
  * sortable-input-many
@@ -617,7 +638,12 @@ Email the list and/or bryan@larsen.st if you get any failures.
  * railtie hook for .try. in collections
  * add a sane default for non-AJAX JSON requests.
  * admin_subsite generator doesn't pull in everything the wizard does
+ * double check attr_accessible vulnerability that took out github
+ * parametrize the clean theme
+ * nested-cache: csrf workaround
+ * deal with my patches to will_paginate
  * document themes/plugins.  Probably easier to create generator & document that
+ * trawl the lighthouse
 
 It's quite likely that some of the new tag definitions are missing
 id, class, merge or param attributes.  This doesn't impact core
