@@ -148,16 +148,16 @@ This will use `<input/>` as the tag in each table cell instead of `<view/>`
 </def>
 
 <!--
-Provides a short hand way of displaying images in public/images
+Provides a short hand way of displaying images.  All attributes supported by `image_tag` are supported.
 
 ### Usage
 
     <image src="hobo.png"/> -> <img src="/images/hobo.png"/>
     <image src="blog/funny.jpg" alt="Funny Scene"/> -> <img src="/images/blog/funny.jpg" alt="Funny Scene"/>
 -->
-<def tag="image" attrs="src">
-  <img src="#{base_url}/images/#{src}" merge-attrs/>
-</def>
+<def tag="image" attrs="src"><%=
+  image_tag src, Hash.new(attributes)
+%></def>
 
 <!-- Renders some standard JavaScript code that various features of the Rapid library rely on. This tag would typicallu be called from your `<page>` tag. The default Rapid pages include this already. -->
 <def tag="hobo-rapid-javascripts">
