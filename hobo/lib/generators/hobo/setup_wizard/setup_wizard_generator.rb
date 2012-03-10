@@ -174,7 +174,7 @@ EOI
         invoke 'hobo:admin_subsite', [@admin_subsite_name],
                                      :user_resource_name => @user_resource_name,
                                      :invite_only => @invite_only,
-                                     :make_front_site => true
+                                     :make_front_site => false
       end
     end
 
