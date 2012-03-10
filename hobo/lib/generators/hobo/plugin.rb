@@ -12,7 +12,7 @@ module Generators
             append_file "Gemfile", "#{comments}\n", :verbose => false
           end
 
-          gem(*args)
+          gem(args[0], args[1], options)
           true
         else
           false
@@ -24,7 +24,13 @@ module Generators
         unless options[:skip_gem]
           gem_options = {}
           gem_options[:version] = options[:version] if options[:version]
-          gem_options[:git] = git_path if git_path
+          if git_path
+            if git_path =~ /:/
+              gem_options[:git] = git_path
+            else
+              gem_options[:path] = git_path
+            end
+          end
           gem_options[:comments] = "# #{options[:comments]}" if options[:comments]
           need_update = gem_with_comments(plugin, gem_options[:version], gem_options)
         end
@@ -88,7 +94,7 @@ module Generators
 
         inject_into_file application_file, :after=>pattern do
           line = "\n<include gem='#{name}'/>\n"
-          line = "<%# #{comments} %>\n#{line}" if comments
+          line = "\n<%# #{comments} %>#{line}" if comments
           line
         end
       end
