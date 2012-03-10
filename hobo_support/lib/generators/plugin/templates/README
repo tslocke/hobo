@@ -1,0 +1,18 @@
+# <%= @plugin_name %>
+
+This is a plugin for [Hobo](http://hobocentral.net) that does lots of
+cool stuff.  It uses the MIT-LICENSE so you can use it too.
+
+It can be installed into a Hobo app by typing:
+
+    hobo generate install_plugin <%= @plugin_name %> git://github.com/my_github_username/<%= @plugin_name %>.git
+
+Although if this plugin is a theme, it's better to use:
+
+    hobo generate install_plugin <%= @plugin_name %> git://github.com/my_github_username/<%= @plugin_name %>.git -s front
+
+If you want it on a different subsite, replace "front" with the subsite name.
+
+You'll have to manually remove references to any old themes from front_site.dryml, front.js & front.css.
+
+The source for this plugin lives at git://github.com/my_github_username/<%= @plugin_name %>.   Pull requests are welcome.

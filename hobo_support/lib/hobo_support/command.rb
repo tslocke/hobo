@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'tmpdir'
+require 'active_support/inflector'
 
 module HoboSupport
   module Command
@@ -145,9 +146,43 @@ say "Please, remember to run `hobo g setup_wizard` from the application root dir
             if ARGV.first =~ /^hobo:(\w+)$/
               puts "NOTICE: You can omit the 'hobo' namespace: e.g. `hobo #{cmd} #{$1} #{ARGV[1..-1] * ' '}`"
             end
-            system "rails #{cmd} hobo:#{ARGV * ' '}"
+            system "bundle exec rails #{cmd} hobo:#{ARGV * ' '}"
           end
 
+        when /^plugin$/
+          plugin_name = ARGV.shift
+          template_path = File.join Dir.tmpdir, "hobo_plugin_template"
+          File.open(template_path, 'w') do |file|
+            source_path = File.expand_path('../../generators/plugin/templates', __FILE__)
+            file.puts %(
+@filename = "#{plugin_name}"
+@module_name = "#{plugin_name.camelize}"
+inject_into_file "#{plugin_name}.gemspec", :before => /end(?!.*end).*?$/m do
+  %(  s.add_runtime_dependency("hobo", ["~> #{version}"])\n)
+end
+inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do %(
+  @@root = Pathname.new File.expand_path('../..', __FILE__)
+  def self.root; @@root; end
+
+  if defined?(Rails)
+    require '#{plugin_name}/railtie'
+
+    class Engine < ::Rails::Engine
+    end
+  end
+)end
+template '#{source_path}/railtie.rb',      "lib/#{plugin_name}/railtie.rb"
+template '#{source_path}/taglib.dryml',    "taglibs/#{plugin_name}.dryml"
+template '#{source_path}/javascript.js',   "vendor/assets/javascripts/#{plugin_name}.js"
+template '#{source_path}/stylesheet.css',  "vendor/assets/stylesheets/#{plugin_name}.css"
+template '#{source_path}/gitkeep',         "vendor/assets/images/.gitkeep"
+template '#{source_path}/helper.rb',       "app/helpers/#{plugin_name}_helper.rb"
+template '#{source_path}/README',          "README"
+remove_file  'README.rdoc'
+)
+          end
+          system "rails plugin new #{plugin_name} #{ARGV * ' '} -m #{template_path}"
+          #File.delete template_path
         else
           puts "\n  => '#{command}' is an unknown command!\n"
           puts banner
