@@ -157,10 +157,14 @@ say "Please, remember to run `hobo g setup_wizard` from the application root dir
             file.puts %(
 @filename = "#{plugin_name}"
 @module_name = "#{plugin_name.camelize}"
-inject_into_file "#{plugin_name}.gemspec", :before => /end(?!.*end).*?$/m do
-  %(  s.add_runtime_dependency("hobo", ["~> #{version}"])\n)
+gsub_file "#{plugin_name}.gemspec", /^  s.files = Dir.*?\\n/m, ''
+gsub_file "#{plugin_name}.gemspec", /^  s.add_development_dependency "sqlite3".*?\\n/m, ''
+inject_into_file "#{plugin_name}.gemspec", :before => /end\\s*$/m do
+"""  s.files = `git ls-files -z`.split('\\0')
+  s.add_runtime_dependency('hobo', ['~> #{version}'])
+"""
 end
-inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do %(
+inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do """
   @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
@@ -170,14 +174,14 @@ inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do %(
     class Engine < ::Rails::Engine
     end
   end
-)end
+"""end
 template '#{source_path}/railtie.rb',      "lib/#{plugin_name}/railtie.rb"
 template '#{source_path}/taglib.dryml',    "taglibs/#{plugin_name}.dryml"
 template '#{source_path}/javascript.js',   "vendor/assets/javascripts/#{plugin_name}.js"
 template '#{source_path}/stylesheet.css',  "vendor/assets/stylesheets/#{plugin_name}.css"
 template '#{source_path}/gitkeep',         "vendor/assets/images/.gitkeep"
 template '#{source_path}/helper.rb',       "app/helpers/#{plugin_name}_helper.rb"
-template '#{source_path}/README',          "README"
+template '#{source_path}/README',          "README.markdown"
 remove_file  'README.rdoc'
 )
           end
