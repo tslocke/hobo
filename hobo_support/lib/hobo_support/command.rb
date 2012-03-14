@@ -178,6 +178,8 @@ inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do """
   @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
+  EDIT_LINK_BASE = 'https://github.com/my_github_username/#{plugin_name}/edit/master'
+
   if defined?(Rails)
     require '#{plugin_name}/railtie'
 
@@ -192,9 +194,6 @@ template '#{source_path}/stylesheet.css',  "vendor/assets/stylesheets/#{plugin_n
 template '#{source_path}/gitkeep',         "vendor/assets/images/.gitkeep"
 template '#{source_path}/helper.rb.erb',   "app/helpers/#{plugin_name}_helper.rb"
 template '#{source_path}/README',          "README.markdown"
-inject_into_file 'lib/#{plugin_name}/version.rb', :before => /end(?!.*end).*?$/m do """
-  EDIT_LINK_BASE = 'https://github.com/my_github_username/#{plugin_name}/edit/master'
-"""end
 remove_file  'README.rdoc'
 )
           end
