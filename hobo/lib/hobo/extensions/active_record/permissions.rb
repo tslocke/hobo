@@ -107,7 +107,7 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   alias_method_chain :insert_record, :owner_attributes
 
   # TODO - add dependent option support
-  def delete_records_with_hobo_permission_check(records)
+  def delete_records_with_hobo_permission_check(records, method)
     klass  = @reflection.through_reflection.klass
     user = acting_user
     if user && records.any? { |r|
@@ -116,7 +116,7 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
       }
       raise Hobo::PermissionDeniedError, "#{@owner.class}##{proxy_reflection.name}.destroy"
     end
-    delete_records_without_hobo_permission_check(records)
+    delete_records_without_hobo_permission_check(records, method)
   end
   alias_method_chain :delete_records, :hobo_permission_check
 
