@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary = 'The RAPID tag library for Hobo'
   s.description = 'The RAPID tag library for Hobo'
 
-  s.add_runtime_dependency('rails', ["~> 3.1.0"])
+  s.add_runtime_dependency('hobo', ["= #{version}"])
 
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
 

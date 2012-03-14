@@ -541,6 +541,16 @@ hobo_ajax_response, that code likely will need to be updated for 1.4.
 
 FIXME: pointer to AJAX background documentation.
 
+### Dryml.render
+
+Dryml.render now has an additional argument: imports.   The template
+environment no longer automatically imports ActionView::Helpers.
+
+### View helpers imported
+
+All application helpers are now available in the template
+environment.
+
 # jQuery rewrite
 
 FIXME: pull into separate document, along with interface specs
@@ -619,33 +629,3 @@ http://code.google.com/p/chromium/downloads/list
      $ rake test:integration
 
 Email the list and/or bryan@larsen.st if you get any failures.
-
-# TODO
-
- * front.css: require application should come after plugins
- * fixup deprecation warnings
- * create_response: mirror update_response
- * sortable-input-many
- * name-many
- * live-search works, but it's not 'live'
- * select-one-or-new-dialog
- * display:inline for remove-button and friends
- * taglib cleanup
- * clean_sidemenu -> plugin
- * port to 3.2
- * cookbook
- * nuke any remaining prototype code
- * railtie hook for .try. in collections
- * add a sane default for non-AJAX JSON requests.
- * admin_subsite generator doesn't pull in everything the wizard does
- * double check attr_accessible vulnerability that took out github
- * parametrize the clean theme
- * nested-cache: csrf workaround
- * deal with my patches to will_paginate
- * document themes/plugins.  Probably easier to create generator & document that
- * trawl the lighthouse
-
-It's quite likely that some of the new tag definitions are missing
-id, class, merge or param attributes.  This doesn't impact core
-functionality, but it does limit your ability to extend the tags.  If
-you notice any such omissions, please let us know, it is easy to fix..

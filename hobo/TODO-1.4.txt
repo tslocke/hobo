@@ -1,0 +1,28 @@
+# TODO
+
+ * front.css: require application should come after plugins
+ * fixup deprecation warnings
+ * create_response: mirror update_response
+ * sortable-input-many
+ * name-many
+ * remote-method-button, create-button, update-button, transition-button: update ajax half
+ * live-search works, but it's not 'live'
+ * display:inline for remove-button and friends
+ * taglib cleanup
+ * clean_sidemenu -> plugin
+ * port to 3.2
+ * nuke any remaining prototype code
+ * railtie hook for .try. in collections
+ * add a sane default for non-AJAX JSON requests.
+ * admin_subsite generator doesn't pull in everything the wizard does
+ * double check attr_accessible vulnerability that took out github
+ * parametrize the clean theme
+ * nested-cache: csrf workaround
+ * deal with my patches to will_paginate
+ * document themes/plugins.  Probably easier to create generator & document that
+ * trawl the lighthouse && pull requests
+
+It's quite likely that some of the new tag definitions are missing
+id, class, merge or param attributes.  This doesn't impact core
+functionality, but it does limit your ability to extend the tags.  If
+you notice any such omissions, please let us know, it is easy to fix..
