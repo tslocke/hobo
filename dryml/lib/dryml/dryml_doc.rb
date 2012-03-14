@@ -32,12 +32,17 @@ require 'rexml/xpath'
 
         def initialize(home, filename, name=nil)
           @name = name || filename.sub(/.dryml$/, '')[home.length+1..-1]
+          @filename = filename
+          parse_file(filename)
+        end
+
+        def parse_file(filename)
           @source = File.read(filename)
           @doc = Dryml::Parser::Document.new(File.read(filename), filename)
           parse_tag_defs
         end
 
-        attr_reader :name, :doc, :tag_defs, :source
+        attr_reader :name, :doc, :tag_defs, :source, :filename
 
         def comment
           first_node = doc[0][0]
