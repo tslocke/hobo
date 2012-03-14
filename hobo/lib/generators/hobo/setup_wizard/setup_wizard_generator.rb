@@ -183,8 +183,10 @@ EOI
       install_plugin_helper('hobo_rapid', nil, :version => Hobo::VERSION)
       say "Installing hobo_jquery plugin..."
       install_plugin_helper('hobo_jquery', nil, :version => Hobo::VERSION)
-      say "Installing hobo_clean theme..."
+      say "Installing hobo_jquery_ui plugin..."
+      install_plugin_helper('hobo_jquery_ui', nil, :version => Hobo::VERSION)
 
+      say "Installing hobo_clean theme..."
       if @add_admin_subsite
         install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :subsite => "front", :comments => "The default Hobo theme")
         install_plugin_helper('hobo_clean_admin', nil, :version => Hobo::VERSION, :subsite => @admin_subsite_name)

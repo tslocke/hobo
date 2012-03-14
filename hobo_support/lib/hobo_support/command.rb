@@ -102,6 +102,7 @@ gem 'hobo_rapid', :path => '#{dev_root}/hobo_rapid'
 gem 'hobo_clean', :path => '#{dev_root}/hobo_clean'
 gem 'hobo_clean_admin', :path => '#{dev_root}/hobo_clean_admin'
 gem 'hobo_jquery', :path => '#{dev_root}/hobo_jquery'
+gem 'hobo_jquery_ui', :path => '#{dev_root}/hobo_jquery'
 )
               end
             else
