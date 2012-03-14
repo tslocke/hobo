@@ -96,8 +96,6 @@ module Hobo
         if options[:contexts_function]
           storage = renderer.part_contexts_storage_uncoded
           page << "#{options[:contexts_function]}(#{storage.to_json});\n"
-        else
-          page << renderer.part_contexts_storage
         end
       end
       page << options[:postamble] if options[:postamble]

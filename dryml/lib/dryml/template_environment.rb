@@ -573,10 +573,9 @@ module Dryml
     end
 
 
-    def part_contexts_storage
-      PartContext.client_side_storage(@_part_contexts, session)
+    def part_contexts_storage_uncoded
+      PartContext.client_side_storage_uncoded(@_part_contexts, session)
     end
-
 
     def render_tag(tag_name, attributes)
       method_name = tag_name.to_s.gsub('-', '_')

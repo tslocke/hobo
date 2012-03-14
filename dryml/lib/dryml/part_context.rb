@@ -13,15 +13,12 @@
       self.digest = 'SHA1'
 
 
-      def self.client_side_storage(contexts, session)
-        return "" if contexts.empty?
-
-        contexts.map do |dom_id, context|
-          code = context.marshal(session).split("\n").map{|line| "'#{line}\\n'"}.join(" +\n    ")
-          "hoboParts['#{dom_id}'] = (#{code});\n"
-        end.join
+      def self.client_side_storage_uncoded(contexts, session)
+        contexts.inject({}) do |h, (dom_id, context)|
+          h[dom_id] = context.marshal(session)
+          h
+        end
       end
-
 
       def self.pre_marshal(x)
         if x.is_a?(ActiveRecord::Base) && x.respond_to?(:typed_id)
