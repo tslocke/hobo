@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'tmpdir'
+require 'rubygems'
 require 'active_support/inflector'
 
 module HoboSupport
@@ -20,7 +21,11 @@ Usage:
                              expect you pass other setup_wizard options
             --skip-setup     generate only the rails infrastructure and
                              expect you launch the setup_wizard manually
-        rails_opt:           all the options accepted by the rails command
+        rails_opt:           all the options accepted by the rails new command
+
+    hobo plugin <plugin_name> [opt]  Creates a new Hobo Plugin
+        opt:                 all the options accepted by the rails plugin new command
+
 )
 
         hobofields_banner = %(
@@ -150,6 +155,11 @@ say "Please, remember to run `hobo g setup_wizard` from the application root dir
           end
 
         when /^plugin$/
+          if ARGV.empty?
+            puts "\nThe plugin name is missing!\n"
+            puts banner
+            return
+          end
           plugin_name = ARGV.shift
           template_path = File.join Dir.tmpdir, "hobo_plugin_template"
           File.open(template_path, 'w') do |file|
@@ -162,8 +172,7 @@ gsub_file "#{plugin_name}.gemspec", /^  s.add_development_dependency "sqlite3".*
 inject_into_file "#{plugin_name}.gemspec", :before => /end\\s*$/m do
 """  s.files = `git ls-files -z`.split('\\0')
   s.add_runtime_dependency('hobo', ['~> #{version}'])
-"""
-end
+"""end
 inject_into_file 'lib/#{plugin_name}.rb', :before => /end(?!.*end).*?$/m do """
   @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
@@ -182,6 +191,9 @@ template '#{source_path}/stylesheet.css',  "vendor/assets/stylesheets/#{plugin_n
 template '#{source_path}/gitkeep',         "vendor/assets/images/.gitkeep"
 template '#{source_path}/helper.rb',       "app/helpers/#{plugin_name}_helper.rb"
 template '#{source_path}/README',          "README.markdown"
+inject_into_file 'lib/#{plugin_name}/version.rb', :before => /end(?!.*end).*?$/m do """
+  EDIT_LINK_BASE = 'https://github.com/my_github_username/#{plugin_name}/edit/master'
+"""end
 remove_file  'README.rdoc'
 )
           end

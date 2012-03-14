@@ -23,7 +23,6 @@ module Generators
         plugin = name.dup
         unless options[:skip_gem]
           gem_options = {}
-          gem_options[:version] = options[:version] if options[:version]
           if git_path
             if git_path =~ /:/
               gem_options[:git] = git_path
