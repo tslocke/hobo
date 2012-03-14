@@ -1,0 +1,27 @@
+<!-- Rapid Editing provdes "in-place" or "ajax" editors. -->
+
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" polymorphic>
+  <%# only called for unknown types %>
+  <live-editor merge/>
+</def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="string"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="text"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="html"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="datetime"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="date"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="integer"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="BigDecimal"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="float"><click-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="boolean"><live-editor merge /></def>
+<!-- This is provided for backwards compatibility with Hobo 1.3. -->
+<def tag="editor" for="HoboFields::Types::EnumString"><live-editor merge /></def>

@@ -1,0 +1,27 @@
+<%#
+ The `<accordion>` tag implements the [jQuery-UI accordion](http://jqueryui.com/demos/accordion/).  It works the same as the `<tabs>` tag, so see the [tabs documentation](/api_tag_defs/tabs) for more information
+
+     <accordion>
+       <section1:>Hello</section1:>
+       <section2:>Hey</section2:>
+     </accordion>
+
+There is one difference:  accordion does not support the `href` option.
+%>
+<def tag="accordion" attrs="sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'icons', 'navigation'])
+     events, html_attrs = attrs.partition_hash(['navigationFilter', 'create', 'change', 'changestart'])
+     add_classes!(html_attrs, "accordion")
+     add_data_rapid!(html_attrs, "accordion", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+    <repeat with="&parameters">
+      <div class="hjq-accordion-element">
+        <% attrs, params = this.call %>
+        <% merge_attrs = attrs - [:name] %>
+        <h3><a href="#"><%= attrs[:name] || this_key.to_s.titleize %></a></h3>
+        <div merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
+      </div>
+    </repeat>
+  </div>
+</def>

@@ -1,0 +1,103 @@
+<!-- A `<select>` menu intended to act as a filter for index pages.
+
+### Example
+
+Filtering on state is a common use.   Here's the dryml for Order:
+
+    <filter-menu param-name="state" options="&Order::Lifecycle.states.keys" />
+
+And the controller action:
+
+    def index
+      # always validate data given in URL's!!!
+      params[:state]=nil unless Order::Lifecycle.states.include?(params[:state]._?.to_sym)
+      finder = params[:state] ? Order.send(params[:state]) : Order
+      hobo_index finder
+    end
+
+See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status) in the [Agility Tutorial](/tutorials/agility) for an example.
+
+### Attributes
+
+Standard AJAX attributes such as 'update' are supported.   If any are supplied, filter-menu uses Ajax rather than a page refresh.
+
+ - `param-name` - the name of the HTTP parameter to use for the filter
+ - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
+   It can be omitted if you provide the options as an array or array of arrays in the locale file.
+ - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+ - `first-value` - the value to be used with the first option. Typically not used,
+ meaning the option has a blank value.
+ - model - the model name (optional: needed if you use the "activerecord.attributes" namespace.
+
+### I18n
+
+It lookups the options attributes in `activerecord.attributes.#{model}.filter_menu.#{param\_name}.options`
+with fallback to `filter_menu.#{param_name}.options`.
+The passed options are used as a default in case the lookup fails.
+Besides the `activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter` or
+`tags.filter_menu.default.no_filter` key is used as default of the attribute "no-filter"
+(or "All" if no default is found)
+
+### I18n Example
+
+
+    es:
+      activerecord:
+        attributes:
+          <model_name>:
+            filter_menu:
+              period:
+                no_filter: Todos Períodos
+                options:
+                - [ "Hoy", "today" ]
+                - [ "Ayer", "yesterday" ]
+
+or
+
+    es:
+      tags:
+        filter_menu:
+          period:
+            no_filter: Todos Períodos
+            options:
+            - [ "Hoy", "today" ]
+            - [ "Ayer", "yesterday" ]
+
+
+     TIME_PERIODS = %w[today yesterday]
+
+     <t-filter-menu param-name="period" options="&TIME_PERIODS" no-filter="All Periods"/>
+
+  with I18n.locale == :es
+
+     <select name="period">
+       <option value="">Todos Períodos</option>
+       <option value="today">Hoy</option>
+       <option value="yesterday">Ayer</option>
+     </select>
+
+  with I18n.locale == :en (i.e no locale file)
+
+     <select name="period">
+       <option value="">All Periods</option>
+       <option value="today">today</option>
+       <option value="yesterday">yesterday</option>
+     </select>
+
+  -->
+<def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
+  <% options = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.options", :default=>[:"tags.filter_menu.#{param_name}.options", options])
+     raise ArgumentError, %(You must provide an "options" attribute, or set "activerecord.attributes.#{model}.filter_menu.#{param_name}.options" or "tags.filter_menu.#{param_name}.options" to an Array or to an Array of Arrays
+     in your locale file(s)) unless options.is_a?(Array)
+     no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
+     %>
+  <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
+    <div>
+      <% opt = options.first.kind_of?(Array) ? options.*.last : options
+         selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
+      <select-menu name="&param_name" options="&options" selected="&selected"
+                   first-option="&no_filter" first-value="&first_value" key="&param_name" merge-params/>
+      <hidden-fields for-query-string skip="page,#{param_name}"/>
+    </div>
+  </form>
+</def>

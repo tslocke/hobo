@@ -1,0 +1,156 @@
+<!--
+`<a>` is extended in Rapid to automatically provide URLs for Hobo model routes
+
+### Usage
+
+The tag behaves as a regular HTML link or anchor if either the href or name attribute is given:
+
+    <a href="/admin">Admin</a> -> Output is exactly as provided, untouched by Rapid
+
+If no href or name is given then the _context_ is used to determine the link URL.
+The helper method `object_url` is used to construct the URL using restful routing:
+
+If the context is a class then the link will be an index page:
+
+    <a with="&BlogPost">My Blog</a> -> <a href="/blog_posts">My Blog</a>
+
+If the context is a hobo model instance then the link will be a show page:
+
+    <% blog_post = BlogPost.find(1) %>
+    <a with="&blog_post">My Blog Post</a> -> <a href="/blog_posts/1">My Blog Post</a>
+
+An action can be provided for an alternative show page:
+
+    <a with="&blog_post" action="edit">Edit Post</a> -> <a href="/blog_posts/1/edit">Edit Post</a>
+
+Or a new page if the context is a class:
+
+    <a with="&BlogPost" action="new">New Blog Post</a> -> <a href="/blog_posts/new">New Blog Post</a>
+
+### Additional Features
+
+* If the constructed route does not exist then the link will not be created, but the content of the link will still be output. E.g. when `/blog_posts` does not exist (because the hobo model controller does not exist or the index action is disabled):
+
+        <a with="&BlogPost">My Blog</a> -> My Blog
+
+    when the show action `/blog_posts/:id` does not exist:
+
+        <a with="&blog_post">My Blog Post</a> -> My Blog Post
+* If no content text is provided then `<a>` will use the name method on the context to provide the text. E.g.
+
+        <a with="&blog_post"/> -> <a href="/blog_posts/1">My First Blog Post</a>`
+        <a with="&BlogPost"/> -> <a href="/blog_posts">Blog Posts</a>`
+* If `action="new"` then `<a>` will check that the current user has permission to create the object
+* Several useful classes are added automatically to the output `<a>`.
+
+### AJAX
+
+The standard AJAX form attributes are supported.  This can be used for conventional Ajax:
+
+    <a href="&refresh_path" update="results">Refresh results</a>
+
+Or it can be used with push-state to provide faster links:
+
+    <a href="somewhere/else" update="body" push-state new-title="Somewhere else">Go somewhere else.</a>
+
+In this case the entire body is being refreshed but the headers
+aren't, so will work to link between two dissimilar pages as long as
+the headers are identical.
+
+AJAX attributes are supported in both modes: in the "magic" mode where
+RAPID determines the href target or in "passthrough" where you supply
+the href or name.
+
+### Attributes
+
+The standard AJAX attributes are supported.
+
+* action:  If "new", triggers the special behaviour listed above.  Otherwise, contains the action to be performed on the context.   If neither `action` nor `method` are specified, the action will be "index" or "show", as appropriate.
+
+* to:  Use this item as the target instead of the current context.
+
+* params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{id=>17, name=>'joe'}"`
+
+* query-params: if set, current query parameters are mirrored onto the link.   If true or blank, all non-ajax query parameters are used.   (`query-params`, `query-params="&true"` or `query-params=""`)  Otherwise, the specified query parameters are used.   (`query-params="page,sort,search"`)
+
+* href, name:  If either of these attributes are present, the smart features of this tag are turned off.
+
+* format: this adds ".#{format}" to the end of the url
+
+* subsite: routes the URL using the subsite
+
+* force: overrides the permission check if `action` is "new"
+
+* method: "get", "put", "post" or "delete".  "get" is the default
+
+-->
+<def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
+  content = parameters.default
+
+  ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+  unless ajax_attrs.blank?
+    add_data_rapid!(attributes, "a", :ajax_attrs => ajax_attrs)
+  end
+
+
+  if query_params
+    if query_params==true || query_params.blank?
+      query_params = query_parameters_filtered
+    else
+      query_params = query_parameters_filtered(:only => comma_split(query_params))
+    end
+    params = query_params.merge(params || HashWithIndifferentAccess.new)
+  end
+
+  if href || attributes[:name]
+    # Regular link
+    href += "?" + params.map { |n, v| "#{n}=#{v}" }.join('&') if !params.blank?
+    element(:a, attributes.update(:href => href), content)
+  else
+    target = to || this
+
+    if target.nil?
+      Dryml.last_if = false
+      nil_view
+    elsif action == "new"
+      # Link to a new object form
+      new_record = target.new
+      new_record.set_creator(current_user)
+      href = object_url(target, "new", params._?.merge(:subsite => subsite))
+
+      if href && (force || can_create?(new_record))
+        new_class_name = if target.respond_to?(:proxy_reflection)
+                           target.proxy_association.reflection.klass.name
+                         else
+                           target.name
+                         end
+
+        add_classes!(attributes, "new-#{new_class_name.underscore}-link")
+        content = "New #{new_class_name.titleize}" if content.blank?
+        Dryml.last_if = true
+        element(:a, attributes.update(:href => href), content)
+      else
+        Dryml.last_if = false
+        ""
+      end
+    else
+      # Link to an existing object
+
+      content = name if content.blank?
+
+      href = object_url(target, action, (params || {}).merge(:subsite => subsite)) unless (action.nil? && target.try.new_record?)
+      if href.nil?
+        # This target is registered with Hobo::Routes as not linkable
+        content
+      else
+        css_class = target.try.origin_attribute || target.class.name.underscore.dasherize
+        add_classes!(attributes, "#{css_class}-link")
+
+        href.sub!(/\?|$/, ".#{format}\\0") unless format.blank?
+
+        # Set default link text if none given
+        element(:a, attributes.update(:href => href), content)
+      end
+    end
+  end
+%></def>

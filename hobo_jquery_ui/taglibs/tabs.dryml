@@ -1,0 +1,61 @@
+<%# This tag allows you to easily use [jQuery-UI tabs](http://jqueryui.com/demos/tabs/)
+
+    <tabs>
+      <first:>tab 1 content</first:>
+      <tab2:>tab 2 content</tab2:>
+    </tabs>
+
+If you don't specify any attributes to the parameters, the parameter name is used for the tab name and ID.   You can adjust this behaviour by specifying attributes to your parameters:
+
+    <tabs>
+      <tab1: name="1" id="id1">tab 1 content</tab1:>
+    </tabs:>
+
+If you specify an href rather than an id, the tab content is loaded dynamically:
+
+    <tabs>
+      <remote: href="/front/hello"/>
+    </tabs>
+
+Attributes are passed through to jQuery-UI, so options and events defined in the [jQuery-ui tabs documentation](http://jqueryui.com/demos/tabs/) may be used:
+
+    <tabs collapsible selected="2">
+      ...
+    </tabs>
+
+### Attributes
+
+Note that `tabs` supports attributes both on the `tabs` tag as well as on the parameters.
+
+The parameters support three attributes:  `id`, `name`, `href`, described above.
+
+The `tabs` tag supports all options and events supported in jQuery-UI, plus one additional attribute:
+
+* sortable:  if set, the tabs are sortable rather than fixed.
+
+### Notes
+
+Usage of Ruby 1.8 will result in an undefined tab order.   Ruby 1.9 is recommended.
+
+%>
+<def tag="tabs" attrs="sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'ajaxOptions', 'cache', 'collapsible', 'cookie', 'deselectable', 'disabled', 'event', 'fx', 'idPrefix', 'panelTemplate', 'selected', 'spinner', 'tabTemplate'])
+     events, html_attrs = attrs.partition_hash(['create', 'select', 'load', 'show', 'add', 'remove', 'enable', 'disable'])
+     add_classes!(html_attrs, "tabs")
+     add_data_rapid!(html_attrs, "tabs", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+    <ul>
+      <repeat with="&parameters">
+        <% attrs, params = this.call %>
+        <li><a href="#{attrs[:href] || '#'+(attrs[:id] || this_key.to_s)}"><%= attrs[:name] || this_key.to_s.titleize %></a></li>
+      </repeat>
+    </ul>
+
+    <repeat with="&parameters">
+      <% attrs, params = this.call %>
+      <% merge_attrs = attrs - [:id, :href, :name] %>
+      <div id="#{attrs[:id] || this_key}" merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
+    </repeat>
+  </div>
+</def>

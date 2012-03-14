@@ -31,7 +31,7 @@ If the transition could not be found, the user does not have permissions for the
     end
     transition_name = transition.name
     has_params = !transition.options[:params].blank?
-    ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+    ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
 
     html_attributes[:method] ||= has_params ? :get : :put
     add_classes!(html_attributes, "transition-button #{transition_name}-button")
@@ -84,7 +84,7 @@ This tag behaves similarly to repeat: an else tag may be used to handle the case
     <transition-buttons/><else>Sorry, no buttons to press.</else>
   -->
 <def tag="transition-buttons">
-  <% ajax_attrs, html_attrs = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS) %>
+  <% ajax_attrs, html_attrs = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS) %>
   <div merge-attrs="&html_attrs" class="transitions">
     <% transitions = this.lifecycle.publishable_transitions_for(current_user) %>
     <if test="&transitions">

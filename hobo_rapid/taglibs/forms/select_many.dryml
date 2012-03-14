@@ -1,0 +1,58 @@
+<%#
+An input for `has_many :through` associations that lets the user chose the items from a `<select>` menu.
+
+To use this tag, the model of the items the user is chosing *must* have unique names.
+
+### Attributes
+
+`options`: An array of ActiveRecord objects
+
+`remove-label`: the label on the remove button.   i18n
+  hobo.actions.remove is the preferred way of changing this value.
+
+`prompt`: default: "Add foos", where foo is the name of the field.
+  i18n foos.form.select_many.prompt is the preferred way to change
+  the prompt.
+
+`name`: the parameter name.  Defaults to `param_name_for_this`.
+
+%>
+<def tag="select-many" attrs="options, remove-label, prompt, disabled, name"><%
+  prompt ||= ht("#{this_field_reflection.klass.to_s.underscore}.form.select_many.prompt", :default=>"Add #{this_field.titleize.singularize}")
+  options ||= this_field_reflection.klass.all(:conditions => this_field_reflection.options[:conditions]).select {|x| can_view?(x)}
+  name ||= param_name_for_this
+
+  values = this
+  remove_label ||= t("hobo.actions.remove", :default=>'Remove')
+  effect_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_EFFECT_ATTRS)
+  -%>
+  <div class="input select-many" data-rapid="#{data_rapid('select-many', effect_attrs)}" merge-attrs>
+    <div style="display:none" class="item-proto">
+      <div class="item" param="proto-item">
+        <span></span>
+        <input type="hidden" name="#{name}[]" param="proto-hidden"/>
+        <input type="button" class="remove-item" value="#{remove_label}" param="proto-remove-button"/>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item" param="item" repeat>
+        <span><%= h this.to_s %></span>
+        <input type="hidden" name="#{name}[]" value="@#{h this.id}" disabled="&disabled"
+               param="hidden"/>
+        <input type="button" class="remove-item" value="#{remove_label}" disabled="&disabled"
+               param="remove-button"/>
+      </div>
+    </div>
+    <select merge-attrs="&{:disabled => disabled}">
+      <option value=""><prompt/></option>
+      <repeat with="&options">
+        <if test="&this.in?(values)">
+          <optgroup class="disabled-option" label="#{h this.to_s}" alt="@#{this.id}">&nbsp;</optgroup>
+        </if>
+        <else>
+          <option value="@#{this.id}"><%= h this.to_s %></option>
+        </else>
+      </repeat>
+    </select>
+  </div>
+</def>

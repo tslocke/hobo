@@ -1,0 +1,60 @@
+<!--
+An in-place-editor type control.  Displays the `view` view of a field
+until it's clicked on, when it switches to the `input` view.  Onchange
+the field is saved via Ajax, and onblur the view switches back to the
+`view` view.
+
+Due to the way the DRYML part system works, `<click-editor>` may not
+be parameterized.  If you wish to parameterize it, see
+`<click-editor-innards>`.
+-->
+<def tag='click-editor'>
+  <div part="editor-part">
+    <click-editor-innards/>
+  </div>
+</def>
+
+<!--
+When placed inside of a part, provides a complete parameterizable `<click-editor>`.
+
+### Usage
+
+    <part name="my-part">
+      <click-editor-innards>
+        <before-view:>My</before-view:>
+        <view: replace>
+          My <view restore/>
+        </view: replace>
+      </click-editor-innads>
+    </part>
+
+### Attributes
+
+The ajax effect options `hide` and `show` adjust the effects used when clicking on the element.  To adjust the effects on update, set `hide` and `show` on the `formlet:` parameter.
+
+All other ajax options are also supported.
+
+blank-message: the message to display if the field is blank.  Note
+that you're probably better off changing this via translations
+(hobo.in_place_editor.click_to_edit).
+
+-->
+<def tag='click-editor-innards' attrs="blank-message">
+  <%
+  blank_message ||= t('hobo.in_place_editor.click_to_edit', :default => '(click to edit)')
+  effect_attrs,attributes = attributes.partition_hash(HoboRapidHelper::AJAX_EFFECT_ATTRS)
+  ajax_attrs,attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+  data = data_rapid('click-editor', effect_attrs)
+  %>
+    <if>
+      <view class="in-place-edit hidden" data-rapid="&data" param/>
+    </if>
+    <else>
+      <view with="&blank_message" class="in-place-edit hidden" data-rapid="&data" param="blank-view"/>
+    </else>
+    <set my-field="&this_field"/>
+    <formlet with="&this_parent" class="in-place-form" ajax errors-ok merge-attrs="&ajax_attrs" param>
+      <error-messages param/><%# TODO: replace with something more compact, maybe even transient %>
+      <input field="&my_field" param/>
+    </formlet>
+</def>

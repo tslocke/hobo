@@ -1,0 +1,70 @@
+<!--
+The JQuery UI [dialog](http://jqueryui.com/demos/dialog/).  All options and methods are supported.
+
+The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) has been changed to `"&false"`.  To display the dialog set autoOpen to `"&true"`, use a `<dialog-open-button>`, use `<dialog-and-button>` or use javascript (`$('#foo-dialog').hjq_dialog('open');`).
+
+The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
+
+    <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
+    <dialog buttons="&buttons">My dialog text</dialog>
+
+or
+
+    <dialog id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog>
+
+or
+
+    <dialog id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
+
+Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
+
+If you do not set [position](http://jqueryui.com/demos/dialog/#option-position) the dialog will appear where it is defined in your DRYML.
+
+JQuery UI is sometimes picky about types.   For instance, the width option must be a number, not a string.  By default Hobo options are strings, but you can easily send a number by using the ampersand to switch to ruby mode:
+
+    <dialog width="&640"/>
+
+The following functions are predefined for use in dialog buttons:  FIXME
+
+ * `hjq.dialog.close`:  close the dialog box
+ * `hjq.dialog.submitFormlet`:  submits all formlets inside the dialog
+ * `hjq.dialog.submitFormletAndClose`: submits any enclosed formlets, then closes the dialog.
+-->
+<def tag="dialog-box" attrs="buttons">
+<%
+ options, attrs = attributes.partition_hash(["autoOpen", "bgiframe", "closeOnEscape", "dialogClass", "draggable", "height", "hide", "maxHeight", "maxWidth", "minWidth", "modal", "position", "resizable", "show", "stack", "title", "width", "zIndex"])
+ events, html_attrs = attrs.partition_hash(["beforeclose", "open", "focus", "dragStart", "drag", "dragStop", "resizeStart", "resize", "resizeStop", "close"])
+ options["autoOpen"]=false unless options.has_key?("autoOpen")
+%>
+ <span class="dialog-position"></span>
+ <% html_attrs = add_classes(html_attrs, "hidden dialog-box") %>
+ <div merge-attrs="&html_attrs" data-rapid="&data_rapid('dialog-box', :options => options, :events => events, :buttons => buttons)" param="default" />
+</def>
+
+<!--
+When pressed, will open a `<dialog-box>`.
+
+### Attributes
+ * `dialog` (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
+ * supports all `<button>` attributes
+
+### Example
+    <dialog id="hello-dialog">Hello!</dialog>
+    <dialog-open-button dialog="#hello-dialog">Press Me!</dialog-open-button>
+-->
+<def tag="dialog-open-button" attrs="dialog">
+  <button data-rapid="&data_rapid('dialog-open-button', :selector => dialog)" param="default" class="dialog-open-button" merge />
+</def>
+
+<!--
+Defines an `<dialog-box>` and a `<dialog-open-button>` and links the two together.
+
+### Attributes
+ * `id` (optional): the DOM id to use for the dialog
+-->
+<def tag="dialog-and-button">
+  <% # we can't use jQuery traversal functions since the dialog will move around in the DOM %>
+  <% attributes["id"]="dialog-#{(rand*1000000000).to_i}" unless attributes.has_key?("id") %>
+  <dialog-box param merge />
+  <dialog-open-button dialog="##{attributes['id']}" param />
+</def>

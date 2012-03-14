@@ -1,0 +1,10 @@
+<!-- This comment shouldn't appear in the cookbook -->
+
+<include src="buttons/*"/>
+<include src="cache/*"/>
+<include src="cards/*"/>
+<include src="editors/*"/>
+<include src="forms/*"/>
+<include src="html/*"/>
+<include src="navigation/*"/>
+<include src="plus/*"/>

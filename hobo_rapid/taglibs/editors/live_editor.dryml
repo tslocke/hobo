@@ -1,0 +1,37 @@
+<!--
+A simpler in-place-editor type control.  Renders an `input` of the
+field that is automatically saved via Ajax onchange.
+
+Due to the way the DRYML part system works, `<live-editor>` may not
+be parameterized.  If you wish to parameterize it, see
+`<live-editor-innards>`.
+-->
+<def tag='live-editor'>
+  <div part="live-editor-part">
+    <live-editor-innards/>
+  </div>
+</def>
+
+<!--
+When placed inside of a part, provides a complete parameterizable `<live-editor>`.
+
+### Usage
+
+    <part name="my-part">
+      <live-editor-innards hide="puff"/>
+    </part>
+
+### Attributes
+
+Attributes are merged onto the supporting formlet, so all `<formlet>`
+attributes are supported.  Many don't make sense to customize, but
+others such as `hide` and `show`, do.
+
+-->
+<def tag='live-editor-innards'>
+  <set my-field="&this_field"/>
+  <formlet with="&this_parent" class="in-place-form" ajax errors-ok data-rapid="&data_rapid('live-editor')" param merge>
+    <error-messages param/><%# TODO: replace with something more compact, maybe even transient %>
+    <input field="&my_field" param/>
+  </formlet>
+</def>

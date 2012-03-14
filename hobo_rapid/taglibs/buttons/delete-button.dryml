@@ -1,0 +1,75 @@
+<!-- Provides either an ajax or non-ajax delete button to send a
+     RESTful "DELETE". The context should be a record for which you to
+     want provide a delete button.
+
+There are three possible types of `delete-button` created.
+
+### Non-Ajax
+
+No Ajax is used if
+
+ - the `update`, `updates` and `ajax` attributes are not set AND EITHER
+ - `in-place` is explicitly set false OR
+ - the context for the delete is the same as the top-level context for the page.   In other words, if you're trying to delete the entire page.
+
+### Standard form Ajax
+
+If you set the `update`, `updates` or `ajax` attributes, standard form/part AJAX is used.   It's assumed that the part you're specifying includes the item to be deleted so that it will be removed from the page by the update.
+
+### "Magic" Ajax
+
+If:
+
+ - the `update`, `updates` and `ajax` attributes are not set AND EITHER
+ - `in-place` is explicitly set true OR
+ - the context for the delete is not the same as the top-level context for the page.   In other words, if you're not trying to delete the entire page.
+
+then `delete-button` performs an Ajax delete and then attempts to fix up the page.   It does this by removing all items on the page that have their hobo-rapid-context set to the item being deleted.   If said deletion results in an empty list, it shows the `.empty-collection-message`.   This procedure should work with `<collection>`, `<table>` and their children (`<sortable-collection>`, `<table-plus>`, etc.).
+
+### Attributes
+
+All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
+
+ - label: The label for the button. Default: "Remove".  (Alternately, use the hobo.actions.remove translation to customize)
+
+ - in-place: see above
+
+ - image: URL of an image for the button.
+
+ - fade: Perform the fade effect (true/false)? Default: true
+
+ - confirm: has a default value of "Are you sure?" or hobo.messages.confirm translated.  You must explicitly set this to false if you don't want a confirm message.
+
+  -->
+<def tag="delete-button" attrs="label, in-place, image, confirm, fade, subsite"><%
+  url = object_url(this, :method => :delete, :subsite => subsite)
+  if url && can_delete?
+    in_place = !(this == @this && request.method.downcase == "get") if in_place.nil?
+    update_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_UPDATE_ATTRS)
+    ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+    attributes[src] = "#{base_url}/images/#{image}" if image
+    label ||= t("hobo.actions.remove", :default=>"Remove")
+    confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
+    ajax_attrs[:confirm] = confirm if confirm
+
+    add_classes!(attributes,
+                 image ? "image-button" : "button",
+                 "delete-button delete-#{this.class.name.underscore.dasherize}-button")
+
+    if in_place && update_attrs.blank?
+      data_rapid = data_rapid(:delete_button)
+      ajax_attrs[:update] ||= ""   # force form ajax
+    elsif !update_attrs.blank?
+      ajax_attrs.merge!(update_attrs)
+      data_rapid = nil
+    else
+      data_rapid = nil
+    end
+  end
+%>
+  <if test="&url && can_delete?">
+    <form method="delete" action="&url" class="button_to" merge-attrs="&ajax_attrs" data-rapid="&data_rapid" data-rapid-context="&typed_id">
+      <input type="submit" value="&label" merge/>
+    </form>
+  </if>
+</def>

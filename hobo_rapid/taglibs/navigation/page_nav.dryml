@@ -1,0 +1,17 @@
+<!--
+A wrapper around the `will_paginate` helper. All [options to
+`will_paginate`](https://github.com/mislav/will_paginate/wiki/the-will_paginate-view-helper)
+are available as attributes.  If you do not specify `params`, it will
+be guessed.  Standard Ajax form attributes are also supported.  See
+the `<a/>` tag for more information on using AJAX with links.
+-->
+<def tag="page-nav">
+  <%  ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS) %>
+  <%= will_paginate this,  attributes.symbolize_keys.reverse_merge(
+         :inner_window => 2,
+         :previous_label => translate("hobo.actions.previous", :default=>"« Prev"),
+         :next_label =>translate("hobo.actions.next", :default=>"Next »"),
+         :params => recognize_page_path.slice(:controller,:action,:id),
+         :extra_attributes => (ajax_attrs.empty? ? {} : {"data-rapid" => {"a" => {"ajax_attrs" => ajax_attrs}}.to_json}),
+         :ignore_params => [:render, :render_options, :"_"]) %>
+</def>

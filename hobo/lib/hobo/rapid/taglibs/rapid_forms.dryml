@@ -40,218 +40,6 @@ executed at various points in the ajax request cycle:
 
 -->
 
-
-<#!-- creates hidden inputs for the specified fields.
-
-### Attributes
-
-- `fields`: the fields to create hidden inputs for.   If neither fields nor for-query-string is specified, all fields except for `type`, `created_at` and `updated_at` are used.
-
-- `for-query-string`:
-<def tag="hidden-fields" attrs="fields, skip, for-query-string"><%=
-  pairs = if for_query_string
-            if for_query_string.blank? || for_query_string==true
-              query_parameters_filtered
-            else
-              query_parameters_filtered(:only => comma_split(for_query_string))
-            end
-          else
-            hiddens = case fields
-                      when '*', nil
-                        this.class.column_names - ['type', 'created_at', 'updated_at']
-                      else
-                        comma_split(fields)
-                      end
-            hiddens.map do |field|
-              val = this.send(field)
-              param_name = param_name_for(form_field_path + [field])
-              [param_name, val] unless val.nil? ||
-                                       field.to_sym.in?(this.class.attr_protected) ||
-                                       (this.new_record? && val == this.class.column(field).default)
-            end.compact
-          end
-  skip = comma_split skip
-  pairs.reject! { |p| p.first.in?(skip) }
-  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.safe_join("\n".html_safe)
-%></def>
-
-
-<!--
-`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base
-`<form>` tag, a form with contents is generated for each Hobo model. These are found in
-`app/views/taglibs/auto/rapid/forms.dryml`.
-
-### Usage
-
-`<form>` can be used as a regular HTML tag:
-
-        <form action="/blog_posts/1" method="POST">...</form>
-
-If no `action` attribute is provided then the context is used to construct an appropriate action using restful routing:
-
-* If the context is a new record then the form action will be a `POST` to the create action:
-
-        <form with="&BlogPost.new">...</form> -> <form action="/blog_posts" method="POST">...</form>
-
-* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special
-  way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method`
-  with a value of `PUT`. Hobo adds this automatically:
-
-        <% blog_post = BlogPost.find(1) %>
-        <form with="&blog_post">...</form> ->
-        <form action="/blog_posts/1" method="POST">
-          <input id="_method" type="hidden" value="PUT" name="_method"/>
-          ...
-        </form>
-
-AJAX based submission can be enabled by simply adding an `update` attribute. e.g.
-
-        <div part="comments"><collection:comments/></div>
-        <form with="&Comment.new" update="comments"/>
-
-### Additional Notes
-
-- Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
-
-- Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a
-  validation error occurs.
-
-- `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
-
-- `<form>` resets `last_if` if it does not have permission to display the form.   The `<else>` clause may be used to display alternate content.   For example:
-
-    <form>...</form>
-    <else>You do not have permission to edit this form</else>
-
-or on a standard generated page using a default form:
-
-    <some-page>
-      <after-form:>
-        <else>You do not have permission to edit this form</else>
-      </after-form:>
-    </some-page>
-
-### Attributes
-
- - [all AJAX attributes](/api_taglibs/rapid_forms)
-
- - action: the controller action.  Default is create or update as appropriate
-
- - method: PUT or POST
-
- - web-method
-
- - lifecycle
-
- - owner
-
- - multipart: if set, the encoding is set to multipart/form-data.  The default is x-www-form-urlencoded
-
- - reset-form: Clear the form after submission (only makes sense for ajax forms)
-
- - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
-
-### Parameters
-
-The standard form tag does not have any parameters, nor does it have any default content.   However, Hobo does autogenerate polymorphic form tags for each of your models into `app/views/taglibs/auto/rapid/forms.dryml`.  These forms have the following parameters:
-
- - error-messages
-
- - field-list
-
- - actions
-
- - submit
-
- - cancel
-
--->
-<def tag="form" polymorphic attrs="update, hidden-fields, action, method, web-method, lifecycle, owner, multipart"><%=
-  ajax_attrs, html_attrs = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
-  html_attrs[:enctype] ||= "multipart/form-data" if multipart
-
-  new_record = this.try.new_record?
-
-  method = if method.nil?
-             (action || web_method || new_record) ? "post" : "put"
-           else
-             method.downcase
-           end
-
-  html_attrs[:action] = action || begin
-     target = if owner
-                collection_name = this.class.reverse_reflection(owner).name
-                this.send(owner).send(collection_name)
-              else
-                this
-              end
-     action = web_method || lifecycle
-     object_url(target, action, :method => method)
-   end
-
-  if action.nil? && (html_attrs[:action].nil? ||
-                     (lifecycle.nil? && new_record && !this.creatable_by?(current_user)) ||
-                     (lifecycle.nil? && !new_record && !can_edit?))
-    Dryml.last_if = false
-    ""
-  else
-    if method == "put"
-      # browsers don't support put -- use post and add the Rails _method hack
-      http_method_hidden = hidden_field_tag("_method", "PUT")
-      html_attrs[:method] = "post"
-    else
-      http_method_hidden = ""
-      html_attrs[:method] = method
-    end
-
-    if update || !ajax_attrs.empty?
-      # add an onsubmit to convert to an ajax form if `update` is given
-      function = ajax_updater(:post_form, update, ajax_attrs)
-      html_attrs[:onsubmit] = [html_attrs[:onsubmit], "#{function}; return false;"].compact.safe_join("; ".html_safe)
-    end
-
-    hiddens = ""
-    body = with_form_context do
-      # It is important to evaluate parameters.default first, in order to populate scope.form_field_names
-      b = parameters.default
-      hiddens = self.hidden_fields(:fields => hidden_fields) if new_record
-      b
-    end
-
-    auth_token = if method.nil? || method == 'get' || !protect_against_forgery?
-                   ''
-                 else
-                   element(:input, {:type => "hidden",
-                           :name => request_forgery_protection_token.to_s,
-                           :value => form_authenticity_token}, nil, true, true)
-                 end
-
-    unless method == "get"
-      page_path = if (request.post? || request.put?) && params[:page_path]
-                    params[:page_path]
-                  else
-                    request.fullpath
-                  end
-      page_path_hidden = hidden_field_tag("page_path", page_path)
-    end
-
-    hiddens_div = element(:div, {:class => "hidden-fields"}, [http_method_hidden, page_path_hidden, auth_token, hiddens].safe_join)
-
-    body = [hiddens_div, body].safe_join
-
-    if action.nil? # don't add automatic css classes if the action was specified
-      if web_method
-        add_classes!(html_attrs, "#{type_id.dasherize}-#{web_method}-form")
-      else
-        add_classes!(html_attrs, "#{'new ' if new_record}#{type_id.dasherize}")
-      end
-    end
-
-    Dryml.last_if = true
-    element("form", html_attrs, body)
-  end
-%></def>
-
 <!-- A shortcut for generating a submit button.
 
 ### Usage
@@ -513,7 +301,7 @@ Forms). If any ajax attributes are given, the button becomes an ajax button, if 
 
  -->
 <def tag="remote-method-button" attrs="method, update, label, confirm, url"><%=
-  ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+  ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
 
   url ||= object_url(this, method.to_s.gsub('-', '_'), :method => :post)
   raise ArgumentError, "no such web method '#{method}' on #{this.typed_id}" unless url
@@ -552,7 +340,7 @@ does ajax.
 <def tag="update-button" attrs="label, update, fields, params"><%=
    raise Hobo::Error.new("no update specified") unless update
 
-   ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+   ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
    params = (params || {}).merge(this.class.name.underscore => fields)
    ajax_attributes.reverse_merge!(:message => label, :params => params, :method => :put)
    func = ajax_updater(object_url(this), update, ajax_attributes)
@@ -560,71 +348,6 @@ does ajax.
 
    element :input, add_classes(html_attributes, "button update-button update-#{this.class.name.underscore}-button"), nil, true, true %>
 </def>
-
-
-<!-- Provides either an ajax or non-ajax delete button to send a RESTful "DELETE". The context should be a record for
-which you to want provide a delete button.
-
-The Rapid Library has a convention of marking (in the output HTML, using a special CSS class) elements as "object
-elements", with the class and ID of the ActiveRecord object that they represent. `<delete-button>` assumes it is placed
-inside such an element, and will automatically find the right element to remove (fade out) from the DOM. The
-`<collection>` tag adds this metadata (CSS class) automatically, so `<delete-button>` works well when used inside a
-`<collection>`. This is a Clever Trick which needs to be revisted and perhaps simplified.
-
-If used within a `<collection>`, `<delete-button>` also knows how to add an "empty message" such as "no comments to
-display" when you delete the last item. Clever Tricks abound.
-
-Current limitation: There is no support for the ajax callbacks at this time.
-
-All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
-
-
-
-### Attributes
-
- - label: The label for the button. Default: "Remove"
-
- - in-place: delete in place (ajax)? Default: true, or false if the record to be deleted is the same as the top level
-   context of the page
-
- - image: URL of an image for the button. Changes the rendered tag from `<input type='button'>` to `<input type='image'
-   src='...'>`
-
- - fade: Perform the fade effect (true/false)? Default: true
-
-  -->
-<def tag="delete-button" attrs="label, update, in-place, image, confirm, fade, subsite"><%=
-  in_place = false if in_place.nil? && this == @this && request.method.downcase == "get"
-  url = object_url(this, :method => :delete, :subsite => subsite)
-  if (Dryml.last_if = url && can_delete?)
-    attributes = attributes.merge(if image
-                                    { :type => "image", :src => "#{base_url}/images/#{image}" }
-                                  else
-                                    { :type => "button" }
-                                  end)
-    label ||= t("hobo.actions.remove", :default=>"Remove")
-    confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
-
-    add_classes!(attributes,
-                 image ? "image-button" : "button",
-                 "delete-button delete-#{this.class.name.underscore.dasherize}-button")
-    if url
-      if in_place == false
-        attributes[:confirm] = confirm if confirm
-        attributes[:method] = :delete
-        button_to(label, url, deunderscore_attributes(attributes))
-      else
-        fade = true if fade.nil?
-        attributes[:value] = label
-        attributes[:onclick] = "Hobo.removeButton(this, '#{url}', #{js_updates(update)}, {fade:#{fade}, confirm: '#{confirm}'})"
-        element(:input, deunderscore_attributes(attributes), nil, true, true)
-      end
-    end
-  else
-    ""
-  end
-%></def>
-
 
 <!-- Provides an ajax create button that will send a RESTful "POST" to the server to create a new resource.
 
@@ -656,7 +379,7 @@ All of the standard ajax attributes are supported (see the main taglib documenti
     params ||= params || {}
     params = params.merge(class_name => fields) unless fields.blank?
 
-    ajax_attributes, html_attributes = attributes.partition_hash(Hobo::Rapid::Helper::AJAX_ATTRS)
+    ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
 
     ajax_attributes.reverse_merge!(:message => message, :params => params)
     func = ajax_updater(object_url(new.class, :method => :post), update, ajax_attributes)

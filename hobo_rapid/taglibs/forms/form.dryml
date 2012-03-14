@@ -1,0 +1,102 @@
+<!--
+`<form>` has been extended in Rapid to make it easier to construct and use forms with Hobo models. In addition to the base
+`<form>` tag, a form with contents is generated for each Hobo model. These are found in
+`app/views/taglibs/auto/rapid/forms.dryml`.
+
+### Usage
+
+`<form>` can be used as a regular HTML tag:
+
+        <form action="/blog_posts/1" method="POST">...</form>
+
+If no `action` attribute is provided then the context is used to construct an appropriate action using restful routing:
+
+* If the context is a new record then the form action will be a `POST` to the create action:
+
+        <form with="&BlogPost.new">...</form> -> <form action="/blog_posts" method="POST">...</form>
+
+* If the context is a saved record then the form action will be a `PUT` to the update action. This is handled in a special
+  way by Rails due to current browsers not supporting `PUT`, the method is set to `POST` with a hidden input called `_method`
+  with a value of `PUT`. Hobo adds this automatically:
+
+        <% blog_post = BlogPost.find(1) %>
+        <form with="&blog_post">...</form> ->
+        <form action="/blog_posts/1" method="POST">
+          <input id="_method" type="hidden" value="PUT" name="_method"/>
+          ...
+        </form>
+
+AJAX based submission can be enabled by simply adding an `update` attribute. e.g.
+
+        <div part="comments"><collection:comments/></div>
+        <form with="&Comment.new" update="comments"/>
+
+More information on Ajax can be viewed in the [manual](/manual/ajax#forms) or in the [Rapid Forms index](/api_taglibs/rapid_forms).
+
+### Additional Notes
+
+- Hobo automatically inserts an `auth_token` hidden field if forgery protection is enabled
+
+- Hobo inserts a `page_path` hidden field in create / update forms which it uses to re-render the correct page if a
+  validation error occurs.
+
+- `<form>` supports all of the standrd ajax attributes - (see the main taglib docs for Rapid Forms)
+
+- `<form>` resets `last_if` if it does not have permission to display the form.   The `<else>` clause may be used to display alternate content.   For example:
+
+    <form>...</form>
+    <else>You do not have permission to edit this form</else>
+
+or on a standard generated page using a default form:
+
+    <some-page>
+      <after-form:>
+        <else>You do not have permission to edit this form</else>
+      </after-form:>
+    </some-page>
+
+### Attributes
+
+ - [all AJAX attributes](/api_taglibs/rapid_forms)
+
+ - action: the controller action.  Default is create or update as appropriate
+
+ - method: PUT or POST
+
+ - web-method
+
+ - lifecycle
+
+ - owner
+
+ - multipart: if set, the encoding is set to multipart/form-data.  The default is x-www-form-urlencoded
+
+ - reset-form: Clear the form after submission (only makes sense for ajax forms)
+
+ - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
+
+### Parameters
+
+The standard form tag does not have any parameters, nor does it have any default content.   However, Hobo does autogenerate polymorphic form tags for each of your models into `app/views/taglibs/auto/rapid/forms.dryml`.  These forms have the following parameters:
+
+ - error-messages
+
+ - field-list
+
+ - actions
+
+ - submit
+
+ - cancel
+
+-->
+<def tag="form" polymorphic >
+<%
+  debugger
+  body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
+  unless body.nil?
+    add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?
+%>
+    <%= element("form", html_attrs.merge(form_attrs), body) if body %>
+<% end %>
+</def>

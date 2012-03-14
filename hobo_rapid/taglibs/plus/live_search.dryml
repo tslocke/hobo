@@ -1,0 +1,40 @@
+<!-- Provides an ajax-powered *find-as-you-type* live search field which is hooked up to Hobo's site-side search feature.
+
+Customizing the display of results can be done through customizing the "box" param and the `search-results` tag.  The current definition of `<search-results>` expects results to be returned in `@search_results`.
+
+TODO: currently you have to press 'return' to initiate the search.  This should be easy to fix in hjq-live-search.js - the hard part will probably be in doing it in a way that works in all possible browsers.
+
+### attributes
+
+- action: the path to send the query.  Default is "/search" (actually, site_search_path)
+- query_param: the name of the param to use for the search.  Default is "query"
+
+All other attributes are merged into the form, so standard form attributes are supported.
+ -->
+<def tag="live-search" attrs="query-param, panel-tag">
+  <% attributes[:action] ||= site_search_path %>
+  <% attributes[:update] ||= "search-results-part" %>
+  <% attributes[:message] ||= t("hobo.live_search.spinner_message", :default => "Querying...") %>
+  <% query_param ||= "query" %>
+  <div class="search" data-rapid='{"live-search": {}}'>
+    <form merge-attrs param refocus-form>
+      <input type="hidden" value="2" name="search_version"/>
+      <label for="&query_param" param><t key="hobo.live_search.label">Search</t></label><input type="search" name="&query_param" class="live-search" param/>
+    </form>
+    <% panel_tag ||= 'dialog-box' %>
+    <% title = t("hobo.live_search.results_label", :default => "Search Results") %>
+    <call-tag tag="&panel_tag" position="&{:my => 'right top'}" width="&600" height="&800" id="search-results-box" with="&nil" title="&title" param="box">
+      <do part="search-results-part">
+        <search-results/>
+      </do>
+    </call-tag>
+  </div>
+</def>
+
+<!-- redefining or extending this tag will allow you to customize the display of search results -->
+<def tag="search-results">
+  <section with="&@search_results || []" data-rapid='{"search-results": {}}'>
+    <collection/>
+    <else><t key="hobo.live_search.no_results">Your search returned no matches.</t></else>
+  </section>
+</def>

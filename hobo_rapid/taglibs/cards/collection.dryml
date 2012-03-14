@@ -1,0 +1,26 @@
+<!-- Repeats the body of the tag inside a `<ul>` list with one item for each object in the collection (`this`). If no body is given, renders a `<card>` inside the `<li>`.
+
+Automatically adds 'even' and 'odd' CSS classes as well as the data-rapid-context attribute.
+
+`empty-collection-message` is called from this tag.   To suppress you can use the `without-empty-message` pseudo-attribute:
+
+    <collection without-empty-message/>
+
+If your collection is an ActiveRecord result set (and in Hobo it most likely is), the best way to customize the empty message is via translations.   Example: for product models, the key to customize would be `products.collection.empty_message`.
+
+If your collection is a generic array, empty-collection-message doesn't work.   `<collection>` also sets the last_if flag, so you can use the `<else>` tag to display a message:
+
+    <collection with="&[]"/>
+    <else>No items.</else>
+ -->
+<def tag="collection" attrs="list-tag">
+  <% list_tag ||= 'ul' %>
+  <call-tag tag="&list_tag" class="collection #{collection_name :dasherize => true}" merge-attrs unless="empty?">
+    <li param="item" class="#{scope.even_odd}" data-rapid-context="&typed_id" repeat="&select_viewable">
+      <do param="default"><card param/></do>
+    </li>
+  </call-tag>
+  <empty-collection-message param="empty-message"/>
+  <if/><%# set last-if so <else/> works %>
+</def>
+

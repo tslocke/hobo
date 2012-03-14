@@ -1,0 +1,54 @@
+<!--
+This is the [jQuery-UI autocompleter](http://jqueryui.com/demos/autocomplete/).  All options and events provided by the jQuery autocompleter are supported in this Hobo tag.   Refer to the jquery autocomplete documentation for more details.
+
+If you do not provide a `source` option, this tag will essentially provide a default similar to this:
+
+    <hjq-autocomplete:project source="&Project.find(:all, :limit => 5000).map {|p| p.name}" />
+
+This will provide a local autocomplete, putting all possible options into your HTML.  This is useful when you have too many options to make a `select-one` infeasible, but will overload your server and crash your browser if you have millions of options.
+
+To do server side autocomplete, you need a controller action like:
+
+    class FoosController < ActionController:Base
+      hobo_user_controller
+      autocomplete :bar
+    end
+
+    <hjq-autocomplete:foo source="&complete_bar_foos_path" />
+
+The argument to the controller's `autocomplete` is optional.  If not supplied the name attribute for the model should be used in the source attribute.
+
+If you do not wish to use the Hobo autocomplete or hobo_completions functions in your controller, it is very easy to roll your own.   For example:
+
+    <hjq-autocomplete:project source="&query_projects_path" delay="500" minLength="3" />
+
+Could be served by:
+
+    index_action :query do
+      render :json => Project.name_contains(params[:term]).limit(100).*.name
+    end
+
+-->
+<def tag="autocomplete" attrs="nil-value">
+<%
+  options, attrs = attributes.partition_hash(['disabled', 'appendTo', 'autoFocus', 'delay', 'minLength', 'position', 'source'])
+  events, html_attrs = attrs.partition_hash(['create', 'search', 'open', 'focus', 'select', 'close', 'change'])
+  options["source"] ||= begin
+                          complete_target = this_field_reflection.klass
+                          complete_target.find(:all, :limit => 5000).*.send(complete_target.name_attribute)
+                        end
+
+  html_attrs["name"] ||= param_name_for_this
+  html_attrs["value"] ||= name(:no_wrapper => true, :if_present => true)
+
+  if(html_attrs["value"].empty?)
+    add_classes!(html_attrs, "nil-value")
+    html_attrs["value"] = nil_value
+  end
+
+  add_data_rapid!(html_attrs, "autocomplete", :options => options, :events => events)
+ %>
+  <wrap tag="span" class="field-with-errors" when="&!this_parent.errors[this_field].empty?">
+    <input type="text" merge-attrs="&html_attrs"/>
+  </wrap>
+</def>

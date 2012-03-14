@@ -1,0 +1,174 @@
+<!--
+`<table>` is extended in Rapid to provide a shorthand way to output a set of fields for a given collection. This is enabled using the `field` attribute (without the `field` attribute this is just the regular HTML `<table>` tag)
+
+### Usage
+
+If the context is an array of blog posts...
+
+    <table fields="name, created_at, description"/>
+
+This will output a header row containing "Name", "Created At" and "Description" followed by a row for each record in the collection. By default, the `<view/>` tag is called for each field in the row. This can be altered with the `field-tag` attribute, e.g.
+
+    <table fields="name, created_at, description" field-tag="input"/>
+
+This will use `<input/>` as the tag in each table cell instead of `<view/>`
+
+### Additional Notes
+
+* `<table>` provides parameters based on the names of the fields which can be used to further customise the output. For each field a heading parameter is provided, e.g. name-heading, created-at-heading, description-heading. These can be used to customise the headings:
+
+        <table fields="name, created_at, description">
+          <created-at-heading:>Creation Date</created-at-heading:>
+        </table>
+* Similarly, "view" parameters are provided as an additional way to customise the table cells of the table body, e.g. `name-view`, `created-at-view`, `description-view`:
+
+        <table fields="name, created_at, description">
+          <created-at-view:><view format="%d %B %Y"/></created-at-view:>
+        </table>
+* By adding an empty `control` parameter, the default control column is enable adding an edit link and delete button for each table row:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+        </table>
+
+    The controls can be further customised using the "edit-link" and "delete-button" parameters:
+
+        <table fields="name, created_at, description">
+          <controls:/>
+          <delete-button: label="Nuke Me"/>
+        </table>
+
+    or by providing completely new content for the control column:
+
+        <table fields="name, created_at, description">
+          <controls:>my controls!</controls:>
+        </table>
+
+### Using table without ActiveRecord
+
+Typical usage for table is to supply the results of an ActiveRecord query as the context.   However, it is possible to supply a more generic array as the context instead.
+
+#### using the tr parameter
+
+If you use the tr parameter you can pass pretty much anything in the array, since you then are supplying the formatting for the row.  Giving:
+
+    <table with="&[1,2,3]">
+      <thead:><tr><th>Heading</th></tr></thead:>
+      <tr:><td><%= this+7 %></td></tr:>
+    </table>
+
+Produces:
+
+    <table>
+      <thead>
+        <tr><th>Heading</th></tr>
+      </thead>
+      <tbody>
+        <tr class='odd fixnum'><td>8</td></tr>
+        <tr class='even fixnum'><td>9</td></tr>
+        <tr class='odd fixnum'><td>10</td></tr>
+      </tbody>
+    </table>
+
+#### using OpenStruct
+
+If you supply an array of generic objects, you can supply method names to fields and `<table>` will produce a valid table.   The only major difference from passing ActiveRecord objects is that this mechanism will not translate table headings.
+
+If you've got a Hash, you can use OpenStruct to make the data available via methods.  Giving:
+
+    <% require 'ostruct' %>
+ {: .hidden}
+
+    <table fields="a,b" with="&[OpenStruct.new(:a => 1, :b => 2), OpenStruct.new(:a => 3, :b => 4)]">
+       <a-heading:>A</a-heading:>
+       <b-heading:>B</b-heading:>
+    </table>
+
+Produces:
+
+      <table>
+        <thead>
+          <tr class='field-heading-row'>
+            <th class='a-heading'>A</th>
+            <th class='b-heading'>B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class='odd open_struct'>
+            <td class='a-view'><span class='view '>1</span></td>
+            <td class='b-view'><span class='view '>2</span></td>
+          </tr>
+          <tr class='even open_struct'>
+            <td class='a-view'><span class='view '>3</span></td>
+            <td class='b-view'><span class='view '>4</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+#### without the magic
+
+If you don't use either the fields attribute or the tr parameter, all processing is turned off, and your table is emitted verbatim.  Giving:
+
+    <table>
+      <thead>
+        <tr><th>a</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>b</td></tr>
+      </tbody>
+    </table>
+
+Will emit the above table verbatim.
+
+Produces:
+ {: .hidden}
+
+    <table>
+      <thead>
+        <tr><th>a</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>b</td></tr>
+      </tbody>
+    </table>
+ {: .hidden}
+-->
+<def tag="table" attrs="fields, field-tag, empty">
+  <if test="&!(fields || all_parameters.tr?)">
+    <%= element("table", attributes, all_parameters.default) %>
+  </if>
+  <else>
+    <% field_tag ||= "view" %>
+    <unless test="&this.empty? && !empty">
+      <%= element "table", attributes - attrs_for(:with_fields) do %>
+      <thead if="&all_parameters[:thead] || fields" param>
+        <tr param="field-heading-row">
+          <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
+            <th param="#{scope.field_name}-heading"><%= this.member_class ? this.member_class.human_attribute_name(scope.field_name) : scope.field_name.to_s.titleize %></th>
+          </with-field-names>
+          <th if="&all_parameters[:controls]" class="controls"/>
+        </tr>
+      </thead>
+      <tbody param>
+        <repeat>
+          <tr param if="&can_view?"
+              class="#{scope.even_odd} #{this_type.name.underscore}" data-rapid-context="&typed_id">
+            <if test="&fields">
+              <with-fields merge-attrs="&all_attributes & attrs_for(:with_fields)" force-all>
+                <td param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-view"><call-tag tag="&field_tag"/></td>
+              </with-fields>
+              <td class="controls" param="controls" if="&all_parameters[:controls]">
+                <a param="edit-link" action="edit" if="&can_edit?">
+                  <t key="hobo.actions.edit_control">Edit</t>
+                </a>
+                <delete-button param/>
+              </td>
+            </if>
+          </tr>
+        </repeat>
+      </tbody>
+      <tfoot if="&all_parameters[:tfoot]" param/>
+      <% end %>
+    </unless>
+  </else>
+</def>

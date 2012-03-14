@@ -1,0 +1,46 @@
+<!--
+This is the [jQuery-UI datepicker](http://docs.jquery.com/UI/Datepicker).  All options and events are supported.
+
+It's probably easiest to add this to your application.dryml:
+
+    <def tag="input" for="Date">
+      <datepicker dateFormat="yy-mm-dd" merge />
+    </def>
+
+It's probably useful to set global options such as dateFormat in application.dryml and set local options such as yearRange in the tag invocation:
+
+    <input:birthdate yearRange="1900:#{Date.today.year}" />
+
+New in version 1.4:
+
+If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.formats.default") from strftime format into the format that the JQuery-UI datepicker likes.
+
+-->
+<def attrs="name" tag="datepicker">
+<%
+  options, attrs = attributes.partition_hash(['altField', 'altFormat', 'appendText', 'buttonImage', 'buttonImageOnly', 'buttonText', 'changeMonth', 'changeYear', 'closeText', 'constrainInput', 'currentText', 'dateFormat', 'dayNames', 'dayNamesMin', 'dayNamesShort', 'defaultDate', 'duration', 'firstDay', 'gotoCurrent', 'hideIfNoPrevNext', 'isRTL', 'maxDate', 'minDate', 'monthNames', 'monthNamesShort', 'navigationAsDateFormat', 'nextText', 'numberOfMonths', 'prevText', 'selectOtherMonths','shortYearCutoff', 'showAnim', 'showButtonPanel', 'showCurrentAtPos', 'showMonthAfterYear', 'showOn', 'showOptions', 'showOtherMonths', 'stepMonths', 'yearRange'])
+  options["dateFormat"]||=begin
+                            d=I18n.t(:"date.formats.default")
+                            {"%Y" => "yy",
+                             "%y" => "y",
+                             "%m" => "mm",
+                             "%_m" => "m",
+                             "%-m" => "m",
+                             "%B" => "MM",
+                             "%^B" => "MM",
+                             "%b" => "M",
+                             "%^b" => "M",
+                             "%h" => "M",
+                             "%d" => "dd",
+                             "%-d" => "d",
+                             "%j" => "oo",
+                             "%D" => "mm/dd/y",
+                             "%F" => "yy-mm-dd",
+                             "%x" => "mm/dd/y"}.each {|rb, js| d.gsub!(rb,js)}
+                           d
+                         end
+  events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
+  add_data_rapid!(html_attrs, "datepicker", :options => options, :events => events)
+%>
+ <%= text_field_tag(name, this, deunderscore_attributes(html_attrs)) %>
+</def>

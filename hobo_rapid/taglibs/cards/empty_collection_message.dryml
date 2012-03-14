@@ -1,0 +1,13 @@
+<!-- Renders a message such as "No products to display". If the collection (`this`) is empty, `style="display:none"` is added. This means the message is still present and can be revealed with JavaScript if all items in the collection are removed via ajax remove buttons.
+
+The message can be customized via the `empty-collection-message` parameter or by changing the `products.collection.empty_message` translation.
+  -->
+<def tag="empty-collection-message">
+  <unless test="&this._?.member_class.nil?">
+    <div class="empty-collection-message" style="#{'display:none' if !this.empty?}" param="default">
+      <ht key="#{this.member_class.name.underscore}.collection.empty_message">
+        No <collection-name/> to display
+      </ht>
+    </div>
+  </unless>
+</def>

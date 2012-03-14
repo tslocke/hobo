@@ -1,0 +1,50 @@
+<!--
+This tag wraps an input with some ajax that refreshes a part when the input is changed.
+
+An example of when this is useful is when a form is rendered differently depending on what country is selected.   In this example, we'll change the label of the region to state or province or whatever is appropriate for the country.
+
+     <field-list: replace>
+       <do part="shipping">
+         <field-list fields="address,city,region,country,postal_code">
+           <country-view:><hot-input ajax /><country-view:>
+           <region-label:><%= this_parent.country._?.region_label %><region-label:>
+         <field-list>
+       </do>
+     <field-list:>
+
+The actual input is exposed as the default parameter, so it can be customized:
+
+     <hot-input ajax selector="select">
+       <combobox>
+         <select-one limit="5000"/>
+       </combobox>
+     </hot-input>
+
+Note also the selector option, which is useful for complex, combined inputs like a combobox.   A single change in a complex input may actually result in change events being fired on multiple fundamental HTML elements, so we use the selector to only watch a single input.
+
+The hot-input must be inside a form, and the form's context must be the same as the page's context.   You can work around this limitation by using custom controller code.
+
+### Attributes
+
+This tag supports the [standard form AJAX attributes](/api_taglibs/rapid_forms), such as update, message, spinner-next-to, etc.
+
+In particular, the part to update *must* be specified using either the `ajax`, `update` or `updates` attribute.
+
+* path: the path to send the AJAX request to.   If not specified, the current page path is used.
+* method: the HTTP method for the request.   Defaults to 'GET'.
+* events: the javascript event(s) to trigger on.  Default is 'change'.
+* selector: filter for the events.  Default is null.
+
+Note that `event` and `selector` are passed straight to `$.on()`  See [its documentation](http://api.jquery.com/on/) for more details.
+
+-->
+<def tag="hot-input" attrs="path, method, events, selector" >
+<%
+  attributes['message'] ||= 'Loading...'
+  ajax_attrs, html_attrs = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+  add_data_rapid!(html_attrs, "hot-input", :ajax_attrs => ajax_attrs, :path => path || request.path, :method => method || 'GET', :events => events || 'change', :selector => selector)
+%>
+  <span class="hot-input" param="default" merge-attrs="&html_attrs">
+    <input merge param />
+  </span>
+</def>

@@ -1,0 +1,48 @@
+<!--
+`<formlet>` works like an AJAX `<form>` without actually being an AJAX `<form>`.  This is useful in scenarios where forms aren't allowed or are problematic, like inside of another form.
+
+### Attributes
+
+ - standard Hobo HTML attributes (id, part, et cetera).  All supported.
+
+ - standard Hobo AJAX attributes:  (see [the cookbook](http://cookbook.hobocentral.net/api_taglibs/rapid_forms) )
+
+   - `update`: (optional).  The DOM ID's of parts to update.  Note that you get an AJAX formlet whether this is provided or not.
+
+   - `message`: the spinner message
+
+   - `spinner-next-to`: DOM id of an element to position the ajax progress spinner next to.
+
+   - `before`, `success`, `error`, `complete`: These callbacks are slightly different from the standard form callbacks.  They are called with "this" set to the formlet.  Also, you may pass in a function name rather than a javascript fragment.  If the before callback returns false, it will cancel the submission.
+
+   - `confirm`: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
+
+   - not supported: `type, script, params, reset-form, refocus-form, result-update`.  None of these are particularly hard to support.  Email or post a message to the list if you need them.
+
+ - standard Hobo Form attributes (all supported):
+
+   - `hidden-fields`
+
+   - `action`
+
+   - `method`
+
+   - `web-method`
+
+   - `lifecycle`
+
+   - `owner`
+-->
+<def tag="formlet" polymorphic attrs="element">
+<%
+  body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
+  element ||= 'div'
+  unless body.nil?
+    add_classes!(html_attrs, "formlet")
+    add_data_rapid!(html_attrs, :formlet, :form_attrs => form_attrs, :ajax_attrs => ajax_attrs)
+%>
+    <%= element(element, html_attrs, body) %>
+<%
+  end
+%>
+</def>

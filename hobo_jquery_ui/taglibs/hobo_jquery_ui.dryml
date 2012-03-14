@@ -1,0 +1,7 @@
+<!--
+
+This plugin provides the jQuery UI widgets in a Hobo friendly manner.
+
+-->
+
+<include src="*"/>

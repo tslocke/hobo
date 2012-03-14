@@ -1,0 +1,7 @@
+
+// stolen from clean.css
+.combobox .ui-button { margin-left: -1px; }
+.combobox .ui-button-icon-only .ui-button-text { padding: 0; }
+.combobox button.ui-button-icon-only { width: 20px; }
+.combobox .ui-autocomplete-input { margin-right: 0; }
+.combobox {white-space: nowrap;}
