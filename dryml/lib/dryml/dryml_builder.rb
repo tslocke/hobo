@@ -151,10 +151,11 @@ module Dryml
         import_module(options[:module].constantize, options[:as])
       else
         template_dir = File.dirname(template_path)
-        options = options.merge(:template_dir => template_dir)
+        options = options.merge(:template_dir => template_dir, :source_template => template_path)
 
-        taglib = Taglib.get(options)
-        taglib.import_into(@environment, options[:as])
+        Taglib.get(options).each do |taglib|
+          taglib.import_into(@environment, options[:as])
+        end
       end
     end
 

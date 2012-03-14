@@ -7,15 +7,16 @@
       class << self
 
         def get(options)
-          src_file = taglib_filename(options)
-          taglib = @cache[src_file]
-          if taglib
-            taglib.reload
-          else
-            taglib = Taglib.new(src_file)
-            @cache[src_file] = taglib
+          taglib_filenames(options).map do |src_file|
+            taglib = @cache[src_file]
+            if taglib
+              taglib.reload
+            else
+              taglib = Taglib.new(src_file)
+              @cache[src_file] = taglib
+            end
+            taglib
           end
-          taglib
         end
 
         def clear_cache
@@ -32,33 +33,24 @@
         # If the plugin defines different taglibs you must also specify the src attribute of the taglib that you want
         # to include: <include gem='gem_name' src='taglib_name'/>'
 
-        def taglib_filename(options)
+        def taglib_filenames(options)
           plugin       = options[:plugin]
           gem          = options[:gem]
           app_root     = Object.const_defined?(:Rails) ? Rails.root : Pathname.new(File.expand_path('.'))
-          taglibs_path = case
-                         when plugin == 'dryml'
-                           Dryml.root.join 'taglibs'
-                         when plugin == 'hobo', gem == 'hobo'
-                           Hobo.root.join 'lib/hobo/rapid/taglibs'
-                         when !plugin.blank?
-                           app_root.join 'vendor/plugins', plugin, 'taglibs'
-                         when !gem.blank?
-                           gem.tr('-','_').camelize.constantize.root.join 'taglibs'
-                         when options[:src] =~ /\//
-                           app_root.join 'app/views'
-                         when options[:template_dir] =~ /^#{Hobo.root}/
-                           Pathname.new(options[:template_dir])
-                         when options[:absolute_template_path]
-                           Pathname.new(options[:absolute_template_path])
-                         else
-                           fail if app_root.nil?
-                           app_root.join options[:template_dir].gsub(/^\//, '') # remove leading / if there is one
-                         end
+          search_path  = []
+          search_path << Dryml.root.join('taglibs') if plugin == 'dryml'
+          search_path << Hobo.root.join('lib/hobo/rapid/taglibs') if plugin == 'hobo' || gem == 'hobo'
+          search_path << app_root.join('vendor/plugins', plugin, 'taglibs') if !plugin.blank?
+          search_path << gem.tr('-','_').camelize.constantize.root.join('taglibs') if !gem.blank?
+          search_path << app_root.join('app/views') if options[:src] =~ /\//
+          search_path << Pathname.new(options[:absolute_template_path]) if options[:absolute_template_path]
+          search_path << Pathname.new(options[:template_dir]) if options[:template_dir] =~ /^\//
+          search_path << app_root.join(options[:template_dir].gsub(/^\//, ''))
           src          = options[:src] || gem || plugin
-          taglib_file  = taglibs_path.join "#{src}.dryml"
-          raise DrymlException, "No such taglib: #{src} #{options.inspect} #{taglib_file}" unless taglib_file.exist?
-          taglib_file.to_s
+          results = nil
+          search_path.any? {|path| !(results = Dir[path.join "#{src}.dryml"]).empty?}
+          raise DrymlException, "No such taglib: #{src} #{options.inspect}" if results.empty?
+          results - [options[:source_template]]
         end
 
       end
