@@ -189,7 +189,7 @@ template '#{source_path}/taglib.dryml',    "taglibs/#{plugin_name}.dryml"
 template '#{source_path}/javascript.js',   "vendor/assets/javascripts/#{plugin_name}.js"
 template '#{source_path}/stylesheet.css',  "vendor/assets/stylesheets/#{plugin_name}.css"
 template '#{source_path}/gitkeep',         "vendor/assets/images/.gitkeep"
-template '#{source_path}/helper.rb',       "app/helpers/#{plugin_name}_helper.rb"
+template '#{source_path}/helper.rb.erb',   "app/helpers/#{plugin_name}_helper.rb"
 template '#{source_path}/README',          "README.markdown"
 inject_into_file 'lib/#{plugin_name}/version.rb', :before => /end(?!.*end).*?$/m do """
   EDIT_LINK_BASE = 'https://github.com/my_github_username/#{plugin_name}/edit/master'
