@@ -92,7 +92,6 @@ The standard form tag does not have any parameters, nor does it have any default
 -->
 <def tag="form" polymorphic >
 <%
-  debugger
   body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
   unless body.nil?
     add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?

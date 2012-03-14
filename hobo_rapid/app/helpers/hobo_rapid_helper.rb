@@ -107,7 +107,6 @@ module HoboRapidHelper
       form_attrs[:enctype] = html_attrs[:enctype] if html_attrs[:enctype]
       form_attrs[:enctype] ||= "multipart/form-data" if attrs[:multipart]
 
-      debugger
       new_record = self.this.try.new_record?
 
       method = if attrs[:method].nil?
