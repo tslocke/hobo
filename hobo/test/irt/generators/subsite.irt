@@ -18,18 +18,6 @@ eval_file '../partials/_subsite_taglib_noopt.rb'
 git_reset_app
 
 invoke 'hobo:assets', %w[ -q ]
-invoke 'hobo:subsite', %w[ subs -q --make-front-site]
-desc "Subsite with make-front-site files exist"
-files_exist? %w[ app/views/taglibs/front_site.dryml
-                 app/views/taglibs/application.dryml
-                 app/controllers/subs/subs_site_controller.rb
-                 app/views/taglibs/subs_site.dryml ]
-test_value_eql? true
-
-
-git_reset_app
-
-invoke 'hobo:assets', %w[ -q ]
 invoke 'hobo:admin_subsite', %w[ subs -q --make-front-site=false]
 eval_file '../partials/_subsite_taglib_admin.rb'
 
