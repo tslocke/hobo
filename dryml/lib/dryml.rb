@@ -35,7 +35,6 @@ module Dryml
   ID_SEPARATOR = '; dryml-tag: '
   APPLICATION_TAGLIB = { :src => "taglibs/application" }
   CORE_TAGLIB        = { :src => "core", :plugin => "dryml" }
-  DEFAULT_IMPORTS = defined?(ApplicationHelper) ? [ApplicationHelper] : []
   @cache = {}
   extend self
   attr_accessor :last_if
@@ -78,11 +77,18 @@ module Dryml
     end
   end
 
-  def page_renderer(view, identifier, local_names=[], controller_path=nil)
+  def imports_for_view(view)
+    imports = []
+    imports << Sprockets::Helpers::RailsHelper if defined?(Sprockets) && defined?(Rails)
+    imports << ActionView::Helpers if defined?(ActionView)
+    imports + view.controller.class.modules_for_helpers(view.controller.class.all_helpers_from_path(view.controller.class.helpers_path))
+  end
+
+  def page_renderer(view, identifier, local_names=[], controller_path=nil, imports=nil)
     controller_path ||= view.controller.controller_path
     if identifier =~ /#{ID_SEPARATOR}/
       identifier = identifier.split(ID_SEPARATOR).first
-      @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_path))
+      @cache[identifier] ||=  make_renderer_class("", "", local_names, taglibs_for(controller_path), imports_for_view(view))
       @cache[identifier].new(view)
     else
       mtime = File.mtime(identifier)
@@ -92,7 +98,8 @@ module Dryml
           (local_names - renderer_class.compiled_local_names).any? || # any new local names?
           renderer_class.load_time < mtime)                           # cache out of date?
         renderer_class = make_renderer_class(File.read(identifier), identifier,
-                                             local_names, taglibs_for(controller_path))
+                                             local_names, taglibs_for(controller_path),
+                                             imports_for_view(view))
         renderer_class.load_time = mtime
         @cache[identifier] = renderer_class
       end
@@ -169,13 +176,15 @@ module Dryml
   #                    "core", :plugin => "dryml" } is automatically
   #                    added to this list.
   # @param [ActionView::Base] view an ActionView instance
-  def render(template_src, locals={}, template_path=nil, included_taglibs=[], view=nil)
+  # @param [Array] A list of helper modules to import.  For example,
+  #                     [ActionView::Base]
+  def render(template_src, locals={}, template_path=nil, included_taglibs=[], view=nil, imports=nil)
     template_path ||= template_src
     view ||= ActionView::Base.new(ActionController::Base.view_paths, {})
     this = locals.delete(:this) || nil
 
     renderer_class = Dryml::Template.build_cache[template_path]._?.environment ||
-      make_renderer_class(template_src, template_path, locals.keys, included_taglibs)
+      make_renderer_class(template_src, template_path, locals.keys, included_taglibs, imports)
     renderer_class.new(view).render_page(this, locals)
   end
 
@@ -217,15 +226,16 @@ private
   #                    "core", :plugin => "dryml" } is automatically
   #                    added to this list.
   #
-  def make_renderer_class(template_src, template_path, locals=[], taglibs=[])
+  def make_renderer_class(template_src, template_path, locals=[], taglibs=[], imports=nil)
     renderer_class = Class.new(TemplateEnvironment)
-    compile_renderer_class(renderer_class, template_src, template_path, locals, taglibs)
+    compile_renderer_class(renderer_class, template_src, template_path, locals, taglibs, imports)
     renderer_class
   end
 
-  def compile_renderer_class(renderer_class, template_src, template_path, locals, taglibs=[])
+  def compile_renderer_class(renderer_class, template_src, template_path, locals, taglibs=[], imports=nil)
     template = Dryml::Template.new(template_src, renderer_class, template_path)
-    DEFAULT_IMPORTS.each {|m| template.import_module(m)}
+
+    imports.each {|m| template.import_module(m)} if imports
 
     # the sum of all the names we've seen so far - eventually we'll be ready for all of 'em
     all_local_names = renderer_class.compiled_local_names | locals

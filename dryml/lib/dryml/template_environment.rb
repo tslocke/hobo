@@ -23,8 +23,6 @@ module Dryml
 
     end
 
-    include Sprockets::Helpers::RailsHelper if defined?(Sprockets)
-    include ActionView::Helpers if defined?(ActionView)
     include Helper  ## FIXME remove
 
     def initialize(view=nil)
