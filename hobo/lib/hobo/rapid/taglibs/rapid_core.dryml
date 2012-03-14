@@ -37,7 +37,7 @@
     <% field_name = this_field_name
        input_attrs = {:no_edit => no_edit} if tag == "input"
     -%>
-      <labelled-item unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
+      <labelled-item param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-row" unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
         <item-label param="#{scope.field_name.to_s.sub('?', '').gsub('.', '-')}-label" unless="&field_name.blank?">
           <do param="label"><%= field_name %></do>
         </item-label>
