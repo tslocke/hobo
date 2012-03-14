@@ -59,7 +59,7 @@ module Hobo
     def hobo_ajax_response(options={})
       r = params[:render]
       if r
-        ajax_update_response(r.values, options[:results] || {}, options | params[:render_options])
+        ajax_update_response(r.values, options[:results] || {}, options || params[:render_options])
         true
       else
         false
@@ -74,6 +74,7 @@ module Hobo
                                                  false,
                                                  view_context.lookup_context.instance_variable_get('@details')).identifier
       renderer = Dryml.page_renderer(view_context, identifier, [], controller)
+      options = options.with_indifferent_access
 
       headers["Content-Type"] = options['content_type'] if options['content_type']
 

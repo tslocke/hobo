@@ -632,7 +632,7 @@ module Hobo
                               valid = valid?  # valid? can be expensive
                               if params[:render]
                                 if (params[:render_options] && params[:render_options][:errors_ok]) || valid
-                                  hobo_ajax_response(this)
+                                  hobo_ajax_response
 
                                   # Maybe no ajax requests were made
                                   render :nothing => true unless performed?
