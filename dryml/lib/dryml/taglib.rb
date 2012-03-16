@@ -50,7 +50,8 @@
           results = nil
           search_path.any? {|path| !(results = Dir[path.join "#{src}.dryml"]).empty?}
           raise DrymlException, "No such taglib: #{src} #{options.inspect}" if results.empty?
-          results - [options[:source_template]]
+          results - [File.expand_path(options[:source_template])]
+
         end
 
       end
