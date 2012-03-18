@@ -46,7 +46,7 @@ module Generators
 
         subsites.each do |subsite|
           inject_js_require(name, subsite, options[:comments]) unless options[:skip_js]
-          inject_css_require(name, subsite, options[:comments]) unless options[:skip_css]
+          inject_css_require(name, subsite, options[:comments], options[:css_top]) unless options[:skip_css]
           inject_dryml_include(name, subsite, options[:comments])
         end
 
@@ -71,13 +71,17 @@ module Generators
         end
       end
 
-      def inject_css_require(name, subsite, comments)
+      def inject_css_require(name, subsite, comments, css_top)
         application_file = "app/assets/stylesheets/#{subsite}.css"
-        pattern          = /\*=(?!.*\*=).*?$/m
+        if css_top
+          opts = {:after => /^\/\*.*?\*=.*?\n /m}
+        else
+          opts = {:before => /\*=(?!.*\*=).*?$/m}
+        end
 
         raise Thor::Error, "Couldn't find #{subsite}.css!" unless exists?(application_file)
 
-        inject_into_file application_file, :before=>pattern do
+        inject_into_file application_file, opts do
           line = "*= require #{name}\n "
           line = "*\n * #{comments}\n #{line}" if comments
           line
