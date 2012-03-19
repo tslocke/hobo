@@ -96,13 +96,13 @@ gem 'hobo_fields', :path => '#{dev_root}/hobo_fields'
 )
               if is_hobo
                 file.puts %(
-gem 'dryml', :path => '#{dev_root}/dryml'
-gem 'hobo', :path => '#{dev_root}/hobo'
-gem 'hobo_rapid', :path => '#{dev_root}/hobo_rapid'
-gem 'hobo_clean', :path => '#{dev_root}/hobo_clean'
-gem 'hobo_clean_admin', :path => '#{dev_root}/hobo_clean_admin'
-gem 'hobo_jquery', :path => '#{dev_root}/hobo_jquery'
-gem 'hobo_jquery_ui', :path => '#{dev_root}/hobo_jquery'
+gem 'dryml', :path => '#{dev_root}'
+gem 'hobo', :path => '#{dev_root}'
+gem 'hobo_rapid', :path => '#{dev_root}'
+gem 'hobo_clean', :path => '#{dev_root}'
+gem 'hobo_clean_admin', :path => '#{dev_root}'
+gem 'hobo_jquery', :path => '#{dev_root}'
+gem 'hobo_jquery_ui', :path => '#{dev_root}'
 )
               end
             else
