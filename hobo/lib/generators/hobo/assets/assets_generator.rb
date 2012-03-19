@@ -24,6 +24,8 @@ module Hobo
       copy_file 'gitkeep',                               'app/assets/javascripts/application/.gitkeep'
       copy_file 'front.js',                              'app/assets/javascripts/front.js'
       copy_file 'gitkeep',                               'app/assets/javascripts/front/.gitkeep'
+
+      application "config.assets.precompile += %w(front.css front.js)"
     end
 
   end
