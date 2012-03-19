@@ -1,6 +1,5 @@
 # TODO
 
- * front.css: require application should come after plugins
  * fixup deprecation warnings
  * create_response: mirror update_response
  * sortable-input-many
@@ -12,17 +11,26 @@
  * clean_sidemenu -> plugin
  * port to 3.2
  * nuke any remaining prototype code
- * railtie hook for .try. in collections
  * add a sane default for non-AJAX JSON requests.
- * admin_subsite generator doesn't pull in everything the wizard does
- * double check attr_accessible vulnerability that took out github
- * parametrize the clean theme
  * nested-cache: csrf workaround
  * deal with my patches to will_paginate
  * document themes/plugins.  Probably easier to create generator & document that
  * trawl the lighthouse && pull requests
+ * checkout out Bob's problem with after-submit
+ * steal the tags from Portal
+ * add theme chooser to setup wizard
+ * add FAQ to docs
 
 It's quite likely that some of the new tag definitions are missing
 id, class, merge or param attributes.  This doesn't impact core
 functionality, but it does limit your ability to extend the tags.  If
 you notice any such omissions, please let us know, it is easy to fix..
+
+before pre1:
+
+ * front.* etc need to be added to precompile lists or something
+
+would be nice:
+
+ * parametrize the clean theme
+ * create a bootstrap theme
