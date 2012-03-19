@@ -19,27 +19,26 @@ module HoboSupport
       this.send(*args, &block)
     end
   end
-end
 
-# CollectionProxy undef's most of it's methods, so put them back.
-
-# FIXME: We don't want to create the ActiveRecord namespace if it
-# isn't included.  We also need to make sure that this snippet is
-# loaded after ActiveRecord::Associations::CollectionProxy.  There's
-# probably a way to satisfy both requirements, but I haven't found it
-# yet.
-if defined? ActiveRecord::Associations::CollectionProxy
-  class ActiveRecord::Associations::CollectionProxy
-    def _?()
-      self
-    end
-
-    def try(*args, &block)
-      HoboSupport.hobo_try(self, *args, &block)
+  if defined? Rails
+    class Railtie < Rails::Railtie
+      initializer 'hobo_support.insert_into_active_record' do
+        ActiveSupport.on_load(:active_record) do
+          # CollectionProxy undef's most of it's methods, so put these
+          # two back
+          ActiveRecord::Associations::CollectionProxy.class_eval do
+            def _?()
+              self
+            end
+            def try(*args, &block)
+              HoboSupport.hobo_try(self, *args, &block)
+            end
+          end
+        end
+      end
     end
   end
 end
-
 
 class Object
 
