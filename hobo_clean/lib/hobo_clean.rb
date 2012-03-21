@@ -4,6 +4,8 @@ module HoboClean
   @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
+  EDIT_LINK_BASE = "https://github.com/tablatom/hobo_tree_table/edit/master/hobo_clean"
+
   require 'hobo_clean/railtie' if defined?(Rails)
 
   class Engine < ::Rails::Engine

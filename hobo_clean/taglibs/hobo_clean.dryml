@@ -1,6 +1,19 @@
+<!-- the default hobo theme -->
+
+<include src="nav"/>
+
 <!-- Renders an ajax-progress 'spinner' with a `class='hidden'` -->
 <def tag="spinner">
   <img src="spinner.gif" class="hidden" merge-attrs/>
+</def>
+
+<!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`.  -->
+<def tag="ajax-progress">
+  <div id="ajax-progress" class="ajax-progress" merge-attrs>
+    <div>
+      <span id="ajax-progress-text"></span>
+    </div>
+  </div>
 </def>
 
 <!-- The basic page structure for all the pages in a Hobo Rapid application. Providing the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
@@ -9,7 +22,7 @@ The easiest way to see what this tag does is to look at the source.
 
 ### Attributes
 
- - `title` - the page title, will have ": `<app-name>`" appended
+ - `title` - the page title, will have ": `[app-name]`" appended
  - `full-title` - the full page title. Set this if you do not want the app name suffix.
 
 -->
@@ -44,4 +57,11 @@ The easiest way to see what this tag does is to look at the source.
       </set-scoped>
     </body>
   </html>
+</def>
+
+<!-- Some of the user pages use a simplified layout that does not feature things like the main nav and live-search. This tag defines that page -->
+<def tag="simple-page">
+  <page without-live-search without-main-nav merge>
+    <account-nav: replace />
+  </page>
 </def>
