@@ -6,15 +6,15 @@ The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) ha
 The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
 
     <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
-    <dialog buttons="&buttons">My dialog text</dialog>
+    <dialog-box buttons="&buttons">My dialog text</dialog>
 
 or
 
-    <dialog id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog>
+    <dialog-box id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog>
 
 or
 
-    <dialog id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
+    <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
 
 Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
 
@@ -22,7 +22,7 @@ If you do not set [position](http://jqueryui.com/demos/dialog/#option-position) 
 
 JQuery UI is sometimes picky about types.   For instance, the width option must be a number, not a string.  By default Hobo options are strings, but you can easily send a number by using the ampersand to switch to ruby mode:
 
-    <dialog width="&640"/>
+    <dialog-box width="&640"/>
 
 The following functions are predefined for use in dialog buttons:  FIXME
 
@@ -46,7 +46,7 @@ When pressed, will open a `<dialog-box>`.
 
 ### Attributes
  * `dialog` (required):a CSS selector (AKA jQuery selector) to locate the dialog in the DOM.  Remember, if you're passing an ID, place a '#' in front of the ID.
- * supports all `<button>` attributes
+ * supports all button attributes
 
 ### Example
     <dialog id="hello-dialog">Hello!</dialog>

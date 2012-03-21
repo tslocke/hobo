@@ -3,7 +3,7 @@ This is the [jQuery-UI autocompleter](http://jqueryui.com/demos/autocomplete/). 
 
 If you do not provide a `source` option, this tag will essentially provide a default similar to this:
 
-    <hjq-autocomplete:project source="&Project.find(:all, :limit => 5000).map {|p| p.name}" />
+    <autocomplete:project source="&Project.find(:all, :limit => 5000).map {|p| p.name}" />
 
 This will provide a local autocomplete, putting all possible options into your HTML.  This is useful when you have too many options to make a `select-one` infeasible, but will overload your server and crash your browser if you have millions of options.
 
@@ -14,13 +14,13 @@ To do server side autocomplete, you need a controller action like:
       autocomplete :bar
     end
 
-    <hjq-autocomplete:foo source="&complete_bar_foos_path" />
+    <autocomplete:foo source="&complete_bar_foos_path" />
 
 The argument to the controller's `autocomplete` is optional.  If not supplied the name attribute for the model should be used in the source attribute.
 
 If you do not wish to use the Hobo autocomplete or hobo_completions functions in your controller, it is very easy to roll your own.   For example:
 
-    <hjq-autocomplete:project source="&query_projects_path" delay="500" minLength="3" />
+    <autocomplete:project source="&query_projects_path" delay="500" minLength="3" />
 
 Could be served by:
 
