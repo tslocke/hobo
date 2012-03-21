@@ -1,0 +1,22 @@
+<!-- Displays a link to a lifecycle transition page if the transition is valid.  If the transition is valid, this is equivalent to:
+
+    <a action="&transition" ...
+
+If the transition is invalid, you may use the `<else>` tag to display an appropriate message:
+
+    <transition-link transition="mogrify">Mogrify</transition-link>
+    <else>Cannot mogrify</else>
+
+### Attributes
+
+All attributes and parameters for the `<a>` tag are also valid.
+
+ - `transition` - the name of the transition to invoke. Required
+  -->
+<def tag="transition-link" attrs="transition"><%
+    trans = this.lifecycle.find_transition(transition, current_user) %>
+    <if test="&trans">
+      <a action="&transition" merge/>
+    </if>
+</def>
+

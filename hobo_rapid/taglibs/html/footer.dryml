@@ -1,0 +1,5 @@
+<!-- A proposed HTML 5 semantic tag. Outputs `<div class="footer">` and works in the same way as `<section>` with empty content. -->
+<def tag="footer" attrs="empty">
+  <set body="&parameters.default"/>
+  <div class="footer" merge-attrs if="&!body.blank? || empty"><%= body %></div>
+</def>

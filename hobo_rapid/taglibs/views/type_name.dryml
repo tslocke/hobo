@@ -1,0 +1,24 @@
+<!-- Renders a human readable version of the type of the context
+
+### Details
+
+ - If `this` is already a class, the name of that class is used
+ - Otherwise, first `this.member_class` (for collections), then `this.class` are tried
+ - By default the name is titleised and singular.
+
+### Attributes
+
+ - plural: pluralise the name
+ - lowercase: render the name in all lower case
+ - dasherize: render the name in lower case with dashes instead of spaces.
+
+-->
+<def tag="type-name" attrs="plural, lowercase, dasherize"><%=
+  type ||= (this if this.is_a?(Class)) || this.try.member_class || this.class
+
+  name = type.respond_to?(:model_name) ? type.model_name.human : type.name
+  name = dasherize ? name.underscore.dasherize : name.titleize
+  name = name.pluralize if plural
+  name = name.downcase if lowercase
+  name
+%></def>

@@ -1,0 +1,131 @@
+<!-- Creates a sub-section of the form which the user can repeat using (+) and (-) buttons, in order to allow an entire `has_many` collection to be created/edited in a single form.
+
+This tag is very different from tags like `<select-many>` and `<check-many>` in that:
+
+ - Those tags are used to *choose existing records* to include in the association, while `<input-many>` is used to actually create or edit the records in the association.
+
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <input-many:products fields="name, price"/>
+
+which is the same as
+
+    <input-many:products><field-list fields="name, price"/></input-many>
+
+The body of the tag will be repeated for each of the current records in the collection, or will just appear once (with blank fields) if the colleciton is empty.
+
+### Attributes
+
+ - fields:  If you do not specify any content for the input-many, a `<field-list>` is rendered.   This attribute is passed through to the `<field-list>`
+
+ - skip:  Passed through to the `<field-list>`.  If not specified, it defaults to the parent association.
+
+ - `minimum`: the minimum number of items in the collection.  Currently only '0' and '1' are supported values.  The default is '0'.
+
+ - `template`: the default values for new items.  Normally this functionality is better provided by Model.new, but it's here if you need it.
+
+ - `add-hook`, `remove-hook`: javascript hooks which work similarly to the events described below.
+
+### Events
+
+ - `rapid:add`: fired after the element is inserted
+
+ - `rapid:remove`: fired before the element is inserted.  Returning false will cancel the removal.
+
+ - `rapid:change`: fired after an element has been removed or inserted.
+
+ - `hide`, `show`: passed to jquery-ui's hide and show functions.
+
+Example javascript:
+
+      var last_added;
+      var last_removed;
+      $(document).ready(function() {
+        $('.stories').on('rapid:add', function(ev) {
+          last_added = this;
+        });
+        $('.stories').on('rapid:remove', function(ev) {
+          last_removed = this;
+          if(!confirm("really?")) return false;
+        });
+      });
+
+### Example
+
+Say you are creating a new `Category` in your online shop, and you want to create some initial products *in the same form*, you can add the following to your form:
+
+    <input-many:products fields="name, price" />
+
+You'll often want to provide the `item` parameter:
+
+    <input-many:products><item:><field-list fields="name, price" /></item:></input-many>
+
+A fully worked up example of nested input-many's may be found in [agility/jquery-test](http://github.com/tablatom/agility/blob/jquery-test/app/views/projects/nested_has_many_test.dryml)
+  -->
+<def tag="input-many" attrs="minimum, fields, skip, more-skip, template, add-hook, remove-hook, hide, show" polymorphic >
+<%
+# helper function to create id's on buttons to facilitate testing
+def underize(s)
+  s.gsub(/\[/,"_").gsub(/\]/,"")
+end
+%>
+  <set empty="&this.empty?"/>
+  <% template ||= this.try.new_candidate || this.member_class.new -%>
+  <% minimum ||= 0 ; minimum = minimum.to_i -%>
+  <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection -%>
+  <% skip += ",#{more_skip}" if more_skip -%>
+  <% js_attrs = all_attributes.slice(:minimum, :add_hook, :remove_hook, :hide, :show) %>
+  <% js_attrs[:prefix] = param_name_for_this %>
+  <ul class="input-many #{this_field.dasherize}" data-rapid="#{data_rapid('input-many', js_attrs)}" merge-attrs>
+    <fake-field-context fake-field="-1" context="&template">
+      <li class="input-many-li input-many-template" id="#{underize param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
+        <div class="buttons">
+          <button param="remove-item" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>
+    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{underize param_name_for_this}_-1_empty">
+      <!-- HACK way to signal an empty collection to the controller -->
+      <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
+      <fake-field-context fake-field="-1" context="&template">
+        <div param="empty-message">
+          <ht key="#{this.class.to_s.underscore}.collection.empty_message">
+            No <%= this.class.name.titleize.downcase.pluralize %>.
+          </ht>
+        </div>
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </fake-field-context>
+    </li>
+    <fake-field-context fake-field="0" context="&template">
+      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{underize param_name_for_this}">
+        <div class="input-many-item" param="default">
+          <field-list param merge-attrs="fields" skip="&skip" />
+        </div>
+        <div class="buttons">
+          <button param="remove-item" class="hidden" id="#{underize param_name_for_this}_remove">-</button>
+          <button param="add-item" id="#{underize param_name_for_this}_add">+</button>
+        </div>
+      </li>
+    </fake-field-context>
+    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{underize param_name_for_this}">
+      <error-messages without-heading class="sub-record"/>
+      <hidden-id-field/>
+      <div class="input-many-item" param="default">
+        <field-list param merge-attrs="fields" skip="&skip" />
+      </div>
+      <div class="buttons">
+        <button param="remove-item" class="#{'hidden' if this_parent.length<=minimum}" id="#{underize param_name_for_this}_remove">-</button>
+        <button param="add-item" class="#{'hidden' if not last_item?}" id="#{underize param_name_for_this}_add">+</button>
+      </div>
+    </li>
+  </ul>
+</def>

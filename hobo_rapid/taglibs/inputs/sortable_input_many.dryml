@@ -1,0 +1,31 @@
+<!-- An enhanced version of [`<input-many>`](/api_tag_defs/input-many)  that supports drag-and-drop re-ordering.
+
+Each item in the collection has a `<div class="ordering-handle" param="handle">` added, which can be used to drag the item up and down.
+
+If the items in the collection contain an [`acts_as_list`](http://ar.rubyonrails.org/classes/ActiveRecord/Acts/List/ClassMethods.html) declaration, it is updated.
+
+The specified sort order may be maintained even without `acts_as_list`.  The items will be passed to the controller in the correct order, so the order may be persisted there.
+
+### Attributes
+
+ - `id`:  Due to a limitation in script.aculo.us, an id is required.  If you do not supply one, one will be generated.
+ - `position-column`:  The position column may be specified via `acts_as_list`, via a `position_column` method on your model or via this attribute.
+ - others:  all other attributes are passed through to `<input-many>`
+
+-->
+
+<def tag="sortable-input-many" attrs="id, position-column, template">
+  <% this_id = this_parent.id || rand(100000) -%>
+  <% id ||= "sortable-input-many-#{this_parent.class.name.underscore.dasherize}-#{this_id}-#{this_field_reflection.name}" -%>
+  <% template ||= this.try.new_candidate || this.member_class.new %>
+  <% position_column ||= template.try.position_column -%>
+  <input-many merge id="&id" class="sortable-input-many" template="&template" more-skip="&position_column">
+    <default: replace>
+        <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
+        <if test="&position_column">
+          <input class="sortable-position" type="hidden" value="&this.send(position_column)" name="#{param_name_for_this}[#{position_column}]" />
+        </if>
+        <default restore/>
+    </default:>
+  </input-many>
+</def>

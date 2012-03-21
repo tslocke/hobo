@@ -1,0 +1,48 @@
+<!--
+Wrapper around the Rails :translate helper with hobo added features.
+
+It can be used as a regular helper or as a dryml tag.
+
+### Hobo Added Features
+
+`ht` adds some conventions for easier hobo translation.
+
+1. Assumes the first part of the key to be a model name (e.g.: users.index.title -> user)
+2. Tries to translate the model by lookup for: (e.g.: user-> activerecord.models.user)
+3. Adds a default fallback to the beginning of the fallback chain by replacing the first part of the key with "hobo" and using the translated model name as additional attribute. This allows us to have default translations (e.g.: hobo.index.title: "{{model}} Index")
+
+You can also pass any other :translate option like for example :count.
+
+Is also used as a tag in the dryml-view files. The syntax is:
+
+      <ht key="my.app">My Application</ht>
+
+Will lookup the "my.app"-key for your locale and replaces the "My Application" content if found.
+
+      <ht key="my" app="Program">My Application</ht>
+
+Will look up both the "my"- and "app"-key for your locale, and replaces the "My Application" with the "my"-key contents (interpolated using the "app"-key.
+
+sample.no.yml-file:
+
+      "no":
+        my: "Mitt {{app}}"
+
+The output should be: Mitt Program
+
+Another example:
+
+    <%= ht :key=>'user.index.title', :default=>'Index'  %>
+    <ht key="user.index.title">Index</ht>
+    #=> "Index" # if "user.index.title" or "hobo.index.title" is not found
+    #=> "User Index" # with the below en.yml file
+
+    === en.yml ===
+    en:
+      hobo:
+        index:
+          title: %{model} Index
+-->
+<fakedef tag="ht">
+<!-- actually defined in translations.rb -->
+</fakedef>

@@ -1,0 +1,99 @@
+<!--
+A convenience tag used to output a count summary with a correctly localized and pluralised label. Works with any kind of collection such as an `ActiveRecord` association or an array.
+
+### Usage
+
+    <count:comments/> -> <span class="count">1 Comment</span>
+
+    <count:viewings/> -> <span class="count">3 Viewings</span>
+
+The label can be customised using the `label` attribute, e.g.
+
+    <count:comments label="blog post comment"/> -> <span class="count">12 blog post comments</span>
+
+You can pass a summary attribute, which will generate a complete localized sentence. It allows 2 options:
+
+- boolean (e.g. `<count summary/>`): it will lookup the 'tags.count.default' key in the locale file. If the lookup fails, it will fallback to the english default sentences consistent with the count.
+- String (e.g. `<count summary="offer"/>`): it will lookup the 'tags.count.offer' key in the locale file.  If the lookup fails, it will fallback to the english default sentences consistent with the count.
+
+### Examples
+
+    it:
+      tags:
+        count:
+          default:
+            zero: "Non ci sono {{label}}"
+            one: "C'è solo 1 {{label}}"
+            other: "Ci sono {{count}} {{label}}"
+          choice:
+            zero: "Non ci sono {{label}} da scegliere"
+            one: "Puoi scegliere solo una {{label}}"
+            other: "Puoi scegliere tra {{count}} {{label}}"
+
+with :en locale and boolean summary (internal defaults)
+
+    <count:comments summary/> -> <span class="count">There is 1 Comment</span>
+    <count:viewings summary/> -> <span class="count">There are 3 Viewings</span>
+
+(note: just add the locale english strings to use like the following examples)
+
+with :it locale and boolean summary (key "tags.count.default")
+
+    <count:comments summary/>
+    -> count => 0 -> <span class="count">Non ci sono Commenti</span>
+    -> count => 1 -> <span class="count">C'è solo 1 Commento</span>
+    -> count => 5 -> <span class="count">Ci sono 5 Commenti</span>
+
+with :it locale and summary="choice" (key "tags.count.choice")
+
+    <count:comments summary="choice"/>
+    -> count => 0 -> <span class="count">Non ci sono Commenti da scegliere</span>
+    -> count => 1 -> <span class="count">Puoi scegliere solo 1 Commento</span>
+    -> count => 5 -> <span class="count">Puoi scegliere tra 5 Commenti</span>
+
+### Additional Notes
+
+* The `prefix` attribute is deprecated: use summary instead.
+
+* Use the `lowercase` attribute to force the generated label to be lowercase:
+
+        <count:comments lowercase/> -> <span class="count">1 comment</span>
+* Use the `if-any` attribute to output nothing if the count is zero. This can be followed by an `<else>` tag to handle the empty case:
+
+        <count:comments if-any/><else>There are no comments</else>
+-->
+<def tag="count" attrs="summary, label, if-any, lowercase, prefix"><span class="count"><%=
+  raise Exception.new("asked for count of a string") if this.is_a?(String)
+  Rails.logger.warn('The "prefix" attribute is deprecated: please, use a locale string') unless prefix.blank?
+
+  c = collection_count
+
+  # generated label will be pluralized
+  label ||= case
+            when this.is_a?(Class)
+              this.model_name.human(:count=>c)
+            when (attr = this.try.origin_attribute)
+              (this_parent || this.origin).class.human_attribute_name(attr, :count=>c)
+            else
+              this.member_class.model_name.human(:count=>c)
+            end
+
+  label = label.downcase if lowercase
+
+  Dryml.last_if = c > 0 if if_any
+  if if_any && c == 0
+    ""
+  else
+    if summary.blank?  # old behaviour
+      main = label.blank? ? c : "#{c} #{label}"
+      if prefix.in? %w(are is)
+        prefix = c == 1 ? "is" : "are"
+      end
+      (prefix ? "#{prefix} #{main}" : main.to_s)
+    else
+      key = summary.kind_of?(String) ? summary : "default"
+      default = c == 1 ? "There is 1 #{label}" : "There are #{c} #{label}"
+      t "tags.count.#{key}", {:count=>c, :label=>label, :default=>default}.merge(attributes)
+    end
+  end
+%></span></def>

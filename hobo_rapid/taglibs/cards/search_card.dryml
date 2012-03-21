@@ -1,0 +1,4 @@
+<!-- A special card which is used by live-search to render the results. By default this just calls card, but you can define your own search cards with `<def tag='search-card' for="MyModel">` to customise search results for that model. -->
+<def tag="search-card" polymorphic>
+  <card merge/>
+</def>

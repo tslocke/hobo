@@ -1,0 +1,69 @@
+<!-- Used to localize and pluralize collection names.
+A collection name is a special case of an attribute name, (indeed you should store the collection names as attribute names in the locale files), so this tag internally uses human_attribute_name to return them.
+
+With the `your` attribute and in the special case the context is a Hobo::Model::UserMixin instance it automatically embeds the `your` tag funtionality. (note: :name is added by default as an interpolable variable)
+
+### Attributes
+
+ - collection - the attribute/collection key to lookup in the `activerecord.attributes` namespace. (e.g. 'roles')
+ - count - used to pick the inflected string for the collection. It should be an integer.
+ - your - wraps the collection name in a `Your` tag
+
+### Example
+
+
+    it:
+      activerecord:
+        attributes:
+          post:
+            comments:
+              one: "Commento"
+              other: "Commenti"
+          user:
+            roles:
+              one: "Ruolo"
+              other: "Ruoli"
+      tags:
+        your:
+          roles:
+            current_user:
+              one: "Il tuo Ruolo"
+              other: "I tuoi Ruoli"
+            other_user:
+              one: "Ruolo di {{name}}"
+              other: Ruoli di {{name}}"
+
+  context is a Post instance ('your' is ignored)
+
+    <human-collection-name collection="comments" count="&user.comments.count" your/>
+    I18n.locale = :en => "Comment" or "Comments"
+    I18n.locale = :it => "Commento" or "Commenti"
+
+  context is a User instance
+
+    <human-collection-name collection="roles' count="&user.roles.count" your/>
+    I18n.locale = :en => "Your Role" or "Jim's Role" or "Your Roles" or "Jim's Roles"
+    I18n.locale = :it => "Il tuo Ruolo" or "Il Ruolo di Jim" or "I tuoi Ruoli" or "I Ruoli di Jim"
+
+  (output is the same as `<Your key="roles" count=>"&user.roles.count"/>`)
+
+    <human-collection-name collection="roles" count="&user.roles.count"/>
+    I18n.locale = :en => "Role" or "Roles"
+    I18n.locale = :it => "Ruolo" or "Ruoli"
+-->
+<def tag="human-collection-name" attrs="collection, count, your"><%
+  raise Hobo::Error, "The 'collection' attribute must be defined" if collection.blank?
+  belong_class = this.kind_of?(Class) ? this : this.class
+  raise Hobo::Error, "The context is not an ActiveRecord::Base instance or class. (this = #{this.typed_id rescue this.inspect})" unless belong_class < ActiveRecord::Base
+  # prepare symbolized attributes for merging
+  attrs = {}
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v} -%>
+<% if your && belong_class < Hobo::Model::UserBase && this.kind_of?(Hobo::Model::UserBase) && I18n.locale == :en -%>
+    <your key="&collection" merge-attrs="&{:name=>name(:no_wrapper => true)}.merge(attrs)" capitalize>
+      <%= belong_class.human_attribute_name(collection.to_sym, attrs) %>
+    </your>
+<% else -%>
+    <%= belong_class.human_attribute_name( collection.to_sym, attrs ) %>
+<% end %>
+</def>
+

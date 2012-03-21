@@ -1,0 +1,11 @@
+<!-- nodoc - to be removed -->
+<def tag="labelled-item-list"><table class="field-list" merge-attrs><do param="default"/></table></def>
+
+<!-- nodoc - to be removed -->
+<def tag="labelled-item"><tr merge-attrs><do param="default"/></tr></def>
+
+<!-- nodoc - to be removed -->
+<def tag="item-label"><th merge-attrs><do param="default"/></th></def>
+
+<!-- nodoc - to be removed -->
+<def tag="item-value"><td merge-attrs><do param="default"/></td></def>

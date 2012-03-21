@@ -1,0 +1,12 @@
+<!-- Simple wrapper around I18n.t.
+
+The tag content is used as the :default option. It is overridden by an explicit 'default' attribute.
+There is a default :count => 1.
+
+### Attributes
+
+ - key: the key to lookup
+ - all the attributes accepted by the wrapped method -->
+<fakedef tag="t" attrs="key">
+<!-- actually defined in i18n.rb -->
+</fakedef>

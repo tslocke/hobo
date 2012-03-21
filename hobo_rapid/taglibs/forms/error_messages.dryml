@@ -1,0 +1,21 @@
+<!-- Renders a localized list of error messages following a form submission. Expects the errors to be in `this.errors`. Renders nothing if there are no errors.
+  -->
+<def tag="error-messages">
+  <section class="error-messages" merge-attrs if="&this.errors.size > 0">
+    <h2 param="heading">
+      <t key="activerecord.errors.template.header" model="&this.class.model_name.human" count="&this.errors.size">
+        <%= model = this.class.model_name.human
+            count = this.errors.size
+        count==1 ? "1 error prohibited this #{model} from being saved" :
+                   "#{count} errors prohibited this #{model} from being saved"
+        %>
+      </t>
+    </h2>
+    <t key="activerecord.errors.template.body">There were problems with the following fields:</t>
+    <ul param>
+      <% this.errors.to_a.each do |message| -%>
+      <li param><%= message %></li>
+      <% end -%>
+    </ul>
+  </section>
+</def>

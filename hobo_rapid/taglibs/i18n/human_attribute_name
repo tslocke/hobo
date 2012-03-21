@@ -1,0 +1,18 @@
+<!-- Wrapper around ActiveRecord::Base.human_attribute_name.
+
+#### Attributes
+
+ - attribute - the attribute to lookup
+ - model - (optional) should be a model class or a record object (default to this)
+ - count - (optional) should be an integer
+
+ -->
+<def tag="human-attribute-name" attrs="attribute, model"><%=
+  model ||= this
+  model = model.class unless model.kind_of? Class
+  # prepare symbolized attributes for merging
+  attrs = {}
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.human_attribute_name( attribute.to_sym, attrs )
+%>
+</def>

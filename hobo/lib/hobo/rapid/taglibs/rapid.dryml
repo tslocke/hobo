@@ -1,25 +1,16 @@
 <!--
 
+Hobo rapid has moved into its own gem.
+
 The Rapid tag library makes web development go fast. The Rapid tag library is your friend.
 
 (This taglib defines no tags - it just includes all the other taglibs. Move along. Nothing to see here.)
 
 -->
 
+<% Rails.logger.warn '<include src="rapid" plugin="hobo"/> should be replaced with <include gem="hobo_rapid"/>' %>
+
 <include module="Hobo::Helper"/>
-<include module="Hobo::Rapid::Helper"/>
+<%# include module="Hobo::Rapid::Helper"/ %>
 <include module="Hobo::Helper::Translations"/>
 
-<include src="rapid_core" gem="hobo"/>
-<include src="rapid_support" gem="hobo"/>
-<include src="rapid_document_tags" gem="hobo"/>
-<include src="rapid_pages" gem="hobo"/>
-<%# <include src="rapid_editing" gem="hobo"/> #>
-<include src="rapid_forms" gem="hobo"/>
-<include src="rapid_navigation" gem="hobo"/>
-<include src="rapid_plus" gem="hobo"/>
-<include src="rapid_generics" gem="hobo"/>
-<include src="rapid_lifecycles" gem="hobo"/>
-<include src="rapid_summary" gem="hobo"/>
-<include src="rapid_user_pages" gem="hobo"/>
-<include src="rapid_i18n" gem="hobo"/>

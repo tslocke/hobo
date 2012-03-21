@@ -1,0 +1,23 @@
+<!-- empty tags should be written as <br> in HTML and <br /> in XHTML -->
+<!-- nodoc. -->
+<def tag="empty-tag" attrs="tag-name"><%= element(tag_name, attributes, nil, true, true) %></def>
+<!-- nodoc. -->
+<def tag="base"><empty-tag tag-name="base" merge/></def>
+<!-- nodoc. -->
+<def tag="meta"><empty-tag tag-name="meta" merge/></def>
+<!-- nodoc. -->
+<def tag="link"><empty-tag tag-name="link" merge/></def>
+<!-- nodoc. -->
+<def tag="img"><empty-tag tag-name="img" merge/></def>
+<!-- nodoc. -->
+<def tag="br"><empty-tag tag-name="br" merge/></def>
+<!-- nodoc. -->
+<def tag="hr"><empty-tag tag-name="hr" merge/></def>
+<!-- nodoc. -->
+<def tag="frame"><empty-tag tag-name="frame" merge/></def>
+<!-- nodoc. -->
+<def tag="area"><empty-tag tag-name="area" merge/></def>
+<!-- nodoc. -->
+<def tag="param"><empty-tag tag-name="param" merge/></def>
+<!-- nodoc. -->
+<def tag="col"><empty-tag tag-name="col" merge/></def>

@@ -1,0 +1,14 @@
+<!-- A shortcut for generating a submit button.
+
+### Usage
+
+    <submit label="Go!"/> -> <input type="submit" value="Go!" class="button submit-button"/>
+    <submit image="/images/go.png"/> -> <input type="image" src="/images/go.png" class="button submit-button"/>
+
+-->
+<def tag="submit" attrs="label, image">
+  <input if="&image" type="image" src="&image" merge-attrs class="image-button submit-button"/>
+  <else>
+    <input type="submit" value="#{label}" merge-attrs class="button submit-button"/>
+  </else>
+</def>

@@ -1,0 +1,113 @@
+
+<!-- Development mode only - a menu to change the `current_user` -->
+<def tag="dev-user-changer">
+  <set user="&Hobo::Model::UserBase.default_user_model"/>
+  <select-menu if="&user && Rails.env.development?"
+               first-option="#{t('hobo.dev_user_changer.guest', {:default=>'Guest'})}" options="&user.all(:limit => 30).*.login"
+               onchange="location.href = '#{dev_support_path :action=>:set_current_user}?login=' + encodeURIComponent(this.options[this.selectedIndex].value)"
+               selected="#{current_user.login}"
+               class="dev-user-changer"
+               merge-attrs/>
+</def>
+
+
+<!-- General purpose navigation bar. Renders a `<ul class="navigation">`. This tag is intended to be used in conunction with `<nav-item>`. The main feature of this pair of tags (over, say, just using a plain `<ul>` list), is that it's easy to have a 'current' CSS class added to the appropriate nav item (so you can highlight the page/section the user is)
+
+The main navigation in the default hobo app is implemented with `<navigation>` but this tag is also appropriate for any sub-navigation.
+
+### Attributes
+
+ - `current` - the textual content of the nav item that should have the 'current' CSS class added (see example)
+
+### Example
+
+The normal usage is to define your own navigation tag that calls `<navigation>`.
+
+    <def tag="sub-nav">
+      <navigation merge>
+        <nav-item>Red</nav-item>
+        <nav-item>Green</nav-item>
+        <nav-item>Blue</nav-item>
+      </navigation>
+    </def>
+
+Then in your pages you can call the tag like this
+
+ - On the 'red' page: `<sub-nav current="red"/>`
+ - On the 'green' page:  `<sub-nav current="green"/>`
+ - and so on.
+
+   -->
+<def tag="navigation" attrs="current">
+  <ul class="navigation" merge-attrs>
+    <set-scoped current-navigation="&current">
+      <do param="default"/>
+    </set-scoped>
+  </ul>
+</def>
+
+
+<!-- Renders a single item in a [`<navigation>`](/api_tag_defs/navigation).
+
+`<nav-item>` is basically an [`<a>`](/api_tag_defs/a) tag wrapped in an `<li>` tag.  The attributes for [`<a>`](/api_tag_defs/a) may all be used on this tag, and work the same way.
+
+Example 1: explicit links.  Note that we're using explicit routes for clarity.  Named routes are better.
+
+    <navigation current="home">
+      <nav-item href="/">Home</nav-item>
+      <nav-item href="/logout">Logout</nav-item>
+    </navigation>
+
+Example 2: navigation based on a collection of items.  Each item will be transformed into a link as described in [`<a>`](/api_tag_defs/a).
+
+    <navigation with="&links">
+      <repeat>
+        <nav-item/>
+      </repeat>
+    </navigation>
+
+-->
+<def tag="nav-item" attrs="name">
+  <% body = parameters.default
+     body = h(this.to_s) if body.blank?
+     name ||= body.gsub(/<.*?>/, '').strip
+     -%>
+  <li class="#{'current' if (c = scope.current_navigation) && c.downcase == name.downcase}"
+      merge-attrs="&attributes - (attrs_for(:a)+['target'])">
+    <a merge-attrs="&attributes & (attrs_for(:a)+['target'])"><%= body %></a>
+  </li>
+</def>
+
+
+<!-- Account Navigation (log in / out / signup)
+
+When logged in, this renders:
+
+ - "Logged in as ..."
+ - Link to account page
+ - Log out link
+
+When not logged in, renders:
+
+ - Log in link
+ - Sign up link
+
+This is a simple tag - just look at the source if you need to know more detail.
+
+  -->
+<def tag="account-nav">
+  <do with="&current_user">
+    <ul class="navigation account-nav" param>
+      <li if="&Rails.env.development?" param="dev-user-changer"><dev-user-changer/></li>
+      <if test="&logged_in?">
+        <li class='nav-item' param="logged-in-as"><a to="&current_user"><t key="hobo.actions.logged_in_as" name="&name">Logged in as <name/></t></a></li>
+        <li class='nav-item' param="account"><a action="account"><t key="hobo.actions.account">Account</t></a></li>
+        <li class='nav-item' param="log-out"><a href="&logout_url"><t key="hobo.actions.logout">Log out</t></a></li>
+      </if>
+      <else>
+        <li class='nav-item' param="log-in"><a href="&login_url"><t key="hobo.actions.login">Log in</t></a></li>
+        <li if="&signup_url" class="nav-item" param="sign-up"><a href="&signup_url"><t key="hobo.actions.signup">Sign up</t></a></li>
+      </else>
+    </ul>
+  </do>
+</def>

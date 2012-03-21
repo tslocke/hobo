@@ -1,0 +1,12 @@
+<!-- Rapid-Pages provides tags for working with entire pages, and
+defines several pages such as the error pages and login pages.  -->
+
+<!-- nodoc. -->
+<def tag="index-page" polymorphic/>
+<!-- nodoc. -->
+<def tag="new-page"   polymorphic/>
+<!-- nodoc. -->
+<def tag="show-page"  polymorphic/>
+<!-- nodoc. -->
+<def tag="edit-page"  polymorphic/>
+

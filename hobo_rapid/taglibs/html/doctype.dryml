@@ -1,0 +1,39 @@
+<!-- Renders one of five HTML DOCTYPE declarations, according to the `version` attribute.
+
+### Attributes
+ - 'version' - the doctype version, must be one of:
+
+   - HTML 4.01 STRICT
+   - HTML 4.01 TRANSITIONAL
+   - XHTML 1.0 STRICT
+   - XHTML 1.0 TRANSITIONAL
+   - XHTML 1.1
+   - HTML
+   - html
+   - HTML5
+   - html5
+
+See the source for the actual output
+
+ -->
+<def tag="doctype" attrs="version"><%=raw(
+  case version.upcase
+    when "HTML 4.01 STRICT"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ' +
+        '"http://www.w3.org/TR/html4/strict.dtd">'
+    when "HTML 4.01 TRANSITIONAL"
+      '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' +
+        '"http://www.w3.org/TR/html4/loose.dtd">'
+    when "XHTML 1.0 STRICT"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ' +
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    when "XHTML 1.0 TRANSITIONAL"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' +
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    when "XHTML 1.1"
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" ' +
+      '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+    when "HTML", "html", "HTML5", "html5"
+      '<!DOCTYPE html>'
+  end)
+%></def>

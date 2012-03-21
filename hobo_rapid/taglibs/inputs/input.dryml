@@ -1,0 +1,76 @@
+<!--
+Provides an editable control tailored to the type of the object in context. `<input>` tags should be used within a
+`<form>`. `<input>` is a _polymorphic_ tag which means that there are a variety of definitions, each one written for a
+particular type. For example there are inputs for `text`, `boolean`, `password`, `date`, `datetime`, `integer`,
+`float`, `string` and more.
+
+### Usage
+
+The tag behaves as a regular HTML input if the type attribute is given:
+
+    <input type="text" name="my_input"/> -> Output is exactly as provided, untouched by Rapid
+
+If no type attribute is given then the _context_ is used. For example if the context is a blog post:
+
+    <input:title/> ->
+    <input id="blog_post[name]" class="string blog-post-name" type="text" value="My Blog Post" name="blog_post[name]"/>
+
+    <input:created_at/> ->
+    <select id="blog_post_created_at_year" name="blog_post[created_at][year]">...</select>
+    <select id="blog_post_created_at_month" name="blog_post[created_at][month]">...</select>
+    <select id="blog_post_created_at_day" name="blog_post[created_at][day]">...</select>
+
+    <input:description/> ->
+    <textarea class="text blog-post-description" id="blog_post[description]" name="blog_post[description]">...</textarea>
+
+If the context is a `belongs_to` association, the `<select-one>` tag is used.
+
+If the context is a `has_many :through` association, the polymorphic `<collection-input>` tag is used.
+
+### Attributes
+
+ - no-edit: control what happens if `can_edit?` is false. Can be one of:
+
+   - view: render the current value using the `<view>` tag
+   - disable: render the input as normal, but add HTML's `disabled` attribute
+   - skip: render nothing at all
+   - ignore: render the input normally. That is, don't even perform the edit check.
+-->
+<def tag="input" attrs="no-edit"><%=
+  if attributes[:type]
+    element :input, deunderscore_attributes(attributes), nil, true, true
+  else
+    no_edit ||= :view
+    no_edit = no_edit.to_sym
+    no_edit_permission = !can_edit? unless no_edit == :ignore
+    if no_edit_permission && no_edit == :view
+      view
+    elsif no_edit_permission && no_edit == :skip
+      ""
+    else
+      attrs = add_classes(attributes, type_id.dasherize, type_and_field.dasherize)
+      attrs[:name] ||= param_name_for_this
+      attrs[:disabled] = true if no_edit_permission && no_edit == :disable
+      the_input = if (refl = this_field_reflection)
+                    if refl.macro == :belongs_to
+                      call_polymorphic_tag('input', attrs) or select_one(attrs)
+                    elsif refl.macro == :has_many
+                      if refl.options[:through]
+                        collection_input(attrs)
+                      else
+                        input_many(attrs)
+                      end
+                    end
+                  else
+                    call_polymorphic_tag('input', attrs) or
+                      (call_polymorphic_tag('input', HoboFields.to_class(this_type::COLUMN_TYPE), attrs) if defined?(this_type::COLUMN_TYPE)) or
+                      raise Hobo::Error, ("No input tag for #{this_field}:#{this_type} (this=#{this.inspect})")
+                  end
+      unless this_parent.errors[this_field].empty?
+        "<span class='field-with-errors'>#{the_input}</span>".html_safe
+      else
+        the_input
+      end
+    end
+  end
+%></def>

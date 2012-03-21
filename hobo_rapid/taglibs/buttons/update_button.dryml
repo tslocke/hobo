@@ -1,0 +1,29 @@
+<!-- Provides an ajax button to send a RESTful update or "PUT" to the server. i.e. to udate one or more fields of a
+record.
+
+Note that unlike simliar tags, `<update-button>` does not support both ajax and non-ajax modes at this time. It only
+does ajax.
+
+`<update-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid Forms).
+
+### Attributes
+
+ - label: The label on the button.
+
+ - fields: A hash with new field values pairs to update the resource with. The items in the hash will be converted to
+   HTTP parameters.
+
+ - params: Another hash with additional HTTP parameters to include in the ajax request
+
+  -->
+<def tag="update-button" attrs="label, update, fields, params"><%=
+   raise Hobo::Error.new("no update specified") unless update
+
+   ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+   params = (params || {}).merge(this.class.name.underscore => fields)
+   ajax_attributes.reverse_merge!(:message => label, :params => params, :method => :put)
+   func = ajax_updater(object_url(this), update, ajax_attributes)
+   html_attributes.reverse_merge!(:type =>'button', :onclick => func, :value => label)
+
+   element :input, add_classes(html_attributes, "button update-button update-#{this.class.name.underscore}-button"), nil, true, true %>
+</def>

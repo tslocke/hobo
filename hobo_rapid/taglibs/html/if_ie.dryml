@@ -1,0 +1,11 @@
+<!-- Renders a conditional comment in order to have some content ignored by all browsers other than Internet Explorer
+
+### Example
+
+
+    <if-ie version="lt IE 7"> ... </if-ie>
+
+ -->
+<def tag="if-ie" attrs="version">
+  <%=raw "<!--[if #{version || 'IE'}]>" %><do param="default"/><%=raw "<![endif]-->" %>
+</def>

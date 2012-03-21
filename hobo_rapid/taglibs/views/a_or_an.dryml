@@ -1,0 +1,10 @@
+<!-- Capitalised version of `<a-or-an>` -->
+<def tag="A-or-An" attrs="word"><%=
+  (word =~ /^[aeiou]/i ? "An " : "A ") + word
+%></def>
+
+<!-- Deprecated. It's harder than you think to do this (e.g. an umbrella, an user)
+-->
+<def tag="a-or-an" attrs="word"><%=
+  (word =~ /^[aeiou]/i ? "an " : "a ") + word
+%></def>

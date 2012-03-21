@@ -1,0 +1,25 @@
+<!-- Renders a `<ul>` list of checkboxes, one for each of the potential targt in a `has_many` association. The user can check the items they wish to have associated. A typical use might be selecting categories for a blog post.
+
+### Attributes
+
+ - `options` - an array of models that may be added to the collection
+ - `disabled` - if true, sets the disabled flag on all check boxes.
+
+  -->
+<def tag="check-many" attrs="options, disabled"><%
+  collection = this
+  param_name = param_name_for_this
+  options ||= begin
+    conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).send(:conditions)
+    this_field_reflection.klass.all(:conditions => conditions, :limit => 100).select {|x| can_view?(x)}
+  end
+  -%>
+  <ul class="check-many" param="default" merge-attrs>
+    <input type="hidden" name="#{param_name}[]" value=""/><% # ensure all items are removed when nothing checked
+    %>
+    <li repeat="&options" param>
+      <input id="#{dom_id(this, :check_many)}" type="checkbox" name="#{param_name}[]" value="@#{this.id}" checked="&this.in?(collection)" disabled="&disabled"/>
+      <label for="#{dom_id(this, :check_many)}"><name param/></label>
+    </li>
+  </ul>
+</def>

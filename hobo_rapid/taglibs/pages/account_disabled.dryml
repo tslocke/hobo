@@ -1,0 +1,19 @@
+<!-- The page that is displayed on attempting to log in to an account that has been disabled. -->
+<def tag="account-disabled-page">
+
+  <simple-page title="#{t 'hobo.account_disabled_page.title', :default=>['Account Disabled'] }" merge>
+
+    <body: class="account-disabled-page" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param><t key="hobo.account_disabled_page.heading">Account is disabled</t></h2>
+      </header>
+
+      <section param="content-body">
+        <p><t key="hobo.account_disabled_page.text">Your account is disabled at this time.</t></p>
+      </section>
+    </content:>
+  </simple-page>
+
+</def>

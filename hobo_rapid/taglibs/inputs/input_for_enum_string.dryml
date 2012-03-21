@@ -1,0 +1,26 @@
+<!-- A `<select>` menu containing the values of an 'enum string'.
+
+### Attributes
+
+ - `labels` - A hash that gives custom labels for the values of the enum.
+   Any values that do not have corresponding keys in this hash will get `value.titleize` as the label.
+ - `titleize` - Set to false to have the value itself (rather than `value.titleize`) be the default label. Default: true
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
+
+   -->
+<def tag="input" for="HoboFields::Types::EnumString" attrs="labels, titleize, first-option, first-value"><%
+  labels ||= {}
+  labels = HashWithIndifferentAccess.new(labels)
+  titleize = true if titleize.nil?
+  options = this_type.values.map {|v| 
+    [I18n.t("activerecord.attributes.#{this_parent.class.to_s.downcase}/#{this_field}s.#{v}",
+      :default => titleize ? v.titleize : v), 
+    v]
+  }
+  %>
+  <select name="#{param_name_for_this}" merge-attrs>
+    <option value="#{first_value}" unless="&first_option.nil?"><first-option/></option>
+    <%= options_for_select(options, this) %>
+  </select>
+</def>

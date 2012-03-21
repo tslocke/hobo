@@ -1,0 +1,11 @@
+<!-- Used as a semantic wrapper around a group of sections and asides. CSS layouts can be provided based on this structure.
+
+### Usage
+
+    <section-group>
+      <section>My First Section</section>
+      <section>My Second Section</section>
+      <aside>My Aside</aside>
+    </section-group>
+-->
+<def tag="section-group"><div class="section-group"><div class="section-group-inner" merge-attrs param="default"></div></div></def>

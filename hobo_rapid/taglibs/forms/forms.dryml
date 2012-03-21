@@ -1,41 +1,5 @@
-<!-- Rapid Forms provides various tags that make it quick and easy to produce working new or edit forms.
-
-### Overview
-
-The main tags are:
-
- - `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts
-   otherwise.
-
- - `<input>`, which automatically choses an appropriate form control based on the type of the date.
-
-### Ajax Attributes
-
-Several of the tags in this taglib support the following set of ajax attributes:
-
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no
-   update.
-
-   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are
-   the same.
-
- - params: a hash of name/value pairs that will be converted to HTTP parameters in the ajax request
-
- - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
-
- - message: a message to be displayed in the Ajax progress spinner. Default: "Saving..."
-
- - spinner-next-to: DOM ID of an element to position the ajax progress spinner next to.
-
-### Ajax Callbacks
-
-The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script
-executed at various points in the ajax request cycle:
-
- - success: script to run on successful completion of the request
-
- - failure: script to run on a request failure
-
- - complete: script to run on completion, regardless of success or failure.
-
+<!--
+Rapid Forms provides various tags that make it quick and easy to
+produce working new or edit forms.  Forms are also a key component of
+the Ajax support in Hobo.   For more information on Ajax, see [the manual](/manual/ajax)
 -->

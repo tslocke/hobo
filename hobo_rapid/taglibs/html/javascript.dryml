@@ -1,0 +1,12 @@
+<!-- Simple wrapper for the `javascript_include_tag` helper. The `name` attribute can be a comma-separated list of script file names.
+ -->
+<def tag="javascript" attrs="name">
+  <if test="&name.is_a?(Symbol)">
+    <%= javascript_include_tag name %>
+  </if>
+  <else>
+    <repeat with="&comma_split(name)">
+      <%= javascript_include_tag this %>
+    </repeat>
+  </else>
+</def>

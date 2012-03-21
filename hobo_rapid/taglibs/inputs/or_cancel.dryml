@@ -1,0 +1,8 @@
+<!-- Renders the common "or (Cancel)" for a form. Attributes are merged into the link (`<a>Cancel</a>`), making it easy to customise the destination of the cancel link. By default it will link to `this` or `this.class`.
+  -->
+<def tag="or-cancel">
+  <if test="&linkable?"><t key="hobo.support.or">or</t> <a merge-attrs><t key="hobo.actions.cancel">Cancel</t></a></if>
+  <else>
+    <if test="&linkable?(this.class)"><t key="hobo.support.or">or</t> <a to="&this.class" merge-attrs><t key="hobo.actions.cancel">Cancel</t></a></if>
+  </else>
+</def>

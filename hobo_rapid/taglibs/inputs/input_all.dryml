@@ -1,0 +1,14 @@
+<!-- Renders a sub-section of a form with fields for every record in a `has_many` association. This is similar to `<input-many>` except there is no ability to add and remove items (i.e. no (+) and (-) buttons).
+  -->
+<def tag="input-all">
+  <% association_fkey = this_field_reflection.foreign_key -%>
+  <ul class="input-all #{this_field.dasherize}">
+    <li repeat class="#{'record-with-errors' unless this.errors.empty?}">
+      <set-scoped form-field-names="&[]">
+        <hidden-id-field/>
+        <do param="default"/>
+        <hidden-fields skip="&association_fkey"/>
+      </set-scoped>
+    </li>
+  </ul>
+</def>

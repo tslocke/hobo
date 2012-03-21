@@ -1,0 +1,57 @@
+<!-- Simple log-in form.
+
+### Attributes
+
+ - `user-model`: The User class
+ - all other attributes are passed on to `<form>`.   You will probably need to set the action attribute:  `action="&user_login_path"`.
+ -->
+<def tag="login-form" attrs="user-model">
+  <% user_model ||= self.try.model -%>
+  <form action="&request.fullpath" class="login" merge>
+    <labelled-item-list param>
+      <labelled-item>
+
+        <item-label param="login-label"><t key="hobo.login.#{user_model.login_attribute}"><%= user_model.login_attribute.to_s.titleize %></t></item-label>
+        <item-value><input type="text" name="login" id="login" class="string" param="login-input" /></item-value>
+      </labelled-item>
+
+      <labelled-item>
+        <item-label param="password-label"><t key="hobo.login.password">Password</t></item-label>
+        <item-value>
+          <input type="password" name="password" id="password" class="string" param="password-input"/>
+        </item-value>
+      </labelled-item>
+
+      <labelled-item param="remember-me">
+        <item-label class="field-label" param="remember-me-label"><t key="hobo.login.remember_me">Remember me:</t></item-label>
+        <item-value>
+          <input type="checkbox" name="remember_me" id="remember-me" param="remember-me-input" checked/>
+        </item-value>
+      </labelled-item>
+    </labelled-item-list>
+    <div param="actions">
+      <submit label="#{t 'hobo.actions.login', :default=>['Log in'] }" param/><if test="&signup_url" class='nav-item'>
+      <t key="hobo.support.or">or</t> <a param="signup" href="&signup_url"><t key="hobo.login.signup">Sign up</t></a></if>
+    </div>
+  </form>
+</def>
+
+<!-- Simple log-in page  -->
+<def tag="login-page">
+  <% remember_me = true if remember_me.nil? %>
+  <simple-page title="#{t 'hobo.login.title', :default=>['Log in'] }" merge>
+
+    <body: class="login-page" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading"><t key="hobo.login.heading">Log In</t></h2>
+      </header>
+
+      <section param="content-body">
+        <login-form param="form" user-model="&model"/>
+        <a href="&forgot_password_url" param="forgot-password" if="&forgot_password_url"><t key="hobo.login.forgot_password">Forgot your password?</t></a>
+      </section>
+    </content:>
+  </simple-page>
+</def>

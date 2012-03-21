@@ -1,0 +1,13 @@
+<!-- A `<select>` menu input. This tag differes from `<select-menu>` only in that it adds the correct `name` attribute for the current field, and `selected` default to `this`.
+
+### Attributes
+
+ - `options` - an array of options suitable to be passed to the Rails `options_for_select` helper.
+ - `selected` - the value (from the `options` array) that should be initially selected. Defaults to `this`
+ - `first-option` - a string to be used for an extra option in the first position. E.g. "Please choose..."
+ - `first-value` - the value to be used with the `first-option`. Typically not used, meaning the option has a blank value.
+
+  -->
+<def tag="select-input">
+  <select-menu name="#{param_name_for_this}" selected="&this" merge/>
+</def>

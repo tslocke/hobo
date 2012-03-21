@@ -1,0 +1,23 @@
+<!-- Renders a Rails flash message wrapped in a `<div>` tag
+
+### Attributes
+
+ - `type` - which flash message to display. Defaults to `:notice`
+
+### CSS Classes
+
+The flash is output in a `<div class="flash notice">`, where `notice` is the `type` specified.
+
+  -->
+<def tag="flash-message" attrs="type">
+  <% type = type ? type.to_sym : :notice -%>
+  <div class="flash #{type}" if="&flash[type]" merge-attrs><%= flash[type] %></div>
+</def>
+
+
+<!-- Renders `<flash-message>` for every flash type given in the `names` attribute (comma separated), or for all flash messages that have been set if `names` is not given -->
+<def tag="flash-messages" attrs="names"><%=
+  scope.flash_rendered = true if scope.respond_to? :flash_rendered
+  names = names.nil? ? flash.keys : comma_split(names)
+  names.map { |name| flash_message :type => name }.safe_join
+%></def>

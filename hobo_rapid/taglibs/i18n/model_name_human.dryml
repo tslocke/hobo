@@ -1,0 +1,16 @@
+<!-- Wrapper around ActiveModel::Name#human
+
+#### Attributes
+
+ - model - (optional) should be a model class or a record object (default to this)
+ - count - (optional) used to pick the inflected string for the model. It should be an integer.
+ -->
+<def tag="model-name-human" attrs="model, count"><%=
+  model ||= this
+  model = model.class unless model.kind_of? Class
+  # prepare symbolized attributes for merging
+  attrs = {}
+  all_attributes.each_pair{|k,v| attrs[k.to_sym] = v}
+  model.model_name.human( attrs )
+%>
+</def>

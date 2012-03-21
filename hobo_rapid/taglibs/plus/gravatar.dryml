@@ -1,0 +1,12 @@
+<!-- Renders a gravatar (see [gravatar.com](http://gravatar.com)) image in side a link to `this`. Requires `this` to have an `email_address` field. Normally called with a user record in context.
+
+### Attributes
+
+ - `size` - Size in pixels of the image. Defaults to 80.
+ - `rating` - The rating allowed. Defaults to 'g'. See [gravatar.com](http://gravatar.com) for information on ratings.
+
+ -->
+<def tag="gravatar" attrs="size, rating">
+  <% size ||= 80; rating ||= 'g'; digest = Digest::MD5.hexdigest(this.email_address) -%>
+  <a class="gravatar"><img class="gravatar" src="http://www.gravatar.com/avatar/#{digest}?s=#{size}&r=#{rating}" merge-attrs/></a>
+</def>

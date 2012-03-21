@@ -1,0 +1,18 @@
+<!-- The page rendered by default in the case of a not-found error
+
+### Attributes
+
+ - `message` - The main message to display. Defaults to "The page you requested cannot be found."
+
+  -->
+<def tag="not-found-page" attrs="message">
+  <% message ||= t("hobo.messages.not_found", :default=>["The page you requested cannot be found."]) %>
+  <page merge>
+    <body: class="not-found"/>
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading"><message/></h2>
+      </header>
+    </content:>
+  </page>
+</def>

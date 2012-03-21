@@ -1,0 +1,2 @@
+<!-- Renders a comma separated list of links (`<a>`), or "(none)" if the list is empty -->
+<def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { a }.safe_join(", ") %></def>

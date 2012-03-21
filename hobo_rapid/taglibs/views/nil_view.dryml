@@ -1,0 +1,10 @@
+<!-- Used to render nil values. By default renders "(Not Available)"
+
+### Usage
+
+Redefine in your app to have nil values displayed differently, e.g.:
+
+    <def tag="nil-view">-</def>
+
+-->
+<def tag="nil-view"><%= scope.nil_view || "(Not Available)" %></def>

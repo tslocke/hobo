@@ -1,0 +1,42 @@
+
+<!-- `<view>` calls this tag when called for a `has_many` collection. By default calls `<links-for-collection/>` -->
+<def tag="collection-view" polymorphic><links-for-collection merge-attrs/></def>
+
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a locale key or a standard format string (see strftime) -->
+<def tag="view" for="date" attrs="format"><%= this && (format||= :default) && I18n.backend.localize(I18n.locale, this, format) %></def>
+
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a Time::DATE_FORMATS or a standard format string (see strftime) -->
+  <def tag="view" for="time" attrs="format"><%= this && (format||= :time) && (format.is_a?(Symbol) ? this.to_s(format) : this.strftime(format) ) %></def>
+
+<!-- Renders `this` in localized :default format. `format` can be a symbol representing a locale key or a standard format string (see strftime) -->
+<def tag="view" for="datetime" attrs="format"><%= this && (format||= :default) && I18n.backend.localize(I18n.locale, this, format) %></def>
+
+<!-- Renders localized `number_with_delimiter this`, or `format % this` if the `format` attribute is given -->
+<def tag="view" for="Numeric" attrs="format"><%= format ? format % this : number_with_delimiter(this) %></def>
+
+<!-- If `this.html_safe?`, returns this unchanged.  Otherwise renders `this` with HTML escaping and newlines replaced with `<br>` tags -->
+<def tag="view" for="string"><%=
+  if this.html_safe?
+    this
+  elsif !(this.class == String) && this.respond_to?(:to_html) # workaround for Maruku which adds String#to_html : (
+    this.to_html(scope.xmldoctype)
+  else
+    h(this).gsub("\n", "<br#{scope.xmldoctype ? ' /' : ''}>").html_safe
+  end
+%></def>
+
+<!-- This tag add internationalization support to EnumString fields -->
+<def tag="view" for="HoboFields::Types::EnumString">
+  <%=
+  model = this_parent.class
+  I18n.t(
+    "activerecord.attributes.#{model.to_s.downcase}/#{this_field}s.#{this}",
+    :default => this.titleize)
+  %>
+</def>
+
+<!-- Renders 'Yes' for true and 'No' for false -->
+<def tag="view" for="boolean"><%= this ? t('hobo.boolean_yes', :default => 'Yes') : t('hobo.boolean_no', :default => 'No') %></def>
+
+<!-- Renders a link (`<a>`) to `this` -->
+<def tag="view" for="ActiveRecord::Base"><a merge-attrs/></def>

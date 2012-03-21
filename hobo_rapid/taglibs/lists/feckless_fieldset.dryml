@@ -1,0 +1,93 @@
+<!--- This tag is very similar `<field-list-v1>`.  However, instead of rendering a table, it renders what [Anatoli Papirovski calls "perfect form markup"](http://web.archive.org/web/20090922234755/http://fecklessmind.com/2009/01/23/how-to-reliable-css-forms/)
+
+It takes the same attributes & parameters as `<field-list-v1>`, with the addition of a `legend` parameter and a `required` attribute.
+
+The accompanying css allows this fieldset to be rendered in three different ways.  You may trigger these by setting a class of `horizontal`, `vertical` or `inline-vertical`.  `inline-vertical` fieldset's may also be nested inside of a `horizontal` fieldset.
+
+### Attributes
+
+ - fields: Comma separated list of field names to display. Defaults to
+ the fields returned by the `standard_fields` helper. That is, all
+ fields apart from IDs and timestamps.
+
+ - force-all: All non-viewable fields will be skipped unless this
+ attribute is given
+
+ - skip: Comma separated list of fields to exclude
+
+ - tag: The name of a tag to use inside the `<td>` to display the
+ value. Defaults to `view`
+
+ - no-edit: Controls the behavior of `<input>` tags when the user doesn't have edit permission for a field.
+   - view: render the current value using the `<view>` tag
+   - disable: render the input as normal, but add HTML's `disabled` attribute
+   - skip: render nothing at all. This will omit the entire row (including the label)
+   - ignore: render the input normally. That is, don't even perform the edit check.
+
+ - no-blanks: (boolean) Controls the behavior of `<view>` tags. The
+ entire row (including the label) will be omitted if `this` is blank.
+ Default false.
+
+ - required: a list of methods.  If the current field is included in the list, the field div has the `required` class added to it.
+
+### Example
+
+    <field-list fields="first-name, last-name, city">
+      <first-name-label:>Given Name</first-name-label:>
+      <last-name-label:>Family Name</last-name-label:>
+      <city-view:><name-one/></city-view:>
+    </field-list>
+
+A more complicated example stolen from actual working code:
+
+    <extend tag="signup-form" for="User">
+      <old-signup-form >
+        <field-list: replace>
+          <fieldset class="horizontal">
+            <legend>New Account Registration</legend>
+            <div class="field name-field">
+              <label class="name-label" for="user_name">Name</label>
+              <feckless-fieldset id="user_name" class="inline-vertical" fields="salutation, first_name, last_name, suffix" required="first_name, last_name" />
+            </div>
+            <div class="field contact-field">
+              <label class="contact-label" for="user_contact">Contact</label>
+              <feckless-fieldset id="user_contact" class="inline-vertical" fields="email_address, phone_number" required="email_address" />
+            </div>
+            <div class="field passwords-field">
+              <label class="passwords-label" for="user_contact">Password</label>
+              <feckless-fieldset id="user_passwords" class="inline-vertical" fields="password, password_confirmation" required="password, password_confirmation">
+                <password-label:></password-label:>
+                <password-confirmation-label:>Confirmation</password-confirmation-label:>
+              </feckless-fieldset>
+            </div>
+          </fieldset>
+        </field-list:>
+      </old-signup-form>
+    </extend>
+
+--> 
+<def tag="feckless-fieldset" attrs="tag, no-edit, required, no-blanks">
+  <% tag ||= scope.in_form ? "input" : "view"; no_edit ||= "skip" -%>
+  <% required ||= "" ; required = comma_split(required.gsub('-', '_')) -%>
+  <fieldset class="feckless-fields" merge-attrs="&attributes - attrs_for(:with_fields)">
+    <legend param if="&all_parameters[:legend]" />
+    <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
+    <% field_name = this_field_name
+       input_attrs = {:no_edit => no_edit} if tag == "input" && no_edit == "disable"
+       field_method = this_field.to_s.sub('?', '')
+       id_for_this = param_name_for_this.gsub('[', '_').gsub(']', '')
+    -%>
+      <div class="field #{field_method}-field #{'required' if required.include?(field_method)} " unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
+        <label for="&id_for_this" param="#{field_method}-label" unless="&field_name.blank?">
+          <%= field_name %>
+        </label>
+        <do param="#{field_method}-view">
+          <do param="view"><call-tag tag="&tag" param="#{field_method}-tag" merge-attrs="&input_attrs"/></do>
+        </do>
+        <span param="#{field_method}-help" class="input-help" if="&tag.to_sym == :input && !this_field_help.blank?">
+          <%= this_field_help %>
+        </span>
+      </div>
+    </with-fields>
+  </fieldset>
+</def>

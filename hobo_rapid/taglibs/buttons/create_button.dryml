@@ -1,0 +1,40 @@
+<!-- Provides an ajax create button that will send a RESTful "POST" to the server to create a new resource.
+
+All of the standard ajax attributes are supported (see the main taglib documention for Rapid Forms).
+
+### Attributes
+
+ - model: The class to instantiate, pass either the class name or the class object.
+
+ -->
+<def tag="create-button" attrs="model, update, label, fields, message"><%=
+  raise Hobo::Error.new("no update specified") unless update
+
+  fields ||= {}
+  class_or_assoc = if model
+                     model.is_a?(String) ? model.constantize : model
+                   elsif Hobo.simple_has_many_association?(this)
+                     id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key
+                     fields[this_field_reflection.foreign_key] = this.proxy_owner.send(id_method)
+                     this
+                   else
+                     raise Hobo::Error.new("invalid context for <create-button>")
+                   end
+  new = class_or_assoc.new(fields)
+  new.set_creator(current_user)
+  if can_create?(new)
+    label ||= ht("#{new.class.to_s.underscore}.actions.new", :default=>"New #{new.class.model_name.human}")
+    class_name = new.class.name.underscore
+    params ||= params || {}
+    params = params.merge(class_name => fields) unless fields.blank?
+
+    ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
+
+    ajax_attributes.reverse_merge!(:message => message, :params => params)
+    func = ajax_updater(object_url(new.class, :method => :post), update, ajax_attributes)
+    html_attributes.reverse_merge!(:type =>'button', :onclick => func, :value => label)
+
+    element :input, add_classes(html_attributes,
+                                "button create-button create-#{class_name}-button"), nil, true, true
+  end
+%></def>

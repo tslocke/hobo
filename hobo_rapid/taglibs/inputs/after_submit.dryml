@@ -1,0 +1,32 @@
+<!--
+Used inside a form to specify where to redirect after successful submission. This works by inserting a hidden field called `after_submit` which is used by Hobo if present to perform a redirect after the form submission.
+
+### Usage
+
+Use the `stay-here` attribute to remain on the current page:
+
+    <form>
+      <after-submit stay-here/>
+      ...
+    </form>
+
+Use the `go-back` option to return to the page in `session[:previous_uri]`:
+
+    <form>
+      <after-submit go-back/>
+      ...
+    </form>
+
+Use the `uri` option to specify a redirect location:
+
+    <form>
+      <after-submit uri="/admin"/>
+      ...
+    </form>
+-->
+<def tag="after-submit" attrs="uri, stay-here, go-back"><%
+  uri = "stay-here" if stay_here
+  uri = session[:previous_uri] if go_back
+  -%>
+  <input type="hidden" value="&params[:after_submit] || uri" name="after_submit" if="&uri"/>
+</def>

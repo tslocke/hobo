@@ -1,0 +1,40 @@
+/* see: http://fecklessmind.com/2009/01/23/how-to-reliable-css-forms/ */
+
+/* put a class of 'vertical', 'horizontal' or 'inline-vertical' on
+your fieldset to choose your layout. */
+
+/* fieldset {clear: both;} */
+fieldset.feckless-fields legend {padding: 0 0 1.286em; font-size: 1.167em; font-weight: 700;}
+fieldset.feckless-fields fieldset legend {padding: 0 0 1.5em; font-size: 1em;}
+* html fieldset.feckless-fields legend {margin-left: -7px;} /* ie6 */
+*+html fieldset.feckless-fields legend {margin-left: -7px;} /* ie7 */
+
+fieldset.feckless-fields .field, fieldset.feckless-fields .buttons {/* clear: both; */ margin: 0 0 1.0em;}
+fieldset.feckless-fields .field label, fieldset.feckless-fields .field .input-help {display: block;}
+fieldset.feckless-fields ul.fields {margin: 0 0 1.0em; padding: 0;}
+fieldset.feckless-fields ul.fields li {list-style-type: none; margin: 0;}
+fieldset.feckless-fields ul.inline li, fieldset.feckless-fields ul.inline label {display: inline;}
+fieldset.feckless-fields ul.inline li {padding: 0 .75em 0 0;}
+
+fieldset.feckless-fields input.radio, fieldset.feckless-fields input.checkbox {vertical-align: top;}
+fieldset.feckless-fields label, fieldset.feckless-fields button, fieldset.feckless-fields input.submit, fieldset.feckless-fields input.image {cursor: pointer;}
+* html fieldset.feckless-fields input.radio, * html fieldset.feckless-fields input.checkbox {vertical-align: middle;} /* ie6 */
+*+html fieldset.feckless-fields input.radio, *+html fieldset.feckless-fields input.checkbox {vertical-align: middle;} /* ie7 */
+
+
+fieldset.feckless-fields textarea {overflow: auto;}
+fieldset.feckless-fields input.text, fieldset.feckless-fields input.string, fieldset.feckless-fields input.email-address, fieldset.feckless-fields input.password, fieldset.feckless-fields textarea, fieldset.feckless-fields select {margin: 0; font: 1em/1.3 Helvetica, Arial, "Liberation Sans", "Bitstream Vera Sans", sans-serif; vertical-align: baseline;}
+fieldset.feckless-fields input.text, fieldset.feckless-fields input.string, fieldset.feckless-fields input.email-address, fieldset.feckless-fields input.password, fieldset.feckless-fields textarea {border: 1px solid #444; padding: 2px;}
+
+/* horizontal layout */
+fieldset.feckless-fields.horizontal .field {padding-left: 150px; }
+fieldset.feckless-fields.horizontal .field label {display: inline; float: left; width: 140px; margin-left: -150px; clear:none;}
+fieldset.feckless-fields.horizontal .input-help { display: inline; margin-left: 0.5em; }
+
+/* inline vertical layout.  We make sure to undue all the fieldset.horizontal styles so that this can be nested inside a fieldset.horizontal */
+fieldset.feckless-fields.inline-vertical .field {padding-left: 0; display: inline-block; float: none; margin-left: 0; clear: none; height:1%; *display:inline;}
+fieldset.feckless-fields.inline-vertical .field label {display: block; float: none; width: 100%; margin-left: 0;}
+fieldset.feckless-fields.inline-vertical .input-help { display: block; margin-left: 0; }
+
+fieldset.feckless-fields .field.required label:before {content:"*"; color: red;}
+fieldset.feckless-fields .field.required label {color: red;}

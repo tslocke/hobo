@@ -1,0 +1,30 @@
+<!-- Renders the name of the current context using a variety of methods.
+
+### Details
+
+ - Equivalent to `<nil-view>` if `this` is nil
+ - Equivalent to `<count>` if `this` is an Array
+ - Equivalent to `<type-name>` if `this` is a class
+ - If the context has a `name_attribute` defined, equivalent to `<view:abc/>` (where `abc` is the name attribute)
+ - Finally falls back to `this.to_s` (html escaped), but only if the user has view permission for `this`
+
+### Attributes
+
+ - if-present: if given, nothing at all will be rendered for nil values (as opposed to rendering `<nil-view>`)
+
+-->
+<def tag="name" attrs="if-present"><%=
+  if this.nil?
+    nil_view unless if_present
+  else
+    if this.is_a?(Array)
+      count
+    elsif this.is_a?(Class)
+      type_name(attributes)
+    elsif (name_attr = this.class.try.name_attribute) && can_view?(this, name_attr)
+      view(merge_attrs(attributes, {:field => name_attr}))
+    elsif can_view?(this)
+      h this.to_s
+    end
+  end
+%></def>

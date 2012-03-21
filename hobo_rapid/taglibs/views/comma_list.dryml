@@ -1,0 +1,2 @@
+<!-- Renders a collection of strings joined with ", ", or some other string passed in the `join` attribute -->
+<def tag="comma-list" attrs="join"><%= this.join(join || ", ") %></def>

@@ -1,0 +1,30 @@
+<!-- Basic account page that provides the ability for the user to change their email address and password. -->
+<def tag="account-page">
+
+  <page title="#{t 'hobo.account_page.title', :default=>['Your Account'] }" merge>
+
+    <body: class="user-account-page #{type_name}" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading"><name/></h2>
+      </header>
+
+      <section param="content-body">
+        <error-messages param/>
+        <form class="change-password" param>
+          <field-list fields="email_address, current_password, password, password_confirmation" param>
+            <password-label:><t key="hobo.account_page.new_password">New Password</t></password-label:>
+            <password-confirmation-label:><t key="hobo.account_page.confirm_new_password">Confirm New Password</t></password-confirmation-label:>
+          </field-list>
+
+          <div class="actions" param="actions">
+            <submit label="#{t 'hobo.actions.save_account', :default=>'Save'}" param/>
+          </div>
+        </form>
+      </section>
+    </content:>
+
+  </page>
+
+</def>

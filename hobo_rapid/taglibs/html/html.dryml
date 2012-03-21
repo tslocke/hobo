@@ -1,1 +1,18 @@
-<!-- Standard HTML tags that have been enhanced in RAPID. -->
+<!-- Standard HTML tags that have been enhanced in RAPID, as well as
+closely related tags -->
+
+
+<!-- Renders an `<html>` tag along with the DOCTYPE specified in the `doctype` attribute.
+
+### Attributes
+
+ - `doctype` - the version of the DOCTYPE required. See the `version` attribute to `<doctype>`
+ -->
+<def tag="html" attrs="doctype">
+  <% doctype ||= 'html' -%>
+  <doctype version="&doctype"/>
+  <% attributes.reverse_merge!(:xmlns => "http://www.w3.org/1999/xhtml") if doctype.upcase =~ /^XHTML/ -%>
+  <%=raw "<html#{tag_options(attributes, true)}>" %>
+    <set-scoped xmldoctype="&doctype.upcase =~ /^XHTML/"><do param="default"/></set-scoped>
+  <%=raw "</html>" %>
+</def>

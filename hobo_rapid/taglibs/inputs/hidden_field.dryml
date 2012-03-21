@@ -1,0 +1,47 @@
+<%# creates hidden inputs for the specified fields.
+
+### Attributes
+
+- `fields`: the fields to create hidden inputs for.   If neither fields nor for-query-string is specified, all fields except for `type`, `created_at` and `updated_at` are used.
+
+- `for-query-string`: creates hidden inputs from the query string
+  parameters of our original request.  AJAX parameters are skipped.
+%>
+<def tag="hidden-fields" attrs="fields, skip, for-query-string"><%=
+  pairs = if for_query_string
+            if for_query_string.blank? || for_query_string==true
+              query_parameters_filtered
+            else
+              query_parameters_filtered(:only => comma_split(for_query_string))
+            end
+          else
+            hiddens = case fields
+                      when '*', nil
+                        this.class.column_names - ['type', 'created_at', 'updated_at']
+                      else
+                        comma_split(fields)
+                      end
+            hiddens.map do |field|
+              val = this.send(field)
+              param_name = param_name_for(form_field_path + [field])
+              [param_name, val] unless val.nil? ||
+                                       field.to_sym.in?(this.class.attr_protected) ||
+                                       (this.new_record? && val == this.class.column(field).default)
+            end.compact
+          end
+  skip = comma_split skip
+  pairs.reject! { |p| p.first.in?(skip) }
+  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.safe_join("\n".html_safe)
+%></def>
+
+
+<%#  a simple wrapper around hidden_field_tag.
+%>
+<def tag="hidden-field">
+  <%= hidden_field_tag(param_name_for_this, this, deunderscore_attributes(attributes)) %>
+</def>
+
+<!-- Renders an `<input type='hidden'>` for the `id` field of the current context -->
+<def tag="hidden-id-field">
+  <if:id><input type="hidden" name="#{param_name_for_this}" value="#{this}" /></if>
+</def>

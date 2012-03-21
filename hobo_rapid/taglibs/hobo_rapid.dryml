@@ -6,5 +6,9 @@
 <include src="editors/*"/>
 <include src="forms/*"/>
 <include src="html/*"/>
-<include src="navigation/*"/>
+<include src="i18n/*"/>
+<include src="inputs/*"/>
+<include src="lists/*"/>
+<include src="pages/*"/>
 <include src="plus/*"/>
+<include src="views/*"/>

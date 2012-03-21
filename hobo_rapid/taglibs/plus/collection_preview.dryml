@@ -1,0 +1,23 @@
+<!-- Deprecated: use collection-preview instead. -->
+<def tag="preview-with-more"><collection-preview merge/></def>
+
+
+<!-- Captures the common pattern of a list of "the first few" cards, along with a link to the rest. -->
+<def tag="collection-preview" attrs="name">
+  <% model_class = this.member_class
+     name ||= model_class.name.downcase.pluralize -%>
+  <section class="#{name.dasherize} collection-preview" param="default">
+    <h3 param="heading">
+      <ht key="#{model_class.to_s.underscore}.collection.heading" count="&this.size">
+        <do param="heading-content"><%= name.pluralize.titleize %></do>
+      </ht>
+    </h3>
+    <a with="&model_class" action="new" if="&can_create?(model_class.new)" param="new-link">
+      <ht key="#{model_class.to_s.underscore}.actions.new">New <%= model_class.model_name.human %></ht>
+    </a>
+    <collection param/>
+    <unless test="&this.empty? || this.size == model_class.count">
+      <a param="show-all"><ht key="#{model_class.to_s.underscore}.actions.show_all" count="100">Show all <%= name.pluralize.titleize %>...</ht></a>
+    </unless>
+  </section>
+</def>
