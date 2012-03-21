@@ -30,8 +30,9 @@
             end.compact
           end
   skip = comma_split skip
-  pairs.reject! { |p| p.first.in?(skip) }
-  pairs.map { |n, v| hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names) }.compact.safe_join("\n".html_safe)
+  pairs.to_a.reject { |p| p.first.in?(skip) }.map { |n, v|
+    hidden_field_tag(n, v.to_s) if v && n.not_in?(scope.form_field_names)
+  }.compact.safe_join("\n".html_safe)
 %></def>
 
 
