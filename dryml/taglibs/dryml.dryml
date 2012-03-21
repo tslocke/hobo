@@ -1,0 +1,3 @@
+<!-- this file exists so the cookbook can find it. -->
+
+<include src="core"/>
