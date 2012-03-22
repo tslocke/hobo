@@ -7,7 +7,7 @@ Create a mock view layer:
 
         >>
          class View
-           extend Hobo::Helper
+           extend HoboRouteHelper
            class << self
              protected_instance_methods.each {|m| public m }
 
