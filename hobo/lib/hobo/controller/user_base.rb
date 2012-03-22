@@ -15,8 +15,6 @@ module Hobo
           skip_before_filter :login_required, :only => [:login, :signup, :do_signup, :forgot_password, :reset_password, :do_reset_password,
                                                         :accept_invitation, :do_accept_invitation]
 
-          include_taglib "rapid_user_pages", :plugin => "hobo"
-
           alias_method_chain :hobo_update, :account_flash
         end
 
