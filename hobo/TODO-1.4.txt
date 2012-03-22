@@ -1,36 +1,65 @@
 # TODO
 
- * fixup deprecation warnings
+## regressions
+
+ * after-submit is probably broken
+ * remote-method-button, create-button, update-button,
+   transition-button: normal usages of these tags work, but they do
+   not work if you ask them to do AJAX
+ * live-search works, but it's not 'live'.  You have to press return
+   to start the search
+ * sortable-input-many doesn't work
+ * name-many doesn't work
+ * remove-button, remote-method-button, create-button & update-button
+   used to display inline but now display as a block.   In other
+   words, they now display one per line rather than several in a
+   single line.
+ * the rapid_summary tags are probably broken.  They will be moved out
+   of core Hobo into their own plugin
+
+## documentation
+
+ * document themes/plugins
+ * FAQ
+ * agility
+ * admin subsite
+ * books
+ * ajax manual section
+
+## Cookbook
+
+ * captcha
+ * search
+ * actually use our Hobo 1.4's new caching abilities
+ * auto-link tags in manual
+
+## new features that aren't "done"
+
  * create_response: mirror update_response
- * sortable-input-many
- * name-many
- * remote-method-button, create-button, update-button, transition-button: update ajax half
- * live-search works, but it's not 'live'
- * display:inline for remove-button and friends
  * taglib cleanup
  * clean_sidemenu -> plugin
- * port to 3.2
- * nuke any remaining prototype code
- * add a sane default for non-AJAX JSON requests.
  * nested-cache: csrf workaround
+ * nested-cache: enhanced sweeper version
  * deal with my patches to will_paginate
- * document themes/plugins.  Probably easier to create generator & document that
- * trawl the lighthouse && pull requests
- * checkout out Bob's problem with after-submit
- * steal the tags from Portal
- * add theme chooser to setup wizard
- * add FAQ to docs
 
 It's quite likely that some of the new tag definitions are missing
-id, class, merge or param attributes.  This doesn't impact core
-functionality, but it does limit your ability to extend the tags.  If
+useful id, class, merge or param attributes. This doesn't impact core
+functionality, but it does limit your ability to extend the tags. If
 you notice any such omissions, please let us know, it is easy to fix..
 
-before pre1:
+## stuff that we really want to do
 
- * front.* etc need to be added to precompile lists or something
+ * fixup deprecation warnings
+ * port to Rails 3.2 and/or 4.0
+ * nuke any remaining prototype code
+ * add a sane default for non-AJAX JSON requests.
+ * trawl the lighthouse && pull requests
+ * steal the tags from Portal
+ * fixup hobo-contrib
 
-would be nice:
+## would be nice:
 
  * parametrize the clean theme
  * create a bootstrap theme
+ * add theme chooser to setup wizard
+ * add support for has-one

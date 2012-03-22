@@ -155,11 +155,42 @@ to your app/assets/stylesheets/front.css.  Some themes may also
 include javascript which would require them to be added to front.js as
 well.
 
+## default doctype changed
+
+The default doctype has been changed from `XHTML 1.0 TRANSITIONAL` to
+`html`, also known as "standards mode" in Internet Explorer 8 and 9
+and "html5" in other browsers.
+
+## default field-list changed
+
+The default for `<field-list>` has changed to `<feckless-fieldset>`.
+The old behaviour is still available in `<field-list-v1>`.   Please
+provide feedback: we are open to reversion before final release.
+
+## Helper rearrangement
+
+In previous versions of Hobo, all Hobo helpers were available in both
+the controllers and the views.   In this version, some helpers are
+only available in the views.   If there is a helper function that you
+need to access in your controller, you can call in your controller:
+
+    HoboTypeHelper.add_to_controller(self)
+
+Other Helper classes not included in the controller by default are
+HoboDebugHelper, HoboDeprecatedHelper and HoboViewHintHelper.
+
+Several helpers have been moved into
+app/helpers/hobo_deprecated_helper.rb
+
+If your application depends on any of these, you can set
+config.hobo.include_deprecated_helper.
+
 ## Enhancements
 
 ### Nested caching
 
-See the docs for `<nested-cache>` and the blog post I'm going to write...
+See the docs for `<nested-cache>` and the blog post I'm going to
+eventually write...
 
 ### push-state
 
