@@ -1,10 +1,6 @@
-require 'active_support/core_ext/string/output_safety'
-module Hobo
-  module Helper
-    module Translations
-      module Normalizer
-
-        private
+module HoboTranslationsNormalizerHelper
+  extend HoboHelperBase
+  private
 
         def normalize_args(key, options={})
           if (key.class == Hash) # called as a tag
@@ -33,7 +29,4 @@ module Hobo
           end
         end
 
-      end
-    end
-  end
 end

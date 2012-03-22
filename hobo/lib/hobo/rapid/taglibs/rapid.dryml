@@ -9,8 +9,3 @@ The Rapid tag library makes web development go fast. The Rapid tag library is yo
 -->
 
 <% Rails.logger.warn '<include src="rapid" plugin="hobo"/> should be replaced with <include gem="hobo_rapid"/>' %>
-
-<include module="Hobo::Helper"/>
-<%# include module="Hobo::Rapid::Helper"/ %>
-<include module="Hobo::Helper::Translations"/>
-

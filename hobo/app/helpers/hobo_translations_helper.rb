@@ -1,8 +1,6 @@
-module Hobo
-  module Helper
-    module Translations
-
-      include Normalizer
+module HoboTranslationsHelper
+  extend HoboHelperBase
+  protected
 
 =begin
 
@@ -49,6 +47,5 @@ en:
 
 
 
-    end
-  end
 end
+

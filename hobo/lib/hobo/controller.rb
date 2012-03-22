@@ -14,7 +14,6 @@ module Hobo
 
       def included_in_class(klass)
         klass.extend(ClassMethods)
-        klass.send(:include, Hobo::Helper::Translations)
         klass.class_eval do
           before_filter :login_from_cookie
           alias_method_chain :redirect_to, :object_url
@@ -29,7 +28,10 @@ module Hobo
           @included_taglibs = []
           rescue_from ActionController::RoutingError, :with => :not_found unless Rails.env.development?
         end
-        Hobo::Helper.add_to_controller(klass)
+        HoboRouteHelper.add_to_controller(klass)
+        HoboTranslationsHelper.add_to_controller(klass)
+        HoboTranslationsNormalizerHelper.add_to_controller(klass)
+        HoboPermissionsHelper.add_to_controller(klass)
       end
 
     end

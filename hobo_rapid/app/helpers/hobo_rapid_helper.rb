@@ -13,6 +13,15 @@ module HoboRapidHelper
     [:params, :errors_ok,
      :reset_form, :refocus_form ]
 
+    def app_name(add_subsite=true)
+      an = Rails.application.config.hobo.app_name
+      if add_subsite && subsite
+        subsite_name = t 'hobo.admin.subsite_name', :default => subsite.titleize
+        an = an + " - #{subsite_name}"
+      end
+      an
+    end
+
     def comma_split(x)
       case x
       when nil
