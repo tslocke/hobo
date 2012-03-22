@@ -1,0 +1,21 @@
+<!-- Selects `<feckless-fieldset>` as the default tag for field lists
+in Hobo.  The previous version is still available in
+`<field-list-v1>`.   To revert to this usage, add to your
+application.dryml:
+
+    <def tag="field-list">
+      <field-list-v1 merge/>
+    </def>
+
+You can use feckless-fieldset in a manner stylistically more similar
+to field-list-v1 via:
+
+    <def tag="field-list">
+      <feckless-fieldset class="horizontal" merge/>
+    </def>
+
+-->
+<def tag="field-list">
+  <feckless-fieldset merge/>
+</def>
+
