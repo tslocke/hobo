@@ -7,5 +7,5 @@ Provides a short hand way of displaying images.  All attributes supported by `im
     <image src="blog/funny.jpg" alt="Funny Scene"/> -> <img src="/images/blog/funny.jpg" alt="Funny Scene"/>
 -->
 <def tag="image" attrs="src"><%=
-  image_tag src, Hash.new(attributes)
+  image_tag(src, Hash[deunderscore_attributes(attributes)])
 %></def>
