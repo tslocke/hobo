@@ -21,32 +21,39 @@ If you're on Linux you'll have to install a javascript runtime.
 On Ubuntu 11.10 you can get one by typing `apt-get install
 nodejs-dev`.  Other Linuxes should be similar.  Windows & OS X users
 should already have a javascript scripting host installed.  The list
-of compatible javascript runtimes is [here](https://github.com/sstephenson/execjs).
+of compatible javascript runtimes is
+[here](https://github.com/sstephenson/execjs).
 
-Next you'll need to download the hobo source
+To install prerelease versions of Hobo, you have three options: gems
+from rubygems, gems from source or pointing your Gemfile at hobo
+source.
+
+### Via gems from rubygems.org
+
+    gem install hobo --pre
+    hobo new foo
+
+### Via gems from source
 
     git clone git://github.com/tablatom/hobo
-
-Now you have two options: create gems, or use the source.
-
-### Via gems
-
     cd hobo
     rake gems[install]
     cd wherever-you-want-to-generate-your-app
     hobo new foo
 
 Once you've generated an app, you may wish to go in and replace the
-version strings for the hobo_* gems with `:git => "git://github.com/tablatom/hobo"
+version strings for the hobo_* gems with `:git => "git://github.com/tablatom/hobo"`
 
-### Via source
+### Via source path
 
 (This won't work on Windows)
 
+    git clone git://github.com/tablatom/hobo
     export HOBODEV=`pwd`/hobo
+    cd wherever-you-want-to-generate-your-app
     $HOBODEV/hobo/bin/hobo new foo
 
-## Updating an existing installation
+## Updating a Hobo 1.3 application
 
 There are several changes that need to be made to your application to
 upgrade from Hobo 1.3 to Hobo 1.4.   Most of these changes are
