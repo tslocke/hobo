@@ -31,7 +31,7 @@ module Generators
             end
           end
           gem_options[:comments] = "# #{options[:comments]}" if options[:comments]
-          need_update = gem_with_comments(plugin, gem_options[:version], gem_options)
+          need_update = gem_with_comments(plugin, options[:version], gem_options)
         end
 
         if options[:subsite] == "all"
