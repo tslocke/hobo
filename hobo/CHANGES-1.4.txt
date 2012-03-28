@@ -1,5 +1,16 @@
+Hobo 1.4 Changes
+{: .document-title}
 
-# Installing
+Documents the changes made in Hobo 1.4 and the changes required to
+migrate applications to Hobo 1.4
+
+Contents
+{: .contents-heading}
+
+- contents
+{:toc}
+
+# Installation
 
 ## Creating a new application
 
@@ -184,6 +195,11 @@ app/helpers/hobo_deprecated_helper.rb
 
 If your application depends on any of these, you can set
 config.hobo.include_deprecated_helper.
+
+## Rails 3.1 required
+
+Hobo 1.4 currently requires Rails 3.1 for operation.  We expect to be
+on Rails 3.2 before final release.
 
 ## Enhancements
 
