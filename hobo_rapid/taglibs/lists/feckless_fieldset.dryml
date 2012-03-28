@@ -74,10 +74,10 @@ A more complicated example stolen from actual working code:
     <with-fields merge-attrs="&attributes & attrs_for(:with_fields)">
     <% field_name = this_field_name
        input_attrs = {:no_edit => no_edit} if tag == "input" && no_edit == "disable"
-       field_method = this_field.to_s.sub('?', '')
+       field_method = scope.field_name.to_s.sub('?', '').gsub('.', '-')
        id_for_this = param_name_for_this.gsub('[', '_').gsub(']', '')
     -%>
-      <div class="field #{field_method}-field #{'required' if required.include?(field_method)} " unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)">
+      <div class="field #{'required' if required.include?(scope.field_name)}" unless="&(tag == 'input' && no_edit == 'skip' && !can_edit?) || (tag == 'view' && no_blanks && this.blank?)" param="#{field_method}-field">
         <label for="&id_for_this" param="#{field_method}-label" unless="&field_name.blank?">
           <%= field_name %>
         </label>
