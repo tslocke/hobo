@@ -10,8 +10,6 @@ source rvm gemset use hobo-smoke
 gem install --no-rdoc --no-ri $full_gems
 
 rm -rf smoke
-hobo new smoke --skip-setup  # will do a bundle install
-rm -rf smoke
 hobo new smoke --setup
 cd smoke
 
