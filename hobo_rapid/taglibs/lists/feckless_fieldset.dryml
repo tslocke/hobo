@@ -81,6 +81,7 @@ A more complicated example stolen from actual working code:
         <label for="&id_for_this" param="#{field_method}-label" unless="&field_name.blank?">
           <%= field_name %>
         </label>
+        &nbsp;
         <do param="#{field_method}-view">
           <do param="view"><call-tag tag="&tag" param="#{field_method}-tag" merge-attrs="&input_attrs"/></do>
         </do>
