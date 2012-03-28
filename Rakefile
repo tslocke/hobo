@@ -23,8 +23,8 @@ end
 
 desc "Build and push or install all the hobo-gems"
 task :gems, :action, :force do |t, args|
-  unless args.action.match(/^push|install$/)
-    puts "Unknown '#{args.action}' action: it must be either 'push' or 'install'."
+  unless args.action.match(/^push|install|build$/)
+    puts "Unknown '#{args.action}' action: it must be either 'push' or 'install' or 'build'."
     exit(1)
   end
   if ! args.force && ! `git status -s`.empty?
@@ -51,10 +51,10 @@ task :gems, :action, :force do |t, args|
 
       gem_name = "#{name}-#{version}.gem"
       sh %(gem build #{name}.gemspec)
-      sh %(gem #{args.action} #{gem_name} #{args.action == 'install' ? '--local' : ''})
+      sh %(gem #{args.action} #{gem_name} #{args.action == 'install' ? '--local' : ''}) unless args.action=='build'
 
     ensure
-      remove_entry_secure gem_name, true
+      remove_entry_secure gem_name, true unless args.action=='build'
       if args.action == 'install'
         File.open('VERSION', 'w') do |f|
           f.puts orig_version
