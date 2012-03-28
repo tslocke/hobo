@@ -2,20 +2,23 @@
 
 ## regressions
 
- * after-submit is probably broken
+ * after-submit, sortable-input-many and name-many do not work
+ * Hobo 1.4 breaks default_scope.  If you're setting the order, you
+   can use Hobo's set_default_order as a stopgap although once it's
+   fixed please switch back to default_scope as set_default_order
+   is deprecated.
  * remote-method-button, create-button, update-button,
    transition-button: normal usages of these tags work, but they do
    not work if you ask them to do AJAX
  * live-search works, but it's not 'live'.  You have to press return
    to start the search
- * sortable-input-many doesn't work
- * name-many doesn't work
  * remove-button, remote-method-button, create-button & update-button
    used to display inline but now display as a block.   In other
    words, they now display one per line rather than several in a
    single line.
- * the rapid_summary tags are probably broken.  They will be moved out
-   of core Hobo into their own plugin
+ * the rapid_summary tags have been moved out
+   of core Hobo into their own plugin,
+   https://github.com/Hobo/hobo_summary, which is not yet in a working state
 
 ## documentation
 
@@ -30,8 +33,9 @@
 
  * captcha
  * search
- * actually use our Hobo 1.4's new caching abilities
+ * actually use Hobo 1.4's new caching abilities
  * auto-link tags in manual
+ * create fakedef manual entries for DRYML tags not in taglibs entry
 
 ## new features that aren't "done"
 
@@ -40,11 +44,11 @@
  * clean_sidemenu -> plugin
  * nested-cache: csrf workaround
  * nested-cache: enhanced sweeper version
- * deal with my patches to will_paginate
+ * monkey patch will_paginate if my patches are not upstreamed
 
 It's quite likely that some of the new tag definitions are missing
-useful id, class, merge or param attributes. This doesn't impact core
-functionality, but it does limit your ability to extend the tags. If
+useful id, class, merge or param attributes.  This doesn't impact core
+functionality, but it does limit your ability to extend the tags.  If
 you notice any such omissions, please let us know, it is easy to fix..
 
 ## stuff that we really want to do
