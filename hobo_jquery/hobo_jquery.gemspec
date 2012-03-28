@@ -6,7 +6,6 @@ spec = Gem::Specification.new do |s|
   s.name = "hobo_jquery"
   s.summary = "JQuery support for Hobo"
   s.description = "JQuery support for Hobo"
-  s.version = "1.3.0pre1"
   s.authors = ["Bryan Larsen"]
   s.email = "bryan@larsen.st"
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
