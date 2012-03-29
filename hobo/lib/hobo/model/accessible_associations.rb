@@ -91,7 +91,7 @@ module Hobo
 
       def finder_for_belongs_to(record, name)
         refl = record.class.reflections[name]
-        conditions = ActiveRecord::Associations::BelongsToAssociation.new(record, refl).send(:conditions)
+        conditions = ActiveRecord::Associations::BelongsToAssociation.new(record, refl).reflection.send(:conditions)
         finder = refl.klass.scoped(:conditions => conditions)
       end
 
