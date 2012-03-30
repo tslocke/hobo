@@ -747,9 +747,11 @@ module Hobo
 
     # --- Miscelaneous Actions --- #
 
+    # Hobo 1.3's name one uses params[:query], jQuery-UI's autocomplete
+    # uses params[:term] and jQuery Tokeninput uses params[:q]
     def hobo_completions(attribute, finder, options={})
       options = options.reverse_merge(:limit => 10, :query_scope => "#{attribute}_contains")
-      options[:param] ||= params[:query].nil? ? :term : :query
+      options[:param] ||= [:term, :q, :query].find{|k| !params[k].nil?}
       finder = finder.limit(options[:limit]) unless finder.try.limit_value
 
       begin
@@ -763,7 +765,11 @@ module Hobo
         end
       end
       if request.xhr?
-        render :json => items.map {|i| i.send(attribute)}
+        if options[:param] == :q
+          render :json => items.map {|i| {:id => "@#{i.send(i.class.primary_key)}", :name => i.send(attribute)}}
+        else
+          render :json => items.map {|i| i.send(attribute)}
+        end
       else
         render :text => "<ul>\n" + items.map {|i| "<li>#{i.send(attribute)}</li>\n"}.join + "</ul>"
       end

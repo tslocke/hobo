@@ -73,7 +73,7 @@ module Hobo
           # just isn't making any updates to the array.  So we're
           # hacking this in: if you pash an empty string where an array
           # is expected, we assume you wanted an empty array.
-          []
+          array_or_hash.split(',')
         else
           array_or_hash
         end
