@@ -2,7 +2,7 @@
 
 ## regressions
 
- * after-submit, sortable-input-many and name-many do not work
+ * after-submit, sortable-input-many do not work
  * Hobo 1.4 breaks default_scope.  If you're setting the order, you
    can use Hobo's set_default_order as a stopgap although once it's
    fixed please switch back to default_scope as set_default_order
@@ -31,7 +31,6 @@
 
 ## Cookbook
 
- * captcha
  * search
  * actually use Hobo 1.4's new caching abilities
  * auto-link tags in manual
@@ -60,6 +59,7 @@ you notice any such omissions, please let us know, it is easy to fix..
  * trawl the lighthouse && pull requests
  * steal the tags from Portal
  * fixup hobo-contrib
+ * convert paperclip_with_hobo to gem
 
 ## would be nice:
 
@@ -67,3 +67,4 @@ you notice any such omissions, please let us know, it is easy to fix..
  * create a bootstrap theme
  * add theme chooser to setup wizard
  * add support for has-one
+ * convert old Hobo plugins:  imaginary-dryml, hoboyui
