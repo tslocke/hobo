@@ -34,6 +34,15 @@ Remember that the default parameter is a list, even if you set per-section="1". 
 
 This tag uses Enumerable#chunk, which is only available with Ruby 1.9.2 and later.   If you are using Ruby 1.8.7, you must include the `backports` gem in your project.
 
+### Attributes:
+
+- `per-section`, `chunker`:  (see above).   Only one of these should
+  be used.   Using neither results is the same as saying
+  per-section="20"
+
+- `sortable`: if set, the accordion is sortable, although the sort
+  order is not saved.
+
 -->
 <def tag="accordion-collection" attrs="per-section,chunker,sortable">
   <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'header', 'icons', 'navigation'])
