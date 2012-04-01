@@ -284,6 +284,12 @@ module Dryml
       res.to_s
     end
 
+    def yield_output_buffer
+      res = nil
+      @view.with_output_buffer { res = yield }
+      res.to_s
+    end
+
 
     def new_object_context(new_this)
       new_context do

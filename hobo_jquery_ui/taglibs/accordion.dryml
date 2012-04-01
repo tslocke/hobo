@@ -15,13 +15,14 @@ There is one difference:  accordion does not support the `href` option.
      add_data_rapid!(html_attrs, "accordion", :options => options, :events => events, :sortable => sortable)
      %>
   <div merge-attrs="&html_attrs">
-    <repeat with="&parameters">
+    <% parameters.map do |param_name, param|
+         yield_output_buffer { %>
       <div class="hjq-accordion-element">
-        <% attrs, params = this.call %>
-        <% merge_attrs = attrs - [:name] %>
-        <h3><a href="#"><%= attrs[:name] || this_key.to_s.titleize %></a></h3>
+        <% attrs, params = param.call -%>
+        <% merge_attrs = attrs - [:name] -%>
+        <h3><a href="#"><%= attrs[:name] || param_name.to_s.titleize %></a></h3>
         <div merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
       </div>
-    </repeat>
+    <% } end.join("").html_safe -%>
   </div>
 </def>

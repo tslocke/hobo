@@ -46,16 +46,18 @@ Usage of Ruby 1.8 will result in an undefined tab order.   Ruby 1.9 is recommend
      %>
   <div merge-attrs="&html_attrs">
     <ul>
-      <repeat with="&parameters">
-        <% attrs, params = this.call %>
-        <li><a href="#{attrs[:href] || '#'+(attrs[:id] || this_key.to_s)}"><%= attrs[:name] || this_key.to_s.titleize %></a></li>
-      </repeat>
+      <% parameters.map do |param_name, param|
+           yield_output_buffer { %>
+        <% attrs, params = param.call -%>
+        <li><a href="#{attrs[:href] || '#'+(attrs[:id] || param_name.to_s)}"><%= attrs[:name] || param_name.to_s.titleize %></a></li>
+      <% } end.join("").html_safe %>
     </ul>
 
-    <repeat with="&parameters">
-      <% attrs, params = this.call %>
-      <% merge_attrs = attrs - [:id, :href, :name] %>
-      <div id="#{attrs[:id] || this_key}" merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
-    </repeat>
+    <% parameters.map do |param_name, param|
+         yield_output_buffer { %>
+      <% attrs, params = param.call -%>
+      <% merge_attrs = attrs - [:id, :href, :name] -%>
+      <div id="#{attrs[:id] || param_name}" merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
+    <% } end.join("").html_safe %>
   </div>
 </def>
