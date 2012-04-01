@@ -1,0 +1,27 @@
+<%#
+
+This is a simple click-to-expand type widget with the same styling as
+the jquery-ui accordion.
+
+### Example
+
+    <toggle open>
+      <heading:>Click me</heading:>
+      <content:>inner content</content:>
+    <toggle>
+
+### Attributes
+
+`open`: if supplied, the content is initially displayed.   Otherwise
+it is initially hidden
+
+%>
+<def tag="toggle" attrs="open">
+  <div class="toggle ui-accordion ui-widget ui-helper-reset ui-accordion-icons" data-rapid="&data_rapid('toggle')" param="outer">
+    <h3 class="ui-accordion-header ui-state-default ui-helper-reset #{open ? 'ui-state-active ui-corner-top' : 'ui-corner-all'}" param>
+      <span class="ui-icon #{open ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e'}" param></span>
+      <a href="#" param="heading"/>
+    </h3>
+    <div class="ui-accordion-content ui-widget-content ui-corner-bottom ui-helper-reset #{open ? 'ui-accordion-content-active' : 'hidden'}" param="content"/>
+  </div>
+</def>
