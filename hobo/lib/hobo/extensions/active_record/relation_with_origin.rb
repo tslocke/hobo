@@ -11,8 +11,10 @@ module ActiveRecord
   module SpawnMethods
     def merge_with_origin(r)
       merged = merge_without_origin(r)
-      merged.origin ||= r.respond_to?(:origin) && r.origin
-      merged.origin_attribute ||= r.respond_to?(:origin_attribute) && r.origin_attribute
+      # LH#1002:  cannot call respond_to? because default_scope ends
+      # up calling merge and we end up with infinite recursion
+      merged.origin = r.origin rescue nil unless merged.instance_variable_defined?("@origin")
+      merged.origin_attribute = r.origin_attribute rescue nil unless merged.instance_variable_defined?("@origin_attribute")
       merged
     end
 
