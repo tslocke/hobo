@@ -41,7 +41,7 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
           <% col = sort_columns[scope.field_path] || scope.field_path
              sort = sort_field == col && sort_direction == 'asc' ?
                       "-#{col}" : col
-             sort_url = url_for_page_path(query_parameters_filtered('except' => 'page').merge(:sort => sort))
+             sort_url = url_for_page_path(query_parameters_filtered('skip' => 'page').merge(:sort => sort))
              col_heading_name = this.member_class.try.human_attribute_name(scope.field_name, :default=> scope.field_name.titleize) %>
 
           <th param="#{scope.field_name}-heading">
