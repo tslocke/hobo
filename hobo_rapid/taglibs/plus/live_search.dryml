@@ -17,7 +17,7 @@ All other attributes are merged into the form, so standard form attributes are s
   <% attributes[:message] ||= t("hobo.live_search.spinner_message", :default => "Querying...") %>
   <% query_param ||= "query" %>
   <div class="search" data-rapid='{"live-search": {}}'>
-    <form merge-attrs param refocus-form>
+    <form merge-attrs param refocus-form with="&nil">
       <input type="hidden" value="2" name="search_version"/>
       <label for="&query_param" param><t key="hobo.live_search.label">Search</t></label><input type="search" name="&query_param" class="live-search" param/>
     </form>
