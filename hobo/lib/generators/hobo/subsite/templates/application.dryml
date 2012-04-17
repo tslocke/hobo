@@ -1,1 +1,6 @@
 <!-- Global taglib - these tags are shared across all subsites -->
+
+<!-- WARNING: This file is loaded before front_site.dryml,
+admin_site.dryml et al.  If you see some instructions that tell you to
+add something to the bottom of application.dryml, you are probably better
+off adding it to the bottom of front_site.dryml -->
