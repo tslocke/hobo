@@ -10,8 +10,8 @@ class DevController < ActionController::Base
                           model.where(model.login_attribute => params[:login]).first
                         else
                           model.find(params[:id])
-                        end
-    redirect_to(request.env["HTTP_REFERER"] ? :back : home_page)
+                        end      
+    redirect_to(request.env["HTTP_REFERER"] ? :back : (home_page.blank? ? "/" : home_page))
   end
 
   private
