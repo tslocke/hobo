@@ -49,7 +49,7 @@ module Hobo
         end
         conditions = conditions.join(" and ")
 
-        results = search_target.where(conditions, *parameters)
+        results = search_target.where(conditions, *parameters).limit(20)
         [search_target.name, results] unless results.empty?
       end
     end
