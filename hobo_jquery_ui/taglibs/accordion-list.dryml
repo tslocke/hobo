@@ -1,0 +1,38 @@
+<%#
+
+Given a list of pairs, renders a [jQuery-UI accordion](jqueryui.com/demos/accordion).
+
+### Example
+
+    <accordion-list with="&[['header 1', 'body 1'], ['header 2', 'body 2']]"/>
+
+### Attributes
+
+All attributes supported by jQuery-UI accordion are passed through.
+
+- sortable:  if true, drag and drop sorting is allowed, although changes are not persistent
+
+ %>
+<def tag="accordion-list" attrs="sortable">
+  <% options, attrs = attributes.partition_hash(['disabled', 'active', 'animated', 'autoHeight', 'clearStyle', 'collapsible', 'event', 'fillSpace', 'header', 'icons', 'navigation'])
+     events, html_attrs = attrs.partition_hash(['navigationFilter', 'create', 'change', 'changestart'])
+     add_classes!(html_attrs, "accordion-list")
+     add_data_rapid!(html_attrs, "accordion", :options => options, :events => events, :sortable => sortable)
+     %>
+  <div merge-attrs="&html_attrs">
+    <repeat>
+      <div class="hjq-accordion-element">
+        <do:first>
+          <h3 param="header-wrapper">
+            <a param="header" href="#"><view/></a>
+          </h3>
+        </do:first>
+        <do:last>
+          <div param="default">
+            <view param/>
+          </div>
+        </do:last>
+      </div>
+    </repeat>
+  </div>
+</def>
