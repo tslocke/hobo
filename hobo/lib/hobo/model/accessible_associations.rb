@@ -71,7 +71,7 @@ module Hobo
           # Due to the way that rails works, there's no good way to tell
           # the difference between an empty array and a params hash that
           # just isn't making any updates to the array.  So we're
-          # hacking this in: if you pash an empty string where an array
+          # hacking this in: if you pass an empty string where an array
           # is expected, we assume you wanted an empty array.
           array_or_hash.split(',')
         else
