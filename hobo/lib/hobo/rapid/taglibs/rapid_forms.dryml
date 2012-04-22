@@ -476,10 +476,12 @@ The menus default to the current time if the current value is nil.
 <def tag="input" for="HoboFields::Types::EnumString" attrs="labels, titleize, first-option, first-value"><%
   labels ||= {}
   labels = HashWithIndifferentAccess.new(labels)
-  titleize = true if titleize.nil?
-  options = this_type.values.map {|v| 
+  titleize = true if titleize.nil? && labels.empty?
+  options = this_type.values.map {|v|
+    default = labels[v] || v
+    default = default.titleize if titleize
     [I18n.t("activerecord.attributes.#{this_parent.class.to_s.downcase}/#{this_field}s.#{v}",
-      :default => titleize ? v.titleize : v), 
+      :default => default),
     v]
   }
   %>
@@ -488,7 +490,6 @@ The menus default to the current time if the current value is nil.
     <%= options_for_select(options, this) %>
   </select>
 </def>
-
 
 <!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller.
 Web Methods provide support for the RPC model of client-server interaction, in contrast to the REST model. The
