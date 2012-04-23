@@ -1,14 +1,5 @@
 # TODO
 
-## hi prio
-
- * remove application from DRYML auto-load, fix up generator
-   appropriately
-
- * fix admin generator
-
- * invite-only generator: admin site broken
-
 ## regressions
 
  * after-submit, sortable-input-many do not work
