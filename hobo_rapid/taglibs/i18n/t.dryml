@@ -3,6 +3,11 @@
 The tag content is used as the :default option. It is overridden by an explicit 'default' attribute.
 There is a default :count => 1.
 
+### Examples
+
+    <t key="activerecord.attributes.model.field">Field</t>
+    <t key="my_key" count="1">A Foo</t>
+
 ### Attributes
 
  - key: the key to lookup
