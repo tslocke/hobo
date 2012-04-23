@@ -150,6 +150,10 @@ EOI
       invoke 'hobo:front_controller', [front_controller_name], :user_resource_name => @user_resource_name, :invite_only => @invite_only
     end
 
+    def install_default_plugins
+      invoke 'hobo:install_default_plugins', [], {:subsite => 'front', :theme => 'hobo_clean', :ui_theme => 'redmond', :skip_gem => false}
+    end
+
     def admin_subsite
       if wizard?
         say_title 'Admin Subsite'
@@ -175,30 +179,6 @@ EOI
                                      :user_resource_name => @user_resource_name,
                                      :invite_only => @invite_only,
                                      :make_front_site => false
-      end
-    end
-
-    def installing_plugins
-      say "Installing hobo_rapid plugin..."
-      install_plugin_helper('hobo_rapid', nil, :version => Hobo::VERSION)
-      say "Installing hobo_jquery plugin..."
-      install_plugin_helper('hobo_jquery', nil, :version => Hobo::VERSION)
-      say "Installing hobo_jquery_ui plugin..."
-      install_plugin_helper('hobo_jquery_ui', nil, :version => Hobo::VERSION)
-
-      say "Installing hobo_clean theme..."
-      inject_css_require("jquery-ui/redmond", "front", nil, true)
-      inject_css_require("jquery-ui/flick", "admin", nil, true) if @add_admin_subsite
-      if @add_admin_subsite
-        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :subsite => "front", :comments => "The default Hobo theme", :css_top => true)
-        install_plugin_helper('hobo_clean_admin', nil, :version => Hobo::VERSION, :subsite => @admin_subsite_name, :css_top => true)
-      else
-        install_plugin_helper('hobo_clean', nil, :version => Hobo::VERSION, :comments => "The default Hobo theme", :subsite => "front", :css_top => true)
-      end
-
-      gem_with_comments("jquery-ui-themes", "~> 0.0.4")
-      Bundler.with_clean_env do
-        run "bundle install"
       end
     end
 

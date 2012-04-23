@@ -17,11 +17,11 @@ module Hobo
       template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
     end
 
+    include Generators::Hobo::Subsite
+
     def generate_site_taglib
       invoke 'hobo:subsite_taglib', [name], options.merge(:admin => true)
     end
-
-    include Generators::Hobo::Subsite
 
   end
 end

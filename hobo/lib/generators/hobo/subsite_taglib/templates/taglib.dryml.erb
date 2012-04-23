@@ -1,8 +1,12 @@
 <!-- Tag definitions for the <%= file_name %> subsite -->
 
+<include gem="hobo_rapid"/>
+
 <include src="taglibs/auto/<%= file_name %>/rapid/cards"/>
 <include src="taglibs/auto/<%= file_name %>/rapid/pages"/>
 <include src="taglibs/auto/<%= file_name %>/rapid/forms"/>
+
+<include src="application"/>
 
 <% if invite_only? -%>
 

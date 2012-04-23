@@ -192,8 +192,7 @@ module Dryml
 private
 
   def taglibs_for(controller_path)
-    ( taglibs_in_dir('application').unshift(APPLICATION_TAGLIB) +
-      subsite_taglibs(controller_path) +
+    ( subsite_taglibs(controller_path) +
       ((controller_path.camelize+"Controller").constantize.try.included_taglibs||[])
     ).compact
   end
@@ -203,7 +202,7 @@ private
     subsite = parts.length >= 2 ? parts[0..-2].join('_') : "front"
     src = "taglibs/#{subsite}_site"
     Object.const_defined?(:Rails) && File.exists?("#{Rails.root}/app/views/#{src}.dryml") ?
-      taglibs_in_dir("#{subsite}_site").unshift({ :src => src }) : []
+      taglibs_in_dir("#{subsite}_site").unshift({ :src => src }) : [APPLICATION_TAGLIB]
   end
 
   def taglibs_in_dir(dir_name)

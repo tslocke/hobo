@@ -1,6 +1,4 @@
-tags = %(<!-- Tag definitions for the subs subsite -->
-
-<include src="taglibs/auto/subs/rapid/cards"/>
+tags = %(<include src="taglibs/auto/subs/rapid/cards"/>
 <include src="taglibs/auto/subs/rapid/pages"/>
 <include src="taglibs/auto/subs/rapid/forms"/>
 )

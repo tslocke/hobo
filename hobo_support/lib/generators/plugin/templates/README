@@ -9,12 +9,6 @@ It can be installed into a Hobo app by typing:
 
     hobo generate install_plugin <%= @filename %> git://github.com/my_github_username/<%= @filename %>.git
 
-Although if this plugin is a theme, it's better to use:
-
-    hobo generate install_plugin <%= @filename %> git://github.com/my_github_username/<%= @filename %>.git --subsite=front --css-top
-
-If you want it installed in a different subsite, replace "front" with the subsite name.
-
 You'll have to manually remove references to any old themes from front_site.dryml, front.js & front.css.
 
 The source for this plugin lives at git://github.com/my_github_username/<%= @filename %>.   Pull requests are welcome.

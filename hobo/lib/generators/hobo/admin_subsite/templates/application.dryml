@@ -1,3 +1,2 @@
-<!-- Global taglib - these tags are shared across all subsites -->
-
-<include src="rapid" gem="hobo"/>
+<!-- this file is included by front_site.dryml, admin_site.dryml et al, so
+you can place common code in this file. -->

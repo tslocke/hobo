@@ -10,6 +10,7 @@ module Hobo
 
     def generate_taglib
       template "taglib.dryml.erb", File.join('app/views/taglibs', "#{file_name}_site.dryml")
+      Rails::Generators.invoke('hobo:install_default_plugins', ["--subsite=#{file_name}", "--theme=hobo_clean_admin", "--ui_theme=flick", "--skip_gem"])
     end
 
   end

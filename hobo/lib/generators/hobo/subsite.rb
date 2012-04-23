@@ -1,14 +1,6 @@
 require 'fileutils'
 require 'thor/parser/option'
 
-# we want the option :make_front_site required even if it is boolean
-# Thor does not allow it, so we patch it
-class  Thor
-  class Option
-    def validate!; end
-  end
-end
-
 module Generators
   module Hobo
     Subsite = classy_module do
@@ -16,31 +8,14 @@ module Generators
       include Generators::Hobo::InviteOnly
       include Generators::Hobo::Taglib
 
-      class_option :make_front_site,
-                   :type => :boolean,
-                   :required => true,
-                   :desc => "Rename application.dryml to front_site.dryml"
-
       # check_class_collision :suffix => 'SiteController'
 
       def move_and_generate_files
-        if options[:make_front_site]
-          unless can_mv_application_to_front_site?
-            say "Cannot rename application.dryml to #{file_name}_site.dryml"
-            exit 1
-          end
+        if can_mv_application_to_front_site?
           say "Renaming app/views/taglibs/application.dryml to app/views/taglibs/front_site.dryml"  unless options[:quiet]
           unless options[:pretend]
             FileUtils.mv('app/views/taglibs/application.dryml', "app/views/taglibs/front_site.dryml")
             copy_file "application.dryml", 'app/views/taglibs/application.dryml'
-
-            # remove lines from front_site.dryml that exist in both front_site.dryml & application.dryml
-            front_site = File.readlines('app/views/taglibs/front_site.dryml') - File.readlines('app/views/taglibs/application.dryml').reject{|l| l.blank?}
-            File.open('app/views/taglibs/front_site.dryml', 'wb') do |file|
-              front_site.each do
-                |line| file.write(line)
-              end
-            end
           end
         end
 

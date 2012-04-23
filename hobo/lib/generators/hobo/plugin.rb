@@ -34,19 +34,15 @@ module Generators
           need_update = gem_with_comments(plugin, options[:version], gem_options)
         end
 
-        if options[:subsite] == "all"
-          if Hobo.subsites.blank?
-            subsites = ['application']
-          else
-            subsites = ['front'] + Hobo.subsites
-          end
+        if options[:subsite].nil? || options[:subsite] == "all"
+          subsites = ['front'] + Hobo.subsites
         else
-          subsites = [options[:subsite] || 'application']
+          subsites = [options[:subsite]]
         end
 
         subsites.each do |subsite|
           inject_js_require(name, subsite, options[:comments]) unless options[:skip_js]
-          inject_css_require(name, subsite, options[:comments], options[:css_top]) unless options[:skip_css]
+          inject_css_require(name, subsite, options[:comments]) unless options[:skip_css]
           inject_dryml_include(name, subsite, options[:comments])
         end
 
@@ -71,13 +67,9 @@ module Generators
         end
       end
 
-      def inject_css_require(name, subsite, comments, css_top)
+      def inject_css_require(name, subsite, comments)
         application_file = "app/assets/stylesheets/#{subsite}.css"
-        if css_top
-          opts = {:after => /^\/\*.*?\*=.*?\n /m}
-        else
-          opts = {:before => /\*=(?!.*\*=).*?$/m}
-        end
+        opts = {:before => /\*=(?!.*\*=).*?$/m}
 
         raise Thor::Error, "Couldn't find #{subsite}.css!" unless exists?(application_file)
 
@@ -91,7 +83,7 @@ module Generators
       def inject_dryml_include(name, subsite, comments)
         subsite = "#{subsite}_site" unless subsite=="application"
         application_file = "app/views/taglibs/#{subsite}.dryml"
-        pattern          = /\<include.*?\>(?!.*\<include.*?\>).*?\n/m
+        pattern          = /\<include gem=.*?\>(?!.*\<include gem=.*?\>).*?\n/m
 
         raise Thor::Error, "Couldn't find #{subsite}.dryml!" unless exists?(application_file)
 

@@ -1,0 +1,3 @@
+Description:
+
+    Installs the default set of Hobo plugins to a subsite.   It is called from the wizard and subsite generators, it is not likely to be useful on its own.
