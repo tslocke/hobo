@@ -21,7 +21,7 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
 -->
 <def tag="table-plus" attrs="sort-field, sort-direction, sort-columns" >
   <% sort_field ||= @sort_field; sort_direction ||= @sort_direction; sort_columns ||= {} %>
-  <% sort_columns['this'] ||= this.member_class.try.name_attribute %>
+  <% sort_columns['this'] ||= this.try.member_class.try.name_attribute %>
   <% ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS) %>
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
