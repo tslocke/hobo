@@ -11,7 +11,7 @@ module Hobo
 
     def install_default_plugins
       opts = options.dup
-      opts[:version => Hobo::VERSION]
+      opts[:version] = Hobo::VERSION
       say "Installing default plugins for #{opts[:subsite]}..."
       say "Installing hobo_rapid plugin..."
       install_plugin_helper('hobo_rapid', nil, opts)
