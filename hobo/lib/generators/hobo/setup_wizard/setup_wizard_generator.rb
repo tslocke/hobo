@@ -31,6 +31,9 @@ module Hobo
     class_option :admin_subsite_name, :type => :string,
                  :desc => "Admin Subsite Name", :default => 'admin'
 
+    class_option :invite_only, :type => :boolean,
+                 :desc => "Require invitation to join site"
+
     class_option :private_site, :type => :boolean,
                  :desc => "Make the site unaccessible to non-members"
 
