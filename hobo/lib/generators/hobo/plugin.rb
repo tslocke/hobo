@@ -43,7 +43,7 @@ module Generators
         subsites.each do |subsite|
           inject_js_require(name, subsite, options[:comments]) unless options[:skip_js]
           inject_css_require(name, subsite, options[:comments]) unless options[:skip_css]
-          inject_dryml_include(name, subsite, options[:comments])
+          inject_dryml_include(name, subsite, options[:comments]) unless options[:skip_dryml]
         end
 
         return need_update

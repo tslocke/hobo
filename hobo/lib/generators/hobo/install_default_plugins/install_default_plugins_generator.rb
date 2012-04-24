@@ -14,7 +14,7 @@ module Hobo
       opts[:version] = Hobo::VERSION
       say "Installing default plugins for #{opts[:subsite]}..."
       say "Installing hobo_rapid plugin..."
-      install_plugin_helper('hobo_rapid', nil, opts)
+      install_plugin_helper('hobo_rapid', nil, opts.merge(:skip_dryml => true))
       say "Installing hobo_jquery plugin..."
       install_plugin_helper('hobo_jquery', nil, opts)
       say "Installing hobo_jquery_ui plugin..."
