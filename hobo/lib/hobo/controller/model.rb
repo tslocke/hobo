@@ -330,19 +330,21 @@ module Hobo
     protected
 
 
-    def parse_sort_param(*sort_fields)
+    def parse_sort_param(*args)
       _, desc, field = *params[:sort]._?.match(/^(-)?([a-z_]+(?:\.[a-z_]+)?)$/)
 
       if field
-        if field.in?(sort_fields.*.to_s)
+        hash = args.extract_options!
+        db_sort_field = hash[field] || hash[field.to_sym] || (field if field.in?(args) || field.to_sym.in?(args))
+
+        if db_sort_field
           @sort_field = field
           @sort_direction = desc ? "desc" : "asc"
 
-          [@sort_field, @sort_direction]
+          "#{db_sort_field} #{@sort_direction}"
         end
       end
     end
-
 
     # --- Action implementation helpers --- #
 

@@ -545,6 +545,15 @@ if you still need it.
 There's a new helper function called query_parameters_filtered that
 returns query parameters with the ajax parameters removed.
 
+### parse_sort_param
+
+The controller function parse_sort_param has been updated so that it
+can take a hash instead of or as well as an argument list.  The key of
+the hash is the field name and the value is the column name.
+Example:
+
+     Book.include(:authors).order(parse_sort_param(:title, :authors => "authors.last_name")
+
 ## Editors
 
 Editors are no longer special-cased, they now use the standard DRYML
