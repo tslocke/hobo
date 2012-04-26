@@ -147,6 +147,7 @@
 	            .click(function(event, ui) {
 
                         select.find("option:selected").removeAttr("selected");
+                        select.val(null);
                         input.val( "" );
 	                input.data( "autocomplete" ).term = "";
                         self._trigger( "selected", event, { item: null });
