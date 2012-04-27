@@ -22,9 +22,9 @@ See [Filtering stories by status](/tutorials/agility#filtering_stories_by_status
 Standard AJAX attributes such as 'update' are supported.   If any are supplied, filter-menu uses Ajax rather than a page refresh.
 
  - `param-name` - the name of the HTTP parameter to use for the filter
- - `options` - an array of options or an array of arrays (useful for localized apps) for the menu.
-   It can be omitted if you provide the options as an array or array of arrays in the locale file.
- - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'
+ - `options` - an array of options or an array of pairs (useful for localized apps) for the menu.
+   It can be omitted if you provide the options as an array or array of pairs in the locale file.
+ - `no-filter` - The text of the first option which indicates no filter is in effect. Defaults to 'All'.  Pass "&false" to disable the no-filter option
  - `first-value` - the value to be used with the first option. Typically not used,
  meaning the option has a blank value.
  - model - the model name (optional: needed if you use the "activerecord.attributes" namespace.
@@ -87,9 +87,13 @@ or
   -->
 <def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
   <% options = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.options", :default=>[:"tags.filter_menu.#{param_name}.options", options])
-     raise ArgumentError, %(You must provide an "options" attribute, or set "activerecord.attributes.#{model}.filter_menu.#{param_name}.options" or "tags.filter_menu.#{param_name}.options" to an Array or to an Array of Arrays
+     raise ArgumentError, %(You must provide an "options" attribute, or set "activerecord.attributes.#{model}.filter_menu.#{param_name}.options" or "tags.filter_menu.#{param_name}.options" to an Array or to an Array of pairs
      in your locale file(s)) unless options.is_a?(Array)
-     no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
+     if no_filter==false
+       no_filter = nil
+     else
+       no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
+     end
      %>
   <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
     <div>
