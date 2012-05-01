@@ -3,6 +3,7 @@ module Hobo
   module Controller
 
     include AuthenticationSupport
+    include Cache
 
     class << self
 

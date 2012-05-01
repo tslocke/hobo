@@ -59,7 +59,8 @@ replace with:
 ### Attributes
 
 All extra attributes are used as non-hierarchical cache keys, so for
-inner caches these should be constants.
+inner caches these should either be constants or be manually
+propagated to the outer caches
 
 `methods`: A comma separated list of methods or fields that can be
 called on the context (aka this) to produce cache keys.  Example:
@@ -76,7 +77,7 @@ its cache key.  If you are caching an item that will be used in
 multiple different actions, you can specify route-on to ensure that
 the different actions can share the cache.  You can pass either an
 object or a path to route-on.  If you pass an object, it is converted
-to a path with `url_for`.  If you specify route-on with a value,
+to a path with `url_for`.  If you specify route-on without a value,
 `this` is used.  An alternative to using `route-on` is to specify
 `controller`, `action` and any other required path parameters
 explicitly.  For example route-on="&posts_path" is identical to
@@ -88,25 +89,13 @@ attribute.
 
 ### Hints
 
-If you are using an LRU cache such as memory-cache, memcached or redis
-you typically specify `updated_at` in the methods attribute.
+If you have sweepers, you probably want `<swept-cache>` instead.
 
-If you are using a cache with manual expiration, `typed_id` is a
-convenient unique id that is available on all Hobo models that have
-been saved in the database.  You can then add this to your FooSweeper:
-
-    def after_update(foo)
-      Rails.cache.delete_matched(/typed_id\=#{CGI.escape foo.typed_id}(&|$)/)
-    end
-
-This will delete the fragment, along will all fragments that contain
-that fragment.
-
-Another thing to keep in mind is that any Hobo tag that can generate a
-page refresh, such as filter-menu, table-plus or page-nav stores query
-parameters such as search, sort & page so that these are not lost when
-refreshed.  So they will need to be added to the query-params for any
-cache containing such tags.
+Any Hobo tag that can generate a page refresh, such as filter-menu,
+table-plus or page-nav stores query parameters such as search, sort &
+page so that these are not lost when the tag is used to refresh the
+page. These will need to be added to the query-params for any cache
+containing such tags.
 
 -->
 <def tag="nested-cache" attrs="methods,query-params,route-on">
@@ -133,7 +122,7 @@ cache containing such tags.
      end
 
      comma_split(query_params).each do |qp|
-       key_key["@#{qp}"] = params[qp]
+       key_key["@#{qp}"] = params[qp] || ""
      end
 
      if route_on == true
@@ -146,10 +135,8 @@ cache containing such tags.
 
      if route_on
        attributes.reverse_merge!(Rails.application.routes.recognize_path(route_on))
-     end
-
-     # it's quite possible that our page was rendered by a different action, so normalize
-     if params[:page_path]
+     elsif params[:page_path]
+       # it's quite possible that our page was rendered by a different action, so normalize
        attributes.reverse_merge!(Rails.application.routes.recognize_path(params[:page_path]))
      end
 
@@ -247,7 +234,7 @@ cache containing such tags.
            fail if scope.cache_paths_stack.length>0
          end
        else
-         # we have a parent cache, so it's set up the scope.
+         # we have a parent cache, so it has set up the scope.
          if form_field_path.nil? || form_field_path[0...scope.cache_path_root.length] != scope.cache_path_root
            fail "nested caching error:  form_field_path has been corrupted via with= or form"
          end
@@ -303,9 +290,10 @@ cache containing such tags.
          thunk2.call(k,v,cache_keys[k])
        end
 
+       # if content_key_s has a value, it means that our original key is still valid, but we were invalidated by our children.
        if content_key_s.nil?
          if !have_children
-           # if we don't have any children, then we can store the content against key_key_s.  We also store cache_keys in case we ever have a parent who needs to regenerate their keys.  We can give then them ours without regenerating.
+           # if we don't have any children, then we can store the content against key_key_s.  We also store cache_keys in case we ever have a parent who needs to regenerate their keys.  We can then give them ours without regenerating.
            Rails.logger.debug "CACHE: #{key_key_s} -> content + key #{cache_keys}"
            Rails.cache.write(key_key_s, [cache_content, cache_keys])
            content_key_s = ""
@@ -328,5 +316,4 @@ cache containing such tags.
 
      end
    end
-%>
-</def>
+%></def>

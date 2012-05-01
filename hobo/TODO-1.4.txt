@@ -24,6 +24,7 @@
  * admin subsite
  * books
  * ajax manual section
+ * miscellaneous controller extensions
 
 ## Cookbook
 
@@ -37,8 +38,7 @@
  * create_response: mirror update_response
  * taglib cleanup
  * clean_sidemenu -> plugin
- * nested-cache: csrf workaround
- * nested-cache: enhanced sweeper version
+ * cache: csrf warning
  * monkey patch will_paginate if my patches are not upstreamed
 
 It's quite likely that some of the new tag definitions are missing

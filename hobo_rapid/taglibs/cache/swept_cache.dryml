@@ -1,0 +1,248 @@
+<!--
+
+`<swept-cache>` is a fragment cache that stores context dependency information for itself and all contained inner swept-cache's.   Dependencies are not checked if the cache is hit.   This means that swept-cache should be considerably faster than `<nested-cache>`, but it does require that you create sweepers for your caches.   These sweepers can use the stored dependency information to invalidate the appropriate fragments.
+
+### Example
+
+    <def tag="card" for="Foo">
+      <swept-cache route-on suffix="card">
+        <card without-header>
+          <body:><view:body/></body>
+        </card>
+      </nested-cache>
+    </def>
+
+    <def tag="view" for="Bar">
+      <swept-cache route-on suffix="view">
+        <view:body/>
+        <swept-cache:foos route-on="&this_parent" suffix="collection">
+          <collection/>
+        <swept-cache>
+      </swept-cache>
+    </def>
+
+    class FooSweeper < ActionController::Caching::Sweeper
+      observe Foo
+
+      def after_create(foo)
+        expire_swept_caches_for(foo.bar, :foos)
+      end
+
+      def after_update(foo)
+        expire_swept_caches_for(foo)
+        expire_swept_caches_for(foo.bar, :foos)
+      end
+
+      def after_destroy(foo)
+        expire_swept_caches_for(foo)
+        expire_swept_caches_for(foo.bar, :foos)
+      end
+    end
+
+    class BarSweeper < ActionController::Caching::Sweeper
+      observe Bar
+
+      def after_update(bar)
+        expire_swept_caches_for(bar)
+      end
+
+      def after_destroy(bar)
+        expire_swept_caches_for(bar)
+      end
+    end
+
+In the above example, if a Foo gets updated, the following fragment caches will be invalidated:
+
+  - the card for the foo
+  - the collection of foos inside bar
+  - the bar view
+  - any pages that have a swept-cache that contains a view of bar
+
+When outer caches are rebuilt, inner caches that are still valid may be used as is.
+
+### Specifying the Context
+
+swept-cache assumes that the cache is dependent on the current context
+(aka this) as well as the context of any contained swept-cache's.
+
+The context must be either an object that has been saved to the
+database, or an attribute on an object that has been saved to the
+database. If it is not one of these two, you must either switch the
+context to something that is, or specify the dependencies manually.
+
+When specifying the dependencies manually, you pass a list of database
+objects, database objects plus an attribute name, and/or strings.
+
+    <swept-cache dependencies="&[this, [this, :comments], foo, :all_foos]"
+
+Note that when dependencies are specified manually, `this` must be
+added to the list, if so desired.
+
+Also note that dependencies are not added to the cache key.
+
+### Attributes
+
+All extra attributes are used as non-hierarchical cache keys, so for
+inner caches these should either be constants or be manually
+propagated to the outer caches
+
+`dependencies`: see above.   Default is "&[this]"
+
+`query-params`: A comma separated list of query (or post) parameters
+used as non-hierarchical cache keys.
+
+`route-on`: Rails fragment caching uses the the current route to build
+its cache key.  If you are caching an item that will be used in
+multiple different actions, you can specify route-on to ensure that
+the different actions can share the cache.  You can pass either an
+object or a path to route-on.  If you pass an object, it is converted
+to a path with `url_for`.  If you specify route-on without a value,
+`this` is used.  An alternative to using `route-on` is to specify
+`controller`, `action` and any other required path parameters
+explicitly.  For example route-on="&posts_path" is identical to
+controller="posts" action="index".  If you do not specify route-on or
+controller, action, etc., `params[:page_path]` or the current action
+is used.  route-on is a non-hierarchical key.
+
+### Hints
+
+Any Hobo tag that can generate a page refresh, such as filter-menu,
+table-plus or page-nav stores query parameters such as search, sort &
+page so that these are not lost when the tag is used to refresh the
+page. These will need to be added to the query-params for any cache
+containing such tags.
+
+### Cache Store requirements
+
+#### stability
+
+For this tag to function correctly, the cache must not evict the
+dependency information, so purely LRU caches such as MemoryStore may
+not be used in production. The cache can evict fragments, though. For
+this reason, you may configure two separate caches:
+
+    config.cache_store = :memory_store, {:size => 512.megabytes}
+    config.hobo.stable_cache_store = :file_store
+
+Note that the dependency cache store does not have to be persistent,
+it's OK to clear the dependency cache at the same time as the fragment
+cache.
+
+#### atomic updates
+
+In production, swept-cache needs to be able to update a list
+atomically.  This is not an operation supported by the Rails cache API,
+but it is supported by most non-trivial caches via one of several
+mechanisms.
+
+#### supported caches
+
+memory_store: not compliant, but can be used for development if the size is set large enough to avoid evictions.
+
+[file_store](http://api.rubyonrails.org/classes/ActiveSupport/Cache/FileStore.html):  A good choice for low traffic sites where reads vastly outnumber writes.
+
+memcached: not compliant
+
+redis:  a great choice.   You can use the same instance for both fragment caching with expiry set the fragments to expire without disturbing the dependency information by setting the options differently:
+
+    config.cache_store = :redis_store, "redis://192.168.1.2:6379/1", :expires_in => 60.minutes
+    config.hobo.stable_cache_store = :redis_store, "redis://192.168.1.2:6379/1"
+
+[torquebox infinispan](http://torquebox.org/): another great choice
+
+    config.cache_store = :torque_box_store
+    config.hobo.stable_cache_store = :torque_box_store, :name => 'dependencies', :mode => :replicated, :sync => true
+
+others: ask on the hobo-users list.
+
+-->
+<def tag="swept-cache" attrs="query-params,route-on,dependencies"><%
+   unless Rails.configuration.action_controller.perform_caching
+     %><%= parameters.default %><%
+   else
+     key_key_s = hobo_cache_key(:views, route_on, query_params, attributes)
+     cache_content = Rails.cache.read key_key_s
+     unless cache_content.nil?
+       Rails.logger.debug "CACHE HIT #{key_key_s}"
+
+       cache_content, cache_ids = cache_content
+
+       if scope.cache_ids
+         # we have parent caches trying to generate their keys, so oblige them
+         scope.cache_ids += Set.new(cache_ids)
+       end
+
+       %><%= raw cache_content %><%
+     else
+       Rails.logger.debug "CACHE MISS #{key_key_s}"
+       # darn, cache is invalid.  Now we have to generate our content and (re)generate our keys.
+
+       unless scope.cache_ids
+         # no parent caches so we need to set up the scope.
+         scope.new_scope(:cache_ids => Set.new, :cache_stack => []) do
+           %><%= cache_content=parameters.default %><%
+           cache_ids = scope.cache_ids
+         end
+       else
+         # we have a parent cache, so it has set up the scope.
+         scope.cache_stack.push scope.cache_ids
+         scope.cache_ids = Set.new
+         %><%= cache_content=parameters.default %><%
+         cache_ids = scope.cache_ids
+       end
+
+       dependencies = comma_split(dependencies) if dependencies.is_a?(String)
+       dependencies ||= [this]
+       dependencies.each do |dep|
+         if dep.respond_to?(:typed_id) && dep.typed_id
+           cache_ids << dep.typed_id
+         elsif dep.respond_to?(:origin) && dep.origin
+           cache_ids << "#{dep.origin.typed_id}:#{dep.origin_attribute}"
+         elsif dep.respond_to?(:to_sym)
+           cache_ids << dep.to_s
+         elsif dep.respond_to?(:first) && dep.first.respond_to?(:typed_id) && dep.first.typed_id && dep.last.respond_to?(:to_sym)
+           cache_ids << "#{dep.first.typed_id}:#{dep.last}"
+         else
+           fail "#{dep} not a Hobo model or not in database"
+         end
+       end
+
+       if scope.cache_stack
+         scope.cache_ids += scope.cache_stack.pop
+       end
+
+       cache_ids.each do |cache_id|
+         # the database we're using must support atomically adding to a cache key
+         # there are several possible ways of doing so.
+         #   transactions: supported by Infinispan and activerecord-cache
+         #   sets: Redis has a set datatype (SADD & friends)
+         #   regex read: munge the value onto the key and then store that instead.   Then do a regex read to get all values
+
+
+         if Hobo.stable_cache.respond_to?(:transaction)
+           key = ActiveSupport::Cache.expand_cache_key(cache_id, :sweep_key)
+           Hobo.stable_cache.transaction do
+             l = Set.new(Hobo.stable_cache.read(key)) << key_key_s
+             Rails.logger.debug "CACHE SWEEP KEY: #{cache_id} #{l.to_a}"
+             Hobo.stable_cache.write(key, l.to_a)
+           end
+         elsif Hobo.stable_cache.respond_to?(:read_matched)
+           key = ActiveSupport::Cache.expand_cache_key([cache_id, key_key_s], :sweep_key)
+           Rails.logger.debug "CACHE SWEEP KEY: #{key}"
+           Hobo.stable_cache.write(key, nil)
+         else
+           # TODO: add support for Redis
+           key = ActiveSupport::Cache.expand_cache_key(cache_id, :sweep_key)
+           Rails.logger.warn "WARNING!  cache transactions not supported please fix before going to production"
+           l = Set.new(Hobo.stable_cache.read(key)) << key_key_s
+           Rails.logger.debug "CACHE SWEEP KEY: #{cache_id} #{l.to_a}"
+           Hobo.stable_cache.write(key, l.to_a)
+         end
+       end
+
+       # Also store cache_ids in case we ever have a parent who needs to regenerate their keys.  We can give then them ours without regenerating.
+       Rails.logger.debug "CACHE: #{key_key_s} -> content + ids #{cache_ids.to_a}"
+       Rails.cache.write(key_key_s, [cache_content, cache_ids.to_a])
+     end
+   end
+%></def>

@@ -16,6 +16,7 @@ module Hobo
       h.read_only_file_system = !!ENV['HEROKU_TYPE']
       h.show_translation_keys = false
       h.dryml_only_templates = false
+      h.stable_cache_store = nil
     end
 
     ActiveSupport.on_load(:action_controller) do
@@ -34,6 +35,7 @@ module Hobo
       require 'hobo/extensions/active_record/relation_with_origin'
       require 'hobo/extensions/active_model/name'
       require 'hobo/extensions/active_model/translation'
+      require 'hobo/extensions/active_support/cache/file_store'
       # added legacy namespace for backward compatibility
       # TODO: remove the following line if Hobo::VERSION > 1.3.x
       Hobo::ViewHints = Hobo::Model::ViewHints
@@ -73,6 +75,14 @@ module Hobo
         app.config.to_prepare do
           Dryml::DrymlGenerator.run
         end
+      end
+    end
+
+    initializer 'hobo.cache' do |app|
+      if app.config.hobo.stable_cache_store
+        Hobo.stable_cache = ActiveSupport::Cache.lookup_store(app.config.hobo.stable_cache_store)
+      else
+        Hobo.stable_cache = Rails.cache
       end
     end
 

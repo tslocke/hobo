@@ -26,7 +26,7 @@ module Hobo
 
   class << self
 
-    attr_accessor :engines
+    attr_accessor :engines, :stable_cache
 
     def raw_js(s)
       RawJs.new(s)
@@ -76,6 +76,7 @@ module Hobo
   end
 
   self.engines = []
+  self.stable_cache = nil
 
 end
 

@@ -1,7 +1,4 @@
-<!-- Tags for caching -->
-
-
-<!-- `<cache>` is a simple fragment cache without the hierarchical dependency tracking used in `<swept-cache>` or `<nested-cache>`.
+<!-- `<item-cache>` let's you use the cache infrastructure to store values
 
 ### Attributes
 
@@ -28,7 +25,7 @@ is used.
    unless Rails.configuration.action_controller.perform_caching
      %><%= parameters.default %><%
    else
-     key_key_s = hobo_cache_key(:views, route_on, query_params, attributes)
+     key_key_s = hobo_cache_key(route_on, query_params)
      cache_content = Rails.cache.read key_key_s
      unless cache_content.nil?
        Rails.logger.debug "CACHE HIT #{key_key_s}"
