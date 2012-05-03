@@ -2,7 +2,7 @@ module HoboRouteHelper
   extend HoboHelperBase
   protected
     def base_url
-      "#{Rails.application.config.action_controller.relative_url_root}"
+      ENV['RAILS_RELATIVE_URL_ROOT'] || '/'
     end
 
     def controller_for(obj)
