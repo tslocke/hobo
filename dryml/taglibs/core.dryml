@@ -43,7 +43,7 @@ For example, you might want to wrap an `<img>` tag in an `<a>` tag but only unde
 -->
 <def tag="partial" attrs="name, locals"><%=
    locals ||= {}
-   render(:partial => name, :locals => locals.merge(:this => this))
+   render(:partial => name, :locals => locals.merge(:this => this)).html_safe
 %></def>
 
 
