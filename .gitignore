@@ -12,3 +12,4 @@ dryml/doc
 .rvmrc
 Gemfile
 Gemfile.lock
+.svn

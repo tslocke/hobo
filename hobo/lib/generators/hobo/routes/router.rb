@@ -40,7 +40,7 @@ module Generators
         def resource_routes
           [
           link("get '#{records}(.:format)' => '#{records}#index', :as => '#{records}'", 'index'),
-          link("get '#{records}/new(.:format)', :as => 'new_#{record}'", 'new'),
+          link("get '#{records}/new(.:format)' => '#{records}#new', :as => 'new_#{record}'", 'new'),
           link("get '#{records}/:id/edit(.:format)' => '#{records}#edit', :as => 'edit_#{record}'", 'edit'),
           link("get '#{records}/:id(.:format)' => '#{records}#show', :as => '#{record}', :constraints => #{ID_REQUIREMENT}", 'show'),
           link("post '#{records}(.:format)' => '#{records}#create', :as => 'create_#{record}'", 'create', :post),
