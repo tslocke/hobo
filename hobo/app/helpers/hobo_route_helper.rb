@@ -112,7 +112,9 @@ O            action = :"index_for_#{owner_name}"
     def recognize_page_path
       # round tripping params through the router will remove
       # unnecessary params
-      Rails.application.routes.recognize_path(params[:page_path] || url_for(params))
+      url = params[:page_path] || url_for(params)
+      url.gsub!(/^#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "") if ENV['RAILS_RELATIVE_URL_ROOT']
+      Rails.application.routes.recognize_path(url)
     end
 
     def url_for_page_path(options={})
