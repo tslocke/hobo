@@ -41,7 +41,7 @@ module HoboRouteHelper
           if method.to_s == 'post'
             action = :"create_for_#{owner_name}"
           else
-O            action = :"index_for_#{owner_name}"
+            action = :"index_for_#{owner_name}"
           end
         end
         klass = obj.member_class

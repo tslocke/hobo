@@ -114,7 +114,8 @@ The standard AJAX attributes are supported.
       nil_view
     elsif action == "new"
       # Link to a new object form
-      new_record = target.new
+      new_record = (target.class==Array) ? target.member_class.new : target.new #+ado avoid new element in this because of rails collection association problem
+      #-ado.. new_record = target.new
       new_record.set_creator(current_user)
       href = object_url(target, "new", params._?.merge(:subsite => subsite))
 
