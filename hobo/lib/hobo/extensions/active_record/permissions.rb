@@ -42,7 +42,11 @@ ActiveRecord::Associations::HasManyAssociation.class_eval do
   def insert_record_with_owner_attributes(record, force = true, raise = false)
     set_owner_attributes(record)
     if (user = acting_user) && record.is_a?(Hobo::Model)
-      with_acting_user(user) { insert_record_without_owner_attributes(record, force, raise) }
+      if respond_to?(:with_acting_user)
+        with_acting_user(user) { insert_record_without_owner_attributes(record, force, raise) }
+      else
+        record.with_acting_user(user) { insert_record_without_owner_attributes(record, force, raise) }
+      end
     else
       insert_record_without_owner_attributes(record, force, raise)
     end
