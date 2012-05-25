@@ -45,19 +45,20 @@ Usage of Ruby 1.8 will result in an undefined tab order.   Ruby 1.9 is recommend
      add_data_rapid!(html_attrs, "tabs", :options => options, :events => events, :sortable => sortable)
      %>
   <div merge-attrs="&html_attrs">
-    <ul>
-      <% parameters.map do |param_name, param|
+    <% Rails.logger.info "tabs" %>
+      <% "<ul>".html_safe + parameters.map do |param_name, param|
            yield_output_buffer { %>
         <% attrs, params = param.call -%>
+        <% Rails.logger.info param_name.to_s %>
         <li><a href="#{attrs[:href] || '#'+(attrs[:id] || param_name.to_s)}"><%= attrs[:name] || param_name.to_s.titleize %></a></li>
-      <% } end.join("").html_safe %>
-    </ul>
-
-    <% parameters.map do |param_name, param|
+      <% } end.join("").html_safe + "</ul>".html_safe + parameters.map do |param_name, param|
          yield_output_buffer { %>
       <% attrs, params = param.call -%>
       <% merge_attrs = attrs - [:id, :href, :name] -%>
-      <div id="#{attrs[:id] || param_name}" merge-attrs="&merge_attrs"><%= params[:default]._?.call %></div>
-    <% } end.join("").html_safe %>
+      <div id="#{attrs[:id] || param_name}" merge-attrs="&merge_attrs">
+        <%= params[:default]._?.call(nil) %>
+      </div>
+    <% } %>
+    <% end.join("").html_safe %>
   </div>
 </def>
