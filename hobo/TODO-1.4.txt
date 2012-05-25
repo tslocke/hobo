@@ -39,6 +39,7 @@
  * taglib cleanup
  * clean_sidemenu -> plugin
  * cache: csrf warning
+ * cache: redis support
  * monkey patch will_paginate if my patches are not upstreamed
 
 It's quite likely that some of the new tag definitions are missing
