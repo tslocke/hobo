@@ -2,7 +2,7 @@ module HoboRouteHelper
   extend HoboHelperBase
   protected
     def base_url
-      ENV['RAILS_RELATIVE_URL_ROOT'] || '/'
+      ENV['RAILS_RELATIVE_URL_ROOT'] || ''
     end
 
     def controller_for(obj)
