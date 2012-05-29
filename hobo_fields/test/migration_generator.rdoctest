@@ -157,8 +157,6 @@ Let's apply that change to the database
 
 ### Change a type
 
-    >> Advert.attr_type :title
-    => String
     >>
      class Advert
        fields do

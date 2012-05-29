@@ -241,10 +241,7 @@ restrict the column type.
     >> Vault2.first.content
     => {:key => "in Vault"}
     >> puts Vault2.count
-    >> v = Vault2.create!(:content => 17)
-    >> Vault2.count
-    => 2   # Invalid type is successfully created...
-    >> v.reload rescue 'broken' # ActiveRecord::SerializationTypeMismatch
+    >> v = Vault2.create!(:content => 17) rescue 'broken' # ActiveRecord::SerializationTypeMismatch
     => 'broken'
 
 ## Enum Strings
@@ -315,7 +312,7 @@ ActiveRecord validation framework.
            end
          end
         >> Article.attr_type :status
-        #<EnumString draft approved published>
+        => #<EnumString draft approved published>
 
 Sometimes it's nice to have a proper type name. Here's one way you might go about it:
 

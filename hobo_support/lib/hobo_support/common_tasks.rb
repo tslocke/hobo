@@ -22,7 +22,9 @@ namespace :test do
         end
       end
       sh %(bundle install)
+      sh %(echo "" >> Gemfile)
       sh %(echo "gem 'irt', :group => :development" >> Gemfile) # to make the bundler happy
+      sh %(echo "gem 'therubyracer'" >> Gemfile)
       sh %(echo "" > app/models/.gitignore) # because git reset --hard would rm the dir
       rm %(.gitignore) # we need to reset everything in a testapp
       sh %(git init && git add . && git commit -m "initial commit")
