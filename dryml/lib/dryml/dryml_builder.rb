@@ -100,7 +100,7 @@ module Dryml
     end
 
     def erb_process(erb_src)
-      trim_mode = ActionView::TemplateHandlers::ERB.erb_trim_mode
+      trim_mode = ActionView::Template::Handlers::ERB.erb_trim_mode
       erb = Erubis.new(erb_src, :trim_mode => trim_mode)
       res = erb.src
       if res.respond_to? :force_encoding
