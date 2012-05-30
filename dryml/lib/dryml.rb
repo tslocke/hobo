@@ -74,7 +74,7 @@ module Dryml
       tag_name = identifier.split(ID_SEPARATOR).last
       renderer.render_tag(tag_name, {:with => this} )
     else
-      renderer.render_page(this, local_assigns).strip
+      renderer.render_page(this, local_assigns).strip.html_safe
     end
   end
 
