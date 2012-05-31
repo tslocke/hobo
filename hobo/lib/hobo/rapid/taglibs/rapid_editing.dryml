@@ -73,7 +73,15 @@ This tag does not sanitize HTML; this is provided by HtmlString before saving to
 
 <!-- Provides an editor that uses a `<select>` menu. Uses the `<string-select-editor>` tag. -->
 <def tag="editor" for="HoboFields::Types::EnumString">
- <string-select-editor values="&this_type.values" merge/>
+ <%
+  model = this_parent.class
+  options = Hash[this_type.values.map {|v| [
+    v.to_sym, 
+    I18n.t("activerecord.attributes.#{model.to_s.downcase}/#{this_field}s.#{v}", 
+      :default => v.titleize)
+  ]}]
+ %>
+ <string-select-editor values="&this_type.values" labels="&options" merge/>
 </def>
 
 <!-- Provides a `<select>` menu with an ajax callback to update a `belongs_to` relationship when changed.
