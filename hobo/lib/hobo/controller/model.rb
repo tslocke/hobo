@@ -591,22 +591,27 @@ module Hobo
     def create_response(new_action, options={}, &b)
       flash_notice (ht( :"#{@this.class.to_s.underscore}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
 
-      response_block(&b) or
-        if valid?
-          respond_to do |wants|
-            wants.html { redirect_after_submit(options) }
-            wants.js   { hobo_ajax_response || render(:nothing => true) }
-          end
-        else
-          respond_to do |wants|
-			# errors is used by the translation helper, ht, below.
-			errors = this.errors.full_messages.join("\n")
-            wants.html { re_render_form(new_action) }
-            wants.js   { render(:status => 500,
-                                :text => ht( :"#{this.class.to_s.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
-                               )}
-          end
-        end
+      response_block(&b) or begin
+                              valid = valid?  # valid? can be expensive
+                              if params[:render]
+                                if (params[:render_options] && params[:render_options][:errors_ok]) || valid
+                                  hobo_ajax_response
+
+                                  # Maybe no ajax requests were made
+                                  render :nothing => true unless performed?
+                                else
+                                  errors = @this.errors.full_messages.join('\n')
+                                  message = ht( :"#{this.class.to_s.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
+                                  ajax_response("alert('#{message}');", params[:render_options])
+                                end
+                              else
+                                if valid
+                                  redirect_after_submit options
+                                else
+                                  re_render_form(new_action)
+                                end
+                              end
+                            end
     end
 
 
