@@ -1,3 +1,6 @@
+ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
+ActiveSupport::Dependencies.autoload_once_paths |= [File.dirname(__FILE__)]
+
 module HoboRapid
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip
