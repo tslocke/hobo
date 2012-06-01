@@ -21,7 +21,7 @@ module HoboPermissionsHelper
         object = object.new
       elsif (refl = object.try.proxy_reflection) && refl.macro == :has_many
         if Hobo.simple_has_many_association?(object)
-          object = object.new
+          object = object.build
           object.set_creator(current_user)
         else
           return false
