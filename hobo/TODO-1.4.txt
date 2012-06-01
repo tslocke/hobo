@@ -25,6 +25,7 @@
  * books
  * ajax manual section
  * miscellaneous controller extensions
+ * there's some nice stuff in HoboFields::Model that should be documented & tested
 
 ## Cookbook
 
@@ -41,6 +42,7 @@
  * cache: csrf warning
  * cache: redis support
  * monkey patch will_paginate if my patches are not upstreamed
+ * multiple file support for AJAX uploads
 
 It's quite likely that some of the new tag definitions are missing
 useful id, class, merge or param attributes.  This doesn't impact core
