@@ -46,7 +46,7 @@ module Hobo
       route "match 'search' => '#{file_path}#search', :as => 'site_search'"
       if class_path.empty?
         route "root :to => '#{file_path}#index'"
-        route "match ENV['RAILS_RELATIVE_URL_ROOT'] => 'front#index' if ENV['RAILS_RELATIVE_URL_ROOT']
+        route "match ENV['RAILS_RELATIVE_URL_ROOT'] => 'front#index' if ENV['RAILS_RELATIVE_URL_ROOT']"
       else
         route "match '#{file_path}' => '#{file_path}#index', :as => '#{file_path.gsub(/\//,'_')}'"
       end
