@@ -257,7 +257,8 @@ module Hobo
       def attribute_protected?(attribute)
         attribute = attribute.to_s
 
-        return true if self.class.attributes_protected_by_default.include? attribute
+        # FIXME: This breaks with Rails 3.2, because 'attributes_protected_by_default' is private. Ticket 1016
+        #return true if self.class.attributes_protected_by_default.include? attribute
 
         if !self.class.accessible_attributes.empty?
           return true if !self.class.accessible_attributes.include?(attribute)
