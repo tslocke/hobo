@@ -54,7 +54,7 @@
                 });
             }
             if(!clone) return this;
-            clone.hide('fast');
+            clone.remove();
             return this;
         },
     };
