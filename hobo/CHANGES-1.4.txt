@@ -60,6 +60,8 @@ version strings for the hobo_* gems with `:git => "git://github.com/tablatom/hob
 ## Updating a Hobo 1.3 application
 {.nomove}
 
+Many of the changes required in upgrading a Hobo 1.3 application are necessitated by the switch from Rails 3.0 to 3.2.  [Railscasts has a good guide to upgrading to Rails 3.1](railscasts.com/episodes/282-upgrading-to-rails-3-1).
+
 There are several changes that need to be made to your application to
 upgrade from Hobo 1.3 to Hobo 2.0.   Most of these changes are
 required by the addition of the asset pipeline which was introduced in
@@ -145,13 +147,26 @@ included via the pipeline and can be deleted rather than moved:
     javascripts/controls.js,dryml-support.js,hobo-rapid.js,ie7-recalc.js,prototype.js,blank.gif,dragdrop.js,effects.js,IE7.js,lowpro.js,rails.js
     stylesheets/reset.css,hobo-rapid.css
 
-Note how Hobo organizes the app/assets directory.   There will be a
-directory called app/assets/javascripts/application/ and a directory
-called app/assets/javascripts/front/.   If you have added a subsite
-called admin there will also be a directory called
-app/assets/javascripts/admin/.   Any files in application/ will always
-be included, and the files in front/ or admin/ will be included only
-on the corresponding subsite.
+You can organize your app/assets directory however you like, but you
+probably should arrange it the way Hobo does, the install_plugin
+generator expects it.
+
+If you generate a new Hobo 2.0 application with the front site named "front" and an additional admin subsite named admin, it will put these in app/assets/javascripts:
+
+    application.js
+    application/
+    front.js
+    front/
+    admin.js
+    admin/
+
+Application.js loads any rails plugins and then everything in the
+application/ directory. Front.js loads application.js, then any hobo
+plugins you've installed and then everything in the front/ directory.
+Admin.js behaves similarly. Hobo views in the front subsite load
+front.js and Hobo views in the admin subsite load admin.js.
+
+app/assets/stylesheets is organized in a similar manner.
 
 # Changes from Hobo 1.3 & hobo-jquery 1.3
 
