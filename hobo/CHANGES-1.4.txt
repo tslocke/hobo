@@ -354,6 +354,10 @@ If you have malsup's form plugin installed, Ajax file uploads should
 "just work", as long as you don't have debug_rjs turned on in your
 config/initializers/development.rb.
 
+Make sure you're form uses multipart encoding:
+
+     <form multipart ajax/>
+
 ### AJAX events
 
 The standard 'before', 'success', 'done' and 'error' callbacks may
@@ -510,6 +514,11 @@ The helper functions have been renamed.   For instance,
 
 Dialog positioning has been updated and should work better now.   See
 the documentation for more details.
+
+### search-filter
+
+The table-plus search filter has been extracted into its own tag for
+use outside of table-plus. It has also gained a "clear" button.
 
 ### live-search
 
