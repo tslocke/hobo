@@ -29,7 +29,7 @@ Examples
 
 # Configuration Variables #
 
-They are set by the hobo engine at startup, and they can be overwrited by adding in `config/application.rb`:
+They are set by the hobo engine at startup, and they can be overwriten by adding in `config/application.rb`:
 
     config.hobo.<variable_name> = <value>
 
