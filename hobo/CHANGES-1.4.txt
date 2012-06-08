@@ -554,6 +554,10 @@ Example:
 
      Book.include(:authors).order(parse_sort_param(:title, :authors => "authors.last_name")
 
+parse_sort_param now also pluralizes table names. For example, if the
+field is named "project.title", parse_sort_param will sort on the
+column "projects.title".
+
 ## Editors
 
 Editors are no longer special-cased, they now use the standard DRYML
