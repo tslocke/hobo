@@ -36,12 +36,9 @@
 
 ## new features that aren't "done"
 
- * taglib cleanup
  * clean_sidemenu -> plugin
  * cache: csrf warning
- * cache: redis support
  * monkey patch will_paginate if my patches are not upstreamed
- * multiple file support for AJAX uploads
 
 It's quite likely that some of the new tag definitions are missing
 useful id, class, merge or param attributes.  This doesn't impact core
@@ -50,6 +47,8 @@ you notice any such omissions, please let us know, it is easy to fix..
 
 ## stuff that we really want to do
 
+ * multiple file support for AJAX uploads
+ * cache: redis support
  * fixup deprecation warnings
  * port to Rails 3.2 and/or 4.0
  * nuke any remaining prototype code
