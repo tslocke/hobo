@@ -47,7 +47,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
     in_place = !(this == @this && request.method.downcase == "get") if in_place.nil?
     update_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_UPDATE_ATTRS)
     ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
-    attributes[src] = "#{base_url}/images/#{image}" if image
+    attributes[:src] = "#{base_url}/images/#{image}" if image
     label ||= t("hobo.actions.remove", :default=>"Remove")
     confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
     ajax_attrs[:confirm] = confirm if confirm
