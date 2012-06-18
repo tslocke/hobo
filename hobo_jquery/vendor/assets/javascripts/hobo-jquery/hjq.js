@@ -10,7 +10,7 @@
 
         /* call only once per document. */
         initOnce: function() {
-          if(History) {  // History.js installed
+          if(typeof History === 'object') {  // History.js installed
             $(window).on("statechange", function() {
               var state = History.getState();
               if(state.data.length==3) {
@@ -316,7 +316,7 @@
            hobo_options: input to buildRequestData, buildRequestCallbacks
            */
         changeLocationAjax: function (url, ajax_options, hobo_options) {
-          if (hobo_options.attrs.push_state) {
+          if (hobo_options.attrs.push_state && typeof History==='object') {
             // if the history plugin is installed, it will fire the
             // changestate event immediately, which is where we
             // actually execute the ajax
