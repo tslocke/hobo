@@ -322,8 +322,8 @@
             // actually execute the ajax
             window.History.pushState([this.getPath(), ajax_options, hobo_options], hobo_options.attrs.new_title || null, url);
           } else {
-            ajax_options = form.hjq('buildRequestCallbacks', ajax_options, hobo_options);
-            $.ajax(form[0].action, ajax_options);
+            ajax_options = this.hjq('buildRequestCallbacks', ajax_options, hobo_options);
+            $.ajax(url, ajax_options);
           }
         },
 
