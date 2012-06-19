@@ -167,7 +167,8 @@ module Hobo
           #       (ie X belongs_to Y (polymorphic), Z is a subclass of Y; @x.y_is?(some_z) will never pass)
           class_eval %{
             def #{name}_is?(target)
-              target.class.name == self.#{refl.options[:foreign_type]} && target.#{id_method} == self.#{refl.foreign_key}
+            
+              target.class.name == self.#{refl.foreign_type} && target.#{id_method} == self.#{refl.foreign_key}
             end
             def #{name}_changed?
               #{refl.foreign_key}_changed? || #{refl.options[:foreign_type]}_changed?
