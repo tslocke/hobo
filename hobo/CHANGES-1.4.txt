@@ -442,6 +442,8 @@ of new options that control how the spinner is displayed.
 - spinner-options: passed to [jQuery-UI's position](http://jqueryui.com/demos/position/).   Defaults are `{my: 'right bottom', at: 'left top'}`
 - message: the message to display inside the spinner
 
+The above attributes may be added to most tags that accept the standard ajax attributes.
+
 These options may be overridden globally by adding them as attributes to the `page-scripts` parameter for the page.
 
      <extend tag="page">
@@ -566,6 +568,24 @@ Example:
 parse_sort_param now also pluralizes table names. For example, if the
 field is named "project.title", parse_sort_param will sort on the
 column "projects.title".
+
+### controller actions
+
+Hobo no longer attempts to perform its part-based AJAX actions when
+sent an xhr request. Instead, Hobo performs part-based AJAX when
+params[:render] is set.
+
+The signature for the function update_response and friends has changed.   This should make it useful for use in your application.   It can be used like this:
+
+    def update
+      hobo_update do
+        if params[:foo]==17
+          render_my_way
+        else
+          update_response   # let Hobo handle it all
+        end
+      end
+    end
 
 ## Editors
 
