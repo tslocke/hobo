@@ -95,7 +95,7 @@ or
      else
        no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
      end
-     attributes['message'] ||= t("FIXME", :default => "Loading...")
+     attributes['message'] ||= t("FIXME", :default => "Loading...") if HoboRapidHelper::AJAX_ATTRS.any?{|a| attributes.has_key?(a)}
      %>
   <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
     <div>
