@@ -47,7 +47,12 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
     in_place = !(this == @this && request.method.downcase == "get") if in_place.nil?
     update_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_UPDATE_ATTRS)
     ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
-    attributes[:src] = "#{base_url}/images/#{image}" if image
+    if image
+      attributes[:src] ||= image_path(image)
+      attributes[:type] ||= 'image'
+    else
+      attributes[:type] ||= 'submit'
+    end
     label ||= t("hobo.actions.remove", :default=>"Remove")
     confirm = t("hobo.messages.confirm", :default=>"Are you sure?") if confirm.nil?
     ajax_attrs[:confirm] = confirm if confirm
@@ -69,7 +74,7 @@ All the standard ajax attributes *except the callbacks* are supported (see the m
 %>
   <if test="&url && can_delete?">
     <form method="delete" action="&url" class="button_to" merge-attrs="&ajax_attrs" data-rapid="&data_rapid" data-rapid-context="&typed_id">
-      <input type="submit" value="&label" merge/>
+      <input value="&label" merge/>
     </form>
   </if>
 </def>
