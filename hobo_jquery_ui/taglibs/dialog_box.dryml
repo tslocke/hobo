@@ -6,15 +6,17 @@ The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) ha
 The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
 
     <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
-    <dialog-box buttons="&buttons">My dialog text</dialog>
-
 or
+    <% buttons = [ ["save", "hjq_dialog_box.submitAndClose"], ["cancel", "hjq_dialog_box.close"], ] %>
 
-    <dialog-box id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog>
+with
+    <dialog-box buttons="&buttons">My dialog text</dialog-box>
 
+Alternatively:
+
+    <dialog-box id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog_box>
 or
-
-    <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
+    <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq_dialog_box.close"}' > My dialog text</dialog_box>
 
 Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
 
@@ -24,11 +26,11 @@ JQuery UI is sometimes picky about types.   For instance, the width option must 
 
     <dialog-box width="&640"/>
 
-The following functions are predefined for use in dialog buttons:  FIXME
+The following functions are predefined for use in dialog buttons:
 
- * `hjq.dialog.close`:  close the dialog box
- * `hjq.dialog.submitFormlet`:  submits all formlets inside the dialog
- * `hjq.dialog.submitFormletAndClose`: submits any enclosed formlets, then closes the dialog.
+ * `hjq_dialog_box.close`:  close the dialog box
+ * `hjq_dialog_box.submit`:  submits all formlets inside the dialog
+ * `hjq_dialog_box.submitAndClose`: submits any enclosed formlets, then closes the dialog.
 -->
 <def tag="dialog-box" attrs="buttons">
 <%
