@@ -53,4 +53,8 @@ doctest: db file exists
 >> File.exist? 'db/development.sqlite3'
 => true
 
-
+doctest: Alpha::Beta class exists
+>> Alpha::Beta.connection.schema_cache.clear!
+>> Alpha::Beta.reset_column_information
+>> Alpha::Beta
+=> Alpha::Beta(id: integer, one: string, two: integer)

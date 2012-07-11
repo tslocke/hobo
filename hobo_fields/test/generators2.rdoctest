@@ -1,5 +1,0 @@
-This test was split out of generators.markdown because a reload is necessary.   It needs to be run after generators.markdown without a reset.
-
-doctest: Alpha::Beta class exists
->> Alpha::Beta
-=> Alpha::Beta(id: integer, one: string, two: integer)

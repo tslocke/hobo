@@ -555,6 +555,8 @@ The migration generator is designed to create complete migrations even if many c
 
 First let's confirm we're in a known state. One model, 'Advert', with a string 'title' and text 'body':
 
+    >> Advert.connection.schema_cache.clear!
+    >> Advert.reset_column_information
     >> Advert.connection.tables
     => ["adverts"]
     >> Advert.columns.*.name
