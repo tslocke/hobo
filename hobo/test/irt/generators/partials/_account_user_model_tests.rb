@@ -1,7 +1,5 @@
 desc "Account Model files exist"
-files_exist? %w[ app/models/account.rb
-                 app/models/account.rb
-]
+files_exist? %w(app/models/account.rb)
 test_value_eql? true
 
 desc "Account Model injection matches"

@@ -1,7 +1,6 @@
 invoke 'hobo:subsite', %w[ subs --make-front-site=false -q]
 desc "Subsite files exist"
-files_exist? %w[ app/controllers/subs/subs_site_controller.rb
-                 app/views/taglibs/subs_site.dryml ]
+files_exist? %w( app/controllers/subs/subs_site_controller.rb app/views/taglibs/subs_site.dryml )
 test_value_eql? true
 
 desc "SiteController matches"

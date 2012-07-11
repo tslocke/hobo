@@ -1,8 +1,6 @@
 invoke 'hobo:front_controller', %w[ -q ]
 desc "All files exist"
-files_exist? %w[ app/controllers/front_controller.rb
-                 app/helpers/front_helper.rb
-                 app/views/front/index.dryml ]
+files_exist? %w( app/controllers/front_controller.rb app/helpers/front_helper.rb app/views/front/index.dryml )
 test_value_eql? true
 
 desc "public/index.html removed"

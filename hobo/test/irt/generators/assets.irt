@@ -1,11 +1,5 @@
 desc "hobo:assets invoke"
 invoke 'hobo:assets', %w(-q)
 
-files_exist? %w[ app/views/taglibs/application.dryml
-                 app/assets/stylesheets/application.css
-                 app/assets/stylesheets/front.css
-                 app/assets/javascripts/application.js
-                 app/assets/javascripts/front.js
-                 app/models/guest.rb
-]
+files_exist? %w( app/views/taglibs/application.dryml app/assets/stylesheets/application.css app/assets/stylesheets/front.css app/assets/javascripts/application.js app/assets/javascripts/front.js app/models/guest.rb )
 test_value_eql? true
