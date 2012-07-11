@@ -2,7 +2,7 @@
 
 ## regressions
 
- * after-submit, sortable-input-many do not work
+ * sortable-input-many does not work
  * remote-method-button, create-button, update-button,
    transition-button: normal usages of these tags work, but they do
    not work if you ask them to do AJAX
@@ -25,6 +25,7 @@
  * books
  * ajax manual section
  * miscellaneous controller extensions
+ * there's some nice stuff in HoboFields::Model that should be documented & tested
 
 ## Cookbook
 
@@ -35,11 +36,8 @@
 
 ## new features that aren't "done"
 
- * create_response: mirror update_response
- * taglib cleanup
  * clean_sidemenu -> plugin
  * cache: csrf warning
- * cache: redis support
  * monkey patch will_paginate if my patches are not upstreamed
 
 It's quite likely that some of the new tag definitions are missing
@@ -49,6 +47,8 @@ you notice any such omissions, please let us know, it is easy to fix..
 
 ## stuff that we really want to do
 
+ * multiple file support for AJAX uploads
+ * cache: redis support
  * fixup deprecation warnings
  * port to Rails 3.2 and/or 4.0
  * nuke any remaining prototype code

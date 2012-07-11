@@ -8,7 +8,23 @@
 
     var methods = {
 
-        init : function() {
+        /* call only once per document. */
+        initOnce: function() {
+          if(typeof History === 'object') {  // History.js installed
+            $(window).on("statechange", function() {
+              var state = History.getState();
+              if(state.data.length==3) {
+                var form = $(state.data[0]);
+                var roptions = form.hjq('buildRequestCallbacks', state.data[1], state.data[2]);
+                $.ajax(state.url, roptions);
+              }
+            })
+          }
+          return true;
+        },
+
+        /* call for every new fragment */
+        init: function() {
             var top = this;
             this.find("[data-rapid-page-data]").each(function() {
                 page_data = $(this).data('rapid-page-data');
@@ -152,12 +168,35 @@
 	    return function() { return eval(script); };
 	},
 
+
+        /* returns a jQuery selector for an element. One option would
+           be to use something like
+           http://stackoverflow.com/questions/2206958/best-way-to-reference-an-element-with-jquery
+           However, if the DOM changes due to Ajax this isn't
+           necessarily stable. So instead we give the element a unique
+           ID if it doesn't already have one.
+        */
+
+        getPath: function() {
+          if(!this.attr("id")) {
+            this.attr("id", Math.random().toString().replace("0.", "id"))
+          }
+          return "#"+this.attr("id");
+        },
+
+
             /* Build an options object suitable for sending to
              * jQuery.ajax.  (Note that the before & confirm callbacks
              * are called from this function, and the spinner is shown)
              *
              * The returned object will include a 'data' value
              * populated with a hash.
+             *
+             * This function has now been split into two parts to
+             * better support push_state.  buildRequestData is the
+             * first part, which builds everything except the
+             * callbacks (but it does execute the before callbacks).
+             * buildRequestCallbacks builds the remaining callbacks.
              *
              * Options:
              *  type: POST, GET
@@ -171,10 +210,13 @@
              *
             */
         buildRequest: function(o) {
+          return methods.buildRequestCallbacks.call(this, methods.buildRequestData.call(this, o), o);
+        },
+
+        buildRequestData: function(o) {
             var that = this;
             if (!o.attrs) o.attrs = {};
-            if (!o.extra_callbacks) o.extra_callbacks = {};
-            var options = {};
+            var result = {};
 
             if(o.attrs.before) {
                 if(!methods.createFunction.call(that, o.attrs.before).call(this)) {
@@ -194,15 +236,15 @@
                 }
             }
 
-            options.context = this;
-            options.type = o.type || 'GET';
-            options.data = {"render_options[preamble]": o.preamble || '',
+            result.context = this;
+            result.type = o.type || 'GET';
+            result.data = {"render_options[preamble]": o.preamble || '',
                             "render_options[contexts_function]": 'hjq.ajax.updatePartContexts'
                            };
-            if(o.postamble) options.data["render_options[postamble]"] = o.postamble;
-            if(o.content_type) options.data["render_options[content_type]"] = o.content_type;
-            if(o.attrs.errors_ok) options.data["render_options[errors_ok]"] = 1;
-            options.dataType = 'script';
+            if(o.postamble) result.data["render_options[postamble]"] = o.postamble;
+            if(o.content_type) result.data["render_options[content_type]"] = o.content_type;
+            if(o.attrs.errors_ok) result.data["render_options[errors_ok]"] = 1;
+            result.dataType = 'script';
             o.spec = jQuery.extend({'function': 'hjq.ajax.update', preamble: ''}, o.spec);
 
             var part_data = {};
@@ -214,10 +256,18 @@
             var ids=methods.getUpdateIds.call(this, o.attrs);
             for(var i=0; i<ids.length; i++) {
                 if(part_data) $("#"+ids[i]).data('hjq-ajax', part_data);
-                options.data["render["+i+"][part_context]"] = page_data.hobo_parts[ids[i]];
-                options.data["render["+i+"][id]"] = ids[i];
-                options.data["render["+i+"][function]"] = o['function'] || 'hjq.ajax.update';
+                result.data["render["+i+"][part_context]"] = page_data.hobo_parts[ids[i]];
+                result.data["render["+i+"][id]"] = ids[i];
+                result.data["render["+i+"][function]"] = o['function'] || 'hjq.ajax.update';
             }
+
+            return result;
+        },
+
+        buildRequestCallbacks: function(result, o) {
+            var that = this;
+            if (!o.attrs) o.attrs = {};
+            if (!o.extra_callbacks) o.extra_callbacks = {};
 
             this.hjq_spinner(o.attrs, "Saving...");
 
@@ -232,7 +282,7 @@
                 if(that.parents("body").length==0) $(document).trigger('rapid:ajax:success', [that]);
                 else  that.trigger('rapid:ajax:success', [that]);
             });
-            options.success = success_dfd.resolve;
+            result.success = success_dfd.resolve;
 
             var error_dfd = jQuery.Deferred();
             if(o.attrs.error) error_dfd.done(methods.createFunction.call(that, o.attrs.error));
@@ -241,7 +291,7 @@
                 if(that.parents("body").length==0) $(document).trigger('rapid:ajax:error', [that]);
                 else  that.trigger('rapid:ajax:error', [that]);
             });
-            options.error = error_dfd.resolve;
+            result.error = error_dfd.resolve;
 
             var complete_dfd = jQuery.Deferred();
             if(o.attrs.complete) complete_dfd.done(methods.createFunction.call(that, o.attrs.complete));
@@ -252,11 +302,29 @@
                 that.hjq_spinner('remove');
                 if(o.attrs.refocus_form) that.find(":input[type!=hidden]:first").focus();
             });
-            options.complete = complete_dfd.resolve;
+            result.complete = complete_dfd.resolve;
 
-            jQuery.extend(options, o.extra_options);
+            jQuery.extend(result, o.extra_options);
 
-            return options;
+            return result;
+        },
+
+        /*
+           this: element to receive callbacks
+           url: new location
+           ajax_options: output from buildRequestData
+           hobo_options: input to buildRequestData, buildRequestCallbacks
+           */
+        changeLocationAjax: function (url, ajax_options, hobo_options) {
+          if (hobo_options.attrs.push_state && typeof History==='object') {
+            // if the history plugin is installed, it will fire the
+            // changestate event immediately, which is where we
+            // actually execute the ajax
+            window.History.pushState([this.getPath(), ajax_options, hobo_options], hobo_options.attrs.new_title || null, url);
+          } else {
+            ajax_options = this.hjq('buildRequestCallbacks', ajax_options, hobo_options);
+            $.ajax(url, ajax_options);
+          }
         },
 
         // given ajax_attrs (update, updates and/or ajax), return DOM id's.
@@ -293,7 +361,7 @@
         if ( methods[method] ) {
             return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
         } else if ( typeof method === 'object' || ! method ) {
-            return methods.init.apply( this, arguments );
+            return methods.initOnce.apply( this, arguments ) && methods.init.apply( this, arguments );
         } else {
             $.error( 'Method ' +  method + ' does not exist on hjq' );
         }

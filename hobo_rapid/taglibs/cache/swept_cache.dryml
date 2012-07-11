@@ -112,6 +112,22 @@ page so that these are not lost when the tag is used to refresh the
 page. These will need to be added to the query-params for any cache
 containing such tags.
 
+### Example: Caching @current_user
+
+This is the pattern we use to cache the page header:
+
+     <swept-cache suffix="header" current-user="&@current_user.id" dependencies="&[@current_user]">
+
+Notice that @current_user is specified as a dependency in 2 different ways.
+
+`current-user="&@current_user.id"` ensures that the current user's ID
+is added to the cache key, ensuring that each user gets their own
+header rather than having every user share the same header.
+
+`dependencies="&[@current_user]` does not affect the cache key, only
+the cache content. It enables the cache to be swept if any of the user
+columns change, such as the user's name.
+
 ### Cache Store requirements
 
 #### stability

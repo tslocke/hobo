@@ -139,7 +139,7 @@ Produces:
   </if>
   <else>
     <% field_tag ||= "view" %>
-    <unless test="&this.empty? && !empty">
+    <unless test="&(this.nil? || this.empty?) && !empty">
       <%= element "table", attributes - attrs_for(:with_fields) do %>
       <thead if="&all_parameters[:thead] || fields" param>
         <tr param="field-heading-row">

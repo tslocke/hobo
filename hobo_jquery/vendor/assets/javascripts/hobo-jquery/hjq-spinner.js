@@ -54,14 +54,14 @@
                 });
             }
             if(!clone) return this;
-            clone.hide('fast');
+            clone.remove();
             return this;
         },
     };
 
     var defaultOptions = function() {
         if(default_options) return default_options;
-        page_options = this.hjq('pageData');
+        var page_options = this.hjq('pageData');
         default_options = {};
         default_options['spinner-next-to'] = page_options['spinner-next-to'];
         default_options['spinner-at'] = page_options['spinner-at'];
@@ -71,6 +71,7 @@
             at: "left top"
         };
         default_options['message'] = page_options['message'];
+        return default_options;
     };
 
     $.fn.hjq_spinner = function( method ) {

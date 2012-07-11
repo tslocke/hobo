@@ -10,6 +10,13 @@ Use the `stay-here` attribute to remain on the current page:
       ...
     </form>
 
+Use the `uri` option to specify a redirect location:
+
+    <form>
+      <after-submit uri="/admin"/>
+      ...
+    </form>
+
 Use the `go-back` option to return to the page in `session[:previous_uri]`:
 
     <form>
@@ -17,12 +24,11 @@ Use the `go-back` option to return to the page in `session[:previous_uri]`:
       ...
     </form>
 
-Use the `uri` option to specify a redirect location:
+Note that session[:previous_uri] isn't automatically populated. To
+automatically populate it, add to application_controller.rb:
 
-    <form>
-      <after-submit uri="/admin"/>
-      ...
-    </form>
+    after_filter HoboRapid::PreviousUriFilter
+
 -->
 <def tag="after-submit" attrs="uri, stay-here, go-back"><%
   uri = "stay-here" if stay_here

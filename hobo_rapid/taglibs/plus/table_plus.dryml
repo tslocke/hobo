@@ -26,12 +26,7 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
   <div class="table-plus" merge-attrs="&attributes - attrs_for(:with_fields) - attrs_for(:table)">
     <div class="header" param="header">
       <div class="search">
-        <form param="search-form" method="get" action="" with="&nil" merge-attrs="&ajax_attrs" >
-          <hidden-fields for-query-string skip="page, search"/>
-          <span><t key="hobo.table_plus.search">Search</t></span>
-          <input class="search" type="search" name="search" value="&params[:search]"/>
-          <submit label="&t('hobo.table_plus.submit_label', :default=>'Go')" class="search-button" param="search-submit"/>
-        </form>
+        <search-filter merge-attrs="&ajax_attrs" param/>
       </div>
     </div>
 

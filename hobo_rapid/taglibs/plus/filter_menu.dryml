@@ -85,7 +85,7 @@ or
      </select>
 
   -->
-<def tag="filter-menu" attrs="model, param-name, options, no-filter, id, first-value">
+<def tag="filter-menu" attrs="model, param-name, options, no-filter, first-value">
   <% # this odd construction is required in production mode for some reason
       translated_options = I18n.translate("activerecord.attributes.#{model}.filter_menu.#{param_name}.options", :default=>[:"tags.filter_menu.#{param_name}.options"])
       options = translated_options unless translated_options.is_a?(String)
@@ -95,6 +95,7 @@ or
      else
        no_filter = t("activerecord.attributes.#{model}.filter_menu.#{param_name}.no_filter", :default=>[:"tags.filter_menu.#{param_name}.no_filter", :"tags.filter_menu.default.no_filter", no_filter, "All"])
      end
+     attributes['message'] ||= t("FIXME", :default => "Loading...") if HoboRapidHelper::AJAX_ATTRS.any?{|a| attributes.has_key?(a)}
      %>
   <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
     <div>

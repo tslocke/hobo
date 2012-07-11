@@ -19,17 +19,24 @@
 
             if(form.attr('enctype') == 'multipart/form-data') {
                 if(form.ajaxSubmit) {
-                    var roptions= form.hjq('buildRequest', $.extend(options, {preamble: '<textarea>', postamble: '</textarea>', content_type: 'text/html'}));
+                    options = $.extend(options, {preamble: '<textarea>', postamble: '</textarea>', content_type: 'text/html'});
+                    var roptions = form.hjq('buildRequestData', options);
 
                     if(!roptions) return false;
                     roptions.iframe = true;
+
+                    roptions = form.hjq('buildRequestCallbacks', roptions, options)
+
+                    if(options.attrs.push_state) {
+                      alert("push_state not supported on multipart forms");
+                    }
                     form.ajaxSubmit(roptions);
                 } else {
                     alert("malsup's jquery form plugin required to do ajax submissions of multipart forms");
                 }
 
             } else {
-                var roptions= form.hjq('buildRequest', options);
+                var roptions= form.hjq('buildRequestData', options);
                 if(!roptions) return false;
 
                 // make sure we don't serialize any nested formlets
@@ -39,10 +46,7 @@
 
                 roptions.data = $.param(roptions.data) + "&" + data;
 
-                if (options.attrs.push_state) {
-                    window.History.pushState(null, options.attrs.new_title || null, form[0].action+"?"+data);
-                }
-                $.ajax(form[0].action, roptions);
+                form.hjq("changeLocationAjax", form[0].action+"?"+data, roptions, options);
             }
 
             // prevent bubbling

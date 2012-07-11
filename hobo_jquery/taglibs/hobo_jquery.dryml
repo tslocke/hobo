@@ -8,11 +8,10 @@ hobo_jquery
 %>
 <def tag="page-scripts">
   <do param="default">
- <% attributes.reverse_merge!(:data_rapid_page_data => {
-                               'form_auth_token' => { 'name' => request_forgery_protection_token, 'value' => form_authenticity_token},
-                               'hobo_parts' => part_contexts_storage_uncoded}.to_json,
-                              :style => "display: none;") %>
-    <%= tag("span", deunderscore_attributes(attributes)) %>
+ <% attrs = deunderscore_attributes(attributes).reverse_merge( 'form_auth_token' => { 'name' => request_forgery_protection_token, 'value' => form_authenticity_token},
+                               'hobo_parts' => part_contexts_storage_uncoded
+                              ) %>
+    <%= tag("span", "data-rapid-page-data" => attrs.to_json, :style => "display: none;") %>
   </do>
 </def>
 
