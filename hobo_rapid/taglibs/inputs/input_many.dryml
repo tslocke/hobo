@@ -74,7 +74,7 @@ end
   <set empty="&this.empty?"/>
   <% template ||= this.try.new_candidate || this.member_class.new -%>
   <% minimum ||= 0 ; minimum = minimum.to_i -%>
-  <% skip ||= this.proxy_reflection.klass.reflect_on_all_associations.detect {|p| p.primary_key_name==this.proxy_reflection.primary_key_name}.try.name.to_s if this.respond_to? :proxy_reflection -%>
+  <% skip ||= this.proxy_association.reflection.klass.reflect_on_all_associations.detect {|p| p.foreign_key==this.proxy_association.reflection.foreign_key}.try.name.to_s if this.respond_to? :proxy_association -%>
   <% skip += ",#{more_skip}" if more_skip -%>
   <% js_attrs = all_attributes.slice(:minimum, :add_hook, :remove_hook, :hide, :show) %>
   <% js_attrs[:prefix] = param_name_for_this %>

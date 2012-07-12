@@ -94,7 +94,7 @@ module Dryml
 
 
     def this_field_reflection
-      this.try.proxy_reflection ||
+      this.try.proxy_association._?.reflection ||
         (this_parent && this_field && this_parent.class.respond_to?(:reflections) && this_parent.class.reflections[this_field.to_sym])
     end
 

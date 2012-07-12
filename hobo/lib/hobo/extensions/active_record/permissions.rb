@@ -118,7 +118,7 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
         joiner = klass.where(construct_join_attributes(r)).first
         joiner.is_a?(Hobo::Model) && !joiner.destroyable_by?(user)
       }
-      raise Hobo::PermissionDeniedError, "#{@owner.class}##{proxy_reflection.name}.destroy"
+      raise Hobo::PermissionDeniedError, "#{@owner.class}##{proxy_association.reflection.name}.destroy"
     end
     delete_records_without_hobo_permission_check(records, method)
   end

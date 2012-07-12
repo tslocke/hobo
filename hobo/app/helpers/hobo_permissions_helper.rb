@@ -19,7 +19,7 @@ module HoboPermissionsHelper
     def can_create?(object=this)
       if object.is_a?(Class) and object < ActiveRecord::Base
         object = object.new
-      elsif (refl = object.try.proxy_reflection) && refl.macro == :has_many
+      elsif (refl = object.try.proxy_association._?.reflection) && refl.macro == :has_many
         if Hobo.simple_has_many_association?(object)
           object = object.build
           object.set_creator(current_user)
