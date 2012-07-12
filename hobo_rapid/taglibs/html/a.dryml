@@ -119,7 +119,7 @@ The standard AJAX attributes are supported.
       href = object_url(target, "new", params._?.merge(:subsite => subsite))
 
       if href && (force || can_create?(new_record))
-        new_class_name = if target.respond_to?(:proxy_reflection)
+        new_class_name = if target.respond_to?(:proxy_association)
                            target.proxy_association.reflection.klass.name
                          else
                            target.name

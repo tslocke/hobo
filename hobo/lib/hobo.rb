@@ -56,7 +56,7 @@ module Hobo
     end
 
     def simple_has_many_association?(array_or_reflection)
-      refl = array_or_reflection.respond_to?(:proxy_reflection) ? array_or_reflection.proxy_reflection : array_or_reflection
+      refl = array_or_reflection.respond_to?(:proxy_association) ? array_or_reflection.proxy_association.reflection : array_or_reflection
       return false unless refl.is_a?(ActiveRecord::Reflection::AssociationReflection)
       refl.macro == :has_many and
         (not refl.through_reflection) and
