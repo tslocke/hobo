@@ -404,15 +404,9 @@ module Dryml
         "<% output_buffer; end"
     end
 
+    # this function is now basically just a hook for DrymlFireMarker
     def wrap_source_with_metadata(content, kind, name, *args)
-      if (!include_source_metadata) || name.in?(NO_METADATA_TAGS)
-        content
-      else
-        metadata = [kind, name] + args + [@template_path]
-        "<% safe_concat(%(<!--[DRYML|#{metadata * '|'}[-->)) %>" +
-        content +
-        "<% safe_concat(%(<!--]DRYML]-->)) %>"
-      end
+      content
     end
 
     def wrap_tag_method_body_with_metadata(content)
@@ -1028,11 +1022,6 @@ module Dryml
       @gensym_counter ||= 0
       @gensym_counter += 1
       "#{name}_#{@gensym_counter}"
-    end
-
-    def include_source_metadata
-      @include_source_metadata = Rails.env.development? && !ENV['DRYML_EDITOR'].blank? if @include_source_metadata.nil?
-      @include_source_metadata
     end
 
   end
