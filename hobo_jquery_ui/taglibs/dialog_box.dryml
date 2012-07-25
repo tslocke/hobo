@@ -14,7 +14,7 @@ or
 
 or
 
-    <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq.dialog.close"}' > FIXME</dialog>
+    <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq_dialog_box.close"}' > FIXME</dialog>
 
 Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
 
@@ -24,11 +24,11 @@ JQuery UI is sometimes picky about types.   For instance, the width option must 
 
     <dialog-box width="&640"/>
 
-The following functions are predefined for use in dialog buttons:  FIXME
+The following functions are predefined for use in dialog buttons:
 
- * `hjq.dialog.close`:  close the dialog box
- * `hjq.dialog.submitFormlet`:  submits all formlets inside the dialog
- * `hjq.dialog.submitFormletAndClose`: submits any enclosed formlets, then closes the dialog.
+ * `hjq_dialog_box.close`:  close the dialog box
+ * `hjq_dialog_box.submit`:  submits all formlets inside the dialog
+ * `hjq_dialog_box.submitAndClose`: submits any enclosed formlets, then closes the dialog.
 -->
 <def tag="dialog-box" attrs="buttons">
 <%
