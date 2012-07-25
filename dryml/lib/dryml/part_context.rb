@@ -98,9 +98,9 @@
       def parse_this_id(page_this)
         if this_id.nil? || this_id =="nil"
           nil
-        elsif this_id == "this" || this_id == page_this.typed_id
+        elsif this_id == "this" || this_id == page_this._?.typed_id
           self.this = page_this
-        elsif this_id =~ /^this:(.*)/ || (page_this.typed_id && this_id =~ /^#{page_this.typed_id}:(.*)/)
+        elsif this_id =~ /^this:(.*)/ || (page_this._?.typed_id && this_id =~ /^#{page_this._?.typed_id}:(.*)/)
           self.this = page_this
           self.this_field = $1
         else
