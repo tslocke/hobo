@@ -19,7 +19,7 @@
             clearButton: true,
             adjustWidth: true,
             uiStyle: false,
-            selected: null,
+            selected: null
         },
 	_create: function() {
 	    var self = this,

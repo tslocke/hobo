@@ -14,7 +14,7 @@
             var annotations = form.data('rapid').form;
 
             var options = {type: form[0].method,
-                           attrs: annotations.ajax_attrs,
+                           attrs: annotations.ajax_attrs
                           };
 
             if(form.attr('enctype') == 'multipart/form-data') {
