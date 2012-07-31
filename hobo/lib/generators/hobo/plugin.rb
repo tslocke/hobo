@@ -35,7 +35,7 @@ module Generators
         end
 
         if options[:subsite].nil? || options[:subsite] == "all"
-          subsites = ['front'] + Hobo.subsites
+          subsites = ['front'] + ::Hobo.subsites
         else
           subsites = [options[:subsite]]
         end
