@@ -30,7 +30,7 @@ sort-columns: a hash that allow you to map fields to sortable columns.   The def
       </div>
     </div>
 
-    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" empty merge-params>
+    <table merge-attrs="&attributes & (attrs_for(:table) + attrs_for(:with_fields))" empty merge-params param>
       <field-heading-row:>
         <with-field-names merge-attrs="&all_attributes & attrs_for(:with_fields)">
           <% col = sort_columns[scope.field_path] || scope.field_path
