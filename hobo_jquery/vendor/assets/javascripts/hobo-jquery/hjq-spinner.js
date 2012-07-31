@@ -56,7 +56,7 @@
             if(!clone) return this;
             clone.remove();
             return this;
-        },
+        }
     };
 
     var defaultOptions = function() {

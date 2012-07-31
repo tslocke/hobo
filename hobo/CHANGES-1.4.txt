@@ -731,7 +731,7 @@ Unfortunately, 2 of the integration tests fails on firefox, which
 works out of the box, so we also have to install capybara-webkit and
 selenium-chrome.
 
-     $ git clone -b jquery git://github.com/Hobo/agility-gitorial.git
+     $ git clone -b hobo-1.4 git://github.com/Hobo/agility-gitorial.git
      $ cd agility-gitorial
 
 Make sure you have the prerequisites for capybara-webkit:
@@ -741,7 +741,7 @@ https://github.com/thoughtbot/capybara-webkit/wiki/Installing-QT
      $ rake db:migrate
 
 Download the selenium-chrome server and place in your path:
-http://code.google.com/p/chromium/downloads/list
+http://code.google.com/p/chromedriver/downloads/list
 
      $ rake test:integration
 

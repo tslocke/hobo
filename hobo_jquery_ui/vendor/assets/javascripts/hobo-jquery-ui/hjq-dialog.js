@@ -44,7 +44,7 @@
         forms or formlets. */
         submit: function(extra_options, extra_attrs) {
             var dialog=this;
-            if(!this.hasClass("dialog-box")) dialog=this.parents(".dialog_box");
+            if(!this.hasClass("dialog-box")) dialog=this.parents(".dialog-box");
             dialog.find("form").trigger('submit');
             dialog.find(".formlet").hjq_formlet('submit', extra_options, extra_attrs);
         },
