@@ -1,6 +1,6 @@
 <def tag="search-filter">
   <form param="search-form" method="get" action="" with="&nil" merge-attrs >
-    <hidden-fields for-query-string skip="page, search"/>
+    <hidden-fields param for-query-string skip="page, search"/>
     <span param="label"><t key="hobo.table_plus.search">Search</t></span>
     <input class="search" type="search" name="search" value="&params[:search]"/>
     <submit label="&t('hobo.table_plus.submit_label', :default=>'Go')" class="search-button" param="search-submit"/>
