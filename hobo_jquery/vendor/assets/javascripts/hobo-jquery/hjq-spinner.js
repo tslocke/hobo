@@ -27,7 +27,10 @@
             if(options['no-spinner']) return this;
 
             var clone=original.clone();
-            this.data('hjq-spinner', clone);
+            var spinner_list = this.data('hjq-spinner') || [];
+            spinner_list.push(clone);
+
+            this.data('hjq-spinner', spinner_list);
             clone.data('source', this);
 
             clone.find("span").text(options.message || default_message || "");
@@ -43,7 +46,8 @@
         },
 
         remove: function() {
-            var clone = this.data('hjq-spinner');
+            var spinner_list = this.data('hjq-spinner');
+            var clone = spinner_list.pop();
             var that=this;
             if(!clone) {
                 $(".ajax-progress").each(function() {
