@@ -36,7 +36,8 @@ Nobody but the computer needs to read the rest of this section.
 
 Let's set up a few models for our testing:
 
-    >>
+    >> File.open("#{Rails.root}/app/models/person.rb", "w") do |f|
+     f.write("""
      class Person < ActiveRecord::Base
        hobo_model
 
@@ -55,19 +56,29 @@ Let's set up a few models for our testing:
        has_many :friendships
        has_many :friends, :through => :friendships
      end
-
-    >>
+     """)
+     end
+    >> File.open("#{Rails.root}/app/models/friendship.rb", "w") do |f|
+     f.write("""
      class Friendship < ActiveRecord::Base
        hobo_model
        fields
        belongs_to :person
-       belongs_to :friend, :class_name => "Person"
+       belongs_to :friend, :class_name => 'Person'
+     end
+     """)
      end
 
 Generate a migration and run it:
 {.hidden}
 
-    >> ActiveRecord::Migration.class_eval(Generators::Hobo::Migration::Migrator.run[0])
+    >> File.open("m.txt", "w") {|f| f.write("m\n\n")}
+    >> system("rails g hobo:migration < m.txt")
+    >> ActionDispatch::Reloader.cleanup!
+    >> ActionDispatch::Reloader.prepare!
+    >> Person.connection.clear_cache!
+    >> Person.connection.schema_cache.clear!
+    >> Person.reset_column_information
     >> Person.columns.*.name
     => ["id", "name", "born_at", "code", "male", "created_at", "updated_at", "state"]
 {.hidden}

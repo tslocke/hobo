@@ -5,8 +5,7 @@ eval_file '../partials/_house_model_tests.rb'
 invoke 'hobo:model', %w(nest/ed alpha:string -q)
 
 desc "Nested files exist"
-files_exist? %w[ app/models/nest/ed.rb
-        app/models/nest.rb ]
+files_exist? %w( app/models/nest/ed.rb app/models/nest.rb )
 test_value_eql? true
 
 desc "Nested injection matches"

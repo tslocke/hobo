@@ -11,7 +11,7 @@ doctest: model file exists
 
 doctest: model content matches
 >> File.read 'app/models/alpha/beta.rb'
-=> "class Alpha::Beta < ActiveRecord::Base\n\n  fields do\n    one :string\n    two :integer\n  end\n\nend\n"
+=> "class Alpha::Beta < ActiveRecord::Base\n\n  fields do\n    one :string\n    two :integer\n  end\n\n  # attr_accessible :title, :body\nend\n"
 
 doctest: module file exists
 >> File.exist? 'app/models/alpha.rb'
@@ -54,6 +54,7 @@ doctest: db file exists
 => true
 
 doctest: Alpha::Beta class exists
+>> Alpha::Beta.connection.schema_cache.clear!
+>> Alpha::Beta.reset_column_information
 >> Alpha::Beta
 => Alpha::Beta(id: integer, one: string, two: integer)
-

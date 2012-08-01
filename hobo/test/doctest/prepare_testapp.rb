@@ -7,5 +7,6 @@ system %(echo "gem 'mocha'" >> #{TESTAPP_PATH}/Gemfile)
 FileUtils.chdir TESTAPP_PATH
 require "#{TESTAPP_PATH}/config/environment"
 require 'rails/generators'
-Rails::Generators.configure!
+Rails::Generators.configure!(Rails.application.config.generators)
+
 

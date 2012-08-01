@@ -257,7 +257,7 @@ module Hobo
       def attribute_protected?(attribute)
         attribute = attribute.to_s
 
-        return true if self.class.attributes_protected_by_default.include? attribute
+        return true if self.class.send(:attributes_protected_by_default).include? attribute
 
         if !self.class.accessible_attributes.empty?
           return true if !self.class.accessible_attributes.include?(attribute)

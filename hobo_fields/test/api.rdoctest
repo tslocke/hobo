@@ -112,6 +112,8 @@ HoboFields adds a few features to your models.
 
 Returns the type (i.e. class) declared for a given field or attribute
 
+        >> Advert.connection.schema_cache.clear!
+        >> Advert.reset_column_information
         >> Advert.attr_type :title
         => String
         >> Advert.attr_type :body

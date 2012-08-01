@@ -1,7 +1,5 @@
 desc "All controller files exists"
-files_exist? %w[ app/controllers/houses_controller.rb
-                 app/helpers/houses_helper.rb
-]
+files_exist? %w( app/controllers/houses_controller.rb app/helpers/houses_helper.rb )
 
 test_value_eql? true
 

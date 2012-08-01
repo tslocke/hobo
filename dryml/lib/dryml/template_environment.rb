@@ -160,7 +160,7 @@ module Dryml
         end
       end
 
-      id = if (typed_id = object.try.typed_id)
+      id = if (!object.is_a?(ActiveRecord::Relation) && typed_id = object.try.typed_id)
              typed_id
            elsif object == @this
              "this"

@@ -1,7 +1,5 @@
 desc "All user controller files exists"
-files_exist? %w[ app/controllers/users_controller.rb
-                 app/helpers/users_helper.rb
-]
+files_exist? %w( app/controllers/users_controller.rb app/helpers/users_helper.rb )
 test_value_eql? true
 
 

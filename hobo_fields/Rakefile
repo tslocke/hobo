@@ -24,7 +24,7 @@ include HoboSupport::CommonTasks
 namespace "test" do
   desc "Run the doctests"
   task :doctest do |t|
-    files=Dir['test/*.rdoctest'].map {|f| File.expand_path(f)}.join(' ')
+    files=Dir['test/*.rdoctest'].sort.map {|f| File.expand_path(f)}.join(' ')
     exit(1) if !system("#{RUBYDOCTEST} #{files}")
   end
 
