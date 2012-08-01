@@ -190,7 +190,7 @@ module HoboRapidHelper
         end
 
         Dryml.last_if = true
-        [body, html_attrs, ajax_attrs, form_attrs]
+        [body, html_attrs, deunderscore_attributes(ajax_attrs), form_attrs]
       end
     end
 
