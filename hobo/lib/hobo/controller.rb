@@ -83,7 +83,7 @@ module Hobo
 
       page = options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;\n"
       for spec in render_specs
-        function = spec[:function] || "_update"
+        function = spec[:function] || "hjq.ajax.update"
         dom_id = spec[:id]
 
         if spec[:part_context]
