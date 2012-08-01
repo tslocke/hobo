@@ -1,5 +1,6 @@
     doctest: prepare testapp environment
     doctest_require: '../prepare_testapp'
+    doctest_require: 'mocha'
 
 # Hobo::Helper
 
