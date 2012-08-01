@@ -6,16 +6,21 @@ The default for [autoOpen](http://jqueryui.com/demos/dialog/#option-autoOpen) ha
 The [buttons](http://jqueryui.com/demos/dialog/#option-buttons) option has been changed slightly.  Because of quoting issues, it's usually easier to assign the list to a variable and then include the list:
 
     <% buttons = [ ["cancel", "jQuery(this).dialog('close')"] ] %>
+
 or
+
     <% buttons = [ ["save", "hjq_dialog_box.submitAndClose"], ["cancel", "hjq_dialog_box.close"], ] %>
 
 with
+
     <dialog-box buttons="&buttons">My dialog text</dialog-box>
 
 Alternatively:
 
     <dialog-box id="story-dialog" buttons='&{"cancel" => "jQuery(this).dialog(\"close\")"}' >My dialog text</dialog_box>
+
 or
+
     <dialog-box id="story-dialog" buttons='&{"cancel" => "hjq_dialog_box.close"}' > My dialog text</dialog_box>
 
 Because Ruby 1.8 Hash's do not preserve order, you may use a list of pairs instead of a Hash.
