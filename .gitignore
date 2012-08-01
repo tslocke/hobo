@@ -13,3 +13,5 @@ dryml/doc
 Gemfile
 Gemfile.lock
 .svn
+
+*/*.gem
