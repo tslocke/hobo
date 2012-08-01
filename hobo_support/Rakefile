@@ -4,7 +4,7 @@ ActiveRecord::ActiveRecordError # hack for https://rails.lighthouseapp.com/proje
 $:.unshift File.expand_path( '../lib', __FILE__)
 require 'hobo_support'
 
-RUBY = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
+RUBY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"')
 RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} -S rubydoctest"
 
 namespace "test" do
