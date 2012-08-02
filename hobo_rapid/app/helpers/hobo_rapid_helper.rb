@@ -194,4 +194,31 @@ module HoboRapidHelper
       end
     end
 
+    # the meat of with-fields, with-field-names, with-fields-grouped.
+    # returns the list of field names
+    def with_fields_helper(attrs)
+      attrs[:fields].nil? || attrs[:associations].nil? or raise ArgumentError, "with-fields -- specify either fields or associations but not both"
+
+      field_names = if attrs[:associations] == "has_many"
+                      this.class.reflections.values.select { |refl| refl.macro == :has_many }.map { |refl| refl.name.to_s }
+
+                    elsif attrs[:fields].nil? || attrs[:fields] == "*" || attrs[:fields].is_a?(Class)
+                      klass = attrs[:fields].is_a?(Class) ? attrs[:fields] : this.class
+                      columns = standard_fields(klass, attrs[:include_timestamps])
+
+                      if attrs[:skip_associations] == "has_many"
+                        assocs = this.class.reflections.values.reject {|r| r.macro == :has_many }.map &its.name.to_s
+                        columns + assocs
+                      elsif attrs[:skip_associations]
+                        columns
+                      else
+                        assocs = klass.reflections.values.map &its.name.to_s
+                        columns + assocs
+                      end
+                    else
+                      comma_split(attrs[:fields].gsub('-', '_'))
+                    end
+      field_names -= comma_split(attrs[:skip]) if attrs[:skip]
+      field_names
+    end
 end
