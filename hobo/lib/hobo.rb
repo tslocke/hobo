@@ -44,7 +44,7 @@ module Hobo
         parameters = []
         like_operator = ActiveRecord::Base.connection.adapter_name =~ /postgres/i ? 'ILIKE' : 'LIKE'
         query_words.each do |word|
-          column_queries = search_target.search_columns.map { |column| "#{column} #{like_operator} ?" }
+          column_queries = search_target.search_columns.map { |column| column == "id" ? "CAST(#{column} AS varchar) #{like_operator} ?" : "#{column} #{like_operator} ?" }
           conditions << "(" + column_queries.join(" or ") + ")"
           parameters.concat(["%#{word}%"] * column_queries.length)
         end
