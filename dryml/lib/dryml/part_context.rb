@@ -56,7 +56,9 @@
       def marshal(session)
         context = [@part_name, @this_id, @locals]
         context << form_field_path if form_field_path
-        data = Base64.encode64(Marshal.dump(context)).strip
+        # http://stackoverflow.com/questions/2620975/strange-n-in-base64-encoded-string-in-ruby
+        # data = Base64.encode64(Marshal.dump(context)).strip
+        data = Base64.strict_encode64(Marshal.dump(context)).strip
         digest = generate_digest(data, session)
         "#{data}--#{digest}"
       end
@@ -65,7 +67,6 @@
       # Unmarshal part context to a hash and verify its integrity.
       def unmarshal(client_store, page_this, session)
         data, digest = CGI.unescape(client_store).strip.split('--')
-
         raise TamperedWithPartContext unless digest == generate_digest(data, session)
 
         context = Marshal.load(Base64.decode64(data))
