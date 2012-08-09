@@ -180,8 +180,7 @@ EOI
         say "Installing admin subsite..."
         invoke 'hobo:admin_subsite', [@admin_subsite_name],
                                      :user_resource_name => @user_resource_name,
-                                     :invite_only => @invite_only,
-                                     :make_front_site => false
+                                     :invite_only => @invite_only
       end
     end
 

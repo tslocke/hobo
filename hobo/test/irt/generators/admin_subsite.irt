@@ -1,5 +1,5 @@
 invoke 'hobo:assets', %w[ -q ]
-invoke 'hobo:admin_subsite', %w[ -q --make-front-site=false ]
+invoke 'hobo:admin_subsite', %w[ -q ]
 desc "Admin Subsite files exist"
 files_exist? %w( app/controllers/admin/admin_site_controller.rb app/controllers/admin/users_controller.rb app/helpers/admin/users_helper.rb app/views/taglibs/admin_site.dryml )
 test_value_eql? true
