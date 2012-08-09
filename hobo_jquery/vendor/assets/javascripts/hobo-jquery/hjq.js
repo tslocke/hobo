@@ -238,9 +238,13 @@
 
             result.context = this;
             result.type = o.type || 'GET';
-            result.data = {"render_options[preamble]": o.preamble || '',
-                            "render_options[contexts_function]": 'hjq.ajax.updatePartContexts'
-                           };
+            result.data = {};
+            /* These are now the defaults, so we don't need to send
+            them over the wire.
+              result.data = {"render_options[preamble]": o.preamble || '',
+                             "render_options[contexts_function]": 'hjq.ajax.updatePartContexts'
+                             }; */
+            if(o.preamble) result.data["render_options[preamble]"] = o.postamble;
             if(o.postamble) result.data["render_options[postamble]"] = o.postamble;
             if(o.content_type) result.data["render_options[content_type]"] = o.content_type;
             if(o.attrs.errors_ok) result.data["render_options[errors_ok]"] = 1;
@@ -258,7 +262,8 @@
                 if(part_data) $("#"+ids[i]).data('hjq-ajax', part_data);
                 result.data["render["+i+"][part_context]"] = page_data.hobo_parts[ids[i]];
                 result.data["render["+i+"][id]"] = ids[i];
-                result.data["render["+i+"][function]"] = o['function'] || 'hjq.ajax.update';
+                // default for render[i][function] is hjq.ajax.update
+                if(o.function) result.data["render["+i+"][function]"] = o['function'];
             }
 
             return result;

@@ -81,7 +81,7 @@ module Hobo
 
       headers["Content-Type"] = options['content_type'] if options['content_type']
 
-      page = options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;\n"
+      page = options[:preamble] || ""
       for spec in render_specs
         function = spec[:function] || "hjq.ajax.update"
         dom_id = spec[:id]
@@ -97,6 +97,7 @@ module Hobo
         end
       end
       if renderer
+        options[:contexts_function] ||= "hjq.ajax.updatePartContexts" unless options[:no_contexts_function]
         if options[:contexts_function]
           storage = renderer.part_contexts_storage_uncoded
           page << "#{options[:contexts_function]}(#{storage.to_json});\n"
