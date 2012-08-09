@@ -68,34 +68,25 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   end
 
 
-  def create!(attrs = nil)
+  def create_record_with_user_create(attrs, options, raise = false, &block)
     klass = @reflection.klass
     user = acting_user if klass < Hobo::Model
-    klass.transaction do
-      object = if attrs
-                 klass.send(:with_scope, :create => attrs) { user ? klass.user_create!(user) : klass.create! }
-               else
-                 user ? klass.user_create!(user) : klass.create!
-               end
-      self << object
-      object
+    if user
+      if attributes.is_a?(Array)
+        attributes.collect { |attr| create_record(attr, options, raise, &block) }
+      else
+        transaction do
+          add_to_target(klass.user_create(attributes)) do |record|
+            yield(record) if block_given?
+            insert_record(record, true, raise)
+          end
+        end
+      end
+    else
+      create_record_without_user_create(attrs, options, raise, &block)
     end
   end
-
-
-  def create(attrs = nil)
-    klass = @reflection.klass
-    user = acting_user if klass < Hobo::Model
-    klass.transaction do
-      object = if attrs
-                 klass.send(:with_scope, :create => attrs) { user ? klass.user_create(user) : klass.create }
-               else
-                 user ? klass.user_create(user) : klass.create
-               end
-      self << object
-      object
-    end
-  end
+  alias_method_chain :create_record, :user_create
 
 
   def insert_record_with_owner_attributes(record, force = true, raise = false)
