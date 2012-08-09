@@ -86,5 +86,17 @@ module Hobo
       end
     end
 
+    # hobo_field's rich types let you refer to rich type with symbols:
+    #     fields do; shout :loud; end.
+    # The problem comes if you never use LoudText in your code, rails
+    # autoloader will never kick in and autoload
+    # app/rich_types/loud_text.rb, so let's preemptively require
+    # everything in that directory.
+    initializer 'hobo.rich_types' do |app|
+      Dir["#{Rails.root}/app/rich_types/*"].each do |file|
+        require_dependency file
+      end
+    end
+
   end
 end
