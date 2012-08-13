@@ -36,14 +36,14 @@ To use this tag, the model of the items the user is chosing *must* have unique n
     </div>
     <div class="items">
       <div class="item" param="item" repeat>
-        <span><%= h this.to_s %></span>
+        <span param='item-label'><%= h this.to_s %></span>
         <input type="hidden" name="#{name}[]" value="@#{h this.id}" disabled="&disabled"
                param="hidden"/>
         <input type="button" class="remove-item" value="#{remove_label}" disabled="&disabled"
                param="remove-button"/>
       </div>
     </div>
-    <select merge-attrs="&{:disabled => disabled}">
+    <select merge-attrs="&{:disabled => disabled}" param>
       <option value=""><prompt/></option>
       <repeat with="&options">
         <if test="&this.in?(values)">
