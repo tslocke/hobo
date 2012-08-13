@@ -68,7 +68,9 @@ module Generators
       end
 
       def inject_css_require(name, subsite, comments)
-        application_file = "app/assets/stylesheets/#{subsite}.css"
+        application_file = "app/assets/stylesheets/#{subsite}.scss"
+        application_file = "app/assets/stylesheets/#{subsite}.css" unless exists?(application_file)
+        raise Thor::Error, "Couldn't find #{subsite}.css!" unless exists?(application_file)
         opts = {:before => /\*=(?!.*\*=).*?$/m}
 
         raise Thor::Error, "Couldn't find #{subsite}.css!" unless exists?(application_file)
