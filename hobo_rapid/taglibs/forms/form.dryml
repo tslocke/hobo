@@ -75,6 +75,8 @@ or on a standard generated page using a default form:
 
  - refocus-form: Refocus the first form-field after submission (only makes sense for ajax forms)
 
+ - before-unload: If set to a message, the message is displayed if the user attempts to leave the page without submitting the form.  Note that some browsers ignore the user's message and display their own in an attempt to stop mouse-trappers.
+
 ### Parameters
 
 The standard form tag does not have any parameters, nor does it have any default content.   However, Hobo does autogenerate polymorphic form tags for each of your models into `app/views/taglibs/auto/rapid/forms.dryml`.  These forms have the following parameters:
@@ -90,11 +92,12 @@ The standard form tag does not have any parameters, nor does it have any default
  - cancel
 
 -->
-<def tag="form" polymorphic >
+<def tag="form" polymorphic attrs="before-unload">
 <%
   body, html_attrs, ajax_attrs, form_attrs = form_helper(attributes, parameters)
   unless body.nil?
     add_data_rapid!(html_attrs, :form, :ajax_attrs => ajax_attrs) unless ajax_attrs.empty?
+    add_data_rapid!(html_attrs, :before_unload, :message => before_unload) if before_unload
 %>
     <%= element("form", html_attrs.merge(form_attrs), body) if body %>
 <% end %>

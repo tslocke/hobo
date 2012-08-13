@@ -587,6 +587,11 @@ The signature for the function update_response and friends has changed.   This s
       end
     end
 
+### before-unload
+
+`<form>` has gained a new option, before-unload, which adds an
+onbeforeunload helper to the page.
+
 ## Editors
 
 Editors are no longer special-cased, they now use the standard DRYML
