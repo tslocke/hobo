@@ -23,7 +23,7 @@ All other attributes are merged into the form, so standard form attributes are s
     </form>
     <% panel_tag ||= 'dialog-box' %>
     <% title = t("hobo.live_search.results_label", :default => "Search Results") %>
-    <call-tag tag="&panel_tag" position="&{:my => 'right top'}" width="&600" height="&800" id="search-results-box" with="&nil" title="&title" param="box">
+    <call-tag tag="&panel_tag" position="center" width="&600" height="&800" id="search-results-box" with="&nil" title="&title" param="box">
       <do part="search-results-part">
         <search-results/>
       </do>
