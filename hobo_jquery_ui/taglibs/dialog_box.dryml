@@ -44,7 +44,7 @@ The following functions are predefined for use in dialog buttons:
  options["autoOpen"]=false unless options.has_key?("autoOpen")
 %>
  <span class="dialog-position"></span>
- <% html_attrs = add_classes(html_attrs, "hidden dialog-box") %>
+ <% html_attrs = add_classes(html_attrs, "dialog-box") %>
  <div merge-attrs="&html_attrs" data-rapid="&data_rapid('dialog-box', :options => options, :events => events, :buttons => buttons)" param="default" />
 </def>
 
