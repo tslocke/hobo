@@ -97,7 +97,7 @@ or
      end
      attributes['message'] ||= t("FIXME", :default => "Loading...") if HoboRapidHelper::AJAX_ATTRS.any?{|a| attributes.has_key?(a)}
      %>
-  <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')">
+  <form action="&request.path" method="get" class="filter-menu" merge-attrs="&attributes"  data-rapid="&data_rapid('filter-menu')" with="&nil">
     <div>
       <% opt = options.first.kind_of?(Array) ? options.*.last : options
          selected = opt.detect {|o| o.to_s==params[param_name.gsub('-', '_')] }  %>
