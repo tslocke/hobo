@@ -28,7 +28,7 @@ then `delete-button` performs an Ajax delete and then attempts to fix up the pag
 
 ### Attributes
 
-All the standard ajax attributes *except the callbacks* are supported (see the main taglib documention for Rapid Forms).
+All the standard ajax attributes *except the callbacks* are supported (see the main taglib documentation for Rapid Forms).
 
  - label: The label for the button. Default: "Remove".  (Alternately, use the hobo.actions.remove translation to customize)
 
