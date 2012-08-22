@@ -2,7 +2,7 @@
 
 ## regressions
 
- * remote-method-button, create-button, update-button,
+ * remote-method-button, update-button,
    transition-button: normal usages of these tags work, but they do
    not work if you ask them to do AJAX
  * live-search works, but it's not 'live'.  You have to press return
