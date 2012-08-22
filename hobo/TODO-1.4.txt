@@ -8,10 +8,6 @@
    not work if you ask them to do AJAX
  * live-search works, but it's not 'live'.  You have to press return
    to start the search
- * remove-button, remote-method-button, create-button & update-button
-   used to display inline but now display as a block.   In other
-   words, they now display one per line rather than several in a
-   single line.
  * the rapid_summary tags have been moved out
    of core Hobo into their own plugin,
    https://github.com/Hobo/hobo_summary, which is not yet in a working state
