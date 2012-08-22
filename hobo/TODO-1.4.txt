@@ -2,7 +2,6 @@
 
 ## regressions
 
- * sortable-input-many does not work
  * remote-method-button, create-button, update-button,
    transition-button: normal usages of these tags work, but they do
    not work if you ask them to do AJAX

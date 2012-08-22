@@ -117,6 +117,8 @@ if(!RegExp.escape) {
             // remove with animation
             me.hjq('hideAndRemove', attrs['hide']);
 
+            top.trigger('rapid:change');
+
             return false; //prevent bubbling
         },
 

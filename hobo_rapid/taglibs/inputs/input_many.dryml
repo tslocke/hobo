@@ -78,7 +78,7 @@ end
   <% skip += ",#{more_skip}" if more_skip -%>
   <% js_attrs = all_attributes.slice(:minimum, :add_hook, :remove_hook, :hide, :show) %>
   <% js_attrs[:prefix] = param_name_for_this %>
-  <ul class="input-many #{this_field.dasherize}" data-rapid="#{data_rapid('input-many', js_attrs)}" merge-attrs>
+  <ul class="input-many #{this_field.dasherize}" data-rapid="#{data_rapid('input-many', js_attrs, attributes)}" merge-attrs>
     <fake-field-context fake-field="-1" context="&template">
       <li class="input-many-li input-many-template" id="#{underize param_name_for_this}">
         <div class="input-many-item" param="default">

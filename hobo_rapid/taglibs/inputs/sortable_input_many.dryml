@@ -8,18 +8,22 @@ The specified sort order may be maintained even without `acts_as_list`.  The ite
 
 ### Attributes
 
- - `id`:  Due to a limitation in script.aculo.us, an id is required.  If you do not supply one, one will be generated.
  - `position-column`:  The position column may be specified via `acts_as_list`, via a `position_column` method on your model or via this attribute.
- - others:  all other attributes are passed through to `<input-many>`
+ - others:  all other attributes are passed through to [jQuery UI's Sortable](http://jqueryui.com/demos/sortable/) or to `<input-many>`, as appropriate.
 
+The jQuery UI option `update` is used internally to update the order.   If you modify this option, your function may call `$(this).hjq_sortable_input_many('update')` to retain this functionality.
 -->
 
-<def tag="sortable-input-many" attrs="id, position-column, template">
-  <% this_id = this_parent.id || rand(100000) -%>
-  <% id ||= "sortable-input-many-#{this_parent.class.name.underscore.dasherize}-#{this_id}-#{this_field_reflection.name}" -%>
+<def tag="sortable-input-many" attrs="position-column, template">
+<%
+  options, attributes = attributes.partition_hash(['disabled', 'appendTo', 'axis', 'cancel', 'connectWith', 'containment', 'cursor', 'cursorAt', 'delay', 'distance', 'dropOnEmpty', 'forceHelperSize', 'forcePlaceholderSize', 'grid', 'handle', 'helper', 'items', 'opacity', 'placeholder', 'revert', 'scroll', 'scrollSensitivity', 'scrollSpeed', 'tolerance', 'zIndex'])
+  events, attributes = attributes.partition_hash(['create', 'start', 'sort', 'change', 'beforeStop', 'stop', 'update', 'receive', 'remove', 'over', 'out', 'activate', 'deactivate'])
+
+  data_rapid_options = { :options => options, :events => events }
+%>
   <% template ||= this.try.new_candidate || this.member_class.new %>
   <% position_column ||= template.try.position_column -%>
-  <input-many merge id="&id" class="sortable-input-many" template="&template" more-skip="&position_column">
+  <input-many merge class="sortable-input-many" template="&template" more-skip="&position_column" data-rapid="&data_rapid('sortable-input-many', data_rapid_options)">
     <default: replace>
         <div class="ordering-handle" param="handle" if="&can_edit?">&uarr;<br/>&darr;</div>
         <if test="&position_column">
