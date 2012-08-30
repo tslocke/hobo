@@ -6,9 +6,9 @@
     // removal ensures it stays on screen long enough to be visible.
 
     var methods = {
-        /* without any options, $(foo).hjq_spinner() places a spinner
+        /* without any options, spinner = $(foo).hjq_spinner() places a spinner
            to the left of foo until you remove it via
-           $(foo).hjq_spinner('remove');
+           spinner.hjq_spinner('remove');
 
            options:
            - spinner-next-to: DOM id of the element to place the spinner next to.
@@ -18,20 +18,17 @@
            - message: the message to display inside the spinner
 
            If options.message is false-ish, default_message is displayed.
+
+           The spinner is returned.
         */
         init: function(options, default_message) {
             var original=$("#ajax-progress");
             if (original.length==0) return this;
 
             options = $.extend({}, defaultOptions.call(this), options);
-            if(options['no-spinner']) return this;
+            if(options['no-spinner']) return $();
 
             var clone=original.clone();
-            var spinner_list = this.data('hjq-spinner') || [];
-            spinner_list.push(clone);
-
-            this.data('hjq-spinner', spinner_list);
-            clone.data('source', this);
 
             clone.find("span").text(options.message || default_message || "");
 
@@ -42,24 +39,11 @@
             else if(options['spinner-next-to']) pos_options.of=$("#"+options['spinner-next-to']);
 
             clone.insertBefore(original).show().position(pos_options);
-            return this;
+            return clone;
         },
 
         remove: function() {
-            var spinner_list = this.data('hjq-spinner');
-            var clone = spinner_list.pop();
-            var that=this;
-            if(!clone) {
-                $(".ajax-progress").each(function() {
-                    if($(this).data('source')[0]==that[0]) {
-                        clone=$(this);
-                        return false;
-                    }
-                });
-            }
-            if(!clone) return this;
-            clone.remove();
-            return this;
+            return this.remove();
         }
     };
 

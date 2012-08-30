@@ -274,7 +274,7 @@
             if (!o.attrs) o.attrs = {};
             if (!o.extra_callbacks) o.extra_callbacks = {};
 
-            this.hjq_spinner(o.attrs, "Saving...");
+            var spinner = this.hjq_spinner(o.attrs, "Saving...");
 
             var success_dfd = jQuery.Deferred();
             if(o.attrs.success) success_dfd.done(methods.createFunction.call(that, o.attrs.success));
@@ -304,7 +304,7 @@
             complete_dfd.done(function() {
                 if(that.parents("body").length==0) $(document).trigger('rapid:ajax:complete', [that]);
                 else  that.trigger('rapid:ajax:complete', [that]);
-                that.hjq_spinner('remove');
+                spinner.hjq_spinner('remove');
                 if(o.attrs.refocus_form) that.find(":input[type!=hidden]:first").focus();
             });
             result.complete = complete_dfd.resolve;
