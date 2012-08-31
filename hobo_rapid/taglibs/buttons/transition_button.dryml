@@ -1,16 +1,27 @@
-<!-- A push-button to invoke a lifecycle transition either as a page-reload or as an ajax call.
+<!-- A push button to invoke a lifecycle transition.
+
+If the transition has parameters or no ajax attributes are supplied, the push-button simply moves to the transition page.  This is bad form, you probably should use `<transition-link>` instead.
+
+If the transition has no parameters and ajax attributes are supplied, ajax is used to perform the transaction.
+
+If your transition has parameters and/or you don't want to use ajax, use and parametrize the automatically generated transition form.
+
+    <transition-button transition="mogrify" ajax/>
+
+is equivalent to
+
+    <mogrify-form without-cancel without-field-list ajax />
 
 ### Attributes
 
  - `transition` - the name of the transition to invoke. Required
- - `update` - one or more DOM IDs of ajax parts to update after the transition
  - `label` - the label on the button. Defaults to the name of the transition
 
 All of the [standard ajax attributes](/api_taglibs/rapid_forms) are also supported.
 
 ### Warning
 
-Transitions with parameters are implemented using a form.  HTML does not allow forms to be nested, so a transitions with parameters should not be placed inside of a form.
+Buttons are implemented using a form.  HTML does not allow forms to be nested, so a transition-button should not be placed inside of a form.
 
 ### Invalid transitions
 
@@ -19,7 +30,7 @@ If the transition could not be found, the user does not have permissions for the
      <transition-button transition="mogrify"/><else>Cannot mogrify</else>
 
   -->
-<def tag="transition-button" attrs="transition, update, label"><%=
+<def tag="transition-button" attrs="transition, label"><%
     if transition.is_a?(String)
       transition = this.lifecycle.find_transition(transition, current_user)
     end
@@ -36,16 +47,17 @@ If the transition could not be found, the user does not have permissions for the
     label = t("activerecord.attributes.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}", :default => (label || transition_name.to_s.titleize))
     title = t("activerecord.attribute_help.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}")
     html_attributes.update(:title => title) unless title.empty? 
-    url = object_url(this, transition_name, :method => html_attributes[:method])
 
-    if (update || !ajax_attributes.empty?) && !has_params
+    if (!ajax_attributes.empty?) && !has_params
       ajax_attributes[:message] ||= label
       ajax_attributes[:method] = html_attributes[:method]
-      func = ajax_updater(url, update, ajax_attributes)
-      html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
-      element(:input, html_attributes, nil, true, true)
-    else
-      button_to(label, url, html_attributes)
+    %><form lifecycle="&transition_name" merge-attrs="&ajax_attributes" class="button_to" param>
+        <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
+        <submit label="&label" merge-attributes="&html_attributes" param="button"/>
+      </form><%
+    else %><%=
+      url = object_url(this, transition_name, :method => html_attributes[:method])
+      button_to(label, url, html_attributes) %><%
     end
   %>
 </def>
@@ -57,6 +69,10 @@ For example, you could use this on a `Friendship` card: the person invited to ha
 This tag behaves similarly to repeat: an else tag may be used to handle the case of no buttons:
 
     <transition-buttons/><else>Sorry, no buttons to press.</else>
+
+### Attributes
+
+Ajax attributes are passed through to the individual transition buttons.   All other attributes are added to the surrounding div.
   -->
 <def tag="transition-buttons">
   <% ajax_attrs, html_attrs = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS) %>
