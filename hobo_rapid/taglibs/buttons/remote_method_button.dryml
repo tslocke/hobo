@@ -1,21 +1,21 @@
-<!-- Provides either an ajax or non-ajax button to invoke a "remote method" or "web method" declared in the controller.
-Web Methods provide support for the RPC model of client-server interaction, in contrast to the REST model. The
-preference in Rails is to use REST as much as possible, but we are pragmatists, and sometimes you just to need a remote
-procedure call.
+<!-- DEPRECATED.  remote-method-button is provided for backwards compatibility.  Ajax functionality is no longer supported.   This would be easy to fix, but testing is harder, so if you want to volunteer to test it, we can fix it for you.
 
-The URL that the call is POSTed to is the `object_url` of `this`, plus the method name
+You can replace remote-method-button with something like:
 
-`<remote-method-button>` supports all of the standard ajax attributes (see the main taglib documention for Rapid
-Forms). If any ajax attributes are given, the button becomes an ajax button, if not, Rails' `button_to` is used, which behaves similarly to a standard link.
+    <form action="method" method="POST"><submit/></form>
 
 ### Attributes
+
+Either method or url must be specified.
 
  - method: the name of the web-method to call
 
  - label: the label on the button
 
+ - url: use this url instead of looking it up
+
  -->
-<def tag="remote-method-button" attrs="method, update, label, confirm, url"><%=
+<def tag="remote-method-button" attrs="method, label, url"><%=
   ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
 
   url ||= object_url(this, method.to_s.gsub('-', '_'), :method => :post)
@@ -23,11 +23,9 @@ Forms). If any ajax attributes are given, the button becomes an ajax button, if 
 
   add_classes!(html_attributes, "button remote-method-button #{method}-button")
   label ||= method.titleize
-  if update || !ajax_attributes.empty?
+  if !ajax_attributes.empty?
     ajax_attributes[:message] ||= label
-    func = ajax_updater(url, update, ajax_attributes.merge(:confirm => confirm))
-    html_attributes.update(:onclick => "var e = this; " + func, :type =>'button', :value => label)
-    element(:input, html_attributes, nil, true, true)
+    fail "UNSUPPORTED"
   else
     button_to(label, url, html_attributes.merge(:confirm => confirm))
   end
