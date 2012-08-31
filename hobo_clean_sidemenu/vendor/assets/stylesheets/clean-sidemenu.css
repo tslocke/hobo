@@ -1,6 +1,3 @@
-@import url('/hobothemes/clean/stylesheets/clean.css');
-@import url('/hobothemes/clean/stylesheets/rapid-ui.css');
-
 body {
   width: 95%;
   min-width: 800px;
@@ -35,7 +32,7 @@ body {
 
 #main-nav-container{
   width: 20%;
-  background: #ACD3E6 url(../images/300-3B5F87-ACD3E6-H.png) repeat-y;
+  background: #ACD3E6 url(300-3B5F87-ACD3E6-H.png) repeat-y;
   vertical-align:top;
 }
 
@@ -71,11 +68,11 @@ body {
 }
 
 .main-nav a:hover {
-  background: #DBE1E5 url(../images/100-ACD3E6-DBE1E5-H.png) repeat-y;
+  background: #DBE1E5 url(100-ACD3E6-DBE1E5-H.png) repeat-y;
   color:#3B5F87;
 }
 
 .main-nav li.current a {
-  background: #FCFFF5 url(../images/100-DBE1E5-FCFEF5-H.png) repeat-y;
+  background: #FCFFF5 url(100-DBE1E5-FCFEF5-H.png) repeat-y;
   color: #242E42;
 }
