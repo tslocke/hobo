@@ -6,7 +6,7 @@ All standard ajax attributes are supported, plus:
 
  - model: The class to instantiate, pass either the class name or the class object.  If model is not supplied, the current context (aka this) must be a has-many association.
 
- - label: the button label.  Rather than using this attribute, the best way to customize this label is to set the i18n key <class_name>.actions.new
+ - label: the button label.  Rather than using this attribute, the best way to customize this label is to set the i18n key `<class_name>.actions.new`
 
  - fields: a hash containing fields and their values to set on the new object
 
