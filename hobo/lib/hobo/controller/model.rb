@@ -32,6 +32,8 @@ module Hobo
           rescue_from Hobo::PermissionDeniedError,         :with => :permission_denied
           rescue_from Hobo::Model::Lifecycles::LifecycleKeyError, :with => :permission_denied
 
+          respond_to :html
+
           alias_method_chain :render, :hobo_model
 
         end
@@ -386,11 +388,24 @@ module Hobo
     end
 
 
-    def destination_after_submit(record=this, destroyed=false)
+    def destination_after_submit(*args)
+      options = args.extract_options!
+      destroyed = args[1]
       after_submit = params[:after_submit]
 
       # The after_submit post parameter takes priority
       (after_submit == "stay-here" ? url_for_page_path : after_submit) ||
+
+        # Then try options[:redirect]
+        ((o=options[:redirect]) && begin
+                                     if o.is_a?(Symbol)
+                                       object_url(@this, o)
+                                     elsif o.is_a?(String) || o.is_a?(Hash)
+                                       o
+                                     else
+                                       object_url(*Array(o))
+                                     end
+                                   end)
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
@@ -408,24 +423,6 @@ module Hobo
     def owning_object
       method = @this.class.view_hints.parent
       method ? @this.send(method) : nil
-    end
-
-
-    def redirect_after_submit(*args)
-      options = args.extract_options!
-      o = options[:redirect]
-      if o
-        url = if o.is_a?(Symbol)
-                object_url(this, o)
-              elsif o.is_a?(String) || o.is_a?(Hash)
-                o
-              else
-                object_url(*Array(o))
-              end
-        redirect_to url
-      else
-        redirect_to destination_after_submit(*args)
-      end
     end
 
 
@@ -521,6 +518,8 @@ module Hobo
       if request.xhr? && params[:render]
         hobo_ajax_response
         render :nothing => true unless performed?
+      else
+        respond_with(self.this)
       end
     end
 
@@ -528,6 +527,8 @@ module Hobo
       if request.xhr? && params[:render]
         hobo_ajax_response(:page => :blah)
         render :nothing => true unless performed?
+      else
+        respond_with(self.this)
       end
     end
 
@@ -547,6 +548,7 @@ module Hobo
         self.this = new_for_create(attributes)
         this.user_save(current_user)
       end
+      flash_notice (ht( :"#{@this.class.to_s.underscore}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
       response_block(&b) || create_response(:new, options)
     end
 
@@ -561,6 +563,7 @@ module Hobo
         self.this = association.new(attributes)
         this.save
       end
+      flash_notice (ht( :"#{@this.class.to_s.underscore}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
       response_block(&b) || create_response(:"new_for_#{name_of_auto_action_for(owner_association)}", options)
     end
 
@@ -587,30 +590,31 @@ module Hobo
     end
 
 
-    def create_response(new_action, options={}, &b)
-      flash_notice (ht( :"#{@this.class.to_s.underscore}.messages.create.success", :default=>["The #{@this.class.model_name.human} was created successfully"])) if valid?
+    def create_response(new_action, options={})
+      valid = valid?  # valid? can be expensive
+      if params[:render]
+        if (params[:render_options] && params[:render_options][:errors_ok]) || valid
+          hobo_ajax_response
 
-      response_block(&b) or begin
-                              valid = valid?  # valid? can be expensive
-                              if params[:render]
-                                if (params[:render_options] && params[:render_options][:errors_ok]) || valid
-                                  hobo_ajax_response
-
-                                  # Maybe no ajax requests were made
-                                  render :nothing => true unless performed?
-                                else
-                                  errors = @this.errors.full_messages.join('\n')
-                                  message = ht( :"#{this.class.to_s.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
-                                  ajax_response("alert('#{message}');", params[:render_options])
-                                end
-                              else
-                                if valid
-                                  redirect_after_submit options
-                                else
-                                  re_render_form(new_action)
-                                end
-                              end
-                            end
+          # Maybe no ajax requests were made
+          render :nothing => true unless performed?
+        else
+          errors = @this.errors.full_messages.join('\n')
+          message = ht( :"#{this.class.to_s.underscore}.messages.create.error", :errors=>errors,:default=>["Couldn't create the #{this.class.name.titleize.downcase}.\n #{errors}"])
+          render :js => "alert(#{message.to_json});\n"
+        end
+      else
+        location = destination_after_submit(options)
+        respond_with(self.this, :location => location) do |format|
+          format.html do
+            if valid
+              redirect_to location
+            else
+              re_render_form(new_action)
+            end
+          end
+        end
+      end
     end
 
 
@@ -642,7 +646,7 @@ module Hobo
     #
     # parameters:
     #   valid is a cache of valid?
-    #   options is passed through to redirect_after_submit
+    #   options is passed through to destination_after_submit
     def update_response(valid=nil, options={})
       # valid? can be expensive, cache it
       valid = valid? if valid.nil?
@@ -656,15 +660,19 @@ module Hobo
           errors = @this.errors.full_messages.join('\n')
           message = ht(:"#{@this.class.to_s.underscore}.messages.update.error", :default=>["There was a problem with that change\\n#{errors}"], :errors=>errors)
 
-          ajax_response("alert('#{message}');", params[:render_options])
+          render :js => "alert(#{message.to_json});\n"
         end
       else
-        if valid
-          flash_notice (ht(:"#{@this.class.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"]))
-
-          redirect_after_submit options
-        else
-          re_render_form(:edit)
+        location = destination_after_submit(options)
+        respond_with(self.this, :location => location) do |format|
+          format.html do
+            if valid
+              flash_notice (ht(:"#{@this.class.to_s.underscore}.messages.update.success", :default=>["Changes to the #{@this.class.model_name.human} were saved"]))
+              redirect_to location
+            else
+              re_render_form(:edit)
+            end
+          end
         end
       end
     end
@@ -674,16 +682,16 @@ module Hobo
       self.this ||= args.first || find_instance
       this.user_destroy(current_user)
       flash_notice ht( :"#{model.to_s.underscore}.messages.destroy.success", :default=>["The #{model.name.titleize.downcase} was deleted"])
-      destroy_response(options, &b)
+      response_block(&b) || destroy_response(options, &b)
     end
 
 
-    def destroy_response(options={}, &b)
-      response_block(&b) or
-        respond_to do |wants|
-          wants.html { redirect_after_submit(this, true, options) }
-          wants.js   { hobo_ajax_response || render(:nothing => true) }
-        end
+    def destroy_response(options={})
+      if params[:render]
+        hobo_ajax_response || render(:nothing => true)
+      else
+        respond_with(self.this, :location => destination_after_submit(this, true, options))
+      end
     end
 
 
@@ -701,25 +709,31 @@ module Hobo
     def do_creator_action(name, options={}, &b)
       @creator = model::Lifecycle.creator(name)
       self.this = @creator.run!(current_user, attribute_parameters)
-      response_block(&b) or
-        if valid?
-          respond_to do |wants|
-            wants.html { redirect_after_submit(options) }
-            wants.js   { hobo_ajax_response || render(:nothing => true) }
-          end
-        else
-          this.exempt_from_edit_checks = true
-          respond_to do |wants|
-  			# errors is used by the translation helper, ht, below.
-			errors = this.errors.full_messages.join("\n")
-            wants.html { re_render_form(name) }
-            wants.js   { render(:status => 500,
-                                :text => ht(:"#{@this.class.to_s.underscore}.messages.creator.error", :default=>["Couldn't do creator #{name}.\n#{errors}"], :name=>name, :errors=>errors)
-                               )}
-          end
-        end
+      response_block(&b) || do_creator_response(name, options)
     end
 
+    def do_creator_response(name, options)
+      if valid?
+        if params[:render]
+          hobo_ajax_response || render(:nothing => true)
+        else
+          location = destination_after_submit(options)
+          respond_with(self.this, :location => location)
+        end
+      else
+        this.exempt_from_edit_checks = true
+        if params[:render] && params[:render_options] && params[:render_options][:errors_ok]
+          hobo_ajax_response
+          render :nothing => true unless performed?
+        else
+          # errors is used by the translation helper, ht, below.
+          errors = this.errors.full_messages.join("\n")
+          respond_with(self.this) do |wants|
+            wants.html { re_render_form(name) }
+          end
+        end
+      end
+    end
 
     def prepare_transition(name, options)
       key = options.delete(:key) || params[:key]
@@ -744,24 +758,8 @@ module Hobo
       options = args.extract_options!
       @transition = prepare_transition(name, options)
       @transition.run!(this, current_user, attribute_parameters)
-      response_block(&b) or
-        if valid?
-          respond_to do |wants|
-            wants.html { redirect_after_submit(options) }
-            wants.js   { hobo_ajax_response || render(:nothing => true) }
-          end
-        else
-          respond_to do |wants|
-  			# errors is used by the translation helper, ht, below.
-			errors = this.errors.full_messages.join("\n")
-            wants.html { re_render_form(name) }
-            wants.js   { render(:status => 500,
-                                :text => ht(:"#{@this.class.to_s.underscore}.messages.transition.error", :default=>["Couldn't do transition #{name}.\n#{errors}"], :name=>name, :errors=>errors)
-                               )}
-          end
-        end
+      response_block(&b) || update_response(nil, options)
     end
-
 
     # --- Miscelaneous Actions --- #
 

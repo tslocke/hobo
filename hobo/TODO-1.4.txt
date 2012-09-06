@@ -45,9 +45,6 @@ you notice any such omissions, please let us know, it is easy to fix..
  * multiple file support for AJAX uploads
  * cache: redis support
  * fixup deprecation warnings
- * port to Rails 3.2 and/or 4.0
- * nuke any remaining prototype code
- * add a sane default for non-AJAX JSON requests.
  * trawl the lighthouse && pull requests
  * steal the tags from Portal
  * fixup hobo-contrib
@@ -59,4 +56,4 @@ you notice any such omissions, please let us know, it is easy to fix..
  * create a bootstrap theme
  * add theme chooser to setup wizard
  * add support for has-one
- * convert old Hobo plugins:  imaginary-dryml, hoboyui
+ * convert old Hobo plugins:  imaginary-dryml, hoboyui, nice theme

@@ -646,6 +646,14 @@ The signature for the function update_response and friends has changed.   This s
       end
     end
 
+## default controller actions now use respond_with
+
+All Hobo model controller actions now use [respond_with](http://apidock.com/rails/ActionController/MimeResponds/respond_with) where appropriate.   This means that you can create an API interface for a controller simply by adding:
+
+    respond_to :html, :json, :xml
+
+See [respond_to](http://apidock.com/rails/ActionController/MimeResponds/ClassMethods/respond_to) and Google for "respond_with" for more information.
+
 ### before-unload
 
 `<form>` has gained a new option, before-unload, which adds an

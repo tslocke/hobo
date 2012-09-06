@@ -107,15 +107,6 @@ module Hobo
       render :js => page
     end
 
-    # use this function to send arbitrary bits of javascript
-    def ajax_response(response, options)
-      page = options[:preamble] || "var _update = typeof Hobo == 'undefined' ? Element.update : Hobo.updateElement;\n"
-      page << response
-      page << options[:postamble] if options[:postamble]
-      render :js => page
-    end
-
-
     # dryml does not use layouts
     def action_has_layout?
       false
