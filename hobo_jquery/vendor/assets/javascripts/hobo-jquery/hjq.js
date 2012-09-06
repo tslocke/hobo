@@ -247,7 +247,7 @@
             if(o.preamble) result.data["render_options[preamble]"] = o.postamble;
             if(o.postamble) result.data["render_options[postamble]"] = o.postamble;
             if(o.content_type) result.data["render_options[content_type]"] = o.content_type;
-            if(o.attrs.errors_ok) result.data["render_options[errors_ok]"] = 1;
+            if(o.attrs['errors-ok']) result.data["render_options[errors_ok]"] = 1;
             result.dataType = 'script';
             o.spec = jQuery.extend({'function': 'hjq.ajax.update', preamble: ''}, o.spec);
 
