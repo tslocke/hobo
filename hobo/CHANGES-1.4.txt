@@ -284,10 +284,9 @@ app/helpers/hobo_deprecated_helper.rb
 If your application depends on any of these, you can set
 config.hobo.include_deprecated_helper.
 
-## Rails 3.1 required
+## Rails 3.2 required
 
-Hobo 1.4 currently requires Rails 3.1 for operation.  We expect to be
-on Rails 3.2 before final release.
+Hobo 1.4 currently requires Rails 3.2 for operation.
 
 ## Enhancements
 
