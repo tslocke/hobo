@@ -95,13 +95,17 @@ module HoboRouteHelper
       options, params = options.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
 
-      if obj.respond_to?(:member_class) && obj.respond_to?(:origin) && obj.origin
-        # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
-        refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
-        owner_name = refl.name.to_s
-        owner_name = owner_name.singularize if refl.macro == :has_many
-        poly = [owner_name, obj.member_class]
-        params[:"#{owner_name}_id"] = obj.origin
+      if obj.respond_to?(:member_class)
+        if obj.respond_to?(:origin) && obj.origin
+          # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
+          refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
+          owner_name = refl.name.to_s
+          owner_name = owner_name.singularize if refl.macro == :has_many
+          poly = [owner_name, obj.member_class]
+          params[:"#{owner_name}_id"] = obj.origin
+        else
+          poly = [obj.member_class]
+        end
       else
         poly = [obj]
       end
