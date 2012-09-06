@@ -1,8 +1,10 @@
 <!-- Provides an ajax-powered *find-as-you-type* live search field which is hooked up to Hobo's site-side search feature.
 
-Customizing the display of results can be done through customizing the "box" param and the `search-results` tag.  The current definition of `<search-results>` expects results to be returned in `@search_results`.
+You can provide a completely custom set of results by changing the action parameter to your own controller action.
 
-TODO: currently you have to press 'return' to initiate the search.  This should be easy to fix in hjq-live-search.js - the hard part will probably be in doing it in a way that works in all possible browsers.
+On the other hand, if you wish to slightly tweak the list of results you can adjust the search columns on each model through [set_search_columns](http://cookbook.hobocentral.net/manual/model#set_search_columns),  To stop querying a model, simply set it's search_columns to an empty list.
+
+Customizing the display of results can be done through customizing the "box" param and the `search-results` tag.  The current definition of `<search-results>` expects results to be returned in `@search_results`.
 
 ### attributes
 
