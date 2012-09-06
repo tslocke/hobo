@@ -9,15 +9,53 @@
   <%= "namespace :#{subsite} do" %>
   <%- end -%>
   <%- for controller in controllers_for(subsite) -%>
+    <%- router = router_for(subsite, controller) -%>
+
+
+<%= "  #{'  ' if subsite}# Resource routes for controller #{controller.controller_path}" %>
+<%= router.emit_hash(router.resources_hash, subsite ? "    " : "  ") -%>
+    <%- router.owner_actions.each do |owner_hash| -%>
+
+<%= "  #{'  ' if subsite}# Owner routes for controller #{controller.controller_path}" %>
+<%= router.emit_hash(owner_hash, subsite ? "    " : "  ") -%>
+    <%- end -%>
+    <%- unless (routes = router.user_routes).blank? -%>
+
+<%= "#{'  ' if subsite}  # User routes for controller #{controller.controller_path}" %>
+      <%- for route in routes -%>
+<%= "#{'  ' if subsite}  #{route}" %>
+      <%- end -%>
+    <%- end -%>
+  <%- end -%>
+  <%- if subsite -%>
+
+  end
+  <%- end -%>
+<%- end -%>
+
+<% unless Rails.configuration.hobo.dont_emit_deprecated_routes %>
+
+# These are the Hobo 1.3 style routes.   They've been included for backwards
+# compatibility reasons because the names of some named routes have been changed.
+# Please update your views to use the new named route names and then disable this
+# section by setting config.hobo.dont_emit_deprecated_routes = true.
+
+
+ <% for subsite in subsites -%>
+  <%- if subsite -%>
+
+  <%= "namespace :#{subsite} do" %>
+  <%- end -%>
+  <%- for controller in controllers_for(subsite) -%>
     <%- router = router_for(subsite, controller)
-        groups = %w[ index_action lifecycle resource owner web_method show_action reorder user ] -%>
+        groups = %w[ index_action lifecycle owner web_method show_action reorder resource ] -%>
 
     <%- for group in groups -%>
     <%- gr = "#{group}_routes"
         routes = gr == 'lifecycle_routes' ? router.send(gr.to_sym, subsite) : router.send(gr.to_sym) -%>
     <%- unless routes.empty? -%>
 
-  <%= "  " if subsite %><%= %(# #{gr.humanize} for controller "#{controller.controller_path}") %>
+  <%= "  " if subsite %><%= "# DEPRECATED #{gr.humanize} for controller #{controller.controller_path}" %>
     <%- end -%>
       <%- for route in routes -%>
   <%= "  " if subsite %><%= route %>
@@ -28,6 +66,7 @@
 
   end
   <%- end -%>
-<%- end -%>
+ <%- end -%>
 
+<%- end -%>
 end

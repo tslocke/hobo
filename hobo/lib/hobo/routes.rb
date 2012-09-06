@@ -17,10 +17,12 @@ module Hobo
     end
 
     def linkable?(klass, action, options={})
+      raise Hobo::Error, "deprecated"
       @linkable_keys.member? linkable_key(klass, action, options)
     end
 
     def models_with(wanted_action)
+      raise Hobo::Error, "deprecated"
       @linkable_keys.map do |k|
         subsite, class_name, action, method = k.split('/')
         (action == wanted_action.to_s) ? class_name.constantize : nil

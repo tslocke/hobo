@@ -174,18 +174,6 @@ require 'fileutils'
       end
 
 
-      def linkable?(*args)
-        options = args.extract_options!
-        options[:subsite] = subsite
-        klass, action = if args.length == 1
-                          [model, args.first]
-                        else
-                          args
-                        end
-        Hobo::Routes.linkable?(klass, action, options)
-      end
-
-
       def sortable_collection?(collection, model=self.model)
         # There's no perfect way to detect for this, given that acts_as_list
         # does not provide any metadata to reflect on, but if the :order

@@ -1,10 +1,17 @@
+<% # routing's not available yet, so we just guess based on presence
+# of methods
+def linkable?(model, action)
+  model.hobo_controller && model.hobo_controller.public_instance_methods.include?(action)
+end
+
+%>
 <% each_controller do -%>
 <%
 next unless @controller < Hobo::Controller::Model
 form_fields = standard_fields :belongs_to, :has_many
 
-cancel_to_show_page  = linkable?(:show)
-cancel_to_index_page = !cancel_to_index_page && linkable?(:index)
+cancel_to_show_page  = linkable?(model, :show)
+cancel_to_index_page = !cancel_to_index_page && linkable?(model, :index)
 model_key = model.to_s.underscore
 -%>
 <def tag="form" for="<%= model.name %>">

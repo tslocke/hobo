@@ -1,3 +1,10 @@
+<% # routing's not available yet, so we just guess based on presence
+# of methods
+def linkable?(model, action)
+  model.hobo_controller && model.hobo_controller.public_instance_methods.include?(action)
+end
+
+%>
 <% each_model do -%>
 <%
 name_attribute        = model.name_attribute
@@ -10,9 +17,9 @@ if creator_attribute
   creator_link = creator_refl && linkable?(creator_refl.klass, :show)
 end
 
-show_link     = linkable?(:show)
-edit_link     = !show_link && linkable?(:edit)
-delete_button = !show_link && !edit_link && linkable?(:destroy, :method => :delete)
+show_link     = linkable?(model, :show)
+edit_link     = !show_link && linkable?(model, :edit)
+delete_button = !show_link && !edit_link && linkable?(model, :destroy)
 
 has_actions = edit_link || delete_button
 has_body    = (!show_link && description_attribute) || creator_link || creator_attribute || primary_collection

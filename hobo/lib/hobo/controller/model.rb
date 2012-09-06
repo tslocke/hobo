@@ -1,6 +1,6 @@
 module Hobo
   module Controller
-	  module Model
+    module Model
 
     include Hobo::Controller
 
@@ -36,6 +36,7 @@ module Hobo
 
         end
         register_controller(base)
+        base.model.hobo_controller = base
 
         Hobo::Controller.included_in_class(base)
       end

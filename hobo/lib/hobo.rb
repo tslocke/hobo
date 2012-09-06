@@ -34,7 +34,7 @@ module Hobo
 
     def find_by_search(query, search_targets=[])
       if search_targets.empty?
-       search_targets = Hobo::Routes.models_with(:show).select {|m| m.search_columns.any? }
+       search_targets = Hobo::Model.all_models.select {|m| m.search_columns.any? }
       end
 
       query_words = ActiveRecord::Base.connection.quote_string(query).split
