@@ -17,7 +17,7 @@ module Hobo
     end
 
     def linkable?(klass, action, options={})
-      raise Hobo::Error, "deprecated"
+      #raise Hobo::Error, "deprecated"
       @linkable_keys.member? linkable_key(klass, action, options)
     end
 
