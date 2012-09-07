@@ -60,17 +60,21 @@ module Enumerable
     MultiSender.new(self, :reject)
   end
 
-  def drop_while
-    drop = 0
-    drop += 1 while yield(self[drop])
-    self[drop..-1]
+  unless method_defined?(:drop_while)
+    def drop_while
+      drop = 0
+      drop += 1 while yield(self[drop])
+      self[drop..-1]
+    end
   end
 
 
-  def take_while
-    take = 0
-    take += 1 while yield(self[take])
-    self[0..take-1]
+  unless method_defined?(:take_while)
+    def take_while
+      take = 0
+      take += 1 while yield(self[take])
+      self[0..take-1]
+    end
   end
 
 end
