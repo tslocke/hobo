@@ -109,7 +109,7 @@
 	        .attr( "tabIndex", -1 )
 	        .attr( "title", "Show All Items" )
 	        .insertAfter( input )
-	        .button({
+	        .jqbutton({
 	            icons: {
 	        	primary: "ui-icon-triangle-1-s"
 	            },
@@ -137,7 +137,7 @@
 	            .attr( "tabIndex", -1 )
 	            .attr( "title", "Clear Entry" )
 	            .insertAfter( input )
-	            .button({
+	            .jqbutton({
 	                icons: {
 	        	    primary: "ui-icon-close"
 	                },
@@ -161,7 +161,7 @@
 
 	destroy: function() {
 	    this.input.remove();
-	    this.button.remove();
+	    this.jqbutton.remove();
 	    this.element.show();
 	    $.Widget.prototype.destroy.call( this );
 	}
