@@ -405,7 +405,7 @@ module Hobo
                                      else
                                        object_url(*Array(o))
                                      end
-                                   end)
+                                   end) ||
 
         # Then try the record's show page
         (!destroyed && object_url(@this)) ||
