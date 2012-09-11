@@ -5,6 +5,9 @@ module Hobo
     # overrides the default
     argument :name, :type => :string, :default => 'admin', :optional => true
 
+    class_option :theme, :type => :string, :desc => "Theme", :default => 'clean_admin'
+    class_option :ui_theme, :type => :string, :desc => "jQuery-UI Theme", :default => 'flick'
+
     include Generators::Hobo::InviteOnly
     include Generators::HoboSupport::EvalTemplate
 

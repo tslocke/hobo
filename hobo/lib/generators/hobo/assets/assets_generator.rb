@@ -14,9 +14,9 @@ module Hobo
       copy_file 'guest.rb',                     'app/models/guest.rb'
 
       FileUtils.mv 'app/assets/stylesheets/application.css', 'app/assets/stylesheets/application.css.orig'
-      copy_file 'application.css',                        'app/assets/stylesheets/application.css'
+      copy_file 'application.scss',                        'app/assets/stylesheets/application.scss'
       copy_file 'gitkeep',                                'app/assets/stylesheets/application/.gitkeep'
-      copy_file 'front.css',                              'app/assets/stylesheets/front.css'
+      copy_file 'front.scss',                              'app/assets/stylesheets/front.scss'
       copy_file 'gitkeep',                                'app/assets/stylesheets/front/.gitkeep'
 
       FileUtils.mv 'app/assets/javascripts/application.js', 'app/assets/javascripts/application.js.orig'

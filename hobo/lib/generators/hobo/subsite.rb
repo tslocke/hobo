@@ -19,7 +19,7 @@ module Generators
           end
         end
 
-        template "site.css.erb", File.join('app/assets/stylesheets', "#{file_name}.css")
+        template "site.scss.erb", File.join('app/assets/stylesheets', "#{file_name}.scss")
         copy_file "gitkeep", "app/assets/stylesheets/#{file_name}/.gitkeep"
         template "site.js.erb", File.join('app/assets/javascripts', "#{file_name}.js")
         copy_file "gitkeep", "app/assets/javascripts/#{file_name}/.gitkeep"

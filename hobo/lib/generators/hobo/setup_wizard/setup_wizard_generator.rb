@@ -25,11 +25,23 @@ module Hobo
     class_option :front_controller_name, :type => :string,
     :desc => "Front Controller Name", :default => 'front'
 
+    class_option :front_theme, :type => :string,
+    :desc => "Front Theme", :default => 'clean'
+
+    class_option :front_ui_theme, :type => :string,
+    :desc => "Front jQuery-UI Theme", :default => 'redmond'
+
     class_option :add_admin_subsite, :type => :boolean,
                  :desc => "Add an Admin Subsite"
 
     class_option :admin_subsite_name, :type => :string,
                  :desc => "Admin Subsite Name", :default => 'admin'
+
+    class_option :admin_theme, :type => :string,
+                 :desc => "Admin Theme", :default => 'clean'
+
+    class_option :admin_ui_theme, :type => :string,
+                 :desc => "Admin jQuery-UI Theme", :default => 'redmond'
 
     class_option :invite_only, :type => :boolean,
                  :desc => "Require invitation to join site"
@@ -154,7 +166,19 @@ EOI
     end
 
     def install_default_plugins
-      invoke 'hobo:install_default_plugins', [], {:subsite => 'front', :theme => 'hobo_clean', :ui_theme => 'redmond', :skip_gem => false}
+      if wizard?
+        say_title 'Front Theme'
+        say "The currently available themes are clean, clean_admin, clean_sidemenu and bootstrap."
+        @front_theme = ask("Choose a theme for the front site: [<enter>=clean|<custom_name>]", 'clean')
+
+        say_title 'Front jQuery-UI Theme'
+        say "The currently available jQuery-UI themes are listed here: https://github.com/fatdude/jquery-ui-themes-rails/blob/master/README.markdown"
+        @front_ui_theme = ask("Choose a jQuery-UI theme for the front site: [<enter>=redmond|<custom_name>]", 'redmond')
+      else
+        @front_theme = options[:front_theme]
+        @front_ui_theme = options[:front_ui_theme]
+      end
+      invoke 'hobo:install_default_plugins', [], {:subsite => 'front', :theme => "hobo_#{@front_theme}", :ui_theme => @front_ui_theme, :skip_gem => false}
     end
 
     def admin_subsite
@@ -162,10 +186,18 @@ EOI
         say_title 'Admin Subsite'
         if @invite_only || (@add_admin_subsite = yes_no?("Do you want an admin subsite?"))
           @admin_subsite_name = ask("Choose a name for the admin subsite: [<enter>=admin|<custom_name>]", 'admin')
+
+          say "The currently available themes are clean, clean_admin, clean_sidemenu and bootstrap."
+          @admin_theme = ask("Choose a theme for the #{@admin_subsite_name} site: [<enter>=clean_admin|<custom_name>]", 'clean_admin')
+
+          say "The currently available jQuery-UI themes are listed here: https://github.com/fatdude/jquery-ui-themes-rails/blob/master/README.markdown"
+          @admin_ui_theme = ask("Choose a jQuery-UI theme for the admin site: [<enter>=flick|<custom_name>]", 'flick')
         end
       else
         if @invite_only || (@add_admin_subsite = options[:add_admin_subsite])
           @admin_subsite_name = options[:admin_subsite_name]
+          @admin_theme = options[:front_theme]
+          @admin_ui_theme = options[:front_ui_theme]
         end
       end
     end
@@ -180,7 +212,9 @@ EOI
         say "Installing admin subsite..."
         invoke 'hobo:admin_subsite', [@admin_subsite_name],
                                      :user_resource_name => @user_resource_name,
-                                     :invite_only => @invite_only
+                                     :invite_only => @invite_only,
+                                     :theme => @admin_theme,
+                                     :ui_theme => @admin_ui_theme
       end
     end
 
