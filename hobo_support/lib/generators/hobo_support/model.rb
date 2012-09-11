@@ -18,6 +18,7 @@ module Generators
       end
 
       def inject_hobo_code_into_model_file
+        gsub_file(model_path, /  # attr_accessible :title, :body\n/m, "")
         inject_into_class model_path, class_name do
           eval_template('model_injection.rb.erb')
         end
