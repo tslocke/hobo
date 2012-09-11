@@ -54,12 +54,14 @@ are the models:
        hobo_model
        fields { name :string }
        has_many :bars, :accessible => true
+       attr_accessible :name, :bars
      end
     >>
      class Bar < ActiveRecord::Base
        hobo_model
        fields { name :string }
        belongs_to :foo
+       attr_accessible :name, :foo, :foo_id
      end
     >> migrate
 

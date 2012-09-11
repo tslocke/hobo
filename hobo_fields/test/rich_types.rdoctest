@@ -118,6 +118,7 @@ Provides validation of correct email address format.
            fields do
              body HoboFields::Types::HtmlString
            end
+           attr_accessible :body
          end
         >> article = Article.create!(:body => "</div>>>p1<p>p2</p>p3<nasty>p4</nasty>p5&lt;script&gt;p6<script>p7</script>p8")
         # some unsafe html fragements are removed on save,
@@ -222,6 +223,7 @@ restrict the column type.
        fields do
          content :serialized
        end
+       attr_accessible :content
      end
 
     >> migrate
@@ -234,6 +236,7 @@ restrict the column type.
        fields do
          content :serialized, :class => Hash
        end
+       attr_accessible :content
      end
 
     >> migrate

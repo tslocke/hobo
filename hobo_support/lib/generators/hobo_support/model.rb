@@ -37,6 +37,10 @@ module Generators
         attributes.reject { |a| a.name == "bt" || a.name == "hm" }
       end
 
+      def accessible_attributes
+        field_attributes + bts.map {|bt| bt+"_id"} + bts + hms
+      end
+
       def hms
         attributes.select { |a| a.name == "hm" }.*.type
       end

@@ -11,7 +11,7 @@ doctest: model file exists
 
 doctest: model content matches
 >> File.read 'app/models/alpha/beta.rb'
-=> "class Alpha::Beta < ActiveRecord::Base\n\n  fields do\n    one :string\n    two :integer\n  end\n\n  # attr_accessible :title, :body\nend\n"
+=> "class Alpha::Beta < ActiveRecord::Base\n\n  fields do\n    one :string\n    two :integer\n  end\n  attr_accessible :one, :two\n\n  # attr_accessible :title, :body\nend\n"
 
 doctest: module file exists
 >> File.exist? 'app/models/alpha.rb'

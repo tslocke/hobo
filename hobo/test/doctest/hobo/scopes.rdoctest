@@ -48,6 +48,7 @@ Let's set up a few models for our testing:
          male :boolean
          timestamps
        end
+       attr_accessible :name, :born_at, :code, :male
 
        lifecycle(:key_timestamp_field => false) do
          state :inactive, :active
@@ -63,6 +64,7 @@ Let's set up a few models for our testing:
      class Friendship < ActiveRecord::Base
        hobo_model
        fields
+       attr_accessible :person, :friend
        belongs_to :person
        belongs_to :friend, :class_name => 'Person'
      end

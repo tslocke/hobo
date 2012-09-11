@@ -26,6 +26,7 @@ A user model for our example:
           fields do
             name :string
           end
+          attr_accessible :name
         end
 
 Now the friendship. For now we'll just declare the *invite* part of the lifecycle. We first declare the *states* -- there's only one for now. We then declare the *invite* action. This is the action that first creates the friendship, so we declare it with `create`:

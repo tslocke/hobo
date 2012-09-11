@@ -44,6 +44,7 @@ declaration:
          title :string, :name => true, :index => true
          content :text, :primary_content => true
        end
+       attr_accessible :title, :content, :poster, :poster_id
 
        belongs_to :poster, :class_name => "User", :creator => true
 
@@ -122,6 +123,7 @@ object.  In this case, you can provide your own name method instead:
          first_name :string
          last_name :string
        end
+       attr_accessible :first_name, :last_name
 
        def name
          first_name + ' ' + last_name
@@ -185,6 +187,7 @@ used elsewhere.
        fields do
          email_address :string, :login => true, :unique => true
        end
+       attr_accessible :email_address
      end
 
     >> User.login_attribute
@@ -214,6 +217,7 @@ case the `login_attribute` is saved to the field:
         fields do
           creator_login :string, :creator => true
         end
+        attr_accessible :creator_login
      end
 
     >> Foo2.creator_attribute

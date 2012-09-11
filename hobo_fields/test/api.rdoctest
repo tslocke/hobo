@@ -24,7 +24,7 @@ This will generate the test, fixture and a model file like this:
         body :text
         contact_address :email_address
       end
-
+      attr_accessible :title, :body, :contact_address
     end
 
 (Note: `:email_address` is an example of a "Rich Type" provided by HoboFields -- more on those later)
@@ -156,6 +156,7 @@ The `:required` argument to a field gives a `validates_presence_of`:
            fields do
              title :string, :required
            end
+           attr_accessible :title
          end
         >> a = Advert.new
         >> a.valid?
@@ -176,6 +177,7 @@ The `:unique` argument in a field declaration gives `validates_uniqueness_of`:
            fields do
              title :string, :unique
            end
+           attr_accessible :title
          end
         >> a = Advert.new :title => "Jimbo"
         >> a.valid?
@@ -196,6 +198,7 @@ Let's get back to the basic Advert class with no validations before we continue:
              body            :text
                   contact_address :email_address
            end
+           attr_accessible :title, :body, :contact_address
          end
 
 
@@ -228,6 +231,7 @@ You can set the type of a virtual field to a rich type, e.g.
         >>
          class Advert
            attr_accessor :alternative_email, :type => :email_address
+           attr_accessible :alternative_email
          end
 
 By default, virtual fields are not subject to validation.
