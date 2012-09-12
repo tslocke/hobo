@@ -106,7 +106,7 @@ This is a simple tag - just look at the source if you need to know more detail.
       </if>
       <else>
         <li class='nav-item' param="log-in"><a href="&login_url"><t key="hobo.actions.login">Log in</t></a></li>
-        <li if="&signup_users_path" class="nav-item" param="sign-up"><a href="&signup_users_path"><t key="hobo.actions.signup">Sign up</t></a></li>
+        <li if="&signup_users_path rescue nil" class="nav-item" param="sign-up"><a href="&signup_users_path"><t key="hobo.actions.signup">Sign up</t></a></li>
       </else>
     </ul>
   </do>
