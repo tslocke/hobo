@@ -17,7 +17,7 @@ module Hobo
 
     def generate_admin_user_controller
       invoke "hobo:controller", ["#{file_name}/#{options[:user_resource_name].pluralize.underscore}"], options
-      template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml"
+      template "users_index.dryml", "app/views/#{file_name}/#{options[:user_resource_name].pluralize.underscore}/index.dryml" if invite_only?
     end
 
     include Generators::Hobo::Subsite
