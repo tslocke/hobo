@@ -1,7 +1,7 @@
 <% # routing's not available yet, so we just guess based on presence
 # of methods
 def linkable?(model, action)
-  model.hobo_controller && model.hobo_controller.public_instance_methods.include?(action)
+  model.hobo_controller[subsite] && model.hobo_controller[subsite].public_instance_methods.include?(action)
 end
 
 %>

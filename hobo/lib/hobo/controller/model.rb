@@ -38,7 +38,8 @@ module Hobo
 
         end
         register_controller(base)
-        base.model.hobo_controller = base
+        subsite = base.name.include?("::") ? base.name.split("::").first.underscore : nil
+        base.model.hobo_controller[subsite] = base
 
         Hobo::Controller.included_in_class(base)
       end

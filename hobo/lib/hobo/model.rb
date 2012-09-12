@@ -18,8 +18,10 @@ module Hobo
 
       base.class_eval do
         inheriting_cattr_reader :default_order
-        cattr_accessor :hobo_controller
         alias_method_chain :attributes=, :hobo_type_conversion
+
+        cattr_accessor :hobo_controller
+        self.hobo_controller = {}
 
         include Permissions
         include Lifecycles::ModelExtensions
