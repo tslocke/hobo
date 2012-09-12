@@ -744,6 +744,14 @@ environment no longer automatically imports ActionView::Helpers.
 All application helpers are now available in the template
 environment.
 
+## Attribute Whitelist
+
+Rails 3.2.3 and later changed the default for config.whitelist_attributes to true, so any newly generated Hobo apps will have this feature turned on.  Hobo heavily depends on mass attribute assignation, so this may cause inconveniences.
+
+Mass assignment protection is redundant in Hobo: your primary protection should come through the edit_permitted? function.   If all of your models have properly defined edit_permitted? then it is safe to turn off config.whitelist_attributes.
+
+If you choose not to turn off config.whitelist_attributes, any fields that are not in your attr_accessible declaration will not be available in forms.   Hobo's generators will now assist in the creation of attr_accessible declarations.
+
 # jQuery rewrite
 
 FIXME: pull into separate document, along with interface specs
