@@ -15,6 +15,8 @@ New in version 1.4:
 
 If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.formats.default") from strftime format into the format that the JQuery-UI datepicker likes.
 
+Note that if you set date.formats.default, it's highly recommended that you install the delocalize gem.  (https://github.com/clemens/delocalize)
+
 -->
 <def attrs="name" tag="datepicker">
 <%
@@ -42,5 +44,5 @@ If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.forma
   events, html_attrs = attrs.partition_hash(['beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect'])
   add_data_rapid!(html_attrs, "datepicker", :options => options, :events => events)
 %>
- <%= text_field_tag(name, this, deunderscore_attributes(html_attrs)) %>
+ <%= text_field_tag(name, this.nil? ? '' : I18n.l(this), deunderscore_attributes(html_attrs)) %>
 </def>
