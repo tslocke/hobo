@@ -1,14 +1,13 @@
 # TODO
 
-## regressions
+## 1.3
 
- * remote-method-button, update-button: normal usages of these tags work, but they do
-   not work if you ask them to do AJAX
- * live-search works, but it's not 'live'.  You have to press return
-   to start the search
- * the rapid_summary tags have been moved out
-   of core Hobo into their own plugin,
-   https://github.com/Hobo/hobo_summary, which is not yet in a working state
+ * https://groups.google.com/d/msg/hobousers/-/-FjNfi6rg1UJ
+ * release 1.3.1
+
+## bugs
+
+ * https://hobo.lighthouseapp.com/projects/8324/tickets/974-partial-tag-not-html_safe-with-rails-3010#ticket-974-10
 
 ## documentation
 
@@ -21,39 +20,47 @@
  * ajax manual section
  * miscellaneous controller extensions
  * there's some nice stuff in HoboFields::Model that should be documented & tested
+ * wire protocol for part ajax
+ * spinner, show/hide javascript
+ * give an example on how tweak hobo_bootstrap
 
 ## Cookbook
 
- * search
+ * live-search taglibs
  * actually use Hobo 1.4's new caching abilities
  * auto-link tags in manual
  * create fakedef manual entries for DRYML tags not in taglibs entry
+ * switch themes
+ * fold in the rest of hobocentral
+ * decide what to do about tag comments: nuke for caching reasons or reenable?
 
-## new features that aren't "done"
+## external plugins to update
 
- * clean_sidemenu -> plugin
- * cache: csrf warning
- * monkey patch will_paginate if my patches are not upstreamed
+ * hobo-contrib
+ * hobo_devise
+ * paperclip_with_hobo
+ * imaginary-dryml
+ * nice
+ * hoboyui?
 
-It's quite likely that some of the new tag definitions are missing
-useful id, class, merge or param attributes.  This doesn't impact core
-functionality, but it does limit your ability to extend the tags.  If
-you notice any such omissions, please let us know, it is easy to fix..
+## Testing
 
-## stuff that we really want to do
+ * clean up and push the integration tests
+ * travis-ci
+ * create RAPID test suite
 
+## 2.1 or break code freeze
+
+ * will_paginate:  monkey patch or add bryanlarsen/will_paginate to gemfile in generators
+ * add quiet_assets gem to generator
+ * create hobo-all meta gem so we don't spam Gemfile
+ * (Matt) turf accessible associations
+ * (Ignacio) dev mode speed improvements
+ * rip out obsolete date stuff from convert_for_mass_assignment: https://github.com/tablatom/hobo/blob/master/hobo/lib/hobo/model.rb#L446
+ * make sure all our tags look good in hobo_bootstrap, and then make it the default theme
+ * wrap bootstrap's dialog & a datepicker, deal with our dependence on jQuery-UI's show & hide, and then make jQuery-UI optional
  * multiple file support for AJAX uploads
  * cache: redis support
- * fixup deprecation warnings
- * trawl the lighthouse && pull requests
- * steal the tags from Portal
- * fixup hobo-contrib
- * convert paperclip_with_hobo to gem
-
-## would be nice:
-
- * parametrize the clean theme
- * create a bootstrap theme
- * add theme chooser to setup wizard
+ * parametrize the clean theme colors using SCSS rather than creating a separate hobo_clean_admin theme
  * add support for has-one
- * convert old Hobo plugins:  imaginary-dryml, hoboyui, nice theme
+
