@@ -22,7 +22,7 @@
            The spinner is returned.
         */
         init: function(options, default_message) {
-            var original=$("#ajax-progress");
+            var original=$("#ajax-progress-wrapper .ajax-progress:first");
             if (original.length==0) return this;
 
             options = $.extend({}, defaultOptions.call(this), options);
@@ -56,7 +56,8 @@
         default_options['no-spinner'] = page_options['no-spinner'];
         default_options['spinner-options'] = page_options['spinner-options'] || {
             my: "right bottom",
-            at: "left top"
+            at: "left top",
+            collision: "none"
         };
         default_options['message'] = page_options['message'];
         return default_options;
