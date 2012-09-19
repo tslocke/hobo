@@ -69,7 +69,7 @@ The standard AJAX attributes are supported.
 
 * to:  Use this item as the target instead of the current context.
 
-* params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{id=>17, name=>'joe'}"`
+* params:  These are appended to the target as a query string after a "?".  Params are passed as a ruby hash.  Example: `params="&{:id=>17, :name=>'joe'}"`
 
 * query-params: if set, current query parameters are mirrored onto the link.   If true or blank, all non-ajax query parameters are used.   (`query-params`, `query-params="&true"` or `query-params=""`)  Otherwise, the specified query parameters are used.   (`query-params="page,sort,search"`)
 
