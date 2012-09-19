@@ -319,7 +319,7 @@ module Hobo
             return true if check_only
 
             def_scope do |query, *fields|
-              match_keyword = ::ActiveRecord::Base.connection.adapter_name == "PostgreSQL" ? "ILIKE" : "LIKE"
+              match_keyword = %w(PostgreSQL PostGIS).include?(::ActiveRecord::Base.connection.adapter_name) ? "ILIKE" : "LIKE"
 
               words = query.split
               args = []
