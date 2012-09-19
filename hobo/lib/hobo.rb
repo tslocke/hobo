@@ -42,7 +42,7 @@ module Hobo
       search_targets.build_hash do |search_target|
         conditions = []
         parameters = []
-        like_operator = ActiveRecord::Base.connection.adapter_name =~ /postgres/i ? 'ILIKE' : 'LIKE'
+        like_operator = ActiveRecord::Base.connection.adapter_name =~ /postg/i ? 'ILIKE' : 'LIKE'
         query_words.each do |word|
           column_queries = search_target.search_columns.map { |column| column == "id" ? "CAST(#{column} AS varchar) #{like_operator} ?" : "#{column} #{like_operator} ?" }
           conditions << "(" + column_queries.join(" or ") + ")"
