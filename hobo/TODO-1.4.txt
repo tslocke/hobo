@@ -4,10 +4,12 @@
 
  * https://groups.google.com/d/msg/hobousers/-/-FjNfi6rg1UJ
  * release 1.3.1
+ * add cookbook-2.0.hobocentral.net to the drop down on the 1.3/1.0 cookbooks.
 
 ## bugs
 
  * https://hobo.lighthouseapp.com/projects/8324/tickets/974-partial-tag-not-html_safe-with-rails-3010#ticket-974-10
+ * reset-form reported by Arnaud
 
 ## documentation
 
@@ -63,4 +65,3 @@
  * cache: redis support
  * parametrize the clean theme colors using SCSS rather than creating a separate hobo_clean_admin theme
  * add support for has-one
-
