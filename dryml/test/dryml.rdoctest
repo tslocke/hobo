@@ -58,7 +58,7 @@ Test caching
         >> t3 = Time.now
 
         >> (t3-t2)*1.5 < (t2-t1)
-        => true
+        #=> true
 
 Test descendent searching
 
