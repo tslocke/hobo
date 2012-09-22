@@ -1,0 +1,8 @@
+<show-page>
+  <field-list: tag="editor"/>
+  <after-collection:>
+    <do:tasks>
+      <create-button fields="&{description: 'from create-button'}" label="create-button-test"/>
+    </do:tasks>
+  </after-collection:>
+</show-page>

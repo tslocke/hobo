@@ -1,0 +1,5 @@
+<edit-page>
+  <form:>
+    <cancel: with="&this.story"/>
+  </form:>
+</edit-page>
