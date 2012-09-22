@@ -31,15 +31,15 @@ end
 # group :development, :test do
 #   gem 'webrat'
 # end
-gem "hobo_support", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo_fields", :git => "git://github.com/tablatom/hobo.git"
-gem "dryml", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo_rapid", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo_clean", :git => "git://github.com/tablatom/hobo.git"
-# gem "hobo_clean_sidemenu", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo_jquery", :git => "git://github.com/tablatom/hobo.git"
-gem "hobo_jquery_ui", :git => "git://github.com/tablatom/hobo.git"
+gem "hobo_support", :path => "../.."
+gem "hobo_fields", :path => "../.."
+gem "dryml", :path => "../.."
+gem "hobo", :path => "../.."
+gem "hobo_rapid", :path => "../.."
+gem "hobo_clean", :path => "../.."
+# gem "hobo_clean_sidemenu", :path => "../.."
+gem "hobo_jquery", :path => "../.."
+gem "hobo_jquery_ui", :path => "../.."
 
 gem "jquery-ui-themes", "~> 0.0.4"
 

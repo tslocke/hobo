@@ -31,8 +31,28 @@ GIT
       xpath (~> 0.1.4)
 
 GIT
-  remote: git://github.com/tablatom/hobo.git
-  revision: 54ff318b145d10c561792056d360659ed88bbc64
+  remote: git://github.com/thoughtbot/paperclip.git
+  revision: 3d556955be58cea1c12c3b9b447a9fb4f673a87b
+  branch: master
+  specs:
+    paperclip (3.1.2)
+      activemodel (>= 3.0.0)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
+      cocaine (>= 0.0.2)
+      mime-types
+
+GIT
+  remote: https://github.com/josephbridgwaterrowe/capybara-webkit.git
+  revision: 824abe88c04c289bc560790b4335d7a45da65d2b
+  branch: patch-1
+  specs:
+    capybara-webkit (0.10.1)
+      capybara (>= 1.0.0, < 1.2)
+      json
+
+PATH
+  remote: ../..
   specs:
     dryml (2.0.0.pre1)
       actionpack (~> 3.2.0)
@@ -57,27 +77,6 @@ GIT
       hobo (= 2.0.0.pre1)
     hobo_support (2.0.0.pre1)
       rails (~> 3.2.0)
-
-GIT
-  remote: git://github.com/thoughtbot/paperclip.git
-  revision: 3d556955be58cea1c12c3b9b447a9fb4f673a87b
-  branch: master
-  specs:
-    paperclip (3.1.2)
-      activemodel (>= 3.0.0)
-      activerecord (>= 3.0.0)
-      activesupport (>= 3.0.0)
-      cocaine (>= 0.0.2)
-      mime-types
-
-GIT
-  remote: https://github.com/josephbridgwaterrowe/capybara-webkit.git
-  revision: 824abe88c04c289bc560790b4335d7a45da65d2b
-  branch: patch-1
-  specs:
-    capybara-webkit (0.10.1)
-      capybara (>= 1.0.0, < 1.2)
-      json
 
 GEM
   remote: http://rubygems.org/
