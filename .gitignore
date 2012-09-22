@@ -10,7 +10,6 @@ doc
 dryml/doc
 .yardoc
 .rvmrc
-Gemfile
 Gemfile.lock
 .svn
 

@@ -1,7 +1,6 @@
 source "http://rubygems.org"
 
 gem 'rubydoctest', :git => 'git://github.com/bryanlarsen/rubydoctest.git'
-gem 'hobo_support', :path => '../hobo_support'
 
 gemspec
 

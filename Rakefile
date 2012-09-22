@@ -3,22 +3,22 @@ RUBYDOCTEST = ENV['RUBYDOCTEST'] || "#{RUBY} `which rubydoctest`"
 GEMS_ROOT = File.expand_path('../')
 
 desc "Run tests and doctests for all components."
-task :test_all do |t|
+task :test do |t|
   puts 'You probably want to set the HOBODEV variable before running rake test_all' if ENV['HOBODEV'].nil?
-  system("cd dryml ; #{RUBY} -S rake test:doctest") &&
-    system("cd hobo_fields ; #{RUBY} -S rake test:doctest") &&
-    system("cd hobo_fields ; #{RUBY} -S rake test:unit") &&
-    system("cd hobo_support ; #{RUBY} -S rake test:doctest") &&
-    system("cd hobo ; #{RUBY} -S rake test:doctest") &&
-    system("cd hobo ; #{RUBY} -S rake test:irt") &&
-    system("cd hobo ; #{RUBY} -S rake test")
+  system("cd dryml ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo_fields ; #{RUBY} -S bundle exec rake test:doctest < test_responses.txt") &&
+    system("cd hobo_fields ; #{RUBY} -S bundle exec rake test:unit") &&
+    system("cd hobo_support ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test:irt") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test")
   exit($?.exitstatus)
 end
 
-require 'rubygems'
-require 'yard'
-YARD::Rake::YardocTask.new do |t|
-  t.files = ['*/lib/**/*.rb', '-', 'hobo/README', 'hobo/CHANGES.txt', 'hobo/LICENSE.txt', 'dryml/README', 'dryml/CHANGES.txt']
+desc "Run the integration tests"
+task :test_integration do |t|
+  system("cd integration_tests/agility; #{RUBY} -S rake test:integration")
+  exit($?.exitstatus)
 end
 
 desc "Build and push or install all the hobo-gems"
