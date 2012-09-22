@@ -1,7 +1,12 @@
 #!/bin/bash
 
+unset HOBODEV
+
+cd ..
 gems=`rake gems[build,force] | grep File: | cut -f 4 -d ' '`
-full_gems=`for f in $gems ; do find . -name $f ; done`
+cd integration_tests
+full_gems=`for f in $gems ; do find .. -name $f ; done`
+
 source rvm gemset create hobo-smoke
 source rvm gemset use hobo-smoke
 source rvm --force gemset empty hobo-smoke
@@ -18,6 +23,8 @@ rails s -p 3003 &
 pid=$!
 sleep 45
 
+set -e
+
 wget http://localhost:3003/
 grep "Smoke" index.html
 grep "Congratulations" index.html
@@ -26,6 +33,8 @@ wget http://localhost:3003/admin/users
 grep "No records to display" users
 grep 'Users : Smoke - Admin' users
 grep "New User" users
+
+set +e
 
 cd ..
 
@@ -48,10 +57,14 @@ rails s -p 3003 &
 pid=$!
 sleep 45
 
+set -e
+
 wget http://localhost:3003/
 grep "Things" index.html
 grep "Smoke" index.html
 grep "Congratulations" index.html
+
+set +e
 
 kill $pid || true
 sleep 1
@@ -69,6 +82,8 @@ rails s -p 3003 &
 pid=$!
 sleep 45
 
+set -e
+
 wget http://localhost:3003/
 grep "Smoke" index.html
 grep "Congratulations" index.html
@@ -77,6 +92,8 @@ wget http://localhost:3003/admin/users
 grep "No records to display" users
 grep 'Users : Smoke - Admin' users
 grep "New User" users
+
+set +e
 
 kill $pid || true
 sleep 1
