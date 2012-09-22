@@ -1,0 +1,3 @@
+<include src="bug-305-test" />
+<editor-field-list />
+<p>You clicked me!</p>

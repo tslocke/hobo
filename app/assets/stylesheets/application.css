@@ -1,0 +1,14 @@
+/*
+ * This is the global stylesheet manifest file.  Files or plugins
+ * referenced from here or placed in the application/ directory will be
+ * included in all subsites.  This file is included by front.css and all
+ * subsites.
+ *
+ *= require_self
+ *= require hobo_rapid
+ *= require hobo_jquery
+ *= require hobo_jquery_ui
+ *= require hobo_simple_color
+ *= require hobo_tokeninput
+ *= require_tree ./application
+*/

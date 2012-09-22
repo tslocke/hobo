@@ -1,0 +1,27 @@
+<index-page>
+  <content:>
+    <div part="body">
+      <header>
+        <p if>
+          <count summary/>
+        </p>
+      </header>
+
+      <card>
+        <form id="form1" with="&StoryStatus.new" update="body">
+          With update=
+          <field-list/>
+          <submit label="new"/>
+        </form>
+      </card>
+
+      <page-nav/>
+      <collection>
+        <card>
+          <delete-button: ajax/>
+        </card>
+      </collection>
+      <page-nav/>
+    </div>
+  </content:>
+</index-page>

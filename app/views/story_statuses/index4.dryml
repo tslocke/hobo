@@ -1,0 +1,17 @@
+<index-page>
+  <content:>
+      <header>
+        <p if>
+          <count summary/>
+        </p>
+      </header>
+
+      <page-nav/>
+      <collection>
+        <card>
+          <delete-button: in-place="&false"/>
+        </card>
+      </collection>
+      <page-nav/>
+  </content:>
+</index-page>

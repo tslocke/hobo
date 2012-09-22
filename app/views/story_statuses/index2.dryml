@@ -1,0 +1,80 @@
+<index-page>
+  <content:>
+    <div part="body">
+      <header>
+        <h2>
+          <model-name-human model="&model"/>
+        </h2>
+
+        <p if>
+          <count summary/>
+        </p>
+      </header>
+
+      <card>
+        <form id="form1" with="&StoryStatus.new" update="body" hide="puff,,slow" show="drop,,slow">
+          With update=
+          <field-list/>
+          <submit label="new"/>
+        </form>
+      </card>
+
+      <card>
+        <form id="form2" with="&StoryStatus.new" updates="#body">
+          With updates= and errors-ok
+          <field-list/>
+          <submit label="new"/>
+        </form>
+      </card>
+
+      <card>
+        <form id="form3" with="&StoryStatus.new" ajax>
+          With ajax
+          <field-list/>
+          <submit label="new"/>
+        </form>
+      </card>
+
+      <card>
+        <formlet id="form4" with="&StoryStatus.new" update="body">
+          formlet
+          <field-list/>
+          <submit label="new"/>
+        </formlet>
+      </card>
+      <page-nav/>
+
+      <table-plus class="statuses" fields="this">
+        <controls:/>
+      </table-plus>
+
+      <page-nav/>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        test("getUpdateIds", function() {
+          var f1=$("#form1");
+          deepEqual(f1.hjq('getUpdateIds', {update:'body'}), ['body'], 'update as string');
+          deepEqual(f1.hjq('getUpdateIds', {update:['body']}), ['body'], 'update as array');
+          deepEqual(f1.hjq('getUpdateIds', {ajax:true}), ['body'], 'update own part');
+          deepEqual(f1.hjq('getUpdateIds', {updates:'#body'}), ['body'], 'css update valid');
+          deepEqual(f1.hjq('getUpdateIds', {updates:'form'}), [], 'css update invalid');
+        });
+
+        foof = function() { return 17; }
+
+        foofie = {
+           f: function() { return 92; }
+        };
+
+        test("createFunction", function() {
+          equal($().hjq('createFunction', '1+2')(), 3);
+          equal($().hjq('createFunction', 'foof')(), 17);
+          equal($().hjq('createFunction', 'foofie.f')(), 92);
+        });
+
+      });
+    </script>
+  </content:>
+</index-page>
