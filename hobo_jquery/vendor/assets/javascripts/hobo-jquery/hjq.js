@@ -280,7 +280,7 @@
             if(o.attrs.success) success_dfd.done(methods.createFunction.call(that, o.attrs.success));
             if(o.extra_callbacks.success) success_dfd.done(methods.createFunction.call(that, o.extra_callbacks.success));
             success_dfd.done(function() {
-                if(o.attrs.reset_form) that[0].reset();
+                if(o.attrs['reset-form']) that[0].reset();
                 // if we've been removed, all event handlers on us
                 // have already been removed and we don't bubble
                 // up, so triggering on that won't do any good
@@ -305,7 +305,7 @@
                 if(that.parents("body").length==0) $(document).trigger('rapid:ajax:complete', [that]);
                 else  that.trigger('rapid:ajax:complete', [that]);
                 spinner.hjq_spinner('remove');
-                if(o.attrs.refocus_form) that.find(":input[type!=hidden]:first").focus();
+                if(o.attrs['refocus-form']) that.find(":input[type!=hidden]:first").focus();
             });
             result.complete = complete_dfd.resolve;
 
