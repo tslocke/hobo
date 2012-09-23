@@ -176,6 +176,15 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     select "documentation", :from => "status"
     assert has_no_content?("First Story")
 
+    # add project members
+    fill_in "project_membership[user]", :with => "Second User"
+    find("input.ui-autocomplete-input").native.send_key(:enter)
+    assert find("ul.memberships").has_text?("Second User")
+
+    find("input.delete-project-membership-button").click
+    page.driver.browser.switch_to.alert.accept
+    assert find("ul.memberships").has_no_text?("Second User")
+
     # TODO: test sortable-collection
 
   end
