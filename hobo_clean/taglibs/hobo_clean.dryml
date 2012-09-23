@@ -9,9 +9,11 @@
 
 <!-- Renders `<div id="ajax-progress"><div><span id="ajax-progress-text"></span></div></div>`.  -->
 <def tag="ajax-progress">
-  <div id="ajax-progress" class="ajax-progress" merge-attrs>
-    <div>
-      <span id="ajax-progress-text"></span>
+  <div id="ajax-progress-wrapper">
+    <div id="ajax-progress" class="ajax-progress" merge-attrs>
+      <div>
+        <span id="ajax-progress-text"></span>
+      </div>
     </div>
   </div>
 </def>

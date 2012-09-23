@@ -23,7 +23,7 @@
         */
         init: function(options, default_message) {
             var original=$("#ajax-progress-wrapper .ajax-progress:first");
-            if (original.length==0) return this;
+            if (original.length==0) return $();
 
             options = $.extend({}, defaultOptions.call(this), options);
             if(options['no-spinner']) return $();
