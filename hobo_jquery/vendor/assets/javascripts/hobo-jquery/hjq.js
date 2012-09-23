@@ -266,6 +266,10 @@
                 if(o.function) result.data["render["+i+"][function]"] = o['function'];
             }
 
+            if(ids.length==0) {
+              result.data.render = 'none'
+            }
+
             return result;
         },
 
