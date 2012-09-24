@@ -13,8 +13,8 @@ GIT
       hobo (> 1.4.0.pre5)
 
 GIT
-  remote: git://github.com/bryanlarsen/will_paginate.git
-  revision: 3096f88403096f7207c4c3ede0a8bb7c344bb78a
+  remote: git://github.com/Hobo/will_paginate.git
+  revision: 2695031cf4d55a6816ff36941605125418ceb8cb
   specs:
     will_paginate (3.0.3)
 
