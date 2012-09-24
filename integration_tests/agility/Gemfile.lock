@@ -181,9 +181,6 @@ GEM
       activesupport (= 3.2.8)
       bundler (~> 1.0)
       railties (= 3.2.8)
-    rails-dev-tweaks (0.6.1)
-      actionpack (~> 3.1)
-      railties (~> 3.1)
     railties (3.2.8)
       actionpack (= 3.2.8)
       activesupport (= 3.2.8)
@@ -256,7 +253,6 @@ DEPENDENCIES
   jquery-ui-themes (~> 0.0.4)
   paperclip!
   rails (= 3.2.8)
-  rails-dev-tweaks
   sass-rails (~> 3.2.3)
   shoulda
   sqlite3

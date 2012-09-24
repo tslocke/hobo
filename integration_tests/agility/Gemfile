@@ -76,7 +76,6 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
-gem 'rails-dev-tweaks'
 gem 'awesome_print'
 
 gem "hobo_simple_color", :git => "git://github.com/Hobo/hobo_simple_color"
