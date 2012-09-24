@@ -77,18 +77,16 @@ Hobo has also gained several additional gems, so you will have to add
 dependencies for those.  hobo_rapid is the Hobo tag library,
 hobo_jquery is the javascript for hobo_rapid, and hobo_clean is the
 default theme.   Instead of or as well as hobo_clean you can use
-hobo_clean_admin or hobo_clean_sidemenu.  Hopefully there will be
-additional themes available soon.
+hobo_clean_admin or hobo_clean_sidemenu or hobo_bootstrap.
+
+You will also have to ensure that you are using Hobo's fork of will_paginate:
+
+    gem "will_paginate", :git => "git://github.com/Hobo/will_paginate.git"
 
 ### config/
 
 All of the changes in config/ are due to the assets pipeline.  See
 http://guides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
-
-Additionally, the Hobo 2.0 generator installs the
-[rails-dev-tweaks](https://github.com/wavii/rails-dev-tweaks) gem.  We
-adjust the configuration so that rails-dev-tweaks applies only to
-assets, not to XHR.
 
 ### application.dryml or front_site.dryml
 

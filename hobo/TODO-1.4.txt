@@ -9,7 +9,6 @@
 ## bugs
 
  * https://hobo.lighthouseapp.com/projects/8324/tickets/974-partial-tag-not-html_safe-with-rails-3010#ticket-974-10
- * reset-form reported by Arnaud
 
 ## documentation
 
@@ -53,8 +52,6 @@
 
 ## 2.1 or break code freeze
 
- * will_paginate:  monkey patch or add bryanlarsen/will_paginate to gemfile in generators
- * add quiet_assets gem to generator
  * create hobo-all meta gem so we don't spam Gemfile
  * (Matt) turf accessible associations
  * (Ignacio) dev mode speed improvements
