@@ -95,13 +95,15 @@ assets, not to XHR.
 Replace
 
     <set-theme name="clean"/>
-
+{.dryml}
+    
 with
 
     <include gem='hobo_rapid'/>
     <include gem='hobo_jquery'/>
     <include gem='hobo_jquery_ui'/>
     <include gem='hobo_clean'/>
+{.dryml}
 
 Note that the default Hobo generation now always creates both a
 front_site.dryml and an application.dryml, even if you don't create
@@ -111,6 +113,7 @@ Also be aware that application.dryml is no longer loaded automatically
 if you have a front_site.dryml.    Add
 
     <include src="application" />
+{.dryml}
 
 to your front_site.dryml, your admin_site.dryml, et cetera.
 
@@ -181,10 +184,12 @@ replaced.   Themes are now Hobo plugins and work like every other Hobo
 Replace:
 
     <set-theme name="clean"/>
+{.dryml}
 
 with
 
     <include gem="hobo_clean"/>
+{.dryml}
 
 and add
 
