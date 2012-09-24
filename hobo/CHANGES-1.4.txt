@@ -394,6 +394,54 @@ Example:
        </div>
      </collection>
 
+### Bottom-loading Javascript
+
+The `<page>` tag has a new attribute: `bottom-load-javascript`. If
+set, Javascript is loaded via a deferred load at the bottom of the
+body rather than being loaded conventionally in the head.
+
+You probably want to enable this globally in your application by
+adding this to your application.dryml:
+
+<extend tag="page">
+  <old-page bottom-load-javascript merge/>
+</extend>
+
+Note that if this option is set, the custom-scripts parameter is no
+longer available. There is a new parameter called custom-javascript
+that can be used instead, though.
+
+Replace:
+
+    <custom-scripts:>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          alert('hi');
+        });
+      </script>
+    </custom-scripts:>
+
+with:
+
+    <custom-javascript:>
+      alert('hi');
+    </custom-javascript:>
+
+If you wish to be compatible with both top & bottom loading use:
+
+    <custom-javascript:>
+      $(document).read(function() {
+        alert('hi');
+      })
+    </custom-javascript:>
+
+If you were previously loading files via custom-scripts, use the asset
+pipeline instead.
+
+Turning on bottom-load will prevent Rails from splitting front.js into
+multiple files even if you enable config.assets.debug in your
+environment.
+
 ### allowing errors in parts
 
 Older versions of Hobo did not render a part update if the update did

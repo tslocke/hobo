@@ -36,9 +36,9 @@
   </table-plus>
   </collection:>
 
-  <custom-scripts:>
-    <script type="text/javascript">
+  <custom-javascript:>
       $(document).ready(function() {
+        setTimeout(function() {
         var f=function(ev, el) {
             $(".events").html($(".events").text()+" "+ev.type);
             return true;
@@ -48,9 +48,9 @@
             return true;
          };
          $(document).on({"rapid:ajax:success": f, "rapid:ajax:before":f, "rapid:ajax:error":f, "rapid:ajax:complete":f});
+        }, 2);
       });
-    </script>
-  </custom-scripts:>
+  </custom-javascript:>
 
   <after-content:>
      <div class="events">events:</div>

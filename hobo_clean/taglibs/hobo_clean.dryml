@@ -18,17 +18,16 @@
   </div>
 </def>
 
-<!-- The basic page structure for all the pages in a Hobo Rapid application. Providing the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
-
-The easiest way to see what this tag does is to look at the source.
+<!-- The basic page structure for all the pages in a Hobo Rapid application that uses the hobo_clean theme, or a variation on it. Provides the doctype, page title, standard stylesheet javascript includes, the ajax progress spinner, default header with app-name, account navigation, main navigation, and live search, empty section for the page content, flash message (if any) and an empty page footer.
 
 ### Attributes
 
  - `title` - the page title, will have ": `[app-name]`" appended
  - `full-title` - the full page title. Set this if you do not want the app name suffix.
+ - `bottom-load-javascript` - if set, will load Javascript at the bottom of the page rather than in head
 
 -->
-<def tag="page" attrs="title, full-title">
+<def tag="page" attrs="title, full-title, bottom-load-javascript">
   <% full_title ||= "#{title} : #{app_name}" %>
   <html merge-attrs>
     <head param>
@@ -37,9 +36,13 @@ The easiest way to see what this tag does is to look at the source.
         <stylesheet name="#{subsite || 'front'}" param="app-stylesheet"/>
       </do>
 
-      <do param="scripts"><%# in Hobo <= 1.3, we had other javascripts here.   Now the asset pipeline is preferred. %>
+      <do param="scripts" if="&!bottom_load_javascript"><%# in Hobo <= 1.3, we had other javascripts here.   Now the asset pipeline is preferred. %>
         <javascript param="application-javascript" name="#{subsite || 'front'}"/>
-        <do param="custom-scripts"/>
+        <do param="custom-scripts">
+          <script type="text/javascript">
+            <do param="custom-javascript"/>
+          </script>
+        </do>
       </do>
       <%= csrf_meta_tag %>
     </head>
@@ -56,6 +59,33 @@ The easiest way to see what this tag does is to look at the source.
         <section with-flash-messages param="content"/>
         <footer class="page-footer" param/>
         <page-scripts param/>
+
+        <if test="&bottom_load_javascript">
+          <script defer type="text/javascript">
+              (function() {
+                function getScript(url,success){
+                  var script=document.createElement('script');
+                  script.src=url;
+                  var head=document.getElementsByTagName('head')[0],
+                      done=false;
+                  script.onload=script.onreadystatechange = function(){
+                    if (!done){
+                      if (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete'){
+                      done=true;
+                      success();
+                      script.onload = script.onreadystatechange = null;
+                      head.removeChild(script);
+                    }}
+                  };
+                  head.appendChild(script);
+                }
+
+                getScript('<%= asset_path((subsite || 'front')+'.js')%>',function(){
+                  <do param="custom-javascript"/>
+                });
+              })();
+          </script>
+        </if>
       </set-scoped>
     </body>
   </html>

@@ -1,6 +1,5 @@
 <edit-page>
-  <custom-scripts:>
-    <script type="text/javascript">
+  <custom-javascript:>
       var last_added;
       var last_removed;
       $(document).ready(function() {
@@ -14,8 +13,7 @@
           if(!confirm("really?")) return false;
         });
       });
-    </script>
-  </custom-scripts:>
+  </custom-javascript:>
   <content:>
     <form>
       <error-messages/>
