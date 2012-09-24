@@ -26,7 +26,9 @@ module Generators
 
         template "controller.rb.erb", File.join('app/controllers', file_name, "#{file_name}_site_controller.rb")
 
+        application "#"
         application "config.assets.precompile += %w(#{file_name}.css #{file_name}.js)"
+        application "# Hobo: the #{file_name} subsite loads #{file_name}.css & #{file_name}.js"
       end
 
       hook_for :test_framework, :as => :controller do | instance, controller_test |

@@ -150,7 +150,9 @@ EOI
       if dryml_only_templates
         remove_file 'app/views/layouts/application.html.erb'
         remove_file 'app/helpers/application_helper.rb'
-        environment "\n  config.hobo.dryml_only_templates = true\n"
+        environment "#"
+        environment "config.hobo.dryml_only_templates = true"
+        environment "# Hobo: remove support for ERB templates"
       end
     end
 
@@ -218,8 +220,10 @@ EOI
       end
     end
 
-    def add_dev_tweaks
-      invoke 'hobo:dev_tweaks'
+    def active_reload_dryml
+      environment "#", :env => :development
+      environment "config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']", :env => :development
+      environment "# Hobo: tell ActiveReload about dryml", :env => :development
     end
 
     def generate_migration
@@ -262,7 +266,9 @@ EOI
       end
       unless default_locale.blank?
         default_locale.gsub!(/\:/, '')
+        environment "#"
         environment "config.i18n.default_locale = #{default_locale.to_sym.inspect}"
+        environment "#"
       end
       ls = (locales - %w[en]).map {|l| ":#{l}" }
       lstr = ls.to_sentence
