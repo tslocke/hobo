@@ -156,6 +156,11 @@ EOI
       end
     end
 
+    def quiet_assets
+      say "Adding quiet_assets gem"
+      gem_with_comments('quiet_assets', :group => :development, :comments => "\n# Hobo has a lot of assets.   Stop cluttering the log in development mode.")
+    end
+
     def front_controller
       if wizard?
         say_title 'Front Controller'
