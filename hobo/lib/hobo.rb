@@ -4,7 +4,6 @@ require 'dryml'
 gem 'will_paginate', ">= 3.0"
 require 'will_paginate'
 require 'hobo/extensions/enumerable'
-require 'hobo/extensions/array'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
 ActiveSupport::Dependencies.autoload_once_paths |= [File.dirname(__FILE__)]

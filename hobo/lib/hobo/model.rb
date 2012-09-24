@@ -1,6 +1,7 @@
 module Hobo
   module Model
     require 'will_paginate/active_record'
+    require 'will_paginate/array'
 
     class NoNameError < RuntimeError; end
 
@@ -13,8 +14,6 @@ module Hobo
       base.extend(ClassMethods)
 
       register_model(base)
-
-      patch_will_paginate
 
       base.class_eval do
         inheriting_cattr_reader :default_order
@@ -42,27 +41,6 @@ module Hobo
 
       included_in_class_callbacks(base)
     end
-
-    def self.patch_will_paginate
-      if defined?(WillPaginate::Collection) && !WillPaginate::Collection.respond_to?(:member_class)
-
-        WillPaginate::Collection.class_eval do
-          attr_accessor :member_class, :origin, :origin_attribute
-
-          # make paginate_by_sql, etc. carry metadata
-          def replace_with_hobo_metadata(array)
-            result = replace_without_hobo_metadata(array)
-            self.member_class = array.try.member_class
-            self.origin = array.try.origin
-            self.origin_attribute = array.try.origin_attribute
-            result
-          end
-          alias_method_chain :replace, :hobo_metadata
-        end
-
-      end
-    end
-
 
     def self.register_model(model)
       @model_names ||= Set.new

@@ -161,6 +161,11 @@ EOI
       gem_with_comments('quiet_assets', :group => :development, :comments => "\n# Hobo has a lot of assets.   Stop cluttering the log in development mode.")
     end
 
+    def will_paginate
+      say "Adding will_paginate gem"
+      gem_with_comments('will_paginate', :git => "git://github.com/Hobo/will_paginate.git", :comments => "\n# Hobo's version of will_paginate is required.")
+    end
+
     def front_controller
       if wizard?
         say_title 'Front Controller'
