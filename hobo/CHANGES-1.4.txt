@@ -121,6 +121,7 @@ if you have a front_site.dryml.    Add
 to your front_site.dryml, your admin_site.dryml, et cetera.
 
 ### move public/ to app/assets/
+{.todo}
 
 In Rails 3.1, images, javascripts and stylesheets are loaded from
 app/assets/ rather than from public/ so you'll have to move them.
@@ -157,7 +158,7 @@ these changes have been to the editors.
 ## The Asset Pipeline
 {.todo}
 
-we should create a (small) chapter on the Hobo asset pipeline layout.  Aka front.js vs application.js etc.
+we should create a (small) chapter on the Hobo asset pipeline layout.  see above (move public/ to app/assets/)
 {.hidden}
 
 Hobo 2.0 uses the asset pipeline features introduced in Rails 3.1.
