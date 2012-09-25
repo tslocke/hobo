@@ -430,9 +430,9 @@ body rather than being loaded conventionally in the head.
 You probably want to enable this globally in your application by
 adding this to your application.dryml:
 
-<extend tag="page">
-  <old-page bottom-load-javascript merge/>
-</extend>
+    <extend tag="page">
+      <old-page bottom-load-javascript merge/>
+    </extend>
 
 Note that if this option is set, the custom-scripts parameter is no
 longer available. There is a new parameter called custom-javascript
