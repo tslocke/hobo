@@ -1,0 +1,49 @@
+## bugs
+
+ * https://hobo.lighthouseapp.com/projects/8324/tickets/974-partial-tag-not-html_safe-with-rails-3010#ticket-974-10
+ * model, scopes, accessible associations pages broken in cookbook
+
+## documentation
+
+https://trello.com/b/JCaGq7ev
+
+## cookbook
+
+https://trello.com/b/fvuauN0Q
+
+## hobo_bootstrap
+
+ * ensure all hobo_rapid tags are themed by hobo_bootstrap
+ * wrap bootstrap's dialog & a datepicker, deal with our dependence on jQuery-UI's show & hide, and then make jQuery-UI optional  (probably as a separate gem so people can easily choose between hobo_jquery_ui or hobo_bootstrap_ui or both)
+ * give an example on how to theme bootstrap from bootswatch.com
+ * make hobo_bootstrap the default once it's ready to go
+
+## internal plugins/themes
+
+ * parametrize the clean theme colors using SCSS rather than creating a separate hobo_clean_admin theme
+
+## external plugins to update
+
+ * metasearch
+ * hobo-contrib
+ * hobo_devise
+ * paperclip_with_hobo
+ * imaginary-dryml
+ * nice theme
+ * hoboyui?
+
+## Testing
+
+ * travis-ci
+ * add hobo-test to hobo/integration_tests
+ * create RAPID test suite
+
+## 2.1 or break code freeze
+
+ * (Matt) turf accessible associations
+ * clean_cache optimizations / config variable so we don't always reload RAPID
+ * rip out obsolete date stuff from convert_for_mass_assignment: https://github.com/tablatom/hobo/blob/master/hobo/lib/hobo/model.rb#L446
+ * multiple file support for AJAX uploads
+ * cache: redis support
+ * add support for has-one
+
