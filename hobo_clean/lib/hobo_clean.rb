@@ -1,3 +1,7 @@
+require 'hobo_rapid'
+require 'hobo_jquery'
+require 'hobo_jquery_ui'
+
 module HoboClean
 
   VERSION = File.read(File.expand_path('../../VERSION', __FILE__)).strip

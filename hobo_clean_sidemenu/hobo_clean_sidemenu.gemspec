@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary = 'The clean sidemenu theme for Hobo'
   s.description = 'The clean sidemenu theme for Hobo'
 
-  s.add_runtime_dependency('rails', ["~> 3.2.0"])
+  s.add_runtime_dependency('hobo_clean', ["= #{version}"])
 
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
 

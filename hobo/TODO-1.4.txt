@@ -52,7 +52,6 @@
 
 ## 2.1 or break code freeze
 
- * create hobo-all meta gem so we don't spam Gemfile
  * (Matt) turf accessible associations
  * (Ignacio) dev mode speed improvements
  * rip out obsolete date stuff from convert_for_mass_assignment: https://github.com/tablatom/hobo/blob/master/hobo/lib/hobo/model.rb#L446

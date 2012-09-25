@@ -18,6 +18,6 @@ spec = Gem::Specification.new do |s|
   s.require_paths = ["lib", "vendor", "taglibs"]
 
   s.add_runtime_dependency('jquery-rails', ["~> 2.0"])
-  s.add_runtime_dependency('hobo', ["= #{version}"])
+  s.add_runtime_dependency('hobo_rapid', ["= #{version}"])
 
 end

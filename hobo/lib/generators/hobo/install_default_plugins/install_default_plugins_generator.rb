@@ -14,11 +14,11 @@ module Hobo
       opts[:version] = Hobo::VERSION
       say "Installing default plugins for #{opts[:subsite]}..."
       say "Installing hobo_rapid plugin..."
-      install_plugin_helper('hobo_rapid', nil, opts.merge(:skip_dryml => true))
+      install_plugin_helper('hobo_rapid', nil, opts.merge(:skip_dryml => true, :skip_gem => true))
       say "Installing hobo_jquery plugin..."
-      install_plugin_helper('hobo_jquery', nil, opts)
+      install_plugin_helper('hobo_jquery', nil, opts.merge(:skip_gem => true))
       say "Installing hobo_jquery_ui plugin..."
-      install_plugin_helper('hobo_jquery_ui', nil, opts)
+      install_plugin_helper('hobo_jquery_ui', nil, opts.merge(:skip_gem => true))
 
       say "Installing #{opts[:theme]} theme..."
       inject_css_require("jquery-ui/#{opts[:ui_theme]}", opts[:subsite], nil)
