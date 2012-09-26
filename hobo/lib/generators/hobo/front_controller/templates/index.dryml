@@ -3,7 +3,7 @@
   <body: class="front-page"/>
 
   <content:>
-    <header class="content-header">
+    <header class="content-header hero-unit">
       <h1>Welcome to <app-name/></h1>
       <section class="welcome-message">
         <h3>Congratulations! Your Hobo Rails App is up and running</h3>
