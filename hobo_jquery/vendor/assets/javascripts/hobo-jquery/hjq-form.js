@@ -8,7 +8,8 @@
         // you should be able to call this externally:
         // $(foo).hjq('submit');   It can be called on the form or any
         // child of the form
-        submit: function () {
+        submit: function (e) {
+            e.preventDefault();
             var form = $(this).closest("form");
             if(form.length==0) return false;
             var annotations = form.data('rapid').form;
@@ -19,7 +20,7 @@
 
             if(form.attr('enctype') == 'multipart/form-data') {
                 if(form.ajaxSubmit) {
-                    options = $.extend(options, {preamble: '<textarea>', postamble: '</textarea>', content_type: 'text/html'});
+                    options = $.extend(options, {preamble: "<textarea>", postamble: '</textarea>', fix_quotes: true, content_type: 'text/html'});
                     var roptions = form.hjq('buildRequestData', options);
 
                     if(!roptions) return false;

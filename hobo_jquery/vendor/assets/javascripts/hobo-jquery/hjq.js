@@ -244,8 +244,9 @@
               result.data = {"render_options[preamble]": o.preamble || '',
                              "render_options[contexts_function]": 'hjq.ajax.updatePartContexts'
                              }; */
-            if(o.preamble) result.data["render_options[preamble]"] = o.postamble;
+            if(o.preamble) result.data["render_options[preamble]"] = o.preamble;
             if(o.postamble) result.data["render_options[postamble]"] = o.postamble;
+            if(o.fix_quotes) result.data["render_options[fix_quotes]"] = o.fix_quotes;
             if(o.content_type) result.data["render_options[content_type]"] = o.content_type;
             if(o.attrs['errors-ok']) result.data["render_options[errors_ok]"] = 1;
             result.dataType = 'script';
@@ -297,6 +298,7 @@
             if(o.attrs.error) error_dfd.done(methods.createFunction.call(that, o.attrs.error));
             if(o.extra_callbacks.error) error_dfd.done(methods.createFunction.call(that, o.extra_callbacks.error));
             error_dfd.done(function() {
+                if(window.console&&window.console.log){window.console.log('ajax failed');}
                 if(that.parents("body").length==0) $(document).trigger('rapid:ajax:error', [that]);
                 else  that.trigger('rapid:ajax:error', [that]);
             });

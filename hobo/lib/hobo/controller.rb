@@ -59,10 +59,10 @@ module Hobo
     end
 
 
-    def hobo_ajax_response(options={})
+    def hobo_ajax_response(options=nil)
       r = params[:render]
       if r
-        ajax_update_response(r.is_a?(String) ? [] : r.values, options[:results] || {}, options || params[:render_options])
+        ajax_update_response(r.is_a?(String) ? [] : r.values, options._?.get(:results) || {}, options || params[:render_options] || {})
         true
       else
         false
@@ -88,6 +88,8 @@ module Hobo
 
         if spec[:part_context]
           part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
+          part_content.gsub!('&quot;', '&amp;quot;') if options[:fix_quotes]
+          debugger
           page << "#{function}(#{dom_id.to_json}, #{part_content.to_json})\n"
         elsif spec[:result]
           result = results[spec[:result].to_sym]
