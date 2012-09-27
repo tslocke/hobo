@@ -1,4 +1,6 @@
 Agility::Application.configure do
+  # Hobo: tell ActiveReload about dryml
+  config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
