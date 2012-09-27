@@ -1,0 +1,7 @@
+<edit-page>
+  <form: replace>
+    <do part="form">
+      <form ajax/>
+    </do>
+  </form:>
+</edit-page>

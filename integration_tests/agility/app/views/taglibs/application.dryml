@@ -130,3 +130,16 @@
     </body:>
   </card>
 </def>
+
+<extend tag="form" for="User">
+  <old-form merge multipart>
+    <field-list: fields="name, email_address, administrator, avatar">
+      <avatar-view:>
+        <if test="&this.exists?">
+          <img src="#{this.url}"/>
+        </if>
+        <input/>
+      </avatar-view:>
+    </field-list:>
+  </old-form>
+</extend>
