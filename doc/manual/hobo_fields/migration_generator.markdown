@@ -1,0 +1,1 @@
+../../../hobo_fields/test/migration_generator.rdoctest

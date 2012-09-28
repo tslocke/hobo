@@ -1,0 +1,1 @@
+../../../hobo_support/test/hobosupport/methodphitamine.rdoctest

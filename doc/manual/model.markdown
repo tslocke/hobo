@@ -1,0 +1,1 @@
+../hobo/test/doctest/hobo/model.rdoctest

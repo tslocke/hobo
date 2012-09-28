@@ -1,0 +1,1 @@
+../../../hobo_fields/test/rich_types.rdoctest

@@ -6,7 +6,6 @@ hobo/taglib-docs
 
 dryml/lib/doc
 dryml/tmp
-doc
 dryml/doc
 .yardoc
 .rvmrc
