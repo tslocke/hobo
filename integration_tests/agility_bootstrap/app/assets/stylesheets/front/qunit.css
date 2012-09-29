@@ -53,7 +53,7 @@
 #qunit-header a:focus {
 	color: #fff;
 }
-#qunit-header label, input{
+#qunit-header label, #qunit-header input{
   float:right;
   color:white;
   margin-right:20px;

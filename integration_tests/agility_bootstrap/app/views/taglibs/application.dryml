@@ -2,10 +2,10 @@
 
 <include src="rapid" plugin="hobo"/>
 
-<include gem="hobo_bootstrap"/>
 <include gem="hobo_rapid"/>
 <include gem="hobo_jquery"/>
 <include gem="hobo_jquery_ui"/>
+<include gem="hobo_bootstrap"/>
 <include src="paperclip" plugin="paperclip_with_hobo"/>
 
 <include src="taglibs/auto/rapid/cards"/>

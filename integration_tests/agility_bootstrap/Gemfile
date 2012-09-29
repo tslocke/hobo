@@ -31,15 +31,15 @@ end
 # group :development, :test do
 #   gem 'webrat'
 # end
-gem "hobo_support", :path => "../.."
-gem "hobo_fields", :path => "../.."
-gem "dryml", :path => "../.."
+#gem "hobo_support", :path => "../.."
+#gem "hobo_fields", :path => "../.."
+#gem "dryml", :path => "../.."
 gem "hobo", :path => "../.."
-gem "hobo_rapid", :path => "../.."
-gem "hobo_clean", :path => "../.."
+# gem "hobo_rapid", :path => "../.."
+# gem "hobo_clean", :path => "../.."
 # gem "hobo_clean_sidemenu", :path => "../.."
-gem "hobo_jquery", :path => "../.."
-gem "hobo_jquery_ui", :path => "../.."
+# gem "hobo_jquery", :path => "../.."
+# gem "hobo_jquery_ui", :path => "../.."
 
 gem "jquery-ui-themes", "~> 0.0.4"
 
