@@ -1,0 +1,30 @@
+<extend tag="page" attrs="title, full-title">
+  <old-page merge title="&title" full-title="&full_title">
+
+    <stylesheets: param>
+      <stylesheet name="reset"/>
+      <theme-stylesheet/>
+      <stylesheet name="application" param="app-stylesheet"/>
+    </stylesheets:>
+
+    <header: class="sidemenu" param>
+      <live-search param if="&defined_route? :site_search"/>
+      <account-nav if="&login_url(Hobo::Model::UserBase.default_user_model)" param/>
+      <h1 param="app-name"><a href="#{base_url}/"><app-name/></a></h1>
+    </header:>
+
+    <content: replace>
+      <table id="container">
+        <tr>
+          <td id="main-nav-container">
+            <main-nav current="&title" param/>
+          </td>
+          <td id="content-container">
+            <section with-flash-messages param="content"/>
+          </td>
+        </tr>
+      </table>
+    </content:>
+
+  </old-page>
+</extend>

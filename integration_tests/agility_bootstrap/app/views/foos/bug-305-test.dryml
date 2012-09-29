@@ -1,0 +1,5 @@
+<def tag="editor-field-list">
+  <field-list tag="editor" merge param />
+</def>
+
+<%# ,f,dec,s,tt,d,dt,tl,md,hh,bool1,bool2,es,v %>

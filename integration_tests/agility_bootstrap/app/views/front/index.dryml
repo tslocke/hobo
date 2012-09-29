@@ -1,0 +1,37 @@
+<page title="Home">
+
+  <body: class="front-page"/>
+
+  <content:>
+    <header class="content-header hero-unit">
+      <h1>Welcome to <app-name/></h1>
+      <section class="welcome-message">
+        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
+        <ul>
+          <li>To customise this page: edit app/views/front/index.dryml</li>
+        </ul>
+
+        <% if User.count == 0 -%>
+          <h3 style="margin-top: 20px;">There are no user accounts - please provide the details of the site administrator</h3>
+          <form with="&this || User.new" without-cancel>
+            <field-list: fields="name, email_address, password, password_confirmation"/>
+            <submit: label="Register Administrator"/>
+          </form>
+        <% end -%>
+
+
+      </section>
+    </header>
+
+    <section with="&current_user" class="content-body" if="&logged_in?">
+      <h3><t key="front_title">Your Projects</t></h3>
+      <collection:projects><card without-creator-link/></collection>
+
+      <a:projects action="new">New Project</a>
+
+      <h3>Projects you have joined</h3>
+      <collection:joined-projects><card without-creator-link/></collection>
+    </section>
+  </content:>
+
+</page>

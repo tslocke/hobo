@@ -1,0 +1,194 @@
+# Hobo internals translation file for English
+en:
+  hobo:
+    # default hobo pages translations
+    index:
+      # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
+      # if you need a different title you should implement a different way to select the tab on your own
+      #title: "%{model} Index"
+      heading: "%{model} Index"
+
+    new:
+      title: "New %{model}"
+      heading: "New %{model}"
+
+    show:
+      title: "%{model}"
+      heading: "%{model} %{name}"
+      back_link: "Back"
+      edit_link: "Edit %{model}"
+      new_link: "New %{model}"
+      add_form_heading: "Add %{model}"
+
+    edit:
+      title: "Edit %{model}"
+      heading: "Edit %{model}"
+
+    index_for_owner:
+      title: "%{model} for"
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      subheading: "For:"
+
+    new_for_owner:
+      title: "New %{model} for"
+      heading: "New %{model}"
+      subheading: "For:"
+
+    login:
+      title: "Login"
+      heading: "Login"
+      email_address: &email_address "E-mail"
+      name: "Name"
+      password: "Password"
+      remember_me: "Remember me"
+      login: "Login"
+      signup: "Signup"
+      forgot_password: &forgot_password "Forgotten password?"
+
+    signup:
+      title: "Signup"
+      heading: "Signup new user"
+
+    forgot_password:
+      title: *forgot_password
+      heading: *forgot_password
+      text: "Enter the e-mail address you used when you signed up for this site.
+             We will then send you an e-mail that you can use to generate a new password."
+      email_address: *email_address
+      send: "Send"
+
+    forgot_password_sent:
+      title: "Forgotten password - E-mail sent"
+      heading: "Forgotten password - E-mail sent"
+      text: "An e-mail with instructions on how to generate a new password has been sent to %{email_address}. If you don't receive this e-mail please check your spam folder."
+
+    account_disabled_page:
+      title: "Account disabled"
+      heading: "Account disabled"
+      text: "Your account is disabled at this time."
+
+    account_page:
+      title: "Your Account"
+      heading: "Your Account"
+      new_password: "New Password"
+      confirm_new_password: "Confirm New Password"
+
+    # default hobo action translation
+    # The action with added model variable are new, create, delete, save,
+    # edit and back_to_parent
+    actions:
+      new: "New %{model}"
+      create: "Create %{model}"
+      previous: "Previous"
+      next: "Next"
+      add: "Add"
+      show_all: "Show all %{model}..."
+      delete: "Delete %{model}"
+      save: "Save %{model}"
+      cancel: "Cancel"
+      edit: "Edit %{model}"
+      back: "Back to"
+      back_to_parent: "Back to %{parent} %{name}"
+      send: "Send"
+      remove: "Remove"
+      signup: "Signup"
+      login: "Login"
+      logout: "Log out"
+      logged_in_as: "Logged in as %{name}"
+      account: "Account"
+      save_account: "Save Your Data"
+
+    # default hobo message translation
+    messages:
+      create:
+        success: "The %{model} was created successfully"
+        error: "Couldn't create the %{model}.\n%{errors}"
+      creator:
+        error: "Couldn't do creator %{name}.\n%{errors}"
+      transition:
+        error: "Couldn't do transition %{name}.\n%{errors}"
+      update:
+        no_attribute_error: "No update specified in params"
+        success: "Changes to the %{model} were saved"
+        error: "There was a problem with that change.\\n%{errors}"
+      destroy:
+        success: "The %{model} was deleted"
+      signup:
+        success: "Thanks for signing up!"
+        must_activate: "You must activate your account before you can log in. Please check your email."
+      login:
+        success: "You have logged in."
+        error: "You did not provide a valid %{login} and Password!"
+      logout: "You have logged out."
+      reset_password: "Your password has been reset."
+      permission_denied: "Permission Denied"
+      not_found: "The page you requested cannot be found."
+      unauthenticated: "Couldn't authenticate you"
+      validate_password: "must be at least 6 characters long and must not consist solely of lowercase letters"
+      current_password_is_not_correct: "is not correct"
+      you_are_site_admin: "You are now the site administrator"
+      you_signed_up: "You have signed up"
+      none: "No %{model} available."
+      confirm: "Are you sure?"
+
+    # default hobo collection translation
+    collection:
+      count: &collection_count
+        zero: &no_model "No %{model}"
+        one: "There is one %{model}."
+        other: "There are %{count} %{model}."
+      # you can use the following to completely override the collection heading
+      # be aware that you will loose the automatic Your <collection> / Jom's <collection>
+      # default output for User models
+      # you better define the heading.* in the specific collection namespace
+      #heading:
+      add_form_heading: "Add %{model}"
+      empty_message: "No records to display"
+
+    # default hobo form translation
+    form:
+      new:
+        heading: "New %{model}"
+      error:
+        heading: "The following error occured:"
+      select_many:
+        prompt: "Add %{model}"
+
+    # hobo support
+    support:
+      or: "or"
+      a: "a"
+      an: "an"
+
+    table_plus:
+      search: "Search"
+      submit_label: "Go"
+
+    live_search:
+      label: "Search"
+      results_label: "Search Results"
+      close_button: "close"
+      no_results: "Your search returned no matches."
+
+    dev_user_changer:
+      guest: "Guest"
+
+    admin:
+      subsite_name: "Admin"
+      invite_new_user: "Invite a new user"
+
+    subsite:
+      back_link: "View Site"
+
+    boolean_yes: "Yes"
+    boolean_no: "No"
+    password_hidden: "[password hidden]"
+
+    in_place_editor:
+      click_to_edit: "(click to edit)"
+
+    select_one_editor:
+      blank_message: *no_model

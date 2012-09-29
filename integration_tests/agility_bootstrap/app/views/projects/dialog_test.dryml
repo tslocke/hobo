@@ -1,0 +1,22 @@
+<show-page>
+  <heading:><editor:name/></heading:>
+
+  <collection: replace>
+      <table-plus:stories fields="this, tasks.count, status" part="stories">
+        <empty-message:>No stories match your criteria</empty-message:>
+      </table-plus>
+  </collection: >
+
+  <new-link: replace>
+    <dialog-and-button title="New Story" if="&can_create?(this.stories)" buttons='&[["cancel", "hjq_dialog_box.close"], ["ok", "hjq_dialog_box.submitAndClose"]]'>
+      <dialog-box:>
+        <formlet owner="project" with="&this.stories.new" update="stories">
+          <field-list fields="title, body, status" />
+        </formlet>
+      </dialog-box:>
+      <dialog-open-button:>New Story</dialog-open-button:>
+    </dialog-and-button>
+  </new-link:>
+
+</show-page>
+

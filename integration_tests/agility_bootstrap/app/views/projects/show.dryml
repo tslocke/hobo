@@ -1,0 +1,37 @@
+<show-page>
+  <field-list: replace>
+    <div part="report-part">
+      <field-list fields="report_file_name,report_file_size"/>
+      <form multipart ajax>
+        <input:report/>
+        <submit label="upload new report"/>
+      </form>
+    </div>
+  </field-list:>
+
+  <collection: replace>
+  <table-plus with="&@stories" fields="this, tasks.count, status">
+    <prepend-header:>
+      <div class="filter">
+        Display by status: <filter-menu param-name="status" options="&StoryStatus.all"/>
+      </div>
+    </prepend-header:>
+    <empty-message:>No stories match your criteria</empty-message:>
+  </table-plus>
+  </collection:>
+
+  <aside:>
+    <h2>Project Members</h2>
+    <collection:memberships part="members">
+      <card><heading:><a:user/></heading:></card>
+    </collection>
+
+    <form:memberships.new update="members" reset-form refocus-form>
+      <div>
+        Add a member:
+        <name-one:user/>
+      </div>
+    </form>
+  </aside:>
+
+</show-page>

@@ -1,0 +1,6 @@
+<page>
+  <content:>
+    <table-plus with="&@my_table" fields="left, right" />
+    <field-list with="&@my_table[1]" fields="left, right" />
+  </content:>  
+</page>
