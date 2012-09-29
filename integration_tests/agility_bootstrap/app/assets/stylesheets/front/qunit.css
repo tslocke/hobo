@@ -53,6 +53,12 @@
 #qunit-header a:focus {
 	color: #fff;
 }
+#qunit-header label, input{
+  float:right;
+  color:white;
+  margin-right:20px;
+}
+
 
 #qunit-banner {
 	height: 5px;
