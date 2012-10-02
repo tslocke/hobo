@@ -8,7 +8,7 @@ module HoboClean
   @@root = Pathname.new File.expand_path('../..', __FILE__)
   def self.root; @@root; end
 
-  EDIT_LINK_BASE = "https://github.com/tablatom/hobo/edit/master/hobo_clean"
+  EDIT_LINK_BASE = "https://github.com/Hobo/hobodoc/edit/master/hobo_clean"
 
   require 'hobo_clean/railtie' if defined?(Rails)
 
