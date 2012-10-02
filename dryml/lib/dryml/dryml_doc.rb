@@ -88,6 +88,16 @@ require 'rexml/xpath'
           doc.restore_erb_scriptlets(node.to_s).strip
         end
 
+        def filename
+          @filename ||= begin
+                          page = node.parent
+                          while page.name != 'dryml_page' do
+                            page = node.parent
+                          end
+                          page.attributes['path']
+                        end
+        end
+
         # The contents of the XML or ERB comment, if any, immediately above the tag definition
         def comment
           @comment ||= begin

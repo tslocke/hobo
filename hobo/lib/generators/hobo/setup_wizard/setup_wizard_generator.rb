@@ -156,6 +156,12 @@ EOI
       end
     end
 
+    def dont_emit_deprecated_routes
+      environment "#"
+      environment "config.hobo.dont_emit_deprecated_routes = true"
+      environment "# Hobo: Named routes have changed in Hobo 2.0.   Set to false to emit both the 2.0 and 1.3 names."
+    end
+
     def quiet_assets
       say "Adding quiet_assets gem"
       gem_with_comments('quiet_assets', :group => :development, :comments => "\n# Hobo has a lot of assets.   Stop cluttering the log in development mode.")

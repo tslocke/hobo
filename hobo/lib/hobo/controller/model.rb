@@ -409,7 +409,7 @@ module Hobo
                                    end) ||
 
         # Then try the record's show page
-        (!destroyed && object_url(@this)) ||
+        (!destroyed && !@this.new_record? && object_url(@this)) ||
 
         # Then the show page of the 'owning' object if there is one
         object_url(owning_object) ||

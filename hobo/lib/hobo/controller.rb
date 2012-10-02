@@ -89,7 +89,6 @@ module Hobo
         if spec[:part_context]
           part_content = renderer.refresh_part(spec[:part_context], session, dom_id)
           part_content.gsub!('&quot;', '&amp;quot;') if options[:fix_quotes]
-          debugger
           page << "#{function}(#{dom_id.to_json}, #{part_content.to_json})\n"
         elsif spec[:result]
           result = results[spec[:result].to_sym]

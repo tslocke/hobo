@@ -18,7 +18,7 @@ module Dryml
         end
 
 
-        @reference_src = "<dryml_page>" + source + "</dryml_page>"
+        @reference_src = "<dryml_page path=\"#{ERB::Util.html_escape path}\">" + source + "</dryml_page>"
         rex_src = Dryml::Parser::Source.new(@reference_src)
 
         @elements = Dryml::Parser::Elements.new(self)
