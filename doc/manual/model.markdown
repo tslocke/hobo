@@ -1,1 +1,1 @@
-../hobo/test/doctest/hobo/model.rdoctest
+../../hobo/test/doctest/hobo/model.rdoctest

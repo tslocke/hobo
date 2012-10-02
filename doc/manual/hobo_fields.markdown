@@ -1,1 +1,1 @@
-../hobo_fields/test/doc-only.rdoctest
+../../hobo_fields/test/doc-only.rdoctest

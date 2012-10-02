@@ -1,1 +1,1 @@
-../hobo/CHANGES-1.3.txt
+../../hobo/CHANGES-1.3.txt

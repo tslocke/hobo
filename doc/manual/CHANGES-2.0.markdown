@@ -1,1 +1,1 @@
-../hobo/CHANGES-2.0.markdown
+../../hobo/CHANGES-2.0.markdown
