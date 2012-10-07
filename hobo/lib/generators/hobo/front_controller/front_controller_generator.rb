@@ -44,6 +44,7 @@ module Hobo
     def add_routes
       return unless options[:add_routes]
       route "match 'search' => '#{file_path}#search', :as => 'site_search'"
+      route "match '#{options[:user_resource_name]}s/:id/activate/:key' => '#{options[:user_resource_name]}s#activate'"
       if class_path.empty?
         route "root :to => '#{file_path}#index'"
         route "match ENV['RAILS_RELATIVE_URL_ROOT'] => 'front#index' if ENV['RAILS_RELATIVE_URL_ROOT']"
