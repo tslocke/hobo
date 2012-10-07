@@ -11,6 +11,11 @@ Contents
 
 # How do I get help with my questions about Hobo?
 
+The fastest way to get an answer is by asking in [Hobo Users](http://groups.google.com/group/hobousers). 
+Before asking, it is recommended to search the documentation (the manual you are reading right now) and the Hobo Users 
+archive. You might not be the first person with the same question!
+
+
 # What's a good development environment?
 
 Webrick, Unicorn, etc? And a basic Gemfile (e.g. conditionally include
