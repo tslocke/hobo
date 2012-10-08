@@ -111,10 +111,6 @@
   </form>
 </def>
 
-<def tag="field-list">
-  <field-list-v1 merge/>
-</def>
-
 <def tag="search-card" for="Project">
   <card class="project" param="default" merge>
     <header: param>
