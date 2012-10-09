@@ -1,4 +1,4 @@
-Frequenty Asked Questions and Misunderstandings
+Frequently Asked Questions and Misunderstandings
 {: .document-title}
 
 This document answers common questions and misunderstandings about Hobo.
