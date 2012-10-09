@@ -14,7 +14,8 @@ of the field.
  - skip: Comma separated list of fields to exclude
 
  - tag: The name of a tag to use inside the `<td>` to display the
- value. Defaults to `view`
+ value. Defaults to `view`, unless we're inside a form, in which case
+ the default is `input`.
 
  - no-edit: Controls the behavior of `<input>` tags when the user doesn't have edit permission for a field.
    - view: render the current value using the `<view>` tag
