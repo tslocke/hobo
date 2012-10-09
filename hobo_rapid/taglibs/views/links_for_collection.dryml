@@ -1,2 +1,2 @@
 <!-- Renders a comma separated list of links (`<view>`), or "(none)" if the list is empty -->
-<def tag="links-for-collection"><%= this.empty? ? "(none)" : context_map { view }.safe_join(", ") %></def>
+<def tag="links-for-collection"><span merge-attrs><%= this.empty? ? "(none)" : context_map { view }.safe_join(", ") %></span></def>
