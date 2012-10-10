@@ -40,7 +40,7 @@
 # Please update your views to use the new named route names and then disable this
 # section by setting config.hobo.dont_emit_deprecated_routes = true.  blah blah
 
- <% puts "Warning: deprecated routes emitted into config/hobo_routes.rb.   These will be removed in Hobo 2.1.   Disable this warning by setting config.hobo.dont_emit_deprecated_routes = true." %>
+ <% puts "Warning: deprecated routes emitted into config/hobo_routes.rb.   These will be removed in Hobo 2.1.   Disable this warning by setting config.hobo.dont_emit_deprecated_routes = true." unless subsites.blank? %>
  <% for subsite in subsites -%>
   <%- if subsite -%>
 
