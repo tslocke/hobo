@@ -1,8 +1,12 @@
 require 'hobo_support'
 require 'hobo_fields'
 require 'dryml'
-gem 'will_paginate', ">= 3.0"
-require 'will_paginate'
+begin
+  gem 'will_paginate', "3.0.4.hobo"
+rescue Gem::LoadError => e
+  puts "WARNING: unable to activate will_paginate 3.0.4.hobo.   Please add gem \"will_paginate\", :git => \"git://github.com/Hobo/will_paginate.git\" to your Gemfile." if File.exist?("app/views/taglibs/application.dryml")
+  # don't print warning if setup not complete
+end
 require 'hobo/extensions/enumerable'
 
 ActiveSupport::Dependencies.autoload_paths |= [File.dirname(__FILE__)]
