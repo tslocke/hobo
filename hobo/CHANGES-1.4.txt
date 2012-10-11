@@ -90,8 +90,20 @@ You will also have to ensure that you are using Hobo's fork of will_paginate:
 
 ### config/
 
-All of the changes in config/ are due to the assets pipeline.  See
+Most the changes in config/ are due to the assets pipeline.  See
 http://guides.rubyonrails.org/asset_pipeline.html#upgrading-from-old-versions-of-rails
+
+In addition, you will probably want to add:
+
+    config.hobo.dont_emit_deprecated_routes = true
+
+to your config/application.rb.   See the [named routes section in this document](#named_routes_names_changed_to_use_standard_rails_names) for more details.
+
+You will also want to add
+
+    config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']
+
+to your config/environments/development.rb
 
 ### application.dryml or front_site.dryml
 
@@ -99,7 +111,7 @@ Replace
 
     <set-theme name="clean"/>
 {.dryml}
-    
+
 with
 
     <include gem='hobo_rapid'/>
