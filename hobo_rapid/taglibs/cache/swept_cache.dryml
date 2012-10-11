@@ -140,16 +140,24 @@ this reason, you may configure two separate caches:
     config.cache_store = :memory_store, {:size => 512.megabytes}
     config.hobo.stable_cache_store = :file_store
 
+(If config.hobo.stable_cache_store is not specified,
+config.cache_store is also used for the stable cache store.)
+
 Note that the dependency cache store does not have to be persistent,
-it's OK to clear the dependency cache at the same time as the fragment
-cache.
+it may be cleared at any time as long as the cache store is also
+cleared at the same time.
+
+If your chosen cache supports FIFO eviction it can be safely used, as
+long as you leave config.hobo.stable_cache_store undefined so that the
+fragment and dependency caches share the FIFO cache.
 
 #### atomic updates
 
 In production, swept-cache needs to be able to update a list
-atomically.  This is not an operation supported by the Rails cache API,
+atomically. This is not an operation supported by the Rails cache API,
 but it is supported by most non-trivial caches via one of several
-mechanisms.
+mechanisms, either through list support (Redis), and some
+caches support transactions (Infinispan).
 
 #### supported caches
 
@@ -164,10 +172,16 @@ redis:  a great choice.   You can use the same instance for both fragment cachin
     config.cache_store = :redis_store, "redis://192.168.1.2:6379/1", :expires_in => 60.minutes
     config.hobo.stable_cache_store = :redis_store, "redis://192.168.1.2:6379/1"
 
+(Note: Redis not yet tested.   Email the hobousers list for a status update)
+
 [torquebox infinispan](http://torquebox.org/): another great choice
 
     config.cache_store = :torque_box_store
     config.hobo.stable_cache_store = :torque_box_store, :name => 'dependencies', :mode => :replicated, :sync => true
+
+ehcache:  can either use two differently configured caches in a manner similar to infinispan, or can use a single FIFO cache.  Not yet tested.   Email the hobousers list for a status update.
+
+mongo:  can be used in FIFO mode (aka capped collections).  Not yet tested.  Email the hobousers list for a status update.
 
 others: ask on the hobo-users list.
 
@@ -257,6 +271,7 @@ others: ask on the hobo-users list.
        end
 
        # Also store cache_ids in case we ever have a parent who needs to regenerate their keys.  We can give then them ours without regenerating.
+       # note that this write occurs after the writes to Hobo.stable_cache so that FIFO caches are supported
        Rails.logger.debug "CACHE: #{key_key_s} -> content + ids #{cache_ids.to_a}"
        Rails.cache.write(key_key_s, [cache_content, cache_ids.to_a])
      end
