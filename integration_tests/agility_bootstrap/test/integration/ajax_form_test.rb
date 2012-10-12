@@ -98,7 +98,7 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     visit "/story_statuses/index4"
     find(".statuses li:first .delete-button").click
     page.driver.browser.switch_to.alert.accept
-    assert has_content?("There is one Story status")
+    assert_equal 1, all("tbody tr.story_status").length
 
     find(".statuses li:first .delete-button").click
     page.driver.browser.switch_to.alert.accept
