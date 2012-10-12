@@ -764,7 +764,7 @@ Notes
    # prepare symbolized attributes for merging
    attrs = {}
    attributes.each_pair{|k,v| attrs[k.to_sym] = v}
-   d = "#{name}'#{'s' unless name.ends_with?('s')} #{all_parameters.default}"
+   d = "#{h name}'#{'s' unless name.ends_with?('s')} #{all_parameters.default}"
    options = {:default=>[d], :count=>(attrs[:count]||1), :name=>name}
    your_key = key.split('.').last
    unless key.eql?(your_key) || attrs.has_key?(your_key.to_sym)
@@ -777,7 +777,7 @@ Notes
          options[:default].unshift :"tags.your.default.other_user"
          t("tags.your.#{your_key}.other_user", options.merge(attrs))
        end
-   capitalize ? s.sub(/^./){|c| c.upcase} : s
+   (capitalize ? s.sub(/^./){|c| c.upcase} : s).html_safe
 %></def>
 
 <!-- Capitalised version of `<a-or-an>` -->
