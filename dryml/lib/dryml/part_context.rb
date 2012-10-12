@@ -19,7 +19,7 @@
         contexts.map do |dom_id, context|
           code = context.marshal(session).split("\n").map{|line| "'#{line}\\n'"}.join(" +\n    ")
           "hoboParts['#{dom_id}'] = (#{code});\n"
-        end.join
+        end.join.html_safe
       end
 
 
