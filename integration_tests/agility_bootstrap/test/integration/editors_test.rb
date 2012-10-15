@@ -62,28 +62,28 @@ class EditorsTest < ActionDispatch::IntegrationTest
     click_link "editors"
 
 
-    use_editor ".i-view", "17"
-    use_editor ".f-view", "3.14159"
-    use_editor ".dec-view", "12.34"
-    use_editor ".s-view", "hello"
-    use_editor ".tt-view", "plain text"
-    use_editor ".d-view", Date.new(1973,4,8).to_s(:default)
+    use_editor ".i-field .controls", "17"
+    use_editor ".f-field .controls", "3.14159"
+    use_editor ".dec-field .controls", "12.34"
+    use_editor ".s-field .controls", "hello"
+    use_editor ".tt-field .controls", "plain text"
+    use_editor ".d-field .controls", Date.new(1973,4,8).to_s(:default)
 #    use_editor ".dt-view", DateTime.new(1975,5,13,7,7).strftime(I18n.t(:"time.formats.default"))
 
-    use_editor ".tl-view", "_this_ is *textile*", "this is textile"
-    use_editor ".md-view", "*this* is **markdown**", "this is markdown"
-    use_editor ".hh-view", "<i>this</i> is <b>HTML</b>", "this is HTML"
+    use_editor ".tl-field .controls", "_this_ is *textile*", "this is textile"
+    use_editor ".md-field .controls", "*this* is **markdown**", "this is markdown"
+    use_editor ".hh-field .controls", "<i>this</i> is <b>HTML</b>", "this is HTML"
 
-    find(".bool1-view input[type=checkbox]").click
-    @verify_list << { :selector => ".bool1-view", :value => "Yes" }
+    find(".bool1-field .controls input[type=checkbox]").click
+    @verify_list << { :selector => ".bool1-field .controls", :value => "Yes" }
 
-    find(".bool2-view input[type=checkbox]").click
+    find(".bool2-field .controls input[type=checkbox]").click
     wait_for_updates_to_finish
-    find(".bool2-view input[type=checkbox]").click
-    @verify_list << { :selector => ".bool2-view", :value => "No" }
+    find(".bool2-field .controls input[type=checkbox]").click
+    @verify_list << { :selector => ".bool2-field .controls", :value => "No" }
 
-    find(".es-view select").select("C")
-    @verify_list << { :selector => ".es-view", :value => "C" }
+    find(".es-field .controls select").select("C")
+    @verify_list << { :selector => ".es-field .controls", :value => "C" }
 
     if Capybara.current_driver == :selenium
       fill_in "foo[i]", :with => "17"
@@ -92,13 +92,13 @@ class EditorsTest < ActionDispatch::IntegrationTest
       find("#bug305i input.foo-i").set("192")
       click_button "reload editors"
 
-      assert find(".i-view .in-place-edit").has_text?("192")
+      assert find(".i-field .controls .in-place-edit").has_text?("192")
 
-      find(".i-view .in-place-edit").click
+      find(".i-field .controls .in-place-edit").click
       # selenium crashes on this line
-      find(".i-view input[type=text]").set('17')
+      find(".i-field .controls input[type=text]").set('17')
       find("h2.heading").click # just to get a blur
-      assert find(".i-view .in-place-edit").has_text?('17')
+      assert find(".i-field .controls .in-place-edit").has_text?('17')
     end
 
     click_link "exit editors"

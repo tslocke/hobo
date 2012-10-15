@@ -147,11 +147,11 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     click_link "New Story status"
     fill_in "story_status_name", :with => "discussion"
     click_button "Create Story status"
-    assert has_content?("There is one Story status")
+    assert_equal 1, all("tbody tr.story_status").length
     click_link "New Story status"
     fill_in "story_status_name", :with => "documentation"
     click_button "Create Story status"
-    assert has_content?("There are 2 Story statuses")
+    assert_equal 2, all("tbody tr.story_status").length
 
     # log in as Test User
     click_link "Log out"
