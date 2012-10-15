@@ -98,19 +98,21 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     visit "/story_statuses/index4"
     find(".statuses li:first .delete-button").click
     page.driver.browser.switch_to.alert.accept
-    assert_equal 1, all("tbody tr.story_status").length
+    visit "/story_statuses/index4" # Index4 delete-buttons have Ajax disabled (in-place="&false")
+    assert_equal 1, all(".statuses li").length
 
     find(".statuses li:first .delete-button").click
     page.driver.browser.switch_to.alert.accept
+    visit "/story_statuses/index4" # Index4 delete-buttons have Ajax disabled (in-place="&false")
     assert has_no_content?("foo4")   # waits for ajax to finish
     assert_equal 0, all(".statuses li").length
     assert has_content?("No records to display")
 
     visit "/projects/#{@project.id}/show2"
-    assert_not_equal "README", find(".report-file-name-view").text
+    assert_not_equal "README", find(".report-file-name-field .controls").text
     attach_file("project[report]", File.join(::Rails.root, "README"))
     click_button "upload new report"
-    assert find(".report-file-name-view").has_content?("README")
+    assert find(".report-file-name-field .controls").has_content?("README")
 
     # these should be set by show2's custom-scripts
     assert find(".events").has_text?("events: rapid:ajax:before rapid:ajax:success rapid:ajax:complete")
