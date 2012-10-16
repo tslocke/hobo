@@ -1,0 +1,18 @@
+This is the integration test suite for Hobo.
+
+# Installation
+
+Install Firefox & Google Chrome.
+
+Install [ChromeDriver](http://code.google.com/p/selenium/wiki/ChromeDriver)
+
+Install [capybara-webkit](https://github.com/thoughtbot/capybara-webkit)
+
+`bundle install`. Do NOT run bundle update. Upgrading capybara often
+breaks something somewhere.
+
+`rake db:migrate`
+
+# Running
+
+`rake test:integration`

@@ -1,0 +1,37 @@
+<edit-page>
+  <custom-javascript:>
+      var last_added;
+      var last_removed;
+      $(document).ready(function() {
+        $('.stories').on('rapid:add', function(ev) {
+          last_added = ev.target;
+        });
+        $('.stories').on('rapid:remove', function(ev) {
+          /* .tasks:rapid:remove events bubble up here, so ignore them */
+          if(ev.target.id.search(/tasks/)>0) return;
+          last_removed = ev.target;
+          if(!confirm("really?")) return false;
+        });
+      });
+  </custom-javascript:>
+  <content:>
+    <form>
+      <error-messages/>
+      <field-list fields="name, owner"/>
+      <input-many:stories>
+        <default:>
+          <card>
+            <header: replace />
+            <body:>
+              <field-list fields="title, body" />
+              <input-many:tasks fields="description" minimum="1"/>
+            </body:>
+          </card>
+        </default:>
+        <add-item:>Add Story</add-item:>
+        <remove-item:>Remove Story</remove-item:>
+      </input-many>
+      <submit value="Save" /><or-cancel/>
+    </form>
+  </content:>
+</edit-page>

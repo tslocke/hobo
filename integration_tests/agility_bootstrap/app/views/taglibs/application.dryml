@@ -1,0 +1,139 @@
+<!-- Global taglib - these tags are shared across all subsites -->
+
+<include src="rapid" plugin="hobo"/>
+
+<include gem="hobo_rapid"/>
+<include gem="hobo_jquery"/>
+<include gem="hobo_jquery_ui"/>
+<include gem="hobo_bootstrap"/>
+<include src="paperclip" plugin="paperclip_with_hobo"/>
+
+<include src="taglibs/auto/rapid/cards"/>
+<include src="taglibs/auto/rapid/pages"/>
+<include src="taglibs/auto/rapid/forms"/>
+
+<include gem='hobo_simple_color'/>
+
+<include gem='hobo_tokeninput'/>
+
+<extend tag="card" for="Task">
+  <old-card merge>
+    <append-body:>
+    <div class="users">
+      Assigned users: <repeat:users join=", "><a/></repeat><else>None</else>
+    </div>
+    </append-body:>
+  </old-card>
+</extend>
+
+<extend tag="form" for="Task">
+  <old-form merge>
+    <field-list: fields="description, users"/>
+  </old-form>
+</extend>
+
+<extend tag="form" for="Story">
+  <old-form merge>
+    <field-list: fields="title, body, color, project, status, tasks">
+      <status-view:>
+        <name-one/>
+      </status-view:>
+      <tasks-view:>
+        <sortable-input-many/>
+      </tasks-view:>
+    </field-list:>
+  </old-form>
+</extend>
+
+<extend tag="form" for="Foo">
+  <old-form merge>
+    <field-list:>
+      <bazs-view:>
+        <name-many/>
+      </bazs-view:>
+    </field-list:>
+  </old-form>
+</extend>
+
+<extend tag="card" for="ProjectMembership">
+  <old-card merge>
+    <body:>
+      <span>Contributor?</span>
+      <editor:contributor/>
+    </body:>
+  </old-card>
+</extend>
+
+<def tag="main-nav">
+  <navigation class="main-nav" merge-attrs>
+    <nav-item href="#{base_url}/">Home</nav-item>
+  </navigation>
+</def>
+
+<extend tag="select-many">
+  <old-select-many merge hide="puff"/>
+</extend>
+
+<extend tag="live-editor-innards">
+  <old-live-editor-innards merge hide="puff"/>
+</extend>
+
+<extend tag="click-editor-innards">
+  <old-click-editor-innards merge hide="puff" show="&false" message="updating...">
+    <formlet: hide="&false" show="&false"/>
+  </old-click-editor-innards>
+</extend>
+
+<def tag="qunit-banner">
+  <h1 id="qunit-header">QUnit</h1>
+  <h2 id="qunit-banner"></h2>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests">
+  </ol>
+</def>
+
+<extend tag="page">
+  <old-page merge bottom-load-javascript>
+    <before-header:>
+      <qunit-banner/>
+    </before-header:>
+  </old-page>
+</extend>
+
+
+<def tag="form" for="Project">
+  <form merge param="default" multipart>
+    <error-messages param/>
+    <field-list fields="name, report, owner, stories" param/>
+    <div param="actions">
+      <submit label="#{ht 'project.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+<def tag="search-card" for="Project">
+  <card class="project" param="default" merge>
+    <header: param>
+      Search result: <h4 param="heading"><a><name/></a></h4>
+    </header:>
+    <body: param>
+      <a:owner param="creator-link"/>
+      <ht key="story.collection.count" count="&this.stories.size">
+         <count:stories param/>
+      </ht>
+    </body:>
+  </card>
+</def>
+
+<extend tag="form" for="User">
+  <old-form merge multipart>
+    <field-list: fields="name, email_address, administrator, avatar">
+      <avatar-view:>
+        <if test="&this.exists?">
+          <img src="#{this.url}"/>
+        </if>
+        <input/>
+      </avatar-view:>
+    </field-list:>
+  </old-form>
+</extend>

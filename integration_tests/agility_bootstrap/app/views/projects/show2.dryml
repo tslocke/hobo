@@ -1,0 +1,74 @@
+<show-page>
+  <field-list: replace>
+    <div part="report-part">
+      <field-list fields="name,report_file_name,report_file_size">
+        <name-view:><editor/></name-view:>
+      </field-list>
+      <form multipart ajax success="cf.call(this, 'success')" error="cf.call(this, 'error')" before="cf.call(this, 'before');" complete="cf.call(this, 'complete')" >
+        <input:report/>
+        <submit label="upload new report"/>
+      </form>
+
+      <form id="name-form" multipart ajax>
+        <input:name/>
+        <submit label="update name without errors-ok"/>
+      </form>
+
+      <form id="name-form-ok" multipart ajax errors-ok>
+        <error-messages/>
+        <input:name/>
+        <submit label="update name with errors-ok"/>
+      </form>
+    </div>
+  </field-list:>
+
+  <collection: replace>
+  <% ixz=0 %>
+  <table-plus with="&@stories" fields="this">
+    <this-view:>
+       <% ixz += 1 %>
+       <div part="story-part" part-locals="ixz">
+         <form ajax>
+           <span class='ixz'><%= ixz %></span> <view:title/> <input:title/>
+         </form>
+       </div>
+    </this-view:>
+  </table-plus>
+  </collection:>
+
+  <custom-javascript:>
+      $(document).ready(function() {
+        setTimeout(function() {
+        var f=function(ev, el) {
+            $(".events").html($(".events").text()+" "+ev.type);
+            return true;
+         };
+         cf=function(cb) {
+            $(".callbacks").html($(".callbacks").text()+" "+cb);
+            return true;
+         };
+         $(document).on({"rapid:ajax:success": f, "rapid:ajax:before":f, "rapid:ajax:error":f, "rapid:ajax:complete":f});
+        }, 2);
+      });
+  </custom-javascript:>
+
+  <after-content:>
+     <div class="events">events:</div>
+     <div class="callbacks">callbacks:</div>
+  </after-content:>
+
+  <aside:>
+    <h2>Project Members</h2>
+    <collection:memberships part="members">
+      <card><heading:><a:user/></heading:></card>
+    </collection>
+
+    <form:memberships.new update="members" reset-form refocus-form>
+      <div>
+        Add a member:
+        <autocomplete:user/>
+      </div>
+    </form>
+  </aside:>
+
+</show-page>

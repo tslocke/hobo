@@ -1,0 +1,32 @@
+<show-page>
+
+  <heading:><editor:name/></heading:>
+    
+  <collection: replace>
+    <table-plus with="&@stories" fields="this, tasks.count, status">
+      <controls:/>
+      <prepend-header:>
+        <div class="filter">
+          Display by status: <filter-menu id="filter-status" param-name="status" options="&StoryStatus.all"/>
+        </div>
+      </prepend-header:>
+      <empty-message:>No stories match your criteria</empty-message:>
+    </table-plus>
+  </collection:>
+  
+  
+  <aside:>
+    <h2>Project Members</h2>
+    <collection:members part="members"/>
+
+    <form:memberships.new update="members" reset-form refocus-form>
+      <div>
+        Add a member: 
+        <name-one:user/>
+      </div>
+    </form>
+  </aside:>
+  
+</show-page>
+
+

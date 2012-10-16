@@ -1,0 +1,9 @@
+.bundle
+db/*.sqlite3
+log/*.log
+tmp/
+app/views/taglibs/auto/**/*
+config/hobo_routes.rb
+patches-master
+chromedriver.log
+public/system/projects/reports/**

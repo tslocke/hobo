@@ -1,0 +1,17 @@
+<include src="bug-305-test"/>
+
+<show-page>
+  <content-body:>    
+    <do part="bug305part">
+      <editor-field-list />
+    </do>
+    <form update="bug305part">
+      <div id="bug305i">
+        305i:
+        <input:i/>
+      </div>
+      <submit label="reload editors"/>
+    </form>
+    <%= link_to( "exit editors", this, :id => "exit" ) %>
+  </content-body:>
+</show-page>

@@ -1,0 +1,15 @@
+/*
+ * This is the stylesheet manifest file for the front subsite (which
+ * is your whole application if you don't have any subsites).  Files
+ * or plugins referenced from here or placed in the front/ directory
+ * will be included.
+ *
+ *= require_self
+ *= require application
+ *= require hobo_rapid
+ *= require hobo_jquery
+ *= require hobo_jquery_ui
+ *= require jquery-ui/redmond
+ *= require hobo_bootstrap
+ *= require_tree ./front
+*/
