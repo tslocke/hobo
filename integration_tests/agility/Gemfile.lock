@@ -110,13 +110,13 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
-    addressable (2.2.8)
+    addressable (2.3.2)
     arel (3.0.2)
     awesome_print (1.0.2)
     bluecloth (2.2.0)
     builder (3.0.3)
-    childprocess (0.3.3)
-      ffi (~> 1.0.6)
+    childprocess (0.3.5)
+      ffi (~> 1.0, >= 1.0.6)
     cocaine (0.2.1)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -142,7 +142,7 @@ GEM
     factory_girl_rails (1.7.0)
       factory_girl (~> 2.6.0)
       railties (>= 3.0.0)
-    ffi (1.0.11)
+    ffi (1.1.5)
     hike (1.2.1)
     httparty (0.8.3)
       multi_json (~> 1.0)
@@ -156,7 +156,7 @@ GEM
       httparty
     json (1.7.4)
     libv8 (3.3.10.4)
-    libwebsocket (0.1.3)
+    libwebsocket (0.1.5)
       addressable
     mail (2.4.4)
       i18n (>= 0.4.0)
@@ -198,7 +198,7 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
-    selenium-webdriver (2.24.0)
+    selenium-webdriver (2.25.0)
       childprocess (>= 0.2.5)
       libwebsocket (~> 0.1.3)
       multi_json (~> 1.0)
@@ -255,6 +255,7 @@ DEPENDENCIES
   paperclip!
   rails (= 3.2.8)
   sass-rails (~> 3.2.3)
+  selenium-webdriver (~> 2.25.0)
   shoulda
   sqlite3
   therubyracer

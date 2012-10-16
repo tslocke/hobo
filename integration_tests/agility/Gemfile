@@ -56,6 +56,8 @@ group :development, :test do
 #  gem 'capybara-webkit', :git => 'git://github.com/thoughtbot/capybara-webkit.git'
   gem 'capybara-webkit', :git => 'https://github.com/josephbridgwaterrowe/capybara-webkit.git', :branch => 'patch-1'
   gem 'database_cleaner'
+
+  gem 'selenium-webdriver', '~> 2.25.0'
 end
 
 gem "jquery-rails"
