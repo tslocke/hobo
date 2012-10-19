@@ -23,9 +23,9 @@ GIT
 
 GIT
   remote: git://github.com/Hobo/will_paginate.git
-  revision: 2695031cf4d55a6816ff36941605125418ceb8cb
+  revision: cc7ef01551b94fe4f607e38929037234dc70bb62
   specs:
-    will_paginate (3.0.3)
+    will_paginate (3.0.4.hobo)
 
 GIT
   remote: git://github.com/jnicklas/capybara.git
