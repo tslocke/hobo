@@ -1,3 +1,0 @@
-<def tag="input" for="Paperclip::Attachment">
-  <%= file_field_tag param_name_for_this, attributes %>
-</def>

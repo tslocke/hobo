@@ -65,6 +65,8 @@ gem "jquery-rails"
 #gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "no-prototype"
 
 gem 'paperclip', :git => "git://github.com/thoughtbot/paperclip.git", :branch => "master"
+gem 'hobo_paperclip', :git => "git://github.com/Hobo/hobo_paperclip.git", :branch => "master"
+gem 'acts_as_list'
 
 # Gems used only for assets and not required
 # in production environments by default.
