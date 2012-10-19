@@ -543,6 +543,14 @@ itself, and passes the element as an argument.
          });
       });
 
+### remove-class
+
+`remove-class` is a new attribute that can be used if you're extending or parameterizing a part to remove a class or several classes from the element you're extending or parameterizing.
+
+     <new-page>
+         <form: remove-class="form-horizontal"/>
+     </new-page>
+
 ### before callback
 {.todo}
 

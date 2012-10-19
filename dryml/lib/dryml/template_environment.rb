@@ -115,9 +115,15 @@ module Dryml
       attributes
     end
 
-
     def add_classes(attributes, *classes)
       add_classes!(HashWithIndifferentAccess.new(attributes), classes)
+    end
+
+    def remove_classes!(attributes, *remove_classes)
+      if attributes[:class]
+        attributes[:class] = (attributes[:class].split - remove_classes).join(' ')
+      end
+      attributes
     end
 
     def add_data_rapid!(attrs, tag, options)
@@ -136,6 +142,7 @@ module Dryml
       attrs = attrs.with_indifferent_access unless attrs.is_a?(HashWithIndifferentAccess)
       classes = overriding_attrs[:class]
       add_classes!(attrs, *classes.split) if classes
+      remove_classes!(attrs, *(overriding_attrs[:remove_class].split)) if overriding_attrs[:remove_class]
       if (data_rapid = overriding_attrs["data_rapid"])
         attrs["data_rapid"]=ActiveSupport::JSON.decode(attrs["data_rapid"] || "{}").
           update(ActiveSupport::JSON.decode(data_rapid)).to_json
