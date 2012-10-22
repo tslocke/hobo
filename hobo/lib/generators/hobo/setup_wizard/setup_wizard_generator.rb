@@ -238,7 +238,7 @@ EOI
 
     def active_reload_dryml
       environment "#", :env => :development
-      environment "config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']", :env => :development
+      environment "config.watchable_dirs[File.join(config.root, 'app/views')] = ['dryml']", :env => :development
       environment "# Hobo: tell ActiveReload about dryml", :env => :development
     end
 
