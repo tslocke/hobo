@@ -1,7 +1,7 @@
 Hobo Manual
 {.document-title}
 
-Welcome to Hobo, I'm sure you'll enjoy the ride.
+Welcome to Hobo, we're sure you'll enjoy the ride.
 
 ## Introduction
 
