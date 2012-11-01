@@ -79,28 +79,6 @@ module Hobo
       invoke 'hobo:assets'
     end
 
-    def choose_test_framework
-      if wizard?
-        say_title 'Test Framework'
-        return unless yes_no? "Do you want to customize the test_framework?"
-        require 'generators/hobo/test_framework/test_framework_generator'
-        f = Hobo::TestFrameworkGenerator::FRAMEWORKS * '|'
-        test_framework = choose("Choose your preferred test framework: [<enter>=#{f}]:", /^(#{f})$/, 'test_unit')
-        fixtures = yes_no?("Do you want the test framework to generate the fixtures?")
-        fixture_replacement = ask("Type your preferred fixture replacement or <enter> for no replacement:")
-      else
-        # return if it is all default so no invoke is needed
-        return if (options[:test_framework].to_s == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
-        test_framework = options[:test_framework]
-        fixtures = options[:fixtures]
-        fixture_replacement = options[:fixture_replacement]
-      end
-      invoke 'hobo:test_framework', [test_framework],
-                                    :fixture_replacement => fixture_replacement,
-                                    :fixtures => fixtures,
-                                    :update => true
-    end
-
     def user_options
       if wizard?
         say_title 'User Resource'
@@ -170,6 +148,28 @@ EOI
     def will_paginate
       say "Adding will_paginate gem"
       gem_with_comments('will_paginate', :git => "git://github.com/Hobo/will_paginate.git", :comments => "\n# Hobo's version of will_paginate is required.")
+    end
+
+    def choose_test_framework
+      if wizard?
+        say_title 'Test Framework'
+        return unless yes_no? "Do you want to customize the test_framework?"
+        require 'generators/hobo/test_framework/test_framework_generator'
+        f = Hobo::TestFrameworkGenerator::FRAMEWORKS * '|'
+        test_framework = choose("Choose your preferred test framework: [<enter>=#{f}]:", /^(#{f})$/, 'test_unit')
+        fixtures = yes_no?("Do you want the test framework to generate the fixtures?")
+        fixture_replacement = ask("Type your preferred fixture replacement or <enter> for no replacement:")
+      else
+        # return if it is all default so no invoke is needed
+        return if (options[:test_framework].to_s == 'test_unit' && options[:fixtures] && options[:fixture_replacement].blank?)
+        test_framework = options[:test_framework]
+        fixtures = options[:fixtures]
+        fixture_replacement = options[:fixture_replacement]
+      end
+      invoke 'hobo:test_framework', [test_framework],
+                                    :fixture_replacement => fixture_replacement,
+                                    :fixtures => fixtures,
+                                    :update => true
     end
 
     def front_controller
