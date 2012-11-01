@@ -47,7 +47,7 @@ Or a new page if the context is a class:
 
 The standard AJAX form attributes are supported.  This can be used for conventional Ajax:
 
-    <a href="&refresh_path" update="results">Refresh results</a>
+    <a href="&request.fullpath" update="results">Refresh results</a>
 
 Or it can be used with push-state to provide faster links:
 
@@ -60,6 +60,12 @@ the headers are identical.
 AJAX attributes are supported in both modes: in the "magic" mode where
 RAPID determines the href target or in "passthrough" where you supply
 the href or name.
+
+Note that `<a>` does NOT set the `page_path` parameter the way that `<form>` does.  This means that Hobo will attempt to render a part in the DRYML for your destination path rather than a part in the current DRYML.   This will only work if either the source and the destination are the same as in our first example, or if the source and destination have a similar part layout.
+
+This is desired behaviour; `<a>` usually means 'go somewhere else' after all.   If you want to set page_path, you're usually better off using a real form:
+
+    <form action="somewhere/else" update="foo"><submit label="update foo"/></form>
 
 ### Attributes
 
