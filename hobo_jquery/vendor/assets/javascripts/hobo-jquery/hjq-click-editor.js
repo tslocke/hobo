@@ -3,7 +3,7 @@
     var methods = {
         init: function(annotations) {
             this.removeClass('hidden').click(methods.click);
-            this.next('.in-place-form').hide().on('blur', methods.blur).on('change', methods.change);
+            this.next('.in-place-form').hide().on('blur', ':input', methods.blur).on('change', methods.change);
         },
 
         click: function(event) {
@@ -18,9 +18,11 @@
         },
 
         blur: function(event) {
-            var formlet = $(this).closest('.in-place-form');
-            formlet.addClass('hidden');
-            formlet.prev('.in-place-edit').removeClass('hidden');
+            var $formlet = $(this).closest('.in-place-form');
+            var $span = $formlet.siblings('.in-place-edit')
+            var annotations = $span.data('rapid')['click-editor'];
+            $formlet.hjq('hide', annotations.hide);
+            $span.hjq('show', annotations.show);
         },
 
         change: function(event) {
