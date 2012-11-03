@@ -125,8 +125,12 @@ module HoboRouteHelper
         url = polymorphic_path(poly, params)
         # validate URL, since polymorphic URL may return a URL for a
         # different method
-        Rails.application.routes.recognize_path(url, {:method => options[:method]})
-        url
+        # use starts_with because recognize path may return new_for_owner, for example
+        if Rails.application.routes.recognize_path(url, {:method => options[:method]})[:action].starts_with?(action.to_s)
+          url
+        else
+          nil
+        end
       rescue NoMethodError => e  # raised if polymorphic_url fails
         nil
       rescue ArgumentError => e  # raised from polymorphic_url
