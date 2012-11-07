@@ -65,7 +65,7 @@ gem "jquery-rails"
 
 #gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "no-prototype"
 
-gem 'paperclip', :git => "git://github.com/thoughtbot/paperclip.git", :branch => "master"
+gem 'paperclip'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -87,3 +87,6 @@ gem "hobo_tokeninput", :git => "git://github.com/Hobo/hobo_tokeninput"
 # gem 'dryml-firemarker', :require => 'dryml13-firemarker', :group => :development, :path => '/work/dryml-firemarker'
 
 # gem "quiet_assets"
+
+gem 'acts_as_list'
+gem 'hobo_paperclip', :git => 'git://github.com/Hobo/hobo_paperclip'

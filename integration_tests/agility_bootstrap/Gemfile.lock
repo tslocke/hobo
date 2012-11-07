@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/Hobo/hobo_paperclip
+  revision: 5b97b6db1e52deac70a216256ad54b33de374e6d
+  specs:
+    hobo_paperclip (0.0.3)
+      hobo
+      paperclip
+
+GIT
   remote: git://github.com/Hobo/hobo_simple_color
   revision: a3004f3cbebd4412647735a87ff470464a63832b
   specs:
@@ -14,9 +22,9 @@ GIT
 
 GIT
   remote: git://github.com/Hobo/will_paginate.git
-  revision: 2695031cf4d55a6816ff36941605125418ceb8cb
+  revision: cc7ef01551b94fe4f607e38929037234dc70bb62
   specs:
-    will_paginate (3.0.3)
+    will_paginate (3.0.4.hobo)
 
 GIT
   remote: git://github.com/jnicklas/capybara.git
@@ -31,18 +39,6 @@ GIT
       xpath (~> 0.1.4)
 
 GIT
-  remote: git://github.com/thoughtbot/paperclip.git
-  revision: 3d556955be58cea1c12c3b9b447a9fb4f673a87b
-  branch: master
-  specs:
-    paperclip (3.1.2)
-      activemodel (>= 3.0.0)
-      activerecord (>= 3.0.0)
-      activesupport (>= 3.0.0)
-      cocaine (>= 0.0.2)
-      mime-types
-
-GIT
   remote: https://github.com/josephbridgwaterrowe/capybara-webkit.git
   revision: 824abe88c04c289bc560790b4335d7a45da65d2b
   branch: patch-1
@@ -54,34 +50,33 @@ GIT
 PATH
   remote: ../..
   specs:
-    dryml (2.0.0.pre3)
+    dryml (2.0.0.pre5)
       actionpack (~> 3.2.0)
-      hobo_support (= 2.0.0.pre3)
-    hobo (2.0.0.pre3)
-      dryml (= 2.0.0.pre3)
-      hobo_fields (= 2.0.0.pre3)
-      hobo_support (= 2.0.0.pre3)
+      hobo_support (= 2.0.0.pre5)
+    hobo (2.0.0.pre5)
+      dryml (= 2.0.0.pre5)
+      hobo_fields (= 2.0.0.pre5)
+      hobo_support (= 2.0.0.pre5)
       will_paginate (~> 3.0.0)
-    hobo_fields (2.0.0.pre3)
-      hobo_support (= 2.0.0.pre3)
-    hobo_jquery (2.0.0.pre3)
-      hobo_rapid (= 2.0.0.pre3)
+    hobo_fields (2.0.0.pre5)
+      hobo_support (= 2.0.0.pre5)
+    hobo_jquery (2.0.0.pre5)
+      hobo_rapid (= 2.0.0.pre5)
       jquery-rails (~> 2.0)
-    hobo_jquery_ui (2.0.0.pre3)
-      hobo (= 2.0.0.pre3)
-      hobo_jquery (= 2.0.0.pre3)
+    hobo_jquery_ui (2.0.0.pre5)
+      hobo (= 2.0.0.pre5)
+      hobo_jquery (= 2.0.0.pre5)
       jquery-ui-themes (~> 0.0.4)
-    hobo_rapid (2.0.0.pre3)
-      hobo (= 2.0.0.pre3)
-    hobo_support (2.0.0.pre3)
+    hobo_rapid (2.0.0.pre5)
+      hobo (= 2.0.0.pre5)
+    hobo_support (2.0.0.pre5)
       rails (~> 3.2.0)
 
 PATH
   remote: ../../../hobo_bootstrap
   specs:
-    hobo_bootstrap (2.0.0.pre3)
-      compass-rails (~> 1.0.3)
-      compass_twitter_bootstrap (~> 2.0.3)
+    hobo_bootstrap (2.0.0.pre5)
+      bootstrap-sass (~> 2.1)
       hobo (~> 2.0.0.pre1)
       hobo_jquery_ui (~> 2.0.0.pre1)
       will_paginate-bootstrap (~> 0.2.1)
@@ -117,15 +112,16 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
+    acts_as_list (0.1.8)
     addressable (2.3.2)
     arel (3.0.2)
     awesome_print (1.0.2)
     bluecloth (2.2.0)
-    builder (3.0.3)
+    bootstrap-sass (2.1.1.0)
+    builder (3.0.4)
     childprocess (0.3.5)
       ffi (~> 1.0, >= 1.0.6)
-    chunky_png (1.2.6)
-    cocaine (0.2.1)
+    cocaine (0.4.2)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -134,14 +130,6 @@ GEM
       execjs
     coffee-script-source (1.3.3)
     columnize (0.3.6)
-    compass (0.12.2)
-      chunky_png (~> 1.2)
-      fssm (>= 0.2.7)
-      sass (~> 3.1)
-    compass-rails (1.0.3)
-      compass (>= 0.12.2, < 0.14)
-    compass_twitter_bootstrap (2.0.3)
-      compass
     database_cleaner (0.8.0)
     debugger (1.1.4)
       columnize (>= 0.3.1)
@@ -159,7 +147,6 @@ GEM
       factory_girl (~> 2.6.0)
       railties (>= 3.0.0)
     ffi (1.1.5)
-    fssm (0.2.9)
     hike (1.2.1)
     httparty (0.8.3)
       multi_json (~> 1.0)
@@ -180,9 +167,15 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.19)
-    multi_json (1.3.6)
+    multi_json (1.3.7)
     multi_xml (0.5.1)
     nokogiri (1.5.5)
+    paperclip (3.3.1)
+      activemodel (>= 3.0.0)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
+      cocaine (~> 0.4.0)
+      mime-types
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -237,7 +230,7 @@ GEM
     treetop (1.4.10)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.33)
+    tzinfo (0.3.35)
     uglifier (1.2.6)
       execjs (>= 0.3.0)
       multi_json (~> 1.3)
@@ -251,6 +244,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
+  acts_as_list
   awesome_print
   bluecloth
   capybara!
@@ -261,11 +255,12 @@ DEPENDENCIES
   factory_girl_rails
   hobo!
   hobo_bootstrap!
+  hobo_paperclip!
   hobo_simple_color!
   hobo_tokeninput!
   jquery-rails
   jquery-ui-themes (~> 0.0.4)
-  paperclip!
+  paperclip
   rails (= 3.2.8)
   sass-rails (~> 3.2.3)
   shoulda
