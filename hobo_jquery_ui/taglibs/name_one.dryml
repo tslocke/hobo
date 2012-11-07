@@ -60,7 +60,11 @@ All other attributes are passed through to the `<autocomplete>` that provides th
 <%
   complete_target ||= this_field_reflection.klass
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute
-  source = polymorphic_url(complete_target, :action => "complete_#{completer}", :routing_type => :path)
+  begin
+    source = polymorphic_url(complete_target, :action => "complete_#{completer}", :routing_type => :path)
+  rescue NoMethodError => e
+    source = polymorphic_url(complete_target.class, :action => "complete_#{completer}", :routing_type => :path, :id => complete_target._?.id)
+  end
   value = name(:no_wrapper => true, :if_present => true)
 -%>
   <autocomplete source="&source" minLength="&min_chars || 1" merge/>
