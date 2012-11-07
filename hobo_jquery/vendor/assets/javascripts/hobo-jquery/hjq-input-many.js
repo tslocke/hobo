@@ -16,7 +16,7 @@ if(!RegExp.escape) {
             });
 
             // bind event handlers
-            this.find(".remove-item:not([disabled])").not(this.find(".input-many .add-item")).click(methods.removeOne);
+            this.find(".remove-item:not([disabled])").not(this.find(".input-many .remove-item")).click(methods.removeOne);
             this.find(".add-item:not([disabled])").not(this.find(".input-many .add-item")).click(methods.addOne);
         },
 
@@ -35,7 +35,7 @@ if(!RegExp.escape) {
                 this.disabled = false;
                 $(this).removeClass("input_many_template_input");
             });
-            clone.find(".remove-item:not([disabled])").not(clone.find(".input-many .add-item")).click(methods.removeOne);
+            clone.find(".remove-item:not([disabled])").not(clone.find(".input-many .remove-item")).click(methods.removeOne);
             clone.find(".add-item:not([disabled])").not(clone.find(".input-many .add-item")).click(methods.addOne);
 
             // update id & name
