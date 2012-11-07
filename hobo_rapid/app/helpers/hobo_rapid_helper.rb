@@ -140,7 +140,7 @@ module HoboRapidHelper
                                  (attrs[:lifecycle].nil? && new_record && !this.creatable_by?(current_user)) ||
                                  (attrs[:lifecycle].nil? && !new_record && !can_edit?))
         Dryml.last_if = false
-        logger.info("unable to render form")
+        logger.info("permission denied; unable to render form")
         return nil
       else
         if method == "put" || method == "delete"
