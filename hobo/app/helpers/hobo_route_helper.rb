@@ -95,23 +95,6 @@ module HoboRouteHelper
       options, params = options.partition_hash([:subsite, :method, :format])
       options[:subsite] ||= self.subsite
 
-      if obj.respond_to?(:member_class)
-        if obj.respond_to?(:origin) && obj.origin
-          # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
-          refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
-          owner_name = refl.name.to_s
-          owner_name = owner_name.singularize if refl.macro == :has_many
-          poly = [owner_name, obj.member_class]
-          params[:"#{owner_name}_id"] = obj.origin
-        else
-          poly = [obj.member_class]
-        end
-      else
-        poly = [obj]
-      end
-
-      poly = [options[:subsite]] + poly if options[:subsite]
-
       action ||= case options[:method].to_s
                  when 'put';    :update
                  when 'post';   :create
@@ -121,15 +104,37 @@ module HoboRouteHelper
 
       params[:action] = action unless action.in?(IMPLICIT_ACTIONS)
 
+      if obj.respond_to?(:member_class)
+        if obj.respond_to?(:origin) && obj.origin
+          # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
+          refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
+          owner_name = refl.name.to_s
+          owner_name = owner_name.singularize if refl.macro == :has_many
+          poly = [owner_name, obj.member_class]
+          params[:"#{owner_name}_id"] = obj.origin
+          action = "#{action}_for_#{owner_name}"
+        else
+          poly = [obj.member_class]
+        end
+      else
+        poly = [obj]
+      end
+
+      poly = [options[:subsite]] + poly if options[:subsite]
+
       begin
         url = polymorphic_path(poly, params)
         # validate URL, since polymorphic URL may return a URL for a
         # different method
         # use starts_with because recognize path may return new_for_owner, for example
-        if Rails.application.routes.recognize_path(url, {:method => options[:method]})[:action].starts_with?(action.to_s)
+        recognized_params = Rails.application.routes.recognize_path(url, {:method => options[:method]})
+        if recognized_params[:action] == action.to_s
           url
         else
-          nil
+          # we get here if the action name is modified: do_signup, etc.
+          recognized_params[:action] = action
+          url2 = url_for(recognized_params)
+          url==url2 ? url : nil
         end
       rescue NoMethodError => e  # raised if polymorphic_url fails
         nil
