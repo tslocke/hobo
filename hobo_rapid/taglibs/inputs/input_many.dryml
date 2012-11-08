@@ -80,7 +80,7 @@ end
   <% js_attrs[:prefix] = param_name_for_this %>
   <ul class="input-many #{this_field.dasherize}" data-rapid="#{data_rapid('input-many', js_attrs, attributes)}" merge-attrs>
     <fake-field-context fake-field="-1" context="&template">
-      <li class="input-many-li input-many-template" id="#{underize param_name_for_this}">
+      <li class="input-many-li input-many-template" id="#{underize param_name_for_this}" param>
         <div class="input-many-item" param="default">
           <field-list param merge-attrs="fields" skip="&skip" />
         </div>
@@ -90,7 +90,7 @@ end
         </div>
       </li>
     </fake-field-context>
-    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{underize param_name_for_this}_-1_empty">
+    <li class="input-many-li empty #{'hidden' unless this.empty? and minimum==0}" id="#{underize param_name_for_this}_-1_empty" param>
       <!-- HACK way to signal an empty collection to the controller -->
       <input type="hidden" class="empty-input" id="#{underize param_name_for_this}" name="#{param_name_for_this}" value="" disabled="&(!this.empty? || minimum>0)" />
       <fake-field-context fake-field="-1" context="&template">
@@ -106,7 +106,7 @@ end
       </fake-field-context>
     </li>
     <fake-field-context fake-field="0" context="&template">
-      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{underize param_name_for_this}">
+      <li class="input-many-li" if="&(this_parent.empty? && minimum>0)" id="#{underize param_name_for_this}" param>
         <div class="input-many-item" param="default">
           <field-list param merge-attrs="fields" skip="&skip" />
         </div>
@@ -116,7 +116,7 @@ end
         </div>
       </li>
     </fake-field-context>
-    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{underize param_name_for_this}">
+    <li repeat class="input-many-li #{'record-with-errors' unless this.errors.empty?}" id="#{underize param_name_for_this}" param>
       <error-messages without-heading class="sub-record"/>
       <hidden-id-field/>
       <div class="input-many-item" param="default">
