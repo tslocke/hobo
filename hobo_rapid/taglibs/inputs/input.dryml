@@ -44,7 +44,7 @@ If the context is a `has_many :through` association, the polymorphic `<collectio
     no_edit = no_edit.to_sym
     no_edit_permission = !can_edit? unless no_edit == :ignore
     if no_edit_permission && no_edit == :view
-      view
+      view(attributes)
     elsif no_edit_permission && no_edit == :skip
       ""
     else
