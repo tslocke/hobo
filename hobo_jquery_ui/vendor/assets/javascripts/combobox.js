@@ -29,6 +29,7 @@
               found = false;
 	    var input = this.input = $( "<input>" )
                 .attr('title', '' + select.attr("title") + '')
+                .attr('type', 'text')
 		.insertAfter( select )
 		.val( value )
 		.autocomplete({
@@ -144,6 +145,7 @@
 	                text: false
 	            })
 	            .removeClass( "ui-corner-all" )
+                    .css("margin-right", "0")
 	            .click(function(event, ui) {
 
                         select.find("option:selected").removeAttr("selected");
