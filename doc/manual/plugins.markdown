@@ -222,9 +222,35 @@ And we're done!   The full source for this plugin can be found [on github](https
 
 # Themes
 
-A hobo theme is simply a Hobo plugin that defines the "page" tag.
+A hobo theme is simply a Hobo plugin that defines the page, simple-page, navigation and nav-item tags.   It should also include the CSS to properly format everything in the hobo_rapid plugin.
 
-(FIXME: more here would be nice)
+The page tag must support the title and full-title attributes, as well as the following parameters:
+
+    head
+      title
+      stylesheets
+        app-stylesheet
+      scripts
+        application-javascript
+        custom-scripts
+          custom-javascript
+    body
+      ajax-progress
+      page-header
+        account-nav
+        app-name
+        live-search
+        main-nav
+
+      content
+        main-content
+          content-header
+          content-body
+        aside
+      footer
+      page-scripts
+
+The parameters should be nested in the manner described above, although minor variations may be acceptable.   For example, hobo_clean_sidemenu moves the main-nav out of page-header, and hobo_bootstrap moves the aside outside of content.
 
 # Submitting Your Plugin
 
