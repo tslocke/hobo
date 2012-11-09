@@ -264,7 +264,7 @@
                 result.data["render["+i+"][part_context]"] = page_data.hobo_parts[ids[i]];
                 result.data["render["+i+"][id]"] = ids[i];
                 // default for render[i][function] is hjq.ajax.update
-                if(o.function) result.data["render["+i+"][function]"] = o['function'];
+                if(o['function']) result.data["render["+i+"][function]"] = o['function'];
             }
 
             if(ids.length==0) {
