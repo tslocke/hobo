@@ -16,7 +16,17 @@
             <main-nav current="&title" param/>
           </td>
           <td id="content-container">
-            <section with-flash-messages param="content"/>
+            <section with-flash-messages param="content">
+              <section-group>
+                <section param="main-content">
+                  <header param="content-header"/>
+
+                  <section param="content-body"/>
+                </section>
+
+                <aside param/>
+              </section-group>
+            </section>
           </td>
         </tr>
       </table>
