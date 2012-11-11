@@ -13,7 +13,7 @@ es:
       # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
       # if you need a different title you should implement a different way to select the tab on your own
       #title: "Indice %{model}"
-      heading: "Indice %{model}"
+      heading: "Índice %{model}"
 
     new:
       title: "Nuevo Registro de %{model}"
@@ -52,7 +52,7 @@ es:
       name: "Nombre"
       password: "Contraseña"
       remember_me: "Recuerda mis datos"
-      login: "Identifición"
+      login: "Identificación"
       signup: "Inscripción"
       forgot_password: &forgot_password "¿Contraseña olvidada?"
 
@@ -71,7 +71,7 @@ es:
     forgot_password_sent:
       title: "Contraseña olvidada - Correo Eléctronico enviado"
       heading: "Contraseña olvidada - Correo Eléctronico enviado"
-      text: "El mensaje con las instruciones para generar una nueva contraseña ha sido enviado a %{email_address}
+      text: "El mensaje con las instrucciones para generar una nueva contraseña ha sido enviado a %{email_address}
              Si no lo recibe, por favor verifique el filtro anti-spam."
 
     account_disabled_page:
@@ -117,7 +117,7 @@ es:
       creator:
         error: "El creator %{name} no se pudo executar.\n%{errors}"
       transition:
-        error: "La transición %{name} no se pudo executar.\n%{errors}"
+        error: "La transición %{name} no se pudo ejecutar.\n%{errors}"
       update:
         no_attribute_error: "Ninguna actualización esta especificada en los parámetros"
         success: "Los cambios a %{model} han sido guardados"
@@ -135,7 +135,7 @@ es:
       permission_denied: "¡Permiso denegado!"
       not_found: "La página solicitada no se encuentra."
       unauthenticated: "No se pudo autenticar."
-      validate_password: "debe contener tansiquiera 6 caracteres, letras mayúsculas y minúsculas"
+      validate_password: "debe contener al menos 6 caracteres, letras mayúsculas y minúsculas"
       current_password_is_not_correct: "no está correcta"
       you_are_site_admin: "Ahora usted es el administrador del sitio."
       you_signed_up: "Usted se inscribió."
