@@ -123,7 +123,7 @@ es:
         success: "Los cambios a %{model} han sido guardados"
         error: "Ha habido un problema con ese cambio.\n%{errors}"
       destroy:
-        success: "La borradura de %{model} ha sido exitosa."
+        success: "La borradura de %{model} ha sido tenido éxito."
       signup:
         success: "¡Gracias por inscribirse!"
         must_activate: "Tiene que activar la cuenta antes de iniciar la sesión. Por favor verifique su correo eléctronico."
@@ -154,7 +154,7 @@ es:
       # you better define the heading.* in the specific collection namespace
       #heading:
       add_form_heading: "Añadir %{model}"
-      empty_message: "Ningun registros"
+      empty_message: "Ningún registro"
 
     # default hobo form translation
     form:
@@ -178,7 +178,7 @@ es:
     live_search:
       label: "Buscar"
       results_label: "Buscar Resultados"
-      close_button: "cierrar"
+      close_button: "cerrar"
       no_results: "No se encuentran resultados."
 
     dev_user_changer:
