@@ -10,8 +10,7 @@ module HoboRapidHelper
     AJAX_PUSHSTATE_ATTRS = [:push_state, :new_title]
 
     AJAX_ATTRS = AJAX_CALLBACKS + AJAX_UPDATE_ATTRS + AJAX_EFFECT_ATTRS + AJAX_SPINNER_ATTRS + AJAX_PUSHSTATE_ATTRS +
-      [:params, :errors_ok,
-       :reset_form, :refocus_form ]
+      [:errors_ok, :reset_form, :refocus_form ]
 
     def app_name(add_subsite=true)
       an = Rails.application.config.hobo.app_name
