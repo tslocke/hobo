@@ -1,7 +1,5 @@
 <!-- Global taglib - these tags are shared across all subsites -->
 
-<include src="rapid" plugin="hobo"/>
-
 <include gem="hobo_clean"/>
 <include gem="hobo_rapid"/>
 <include gem="hobo_jquery"/>
