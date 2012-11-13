@@ -11,7 +11,7 @@ It's probably useful to set global options such as dateFormat in application.dry
 
     <input:birthdate yearRange="1900:#{Date.today.year}" />
 
-New in version 1.4:
+New in version 2.0:
 
 If you do not specify dateFormat, we will attempt to convert I18n.t(:"date.formats.default") from strftime format into the format that the JQuery-UI datepicker likes.
 

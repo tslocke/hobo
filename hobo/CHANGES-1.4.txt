@@ -721,6 +721,11 @@ to press 'return' to initiate the search.  This should be easy to fix
 in hjq-live-search.js -- the hard part will probably be in doing it in
 a way that works in all possible browsers.
 
+`live-search` requires an implementation of
+`<search-results-container>`.  Both hobo-jquery-ui and
+hobo-bootstrap-ui provide implementations of
+`<search-results-container>`.
+
 ### hot-input
 {.done}
 

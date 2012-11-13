@@ -1,0 +1,17 @@
+<!-- implements `<search-results-container>` for hobo-rapid with `<dialog-box>` -->
+<def tag="search-results-container" attrs="title">
+  <dialog-box position="center" width="&600" height="&800" id="search-results-box" title="&title" param="default" autoOpen="&true">
+    <search-results/>
+  </dialog-box>
+</def>
+
+<!-- use jQuery-UI for date inputs.   To switch back to vanilla Rails add to your application.dryml:
+
+    <def tag="input" for="Date">
+      <select-date merge/>
+    </def>
+-->
+<def tag="input" for="Date">
+  <datepicker dateFormat="yy-mm-dd" merge />
+</def>
+

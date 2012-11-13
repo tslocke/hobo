@@ -23,22 +23,22 @@ All other attributes are merged into the form, so standard form attributes are s
       <input type="hidden" value="2" name="search_version"/>
       <label for="&query_param" param><t key="hobo.live_search.label">Search</t></label><input type="search" name="&query_param" class="live-search" param/>
     </form>
-    <% panel_tag ||= 'dialog-box' %>
-    <% title = t("hobo.live_search.results_label", :default => "Search Results") %>
-    <call-tag tag="&panel_tag" position="center" width="&600" height="&800" id="search-results-box" with="&nil" title="&title" param="box">
-      <do part="search-results-part">
-        <search-results/>
-      </do>
-    </call-tag>
+    <do part="search-results-part">
+      <if test="&defined?(@search_results)">
+        <search-results-container with="@search_results || []" title="&t('hobo.live_search.results_label', :default => 'Search Results')">
+      </if>
+    </do>
   </div>
 </def>
 
 <!-- redefining or extending this tag will allow you to customize the display of search results -->
 <def tag="search-results">
-  <section with="&@search_results || []" data-rapid='{"search-results": {}}'>
+  <section param>
     <collection param>
       <search-card/>
     </collection>
-    <else><t key="hobo.live_search.no_results">Your search returned no matches.</t></else>
+    <else>
+      <t key="hobo.live_search.no_results">Your search returned no matches.</t>
+    </else>
   </section>
 </def>
