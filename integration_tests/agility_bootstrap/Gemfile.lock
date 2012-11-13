@@ -50,36 +50,42 @@ GIT
 PATH
   remote: ../..
   specs:
-    dryml (2.0.0.pre5)
+    dryml (2.0.0.pre6)
       actionpack (~> 3.2.0)
-      hobo_support (= 2.0.0.pre5)
-    hobo (2.0.0.pre5)
-      dryml (= 2.0.0.pre5)
-      hobo_fields (= 2.0.0.pre5)
-      hobo_support (= 2.0.0.pre5)
+      hobo_support (= 2.0.0.pre6)
+    hobo (2.0.0.pre6)
+      dryml (= 2.0.0.pre6)
+      hobo_fields (= 2.0.0.pre6)
+      hobo_support (= 2.0.0.pre6)
       will_paginate (~> 3.0.0)
-    hobo_fields (2.0.0.pre5)
-      hobo_support (= 2.0.0.pre5)
-    hobo_jquery (2.0.0.pre5)
-      hobo_rapid (= 2.0.0.pre5)
+    hobo_fields (2.0.0.pre6)
+      hobo_support (= 2.0.0.pre6)
+    hobo_jquery (2.0.0.pre6)
+      hobo_rapid (= 2.0.0.pre6)
       jquery-rails (~> 2.0)
-    hobo_jquery_ui (2.0.0.pre5)
-      hobo (= 2.0.0.pre5)
-      hobo_jquery (= 2.0.0.pre5)
+    hobo_jquery_ui (2.0.0.pre6)
+      hobo (= 2.0.0.pre6)
+      hobo_jquery (= 2.0.0.pre6)
       jquery-ui-themes (~> 0.0.4)
-    hobo_rapid (2.0.0.pre5)
-      hobo (= 2.0.0.pre5)
-    hobo_support (2.0.0.pre5)
+    hobo_rapid (2.0.0.pre6)
+      hobo (= 2.0.0.pre6)
+    hobo_support (2.0.0.pre6)
       rails (~> 3.2.0)
 
 PATH
   remote: ../../../hobo_bootstrap
   specs:
-    hobo_bootstrap (2.0.0.pre5)
+    hobo_bootstrap (2.0.0.pre6)
       bootstrap-sass (~> 2.1)
       hobo (~> 2.0.0.pre1)
       hobo_jquery_ui (~> 2.0.0.pre1)
       will_paginate-bootstrap (~> 0.2.1)
+
+PATH
+  remote: ../../../hobo_bootstrap_ui
+  specs:
+    hobo_bootstrap_ui (2.0.0.pre6)
+      hobo_bootstrap (~> 2.0.0.pre1)
 
 GEM
   remote: http://rubygems.org/
@@ -255,6 +261,7 @@ DEPENDENCIES
   factory_girl_rails
   hobo!
   hobo_bootstrap!
+  hobo_bootstrap_ui!
   hobo_paperclip!
   hobo_simple_color!
   hobo_tokeninput!

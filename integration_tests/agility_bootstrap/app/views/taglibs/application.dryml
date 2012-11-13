@@ -6,6 +6,7 @@
 <include gem="hobo_jquery"/>
 <include gem="hobo_jquery_ui"/>
 <include gem="hobo_bootstrap"/>
+<include gem="hobo_bootstrap_ui"/>
 <include gem="hobo_paperclip"/>
 
 <include src="taglibs/auto/rapid/cards"/>

@@ -48,10 +48,10 @@ class DialosgTest < ActionDispatch::IntegrationTest
 
     visit "/projects/#{@project.id}/dialog_test"
 
-    click_button "New Story"
+    click_link "New Story"
     fill_in "story[title]", :with => "Another Story"
     fill_in "story[body]", :with => "body"
-    click_button "ok"
+    click_button "Submit"
     wait_for_updates_to_finish
 
     assert find("#stories tr:eq(2) td:first").has_content?("Another Story")

@@ -8,14 +8,20 @@
   </collection: >
 
   <new-link: replace>
-    <dialog-and-button title="New Story" if="&can_create?(this.stories)" buttons='&[["cancel", "hjq_dialog_box.close"], ["ok", "hjq_dialog_box.submitAndClose"]]'>
-      <dialog-box:>
-        <formlet owner="project" with="&this.stories.new" update="stories">
-          <field-list fields="title, body, status" />
-        </formlet>
-      </dialog-box:>
-      <dialog-open-button:>New Story</dialog-open-button:>
-    </dialog-and-button>
+    <if test="&can_create?(this.stories)">
+      <modal id="new-story-modal">
+        <modal:>
+          <formlet owner="project" with="&this.stories.new" update="stories" success="$('#new-story-modal').modal('hide');">
+            <modal-header>New Story</modal-header>
+            <div class="modal-body">
+              <field-list size="0" fields="title, body, status" />
+            </div>
+            <modal-form-footer/>
+          </formlet>
+        </modal:>
+      </modal>
+      <modal-open-button modal="new-story-modal">New Story</modal-open-button>
+    </if>
   </new-link:>
 
 </show-page>

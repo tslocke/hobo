@@ -9,4 +9,5 @@
 //
 //= require application
 //= require hobo_bootstrap
+//= require hobo_bootstrap_ui
 //= require_tree ./front
