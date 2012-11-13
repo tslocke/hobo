@@ -25,7 +25,7 @@ All other attributes are merged into the form, so standard form attributes are s
     </form>
     <do part="search-results-part">
       <if test="&defined?(@search_results)">
-        <search-results-container with="@search_results || []" title="&t('hobo.live_search.results_label', :default => 'Search Results')">
+        <search-results-container with="@search_results || []" title="&t('hobo.live_search.results_label', :default => 'Search Results')"/>
       </if>
     </do>
   </div>
