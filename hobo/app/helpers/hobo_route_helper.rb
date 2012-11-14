@@ -99,7 +99,7 @@ module HoboRouteHelper
                  when 'put';    :update
                  when 'post';   :create
                  when 'delete'; :destroy
-                 else; obj.is_a?(Class) ? :index : :show
+                 else; obj.is_a?(Class) || obj.respond_to?(:length) ? :index : :show
                  end
 
       params[:action] = action unless action.in?(IMPLICIT_ACTIONS)
