@@ -51,8 +51,8 @@ class SearchTest < ActionDispatch::IntegrationTest
     fill_in "query", :with => "First"
     find("input[name=query]").native.send_key(:enter)
     assert has_content?("Search Results")
-    assert find("#search-results-part").has_content?("First Project")
-    assert find("#search-results-part").has_content?("First Story")
+    assert find("#search-results-box").has_content?("First Project")
+    assert find("#search-results-box").has_content?("First Story")
 
   end
 end
