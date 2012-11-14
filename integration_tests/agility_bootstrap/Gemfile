@@ -39,7 +39,7 @@ gem "hobo", :path => "../.."
 # gem "hobo_clean", :path => "../.."
 # gem "hobo_clean_sidemenu", :path => "../.."
 # gem "hobo_jquery", :path => "../.."
-# gem "hobo_jquery_ui", :path => "../.."
+gem "hobo_jquery_ui", :path => "../.."
 
 gem "jquery-ui-themes", "~> 0.0.4"
 

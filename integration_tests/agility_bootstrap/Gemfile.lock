@@ -77,8 +77,8 @@ PATH
   specs:
     hobo_bootstrap (2.0.0.pre6)
       bootstrap-sass (~> 2.1)
-      hobo (~> 2.0.0.pre1)
-      hobo_jquery_ui (~> 2.0.0.pre1)
+      hobo (~> 2.0.0.pre6)
+      hobo_jquery (~> 2.0.0.pre6)
       will_paginate-bootstrap (~> 0.2.1)
 
 PATH
@@ -262,6 +262,7 @@ DEPENDENCIES
   hobo!
   hobo_bootstrap!
   hobo_bootstrap_ui!
+  hobo_jquery_ui!
   hobo_paperclip!
   hobo_simple_color!
   hobo_tokeninput!
