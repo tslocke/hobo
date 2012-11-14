@@ -5,13 +5,12 @@
   </dialog-box>
 </def>
 
-<!-- use jQuery-UI for date inputs.   To switch back to vanilla Rails add to your application.dryml:
+<!-- use jQuery-UI for date inputs.   To switch back to vanilla Rails (`<select-date>`) add to your application.dryml:
 
     <def tag="input" for="Date">
-      <select-date merge/>
+      <date-select merge/>
     </def>
 -->
 <def tag="input" for="Date">
   <datepicker dateFormat="yy-mm-dd" merge />
 </def>
-

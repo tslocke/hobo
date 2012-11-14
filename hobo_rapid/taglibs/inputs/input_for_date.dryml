@@ -24,25 +24,22 @@ Examples:
      </def>
 
   -->
-<def tag="select-date" attrs="use-month-numbers, use-short-month, add-month-numbers, use-month-names, date-separator, start-year, end-year, discard-day, discard-month, discard-year, order, include-blank, default, disabled, prompt, prefix">
+<def tag="date-select" attrs="use-month-numbers, use-short-month, add-month-numbers, use-month-names, date-separator, start-year, end-year, discard-day, discard-month, discard-year, order, include-blank, default, disabled, prompt, prefix">
   <% order = order.nil? ? [:year, :month, :day] : comma_split(order).*.to_sym -%>
+  <% debugger %>
   <%= select_date(this || current_time,
                   (all_attributes - attributes.keys).reverse_merge(:prefix => param_name_for_this).merge(:order => order),
                   attributes - [:name]) %>
 </def>
 
 
-<%# Selects the `<datepicker>` as the default input for date.   To
-  choose the older `<select-date>` input, add this to your
-  application.dryml:
-
-     <def tag='input' for='date'>
-       <select-date merge/>
-     </def>
+<%# Selects the `<select-date>` as the default input for date.   select-date is pretty old-school; hobo_jquery_ui provides a much more pleasant datepicker.
 %>
 <def tag="input" for="Date">
-  <datepicker merge/>
+  <date-select merge/>
 </def>
+
+
 
 <!-- A date/time picker, using the `select_time` helper from Rails
 
