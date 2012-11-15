@@ -595,7 +595,7 @@ Examples:
 
      <form ajax hide="drop" show="&['slide', nil, 1000, 'alert(done);']"/>
 
-These two options have global defaults which are TBD.  They may be overridden by passing options to the page-script parameter of `<page>`:
+These default effect is "no effect".  They may be overridden by passing options to the page-script parameter of `<page>`:
 
      <extend tag="page">
        <old-page merge>
@@ -603,7 +603,11 @@ These two options have global defaults which are TBD.  They may be overridden by
        </old-page>
      </extend>
 
-To disable effects entirely:  FIXME.
+If, after changing the default you wish to disable effects on one specific ajax element, pass false:
+
+     <form ajax hide="&false" show="&false" ...
+
+Note that these effects require jQuery-UI.  You will get Javascript errors if you attempt to use effects and do not have jQuery-UI installed.
 
 ### spinner options
 {.todo}
