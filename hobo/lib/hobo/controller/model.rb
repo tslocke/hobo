@@ -591,7 +591,7 @@ module Hobo
     end
 
 
-    def create_response(new_action, options={})
+    def create_response(new_action=:new, options={})
       valid = valid?  # valid? can be expensive
       if params[:render]
         if (params[:render_options] && params[:render_options][:errors_ok]) || valid
