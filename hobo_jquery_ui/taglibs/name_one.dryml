@@ -56,7 +56,7 @@ All other attributes are passed through to the `<autocomplete>` that provides th
 - `nil-value`: If there is no current value, this text will appear greyed out inside the control, and will disappear on focus.
 
   -->
-<def tag="name-one" attrs="complete-target, completer, min-chars">
+<def tag="name-one-jquery-ui" attrs="complete-target, completer, min-chars">
 <%
   complete_target ||= this_field_reflection.klass
   completer ||= (complete_target.is_a?(Class) ? complete_target : complete_target.class).name_attribute

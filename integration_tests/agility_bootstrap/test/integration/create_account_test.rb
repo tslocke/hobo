@@ -178,7 +178,8 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
 
     # add project members
     fill_in "project_membership[user]", :with => "Second User"
-    find("input.ui-autocomplete-input").native.send_key(:enter)
+    click_link "Second User"
+    find("form.project-membership input[type=text]").native.send_key(:enter)
     assert find("ul.memberships").has_text?("Second User")
 
     find("input.delete-project-membership-button").click

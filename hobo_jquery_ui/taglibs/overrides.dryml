@@ -14,3 +14,9 @@
 <def tag="input" for="Date">
   <datepicker dateFormat="yy-mm-dd" merge />
 </def>
+
+
+<!-- alias `<name-one>` to `<name-one-jquery-ui>` -->
+<def tag="name-one">
+  <name-one-jquery-ui merge/>
+</def>
