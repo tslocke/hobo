@@ -82,4 +82,8 @@ module Dryml::Helper
       register_form_field(name)
       name
     end
+
+    def param_name_for_this_parent
+      param_name_for(path_for_form_field[0..-2])
+    end
 end
