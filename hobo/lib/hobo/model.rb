@@ -17,7 +17,6 @@ module Hobo
 
       base.class_eval do
         inheriting_cattr_reader :default_order
-        alias_method_chain :attributes=, :hobo_type_conversion
 
         cattr_accessor :hobo_controller
         self.hobo_controller = {}
@@ -356,17 +355,6 @@ module Hobo
     end
 
 
-    def attributes_with_hobo_type_conversion=(attributes, guard_protected_attributes=true)
-      converted = attributes.map_hash { |k, v| convert_type_for_mass_assignment(self.class.attr_type(k), v) }
-      # Avoid passing this third argument if possible, to avoid a deprecation warning in Rails 3.1
-      if guard_protected_attributes
-        send(:attributes_without_hobo_type_conversion=, converted)
-      else
-        send(:attributes_without_hobo_type_conversion=, converted, true)
-      end
-    end
-
-
     # We deliberately give these three methods unconventional (java-esque) names to avoid
     # polluting the application namespace
 
@@ -412,53 +400,6 @@ module Hobo
         "#{self.class.model_name.human} #{id}"
       end
     end
-
-
-    private
-
-
-    def convert_type_for_mass_assignment(field_type, value)
-      if !field_type.is_a?(Class)
-        value
-
-      elsif field_type <= Date
-        if value.is_a? Hash
-          parts = %w{year month day}.map{|s| value[s].to_i}
-          if parts.include?(0)
-            nil
-          else
-            begin
-              Date.new(*parts)
-            rescue ArgumentError => ex
-              Time.time_with_datetime_fallback(ActiveRecord::Base.default_timezone, *parts).to_date
-            end
-          end
-        else
-          value
-        end
-
-      elsif field_type <= Time || field_type <= ActiveSupport::TimeWithZone
-        if value.is_a? Hash
-          parts = %w{year month day hour minute second}.map{|s| value[s].to_i}
-          if parts[0..2].include?(0)
-            nil
-          else
-            field_type <= Time ? Time.utc(*parts) : Time.zone.local(*parts)
-          end
-        else
-          value
-        end
-
-      elsif field_type <= Hobo::Boolean
-        (value.is_a?(String) && value.strip.downcase.in?(['0', 'false']) || value.blank?) ? false : true
-
-      else
-        # no conversion
-        value
-      end
-    end
-
-
   end
 
 end
