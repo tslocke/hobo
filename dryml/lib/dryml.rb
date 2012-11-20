@@ -43,7 +43,7 @@ module Dryml
   def precompile_taglibs
     Dir.chdir(Rails.root) do
       Dir["app/views/taglibs/**/*.dryml"].each do |f|
-        Taglib.get(:template_dir => File.dirname(f), :src => File.basename(f).remove(".dryml"), :source_template => f)
+        Taglib.get(:template_dir => File.dirname(f), :src => File.basename(f).remove(".dryml"), :source_template => "_.dryml")
       end
     end
   end
