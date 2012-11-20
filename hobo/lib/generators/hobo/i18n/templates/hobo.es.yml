@@ -12,7 +12,7 @@ es:
     index:
       # if you uncomment the following you will loose the automatic selection of dinamically pluralized nav-tabs
       # if you need a different title you should implement a different way to select the tab on your own
-      #title: "Indice %{model}"
+      #title: "Índice %{model}"
       heading: "Índice %{model}"
 
     new:
@@ -24,7 +24,7 @@ es:
       heading: "%{model} %{name}"
       back_link: "Atrás"
       edit_link: "Actualizar %{model}"
-      new_link: "Nuevo Registro %{model}"
+      new_link: "Nuevo registro %{model}"
       add_form_heading: "Añadir %{model}"
 
     edit:
@@ -41,56 +41,57 @@ es:
       subheading: "Para:"
 
     new_for_owner:
-      title: "Nuevo Registro de %{model} para"
-      heading: "Nuevo Registro de %{model}"
+      title: "Nuevo registro de %{model} para"
+      heading: "Nuevo registro de %{model}"
       subheading: "Para:"
 
     login:
-      title: "Iniciar Sesión"
-      heading: "Iniciar Sesión"
-      email_address: &email_address "Correo Eléctronico"
+      title: "Iniciar sesión"
+      heading: "Iniciar sesión"
+      email_address: &email_address "Correo eléctronico"
       name: "Nombre"
       password: "Contraseña"
       remember_me: "Recuerda mis datos"
       login: "Identificación"
-      signup: "Inscripción"
+      signup: "Registro"
       forgot_password: &forgot_password "¿Contraseña olvidada?"
 
     signup:
-      title: "Inscripción"
-      heading: "Inscribir Nuevo Usuario"
+      title: "Registro"
+      heading: "Registrar nuevo usuario"
 
     forgot_password:
       title: *forgot_password
       heading: *forgot_password
-      text: "Ingresa la dirección de tu Correo Eléctronico que utilizaste cuando te inscribiste.
-             Te enviaremos un Correo Eléctronico que podrás utilizar para generar una nueva contraseña."
+      text: "Introduzca la dirección de correo electrónico mediante la cual se registró. Le enviaremos un correo con instrucciones para generar una nueva contraseña."
+             
+             
       email_address: *email_address
-      send: "Enviar"
+      send: "Enviar nueva contraseña"
 
     forgot_password_sent:
-      title: "Contraseña olvidada - Correo Eléctronico enviado"
-      heading: "Contraseña olvidada - Correo Eléctronico enviado"
+      title: "Contraseña olvidada - Correo eléctronico enviado"
+      heading: "Contraseña olvidada - Correo eléctronico enviado"
       text: "El mensaje con las instrucciones para generar una nueva contraseña ha sido enviado a %{email_address}
              Si no lo recibe, por favor verifique el filtro anti-spam."
 
     account_disabled_page:
-      title: "Cuenta Desactivada"
-      heading: "Cuenta Desactivada"
-      text: "Su cuenta está desactivada en ese momento."
+      title: "Cuenta desactivada"
+      heading: "Cuenta desactivada"
+      text: "Su cuenta está desactivada en este momento."
 
     account_page:
-      title: "Tu Perfil"
-      heading: "Tu Perfil"
-      new_password: "Nueva Contraseña"
-      confirm_new_password: "Confirmación Nueva Contraseña"
+      title: "Tu perfil"
+      heading: "Tu perfil"
+      new_password: "Nueva contraseña"
+      confirm_new_password: "Confirmación nueva contraseña"
 
     # default hobo action translation
     actions:
-      new: "Nuevo Registro de %{model}"
+      new: "Nuevo registro de %{model}"
       create: "Crear %{model}"
-      previous: "Precedente"
-      next: "Próxima"
+      previous: "Anterior"
+      next: "Siguiente"
       add: "Añadir"
       show_all: "Muestra todos %{model}..."
       delete: "Borrar %{model}"
@@ -102,12 +103,12 @@ es:
       back_to_parent: "Volver a %{parent} %{name}"
       send: "Enviar"
       remove: "Eliminar"
-      signup: "Inscripción"
+      signup: "Registro"
       login: "Iniciar Sesión"
       logout: "Terminar Sesión"
       logged_in_as: "%{name}"
       account: "Perfil"
-      save_account: "Guarda Tu Perfil"
+      save_account: "Guarda tu perfil"
 
     # default hobo message translation
     messages:
@@ -119,16 +120,16 @@ es:
       transition:
         error: "La transición %{name} no se pudo ejecutar.\n%{errors}"
       update:
-        no_attribute_error: "Ninguna actualización esta especificada en los parámetros"
+        no_attribute_error: "Ninguna actualización está especificada en los parámetros"
         success: "Los cambios a %{model} han sido guardados"
         error: "Ha habido un problema con ese cambio.\n%{errors}"
       destroy:
-        success: "La borradura de %{model} ha sido tenido éxito."
+        success: "La eliminación de %{model} ha sido tenido éxito."
       signup:
-        success: "¡Gracias por inscribirse!"
+        success: "¡Gracias por registrarte!"
         must_activate: "Tiene que activar la cuenta antes de iniciar la sesión. Por favor verifique su correo eléctronico."
       login:
-        success: "La sesión ha iniciado."
+        success: "Ha iniciado la sesión."
         error: "¡No se ingresaron %{login} y Contraseña válidos!"
       logout: "La sesión ha terminado."
       reset_password: "Tu contraseña ha sido reiniciada."
@@ -138,7 +139,7 @@ es:
       validate_password: "debe contener al menos 6 caracteres, letras mayúsculas y minúsculas"
       current_password_is_not_correct: "no está correcta"
       you_are_site_admin: "Ahora usted es el administrador del sitio."
-      you_signed_up: "Usted se inscribió."
+      you_signed_up: "Usted se registró."
       none: "No hay %{model} disponibles."
       confirm: "¿Está seguro?"
 
@@ -159,7 +160,7 @@ es:
     # default hobo form translation
     form:
       new:
-        heading: "Nuevo Registro de %{model}"
+        heading: "Nuevo registro de %{model}"
       error:
         heading: "Ocurrió el siguiente error:"
       select_many:
@@ -186,7 +187,7 @@ es:
 
     admin:
       subsite_name: "Administración"
-      invite_new_user: "Invitar Nuevo Usuario"
+      invite_new_user: "Invitar nuevo usuario"
 
     subsite:
       back_link: "Sitio Principal"
