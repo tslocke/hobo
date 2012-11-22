@@ -1,0 +1,46 @@
+Hobo's Miscellaneous Controller Extensions
+{.document-title}
+
+This chapter of the Hobo Manual describes Hobo's controller extensions.
+
+Contents
+{.contents-heading}
+
+- contents
+{:toc}
+
+   doctest: prepare testapp environment
+   doctest_require: '../prepare_testapp'
+{.hidden}
+
+# Authentication support
+
+## authorized?
+
+This method checks if the user is authorized. It returns true by default. Override this method in your controllers if you want to restrict access to only a few actions or if you want to check if the user has the correct rights.
+
+Example:
+
+      # only allow nonbobs
+      def authorized?
+        current_user.login != "bob"
+      end
+
+## login_required
+
+This is used as a filter to control authentication.
+
+To require logins for all actions, use this in your controllers:
+
+    before_filter :login_required
+
+To require logins for specific actions, use this in your controllers:
+
+    before_filter :login_required, :only => [ :edit, :update ]
+
+To skip this in a subclassed controller:
+
+    skip_before_filter :login_required
+
+
+
