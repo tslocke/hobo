@@ -80,3 +80,44 @@ Refer to the `<swept-cache>` taglib for more information.
 
 
 
+# Model
+
+## Introduction to the Hobo Model Controller Module
+
+This module uses `def included(base)` to run some code in the context of the current controller. Some interesting stuff:
+* Defines @auto_actions as an empty hash if it's not already defined.
+* Runs `extend ClassMethods` to add the ClassMethods module to the current controller.
+* Adds a couple of helpers: `:model, :current_user`
+* Rescues from some errors: `ActiveRecord::RecordNotFound, ActiveRecord::RecordNotFound, Hobo::Model::Lifecycles::LifecycleKeyError`
+* Loads some subsite magic
+
+The rest of this section will talk about the ClassMethods added to the controller.
+
+
+## model_name and model
+
+`model_name` returns `model.name.underscore`
+
+`model` returns `@model` or `controller_name.camelcase.singularize.constantize`
+
+
+## autocomplete
+
+This is the action called by the `<name-one>` tag to autocomplete results. See Autocompleters section in the controller manual.
+
+
+## web_method
+
+See `Web methods` sections in the Controller manual.
+
+
+
+## auto_actions
+
+See `Selecting the automatic actions` in the Controller manual.
+
+
+
+## def_lifecycle_actions
+
+See Lifecycles section in the Controller manual.
