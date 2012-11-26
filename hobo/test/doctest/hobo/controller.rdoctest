@@ -44,3 +44,39 @@ To skip this in a subclassed controller:
 
 
 
+## store_location
+
+Store the URI of the current request in the session. We can return to this location by calling #redirect_back_or_default.
+
+
+
+## redirect_back_or_default(default)
+
+Redirect to the URI stored by the most recent store_location call or to the passed default.
+
+
+
+
+## login_from_cookie and authenticated_user_from_cookie
+
+When called with before_filter, `login_from_cookie` will call `authenticated_user_from_cookie` to check for
+an `auth_token` cookie, and if the result is appropiate, it will log the user in.
+
+
+
+
+## create_auth_cookie
+
+Populates `cookies[:auth_token]` with `current_user` data.
+
+
+
+# Cache
+
+## expire_swept_caches_for(obj, attr=nil)
+
+This method is to be used in the controller as a partner to the `<swept-cache>` tag. 
+Refer to the `<swept-cache>` taglib for more information.
+
+
+
