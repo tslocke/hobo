@@ -1,7 +1,7 @@
 <!-- Tags for caching -->
 
 
-<!-- `<cache>` is a simple fragment cache without the hierarchical dependency tracking used in `<swept-cache>` or `<nested-cache>`.
+<!-- `<hobo-cache>` is a simple fragment cache without the hierarchical dependency tracking used in `<swept-cache>` or `<nested-cache>`.
 
 ### Attributes
 
@@ -24,7 +24,7 @@ controller, action, etc., `params[:page_path]` or the current action
 is used.
 
 -->
-<def tag="cache" attrs="query-params,route-on"><%
+<def tag="hobo-cache" attrs="query-params,route-on"><%
    unless Rails.configuration.action_controller.perform_caching
      %><%= parameters.default %><%
    else
