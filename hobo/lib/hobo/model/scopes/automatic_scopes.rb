@@ -293,6 +293,7 @@ module Hobo
             klass = @klass
             def_scope do |*args|
               field, asc = args
+              field ||= ""
               type = klass.attr_type(field)
               if type.nil? #a virtual attribute from an SQL alias, e.g., 'total' from 'COUNT(*) AS total'
                 colspec = "#{field}" # don't prepend the table name
@@ -321,7 +322,7 @@ module Hobo
             def_scope do |query, *fields|
               match_keyword = %w(PostgreSQL PostGIS).include?(::ActiveRecord::Base.connection.adapter_name) ? "ILIKE" : "LIKE"
 
-              words = query.split
+              words = (query || "").split
               args = []
               word_queries = words.map do |word|
                 field_query = '(' + fields.map { |field|
