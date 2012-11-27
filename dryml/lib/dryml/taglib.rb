@@ -36,7 +36,8 @@
         def taglib_filenames(options)
           plugin       = options[:plugin]
           gem          = options[:gem]
-          app_root     = Object.const_defined?(:Rails) ? Rails.root : Pathname.new(File.expand_path('.'))
+          app_root     = Rails.root if Object.const_defined?(:Rails)
+          app_root   ||= Pathname.new(File.expand_path('.'))
           search_path  = []
           search_path << Dryml.root.join('taglibs') if plugin == 'dryml'
           search_path << Hobo.root.join('lib/hobo/rapid/taglibs') if plugin == 'hobo' || gem == 'hobo'
