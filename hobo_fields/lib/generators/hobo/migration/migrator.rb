@@ -76,12 +76,7 @@ module Generators
 
 
         def load_rails_models
-          if defined? Rails.root
-            Dir["#{Rails.root}/app/models/**/[a-z0-9_]*.rb"].each do |f|
-              _, filename = *f.match(%r{/app/models/([_a-z0-9/]*).rb$})
-              filename.camelize.constantize
-            end
-          end
+          Rails.application.eager_load!
         end
 
 
