@@ -58,14 +58,22 @@ Hobo in development mode is much slower than vanilla Rails, however in
 production mode the speed should be comparable.
 
 Optimizing a Hobo application is very similar to optimizing a Rails
-application, so many of the techniques and online resources which 
+application, so many of the techniques and online resources which
 apply to Rails apps may help for Hobo apps too.
 
+There are some things you can turn on that can significantly speed up
+your Hobo application:
+
+* make sure you are running in production mode
+* [bottom load javascript](http://cookbook.hobocentral.net/manual/changes20#bottomloading_javascript)
+* [explicit push-state](http://cookbook-1.4.hobocentral.net/manual/changes20#pushstate) or [implicit push-state](https://github.com/rails/turbolinks)
+
 There are two major steps to optimizing a Rails application:
+
 + optimizing database access
 + caching
 
-*Optimizing database access* is slightly more difficult in Hobo than in 
+*Optimizing database access* is slightly more difficult in Hobo than in
 Rails because database access in Hobo is usually implicit. To
 optimize, we add an initial efficient explicit access.   For example:
 
@@ -76,6 +84,9 @@ optimize, we add an initial efficient explicit access.   For example:
 
 Make sure that your relationships have the :inverse_of option set on
 both ends or this technique will make things worse rather than better.
+
+Also ensure that every column that you are sorting or searching on is
+indexed in your database.
 
 *Caching* a Hobo application is much easier than caching a Rails
 application. Rails caching is described in the [Caching with Rails
@@ -105,8 +116,7 @@ plumbing working, before starting on your custom pages and controllers
 - migrations only need to happen when you change the data model 
 (ie when you add/delete fields or indexes from files in the models folder)
 - use the rails console if you want to interrogate the database while
-running your 
-app
+running your app
 - run your app in debug mode if you're struggling to work out what's 
 happening in the dryml, controllers, or specifically if you want to 
 understand what "this"is at any specific point.
