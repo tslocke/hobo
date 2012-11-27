@@ -36,21 +36,9 @@
   </table-plus>
   </collection:>
 
-  <custom-javascript:>
-      $(document).ready(function() {
-        setTimeout(function() {
-        var f=function(ev, el) {
-            $(".events").html($(".events").text()+" "+ev.type);
-            return true;
-         };
-         cf=function(cb) {
-            $(".callbacks").html($(".callbacks").text()+" "+cb);
-            return true;
-         };
-         $(document).on({"rapid:ajax:success": f, "rapid:ajax:before":f, "rapid:ajax:error":f, "rapid:ajax:complete":f});
-        }, 2);
-      });
-  </custom-javascript:>
+  <before-custom-scripts:>
+    <javascript name="show2"/>
+  </before-custom-scripts:>
 
   <after-content:>
      <div class="events">events:</div>

@@ -405,6 +405,12 @@ push-state works best in an HTML5 browser.  It works in older browsers
 such as IE8, IE9 or Firefox 3, but results in strange looking URL's.   See
 the README for History.js for more details on that behaviour.
 
+### turbolinks support
+
+[turbolinks](https://github.com/rails/turbolinks) provides capabilities similar to the push-state fragment Ajax described above.  However, rather than updating fragments, it updates the entire page.   This makes it slightly slower but does not require any code modification.
+
+Turbolinks is not compatible with the [bottom-load-javascript](http://cookbook-1.4.hobocentral.net/manual/changes20#bottomloading_javascript) option.
+
 ### plugin generators
 {.part}
 
@@ -495,6 +501,8 @@ pipeline instead.
 Turning on bottom-load will prevent Rails from splitting front.js into
 multiple files even if you enable config.assets.debug in your
 environment.
+
+bottom-load-javascript is incompatible with turbolinks.
 
 ### allowing errors in parts
 {.todo}

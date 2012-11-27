@@ -93,7 +93,7 @@
 </def>
 
 <extend tag="page">
-  <old-page merge bottom-load-javascript>
+  <old-page merge>
     <before-header:>
       <qunit-banner/>
     </before-header:>

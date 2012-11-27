@@ -88,3 +88,5 @@ gem "hobo_tokeninput", :git => "git://github.com/Hobo/hobo_tokeninput"
 # gem 'dryml-firemarker', :require => 'dryml13-firemarker', :group => :development, :path => '/work/dryml-firemarker'
 
 # gem "quiet_assets"
+
+gem "turbolinks"
