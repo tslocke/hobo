@@ -514,9 +514,10 @@ This behaviour may now be overridden by using the 'errors-ok'
 attribute on your form.  (or formlet or whatever other tag initiates
 the Ajax call).
 
-The 'errors-ok' attribute is processed in update_response.   If you've
-supplied a block to hobo_update you will be responsible for
-implementing this functionality yourself.
+The 'errors-ok' attribute is processed in update_response.  If you
+render or redirect inside a block to hobo_update you will be
+responsible for implementing this functionality yourself, or calling
+update_response to do it for you.
 
 ### AJAX file uploads
 {.todo}
@@ -776,23 +777,13 @@ field is named "project.title", parse_sort_param will sort on the
 column "projects.title".
 
 ### controller actions
-{.todo}
+{.done}
 
 Hobo no longer attempts to perform its part-based AJAX actions when
 sent an xhr request. Instead, Hobo performs part-based AJAX when
 params[:render] is set.
 
-The signature for the function update_response and friends has changed.   This should make it useful for use in your application.   It can be used like this:
-
-    def update
-      hobo_update do
-        if params[:foo]==17
-          render_my_way
-        else
-          update_response   # let Hobo handle it all
-        end
-      end
-    end
+The signature for the function update_response, index_response and friends have changed.   This should make it useful for use in your application.  update_response is called automatically by hobo_update if you don't render or redirect inside of the block parameter hobo_update.
 
 ### default controller actions now use respond_with
 
@@ -857,7 +848,7 @@ the change is one I could do myself...)
 - https://github.com/tablatom/hobo/commit/e9460d336ef85388af859e5082763bfae0ad01f5
 
 ### controller changes
-{.todo}
+{.done}
 
 Due to limitations on Ajax file uploads, multipart forms are not sent with the proper Ajax headers.   If your controller action may receive multipart forms, rather than using:
 
@@ -877,7 +868,7 @@ use
 for more information see http://jquery.malsup.com/form/#file-upload
 
 ### hobo_ajax_response
-{.todo}
+{.done}
 
 the `hobo_ajax_response` function now has a different signature.
 Standard usage doesn't supply any arguments to hobo_ajax_response.

@@ -337,3 +337,15 @@ application.dryml or front_site.dryml, simply touch the dryml file for
 your current view. For example, if you touch app/views/foos/show.dryml
 and then reload /foos/17, all changed DRYML files that are required by
 show.dryml will be reloaded.
+
+# What's the difference between `this` and `@foos`
+
+The default index action for a hobo controller named FoosController will assign the list of foos to both `this` and `@foos`.
+
+In the view, `this` will change, always hold the current context while `@foos` won't change unless you do it yourself.
+
+Hobo controllers contain methods that ensure that those two variables always hold the same value.   So these three lines are essentially identical.
+
+     @foos = Foo.all
+     self.this = Foo.all
+     @foos = self.this = Foo.all

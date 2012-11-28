@@ -95,7 +95,6 @@ The action names and routes for these actions are as follows:
 
 It's common for the association name and the class name of the target to be the same (e.g. in an association like `belongs_to :category`). We've deliberately chosen an example where they are different ("author" and "user") in order to show where the two names are used. The association name ("author") is used everywhere except in the `/users` at the beginning of the route.
 
-
 # Instance Variables
 
 As well as setting the default DRYML context, the default actions all make the record, or collection of records, available to the view in an instance variable that follows Rails conventions. E.g. for a 'product' model, the product will be available as `@product` and the collection of products on an index page will be available as `@products`
@@ -178,7 +177,7 @@ Sometimes the implementations Hobo provide aren't what you want. They might be c
 
 ## A cautionary note concerning controller methods
 
-Always start by asking: should this go in the model? It's a very, very, very common mistake to put code in the controller that belongs in the model. Want to send an email in the `create` action? Don't! Send it from an `after_create` callback in the model. Want to check something about the current user before allowing a `destroy` to proceed? Use Hobo's [Permission System](permissions).
+Always start by asking: should this go in the model? It's a very, very, very common mistake to put code in the controller that belongs in the model. Want to send an email in the `create` action? Don't! Send it from an `after_create` callback in the model, or even better: use a lifecycle. Want to check something about the current user before allowing a `destroy` to proceed? Use Hobo's [Permission System](permissions).
 
 Typically, valid reasons to add custom controller code are things like:
 
@@ -206,6 +205,7 @@ The simplest way to customise an action is to write it yourself. Say your advert
 
       def index
         @adverts = Advert.published.all
+        respond_with(@adverts)
       end
 
     end
@@ -213,8 +213,18 @@ The simplest way to customise an action is to write it yourself. Say your advert
 
 In other words you don't need to do anything different than you would in a normal Rails action. Hobo will look for either `@advert` (for actions which expect an ID) or `@adverts` (for index actions) as the initial context for a DRYML page.
 
-(Note: In the above example, we've asked for the default `index` action and then overwrote it. It might have been neater to say "`auto_actions :all, :except => :index`" but it really doesn't matter.)
+Note: In the above example, we've asked for the default `index` action and then overwrote it.  That way Hobo also creates the route for us.
 
+The above example won't perform Hobo's part AJAX.   If you need this, you can use
+
+      def index
+        @adverts = Advert.published.all
+        if request.xhr?
+          hobo_ajax_response
+        else
+          respond_with(@adverts)
+        end
+      end
 
 ## Customising Hobo's implementation
 
@@ -262,7 +272,7 @@ The correct place to perform a redirect is in a block passed to `hobo_update`. A
     end
 {.ruby}
 
-The problem this time is that we almost certainly don't want to do that redirect if there were validation errors during the update. As with the typical Rails pattern, validation errors are handled by re-rendering the form (along with the error messages). Hobo provides a method `valid?` for these situations:
+The problem this time is that we almost certainly don't want to do that redirect if there were validation errors during the update.   As with the typical Rails pattern, validation errors are handled by re-rendering the form (along with the error messages). Hobo provides a method `valid?` for these situations:
 
     def update
       hobo_update do
@@ -271,82 +281,61 @@ The problem this time is that we almost certainly don't want to do that redirect
     end
 {.ruby}
 
-If the update was valid, the above redirect will happen. If it wasn't, the block won't respond so Hobo's response will kick in and re-render the form. Perfect!
+If the update was valid, the redirect will proceed. If it wasn't, the block won't respond so Hobo's response will kick in and re-render the form. Perfect!
 
 If you want access to the object either in the block or after the call to `hobo_update`, it's available either as `this` or in the conventional Rails instance variable, in this case `@advert`.
 
-### Handling different formats
-
-By default, the response block is only called if an HTML response is required. If you want to handle other response types, declare a block with a single argument. The "format" object from Rails' `respond_to` will be passed. The typical usage would be:
-
-    def update
-      hobo_update do |format|
-        format.html { ... }
-        format.js   { ... }
-      end
-    end
-{.ruby}
-
-
 ### Passing options
 
-Here's another example of tweaking one of the automatic actions. The `hobo_*` methods can all be passed a range of options. Here's a simple example: changing the page size on an index page:
+In previous versions of Hobo, options to hobo controller actions were documented in this manual chapter.  They are still available for backwards compatibility reasons, but are not recommended for use in new applications.
+
+Using options, you could pass a finder, options for will_paginate, and options for find.
+
+To adjust the finder and/or adjust will_paginate options, simply assign to self.this before calling the controller action.
 
     def index
-      hobo_index :per_page => 10
+      self.this = Foo.paginate(:page => params[:page] || 1, :per_page => 10)
+      hobo_index
     end
 {.ruby}
 
-That's pretty much all there is to customizing Hobo's automatic actions: define the action as a public method in which you call the appropriate `hobo_*` method, passing it parameters and/or a block.
+Note that `self.this = ...` is equivalent to `@foos = ...` in hobo controllers.  Both @foos and this will be assigned no matter which form you use.
 
-The remainder of this guide will cover the parameters available to each of the `hobo_*` methods.
+In Rails 3.0 and greater, the use of `find` is discouraged.   The use of scopes and `where` provides more idiomatic Rails 3.0 code.   So rather than passing `:order_by => "name asc", :include => :foos` as an option to hobo_index, you can use scopes on self.this
 
-Note that you can also pass these options directly to the `index_action` and `show_action` declarations, e.g.:
-
-    index_action :table, :per_page => 10
+    def index
+      hobo_index do
+        self.this = this.order_by("name asc").includes(:foos)
+      end
+    end
 {.ruby}
 
 # The default actions
 
 In this section we'll go through each of the action implementations that Hobo provides.
 
-## `hobo_index`
+## `hobo_index` and `index_response`
 
-`hobo_index` takes a "finder" as an optional first argument, and then options. A finder is any object that supports the `find` and / or `paginate` methods, such as an ActiveRecord model class, a `has_many` association, or a scope.
+`hobo_index` does a paginated query if self.this is not yet set, and then calls any supplied block.   If the block has not rendered or redirected, it calls `index_response`.   `index_response` calls either `hobo_ajax_response` or `respond_with` as appropriate.
 
-### Find options
+## `hobo_show`, `find_instance` and `show_response`
 
-Any of the standard ActiveRecord find options you pass are forwarded to the find method. This is particularly useful with the `:include` option to avoid the dreaded N+1 query problem.
+`hobo_index` calls `find_instance` if self.this is not yet set, and then calls any supplied block.   If the block has not rendered or redirected, it calls `show_response`.   `show_response` calls either `hobo_ajax_response` or `respond_with` as appropriate.
 
-### Pagination
+`find_instance` essentially does
 
-Turn pagination on or off by passing true/false to the `:paginate` option. If not specified Hobo will guess based on the value of `request.format`. It's normally on, but won't be for things like XML and CSV. When pagination is on, any other options to `hobo_index` are forwarded to the `paginate` method from will-paginate, so you can pass things like `:page` and `:per_page`. If you don't specify `:page` it defaults to `params[:page]` or if that's not given, the first page.
-
-### Scope
-
-The finder may be filtered via a scope in a fashion similar to [how an
-association is scoped](/manual/scopes#scoping_associations).
-
-## `hobo_show`
-
-Options to `hobo_show` are forwarded to the method `find_instance` which does:
-
-    model.user_find(current_user, params[:id], options)
+    model.user_find(current_user, params[:id])
 {.ruby}
 
 `user_find` is a method added to your model by Hobo which combines a normal find with a check for view permission.
 
-As with `hobo_index`, a typical use would be to pass `:include` to do eager loading.
-
-
 ## `hobo_new`
 
-`hobo_new` will either instantiate the model for you using the `user_new` method from Hobo's permission system, or will use the first argument (if you provide one) as the new record.
-
+`hobo_new` will either instantiate the model for you using the `user_new` method from Hobo's permission system if you have not already supplied it in `self.this`.  If you do not redirect or render in a supplied block, `show_response` is then called.
 
 ## `hobo_create`
 
-`hobo_create` will instantiate the model (using `user_new`), or take the first argument if you provide one.
+`hobo_create` will instantiate the model (using `user_new`) if you have not already supplied it in `self.this`
 
 The attributes hash for this new record are found either from the option `:attributes` if you passed one, or from the conventional parameter that matches the model name (e.g. `params[:advert]`).
 
@@ -358,17 +347,13 @@ The response (assuming you didn't respond in the block) will handle
  - re-rendering the form if not (or sending textual validation errors back to an ajax caller)
  - performing Hobo's part updates as required for ajax requests
 
-
 ## `hobo_update`
 
-`hobo_update` has the same behaviour as `hobo_create` except that the record is found rather than created. You can pass the record as the first argument if you want to find it yourself.
-
-The response is also essentially the same as `hobo_create`, with some extra smarts to support the in-place-editor from Script.aculo.us.
-
+`hobo_update` has the same behaviour as `hobo_create` except that the record is found rather than created. You can pass the record in `self.this` if you want to find it yourself.
 
 ## `hobo_destroy`
 
-The record to destroy is found using the `find_instance` method, unless you provide it as the first argument.
+The record to destroy is found using the `find_instance` method, unless you provide it in `self.this`.
 
 The actual destroy is performed with:
 
@@ -377,7 +362,7 @@ The actual destroy is performed with:
 
 which performs a permission check first.
 
-The response is either a redirect or an ajax part update as appropriate.
+The response is either a redirect or an ajax part update as appropriate unless you have rendered or redirected in a supplied block.
 
 ## Owner actions
 
@@ -404,27 +389,7 @@ The `hobo_create`, `hobo_update` and `hobo_destroy` actions all set reasonable f
 
 The `hobo_create`, `hobo_create_for`, `hobo_update` and `hobo_destroy` actions all perform a redirect on success.
 
-## Block Response
-
-If you supply a block to the `hobo_*` action, no redirection is done so that it may be performed by the block:
-
-    def update
-      hobo_update do
-        redirect_to my_special_place if valid?
-      end
-    end
-{.ruby}
-
 ## the :redirect parameter
-
-If you supply a block to the `hobo_*` action, you must redirect or render all potential formats.  But what if you want to supply a redirect for HTML requests, but let Hobo handle AJAX requests?  In this case you can supply the `:redirect` option to `hobo_*`:
-
-    def update
-      hobo_update :redirect => my_special_place
-    end
-{.ruby}
-
-`:redirect` is only used for valid HTML requests.
 
 The `:redirect` option may be one of:
 
