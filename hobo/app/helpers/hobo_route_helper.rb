@@ -123,11 +123,14 @@ module HoboRouteHelper
       poly = [options[:subsite]] + poly if options[:subsite]
 
       begin
-        url = polymorphic_path(poly, params)
+        base_url = url = polymorphic_path(poly, params)
         # validate URL, since polymorphic URL may return a URL for a
         # different method
         # use starts_with because recognize path may return new_for_owner, for example
-        recognized_params = Rails.application.routes.recognize_path(url, {:method => options[:method]})
+        if Rails.application.config.action_controller.relative_url_root
+          base_url = url.gsub(/^#{Rails.application.config.action_controller.relative_url_root}/, "")
+        end
+        recognized_params = Rails.application.routes.recognize_path(base_url, {:method => options[:method]})
         if recognized_params[:action] == action.to_s
           url
         else
