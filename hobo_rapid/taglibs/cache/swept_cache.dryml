@@ -159,6 +159,10 @@ but it is supported by most non-trivial caches via one of several
 mechanisms, either through list support (Redis), and some
 caches support transactions (Infinispan).
 
+#### consistent
+
+If a cache for a single process is updated, the caches for all processes must also be updated.
+
 #### supported caches
 
 memory_store: not compliant, but can be used for development if the size is set large enough to avoid evictions.
