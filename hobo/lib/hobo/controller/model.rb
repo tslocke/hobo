@@ -429,12 +429,12 @@ module Hobo
 
     def response_block(&b)
       if b
-        respond_to do |format|
-          if b.arity == 1
+        if b.arity == 1
+          respond_with(@this) do |format|
             yield format
-          else
-            format.html { yield }
           end
+        else
+          yield
         end
         performed?
       end
