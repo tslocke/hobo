@@ -511,7 +511,7 @@ module Hobo
     end
 
     def hobo_new(record=nil, &b)
-      self.this = record || model.user_new(current_user, attribute_parameters)
+      self.this ||= record || model.user_new(current_user, attribute_parameters)
       response_block(&b) || show_response
     end
 
@@ -535,7 +535,7 @@ module Hobo
 
     def hobo_new_for(owner, record=nil, &b)
       owner, association = find_owner_and_association(owner)
-      self.this = record || association.user_new(current_user, attribute_parameters)
+      self.this ||= record || association.user_new(current_user, attribute_parameters)
       response_block(&b) || show_response
     end
 
