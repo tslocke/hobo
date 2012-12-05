@@ -97,7 +97,7 @@ module Hobo
       end
 
       def account_active?
-        lifecycle.active_state?
+        !self.class.has_lifecycle? || lifecycle.active_state?
       end
 
       # Encrypts the password with the user salt
