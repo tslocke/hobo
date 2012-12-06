@@ -430,7 +430,7 @@ module Hobo
     def response_block(&b)
       if b
         if b.arity == 1
-          respond_with(@this) do |format|
+          respond_to do |format|
             yield format
           end
         else
