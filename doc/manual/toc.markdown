@@ -48,6 +48,9 @@ Hobo's extensions to [Active Record](http://ar.rubyonrails.org/).
 extensions to
 [Action Controller](http://api.rubyonrails.org/classes/ActionController/Base.html)
 
+[**Miscellaneous Controller Extensions**](/manual/controller) document the rest of
+Hobo's extensions to [Action Controller](http://api.rubyonrails.org/classes/ActionController/Base.html).
+
 ## Action View
 
 [**DRYML**](/manual/dryml-guide) is a template language that allows you to
