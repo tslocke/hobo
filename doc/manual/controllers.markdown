@@ -310,6 +310,30 @@ In Rails 3.0 and greater, the use of `find` is discouraged.   The use of scopes 
     end
 {.ruby}
 
+### Alternate Response Formats
+
+Hobo 2.0 uses a respond_with block to render its responses.   Therefore, you can add a [respond_to](http://apidock.com/rails/ActionController/MimeResponds/ClassMethods/respond_to) declaration to your class and Hobo will also render those types.
+
+    respond_to :html, :json
+
+The default is `respond_to :html`.   Hobo controller actions also respond to part AJAX, although that is done outside of the respond_with block, so you do not have to add `:js` to your respond_to declaration for part AJAX.
+
+The default respond_with handlers return the context.   If you need a custom response you can render it before the hobo action or inside of a block passed to the hobo action:
+
+    hobo_show do
+      render foo if request.format.pdf?
+    end
+
+If your block takes a parameter (aka has an arity of 1), Hobo will open up a respond_to block for you:
+
+    hobo_show do |format|
+      format.pdf { render foo }
+    end
+
+Note that this is a respond_to block, not a respond_with block.
+
+The hobo action will only render or redirect if you do not render or redirect before the action or inside the block.
+
 # The default actions
 
 In this section we'll go through each of the action implementations that Hobo provides.
