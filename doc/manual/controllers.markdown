@@ -334,6 +334,8 @@ Note that this is a respond_to block, not a respond_with block.
 
 The hobo action will only render or redirect if you do not render or redirect before the action or inside the block.
 
+Note that the JSON and XML interfaces will only use coarse grained model-level permission checking rather than fine grained attribute level permission checking.
+
 # The default actions
 
 In this section we'll go through each of the action implementations that Hobo provides.
