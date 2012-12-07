@@ -64,11 +64,14 @@ an `auth_token` cookie, and if the result is appropiate, it will log the user in
 
 
 
-
+/manual/users_and_authentication#hobo_user_controller
 ## create_auth_cookie
-
+/manual/users_and_authentication#hobo_user_controller
 Populates `cookies[:auth_token]` with `current_user` data.
 
+
+
+See also the [Hobo User Controller section](/manual/users_and_authentication#hobo_user_controller) in the Users and Authentication manual.
 
 
 # Cache
