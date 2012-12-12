@@ -7,7 +7,7 @@
     timestamps
 <% end -%>
   end
-  attr_accessible <%= accessible_attributes.map {|a| ":#{a.name}"}.join ", " %>
+  attr_accessible <%= accessible_attributes.map {|a| ":#{a}"}.join ", " %>
 
 <% for bt in bts -%>
   belongs_to :<%= bt %>

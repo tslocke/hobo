@@ -39,7 +39,7 @@ module Generators
       end
 
       def accessible_attributes
-        field_attributes + bts.map {|bt| bt+"_id"} + bts + hms
+        field_attributes.*.name + bts.map {|bt| "#{bt}_id"} + bts + hms
       end
 
       def hms
