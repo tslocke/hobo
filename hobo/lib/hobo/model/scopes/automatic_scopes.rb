@@ -31,6 +31,8 @@ module Hobo
         def create_scope(check_only=false)
           matched_scope = true
 
+          like_operator = ActiveRecord::Base.connection.adapter_name =~ /postg/i ? 'ILIKE' : 'LIKE'
+
           case
           # --- Association Queries --- #
 
@@ -152,7 +154,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} LIKE ?", "%#{str}%"
+              @klass.where "#{column_sql(col)} #{like_operator} ?", "%#{str}%"
             end
 
           # name_does_not_contain
@@ -160,7 +162,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} NOT LIKE ?", "%#{str}%"
+              @klass.where "#{column_sql(col)} NOT #{like_operator} ?", "%#{str}%"
             end
 
           # name_starts(str)
@@ -168,7 +170,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} LIKE ?", "#{str}%"
+              @klass.where "#{column_sql(col)} #{like_operator} ?", "#{str}%"
             end
 
           # name_does_not_start
@@ -176,7 +178,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} NOT LIKE ?", "#{str}%"
+              @klass.where "#{column_sql(col)} NOT #{like_operator} ?", "#{str}%"
             end
 
           # name_ends(str)
@@ -184,7 +186,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} LIKE ?", "%#{str}"
+              @klass.where "#{column_sql(col)} #{like_operator} ?", "%#{str}"
             end
 
           # name_does_not_end(str)
@@ -192,7 +194,7 @@ module Hobo
             return true if check_only
 
             def_scope do |str|
-              @klass.where "#{column_sql(col)} NOT LIKE ?", "%#{str}"
+              @klass.where "#{column_sql(col)} NOT #{like_operator} ?", "%#{str}"
             end
 
           # published (a boolean column)
