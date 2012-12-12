@@ -135,20 +135,28 @@ But the Hobo scope form allows us to supply several variations
 
 ## \_contains
 
+Case insensitive.
+
     >> Person.name_contains("y").*.name
     => ["Bryan", "Bethany"]
 
 ## \_does\_not\_contain
 
-    >> Person.name_does_not_contain("B").*.name
+Case insensitive.
+
+    >> Person.name_does_not_contain("b").*.name
     => []
 
 ## \_starts
 
-    >> Person.name_starts("B").*.name
+Case insensitive.
+
+    >> Person.name_starts("b").*.name
     => ["Bryan", "Bethany"]
 
 ## \_does\_not\_start
+
+Case insensitive.
 
     >> Person.name_does_not_start("B").length
     => 0
