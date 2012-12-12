@@ -68,7 +68,7 @@ module Hobo
           flash[:error] = options[:failure_notice]
           hobo_ajax_response if request.xhr? && !performed?
         else
-          self.sign_user_in(user, options){ yield if block_given?}
+          self.sign_user_in(user, options, &block)
         end
       end
     end
@@ -166,7 +166,12 @@ module Hobo
       old_user = current_user
       self.current_user = user
 
-      yield if block_given?
+      if block_given?
+        unless yield
+          self.current_user = nil
+          return
+        end
+      end
 
       if !user.account_active?
         # account not activate - cancel this login
