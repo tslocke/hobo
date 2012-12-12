@@ -18,6 +18,12 @@ Assuming the context is a blog post...
 
         <view/> -> <span class="view model:blog-post-1"><a href="/blog_posts/1">My First Blog Post</a></span>
 
+### if-blank
+
+The `if-blank` attribute can be used to provide alternate content if `this.blank?`.
+
+        <view if-blank="(None)"/>
+
 ### Additional Notes
 
 * The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` or `block` attributes to force a `<span>` or a `<div>`, e.g.
@@ -27,6 +33,7 @@ Assuming the context is a blog post...
         <view:body inline/> -> <span class="view blog-post-body">This is my blog post body</span>
 
         <view:created_at block/> -> <div class="view blog-post-created-at">June 09, 2008 15:36</div>
+
 * Use the `no-wrapper` attribute to remove the wrapper tag completely. e.g.
 
         <view:created_at no-wrapper/> -> June 09, 2008 15:36
