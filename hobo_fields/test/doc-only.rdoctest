@@ -16,6 +16,10 @@ First off, if you're using the migration generator outside of Hobo, do remember 
 
         $ rails generate model blog_post --skip-migration
 
+If you're using Hobo:
+
+        $ rails generate hobo:model blog_post
+
 Now edit your model as follows:
 
     class BlogPost < ActiveRecord::Base
@@ -60,11 +64,7 @@ The simplest and recommended way to install HoboFields is as a gem:
 
 The source lives on GitHub as part of the main Hobo repo:
 
- - [http://github.com/tablatom/hobo](http://github.com/tablatom/hobo)
-
-To use hobo_fields as a plugin is not as simple as it should be.  You
-will have to clone `git://github.com/tablatom/hobo` and then copy the
-`hobo_fields` subdirectory into `/vendors/plugins`
+ - [http://github.com/Hobo/hobo](http://github.com/Hobo/hobo)
 
 ## Rich Types
 

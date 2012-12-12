@@ -17,7 +17,7 @@ The migration generator works by:
 
 Normally you would run the migration generator as a regular Rails generator. You would type
 
-    $ script/generator hobo_migration
+    $ rails generate hobo:migration
 
 in your Rails app, and the migration file would be created in `db/migrate`.
 
