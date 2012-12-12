@@ -24,6 +24,12 @@ The `if-blank` attribute can be used to provide alternate content if `this.blank
 
         <view if-blank="(None)"/>
 
+### force
+
+The `force` attribute causes the permission check to be skipped.
+
+        <view force/>
+
 ### Additional Notes
 
 * The wrapper tag is `<span>` unless the field type is `Text` (different to `String`) where it is `<div>`. Use the `inline` or `block` attributes to force a `<span>` or a `<div>`, e.g.
@@ -38,9 +44,9 @@ The `if-blank` attribute can be used to provide alternate content if `this.blank
 
         <view:created_at no-wrapper/> -> June 09, 2008 15:36
 -->
-<def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate"><%=
+<def tag="view" attrs="inline, block, if-blank, no-wrapper, truncate, force"><%=
   raise Hobo::PermissionDeniedError, "view of non-viewable field '#{this_field}' of #{this_parent.typed_id rescue this_parent}" unless
-    can_view?
+    force || can_view?
 
   res = if this.nil? && if_blank.nil?
           this_type.is_a?(Class) && this_type <= String ? "" : nil_view
