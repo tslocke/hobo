@@ -67,6 +67,7 @@ your Hobo application:
 * make sure you are running in production mode
 * [bottom load javascript](http://cookbook.hobocentral.net/manual/changes20#bottomloading_javascript)
 * [explicit push-state](http://cookbook-1.4.hobocentral.net/manual/changes20#pushstate) or [implicit push-state](https://github.com/rails/turbolinks)
+* turning off permission checks by passing `force` to `<view>`, `ignore` to `<input>` and `force_all` to field lists.
 
 There are two major steps to optimizing a Rails application:
 
@@ -95,8 +96,7 @@ caching and action caching are identical in both Hobo & vanilla Rails,
 but [Hobo adds several tags to make fragment caching much
 easier](http://cookbook-1.4.hobocentral.net/api_taglibs/cache).
 
-There will eventually be a blog post and/or manual page or something
-describing Hobo 2.0 caching support in more detail. Hopefully soon.
+There's a [tutorial describing the Hobo caching tags](/tutorials/caching)
 
 # What's a good development cycle?
 
