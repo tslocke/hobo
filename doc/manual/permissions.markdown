@@ -233,6 +233,8 @@ Similarly, if a virtual attribute is read-only in the Ruby sense (it has no sett
 
 Tip: if a particular attribute can *never* be edited by any user, it's simplest to just declare it as `attr_protected` or `attr_readonly` (read-only attributes can be set on creation, but not changed later). If the ability to change the attribute either depends on the state of the record, or varies from user to user, `attr_protected` and the rest are not flexible enough -- define permission methods instead.
 
+Note that in recent versions of Rails, `config.active_record.whitelist_attributes = true` is added to `config/application.rb`.   This setting means that your application *must* include an `attr_accessible` declaration.   It's safe to turn this configuration item off if you are only using hobo models, `create_permitted?` and `edit_permitted?` will thoroughly protect your models.
+
 We'll now take a look at how `edit_permitted?` is provided automatically, and then cover the details of defining edit permission yourself.
 
 ### Deriving edit permission
@@ -510,9 +512,7 @@ At some point we may add an option to the generators so you will only get `admin
  
 # View helpers
 
-TO DO
-
-Quick version - five permission related view-helpers are provided:
+Five permission related view-helpers are provided:
 
  - `can_create?(object=this)`
  - `can_update?(object=this)`
@@ -520,14 +520,32 @@ Quick version - five permission related view-helpers are provided:
  - `can_delete?(object=this)`
  - `can_call?` -- arguments are an object and a method name (symbol), or just a method name (assumes `this` as the object)
 
+`can_create?` is simply a shorthand for `this.creatable_by?(current_user)`.
+
 
 # Permissions in the Rapid tag library
 
-TO DO (use of permissions by view, input, form etc.)
+Permissions are used throughout Rapid, but you'll encounter them most often when using `<form>`, `<input>` and `<view>`.
 
+## form
+
+`<form>` does the appropriate permission check.   If the check fails, it sends a message to the log, sets `last_if` to false and renders nothing.   This can be quite surprising to users.   You can take advantage of `last_if` to display alternate content:
+
+    <form/>
+    <else> You do not have permission to view this form </else>
+
+## input & view
+
+`<input>` is divided into two parts.   An untyped `<input>` is first called, which does a permission check.   If the permission check passes, the appropriate typed `<input>` does the actual rendering.
+
+The untyped `<input>` has an attribute `no-edit` which determines the desired behaviour when a permission check is not desired.   See `<input>` for more details.
+
+`<view>` throws a `Hobo::PermissionDeniedError` if a permission check fails, which will result in the display of `<permission-denied-page>` unless you have changed the default behaviour as described in [the controller manual](/manual/controllers#permission_and_notfound_errors)
+
+## field-lists
+
+The field-list tags `<field-list-v1>`, `<feckless-fieldset>` and `<bootstrap-fields>` do permission checks and skip all fields without permissions unless the `force-all` attribute is set.
 
 # Why no roles?
-
-TO DO
 
 People often expect a role based permissions system. What we've provided is a simple general-purpose system. There are many different ways to build a role-based system. We've just provided the tools with which to build one if you need one.
