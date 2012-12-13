@@ -90,6 +90,7 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     click_button "Add"
     assert has_content?("The Task was created successfully")
 
+    # test sortable-collection
     find("ul.tasks li:last .ordering-handle").drag_to(find("ul.tasks li:first .ordering-handle"))
     sleep 1
     visit page.current_path
@@ -184,8 +185,5 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     find("input.delete-project-membership-button").click
     page.driver.browser.switch_to.alert.accept
     assert find("ul.memberships").has_no_text?("Second User")
-
-    # TODO: test sortable-collection
-
   end
 end
