@@ -41,7 +41,7 @@ class LifecycleTest < ActionDispatch::IntegrationTest
 
     visit "/foos/new"
     click_button "Create Foo"
-    click_button "Trans1"
+    find('input[value=Trans1]').click
     uncheck "foo[v]"
     sleep 1
     click_button "Trans1"

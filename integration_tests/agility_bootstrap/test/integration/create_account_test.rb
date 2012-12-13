@@ -178,7 +178,7 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
 
     # add project members
     fill_in "project_membership[user]", :with => "Second User"
-    click_link "Second User"
+    find("a:contains('Second User')").click
     find("form.project-membership input[type=text]").native.send_key(:enter)
     assert find("ul.memberships").has_text?("Second User")
 
