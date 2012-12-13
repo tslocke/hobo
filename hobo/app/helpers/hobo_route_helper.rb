@@ -165,12 +165,18 @@ module HoboRouteHelper
     def recognize_page_path
       # round tripping params through the router will remove
       # unnecessary params
-      url = params[:page_path] || url_for(params)
+      if params[:page_path]
+        url = params[:page_path]
+        method = "GET"
+      else
+        url = url_for(params)
+        method = request.method
+      end
       if ENV['RAILS_RELATIVE_URL_ROOT']
         url.gsub!(/^#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
         url.gsub!(/^https?:\/\/.*?#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
       end
-      Rails.application.routes.recognize_path(url)
+      Rails.application.routes.recognize_path(url, :method => method)
     end
 
     def url_for_page_path(options={})
