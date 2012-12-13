@@ -71,6 +71,10 @@ module Hobo
 
 
     def ajax_update_response(render_specs, results={}, options={})
+      if render_specs.blank?
+        render :js => ''
+        return
+      end
       controller, action = controller_action_from_page_path
       identifier = view_context.view_paths.find( action,
                                                  controller,
