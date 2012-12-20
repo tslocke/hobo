@@ -340,13 +340,12 @@ Hobo 2.0 currently requires Rails 3.2 for operation.
 ## Enhancements
 
 ### Nested caching
-{.todo}
+{.done}
 
-See the docs for `<nested-cache>` and the blog post I'm going to
-eventually write...
+See the docs for `<nested-cache>` and the [caching-tutorial](/tutorials/caching).
 
 ### push-state
-{.todo}
+{.done}
 
 AJAX now supports a new AJAX option 'push-state' if you have
 History.js installed.   It was inspired by [this
@@ -505,7 +504,7 @@ environment.
 bottom-load-javascript is incompatible with turbolinks.
 
 ### allowing errors in parts
-{.todo}
+{.done}
 
 Older versions of Hobo did not render a part update if the update did
 not pass validation.
@@ -561,7 +560,7 @@ itself, and passes the element as an argument.
      </new-page>
 
 ### before callback
-{.todo}
+{.done}
 
 A new callback has been added to the list of Ajax Callbacks: before.
 This callback fires before any Ajax is done.   If you return false
@@ -570,7 +569,7 @@ explicitly return true if you use it and don't want your ajax
 cancelled.
 
 ### callbacks
-{.todo}
+{.done}
 
 Normally in HTML you can attach either a snippet of javascript or a
 function to a callback.
@@ -589,7 +588,7 @@ Now you can just return the function name:
     <form ajax success="fbar"/>
 
 ### `hide` and `show` ajax options
-{.todo}
+{.done}
 
 There are two new ajax options: `hide` and `show`.  These are passed
 directly to the jQuery-UI `hide` and `show` functions.  See
@@ -619,7 +618,7 @@ If, after changing the default you wish to disable effects on one specific ajax 
 Note that these effects require jQuery-UI.  You will get Javascript errors if you attempt to use effects and do not have jQuery-UI installed.
 
 ### spinner options
-{.todo}
+{.done}
 
 By default, the spinner is now displayed next to the element being
 updated.  Besides the old `spinner-next-to` option, there are a number

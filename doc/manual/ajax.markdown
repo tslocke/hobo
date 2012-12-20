@@ -16,23 +16,26 @@ Contents
 # Editors
 
 [Editors](/api_taglibs/rapid_editing) are perhaps the easiest way of
-using Ajax.  Editors act like standard views until they are clicked
-on.   Once clicked, they transform into an input so the user may
-modify them.  When the input loses focus, the update is sent
-asynchronously to Hobo.
+using Ajax.  Editors act like standard views with live-editing capability: changes made to them are sent to the server immediately.
+
+There are two types of editors: `<live-editor>` and `<click-editor>`.
+Live editors always display the `<input>` form of the data.  Click
+editors display the `<view>` form until they are clicked on when they
+switch to the `<input>` form.  When the user moves away form the click
+editor, it transforms back into the `<view>` form.
 
 Perhaps the easiest way of using editors is to [convert your show
 page](/tutorials/agility#story-status-ajaxified) to use editors
 instead of views:
 
      <show-page>
-        <field-list: tag="editor" />
+        <field-list: tag="click-editor" />
      <show-page>
 
 If you want a single editor, all you have to do is declare it in the
 context of a field:
 
-     <editor:name/>
+     <click-editor:name/>
 
 Editors fall back to use a view if the user does not have edit
 permissions.  (Edit permission also requires view permission).  So if
@@ -40,30 +43,23 @@ you do not see the expected editor, check your permissions.
 
 ## Extending Editors
 
-The client-side functionality for Hobo's editors is provided by
-script.aculo.us' [Ajax.InPlaceEditor](http://wiki.github.com/madrobby/scriptaculous/ajax-inplaceeditor).  
+Because `<click-editor>` and `<live-editor>` use AJAX parts internally, they are not directly customizable.   Instead, you may utilize the customizable `<click-editor-innards>` and `<live-editor-innards>` directly by providing your own part.  The part name is not significant.
 
-To create an editor for your rich type, start by copying and modifying
-the definition for a similar type, such as `<editor for='string'>`.
-You will also need to add behaviour to your application.js.  You can
-find several examples in hobo-rapid.js:
+    <part name="my-part">
+      <click-editor-innards>
+        <view: replace>
+          My <view restore/>
+        </view:>
+      </click-editor-innards>
+    </part>
 
-    Event.addBehavior({    
-      '.my-rich-type.in-place-edit:change' : function (ev) {
-        // Ajax.InPlaceEditor options to override the Hobo defaults
-        var options = {};  
-        var ipe = Hobo._makeInPlaceEditor(this, options);
-        ipe.getText = function() {
-            return this.element.innerHTML.gsub(/<br\s*\/?>/, "\n").unescapeHTML();
-        }
-      }});
+The most useful parameters to customize are the `view`, `blank-view` and `input` parameters on `<click-editor>` and the `input` parameter on `<live-editor>`.
 
-If you need to pass data down into your javascript, one option is to
-use classdata:
+`<click-editor>`, `<live-editor>`, `<click-editor-innards>` and `<live-editor-innards>` are not polymorphic.   They do utilize the polymorphic `<input>` and `<view>` tags, so any customizations you do for those tags will be picked up and utilized.
 
-    <editor:name class="#{css_data(:rows, 2)}">
+## Backwards Compatibility
 
-    var options = {rows: parseInt(Hobo.getClassData(el, "rows"))};
+The `<editor>` tag simply selects either `<live-editor>` or `<click-editor>`, depending on which one most closely mimics the functionality available in Hobo 1.3 or earlier.  But it is not simply a backwards compatibility shim, it is useful in its own right -- feel free to use it in new code if you feel it is appropriate.
 
 # Forms
 
@@ -84,7 +80,7 @@ After an Ajax form has been submitted, Hobo can update any part of the
 page you mark as a part and then specify in the update attribute:
 
     <edit-page:>
-      <content-body:>      
+      <content-body:>
         <count:comments part="count"/>
         <form update="count" />
       </content-body:>
@@ -96,145 +92,231 @@ The update attribute technically has to be set to the DOM id of the
 part rather than the part name.   Normally that's not an issue since
 the default DOM id for a part is the part name.
 
-However, if you use a `<repeat>` or a `<table>` to display a part more
-than once, you'll need to specify the ID explicitly.
+Hobo adds two new attributes to make this simpler.  Instead of `update`, you can instead use `updates` or `ajax`.
 
-    <repeat:comments>
-      <do part="comment" id="comment-#{this_field}">
-        <form update="comment-#{this_field}"/>
-      </do>
-    </repeat>
+`updates` uses a jQuery/CSS selector instead of a DOM id.   So `updates="#foo"` is the same as `update="foo"`.
 
-In Hobo, `this_field` contains the key if you're iterating over a
-hash, or the index into the array if you're iterating over an array.
+The `ajax` attribute specifies that the enclosing part is to be updated.   In this example, the part named `foo` would be updated:
 
-[Tom wrote a
-recipe](http://cookbook.hobocentral.net/recipes/8-use-parts-on-repeated-elements)
-that covers this topic in further detail.
+    <part name="foo">
+      <form ajax/>
+    </part>
 
-## Other form attributes
+## Multiple parts
 
-An Ajax form supports all of the Ajax attributes and Ajax callbacks
-listed on the [Rapid Forms manual index
-page](/api_taglibs/rapid_forms).  These attributes include `update`,
-`params`, `confirm`, `message`, and `spinner-next-to`.  They also
-support the attributes `reset-form` and `refocus-form`, which are
-documented on the [form manual page](/api_tag_defs/form).
+In Hobo 1.3, it was illegal to have two parts with the same name.  Hobo 2.0 automatically renames duplicate part names.  A renamed part will be inaccessible using the `update` attribute, but can be accessed using the `updates` or `ajax` attributes.
 
-# Other Ajax mechanisms
+For example:
 
-Several other tags in Rapid support the [standard Ajax
-attributes](/api_taglibs/rapid_forms) (update, params, confirm,
-message and spinner-next-to).  These tags work very similarly to
-`<form>`, so refer to the documentation above as well as the manual
-page.
+    <repeat>
+      <part name="foo">
+        <form update="foo">
+          ...
 
- - [remote-method-button](/api_tag_defs/remote-method-button):
-   Provides a button to invoke a web method (RPC call) on an object.
+If there is more than one item in the list, then only the first part will have the DOM id "foo".   So if you submit the second form, Hobo would update the first form.   This is easily fixed:
 
- - [update-button](/api_tag_defs/update-button): similar to an Ajax
-   form containing zero or more hidden inputs and a submit button
+    <repeat>
+      <part name="foo">
+        <form ajax>
+          ...
 
- - [create-button](/api_tag_defs/create-button): similar to `<form
-   with="&Foo.new" update="part17"><submit label="New Foo"/></form>`
+## Other AJAX attributes
 
- - [transition-button](/api_tag_defs/transition-button): invoke a
-   lifecycle transition.
+There are several other attributes that can be used with AJAX forms.  The use of any one of these attributes specifies will convert the form into an AJAX form.
 
-# Submitting an Ajax form via Javascript
+### messages
 
-To make your form even more AJAXy, you may wish to get rid of your
-submit button.  Here's a chunk of
-[lowpro](http://www.danwebb.net/lowpro) javascript that you can throw
-into your application.dryml.  Hobo includes lowpro as a dependency,
-but if you prefer to use jQuery or a different library, you're
-certainly welcome to.
+* `confirm`: a message to display before form submission.   If you wish to use this with non-AJAX forms, use the jquery-rails attribute `data-confirm`.
 
-    Event.addBehavior({
-      ".project-name:change": function(ev) {
-        Hobo.ajaxRequest(this.up('form'), ['my-part']);
-      }
-    });
+* `message`: the message to display in the AJAX progress spinner
 
-This javascript fragment adds the inner anonymous javascript function
-to the change event on every object with the *project-name* class.
-When the event happens, `Hobo.ajaxRequest` is called.
+### callbacks
 
-ajaxRequest takes three parameters:
+There are four callback attributes:  `success`, `failure`, `complete` and `before`.
 
-  - `url_or_form`:  the URL to submit to or the form element to submit
+You can pass either a javascript snippet or the name of a javascript function.
 
-  - `updates`: a list of part DOM id's to update
+     <form before="alert('hello');">
 
-  - `options`: optional options hash
+     <form before="Foo.confirmFrobification">
 
-The meat of this functions is performed by prototype.js'
-[Ajax.Request](http://api.prototypejs.org/ajax/ajax/request.html).
-The options hash is basically passed straight through to Ajax.Request,
-so you can see the [prototype.js Ajax
-documentation](http://api.prototypejs.org/ajax_section.html) for more
-details.  Hobo adds the following options:
+For all callbacks, the context (aka this) will be set to the form DOM element.
 
-  - `params`: a hash of the parameters in the request.  Hobo adds the
-    form parameters if you specified a form in `form_or_url`.  The
-    prototype.js `parameters` option will be overridden by Hobo -- you
-    must use `params` instead.
+* `before`: called before the form is submitted.  If it returns false,
+form submission is cancelled and no other callbacks are called.  Given
+Javascript's liberal interpretation of "falsiness", you should
+probably explicitly return true if you use it and don't want your ajax
+cancelled.
 
-  - `message`: the message to display in the update spinner while the
-    Ajax is in progress.  If set explicitly to false, the spinner is
-    not displayed.
+* `success`, `failure`: called in the event of success or failure, respectively
 
-  - `spinnerNextTo`: the element or element ID to display the spinner
-    next to.  If not specified, the spinner is not moved from its
-    present location.
+* `complete`:  called after the `success` or `failure` callback
 
-# Supporting Hobo Ajax in random controller actions
+### effects
 
-Most Hobo controller actions have Ajax support built in to them.  The
-ones that don't are the ones that only display a web page but do not
-create or modify any models.  For example, `edit` does not support
-Ajax, but `update` does.  Lifecycle controller actions also have ajax
-support baked in.
+The `hide` and `show` attributes are passed through to jQuery-UI when
+removing the old part and replacing it with the new part. See
+(here)[http://jqueryui.com/demos/show/] and
+(here)[http://docs.jquery.com/UI/Effects] for more documentation on
+these two functions.  Due to ruby to javascript translation
+difficulties, you may not drop optional middle parameters.
 
-To add ajax support to your controller, call `hobo_ajax_response`:
+Examples:
 
-    hobo_ajax_response if request.xhr?
+     <form ajax hide="puff,,slow" show="&['slide', {:direction => :up}, 'fast', 'myFunctionName']/>
 
-Another good option is to call `hobo_update` or `hobo_create` without
-supplying a block.   These two functions do more than just the
-response, but often it's useful stuff that you'd be doing in your
-controller action anyways.  See the [controllers
-manual](/manual/controllers) for more information.
+     <form ajax hide="drop" show="&['slide', nil, 1000, 'alert(done);']"/>
 
-If you do need to supply a block to `hobo_update`, `hobo_create` or a
-lifecycle controller action, be sure to call `hobo_ajax_response` so
-that you do not lose Ajax support.  Here is the default response block
-for `hobo_update`, which you can copy and modify.  I've removed
-support for [editors](/api_taglibs/rapid_editing) and for
-internationalization for simplification.  See `model_controller.rb` in
-the hobo source code for the full block if you need either of these.
+These default effect is "no effect".  They may be overridden by passing options to the page-script parameter of `<page>`:
 
-        if valid?
-          respond_to do |wants|
-            wants.html do
-              redirect_after_submit options
-            end
-            wants.js do
-              hobo_ajax_response(this)
+     <extend tag="page">
+       <old-page merge>
+         <page-scripts: hide="&['slide',{:direction => :up}, 'fast']" show="&['slide',{:direction => :up},'fast']"/>
+       </old-page>
+     </extend>
 
-              # Maybe no ajax requests were made
-              render :nothing => true unless performed?
-            end
-          end
-        else
-          respond_to do |wants|
-            wants.html { re_render_form(:edit) }
-            wants.js do
-              errors = @this.errors.full_messages.join("\n")
-              render(:status => 500, :text => "There was a problem with that change.\n#{errors}")
-            end
-          end
-        end
+If, after changing the default you wish to disable effects on one specific ajax element, pass false:
+
+     <form ajax hide="&false" show="&false" ...
+
+Note that these effects require jQuery-UI.  You will get Javascript errors if you attempt to use effects and do not have jQuery-UI installed.
+
+### spinner
+
+By default, the spinner is now displayed next to the element being
+updated.
+
+- spinner-next-to: DOM id of the element to place the spinner next to.
+- spinner-at: CSS selector for the element to place the spinner next to.
+- no-spinner: if set, the spinner is not displayed.
+- spinner-options: passed to [jQuery-UI's position](http://jqueryui.com/demos/position/).   Defaults are `{my: 'right bottom', at: 'left top'}`
+- message: the message to display inside the spinner
+
+The above attributes may be added to most tags that accept the standard ajax attributes.
+
+These options may be overridden globally by adding them as attributes to the `page-scripts` parameter for the page.
+
+     <extend tag="page">
+       <old-page merge>
+         <page-scripts: spinner-at="#header" spinner-options="&{:my => 'left top', :at => 'left top'}" />
+       </old-page>
+     </extend>
+
+Note that all positioning is done using jQuery-UI.   If jQuery-UI is not included in your application, the spinner will be positioned in the top left corner.
+
+### push-state
+
+AJAX now supports a new AJAX option 'push-state' if you have
+History.js installed.   It was inspired by [this
+post](http://37signals.com/svn/posts/3112-how-basecamp-next-got-to-be-so-damn-fast-without-using-much-client-side-ui)
+which uses push-state and fragment caching to create a very responsive
+rails application.    Hobo has always supported fragment caching
+through Rails, but push-state support is new.
+
+The easiest way to install History.js is to use the [jquery-historyjs](https://github.com/wweidendorf/jquery-historyjs)
+gem.  Follow the instructions in the [README at the
+link](https://github.com/wweidendorf/jquery-historyjs).
+
+push-state blurs the line between AJAX and non-AJAX techniques,
+bringing the advantages of both to the table.   It's considerably more
+responsive than a page refresh, yet provides allows browser bookmarks
+and history navigation to work correctly.
+
+For example, if the foos and the bars pages have exactly the same
+headers but different content, you can speed up links between the
+pages by only refreshing the content:
+
+    <%# foos/index.dryml %>
+    <index-page>
+      <content:>
+        <do part="content">
+          <a href="&bars_page" ajax push-state new-title="Bars">Bars</a>
+          ...
+        </do>
+      </content:>
+    <index-page>
+
+The `new-title` attribute may be used with push state to update the
+title.  If you want to update any other section in your headers, you
+can put that into a part and list it in the update list as well.
+However the new page cannot have new javascript or stylesheets.
+Avoiding the refresh of these assets is one of the major reasons to
+use push-state!
+
+push-state is well suited for tasks that refreshed the current page
+with new query parameters in Hobo 1.3, like `filter-menu`, pagination and
+sorting on a `table-plus`.  Thus these tags have been updated to
+support all of the standard ajax attributes.
+
+Of course, ajax requests that update only a small portion of the page
+will update faster than those that update most of the page.   However,
+a small update may mean that a change to the URL is warranted, so you
+may want to use standard Ajax rather than push-state in those cases.
+Also, push-state generally should not be used for requests that modify
+state
+
+push-state works best in an HTML5 browser.  It works in older browsers
+such as IE8, IE9 or Firefox 3, but results in strange looking URL's.   See
+the README for History.js for more details on that behaviour.
+
+### errors-ok
+
+Older versions of Hobo did not render a part update if the update did
+not pass validation.
+
+This behaviour may now be overridden by using the 'errors-ok'
+attribute on your form.  (or formlet or whatever other tag initiates
+the Ajax call).
+
+The 'errors-ok' attribute is processed in `update_response`.  If you
+render or redirect inside a block to `hobo_update` you will be
+responsible for implementing this functionality yourself, or calling
+update_response to do it for you.
+
+### reset-form
+
+If set, the form inside the part will be reset after AJAX.
+
+### refocus-form
+
+If set, the focus will be reset to the first input inside of the part after AJAX.
+
+### params
+
+Hobo 1.3 included a `params` attribute.   This is *NOT* supported in Hobo 2.0.  If you wish to add additional parameters, just use a hidden input inside your form:
+
+    <input type="hidden" name="foo" value="17"/>
+
+# Using AJAX without the `<a>` tag
+
+The `<a>` tag also includes support for AJAX.  See it's documentation
+for more details.  Note that `<a>` tag is used to display a
+*different* page, which can cause issues with context.  The `<form>`
+tag rerenders the current page with the appropriate changes.
+
+In many cases you're better off using a construction like this instead of the `<a href="somewhere/else">`
+
+    <form action="somewhere/else" update="foo"><submit label="update foo"/></form>
+
+# Ajax without the `<form>` tag.
+
+Hobo 2.0 uses forms for almost all of its AJAX.  If you want to use
+Hobo part AJAX for things that would not conventionally be handled by
+a form, it's still easiest to use a form.
+
+For instance, you can create an AJAX button with something like:
+
+    <form action="foo" update="foo-part"><submit label="foo"/></form>
+
+If you wish to invoke AJAX via Javascript, you can create a hidden
+form that you can parameterize and submit via Javascript:
+
+    <form id="foo-form" style="display:none;" action="foo" update="foo-part">
+        <input name="p1" value="17" type="hidden"/>
+    </form>
+
+    $("input[name=p1]").val(92);
+    $("form#foo-form").submit();
 
 # The Part Context
 
@@ -361,46 +443,3 @@ In this example it's the second behaviour we want.   So to avoid
 confusion, drop the part-locals attribute.  Without it you will need
 to ensure that the instance variable is declared in both of the
 relevant controller actions.
-
-# old rapid form documentation
-
-Rapid Forms provides various tags that make it quick and easy to produce working new or edit forms.
-
-### Overview
-
-The main tags are:
-
- - `<form>`, which acts like the dumb HTML tag if you provide the `action` attribute, and picks up various Rapid smarts
-   otherwise.
-
- - `<input>`, which automatically choses an appropriate form control based on the type of the date.
-
-### Ajax Attributes
-
-Several of the tags in this taglib support the following set of ajax attributes:
-
- - update: one or more DOM ID's (comma separated string or an array) to be updated as part of the ajax call. Default - no
-   update.
-
-   NOTE: yes that's *DOM ID's* not part-names. A common source of confusion because by default the part name and DOM ID are
-   the same.
-
- - params: a hash of name/value pairs that will be converted to HTTP parameters in the ajax request
-
- - confirm: a message to be displayed in a JavaScript confirm dialog. By default there is no confirm dialog
-
- - message: a message to be displayed in the Ajax progress spinner. Default: "Saving..."
-
- - spinner-next-to: DOM ID of an element to position the ajax progress spinner next to.
-
-### Ajax Callbacks
-
-The following attributes are also supported by all the ajax tags. Set them to fragments of javascript to have that script
-executed at various points in the ajax request cycle:
-
- - success: script to run on successful completion of the request
-
- - failure: script to run on a request failure
-
- - complete: script to run on completion, regardless of success or failure.
-
