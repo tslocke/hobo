@@ -187,7 +187,7 @@ EOI
       if wizard?
         say_title 'Front Theme'
         say "The currently available themes are clean, clean_admin, clean_sidemenu and bootstrap."
-        @front_theme = ask("Choose a theme for the front site: [<enter>=clean|<custom_name>]", 'clean')
+        @front_theme = ask("Choose a theme for the front site: [<enter>=bootstrap|<custom_name>]", 'bootstrap')
 
         say_title 'Front jQuery-UI Theme'
         say "The currently available jQuery-UI themes are listed here: https://github.com/fatdude/jquery-ui-themes-rails/blob/master/README.markdown"

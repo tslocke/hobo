@@ -19,6 +19,10 @@ module Hobo
       install_plugin_helper('hobo_jquery', nil, opts.merge(:skip_gem => true))
       say "Installing hobo_jquery_ui plugin..."
       install_plugin_helper('hobo_jquery_ui', nil, opts)
+      if opts[:theme]=='hobo_bootstrap'
+        say "Installing hobo_bootstrap_ui plugin..."
+        install_plugin_helper('hobo_bootstrap_ui', nil, opts)
+      end
 
       say "Installing #{opts[:theme]} theme..."
       inject_css_require("jquery-ui/#{opts[:ui_theme]}", opts[:subsite], nil)
