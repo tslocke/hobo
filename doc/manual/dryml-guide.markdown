@@ -1302,13 +1302,17 @@ Load `foo.dryml` from the same directory as the current template or taglib.
 
 Load `app/views/path/to/foo.dryml`
     
-    <include src="foo" plugin="path/to/plugin"/>
+    <include gem="foo_gem"/>
 {.dryml}
     
-Load `vendor/plugins/path/to/plugin/taglibs/foo.dryml`
+Load `taglibs/foo_gem.dryml` inside of foo_gem.
 
-When running in development mode, all of these libraries are
-automatically reloaded on every request.
+    <include src="*"/>
+{.dryml}
+
+Wild cards are supported in Hobo 2.0.  This loads everything from the same directory as the current source except for the current source.
+
+When running in development mode, libraries are reloaded if a change is noted.   ActiveSupport isn't completely aware of the DRYML structure; sometimes it's useful to touch the source file for the current page if you make a change to a dependent file.
 
 # Divergences from XML and HTML
 
