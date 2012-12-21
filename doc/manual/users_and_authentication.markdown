@@ -87,7 +87,7 @@ following functions defined:
 # The Hobo User Model
 
 The best way to use the Hobo User Model is to invoke the
-`hobo_user_model` and `hobo_user_controller` generators.  If you
+`hobo:user_model` and `hobo:user_controller` generators.  If you
 generated your application with the `hobo` command, these generators
 have already been run for you.
 
