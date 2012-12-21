@@ -42,7 +42,7 @@ If the transition could not be found, the user does not have permissions for the
     has_params = !transition.options[:params].blank?
     ajax_attributes, html_attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
 
-    html_attributes[:method] ||= has_params ? :get : :put
+    html_attributes[:method] ||= has_params ? "get" : "put"
     add_classes!(html_attributes, "transition-button #{transition_name}-button")
     label = t("activerecord.attributes.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}", :default => (label || transition_name.to_s.titleize))
     title = t("activerecord.attribute_help.#{this.class.to_s.underscore}.lifecycle.transitions.#{transition_name}")
