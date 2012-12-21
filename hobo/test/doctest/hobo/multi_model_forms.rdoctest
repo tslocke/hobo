@@ -28,7 +28,17 @@ Contents
 
 Using multi-model forms in Hobo is very straightforward:
 
-      has_many :posts, :accessible => true
+    class Blog < ActiveRecord::Base
+      hobo_model
+      has_many :posts, :accessible => true, :inverse_of => :blog
+
+    class Post < ActiveRecord::Base
+      hobo_model
+      belongs_to :blog, :inverse_of => :posts
+
+The `:accessible` flag is a Hobo addition, the `:inverse_of` flag is
+standard Rails.  `:inverse_of` is optional but highly recommended in
+Rails; Hobo requires it.
 
 Once you've done that, the default forms that Hobo builds will use the
 [input-many](/api_tag_defs/input-many) tag.
@@ -243,8 +253,8 @@ large number of elements in the association.
 
 Both mechanisms are compatible and may be enabled simultaneously.
 
-It's certainly possible that Rapid >=1.1 will acquire tags that will
-require `accept_nested_attributes_for`.   However, it's unlikely that
-Hobo will drop support for accessible associations unless ActiveRecord
-itself changes significantly.
+It's certainly possible that later versions of Rapid will acquire tags
+that will require `accept_nested_attributes_for`.  However, it's
+unlikely that Hobo will drop support for accessible associations
+unless ActiveRecord itself changes significantly.
 
