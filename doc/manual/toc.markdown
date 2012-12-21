@@ -56,12 +56,34 @@ Hobo's extensions to [Action Controller](http://api.rubyonrails.org/classes/Acti
 [**DRYML**](/manual/dryml-guide) is a template language that allows you to
 create highly reusable HTML components.
 
-[**Rapid**](/api_taglibs) is a large library of HTML tags built with
+[**Rapid**](/api_plugins/hobo_rapid) is a large library of HTML tags built with
 [DRYML](/manual/dryml-guide).
 
 [**Ajax**](/manual/ajax) describes how Rapid and Hobo combine to support
 [Ajax](http://en.wikipedia.org/wiki/Ajax_%28programming%29) in a
 fashion that's often easier than using Web 1.0 techniques.
+
+## Tags & Javascript
+
+[**Hobo Rapid**](/api_plugins/hobo_rapid) is the standard tag library for Hobo, and as such is a required component.
+
+[**Hobo jQuery**](/api_plugins/hobo_jquery) provides the Javascript for [Hobo Rapid](/api_plugins/hobo_rapid) and for [Hobo part AJAX](http://cookbook.hobocentral.net/manual/ajax).  The interface that hobo_jquery uses is well-defined and described in [TBD] so it is theoretically possible to replace hobo_jquery with a plugin based on something other than jQuery.
+
+## Themes
+
+A Hobo application also requires a theme.   The default theme for Hobo 2.0 is [**Hobo Bootstrap**](/api_plugins/hobo_bootstrap), which uses [Bootstrap 2.X](http://twitter.github.com/bootstrap/).
+
+Each subsite in your application may use a different theme.
+
+[**Hobo Clean**](/api_plugins/hobo_clean) was the default theme for Hobo 0.8 through 1.3 and is still available.   You can also choose to use its variant, [Hobo Clean Sidemenu](/api_plugins/hobo_clean_sidemenu).
+
+It's not difficult to [create your own theme](http://cookbook.hobocentral.net/manual/plugins#themes).
+
+## UI Plugin
+
+Hobo also requires a few UI widgets and capabilities that aren't provided by jQuery itself.   These can be provided by [**Hobo jQuery-UI**](/api_plugins/hobo_jquery_ui) and/or [**Hobo Bootstrap UI**](/api_plugins/hobo_bootstrap_ui).
+
+More information about the differences and overlap between these two are explained by [UI Plugins](/manual/gems)
 
 ## Top to Bottom
 
