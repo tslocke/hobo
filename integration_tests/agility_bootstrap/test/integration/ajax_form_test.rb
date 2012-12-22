@@ -49,7 +49,10 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     Capybara.current_driver = :selenium_chrome
     Capybara.default_wait_time = 10
     visit root_path
-
+    
+    # Resize the window so Bootstrap shows Login button
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
+    
     # log in as Administrator
     click_link "Login"
     fill_in "login", :with => "admin@example.com"
