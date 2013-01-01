@@ -1,3 +1,5 @@
+# Hobo's Caching Tags
+
 In the last couple of years, it has become accepted wisdom in some circles that to build a fast, responsive web application you need to use a client-side Javascript framework such as Ember, AngularJS or one of their myriad competitors.
 
 But earlier this year, dhh challenged this accepted wisdom with a blog post: [How Basecamp Next got to be so damn fast without using much client-side UI](http://37signals.com/svn/posts/3112-how-basecamp-next-got-to-be-so-damn-fast-without-using-much-client-side-ui)
@@ -20,7 +22,7 @@ We're going to use the Rails default MemoryStore for caching.   This cache works
 
 For the purposes of our demo, we're going to cache the widget index page since it displays many different models in one page.   Here's what it looks like:
 
-SCREENSHOT
+![screenshot](/assets/caching_demo.png)
 
 and here's the view code [app/views/widgets/index.dryml](https://github.com/Hobo/hobo_caching_demo/blob/master/app/views/widgets/index.dryml):
 

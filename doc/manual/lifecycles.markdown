@@ -85,7 +85,7 @@ Here's the code for the friendship mode (don't be put off by the `MagicMailer`, 
 
 Visually, the lifecycle can be represented as a graph, just as we would draw a finite state machine:
 
-![Friendship Lifecycle](/images/manual/friendship-lifecycle.png)
+![Friendship Lifecycle](/assets/manual/friendship-lifecycle.png)
 
 Let's work through what we did there.
 

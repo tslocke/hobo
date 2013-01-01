@@ -1,4 +1,5 @@
 
+* [<h4>Tutorials and Recipes</h4>](/tutorials)
 * [Hobo in Two Minutes](two-minutes)
 * [Screencast](screencast)
 * [Full Tutorial](agility)
