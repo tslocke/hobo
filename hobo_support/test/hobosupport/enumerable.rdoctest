@@ -1,6 +1,7 @@
-# HoboSupport - Eumerable extensions
+# HoboSupport - Enumerable extensions
 
     doctest_require: '../../lib/hobo_support'
+{.hidden}
 
 ## `Enumerable#map_and_find`
 

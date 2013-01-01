@@ -1,9 +1,9 @@
+Hobo Scopes
+{: .document-title}
+
     doctest: prepare testapp environment
     doctest_require: '../prepare_testapp'
 {.hidden}
-
-Hobo Scopes
-{: .document-title}
 
 Hobo scopes are an extension of the *named scope* and *dynamic finder*
 functionality introduced in Rails 2.1, 2.2 and 2.3.

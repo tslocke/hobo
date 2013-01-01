@@ -150,3 +150,13 @@ collection is considered blank)
 <!-- nodoc: used to provide documentation for a tag without actually defining the tag -->
 <def tag="fakedef">
 </def>
+
+<!-- Set local variables.
+
+    <set foo="yo" bar="&17"/>
+
+is equivalent to
+
+    <% foo="yo"; bar=17; %>
+-->
+<fakedef tag="set"></fakedef>
