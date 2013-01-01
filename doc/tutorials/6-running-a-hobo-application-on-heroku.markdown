@@ -2,7 +2,7 @@
 
 Originally written by Owen on 2008-10-20.
 
-This recipe answers [How to get a Hobo app working on Heroku.com](/questions/17-how-to-get-a-hobo-app)
+This recipe answers [How to get a Hobo app working on Heroku.com](/manual/faq/17-how-to-get-a-hobo-app)
 
 This is link to a draft in PDF format.
 

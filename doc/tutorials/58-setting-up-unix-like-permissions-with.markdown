@@ -2,7 +2,7 @@
 
 Originally written by kevinpfromnm on 2010-08-10.
 
-This recipe answers [How do I setup groups for permissions?](/questions/65-how-do-i-setup-groups-for)
+This recipe answers [How do I setup groups for permissions?](/manual/faq/65-how-do-i-setup-groups-for)
 
 For any unfamiliar with unix permissions, the basic concept is that each file, or in our case model instance, has an owner and group.  There are independent permissions for owner, group and everyone on read, write, and execute.
 

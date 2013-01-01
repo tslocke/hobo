@@ -2,7 +2,7 @@
 
 Originally written by James on 2008-10-16.
 
-This recipe answers [Using hobo_subsite to generate an admin interface?](/questions/33-using-hobo-subsite-to-generate-an)
+This recipe answers [Using hobo_subsite to generate an admin interface?](/manual/faq/33-using-hobo-subsite-to-generate-an)
 
 A `hobo_subsite` generator has been added to Hobo since this guide was written. The following should still work but is a bit out of date.
 {: .note}

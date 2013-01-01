@@ -2,7 +2,7 @@
 
 Originally written by txinto on 2011-09-06.
 
-This recipe answers [Definitive guide to multi-language website (I18n)](/questions/97-definitive-guide-to-multi-language-website)
+This recipe answers [Definitive guide to multi-language website (I18n)](/manual/faq/97-definitive-guide-to-multi-language-website)
 
 #Step 1:
 

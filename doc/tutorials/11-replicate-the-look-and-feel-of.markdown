@@ -2,7 +2,7 @@
 
 Originally written by Tom on 2008-10-28.
 
-This recipe answers [how can I change the front page?](/questions/54-how-can-i-change-the-front)
+This recipe answers [how can I change the front page?](/manual/faq/54-how-can-i-change-the-front)
 
 Say we want a new Hobo app to have the same look-and-feel of an existing site. The really big win is if we can have this look and feel happen to our new app almost 'automatically'. We want to be able to develop at "Hobo speed", and have the look and feel "just happen". This is not trivial to set up, but once it is the pay-back in terms of development agility will be more than worth it. That is the topic of this how-to.
 

@@ -2,9 +2,9 @@
 
 Originally written by adamski on 2008-10-23.
 
-This recipe answers [Comments in Hobo](/questions/16-comments-in-hobo)
+This recipe answers [Comments in Hobo](/manual/faq/16-comments-in-hobo)
 
-This recipe answers [polymorphic associations such as a comment model](/questions/53-polymorphic-associations-such-as-a-comment)
+This recipe answers [polymorphic associations such as a comment model](/manual/faq/53-polymorphic-associations-such-as-a-comment)
 
 After posting the question, and recently getting into polmorphic stuff with Rails and Hobo, I realised how easy it is to set up cross-model comments.
 

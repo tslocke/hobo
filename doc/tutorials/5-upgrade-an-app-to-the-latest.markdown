@@ -2,7 +2,7 @@
 
 Originally written by Tom on 2008-10-17.
 
-This recipe answers [How to safely upgrade to a new hobo version](/questions/11-how-to-safely-upgrade-to-a)
+This recipe answers [How to safely upgrade to a new hobo version](/manual/faq/11-how-to-safely-upgrade-to-a)
 
 ## Breaking Changes
 

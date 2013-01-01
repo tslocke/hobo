@@ -2,7 +2,7 @@
 
 Originally written by mdkarp on 2012-02-11.
 
-This recipe answers [How to create a iPhone or mobile layout](/questions/30-how-to-create-a-iphone-or)
+This recipe answers [How to create a iPhone or mobile layout](/manual/faq/30-how-to-create-a-iphone-or)
 
 Hi all,
 

@@ -2,7 +2,7 @@
 
 Originally written by Dean on 2010-05-25.
 
-This recipe answers [contact form and google maps maybe](/questions/42-contact-form-and-google-maps-maybe)
+This recipe answers [contact form and google maps maybe](/manual/faq/42-contact-form-and-google-maps-maybe)
 
 Integrating Google Maps into a Hobo application is very simple.  The [YM4R](http://ym4r.rubyforge.org/) plugin does all of the heavy lifting of generating the necessary Javascript.
 

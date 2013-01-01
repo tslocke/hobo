@@ -2,7 +2,7 @@
 
 Originally written by cbenedict on 2010-07-28.
 
-This recipe answers [How do I get pagination to work for child collections on a show page defined with the children view hint?](/questions/58-how-do-i-get-pagination-to)
+This recipe answers [How do I get pagination to work for child collections on a show page defined with the children view hint?](/manual/faq/58-how-do-i-get-pagination-to)
 
 <h1>Intro</h1>
 If you have models with belongs\_to and has\_many relationships and have used the children view hint on the parent model, you will get a collection of cards on the bottom of the main page or on the sidebar depending on how many child models you specify and in what order.  See (<http://cookbook.hobocentral.net/manual/viewhints#child_relationships>) for more information on this behavior.

@@ -2,9 +2,9 @@
 
 Originally written by Tom on 2008-10-28.
 
-This recipe answers [User states when account isn't immediately active](/questions/49-user-states-when-account-isn-t)
+This recipe answers [User states when account isn't immediately active](/manual/faq/49-user-states-when-account-isn-t)
 
-This recipe answers [How would you make a Hobo site completely private?](/questions/7-how-would-you-make-a-hobo)
+This recipe answers [How would you make a Hobo site completely private?](/manual/faq/7-how-would-you-make-a-hobo)
 
 # UPDATE - `--invite-only` added to Hobo
 

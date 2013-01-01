@@ -2,7 +2,7 @@
 
 Originally written by kevinpfromnm on 2010-08-06.
 
-This recipe answers [How do I setup full text search?](/questions/63-how-do-i-setup-full-text)
+This recipe answers [How do I setup full text search?](/manual/faq/63-how-do-i-setup-full-text)
 
 Basically we'll be following [sunspots quickstart guide](http://wiki.github.com/outoftime/sunspot/adding-sunspot-search-to-rails-in-5-minutes-or-less) with a couple of tweaks for hobo.
 
