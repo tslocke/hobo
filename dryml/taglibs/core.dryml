@@ -160,3 +160,21 @@ is equivalent to
     <% foo="yo"; bar=17; %>
 -->
 <fakedef tag="set"></fakedef>
+
+
+<!-- Set a "scoped" variable.   See [the corresponding section in The DRYML Guide](/manual/dryml-guide#scoped_variables__#) for more details -->
+<fakedef tag="set-scoped"></fakedef>
+
+
+<!-- Define a DRYML tag.   See [The DRYML Guide](/manual/dryml-guide) for more details -->
+<fakedef tag="def"></fakedef>
+
+<!-- Extend a DRYML tag.   See [The DRYML Guide](/manual/dryml-guide) for more details -->
+<fakedef tag="extend"></fakedef>
+
+
+<!-- Include a taglib.   See [the Taglibs section in The DRYML Guide](/manual/dryml-guide#taglibs) for more details -->
+<fakedef tag="extend"></fakedef>
+
+<!-- Define a part.   See [the Ajax manual](/manual/ajax) for more information. -->
+<fakedef tag="part"></fakedef>

@@ -86,7 +86,7 @@ All extra attributes are used as non-hierarchical cache keys, so for
 inner caches these should either be constants or be manually
 propagated to the outer caches
 
-`dependencies`: see above.   Default is "&[this]"
+`dependencies`: see above.   Default is `&[this]`
 
 `query-params`: A comma separated list of query (or post) parameters
 used as non-hierarchical cache keys.

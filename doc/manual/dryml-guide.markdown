@@ -312,7 +312,7 @@ In order to see the implicit context in its best light, we'll start by defining 
     <def tag="view"><%= h this.to_s %></def>
 {.dryml}
 
-Next we'll define a tag for making a link to the current context. We'll assume the object will be recognised by Rails' polymorphic routing. Let's call the tag `<l>` (for link):
+Next we'll define a tag for making a link to the current context. We'll assume the object will be recognised by Rails' polymorphic routing. Let's call the tag `l` (for link):
 
     <def tag="l"><a href="#{url_for this}" param="default"/></def>
 {.dryml}
@@ -493,7 +493,7 @@ Inside a tag definition two hashes are available in local variables:
 
 In a tag definition, you can use the `merge-attrs` attribute to take any 'extra' attributes that the caller passed in, and add them to a tag of your choosing inside your definition. Let's backtrack a bit and see why you might want to do that.
 
-Here's a simple definition for a `<markdown-help>` tag- it's similar to a tag defined in the Hobo Cookbook app:
+Here's a simple definition for a `markdown-help` tag- it's similar to a tag defined in the Hobo Cookbook app:
 
     <def tag="markdown-help">
       <a href="http://daringfireball.net/..." param="default"/>

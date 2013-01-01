@@ -33,8 +33,8 @@ The normal usage is to define your own navigation tag that calls `<navigation>`.
 
 Then in your pages you can call the tag like this
 
- - On the 'red' page: `<sub-nav current="red"/>`
- - On the 'green' page:  `<sub-nav current="green"/>`
+ - On the 'red' page: <`sub-nav current="red"/`>
+ - On the 'green' page:  <`sub-nav current="green"/`>
  - and so on.
 
    -->

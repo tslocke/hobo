@@ -1,6 +1,6 @@
 # Frequently Asked Questions and Misunderstandings
 
-[Add a mew question or answer](https://github.com/Hobo/hobodoc/new/master/doc/manual/faq)
+[Add a new question or answer](https://github.com/Hobo/hobodoc/new/master/doc/manual/faq)
 
 - [How do I get help with my questions about Hobo?](faq/how-do-I-get-help)
 - [What's a good development environment?](faq/good-dev-env)
@@ -26,7 +26,7 @@
 - [What's the difference between `this` and `@foos`](faq/this)
 - [How come my form is blank?](faq/blank-form)
 
-[Add a mew question or answer](https://github.com/Hobo/hobodoc/new/master/doc/manual/faq)
+[Add a new question or answer](https://github.com/Hobo/hobodoc/new/master/doc/manual/faq)
 
 # User Questions
 
