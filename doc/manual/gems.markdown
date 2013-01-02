@@ -36,7 +36,7 @@ own gem, but this has not yet occured.
 
 [**Hobo Rapid**](/api_plugins/hobo_rapid) is the standard tag library for Hobo, and as such is a required component.
 
-[**Hobo jQuery**](/api_plugins/hobo_jquery) provides the Javascript for [Hobo Rapid](/api_plugins/hobo_rapid) and for [Hobo part AJAX](http://cookbook.hobocentral.net/manual/ajax).  The interface that hobo_jquery uses is well-defined and described in [TBD] so it is theoretically possible to replace hobo_jquery with a plugin based on something other than jQuery.
+[**Hobo jQuery**](/api_plugins/hobo_jquery) provides the Javascript for [Hobo Rapid](/api_plugins/hobo_rapid) and for [Hobo part AJAX](http://cookbook.hobocentral.net/manual/ajax).  The interface that hobo_jquery uses is well-defined and described in TBD so it is theoretically possible to replace hobo_jquery with a plugin based on something other than jQuery.
 
 # Themes
 

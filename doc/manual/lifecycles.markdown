@@ -384,7 +384,7 @@ The rules for the `:available_to` option are as follows. Firstly, it can be one 
 
  - `:key_holder` -- (transitions only) anyone can trigger the transition, provided `record.lifecycle.provided_key` is set to the correct key. Discussed in detail later.
 
- - :self -- (transitions only) the `acting_user` and the record the transition is called on must be one and the same. Only makes sense for user models of course.
+ - `:self`-- (transitions only) the `acting_user` and the record the transition is called on must be one and the same. Only makes sense for user models of course.
 
 If `:available_to` is not one of those, it is an indication of some code to run (just like the `:if` option for example):
 

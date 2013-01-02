@@ -8,14 +8,15 @@ Literally everything I try to do breaks, and I can't figure out why.
 
 For instance, I have an array of model instances returned by find.
 I'd like to try something like this:
-<repeat with="&@all">
-      <collection/>
-</repeat>
 
-where @all=<Model>.find :all, populated in the controller. This seems
+    <repeat with="&amp;@all">
+      <collection/>
+    </repeat>
+
+where `@all=<Model>.find :all`, populated in the controller. This seems
 like a minimal change from what's in the Agility tutorial, and I can't
 tell what's wrong, but I get a method missing exception on empty?.
-Eventually I gave up on using <collection> entirely.
+Eventually I gave up on using `<collection>` entirely.
 
 I want to modify the edit form so that it shows a textarea instead of
 an input type='text' for one field, and there doesn't seem to be any

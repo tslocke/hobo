@@ -1,1 +1,0 @@
-../../../hobo_fields/test/generators.rdoctest

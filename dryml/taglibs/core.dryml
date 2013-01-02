@@ -174,7 +174,7 @@ is equivalent to
 
 
 <!-- Include a taglib.   See [the Taglibs section in The DRYML Guide](/manual/dryml-guide#taglibs) for more details -->
-<fakedef tag="extend"></fakedef>
+<fakedef tag="include"></fakedef>
 
 <!-- Define a part.   See [the Ajax manual](/manual/ajax) for more information. -->
 <fakedef tag="part"></fakedef>

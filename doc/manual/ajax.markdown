@@ -156,8 +156,8 @@ cancelled.
 
 The `hide` and `show` attributes are passed through to jQuery-UI when
 removing the old part and replacing it with the new part. See
-(here)[http://jqueryui.com/demos/show/] and
-(here)[http://docs.jquery.com/UI/Effects] for more documentation on
+[here](http://jqueryui.com/demos/show/) and
+[here](http://docs.jquery.com/UI/Effects) for more documentation on
 these two functions.  Due to ruby to javascript translation
 difficulties, you may not drop optional middle parameters.
 

@@ -32,7 +32,6 @@
 
 These questions were imported from the old hobocookbook site for older versions of Hobo and may or may not still be relevant.
 
-* [A bug in dryml ?](faq/102-a-bug-in-dryml) by Yannick Chevalier on 2012-07-11
 * [Hobo copy (clone / dup) a record](faq/101-hobo-copy-clone-dup-a-record) by OmniBus on 2012-06-14
 * [Tabbed Layout, can I do this?](faq/100-tabbed-layout-can-i-do-this) by lepodo on 2012-02-07
 * [HABTM three model filtered index page](faq/99-habtm-three-model-filtered-index-page) by slm4996 on 2012-01-17
@@ -73,7 +72,7 @@ These questions were imported from the old hobocookbook site for older versions 
 * [How do I change the navigation tabs along the top?](faq/64-how-do-i-change-the-navigation) by kevinpfromnm on 2010-08-05
 * [How do I setup full text search?](faq/63-how-do-i-setup-full-text) by kevinpfromnm on 2010-08-05
 * [I've got some method(s) I want to set for multiple models](faq/62-i-ve-got-some-method-s) by kevinpfromnm on 2010-08-04
-* [Change "Add `<ModelName>`" from select area in 1..n relation](faq/61-change-add-modelname-from-select-area) by kevinpfromnm on 2010-08-04
+* [Change "Add `ModelName`" from select area in 1..n relation](faq/61-change-add-modelname-from-select-area) by kevinpfromnm on 2010-08-04
 * [Why can't I call acting_user or current_user in x method in my model?](faq/60-why-can-t-i-call-acting) by kevinpfromnm on 2010-08-04
 * [How do I add additional recent items to an index-page?](faq/59-how-do-i-add-additional-recent) by kevinpfromnm on 2010-08-04
 * [How do I get pagination to work for child collections on a show page defined with the children view hint?](faq/58-how-do-i-get-pagination-to) by kevinpfromnm on 2010-08-04
@@ -87,7 +86,7 @@ These questions were imported from the old hobocookbook site for older versions 
 * [routing and performance](faq/50-routing-and-performance) by kevinpfromnm on 2010-08-04
 * [User states when account isn't immediately active](faq/49-user-states-when-account-isn-t) by kevinpfromnm on 2010-08-04
 * [Does Hobo work with x?](faq/48-does-hobo-work-with-x) by kevinpfromnm on 2010-08-04
-* [>`hobo thingybob returns "Command Not Found"](faq/47-hobo-thingybob-returns-command-not-found) by eengnerd on 2010-07-19
+* [hobo thingybob returns "Command Not Found"](faq/47-hobo-thingybob-returns-command-not-found) by eengnerd on 2010-07-19
 * [Automating task via cron](faq/46-automating-task-via-cron) by cbenedict on 2010-07-18
 * [Using Legacy data in Hobo](faq/45-using-legacy-data-in-hobo) by gigg on 2010-07-02
 * [Recipes as screencasts?](faq/43-recipes-as-screencasts) by mydoghasworms on 2010-03-15

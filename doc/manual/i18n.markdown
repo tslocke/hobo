@@ -60,7 +60,7 @@ with the translated string identified by the key. By using the content
 of the key as a default value its possible to leave the templates
 mostly untouched. Just wrap the strings to translate with the tag.
 
-## `ActionView::Helpers::TranslationHelper.translate` helper and `<translate>`/`<t>` tag
+## `ActionView::Helpers::TranslationHelper.translate` helper and `<t>` tag
 
 Rails introduces the rails :translate (t) helper, which is internally used by hobo in any translation.
 Additionally, hobo patches it in order to fix a XSS potential security breach in the original Rails helper.

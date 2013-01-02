@@ -12,7 +12,7 @@ Contents
 
 # Installation
 
-Meta tags:  note for collaborators.   A meta-tag looks like this {.done}.   It's added after a paragraph with no blank spaces.   The tags that we support are:  {.ruby} {.javascript} {.dryml} and {.diff} for code highlighting.   {.todo}, {.done}, {.check}, {.part} and {.nomove} indicate documentation progress moving into the Hobo manuals.  {.check} means that it's probably done.  {.part} means that it's partly done.  {.nomove} means that this section only needs to exist in this CHANGES document.   Finally, {.hidden} is used for paragraphs like this one that shouldn't show up on the website.
+    Meta tags:  note for collaborators.   A meta-tag looks like this {.done}.   It's added after a paragraph with no blank spaces.   The tags that we support are:  {.ruby} {.javascript} {.dryml} and {.diff} for code highlighting.   {.todo}, {.done}, {.check}, {.part} and {.nomove} indicate documentation progress moving into the Hobo manuals.  {.check} means that it's probably done.  {.part} means that it's partly done.  {.nomove} means that this section only needs to exist in this CHANGES document.   Finally, {.hidden} is used for paragraphs like this one that shouldn't show up on the website.
 {.hidden}
 
 ## Creating a new application
@@ -592,8 +592,8 @@ Now you can just return the function name:
 
 There are two new ajax options: `hide` and `show`.  These are passed
 directly to the jQuery-UI `hide` and `show` functions.  See
-(here)[http://jqueryui.com/demos/show/] and
-(here)[http://docs.jquery.com/UI/Effects] for more documentation on
+[here](http://jqueryui.com/demos/show/) and
+[here](http://docs.jquery.com/UI/Effects) for more documentation on
 these two functions.  Due to ruby to javascript translation
 difficulties, you may not drop optional middle parameters.
 
@@ -780,7 +780,7 @@ column "projects.title".
 
 Hobo no longer attempts to perform its part-based AJAX actions when
 sent an xhr request. Instead, Hobo performs part-based AJAX when
-params[:render] is set.
+`params[:render]` is set.
 
 The signature for the function update_response, index_response and friends have changed.   This should make it useful for use in your application.  update_response is called automatically by hobo_update if you don't render or redirect inside of the block parameter hobo_update.
 

@@ -400,10 +400,12 @@ Sometimes you want to drill down through several fields at a time. Both the `fie
 
 When you change the context using `field="my-field"` (or the `<tag:my-field>` shorthand), the previous context is available as `this_parent`, and the name of the field is available as `this_field`. If you set the context using `with="..."`, these values are not available. That means the following apparently identical tag calls are not quite the same:
 
-    <my-tag with="&@post.title"/>
-    
+    <my-btag with="&@post.title"/>
+
+is not quite the same as:
+
     <my-tag with="&@post" field="title"/>
-    
+
 If the tag requires `this_parent` and `this_field`, and in Rapid, for
 example, some do, then it must be called using the second style.
 
@@ -413,6 +415,8 @@ If your current context is a collection, you can use the field
 attribute to change the context to a single item.
 
     <my-tag field="7" />
+
+and
 
     <% i=97 %>
     <my-tag field="&i" />
@@ -1172,7 +1176,7 @@ Once or twice in the previous examples, we have extended our card tag definition
 
 There's a bit of repetition there -- `<%= h this.to_s %>` was already present in the original definition. All we really wanted to do was wrap the existing heading in an `<a>`. In this case there wasn't much markup to repeat, so it wasn't a big deal, but in other cases there might be much more.
     
-We can't use `<prepend-heading:><a></prepend-heading:>` and `<append-heading:></a></append-heading:>` because that's not well formed markup (and is very messy besides). Instead, DRYML has a specific feature for this situation. The `<param-content>` tag is a special tag that brings back the default content for a parameter. Here's how it works:
+We can't use `<prepend-heading:><a></prepend-heading:>` and `<append-heading:></a></append-heading:>` because that's not well formed markup (and is very messy besides). Instead, DRYML has a specific feature for this situation. The <`param-content`> tag is a special tag that brings back the default content for a parameter. Here's how it works:
 
     <card>
       <heading:><a href="#{object_url this}"><param-content for="heading"/></a></heading:>
@@ -1208,7 +1212,7 @@ To use DRYML terminology, what we've done there is *replaced* the entire heading
     </card>
 {.dryml}
     
-To summarise, to wrap content inside a parameter, use `<param-content/>`. To wrap an entire parameter, including the parameterised tag itself (the `<h3>` in our examples), use the `replace` and `restore` attributes.
+To summarise, to wrap content inside a parameter, use <`param-content/`>. To wrap an entire parameter, including the parameterised tag itself (the `<h3>` in our examples), use the `replace` and `restore` attributes.
     
 
 # Local variables and scoped variables.
@@ -1240,7 +1244,7 @@ The `<set-scoped>` tag is very much like `<set>` except you open it up and put D
     </set-scoped>
 {.dryml}
     
-The value is available as `scope.xyz` anywhere inside the tag *and in any tags that are called inside that tag*. That's the difference between `<set>` and `<set-scoped>`. They are like *dynamic variables* from LISP. To repeat the point, they are like global variables that exist from the time the `<set-scope>` tag is evaluated, and for the duration of the evaluation of the body of the tag, and are then removed.
+The value is available as `scope.xyz` anywhere inside the tag *and in any tags that are called inside that tag*. That's the difference between `<set>` and `<set-scoped>`. They are like *dynamic variables* from LISP. To repeat the point, they are like global variables that exist from the time the `<set-scoped>` tag is evaluated, and for the duration of the evaluation of the body of the tag, and are then removed.
     
 As an example of their use, let's define a simple tag for rendering navigation links. The output should be a list of `<a>` tags, and the `<a>` that represents the "current" page should have a CSS class "current", so it can be highlighted in some way by the stylesheet. (In fact, the need to create a reusable tag like this is where the feature originally came from).
 
@@ -1249,7 +1253,7 @@ On our pages, we'd like to simply call, say:
     `<main-nav current="Home">`
 {.dryml}
 
-And we'd like it to be easy to define our own `<main-nav>` tag in our applications:
+And we'd like it to be easy to define our own <`main-nav`> tag in our applications:
 
     <def tag="main-nav">
       <navigation merge-attrs>
@@ -1265,7 +1269,7 @@ Here's the definition for the `<navigation>` tag:
     <def tag="navigation" attrs="current">
       <set-scoped current-nav-item="current">
         <ul merge-attrs param="default"/>
-      </set-scoped
+      </set-scoped>
     </def>
 {.dryml}
 
