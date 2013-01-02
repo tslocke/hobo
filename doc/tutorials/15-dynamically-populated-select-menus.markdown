@@ -1,4 +1,4 @@
-# Dynamically populated <select> menus
+# Dynamically populated `<select>` menus
 
 Originally written by Tom on 2008-10-29.
 

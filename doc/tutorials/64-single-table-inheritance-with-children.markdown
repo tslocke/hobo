@@ -159,7 +159,7 @@ Edit the controllers:
 
     end
 
-Edit **application.dryml
+Edit application.dryml
 
     # Add this at an appropriate place (I put it at the end).
 

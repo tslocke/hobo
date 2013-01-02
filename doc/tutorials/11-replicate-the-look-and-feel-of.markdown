@@ -430,7 +430,7 @@ It seems like a good idea to define a tag that creates one of these panels, say:
 
 We've re-used the `<nav-item>` tag as it gives us an `<li>` and an `<a>` which is just what we need here.
   
-Now add the definition of `<nav-panel>` to your `application.dryml`:
+Now add the definition of <`nav-panel`> to your `application.dryml`:
 
     <def tag="nav-panel">
       <div class="nav-panel" param="default">
@@ -576,9 +576,9 @@ Somehow the idea of "creating a plugin" seems like a big deal, but it's there's 
 
 We've copied the whole of `application.dryml` into our plugin, because nearly everything in there belongs in the plugin, but it does need some editing:
 
- - At the top, remove all of the includes, the `<set-theme>` and the definition of `<app-name>`
+ - At the top, remove all of the includes, the <`set-theme`> and the definition of <`app-name`>
  
- - We need to make sure our stylesheet gets included, so add the following parameter to the call to `<old-page>`:
+ - We need to make sure our stylesheet gets included, so add the following parameter to the call to <`old-page`>:
  
         <append-stylesheets:>
           <stylesheet name="/csrees/stylesheets/csrees.css"/>
@@ -595,38 +595,40 @@ To try out the plugin, create a new blank Hobo app. There are then three steps t
 
     <include src="csrees" plugin="csrees"/>
     
-to `application.dryml`. It must be added *after* the `<set-theme>` tag.
+to `application.dryml`. It must be added *after* the <`set-theme`> tag.
 
 **To install the public assets**:
 
     $ cp -R vendor/plugins/csrees/public/* public
     
-That should be it - your new app will now look like the CSREES website, and the tags we defined, such as `<nav-panel>` will be available in every template.
+That should be it - your new app will now look like the CSREES website, and the tags we defined, such as <`nav-panel`> will be available in every template.
 
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_.jpg)
+[5]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-1.jpg)
+[6]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-2.jpg)
+[7]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-1.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-3.jpg)
+[8]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-2.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-4.jpg)
+[9]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-3.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-5.jpg)
+[10]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-4.jpg
 
-![image](/images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-6.jpg)
+[11]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-5.jpg
 
-![image](/images/original_Home___Csreesdemo-1.jpg)
+[12]: /images/original_Cooperative_State_Research_Education_and_Extension_Service_CSREES_-6.jpg
 
-![image](/images/original_banner_csrees.gif)
+[14]: /images/original_Home___Csreesdemo-1.jpg
 
-![image](/images/original_banner_photo.jpg)
+[15]: /images/original_banner_csrees.gif
 
-![image](/images/original_Home___Csreesdemo.jpg)
+[16]: /images/original_banner_photo.jpg
 
-![image](/images/original_Home___Csreesdemo-2.jpg)
+[17]: /images/original_Home___Csreesdemo.jpg
 
-![image](/images/original_Home___Csreesdemo-3.jpg)
+[18]: /images/original_Home___Csreesdemo-2.jpg
+
+[19]: /images/original_Home___Csreesdemo-3.jpg
 

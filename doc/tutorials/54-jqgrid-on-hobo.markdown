@@ -38,5 +38,5 @@ Example:
     </index-page>
 
 
-Copyright (c) 2010 [name of plugin creator], released under the MIT license
+Copyright (c) 2010 \[name of plugin creator\], released under the MIT license
 

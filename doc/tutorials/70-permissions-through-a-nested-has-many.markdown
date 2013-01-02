@@ -6,7 +6,7 @@ I have a app where the ability to assign many different users to review a projec
 
 What I did was discover a handy gem named "nested\_has\_many\_through" which allowed the hobo permissions access to the nested data.
 
-See [https://github.com/romanvbabenko/nested\_has\_many\_through] ("https://github.com/romanvbabenko/nested\_has\_many\_through") for more information about the gem in the recipe.
+See [https://github.com/romanvbabenko/nested_has_many_through](https://github.com/romanvbabenko/nested_has_many_through) for more information about the gem in the recipe.
   
   
 Be sure to add the gem. Put this line in your Gemfile:
@@ -123,5 +123,5 @@ Now we're all set, run the following from the command line.
     $ rails s
 
   
-Add some users and programs then go to reviews and assign users to their programs. This application has been posted on Github, so feel free to check it out. [https://github.com/jdowning/Has-Many-Reviewers] ("https://github.com/jdowning/Has-Many-Reviewers")
+Add some users and programs then go to reviews and assign users to their programs. This application has been posted on Github, so feel free to check it out. [https://github.com/jdowning/Has-Many-Reviewers](https://github.com/jdowning/Has-Many-Reviewers)
 

@@ -213,7 +213,7 @@ In apps/views/taglibs/application.dryml file, add the '?locale=#{I18n.locale}' t
     </def>
 
 #Step 13:
-Let's add some flag icons in the footer to change the param[:locale], to allow the Guest user to change the locale of the web.
+Let's add some flag icons in the footer to change the `param[:locale]`, to allow the Guest user to change the locale of the web.
 
     > edit app/views/taglibs/application.dryml
 

@@ -63,7 +63,7 @@ The admin menu was:
        *   Roles
        *   Users
   
-The formats of these menus can be seen in the attached images (once someone tells me where the link is [hint, it is not the words "Upload image" on the left aside]).
+The formats of these menus can be seen in the attached images (once someone tells me where the link is (hint, it is not the words "Upload image" on the left aside)).
 In the meanwhile, the images are in the github repository noted above under the doc directory.
 
 If all of the tabs on the main menu were visible simultaneously, 

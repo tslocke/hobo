@@ -1,4 +1,4 @@
-# Remembering <table-plus> Filter Parameters
+# Remembering `<table-plus>` Filter Parameters
 
 Originally written by Dean on 2010-07-08.
 

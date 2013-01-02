@@ -12,12 +12,12 @@ Step One: Create two tables and install paperclip
 =================================================
 
 We create the application and two tables: clients and attachments
-<pre>
-hobo demo_progress_bar
-cd demo_progress_bar
-script/generate hobo_model_resource client name:string
-script/generate hobo_model_resource attachment
-</pre>
+
+    hobo demo_progress_bar
+    cd demo_progress_bar
+    script/generate hobo_model_resource client name:string
+    script/generate hobo_model_resource attachment
+
 
 Every *client* has_many *attachments*:
 
@@ -79,8 +79,6 @@ tar xzfv Paperclip.tar.gz
 
 Now we prepare the model, the views and the migrations
 
-<pre class="ruby">
-<code>
       has_attached_file :file, 
           :whiny => false, 
           :path => "#{RAILS_ROOT}/files/:id.:extension"
@@ -99,8 +97,7 @@ Now we prepare the model, the views and the migrations
           (file_file_size / 1048576).to_s + ' MB'
         end
       end
-</code>
-</pre>
+{.ruby}
 
 
 

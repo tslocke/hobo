@@ -1,4 +1,4 @@
-# Using multiple <sortable-collection>'s for the same model on the same page
+# Using multiple `<sortable-collection>`'s for the same model on the same page
 
 Originally written by Henry Baragar on 2010-04-09.
 

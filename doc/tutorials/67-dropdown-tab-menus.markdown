@@ -240,45 +240,45 @@ One of my clients insisted on having drop-down menus on her website.  Since "The
 
     /* End of Dropdown menu code */
 
-4) Insert the following in application.css (again, this should go in its own file, but..._
+4) Insert the following in application.css (again, this should go in its own file, but...
 
-/* ######### Style for Drop Down Menu ######### */
-
-.my_drop_down_div
-{
-  position:absolute;
-  top: 0;
-  border : none;
-  line-height:18px;
-  z-index:100;
-  background-color: #ff0000; 
-  width: 110px;
-  visibility: hidden;
-  font:10px/18px "Lucida Grande","Trebuchet MS",Arial,sans-serif;
-}
-
-
-.my_drop_down_div a
-{
-	width: auto;
-	display: block;
-	text-indent: 5px;
-	padding: 2px 0;
-	text-decoration: none;
-	color: white;
-	background:  #242E42;
-}
-
-* html .my_drop_down_div a /*IE only hack*/
-{
-  width: 100%;
-}
-
-.my_drop_down_div a:hover /*THEME CHANGE HERE*/
-{
-  color: #242E42;
-  background-color: #ffffff; 
-}
+    /* ######### Style for Drop Down Menu ######### */
+    
+    .my_drop_down_div
+    {
+      position:absolute;
+      top: 0;
+      border : none;
+      line-height:18px;
+      z-index:100;
+      background-color: #ff0000; 
+      width: 110px;
+      visibility: hidden;
+      font:10px/18px "Lucida Grande","Trebuchet MS",Arial,sans-serif;
+    }
+    
+    
+    .my_drop_down_div a
+    {
+            width: auto;
+            display: block;
+            text-indent: 5px;
+            padding: 2px 0;
+            text-decoration: none;
+            color: white;
+            background:  #242E42;
+    }
+    
+    * html .my_drop_down_div a /*IE only hack*/
+    {
+      width: 100%;
+    }
+    
+    .my_drop_down_div a:hover /*THEME CHANGE HERE*/
+    {
+      color: #242E42;
+      background-color: #ffffff; 
+    }
 
 
 I fiddled with the css until the drop down looked like the main tabs.  You will probably want to adjust the width to suit your drop down menu width, but it seems to adjust itself appropriately for most cases.
