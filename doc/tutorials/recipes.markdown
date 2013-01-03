@@ -1,6 +1,6 @@
 # User Contributed Recipes
 
-[Add a mew recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
+[Add a new recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
 
 * [Mobile & iPad friendly sortable-collections](1804-mobile-ipad-friendly-sortable-collections) by Henry Baragar
 * [Use your own hobo fork](1803-use-your-own-hobo-fork) by kredmer
@@ -68,4 +68,4 @@
 * [Fall back to Rails techniques in your views](2-fall-back-to-rails-techniques-in) by Tom
 * [Add your own rich type](1-add-your-own-rich-type) by Tom
 
-[Add a mew recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
+[Add a new recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
