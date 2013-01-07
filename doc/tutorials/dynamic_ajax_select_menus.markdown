@@ -79,7 +79,6 @@ OK - fire her up. Once you've signed up you'll see you have a regular "New Proje
 
 Here's a custom version of the project form that populates the city menu according to the projects country:
 
-```xml
     <extend tag="form" for="Project">
       <old-form merge>
         <field-list: fields="name, country, city">
@@ -94,7 +93,7 @@ Here's a custom version of the project form that populates the city menu accordi
         </field-list:>
       </old-form>
     </extend>
-```
+{.dryml}
 
 Try adding that to front_site.dryml and then create a project. The new project wont have a country, so the city menu will be disabled. But if you chose a country, create the project and then go to edit it, you should see the cities from that country in the city menu. We're making progress.
 
@@ -102,14 +101,13 @@ Try adding that to front_site.dryml and then create a project. The new project w
 
 We now need to do three things to add the ajax behaviour and tie it all together:
 
- - Put the city menu in an ajax 'part' so that it can be updated dynamically (<do>` is just a do nothing tag that can be used to add parts or params without changing the markup)
+ - Put the city menu in an ajax 'part' so that it can be updated dynamically (`<do>` is just a do nothing tag that can be used to add parts or params without changing the markup)
 
  - Add a formlet capable of updating the 'part'
 
  - Add some JavaScript to the country select onchange event to trigger the formlet
  
 
-```xml
     <extend tag="form" for="Project">
       <old-form merge>
         <field-list: fields="name, country, city">
@@ -136,6 +134,6 @@ We now need to do three things to add the ajax behaviour and tie it all together
         </field-list:>
       </old-form>
     </extend> 
-```
+{.dryml}
 
 It should now all be working :o)
