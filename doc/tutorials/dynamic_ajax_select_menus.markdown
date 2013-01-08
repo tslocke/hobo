@@ -127,7 +127,7 @@ We now need to do three things to add the ajax behaviour and tie it all together
               </else>
             </do>
             
-            <formlet action="/projects" id="city-menu-form" updates="#city-menu">
+            <formlet action="/projects/new" method="get" id="city-menu-form" updates="#city-menu">
               <input id="country-field" name="project[country_id]" value="" type="hidden"/>
             </formlet>
           </city-view:>
