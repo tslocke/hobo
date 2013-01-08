@@ -1,7 +1,15 @@
 The DRYML Guide
 {: .document-title}
 
-Welcome to the DRYML Guide. If you want to learn all the ins and outs of DRYML and become a master of quick and elegant view templates, you're in the right place. If you're very new to Hobo and DRYML you might be better off with something like the Agility tutorial. This guide is somewhere between a tutorial and a reference, designed to fill in the gaps for people who have already got the hang of the basics. 
+DRYML is a templating language based on the concept of composable parameterized tags.  This makes it possible to create a complex tag (such as a whole web page) whose inner (parameterized) pieces can be customized differently on different invocations.  For example, for every resouce (model-view-controller) created in application, hobo automatically creates an associated CRUD interface that is easily adaptable to meet the application's requirements.  Indeed, most Hobo applications, even the ones with complex interfaces, simply use the generated interface with minor adaptions.
+
+This chapter is devoted to the details of how to use, create and extend DRYML tags.  If you have little or no experience with Hobo and DRYML, then it would be better for you to start with the Agility tutorial---to get an understanding of how DRYML is used---before staring on this chapter.  If you are developing an application and want to customize part of the interface, then it would be better for you to start in the app/views/taglibs/auto/rapid/ directory of your application, where the automatically generated tags are stored.  If you need more information about the tags used construct your application's interface, or need specialized tags, then you probably should be exploring the Tab Libraries (Taglibs).  Fin
+ally, if you need to create new tags, extend old tags, or need to call tags in a
+ non-simple way, then read on.
+
+
+
+
 
 Contents
 {: .contents-heading}
