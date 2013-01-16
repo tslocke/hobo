@@ -44,10 +44,10 @@ Here's the code for the friendship mode (don't be put off by the `MagicMailer`, 
       hobo_model
 
       # The 'sender' of the invite
-      belongs_to :invitor, :class_name => "User"
+      belongs_to :invitor, :class_name => "User", :inverse_of => :friendships
 
       # The 'recipient' of the invite
-      belongs_to :invitee, :class_name => "User"
+      belongs_to :invitee, :class_name => "User", :inverse_of => :friendships
 
       lifecycle do
 
@@ -456,9 +456,7 @@ Proc to provide a snippet of code that either returns acting_user or nil:
 
 # Validations
 
-TO DO
-
-Short version: validations have been extended so you can give the name of a lifecycle step to the :on option. e.g.
+Validations have been extended so you can give the name of a lifecycle step to the :on option. e.g.
 
     validates_presence_of :notes, :on => :submit
 {.ruby}
@@ -653,16 +651,17 @@ Where `submit` can be any lifecycle step.
 
 # Lifecycles in Rapid: pages, forms and buttons
 
-TO DO.
+`<form>` has support for lifecycle actions in Hobo.  The `lifecycle` attribute allows you to specify the name of a transition or creator rather than specifying the `action` and `method` attributes.  If the lifecycle is not available due to state or permissions, the form is not displayed.    `<else>` may be used to display an alternate message.
 
-Have a look in the auto-generated taglibs:
+    <form lifecycle="mogrify">
+       ...
+    </form>
+    <else>
+      Foo is already in the mogrified state.
+    </else>
 
- - `pages.dryml` contains pages for each publishable create and transition.
+Hobo also auto-generates form for all of the available lifecycle transitions and creators.  Look in `app/views/taglibs/auto/rapid/forms.dryml` for their definitions.   You may copy & modify those in your application.dryml.   Even better, you can use standard DRYML techniques to extend them.
 
- - `forms.dryml` contains forms for each publishable create and transition.
+Hobo also auto-generates pages for the available lifecycle transitions and creators.   The definitions for these are available in  `app/views/taglibs/auto/rapid/pages.dryml`.
 
-There are a couple of tags in `rapid_lifecycles.dryml` that provide buttons for executing transition steps (e.g. an "Accept Friendship" button).
-
-# Other bits to do:
-
-Invariants (do we even need/want these?)
+You can create buttons for parameter-less transitions and links to lifecycle pages for creators and transitions with parameters via the RAPID tags `<transition-button>`, `<transition-buttons>` and `<transition-link>`.

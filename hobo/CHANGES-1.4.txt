@@ -763,6 +763,7 @@ There's a new helper function called query_parameters_filtered that
 returns query parameters with the ajax parameters removed.
 
 ### parse_sort_param
+{.done}
 
 The controller function parse_sort_param has been updated so that it
 can take a hash instead of or as well as an argument list.  The key of

@@ -65,7 +65,7 @@ or on a standard generated page using a default form:
 
  - web-method
 
- - lifecycle
+ - lifecycle: specifies the name of a transition or creator.   This attribute is an alternative to the action and method attributes.   There should also be auto-generated forms in your `app/views/taglibs/auto/rapid/forms.dryml` that you may be able to use unchanged or with light customization.   See [the lifecycles manual](/manual/lifecycles#lifecycles_in_rapid_pages_forms_and_buttons) for more information
 
  - owner
 
