@@ -62,11 +62,10 @@ Redirect to the URI stored by the most recent store_location call or to the pass
 When called with before_filter, `login_from_cookie` will call `authenticated_user_from_cookie` to check for
 an `auth_token` cookie, and if the result is appropiate, it will log the user in.
 
+See the [controller section in Users and Authentication](/manual/users_and_authentication#hobo_user_controller) for more information
 
-
-/manual/users_and_authentication#hobo_user_controller
 ## create_auth_cookie
-/manual/users_and_authentication#hobo_user_controller
+
 Populates `cookies[:auth_token]` with `current_user` data.
 
 
@@ -87,6 +86,8 @@ Refer to the `<swept-cache>` taglib for more information.
 
 ## Introduction to the Hobo Model Controller Module
 
+Adding `hobo_model_controller` to one of your controllers will include this module
+
 This module uses `def included(base)` to run some code in the context of the current controller. Some interesting stuff:
 * Defines @auto_actions as an empty hash if it's not already defined.
 * Runs `extend ClassMethods` to add the ClassMethods module to the current controller.
@@ -94,33 +95,72 @@ This module uses `def included(base)` to run some code in the context of the cur
 * Rescues from some errors: `ActiveRecord::RecordNotFound, ActiveRecord::RecordNotFound, Hobo::Model::Lifecycles::LifecycleKeyError`
 * Loads some subsite magic
 
-The rest of this section will talk about the ClassMethods added to the controller.
+## Class Methods
 
 
-## model_name and model
+### model_name and model
 
 `model_name` returns `model.name.underscore`
 
 `model` returns `@model` or `controller_name.camelcase.singularize.constantize`
 
 
-## autocomplete
+### autocomplete
 
-This is the action called by the `<name-one>` tag to autocomplete results. See Autocompleters section in the controller manual.
-
-
-## web_method
-
-See `Web methods` sections in the Controller manual.
+This is the action called by the `<name-one>` tag to autocomplete results. See [Autocompleters](/manual/controllers#autocompleters) section in the controller manual.
 
 
+### web_method
 
-## auto_actions
-
-See `Selecting the automatic actions` in the Controller manual.
+See [Web methods](/manual/controllers#web_methods) in the Controller manual.
 
 
 
-## def_lifecycle_actions
+### auto_actions
 
-See Lifecycles section in the Controller manual.
+See [Selecting the automatic actions](/manual/controllers#selecting_the_automatic_actions) in the Controller manual.
+
+
+### def_lifecycle_actions
+
+See [Lifecycles](/manual/controllers#lifecycles) in the Controller manual.
+
+
+## Instance Methods
+
+### find_instance
+
+If your model is Foo, this method is equivalent to
+
+    Foo.find(params[:id])
+
+in the simple case.   However, it also understands owned routes and sets `acting_user`.
+
+    @foo = find_instance
+
+is quite frequently the first line a custom Hobo controller action.
+
+
+### re_render_form
+
+If you have errors on your page, you can call this helper to re-render the view that contains the source form, with errors highlighted.
+
+
+### destination_after_submit
+
+Contains the logic for [Automatic Redirects)(/manual/controllers#automatic_redirects).
+
+
+### parse_sort_param
+
+Converts params[:sort] from the form used by `<table-plus>` into a form suitable to be passed to the [order_by](/manual/scopes#order_by) scope.
+
+Simple usage is to pass a list of field names, however the last parameter can be a hash which maps from field name to database column name.
+
+    parse_sort_param(:title, :isbn, :author => "authors.last_name")
+
+`parse_sort_param` accepts dotted field names, automatically pluralizing to determine the database column.
+
+    Story.include(:tasks).order_by(parse_sort_param("task.title"))
+
+will sort on `task.title` as long as :tasks is included or joined to the scope
