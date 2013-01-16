@@ -20,11 +20,11 @@ your best resource.
 The application that I'm going to convert is called **scheduler**.
 Let's add a Hobo dependency to it.
 
-    $ gem install hobo
-
 Inside the Gemfile add:
 
-    gem 'hobo'
+    gem 'hobo', "2.0.0.pre8"
+
+and then run `bundle`.
 
 It might be a good idea to run your application and confirm that
 everything still works.
@@ -43,17 +43,24 @@ Now we'll ask Hobo to copy it's shared files into your application.
 These are mostly javascript, css and dryml files
 
     $ hobo g assets
-    $ hobo g rapid
+    $ hobo g install_plugin hobo_jquery_ui
+
+(Note that hobo_jquery_ui may later be removed (http://hobocentral.net/blog/2012/12/21/using-hobo-2-0-without-jquery-ui/).
 
 Now let's create our admin subsite:
 
-    $ hobo g subsite admin --make-front-site
-    $ hobo g front_controller admin::front --add-routes
+    $ hobo g subsite admin --theme=bootstrap
 
 Note that if you use `admin_subsite` rather than `subsite`, the
 subsite will be limited to the administrator.  For this to work, you
 will need to complete the section labelled "Updating your User Model",
 below.
+
+The two most common choices for theme is `bootstrap` and `clean`.  If you choose the bootstrap theme, you probably also want to `hobo g install_plugin hobo_bootstrap_ui`.
+
+    $ hobo g front_controller admin::front --add-routes
+
+Now if you run your application you should be able to access the page `/admin/front`.   You can customize this page at `app/views/admin/front/index.dryml`.   You may have to remove the clause containing `if User.count == 0`.
 
 ## Hobofying a model
 
@@ -88,7 +95,7 @@ what I use in my user model:
       true
     end
 
-For now, I recommend returning _true_ from all of these permission
+For now, I recommend temporarily returning _true_ from all of these permission
 functions.  After hobofying your User model, these functions will
 become easier to write.
 
