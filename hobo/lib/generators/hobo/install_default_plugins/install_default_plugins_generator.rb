@@ -17,6 +17,8 @@ module Hobo
       install_plugin_helper('hobo_rapid', nil, opts.merge(:skip_dryml => true, :skip_gem => true))
       say "Installing hobo_jquery plugin..."
       install_plugin_helper('hobo_jquery', nil, opts.merge(:skip_gem => true))
+      say "Installing #{opts[:theme]} theme..."
+      install_plugin_helper(opts[:theme], nil, opts)
       say "Installing hobo_jquery_ui plugin..."
       install_plugin_helper('hobo_jquery_ui', nil, opts)
       if opts[:theme]=='hobo_bootstrap'
@@ -24,9 +26,7 @@ module Hobo
         install_plugin_helper('hobo_bootstrap_ui', nil, opts)
       end
 
-      say "Installing #{opts[:theme]} theme..."
       inject_css_require("jquery-ui/#{opts[:ui_theme]}", opts[:subsite], nil)
-      install_plugin_helper(opts[:theme], nil, opts)
 
       unless opts[:skip_gem]
         gem_with_comments("jquery-ui-themes", "~> 0.0.4")

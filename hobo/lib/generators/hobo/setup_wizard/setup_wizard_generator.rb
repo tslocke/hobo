@@ -26,7 +26,7 @@ module Hobo
     :desc => "Front Controller Name", :default => 'front'
 
     class_option :front_theme, :type => :string,
-    :desc => "Front Theme", :default => 'clean'
+    :desc => "Front Theme", :default => 'bootstrap'
 
     class_option :front_ui_theme, :type => :string,
     :desc => "Front jQuery-UI Theme", :default => 'redmond'
