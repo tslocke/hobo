@@ -9,7 +9,7 @@ module Generators
 
         unless File.read("Gemfile") =~ /^gem ("|')#{name}/
           if (comments = options.delete(:comments))
-            append_file "Gemfile", "#{comments}\n", :verbose => false
+            append_file "Gemfile", "#{comments}", :verbose => false
           end
 
           gem(args[0], args[1], options)
