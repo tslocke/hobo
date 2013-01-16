@@ -177,29 +177,9 @@ It is omnipresent: it will just appear everywhere there is a key lookup, even in
 It also shows how to override any hobo default strings for a specific model, (for example titles or heading for pages) since it shows both the called key and the fallback for each key passed to the ht method.
 
 
-# Issues with Enum String in Hobo 1.3
+# Issues with Enum String
 
-If you are trying to translate a enum_string field in Hobo 1.3, please take a look at this topic in Hobo Users: http://groups.google.com/group/hobousers/browse_thread/thread/484dc97b1e7c80e6
+If you are trying to translate a enum_string field, please take a look at this topic in Hobo Users: http://groups.google.com/group/hobousers/browse_thread/thread/484dc97b1e7c80e6
 
-This is an example in the model:
-
-```ruby
-Sex = HoboFields::Types::EnumString.for(:male, :female) 
-fields do
-  ...
-  sex Sex
-  ...
-end
-```
-
-And in the translation file:
-
-```yaml
-es:
-  expedient/sexs:
-    male: "Hombre"
-    female: "Mujer" 
-```
-
-While this works right when translating an application to one language, if you need to switch languages there 
-is an issue at the time of writing: https://hobo.lighthouseapp.com/projects/8324/tickets/1000-i18n-support-switching-locales-with-enum_string
+While this works right when translating an application to one language, if you need to switch languages dynamically there 
+is an issue at the time of writing: https://github.com/Hobo/hobo/issues/21
