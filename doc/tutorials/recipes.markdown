@@ -1,3 +1,14 @@
+# Tutorials
+
+* [Hobo in Two Minutes](two-minutes)
+* [Screencast](screencast)
+* [Full Tutorial](agility)
+* [Adding a Hobo subsite to a Rails app](subsite)
+* [The Caching Tags](caching)
+* [Dynamic Ajax Select](dynamic_ajax_select_menus)
+* [The Caching Tags](caching)
+* [Using Hobo 2.0 without jQuery-UI](http://hobocentral.net/blog/2012/12/21/using-hobo-2-0-without-jquery-ui/)
+
 # User Contributed Recipes
 
 [Add a new recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)

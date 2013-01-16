@@ -5,5 +5,7 @@
 * [Full Tutorial](agility)
 * [Adding a Hobo subsite to a Rails app](subsite)
 * [The Caching Tags](caching)
-* [User Contributed Recipes](recipes)
+* [Dynamic Ajax Select](dynamic_ajax_select_menus)
+* [The Caching Tags](caching)
+* [More...](recipes)
 {.navigation .nav .nav-list}
