@@ -58,7 +58,7 @@ Note that now that we have more than one cache tag on this page we've added a `s
 
 Here we are still using the `<hobo-cache>` tag so you have to manually ensure that the cache keys passed to the outer cache tag are a superset of the cache keys passed to the inner cache tag.   That's quite easy for this simple example, but on a more complex website this violates the principle of Don't Repeat Yourself.  Dependency information should only be specified in one place.
 
-<script src="http://gist-it.appspot.com/github/Hobo/hobo_caching_demo/raw/master/app/views/widgets/simple_russian.dryml"> </script>
+<script src="http://gist-it.appspot.com/github/Hobo/hobo_caching_demo/raw/master/app/views/widgets/nested.dryml"> </script>
 
 We've made two major changes for nested.dryml.   We've switched from `<hobo-cache>` to `<nested-cache>`, and we've split out the table row into it's own tag.
 
