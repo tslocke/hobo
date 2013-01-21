@@ -6,11 +6,11 @@ An example of when this is useful is when a form is rendered differently dependi
      <field-list: replace>
        <do part="shipping">
          <field-list fields="address,city,region,country,postal_code">
-           <country-view:><hot-input ajax /><country-view:>
-           <region-label:><%= this_parent.country._?.region_label %><region-label:>
-         <field-list>
+           <country-view:><hot-input ajax /></country-view:>
+           <region-label:><%= this_parent.country._?.region_label %></region-label:>
+         </field-list>
        </do>
-     <field-list:>
+     </field-list:>
 
 The actual input is exposed as the default parameter, so it can be customized:
 
