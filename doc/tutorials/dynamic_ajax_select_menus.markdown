@@ -137,3 +137,33 @@ We now need to do three things to add the ajax behaviour and tie it all together
 {.dryml}
 
 It should now all be working :o)
+
+
+# Update: Refactoring the code with hot-input
+
+A month after writing this recipe I came across `hot-input`, a new tag that allows us to refactor this code in a very nice way. This is the same form with hot-input:
+
+        <extend tag="form" for="Project">
+          <old-form merge>
+            <field-list: replace>
+              <do part="shipping">
+                <field-list fields="name, country, city">
+                  <country-view:><hot-input ajax /></country-view:>
+                  <city-view:>
+                    <if test="&this_parent.country">
+                      <select-one options="&this_parent.country.cities"/>
+                    </if>
+                    <else>
+                      <select disabled><option>First choose a country</option></select>
+                    </else>
+                  </city-view:>
+                </field-list>
+              </do>
+            </field-list:>
+          </old-form>
+        </extend>
+{.dryml}
+
+This is much shorter and works exactly the same :).
+
+[More info about hot-input](http://cookbook.hobocentral.net/tagdef/hobo_rapid/inputs/hot-input)
