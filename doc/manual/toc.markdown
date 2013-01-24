@@ -10,6 +10,10 @@ First you need to [**Download and Install**](/manual/download) Hobo.
 Next you will probably want to check out one of our fine
 [**tutorials**](/tutorials).
 
+More information about Hobo is provided on our [**About**](/manual/about) page.
+
+[**Community**](/manual/community) tells you where to go to get help.
+
 ## Ruby
 
 [**Hobo Support**](/manual/hobo_support) is akin to
