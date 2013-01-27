@@ -13,6 +13,7 @@
 
 [Add a new recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
 
+* [Dynamic Ajax select menus](dynamic_ajax_select_menus) by ignacio
 * [Mobile & iPad friendly sortable-collections](1804-mobile-ipad-friendly-sortable-collections) by Henry Baragar
 * [Use your own hobo fork](1803-use-your-own-hobo-fork) by kredmer
 * [Appcelerator Titanium (Mobile App) and Hobo](1802-appcelerator-titanium-mobile-app-and-hobo) by mdkarp
@@ -31,7 +32,6 @@
 * [Hobo with Paperclip - storage to db column.](63-hobo-with-paperclip-storage-to-db) by dziesig
 * [Full stack testing a Hobo Application](62-full-stack-testing-a-hobo-application) by umuro
 * [Hobo on Amazon EC2](61-hobo-on-amazon-ec2) by brett
-* [incompatibilti ç, help me](60-incompatibilti-help-me) by martinszutner
 * [Instant Front End: Just Add Schema to Hobo](59-instant-front-end-just-add-schema) by allen13
 * [Setting up unix like permissions with hobo](58-setting-up-unix-like-permissions-with) by kevinpfromnm
 * [How to get full text search working with Sunspot](57-how-to-get-full-text-search) by kevinpfromnm
