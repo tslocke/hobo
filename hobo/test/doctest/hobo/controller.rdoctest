@@ -148,7 +148,7 @@ If you have errors on your page, you can call this helper to re-render the view 
 
 ### destination_after_submit
 
-Contains the logic for [Automatic Redirects)(/manual/controllers#automatic_redirects).
+Contains the logic for [Automatic Redirects](/manual/controllers#automatic_redirects).
 
 
 ### parse_sort_param
