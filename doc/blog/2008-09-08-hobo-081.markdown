@@ -1,0 +1,148 @@
+--- 
+wordpress_id: 207
+author_login: admin
+layout: post
+comments: 
+- author: Owen
+  date: Mon Sep 08 18:41:35 +0000 2008
+  id: 47720
+  content: |
+    <p>Thanks, Tom.  You are on a roll!</p>
+    
+    <p>-Owen</p>
+
+  date_gmt: Mon Sep 08 18:41:35 +0000 2008
+  author_email: odall@barquin.com
+  author_url: http://www.barquin.com
+- author: Edward
+  date: Tue Sep 09 14:18:51 +0000 2008
+  id: 47785
+  content: |
+    <p>Please help, I have a problem</p>
+    
+    <p>C:\ruby\PROJECTZ>gem update hobo
+    Updating installed gems
+    Updating hobo
+    ERROR:  While executing gem ... (Gem::InstallError)
+        hobo requires rails (= 2.1, runtime)</p>
+    
+    <p>then when I try to downgrade rails to 2.1 from 2.1.1 it says</p>
+    
+    <p>C:\ruby\PROJECTZ>gem install rails 2.1
+    Successfully installed rails-2.1.1
+    ERROR:  could not find gem 2.1 locally or in a repository
+    1 gem installed</p>
+
+  date_gmt: Tue Sep 09 14:18:51 +0000 2008
+  author_email: edward.samokhvalov@dfgcapital.com
+  author_url: ""
+- author: Kevin
+  date: Tue Sep 09 16:53:47 +0000 2008
+  id: 47792
+  content: |
+    <p>You need to specify a version with -v VERSION</p>
+
+  date_gmt: Tue Sep 09 16:53:47 +0000 2008
+  author_email: kevinpfromnm@gmail.com
+  author_url: ""
+- author: Edward
+  date: Thu Sep 11 14:22:34 +0000 2008
+  id: 47899
+  content: |
+    <p>Thx for help, but another problem here.</p>
+    
+    <p>I've updated hobo and rails' version is now 1.2.0
+    After generating app and starting server, in the browser it shows</p>
+    
+    <p>Hobo::Dryml::DrymlException in Front#index</p>
+    
+    <p>Showing front/index.dryml where line # raised:</p>
+    
+    <p>No such taglib: C:/ruby/PROJECTZ/newapp/app/views {:type=>:include, :src=>"taglibs/auto/rapid/cards", :template_dir=>"app/views/taglibs"} C:/ruby/PROJECTZ/newapp/app/views/taglibs/auto/rapid/cards.dryml</p>
+
+  date_gmt: Thu Sep 11 14:22:34 +0000 2008
+  author_email: edward.samokhvalov@dfgcapital.com
+  author_url: ""
+- author: Ben H
+  date: Wed Oct 29 20:59:26 +0000 2008
+  id: 50270
+  content: |
+    <p>Having the exact same problem as Edward on a virgin 2.1.1 hobo app using 0.8.3</p>
+
+  date_gmt: Wed Oct 29 20:59:26 +0000 2008
+  author_email: ""
+  author_url: ""
+- author: nigel thorne
+  date: Mon Dec 08 10:59:18 +0000 2008
+  id: 51519
+  content: |
+    <p>same problem here too. on virgin rails 2.2.2  hobo 0.8.4 app</p>
+    
+    <p>Processing FrontController#index (for xxx.xx.xx.x  at 2008-12-08 10:53:22) [GET]
+    Rendering front/index</p>
+    
+    <p>ActionView::TemplateError (No such taglib: /home/webhost/public<em>html/codeblog/app/views {:type=>:include, :template</em>dir=>"app/views/taglibs", :src=>"taglibs/auto/rapid/cards"} /home/webhost/public_html/codeblog/app/views/taglibs/auto/rapid/cards.dryml) in app/views/front/index.dryml:</p>
+
+  date_gmt: Mon Dec 08 10:59:18 +0000 2008
+  author_email: hobo@nigelthorne.com
+  author_url: ""
+- author: Arch
+  date: Sun Dec 14 08:38:47 +0000 2008
+  id: 51556
+  content: |
+    <p>Same issue here, rails 2.2.2, hobo 0.8.5</p>
+    
+    <p>No such taglib: /var/www/register/app/views {:type=>:include, :src=>"taglibs/auto/rapid/cards"</p>
+    
+    <p>Any idea what to do to get this to work, i'm using mysql incase that makes a difference.</p>
+
+  date_gmt: Sun Dec 14 08:38:47 +0000 2008
+  author_email: archfile@gmail.com
+  author_url: http://Nil
+- author: Ade
+  date: Sat Jan 03 20:03:07 +0000 2009
+  id: 51568
+  content: |
+    <p>Same problem here.</p>
+
+  date_gmt: Sat Jan 03 20:03:07 +0000 2009
+  author_email: ""
+  author_url: ""
+- author: Ade
+  date: Sat Jan 03 20:07:06 +0000 2009
+  id: 51569
+  content: |
+    <p>Fix: Just run
+        ./script/generate hobo_migration
+    before starting the server.</p>
+
+  date_gmt: Sat Jan 03 20:07:06 +0000 2009
+  author_email: ""
+  author_url: ""
+- author: Tom
+  date: Mon Jan 05 09:02:50 +0000 2009
+  id: 51570
+  content: |
+    <p>As Ade figured out, the "No such taglib ... rapid/cards" was a case of a misleading error message. In fact there was an error with the database. Most likely you have not created or run migrations, and the actual error is something like "missing table: users".</p>
+    
+    <p>This is fixed in the latest Hobo code - you see the real error rather than this misleading one.</p>
+
+  date_gmt: Mon Jan 05 09:02:50 +0000 2009
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+author: Tom
+title: Hobo 0.8.1
+published: true
+tags: []
+
+date: 2008-09-08 17:00:50 +00:00
+categories: 
+- Releases
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2008/09/08/hobo-081/
+author_url: http://www.hobocentral.net
+status: publish
+---
+I've just released Hobo 0.8.1 which contains a bunch of fixes and small enhancements. It's tagged in the git repo, the gems are on Rubyforge (so you can just `gem update hobo`), and you can read the [changes](/gems/CHANGES.txt)
+
+Enjoy!

@@ -1,0 +1,106 @@
+--- 
+wordpress_id: 276
+author_login: bryanlarsen
+layout: post
+comments: 
+- author: Betelgeuse
+  date: Thu Jan 21 19:10:12 +0000 2010
+  id: 51843
+  content: |
+    <p>Some other fixed tickets:
+    https://hobo.lighthouseapp.com/projects/8324/tickets/584-using-count-in-index-page-cards-leads-to-loading-the-whole-collection</p>
+    
+    <p>https://hobo.lighthouseapp.com/projects/8324/tickets/565-rake-hobogenerate_taglibs-fails-after-upgrade-to-09102</p>
+    
+    <p>Please mark this as resolved and to the right milestone.</p>
+    
+    <p>https://hobo.lighthouseapp.com/projects/8324/tickets/581-hobo-10-rc2-generates-card-css-class-with-spaces-instead-of-hyphens</p>
+
+  date_gmt: Thu Jan 21 19:10:12 +0000 2010
+  author_email: petsku@petteriraty.eu
+  author_url: ""
+- author: ""
+  date: Thu Jan 21 21:50:45 +0000 2010
+  id: 51844
+  content: |
+    <p>My initial tests on Windows XP with Ruby 1.9.1 work fine...</p>
+    
+    <p>-Owen</p>
+
+  date_gmt: Thu Jan 21 21:50:45 +0000 2010
+  author_email: ""
+  author_url: ""
+- author: Owen
+  date: Fri Jan 22 10:51:20 +0000 2010
+  id: 51845
+  content: |
+    <p>I have tested now on Windows XP, Windows Vista, Windows 7, and Mac Snow Leopard.</p>
+    
+    <p>Looking good!</p>
+
+  date_gmt: Fri Jan 22 10:51:20 +0000 2010
+  author_email: odall@barquin.com
+  author_url: http://www.barquin.com
+- author: Owen
+  date: Fri Jan 22 19:29:58 +0000 2010
+  id: 51850
+  content: |
+    <p>On to RC4 this weekend</p>
+
+  date_gmt: Fri Jan 22 19:29:58 +0000 2010
+  author_email: ""
+  author_url: ""
+author: Bryan Larsen
+title: Hobo 1.0RC3
+published: true
+tags: []
+
+date: 2010-01-21 18:34:06 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=276
+author_url: http://bryan.larsen.st
+status: publish
+---
+I'm pleased to announce the release of Hobo 1.0RC3 (AKA 0.9.104).  We hope that this will be the last release candidate before 1.0.
+
+A large amount of the effort between the last two releases has gone into testing and into the [documentation](http://cookbook.hobocentral.net/manual/toc).
+
+Here's the changelog:
+
+[#604](https://hobo.lighthouseapp.com/projects/8324/tickets/604):
+
+The new input-many introduced in 0.9.103 had issues with >10 elements,
+several issues running with IE7 and an issue with its javascript
+callbacks.
+
+[#537](https://hobo.lighthouseapp.com/projects/8324/tickets/537):
+
+`x._?.to_s` now returns nil rather than a blank string
+
+[#592](https://hobo.lighthouseapp.com/projects/8324/tickets/592): 
+
+If you previously had a snippet such as this:
+
+    <table fields="this, date, account.login">
+      <login-view:>
+        ...
+      </login-view:>
+    </table>
+
+You now have to use:
+
+    <table fields="this, date, account.login">
+      <account-login-view:>
+        ...
+      </account-login-view:>
+    </table>
+
+The same change has been applied to `<field-list>`
+
+[#568](https://hobo.lighthouseapp.com/projects/8324/tickets/568):
+
+`hobo_index` now supports the `:scope` option
+
+See also the [git log](http://github.com/tablatom/hobo/commits/v0.9.104)

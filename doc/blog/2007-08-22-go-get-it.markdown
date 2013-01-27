@@ -1,0 +1,122 @@
+--- 
+wordpress_id: 168
+author_login: admin
+layout: post
+comments: 
+- author: Michael
+  date: Wed Aug 22 15:19:47 +0000 2007
+  id: 9483
+  content: |
+    <p>Woo hoo!  I can't wait to try it out.  Thanks for all the hard work Tom.</p>
+
+  date_gmt: Wed Aug 22 15:19:47 +0000 2007
+  author_email: michael@tradermike.net
+  author_url: http://tradermike.net
+- author: Sean
+  date: Wed Aug 22 16:04:43 +0000 2007
+  id: 9484
+  content: |
+    <p>Nice! I've been looking forward to this...</p>
+
+  date_gmt: Wed Aug 22 16:04:43 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: sol
+  date: Wed Aug 22 16:53:28 +0000 2007
+  id: 9486
+  content: |
+    <p>great! thanks a lot.</p>
+
+  date_gmt: Wed Aug 22 16:53:28 +0000 2007
+  author_email: cb@tachium.at
+  author_url: http://www.tachium.at
+- author: Thomas Fee
+  date: Thu Aug 23 03:07:14 +0000 2007
+  id: 9506
+  content: |
+    <p>Great! Thanks so much for this gift. Have been looking forward to this.</p>
+
+  date_gmt: Thu Aug 23 03:07:14 +0000 2007
+  author_email: gasbeing@gmail.com
+  author_url: ""
+- author: Andy
+  date: Thu Aug 23 07:21:30 +0000 2007
+  id: 9515
+  content: |
+    <p>Yah! cannot wait to get my dity paws on it. Thanks Tom!</p>
+
+  date_gmt: Thu Aug 23 07:21:30 +0000 2007
+  author_email: andy@stannard.net
+  author_url: http://www.MADM0nk3y.com
+- author: polarbear
+  date: Thu Aug 23 20:31:25 +0000 2007
+  id: 9532
+  content: |
+    <p>Great! :-) Now force yourself to write that documentation, even if it is boring work, because we hobo users really appreciate it.</p>
+
+  date_gmt: Thu Aug 23 20:31:25 +0000 2007
+  author_email: mats.ekblom@gmail.com
+  author_url: ""
+- author: hachaboob
+  date: Sat Aug 25 07:54:44 +0000 2007
+  id: 9605
+  content: |
+    <p>I love the "migrations" in the models. I hope something like this gets into edge!</p>
+    
+    <p>The migrations? Are? Inside the model? Ooo Ah ah ah! Ooo! Ooo!</p>
+
+  date_gmt: Sat Aug 25 07:54:44 +0000 2007
+  author_email: hachaboob@optusnet.com.au
+  author_url: ""
+- author: Tom
+  date: Sat Aug 25 08:36:31 +0000 2007
+  id: 9611
+  content: |
+    <p>hachaboob - just to clarify, the migrations aren't really in the model. Migrations are still the same, but the field declarations are in the model and the migrations are generated automatically.</p>
+    
+    <p>Just thought I'd clarify that for people that haven't used it and might think all the migration code goes in the model.</p>
+
+  date_gmt: Sat Aug 25 08:36:31 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: hachaboob
+  date: Sat Aug 25 11:10:24 +0000 2007
+  id: 9613
+  content: |
+    <p>Yeah I don't explain stuff good. Basically I think it's genius.</p>
+
+  date_gmt: Sat Aug 25 11:10:24 +0000 2007
+  author_email: hachaboob@optusnet.com.au
+  author_url: ""
+- author: "A Fresh Cup &raquo; Blog Archive &raquo; Double Shot #79"
+  date: Fri Dec 28 18:57:06 +0000 2007
+  id: 19550
+  content: |
+    <p>[...] Go get it - Hobo 0.6, which provides fast web app building tools for Rails, is out. [...]</p>
+
+  date_gmt: Fri Dec 28 18:57:06 +0000 2007
+  author_email: ""
+  author_url: http://afreshcup.com/?p=534
+author: Tom
+title: Go get it
+published: true
+tags: []
+
+date: 2007-08-22 14:20:42 +00:00
+categories: 
+- Releases
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/08/22/go-get-it/
+author_url: http://www.hobocentral.net
+status: publish
+---
+And finally...
+
+ * [Hobo-0.6.gem](/gems/hobo-0.6.gem)
+ * [Change Log](/gems/CHANGES.txt)
+ 
+Also note we're now on rubyforge so you could always just `gem update hobo` (subject to rubyforge delays -- I only threw it up there one minute ago)
+ 
+The demos on the site have not been updated, nor has the manual I'm afraid to say. But work on updating the manual is already underway so hopefully it won't be all that long.
+
+Have fun!

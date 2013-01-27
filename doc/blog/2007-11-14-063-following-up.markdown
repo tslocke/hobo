@@ -1,0 +1,54 @@
+--- 
+wordpress_id: 181
+author_login: admin
+layout: post
+comments: 
+- author: Kwahu
+  date: Wed Nov 14 10:54:20 +0000 2007
+  id: 14992
+  content: |
+    <p>This worked for me ;):</p>
+    
+    <p>hobo name</p>
+    
+    <p>rails:freeze:edge TAG=rel<em>2-0-0</em>RC1</p>
+    
+    <p>Update config/environment.rb
+    config.action<em>controller.session = { :session</em>key => "tm_session", :secret => "29829adkgjkakllasdk" }
+    Generate migration </p>
+    
+    <p>ruby script/generate hobo_migration</p>
+    
+    <p>db:migrate</p>
+
+  date_gmt: Wed Nov 14 10:54:20 +0000 2007
+  author_email: kwahus@gmail.com
+  author_url: ""
+author: Tom
+title: 0.6.3 - Following up
+published: true
+tags: []
+
+date: 2007-11-14 10:15:43 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/11/14/063-following-up/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Oops -- forgot to mention that Hobo 0.6.3 requires Rails 2.0 RC1
+
+To freeze:
+
+    rake rails:freeze:edge TAG=rel_2-0-0_RC1
+
+If you want to use the `hobo` command, or if you don't like freezing Rails, you'll need the 2.0RC1 gems:
+
+    gem update rails --source http://gems.rubyonrails.org -y
+    
+Also note that Hobo 0.6.3 has a new version of lowpro.js that needs Prototype 1.6 (Rails is on Prototype 1.6 now). You might need a 
+
+    rake rails:update:javascripts
+    
+There may be a few bugs related to the switch to Prototype 1.6. These can slip through because most of our tests are in applications that have not been upgraded to Prototype 1.6 yet. Stay tuned.

@@ -1,0 +1,148 @@
+--- 
+wordpress_id: 221
+author_login: admin
+layout: post
+comments: 
+- author: solars
+  date: Wed Dec 10 17:43:35 +0000 2008
+  id: 51550
+  content: |
+    <p>I'd like to join you Tom :)
+    But, first of all I'd like to thank you (and James), for starting hobo, which is without a doubt a giant standing on the shoulders of another giant, namely rails.</p>
+    
+    <p>Not only did it save my ass when it made my bachelor thesis almost effortless :D, it saves me so much time with a lot of trivial applications that I use internally to simplify my work.</p>
+    
+    <p>I don't know what kind of steroids you are on, but sometimes it's really hard to follow your incredible rapid development, I wish I could be as productive and inventive (if that is the right english word) as you :)</p>
+    
+    <p>Of course a big thank you to all the other supporters, unfortunately I do not yet know most of them.
+    AND, last but not least the #hobo IRC community, consisting of about 2 to 5 people that had the patience to stay with hobo during a sometimes wild ride :D</p>
+    
+    <p>happy holidays</p>
+
+  date_gmt: Wed Dec 10 17:43:35 +0000 2008
+  author_email: sol@textmode.at
+  author_url: http://textmode.at
+- author: Owen
+  date: Thu Dec 11 01:51:44 +0000 2008
+  id: 51551
+  content: |
+    <p>I would also like to second the kudos to the others who have the great wisdom :) to support and contribute to Hobo. </p>
+    
+    <p>Special consideration goes to James, who I know has been quitely contributing significantly and we have often relied on him in the forums. I have always envied his gig with La Maglia, but that is another story...</p>
+    
+    <p>Looking forward to getting Dr. Nic back involved again in the future.  Nic, what can we do to lure you back in with Hobo Magic Models?  (There is a 1958 MGA with your name on it...)</p>
+    
+    <p>-Owen</p>
+
+  date_gmt: Thu Dec 11 01:51:44 +0000 2008
+  author_email: ""
+  author_url: ""
+- author: Owen
+  date: Thu Dec 11 01:53:56 +0000 2008
+  id: 51552
+  content: |
+    <p>I would also like to second the kudos to the others who have the great wisdom :) to support and contribute to Hobo. </p>
+    
+    <p>Special consideration goes to James, who I know has been quitely contributing significantly and we have often relied on him in the forums. I have always envied his gig with La Maglia, but that is another story...</p>
+    
+    <p>Looking forward to getting Dr. Nic back involved again in the future.  Nic, what can we do to lure you back in with Hobo Magic Models?  </p>
+    
+    <p>-Owen</p>
+
+  date_gmt: Thu Dec 11 01:53:56 +0000 2008
+  author_email: ""
+  author_url: ""
+- author: Matthias
+  date: Fri Dec 19 20:04:12 +0000 2008
+  id: 51558
+  content: |
+    <p>Thanks a lot for all the good work. </p>
+    
+    <p>Merry Christmas to you, Tom.</p>
+
+  date_gmt: Fri Dec 19 20:04:12 +0000 2008
+  author_email: flohkraut@gmx.at
+  author_url: http://theyshootmusic.at
+- author: Per
+  date: Sat Dec 20 01:12:07 +0000 2008
+  id: 51559
+  content: |
+    <p>I just stumbled upon this website and I must say I am amazed!</p>
+    
+    <p>"The ultimate goal is: don&rsquo;t program your application, just declare it." - this is exactly what I was thinking about in the last days while digging into Rails!</p>
+    
+    <p>Best regards
+    Per</p>
+
+  date_gmt: Sat Dec 20 01:12:07 +0000 2008
+  author_email: mail@perguth.de
+  author_url: http://perguth.de
+- author: Martin
+  date: Fri Jan 23 07:47:33 +0000 2009
+  id: 51579
+  content: |
+    <p>'Ello 'ello 'ello, what's all this then? Christmas is over, and we're halfway into the new year already! We want to see action! We want a progress report! We want Hobo 1.0 rolling out the door! (Now comes the mandatory smiley that tells you that everything said is to be taken in good humour) :-)</p>
+
+  date_gmt: Fri Jan 23 07:47:33 +0000 2009
+  author_email: dumace@telkomsa.net
+  author_url: http://martinceronio.net
+- author: Martin
+  date: Wed Jan 28 07:29:01 +0000 2009
+  id: 51580
+  content: |
+    <p>I hope my last comment was not taken the wrong way. I too want to take off my hat to you guys for all the effort you put in to create something brilliant. I wish you a prosperous 2009 and I hope we see Hobo take off in a big way.</p>
+
+  date_gmt: Wed Jan 28 07:29:01 +0000 2009
+  author_email: dumace@telkomsa.net
+  author_url: http://martinceronio.net
+- author: Tom
+  date: Wed Jan 28 08:40:17 +0000 2009
+  id: 51581
+  content: |
+    <p>Martin - not at all. Thanks for the good wishes.</p>
+
+  date_gmt: Wed Jan 28 08:40:17 +0000 2009
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Steve
+  date: Fri Feb 20 15:37:02 +0000 2009
+  id: 51583
+  content: |
+    <p>Thanks for Hobo!  Does anyone know if anyone is planning on on picking it up and running with it?  Activity appears to have slowed then stopped shortly after Barquin invested in the project.  Did it compete with something they were working on?</p>
+
+  date_gmt: Fri Feb 20 15:37:02 +0000 2009
+  author_email: borg_business@yahoo.com
+  author_url: ""
+- author: Tom
+  date: Wed Mar 04 15:32:35 +0000 2009
+  id: 51584
+  content: |
+    <p>Steve - not the case! I'm just a very inconsistent blogger : ) If you look on the github repo or the hobousers google group you'll see that the project is very much active.</p>
+
+  date_gmt: Wed Mar 04 15:32:35 +0000 2009
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+author: Tom
+title: Thanks
+published: true
+tags: []
+
+date: 2008-12-10 14:52:53 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2008/12/10/thanks/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Just had time to dash this off before heading out. I've already said a thank you to the team at Barquin, so I better not forget others who've helped out along the way!
+
+Many thanks to Dr Nic for the early work in getting Hobo running as a gem, and for those super cool TextMate tricks. And to Mathijs and Matt for many fixes and tweaks here and there. And of course Mr. James Garlick for a ton of commits in all areas of Hobo, contributions to the docs, and for making Hobo look good both on the outside (the Clean theme) and the inside (James is my API aesthetics consultant!)
+
+Also a shout to Jason and Joel over at [i5labs](http://i5labs.com). These guys helped me out with a Hobo project that I got too busy to finish. If anyone out there needs development or help with a Hobo project, drop i5labs a line - they know what they're doing. 
+
+Also thanks to Pete Ferne and the boys at [Jiva](http://jivatechnology.com/), for choosing Hobo for [Beanbag](http://beanbaglearning.com/), and for the many contributions to Hobo which they funded. I *am* going to do a proper post about Beanbag at some point - promise!
+
+Finally a big thanks to everyone in the wider Hobo community for their involvement, large or small.
+
+Merry Christmas -- or whatever you will be celebrating -- to all!

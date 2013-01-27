@@ -1,0 +1,97 @@
+--- 
+wordpress_id: 173
+author_login: admin
+layout: post
+comments: 
+- author: Logan Koester
+  date: Mon Sep 10 04:25:48 +0000 2007
+  id: 10394
+  content: |
+    <p>I updated to 0.6.2 with gem and generated a new project with the hobo command. Running rake in the fresh project directory however yields
+    <code>rake aborted!
+    superclass mismatch for class Annotation
+    /home/logankoester/projects/pagetubes/trunk/freshproject/Rakefile:10</code></p>
+    
+    <p>Any thoughts on this?</p>
+
+  date_gmt: Mon Sep 10 04:25:48 +0000 2007
+  author_email: logan@logankoester.com
+  author_url: http://logankoester.com
+- author: Tom
+  date: Mon Sep 10 07:24:40 +0000 2007
+  id: 10398
+  content: |
+    <p>Logan - I used to get this error when the specs were contained inside Hobo. The specs contain a mini Rails app which in turn contains the whole of edge Rails which was causing this problem.</p>
+    
+    <p>Ah! Did you do <code>hobo --svn</code> ? I forgot to update the SVN path in the <code>hobo</code> script. ... Just uploaded the fix to rubyforge</p>
+
+  date_gmt: Mon Sep 10 07:24:40 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Logan Koester
+  date: Mon Sep 10 09:46:45 +0000 2007
+  id: 10402
+  content: |
+    <p>Thanks Tom :)</p>
+
+  date_gmt: Mon Sep 10 09:46:45 +0000 2007
+  author_email: logan@logankoester.com
+  author_url: http://logankoester.com
+- author: Troy Heninger
+  date: Thu Sep 13 03:15:25 +0000 2007
+  id: 10510
+  content: |
+    <p>I'm also getting an error trying to run the hobo command with 0.6.2. I tried 0.6.1 and got the same error. I'm on Windows and it's getting an error in mkdir. I downgraded to 0.5.3 (which I happened to have) and it's working again. Any ideas?</p>
+
+  date_gmt: Thu Sep 13 03:15:25 +0000 2007
+  author_email: troyhen@gmail.com
+  author_url: ""
+- author: Tom
+  date: Thu Sep 13 09:32:47 +0000 2007
+  id: 10524
+  content: |
+    <p>Troy - I've uploaded a fix for this. Try <code>gem install hobo --force</code></p>
+
+  date_gmt: Thu Sep 13 09:32:47 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: marc
+  date: Thu Sep 27 17:08:28 +0000 2007
+  id: 11623
+  content: |
+    <p>hi there, for me the new version does not generate the user migration script anymore...</p>
+
+  date_gmt: Thu Sep 27 17:08:28 +0000 2007
+  author_email: marc@jupiter-labs.com
+  author_url: ""
+- author: Malik
+  date: Mon Oct 22 02:51:28 +0000 2007
+  id: 12933
+  content: |
+    <p>The model migrations are not being generated automatically when following the examples from the screencast.</p>
+
+  date_gmt: Mon Oct 22 02:51:28 +0000 2007
+  author_email: tharwat@gmail.com
+  author_url: ""
+author: Tom
+title: 0.6.2 Released
+published: true
+tags: []
+
+date: 2007-09-09 10:25:32 +00:00
+categories: 
+- Releases
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/09/09/062-released/
+author_url: http://www.hobocentral.net
+status: publish
+---
+There's a subtle blend of fixes and small enhancements in this release. Enjoy!
+
+ * [Changes](/gems/CHANGES.txt)
+
+*REPOSITORY LAYOUT CHANGE*: Please note the svn url for the plugin has changed. It is now:
+
+ * `svn://hobocentral.net/hobo/trunk/hobo`
+ 
+If you check out `svn://hobocentral.net/hobo/trunk` you'll get both `hobo` and `hobo_spec`, and you'll be able to run the specs by typing `rake` in the `hobo` directory. The specs are very thin on the ground right now but that will improve as we migrate our old test/unit tests to specs.

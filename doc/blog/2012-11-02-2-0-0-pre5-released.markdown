@@ -1,0 +1,38 @@
+--- 
+wordpress_id: 455
+author_login: bryanlarsen
+layout: post
+comments: []
+
+author: Bryan Larsen
+title: 2.0.0.pre5 released
+published: true
+tags: []
+
+date: 2012-11-02 16:03:44 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=455
+author_url: http://bryan.larsen.st
+status: publish
+---
+Hobo 2.0.0.pre5 has been released.
+
+This contains one minor bugfix, one major bugfix and some documentation updates.
+
+The minor bugfix is to click-editor.
+
+The major bugfix is to the setup generator.   It is related to the Rails 3.2 development caching feature, making your app not reload changes in Dryml, and forcing you to restart the server all the time. If you have created an app with an older version of Hobo 2.0 you can fix it easily:
+
+The wrong line is near the top of config/environments/development.rb:
+
+    config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']
+
+And the same line corrected:
+
+    config.watchable_dirs[File.join(config.root, 'app/views')] = ['dryml']
+
+Just an "s", but an important one :).   Thanks Ignacio for catching it.
+
+hobo_bootstrap 2.0.0.pre5 has also been released.   It's the recommended theme for Hobo 2.0.   We haven't made it the default yet because it's still stabilizing, but I anticipate that will happen soon.

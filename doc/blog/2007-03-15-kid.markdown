@@ -1,0 +1,157 @@
+--- 
+wordpress_id: 138
+author_login: admin
+layout: post
+comments: 
+- author: john
+  date: Thu Mar 15 15:35:33 +0000 2007
+  id: 867
+  content: |
+    <p>I found the IF...ELSE conditional to be a little cumbersome in Kid. In fact, I'm not even sure there is an else.... I think there is only a handful of py: tags for Kid. DRYML feels better to me. </p>
+    
+    <p>I read somewhere that TurboGears is moving towards Genshi and away from Kid. Not sure if that is true or not.</p>
+
+  date_gmt: Thu Mar 15 15:35:33 +0000 2007
+  author_email: acheekymonkey@mac.com
+  author_url: ""
+- author: Tom
+  date: Fri Mar 16 12:02:24 +0000 2007
+  id: 884
+  content: |
+    <p>Ah! A fence-looker-overer :-) Good to have you on board!</p>
+
+  date_gmt: Fri Mar 16 12:02:24 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: petef
+  date: Fri Mar 16 13:41:01 +0000 2007
+  id: 886
+  content: |
+    <p>My first reaction to an 'if' attribute is: yup, definitely too inconsistent. A separate  tag <em>is</em> a bit icky though. How about:</p>
+    
+    <pre><code><if q="#@pages.length > 1">
+      <section>
+        <div class="page_links">
+          <page_nav/>
+        </div>
+      </section>
+      <:else>
+        <p>This is the only page</p>
+      </:else>
+    </if>
+    </code></pre>
+    
+    <p>Is that any better? Worse? How about if that was more or less a degenrate case of a  tag that worked like this:</p>
+    
+    <pre><code><case q="username">
+      <:when case="#'Jim', 'James'">
+        <p>Hello Jim</p>
+      </:when>
+      <:when case="#'Fred', 'Frederick'">
+        <p>Hello Fred</p>
+      </:when>
+      <:else>
+        <p>Hello <%= username =></p>
+      </:else>
+    </case>
+    </code></pre>
+    
+    <p>Thoughts?</p>
+
+  date_gmt: Fri Mar 16 13:41:01 +0000 2007
+  author_email: properdigital@petef.com
+  author_url: http://petef.org
+- author: petef
+  date: Fri Mar 16 13:45:56 +0000 2007
+  id: 887
+  content: |
+    <p>Whoops. That should have read: A separate <code><else></code> tag <em>is</em> a bit icky... and ...a degenerate case of a <code><case></code> tag....</p>
+
+  date_gmt: Fri Mar 16 13:45:56 +0000 2007
+  author_email: properdigital@petef.com
+  author_url: http://petef.org
+- author: Tom
+  date: Fri Mar 16 20:18:56 +0000 2007
+  id: 894
+  content: |
+    <p>Petef - Unfortunately your if with the nested <:else> isn't valid DRYML anymore. It used to be, but I realised I had lost line number parity. The DRYML compiler goes to considerable length to keep a 1-to-1 mapping of your source line numbers to the resulting Ruby line numbers, so that you get the correct line in error messages.</p>
+    
+    <p>Now parameter tags like <:else> have to come before any regular content, so you'd have to have the else first. Actually some tags do now work like this, e.g.</p>
+    
+    <p><repeat attr="comments">
+        <:else>There are no comments</:else>
+        <div>Posted by <show attr="name"/>...</div>
+      </repeat></p>
+    
+    <p>The case is a nice idea, pretty much the same as the XSL-T  'choose' (I think that's what it's called). Right now all of those choices would be evaluated though, so it would be very inefficient. That might be changing though, so this case tag may well make it in. Maybe 'choose' is a better name for the designers?</p>
+    
+    <p>As for getting rid of the <code><else></code> tag and only having <code><if></code> and <code><choose></code>... Hmmm. I did implement if/else that way specifically because I found the XSL-T 'choose' to be cumbersome. I guess this decision has to brew a little longer :-)</p>
+
+  date_gmt: Fri Mar 16 20:18:56 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: petef
+  date: Sat Mar 17 21:51:52 +0000 2007
+  id: 909
+  content: |
+    <p>I suppose you could get around the line number parity issue by going with a scheme like:</p>
+    
+    <pre><code><if q="...">
+      <:then>
+        ...
+      </:then>
+      <:else>
+        ...
+      </:else>
+    </if>
+    </code></pre>
+    
+    <p>Still a bit cumbersome though. Hmmm.</p>
+
+  date_gmt: Sat Mar 17 21:51:52 +0000 2007
+  author_email: subs@petef.com
+  author_url: http://petef.org
+author: Tom
+title: Kid
+excerpt: |
+  Any of you Ruby folk taken a look over the fence into Python land and seen Kid templates?
+  
+  They call it an "attribute language" because unlike DRYML, there are smart attributes rather than smart tags. e.g. from their docs:
+  
+  	<p py:if="system() == 'Linux'">
+  	  Good for you!
+  	</p>
+  	
+
+published: true
+tags: []
+
+date: 2007-03-15 15:06:33 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/03/15/kid/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Any of you Ruby folk taken a look over the fence into Python land and seen Kid templates?
+
+They call it an "attribute language" because unlike DRYML, there are smart attributes rather than smart tags. e.g. from their docs:
+
+	<p py:if="system() == 'Linux'">
+	  Good for you!
+	</p>
+	
+<a id="more"></a><a id="more-138"></a>
+	
+When you've stopped sniggering about those empty brackets, you might agree that it's rather elegant and compact -- particularly for this specific example: a conditional.
+
+Over in the forums we've been chatting about how all the `if_this`, `if_that` tags in DRYML are kinda icky. I'm wondering about supporting this style just for `if`. Something like
+
+	<p if="logged_in?">Logged in as <display_name obj="#current_user"/></p>
+	
+Is that just too inconsistent when everything else is done with tags? How about the `else`? Whadayathink?
+
+p.s. I was going to post this in the forums, but I thought I'd give this way a try. Let me know if you think this is noise in the context of the blog.
+
+So that's two questions for you. I just put a fresh pad of blank comments in the server so knock yourself out.

@@ -1,0 +1,118 @@
+--- 
+wordpress_id: 464
+author_login: bryanlarsen
+layout: post
+comments: 
+- author: Owen
+  date: Thu Dec 06 16:08:03 +0000 2012
+  id: 52786
+  content: |
+    <p>Thanks, Bryan.  Excellent work!</p>
+
+  date_gmt: Thu Dec 06 16:08:03 +0000 2012
+  author_email: ""
+  author_url: ""
+- author: Owen
+  date: Thu Dec 06 19:09:01 +0000 2012
+  id: 52787
+  content: |
+    <p>Testing it on a windows box now...</p>
+
+  date_gmt: Thu Dec 06 19:09:01 +0000 2012
+  author_email: ""
+  author_url: ""
+- author: Kieran P
+  date: Fri Dec 07 05:22:53 +0000 2012
+  id: 52790
+  content: |
+    <p>Please make hobo_fields Rails 3.3 compatible. It's holding me back from upgrading.</p>
+
+  date_gmt: Fri Dec 07 05:22:53 +0000 2012
+  author_email: kieran776@gmail.com
+  author_url: http://k776.tumblr.com
+- author: Bryan Larsen
+  date: Fri Dec 07 13:42:35 +0000 2012
+  id: 52792
+  content: |
+    <p>Rails 3.3?   The latest current rails is 3.2.9, as far as I'm aware, and 2.0.0.pre7 works on that.  We don't yet support Rails 4, but that's not released yet...</p>
+
+  date_gmt: Fri Dec 07 13:42:35 +0000 2012
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+- author: Daniel
+  date: Fri Dec 07 20:01:47 +0000 2012
+  id: 52793
+  content: |
+    <p>Looking forward to see the final version of Hobo 2. Unfortunately, as soon as it will be released, it won't be compatible with the new Rails V4 and we have to wait a long time until there will be an updated Hobo Version. Any plan how to eliminate those big gaps between Rails and Hobo compatible releases?</p>
+
+  date_gmt: Fri Dec 07 20:01:47 +0000 2012
+  author_email: ""
+  author_url: ""
+- author: Bryan Larsen
+  date: Fri Dec 07 20:33:21 +0000 2012
+  id: 52794
+  content: |
+    <p>Both the Rails 3.0 port and the Rails 3.2 port were huge projects.</p>
+    
+    <p>Rails 3.0 was pretty much a complete rewrite of Rails so we had to update most of Hobo.</p>
+    
+    <p>The problem with Rails 3.2 was that we replaced prototype.js with jQuery, generating a lot of churn.</p>
+    
+    <p>We haven't started the Hobo 4.0 port yet, but we don't anticipate that it will take as long as either the Rails 3.0 or 3.2 support.   Rails 2.3 didn't take long -- hopefully 4.0 is similar.</p>
+    
+    <p>The other problem is resources.   Both Ignacio &amp; I are busy people -- more help is always appreciated!</p>
+
+  date_gmt: Fri Dec 07 20:33:21 +0000 2012
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+author: Bryan Larsen
+title: Hobo 2.0.0.pre7
+published: true
+tags: []
+
+date: 2012-12-06 15:44:40 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=464
+author_url: http://bryan.larsen.st
+status: publish
+---
+We're pleased to announce the availability of Hobo 2.0.0.pre7
+
+### renamed tags that shadow Rails helpers
+
+Hobo tags and rails helpers exist in the same namespace.  So if there is a tag with the same name as a helper, the helper becomes unavailable.   Therefore we have renamed a couple of tags in Rapid that have the same names as existing rails helpers.
+
+* `<cache>` has been renamed to `<hobo-cache>`
+* `<select-date>` has been renamed to `<datepicker-rails>`
+
+### custom alternate formats
+
+Hobo no longer executes an arity zero block passed to hobo controller actions inside of a respond\_to block.  This means that you can render formats other than html inside of an arity zero block.
+
+    hobo_show do
+      render something if request.format.pdf?
+    end
+
+Any formats that you do not render or redirect inside the block will be handled by hobo\_show via respond\_with.
+
+If your block has a parameter, the block continues to be executed inside of a respond\_to.
+
+    hobo_show do |format|
+      format.pdf do { render something }
+    end
+
+Because this is a respond\_to block any formats you do not render will fall through and be handled by hobo\_show's respond_with block.
+
+See this [new section in the controllers manual](http://cookbook.hobocentral.net/manual/controllers#alternate_response_formats) for more information.
+
+### fixes for
+
+- using Hobo outside of Rails
+- hobo\_user\_model without a lifeycle
+- hobo\_new was ignoring a preset @this
+- search and sort automatic scopes don't crash on nil
+- precompile\_taglibs
+- Spanish translation
+- added default first parameter for create\_response

@@ -1,0 +1,108 @@
+--- 
+wordpress_id: 222
+author_login: admin
+layout: post
+comments: 
+- author: Andrew
+  date: Wed Apr 22 18:38:13 +0000 2009
+  id: 51586
+  content: |
+    <p>Will Hobo 1.0 be made to work with rails 3.0?</p>
+
+  date_gmt: Wed Apr 22 18:38:13 +0000 2009
+  author_email: andrei.shindyapin@gmail.com
+  author_url: ""
+- author: Matthias
+  date: Wed Apr 22 19:54:53 +0000 2009
+  id: 51587
+  content: |
+    <p>This is huge! Woho!</p>
+
+  date_gmt: Wed Apr 22 19:54:53 +0000 2009
+  author_email: matthias@leihs.at
+  author_url: http://theyshootmusic.at
+- author: Bryan Larsen
+  date: Wed Apr 22 20:08:24 +0000 2009
+  id: 51588
+  content: |
+    <p>Sorry, 1.0 will not support rails 3.0.   It will support rails 2.3, though, which is better than the current gem.</p>
+
+  date_gmt: Wed Apr 22 20:08:24 +0000 2009
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+- author: Tom
+  date: Thu Apr 23 09:20:45 +0000 2009
+  id: 51589
+  content: |
+    <p>Andrew - we're hoping Hobo 1.0 will be out before Rails 3. When Rails 3 is out we'll definitely make sure Hobo is compatible, but we'll probably be at Hobo 1.1 or something like that by then</p>
+
+  date_gmt: Thu Apr 23 09:20:45 +0000 2009
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: "Double Shot #437 &laquo; A Fresh Cup"
+  date: Thu Apr 23 10:26:11 +0000 2009
+  id: 51590
+  content: |
+    <p>[...] Hobo 1.0 Nears - This extra layer of sugar on top of Rails has been quietly moving along. [...]</p>
+
+  date_gmt: Thu Apr 23 10:26:11 +0000 2009
+  author_email: ""
+  author_url: http://afreshcup.com/2009/04/23/double-shot-437/
+- author: Andrew
+  date: Thu Apr 23 20:34:24 +0000 2009
+  id: 51594
+  content: |
+    <p>Thanks, Tom and Bryan!</p>
+
+  date_gmt: Thu Apr 23 20:34:24 +0000 2009
+  author_email: andrei.shindyapin@gmail.com
+  author_url: ""
+- author: Owen
+  date: Thu Apr 23 23:58:39 +0000 2009
+  id: 51595
+  content: |
+    <p>I think of Hobo as a triple expresso compared to Rails coffee.  As we Yanks say, "You ain't seen nothin' yet!"</p>
+
+  date_gmt: Thu Apr 23 23:58:39 +0000 2009
+  author_email: odall@barquin.com
+  author_url: http://www.barquin.com
+- author: Hobo - The web app builder for Rails
+  date: Mon May 04 21:18:06 +0000 2009
+  id: 51609
+  content: |
+    <p>[...] As Tom mentioned we hope to get Hobo 1.0rc1 out soon.&nbsp; The code is frozen, we&#8217;re only fixing bugs.&nbsp; Please ensure you&#8217;ve entered any bugs you find in our Lighthouse so we don&#8217;t miss any. And if you have any changes of your own, please send patches or pull requests quickly. [...]</p>
+
+  date_gmt: Mon May 04 21:18:06 +0000 2009
+  author_email: ""
+  author_url: http://hobocentral.net/blog/2009/04/28/this-week-in-edge-hobo/
+- author: pengekcs
+  date: Thu May 21 05:11:37 +0000 2009
+  id: 51651
+  content: |
+    <p>I have seen hobo years ago - and glad you guys still keep it updated, not like streamlined (last update in 2008...) and other stuff. I have just tried hobo with rails 2.3.2 and everything worked without a hitch. Nice stuff - I'm definitely gonna investigate it more.</p>
+
+  date_gmt: Thu May 21 05:11:37 +0000 2009
+  author_email: nope@nope.net
+  author_url: http://www.pengekcs.com
+author: Tom
+title: Hobo 1.0 Nears
+published: true
+tags: []
+
+date: 2009-04-22 18:01:14 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/?p=222
+author_url: http://www.hobocentral.net
+status: publish
+---
+Things may have been quiet on the blog, but those who've been following the hobousers google group or keeping an eye on the github commits will know that the Hobo project is just as active as ever. In fact we have a couple of news items for y'all 
+
+First up, I'd like to give a big welcome to Bryan Larsen, who is now working on Hobo full time. Bryan made some excellent contributions entirely off his own back, and he happened to come to the end of a previous project at just the right time so we snapped him up. A big thanks too to our good sponsors at [Barquin International](http://barquin.com) for helping us to bring Bryan on to the team.
+
+As requested on hobousers, we're going to start putting out regular updates on the blog about the latest changes to the code; a sort of "This week in Edge Hobo". Bryan will be helping out with these posts. 
+
+And the other little item of news is that we've started the push to Hobo 1.0. The feature set is frozen at this point, and we are working our way through bug fixes, improving the test coverage and docs. If you've got a pet bug that you want to see fixed in Hobo 1.0, make sure it's [ticketed](http://hobo.lighthouseapp.com).
+
+Stay tuned!

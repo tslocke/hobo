@@ -1,0 +1,27 @@
+--- 
+wordpress_id: 182
+author_login: admin
+layout: post
+comments: []
+
+author: Tom
+title: "Bugfix: Hobo 0.6.4"
+published: true
+tags: []
+
+date: 2007-11-14 15:30:06 +00:00
+categories: 
+- Releases
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/11/14/bugfix-hobo-064/
+author_url: http://www.hobocentral.net
+status: publish
+---
+As warned of in the previous post, we had some Prototype/Scriptaculous related problems in 0.6.3. Now fixed in Hobo 0.6.4.
+
+Same deal as usual:
+
+ * Either `gem update hobo`
+ * or [download the gem from here](/gems/hobo-0.6.4.gem)
+ * Subversion: `svn://hobocentral.net/hobo/trunk/hobo`
+ * [CHANGELOG](/gems/CHANGES.txt)

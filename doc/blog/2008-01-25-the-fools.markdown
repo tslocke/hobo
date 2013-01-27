@@ -1,0 +1,128 @@
+--- 
+wordpress_id: 190
+author_login: admin
+layout: post
+comments: 
+- author: Fernando Correia
+  date: Sat Jan 26 15:07:55 +0000 2008
+  id: 22615
+  content: |
+    <p>Great! Please try to record and publish a webcast of the whole session. Then we'll have an up-to-date Hobo tutorial... :)</p>
+
+  date_gmt: Sat Jan 26 15:07:55 +0000 2008
+  author_email: fernando.correia@plainworks.com
+  author_url: http://plainworks.com
+- author: Jabari Zakiya
+  date: Sat Jan 26 16:23:42 +0000 2008
+  id: 22630
+  content: |
+    <p>Please don't believe that screencasts are substitutes for written documentation.  Hobo is still in serious need for clear, complete, and comprehensive written documentation, and until it produces it, the project will never grow at the rate it should because it will continue to remain a mystical programming paradigm versus a functional application building tool.</p>
+
+  date_gmt: Sat Jan 26 16:23:42 +0000 2008
+  author_email: jzakiya@mail.com
+  author_url: ""
+- author: Kevin Triplett
+  date: Sat Jan 26 17:23:14 +0000 2008
+  id: 22636
+  content: |
+    <p>Excellent! Yes, please do encourage the conference folks to record your presentation. I'll even volunteer to convert it into a webcast (I do that kind of thing as part of my job). Webcasts are very handy, as is textual and rdoc style documentation, but webcasts are particularly friendly. Once people see how it's done, maybe there can be more of a community contributions to the documentary project through things like personal blogs. Have fun, Tom!</p>
+
+  date_gmt: Sat Jan 26 17:23:14 +0000 2008
+  author_email: kevin@mopacmedia.com
+  author_url: ""
+- author: Andy
+  date: Sat Jan 26 23:05:37 +0000 2008
+  id: 22668
+  content: |
+    <p>Great news! Congrats again.</p>
+    
+    <p>Hey, get your photo over to those guys so the world can see just what the Magical Tom Locke looks like :)</p>
+    
+    <p>http://jaoo.dk/ruby-cph/speakers/</p>
+    
+    <p>:)</p>
+
+  date_gmt: Sat Jan 26 23:05:37 +0000 2008
+  author_email: andy@adveho.net
+  author_url: ""
+- author: Owen
+  date: Sun Jan 27 14:13:02 +0000 2008
+  id: 22706
+  content: |
+    <p>Great news, but we REALLY need documentation.  I thought the project might be dead as haven't seen entries in my RSS reader for a long time.  I also keep looking at beta.hobocentral.net and don't see any updates.</p>
+    
+    <p>Any updates?</p>
+    
+    <p>Thanks.</p>
+
+  date_gmt: Sun Jan 27 14:13:02 +0000 2008
+  author_email: odall@barquin.com
+  author_url: http://www.barquin.com
+- author: solars
+  date: Sun Jan 27 20:43:01 +0000 2008
+  id: 22751
+  content: |
+    <p>good luck Tom :)</p>
+    
+    <p>looking forward to a video of your presentation :)</p>
+
+  date_gmt: Sun Jan 27 20:43:01 +0000 2008
+  author_email: cb@textmode.at
+  author_url: http://railsbased.org
+- author: Jabari Zakiya
+  date: Mon Jan 28 18:09:27 +0000 2008
+  id: 22857
+  content: |
+    <p>I really like how the Ramaze project has done its screencasts.</p>
+    
+    <p>http://ramaze.net/screencasts</p>
+
+  date_gmt: Mon Jan 28 18:09:27 +0000 2008
+  author_email: jzakiya@mail.com
+  author_url: ""
+- author: Andy
+  date: Tue Feb 05 09:19:24 +0000 2008
+  id: 24012
+  content: |
+    <p>Great photo :) http://jaoo.dk/ruby-cph/speaker/Tom+Locke</p>
+    
+    <p>Congrats again, and on Railsconf.</p>
+
+  date_gmt: Tue Feb 05 09:19:24 +0000 2008
+  author_email: ""
+  author_url: ""
+- author: Raymond Gao
+  date: Mon Oct 12 03:42:14 +0000 2009
+  id: 51728
+  content: |
+    <p>Does Hobo work with Facebook? I am trying to write a Facebook Canvas application. Is Hobo the right tool for the job? I am trying to use it with Facebooker plugin.</p>
+    
+    <p>Thanks</p>
+
+  date_gmt: Mon Oct 12 03:42:14 +0000 2009
+  author_email: raygao2000@yahoo.com
+  author_url: http://raysblog.are4.us
+author: Tom
+title: The Fools!
+published: true
+tags: []
+
+date: 2008-01-25 22:48:15 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2008/01/25/the-fools/
+author_url: http://www.hobocentral.net
+status: publish
+---
+The kind fools at the [Ruby Fools Conference](http://jaoo.dk/ruby-cph/conference/) have invited me to give a presentation on Hobo in Copenhagen on April 2nd. This will be the third time I've stood up to talk about Hobo and both times it's been really difficult to cover such a big topic in a short time. So I made a suggestion -- how about a railsconf style three hour tutorial? To which they replied with an enthusiastic "yes!".
+
+Three hours should be enough time to build a complete Facebook clone and still have time for a relaxed chat about Danish history. Well, um, it should be enough time to build a decent demo app and get some experience with all of the main features of Hobo. Excellent! The tutorial is scheduled for March 31st, which I believe is the day before the presentations start. The tutorial is in addition to the one hour presentation which is on the 2nd.
+
+Would be great to meet some more of you Hobo people face-to-face.
+
+If you're coming, say so in the comments :-)
+
+Should be fun!
+
+p.s. As I'm writing this the details they have for me on the conference website are kinda broken, and my face is that of a white fuzzy blob. Should all be fixed up shortly :-)

@@ -1,0 +1,42 @@
+--- 
+wordpress_id: 204
+author_login: admin
+layout: post
+comments: 
+- author: Waldo
+  date: Thu Aug 14 13:04:16 +0000 2008
+  id: 45892
+  content: |
+    <p>Hi Tom,</p>
+    
+    <p>I'm REALLY new to Hobo and so far, I've only seen the screencasts and tutorials. I'm going to start playing with it today. Great work so far (I'm been trying to use AS but after viewing what I've seen of Hobo, I think I prefer it much better).</p>
+    
+    <p>I have one question. What is the best way to keep informed on hobo's progress? The new twitter site? The google groups seems fairly inactive. There are some recent posts there but no one really replies to anyone. I've been on the IRC channel for 12 hours and there's no communication flowing. So, even though it seems to be a great framework, I'm just curious if there is a community of users that could provide some support, if needed.</p>
+    
+    <p>Anyway, I know you don't like distractions and this is a bit off topic, but would it be possible for you to share some info on how you have your Emacs setup on OS X? I saw on the screencasts how you launch it with the 'ed' command on a separate 'shell window' and the support you have for writing RoR code and DRYML. I'm an Emacs user but no Emacs expert.</p>
+    
+    <p>Thanks</p>
+
+  date_gmt: Thu Aug 14 13:04:16 +0000 2008
+  author_email: lists@infoway.net
+  author_url: ""
+author: Tom
+title: Tweeting
+published: true
+tags: []
+
+date: 2008-08-05 12:02:10 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2008/08/05/tweeting/
+author_url: http://www.hobocentral.net
+status: publish
+---
+I finally succumbed
+
+ * [http://twitter.com/tablatom](http://twitter.com/tablatom)
+ 
+I'll pretty much only be using this to let anyone that's interested know what I'm up to with Hobo at a given time. Don't expect to see "brushing my teeth" or anything like that : )
+
+This is going to be pretty much write-only, too. I'm not good with distractions. So apologies in advance if I don't respond to your responses.

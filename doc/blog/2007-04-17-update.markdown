@@ -1,0 +1,133 @@
+--- 
+wordpress_id: 149
+author_login: admin
+layout: post
+comments: 
+- author: Paul
+  date: Tue Apr 17 15:45:34 +0000 2007
+  id: 1887
+  content: |
+    <p>Thanks for the update Tom. Sounds great.</p>
+    
+    <p>Pd</p>
+
+  date_gmt: Tue Apr 17 15:45:34 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: Michiel
+  date: Tue Apr 17 17:59:01 +0000 2007
+  id: 1890
+  content: |
+    hobo@irc.freenode.net seems a little underpopulated ..
+
+  date_gmt: Tue Apr 17 17:59:01 +0000 2007
+  author_email: michielkalkman@gmail.com
+  author_url: ""
+- author: Red
+  date: Tue Apr 17 22:16:07 +0000 2007
+  id: 1896
+  content: |
+    <p>That's an understatement Michiel. We were bouncing around in there on our own earlier today. :-) Ah well, it's a great idea...</p>
+
+  date_gmt: Tue Apr 17 22:16:07 +0000 2007
+  author_email: red@redferret.net
+  author_url: ""
+- author: Benjamin
+  date: Wed Apr 18 21:35:23 +0000 2007
+  id: 1930
+  content: |
+    <p>The IRC channel #hobo has 4 of us right now. It varies from 0.upto(x) depending on whose online. During the days i'm there idling and so is tshine.</p>
+    
+    <p>UncleD</p>
+
+  date_gmt: Wed Apr 18 21:35:23 +0000 2007
+  author_email: theuncled@gmail.com
+  author_url: http://rubyonrailsblog.com
+- author: Ruby on Rails Blog
+  date: Wed Apr 18 21:36:16 +0000 2007
+  id: 1931
+  content: |
+    <p>We have some hobo running in the backend on several of our apps also. It's in development alpha stages but promising and we look forward to this upcoming release.</p>
+
+  date_gmt: Wed Apr 18 21:36:16 +0000 2007
+  author_email: theuncled@gmail.com
+  author_url: http://rubyonrailsblog.com
+- author: Red
+  date: Thu Apr 19 15:52:10 +0000 2007
+  id: 1952
+  content: |
+    <p>Actually I take that back Michiel, #hobo is actually quite a buzzing channel. :-) It's great.</p>
+
+  date_gmt: Thu Apr 19 15:52:10 +0000 2007
+  author_email: red@redferret.net
+  author_url: ""
+- author: polarbear
+  date: Thu Apr 19 19:34:23 +0000 2007
+  id: 1959
+  content: |
+    <p>Tom!
+    Really looking forward to the 0.5.2 release. Some more screencasts and extended documentation would also be great.</p>
+    
+    <p>Regarding the forum, there seems to be a problem. I have been trying and trying again to post a relevant question but the forum spam filter complains about it for no apparent reason. And finally my account was automatically banned! Can you please activate it again. Username: polarbear.</p>
+
+  date_gmt: Thu Apr 19 19:34:23 +0000 2007
+  author_email: mats.ekblom@gmail.com
+  author_url: ""
+author: Tom
+title: Update
+excerpt: |+
+  You may have noticed I've been a little quiet of late---both on the blog and the forums. It's end-of-project syndrome. We're just coming to the end of the final delivery in the first major client project built on top of Hobo. Deadlines are hard work!
+  
+  Here's a bit of an update about what's been going on with Hobo recently.
+  
+published: true
+tags: []
+
+date: 2007-04-17 11:44:29 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/04/17/update/
+author_url: http://www.hobocentral.net
+status: publish
+---
+You may have noticed I've been a little quiet of late---both on the blog and the forums. It's end-of-project syndrome. We're just coming to the end of the final delivery in the first major client project built on top of Hobo. Deadlines are hard work!
+
+Here's a bit of an update about what's been going on with Hobo recently.
+
+<a id="more"></a><a id="more-149"></a>
+
+First-up, Hobo 0.5.2 is due to go out. I'll make a commitment, because I've found that's a good way to ensure it actually happens - I'll get 0.5.2 out by the end of this week. In this version are a bunch of fixes as always, the new mechanism to customise controller behaviour, and a nice extension to ActiveRecord which came out the recent stuff on `scope_out`.
+
+If you followed the comments on that post you probably saw the [link](http://neotrivium.com/blog/2007/4/4/out_of_the_scope_of_scope_out?language=en-US) to neotrivium from kaspar (thanks!). A very nice development of the ideas in `scope_out` but lacking some `scope_out` features such as cacheing of scoped associations. All this inspired me to see if I could take the idea a bit further, and you can see how I got on in Hobo 0.5.2. By way of a sneak preview you can do:
+
+	Post.comments.published
+	
+And get back a full AR association proxy, which you can either treat as an array, or use to do further finding, counting etc. All this for the bargain price of:
+
+	def_scope :published, :conditions => "published = 1"
+  
+In the `Comments` class. You can also do things like:
+
+	Comments.published.find(...)
+	Comments.published.boring.count
+	
+Handy! (the SQL fragment to identify a boring comment is left as an exercise for the reader)
+
+Let's see, what else..?
+
+I'm waaay behind on the forums, so a big apology to anyone who's looking for help and hasn't yet received any. I'll get there :-) 
+
+On the subject of community - I was very happily surprised to get this mail yesterday:
+
+>	Hey Tom,
+
+>	We started a #hobo channel on freenode for hobo users. Please come visit us irc.freenode.net #hobo and help support your freenode hobo community users :) We are supporting eachother right now and would like to see you come through. 
+
+>	UncleD @ http://rubyonrailsblog.com
+
+Awesome! I'm afraid to say I haven't shown my face as yet (did I mention I've had a deadline on?) I definitely will stop by from time to time, but I must warn you I'm not a great IRCer.
+
+And saving the best news for last--a little tentative at this stage, but potentially a big deal. We at HoboTech are close to making our first hire. I'm REALLY looking forward to the prospect of NOT BEING RUN COMPLETELY OFF MY FEET ALL DAY EVERY DAY!!! Sorry just venting some frustration :-) If this works out it's going to have a big impact on the time I have to focus on the many aspects of Hobo (documentation!), so cross your fingers.
+
+Catch you again later this week with the "0.5.2 Released" post :-)

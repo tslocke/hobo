@@ -1,0 +1,115 @@
+--- 
+wordpress_id: 202
+author_login: admin
+layout: post
+comments: 
+- author: Craig
+  date: Mon Jul 28 14:23:09 +0000 2008
+  id: 44236
+  content: |
+    <p>This is great news.  I have recently been following hobo and just started a few apps using it,  a couple of pet projects and one at work.  I am already very excited where hobo is at and with this news I am very excited at where it is going.  Keep up the great work Tom.  You have an incredible project here.</p>
+
+  date_gmt: Mon Jul 28 14:23:09 +0000 2008
+  author_email: craigkuhns@gmail.com
+  author_url: ""
+- author: sequence
+  date: Mon Jul 28 16:52:59 +0000 2008
+  id: 44252
+  content: |
+    <p>That are great news! Congratulations!</p>
+
+  date_gmt: Mon Jul 28 16:52:59 +0000 2008
+  author_email: anotherfruit@gmx.at
+  author_url: http://theyshootmusic.at
+- author: HAK
+  date: Mon Jul 28 20:34:37 +0000 2008
+  id: 44284
+  content: |
+    <p>Hi Tom,</p>
+    
+    <p>Great News.</p>
+    
+    <p>What is going to be used to build the test suite (i.e. RSpec or some other framework).</p>
+    
+    <p>Regards,
+    HAK</p>
+
+  date_gmt: Mon Jul 28 20:34:37 +0000 2008
+  author_email: ashvinih@gmail.com
+  author_url: ""
+- author: Tom
+  date: Tue Jul 29 09:26:36 +0000 2008
+  id: 44392
+  content: |
+    <p>Hak - I'm leaning towards test/unit with shoulda, or possibly rubydoctest</p>
+
+  date_gmt: Tue Jul 29 09:26:36 +0000 2008
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Jackson Blacklock
+  date: Wed Jul 30 15:47:20 +0000 2008
+  id: 44603
+  content: |
+    <p>Tom,</p>
+    
+    <p>Congrats!  That is tremendous news.  I'm looking forward to the continued success of your project (which is inextricably attached to [all of] mine)!  ^_^</p>
+    
+    <p>Best,</p>
+    
+    <p>Jackson</p>
+
+  date_gmt: Wed Jul 30 15:47:20 +0000 2008
+  author_email: jhblacklock@twinbcreative.com
+  author_url: ""
+- author: ""
+  date: Thu Jul 31 04:10:02 +0000 2008
+  id: 44670
+  content: |
+    <p>It's very nice to see your blog post.  I toyed with Hobo a while back but have been holding off using it seriously pending some better DRYML docs.</p>
+
+  date_gmt: Thu Jul 31 04:10:02 +0000 2008
+  author_email: ""
+  author_url: ""
+- author: Jim
+  date: Sun Aug 17 12:17:05 +0000 2008
+  id: 46090
+  content: |
+    <p>Congrats Tom!</p>
+    
+    <p>I'm excited to see how Hobo progresses!</p>
+    
+    <p>Can I put in a request for some more in-depth sample applications when you have the time?</p>
+    
+    <p>You're a superstar.</p>
+
+  date_gmt: Sun Aug 17 12:17:05 +0000 2008
+  author_email: ""
+  author_url: ""
+author: Tom
+title: Good News
+published: true
+tags: []
+
+date: 2008-07-28 08:43:36 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2008/07/28/good-news/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Oops I did it again. Stopped blogging that is. Hands up who thought this blog had died?
+
+Of course those who wanted to know if the Hobo project itself was still active, if they knew where to look, would have headed over [here](http://github.com/tablatom/hobo/commits/master) and would have found things to be very much alive. That's all very well but I *really* must start blogging more!
+
+OK where were we? About the time of the last post I was just about to head off to Railsconf with some very interesting news. As often happens in life, and even more often with anything related to software development, things didn't quite pan out the way we expected. I do have news though, oh yes, even better news than I had before in fact.
+
+At Railsconf we announced our plan to form the Hobo Foundation, a non-profit organisation to act as a conduit for companies that want to help Hobo succeed, and a way for developers to put some serious time into the project while still paying the rent. The driving force behind the idea was a company over in Washington D.C., [Barquin International](http://barquin.com/), who were to be the initial sponsor. The more we talked to Barquin, the more apparent it became that these guys really wanted to take Hobo seriously. They're using Hobo in some very critical projects, the first of which rolls-out next month. To cut a long story short, we've arrived at a perfect solution which gets Hobo very much on track, and gives Barquin a close link with the on-going development: they've contracted me to work on Hobo full-time! The Hobo Foundation lives on in spirit, but for now this is by far the best arrangement for everyone.
+
+That's right folks, progress is about to take a big leap forwards. You know what this means don't you? It means all those warm and fuzzy things like a solid test suite, lots of documentation, continuing to separate out all the major sub-components like DRYML into their own projects. Good things are coming!
+
+I want to say a big thank-you to the folk at Barquin for supporting open-source and creating this great opportunity for the Hobo project. Barquin does a lot of work for the US Federal Government, and to be honest, this is the very last place I would have looked for a company willing to stick their neck out for some exciting new technology. It turns out Barquin are not your average government contractor. They're firm believers in client-centred agile practices, and that approach recently won them (shameless sponsor plug!) the "Small Business Contractor of the Year Award" from the US Department of Agriculture.
+
+Here's looking forward to really getting stuck in and making Hobo as good as it can be. Maybe I'll even find time to blog more :-)
+
+(p.s. In fact I've got a whole load more to tell everyone about, so do expect more posts over the next few days.)

@@ -1,0 +1,105 @@
+--- 
+wordpress_id: 144
+author_login: admin
+layout: post
+comments: 
+- author: Michiel
+  date: Fri Mar 30 10:29:58 +0000 2007
+  id: 1158
+  content: |
+    <p>Inner tags look awesome.</p>
+    
+    <p>I do a lot of this with CSS nested classes, but being able to change the HTML as well would rock.</p>
+
+  date_gmt: Fri Mar 30 10:29:58 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: Tom
+  date: Fri Mar 30 11:41:28 +0000 2007
+  id: 1161
+  content: |
+    <p>Just to be clear on terminology, I've been calling these tags "local tags". Inner Tags on the other hand are the ones you set up with <code>content_option</code> and <code>replace_option</code> attributes, the ones that let you replace something <em>inside</em> a tag that you're calling. Does that make sense?</p>
+
+  date_gmt: Fri Mar 30 11:41:28 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Michiel
+  date: Sun Apr 01 18:13:57 +0000 2007
+  id: 1252
+  content: |
+    <p>Makes perfect sense. I was just looking at the code and skipped the attentive reading of the terminology.</p>
+
+  date_gmt: Sun Apr 01 18:13:57 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: Rainer
+  date: Tue May 22 20:22:14 +0000 2007
+  id: 3393
+  content: |
+    <p>Firstly - thank you so much for your great work on Hobo. Have just started looking at it and i'm gobsmacked!
+    Also - looking forward to you expanding on your brief reference regarding Composite Models - i assume by Composite you refer to the GoF design pattern?
+    These sure are exciting times.
+    Best
+    Rainer</p>
+
+  date_gmt: Tue May 22 20:22:14 +0000 2007
+  author_email: rthiel@telkomsa.net
+  author_url: ""
+- author: Tom
+  date: Wed May 23 07:27:17 +0000 2007
+  id: 3433
+  content: |
+    <p>"i assume by Composite you refer to the GoF design pattern?" </p>
+    
+    <p>It's probably a similar idea, but I'm not much of a patterns guy to be honest.</p>
+    
+    <p>In Hobo, a composite model is a way of treating two or more models as a single restful resource. It's also a place to put domain logic that depends equally on two different model types.</p>
+
+  date_gmt: Wed May 23 07:27:17 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+author: Tom
+title: What's Next?
+excerpt: |
+  Let's not go so far as to call this a road-map, but I thought I'd just let you know what's coming up.
+  
+
+published: true
+tags: []
+
+date: 2007-03-21 18:23:09 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/03/21/whats-next-2/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Let's not go so far as to call this a road-map, but I thought I'd just let you know what's coming up.
+
+<a id="more"></a><a id="more-144"></a>
+
+The manual needs completing, so I'll be chipping away at that and posting updates as I go. The manual is only the start of the documentation of course. We still need proper API docs and a decent tutorial. I'd also really like to see some kind of "How To" style docs, with things like "How to add a password reset feature." "Hobo Recipes" I guess. Those things will have to wait for a while though. For now I'll be putting my energy into finishing the existing manual.
+
+Then there's a couple of articles I'm intending to write on new features:
+
+ * Inner Tags
+ * Composite Models - there's an interesting story behind these, and it's about REST no less, so highly topical :-)
+
+I also want to do a post on the next 'big' feature that's going into DRYML - local definitions. The idea with these is that you'll be able to write a page like this:
+
+    <page>
+	  <:sidecol>
+	    <section>...</section>
+	  </:sidecol>
+	
+	  <:maincol>
+	    <section>...</section>
+	  </:maincol>
+	</page>
+	
+and have that `<section>` tag produce entirely different HTML in each case. This is key to getting themes to work properly, and in moving towards the Holy Grail of the view layer: total separation of logical markup from physical presentation.
+	
+Then there's a couple of unfulfilled promises WRT making it easier for you guys to get involved: adding tests to the Hobo code-base, and having all the outstanding things to do properly tracked as [trac](http://dev/hobocentral.net) tickets. I have not forgotten!
+
+I'm sure there's a million other pressing things to do too... :-)

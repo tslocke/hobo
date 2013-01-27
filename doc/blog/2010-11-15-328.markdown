@@ -1,0 +1,133 @@
+--- 
+wordpress_id: 328
+author_login: bryanlarsen
+layout: post
+comments: 
+- author: Quikin
+  date: Mon Nov 15 17:42:13 +0000 2010
+  id: 52067
+  content: |
+    <p>when date  hobo 1.3 work rails 3 and ruby 1.9.2 ?</p>
+
+  date_gmt: Mon Nov 15 17:42:13 +0000 2010
+  author_email: morefx@hotmail.com
+  author_url: ""
+- author: Peter
+  date: Mon Nov 15 17:43:07 +0000 2010
+  id: 52068
+  content: |
+    <p>compare link seems down</p>
+
+  date_gmt: Mon Nov 15 17:43:07 +0000 2010
+  author_email: peter.i.ehrlich@gmail.com
+  author_url: ""
+- author: Bryan Larsen
+  date: Mon Nov 15 18:00:43 +0000 2010
+  id: 52069
+  content: |
+    <p>Quikin: There are currently no outstanding issues specifically against 1.3.   We just need to document and test it properly.   This may take a while, but that shouldn't prevent you from using 1.3.0.pre16 or later...</p>
+    
+    <p>Peter:  fixed. thanks.</p>
+
+  date_gmt: Mon Nov 15 18:00:43 +0000 2010
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+- author: Quikin
+  date: Mon Nov 15 20:13:50 +0000 2010
+  id: 52071
+  content: |
+    <p>thanks bryan</p>
+
+  date_gmt: Mon Nov 15 20:13:50 +0000 2010
+  author_email: morefx@hotmail.com
+  author_url: ""
+- author: Owen
+  date: Tue Nov 16 00:00:12 +0000 2010
+  id: 52072
+  content: |
+    <p>Thanks, Bryan!</p>
+    
+    <p>Yes 1.3 is lookin' great but need to get the doc and "Rapid Rails with Hobo" updated.</p>
+    
+    <p>Should be a nice New Year's present...</p>
+
+  date_gmt: Tue Nov 16 00:00:12 +0000 2010
+  author_email: ""
+  author_url: ""
+- author: Tobias W.
+  date: Thu Nov 18 12:20:00 +0000 2010
+  id: 52074
+  content: |
+    <p>Thanks for your work on Hobo. I have yet to start anything serious with Hobo, though that is just a matter of spare time now! :)</p>
+
+  date_gmt: Thu Nov 18 12:20:00 +0000 2010
+  author_email: tobias@weisserth.net
+  author_url: http://www.weisserth.net
+- author: Kent G
+  date: Tue Feb 22 11:34:19 +0000 2011
+  id: 52161
+  content: |
+    <p>I am starting fresh with Hobo and loving it!   It is difficult though as I wanted to start with Rails 3 and Hobo 1.3, but documentation not being updated makes it difficult.</p>
+    
+    <p>If you need someone to work on the docco for you, let me know.   Keen to help out with this fantastic product... and whilst my ruby skills are lacking, my docco skills may prove useful.</p>
+
+  date_gmt: Tue Feb 22 11:34:19 +0000 2011
+  author_email: kent@georgesons.net
+  author_url: ""
+author: Bryan Larsen
+title: Hobo 1.0.2 and 1.1.0.pre2 released
+published: true
+tags: []
+
+date: 2010-11-15 16:17:18 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=328
+author_url: http://bryan.larsen.st
+status: publish
+---
+On Friday I released three new Hobo gems:  1.0.2, 1.1.0.pre0 and 1.1.0.pre2.  (1.1.0.pre1 was a glitch).
+
+Here are the notes for 1.0.2 from CHANGES.txt:
+
+<em>1.0.2 is almost identical to 1.0.1 except that it updates the
+version requirements to exclude Rails3.  (Rails3 support is being worked on in the 1.3 branch).
+
+This release silences some warnings produced when running with Rails
+2.3.10.
+
+This release contains preliminary support for Ruby 1.9.2, although you
+may encounter problems if you use Single Table Inheritance (STI)
+models.
+
+A few very minor bug fixes have also been included.  See the [github
+log](https://github.com/tablatom/hobo/compare/v1.0.1...v1.0.2) for
+more details.
+</em>
+
+1.1.0.pre0 is essentially a packaging of Hobo trunk as it existed a month ago.   (So it does not include the improvements added for 1.0.2) This version has been stable for people, and has been known to be used in production use.
+
+The biggest difference between 1.0.X and 1.1.X is that Dryml has been split out into its own gem.  There are also some very minor incompatibilities that affect things like CSS class names.  The delta between 1.0.2 and 1.1.0.pre2 can be viewed on [github](https://github.com/tablatom/hobo/compare/v1.0.2...v1.1.0.pre2)
+
+1.1.0.pre2 merges in fixes that have accumulated on several vendor branches of Hobo, as well as the 1.0.2 fixes.    1.1.0.pre2 requires the "--pre" option to be installed:
+
+    gem install hobo -v 1.1.0.pre2 --pre
+
+As always when upgrading hobo versions, you will probably want to run
+
+    ruby script/generate hobo_rapid
+
+or
+
+    rake hobo:symlink_assets
+
+to ensure that you get the latest versions of the javascript and CSS files copied into your application.
+
+<strong>Which version of Hobo should you use?</strong>
+
+If you are currently using 1.0.0 or 1.0.1 in production, you only need to upgrade to 1.0.2 if you are also upgrading your version of Ruby or Rails or need one of the bugfixes listed [here](https://github.com/tablatom/hobo/compare/v1.0.1...v1.0.2)
+
+If you have a Rails 2.3 project currently under active development, we recommend 1.1.0.pre2 (or the github master branch).   Hopefully we have 1.1.0 released before you go to production -- but even if we don't, we do not believe that there are any issues that would prevent 1.1.0.pre2 from being usable in production.
+
+If you are developing a new project and/or wish to use Rails 3, the 1.3 branch of Hobo currently being developed by Domizio is definitely stabilizing and becoming useful.  The major issues preventing the release of 1.3 are all related to documentation. 

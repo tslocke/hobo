@@ -1,0 +1,177 @@
+--- 
+wordpress_id: 263
+author_login: bryanlarsen
+layout: post
+comments: 
+- author: Bryan Larsen
+  date: Wed Dec 02 00:20:03 +0000 2009
+  id: 51783
+  content: |
+    <p>P.S.  You may receive an error posting comments.  Don't worry, they will appear, unless akismet takes offense.</p>
+
+  date_gmt: Wed Dec 02 00:20:03 +0000 2009
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+- author: Brian Corbin
+  date: Wed Dec 02 01:49:56 +0000 2009
+  id: 51784
+  content: |
+    <p>You're probably already aware, but something is causing a NoMethodError in Front#index.</p>
+    
+    <p>Steps to reproduce:</p>
+    
+    <p>hobo test
+    script/generate hobo<em>model</em>resource aresource
+    script/generate hobo_migration   (respond m)
+    script/server</p>
+    
+    <p>And that's it.  Attempt to browse http://localhost:3000 and I get:</p>
+    
+    <p>undefined method `model' for #</p>
+    
+    <p>backtrace edited out</p>
+
+  date_gmt: Wed Dec 02 01:49:56 +0000 2009
+  author_email: bcorbin@vmware.com
+  author_url: ""
+- author: Bryan Larsen
+  date: Wed Dec 02 02:32:18 +0000 2009
+  id: 51785
+  content: |
+    <p>OK, that was embarassing.  Not only did the first release fail epically, the quick hack fix was also broken.  Look for 0.9.102 in a couple of minutes...</p>
+
+  date_gmt: Wed Dec 02 02:32:18 +0000 2009
+  author_email: bryan@larsen.st
+  author_url: http://bryan.larsen.st
+author: Bryan Larsen
+title: 1.0RC1 released!
+published: true
+tags: []
+
+date: 2009-12-02 00:00:15 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=263
+author_url: http://bryan.larsen.st
+status: publish
+---
+I'm proud to announce that we've just released Hobo 1.0RC1 to gemcutter and rubyforge.  It's named 0.9.100 just in case any of you still have old versions of rubygems and don't want to upgrade.
+
+The fixes came fast and furiously in the last two weeks, and we took the opportunity to make a couple of small API changes before we locked down for 1.0.  The biggest change was the removal of the ":dependent => :destroy" magic.  Hobo no longer uses ":dependent => :destroy" to determine your primary collection.  You will have to add "children" declarations in your viewhints files if you were depending on this behaviour.   There's a [new step in the agility tutorial](http://cookbook.hobocentral.net/tutorials/agility#viewhints-children) that talks about this.  There's also a new agility chapter for [translations](http://cookbook.hobocentral.net/tutorials/agility#translating_the_application).
+
+At this point we're frozen for 1.0.  From now on only critical and documentation and testing bugs will be fixed on our 1.0 branch.   I'm also proud to announce that there are currently 0 critical bugs on our [bugtracker](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/bins/8323).  I expect you to change that quickly, but it feels pretty good to get it down to 0, even for a brief moment!  Unfortunately, the Lighthouse doesn't contain all of our documentation and testing bugs, because there aren't many of those on there either.
+
+Matt Jones (al2o3cr) and Tom Locke made significant contributions to this release.
+
+### Changelog
+
+Deletions:
+
+  - Children must now be specified in the viewhints.   Hobo no longer
+    uses the presence of :dependent => :destroy to determine the
+    primary child association.
+
+  - The bundles feature of Hobo which never really worked and was
+    never documented has been removed from this release.
+
+  - The message "You must activate your account before you can log
+    in. Please check your email." which used to be added to the flash
+    message when a user has signed up has been removed from
+    `hobo_do_signup`.
+
+  - The fix for
+    [#556](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/556)
+    means that the migration generator now ignores all models that have
+    a `hobo_model` declaration but not a `fields` declaration.  If you
+    have any models that do not have a fields declaration (join
+    tables, for example), you may wish to add a blank fields
+    declaration.
+
+Major enhancements:
+
+  - Hobo now supports Ruby 1.9.1.  Problems have been encountered with
+    Ruby 1.9.1 and Rails 2.3.4.  Rails 2.3.3 and 2.3.5 work fine.
+
+  - Hobo has been tested against the new Rails 2.3.5.  JRuby users may
+    encounter [Rails bug 3497](https://rails.lighthouseapp.com/projects/8994/tickets/3497)
+
+  - Rails 2.2 is still supported for this release.   Support for 2.2
+    may be dropped post-1.0.
+
+  - Translations (ie, the ht functions) has now been moved into its
+    own module.  To access the translation functions from elsewhere
+    use `Hobo::Translations.ht`.  Alternatively, including the
+    Hobo::Translations module into your class will give you `ht` as a
+    local instance method.  (This is one of the things the
+    `hobo_controller` declaration does.)
+
+  - `rake hobo:run_invite_only_generators` was added as an alternative
+    to `rake hobo:run_standard_generators` for those who created their
+    application with the `--invite-only` flag
+
+  - [#409](https://hobo.lighthouseapp.com/projects/8324/tickets/409)
+    The `<editor>` tag has been modified to display the `to_s`
+    representation of the object while in edit mode.  The `to_html`
+    representation is still used in view mode.  The editor tag for
+    HTML columns has been modified to remove the heavy sanitizing that
+    was previously performed.  HtmlString will sanitize before saving
+    to the database.  You need to update your hobo-rapid.js for this
+    fix.  Run `rake hobo:run_standard_generators` or copy the file
+    directly from [github](http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/hobo-rapid.js)
+
+  - [#296](https://hobo.lighthouseapp.com/projects/8324/tickets/296)
+    The migration generator now fully understands HABTM join tables. Note that
+    the "decorated join table" functionality that was deprecated in Rails 2.3
+    is NOT supported.
+
+  - [#475](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/475)
+    User-defined rich types are now loaded from `RAILS_ROOT/app/rich_types`, if it exists.
+
+  - EnumString's can now be translated.  The
+    [manual](http://cookbook.hobocentral.net/manual/hobofields/rich_types)
+    has been updated with the details.
+
+  - ViewHint's can now be translated.  Well, they mostly could in 0.9,
+    but it has been cleaned up and [documented with
+    ViewHints](http://cookbook.hobocentral.net/manual/viewhints).
+
+  - Lifecycle states can now be translated. The key is
+    `#{table_name}.states.#{state}`  Transitions use the key `#{table_name}.actions.#{transition}`
+
+Major bug fixes:
+
+  - [#537](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/537)
+    The `._?.` "smart dot" now returns 'nil' rather than calling its
+    trailing function more often than it used to, more closely
+    matching its documentation.
+
+  - [#457](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/457)
+    ie7-recalc.js has been updated to improve compatibility with IE6.
+    Please update the copy inside of your application, either by
+    running `rake hobo:run_standard_generators` or by copying the file
+    directly from [github](http://github.com/tablatom/hobo/blob/master/hobo/rails_generators/hobo_rapid/templates/ie7-recalc.js)
+
+  - [#512](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/512)
+    Hobo now has better compatibility with non-DRYML templates
+
+Minor enhancements:
+
+  - [#554](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/554)
+    The transition-buttons tag no longer displays transitions that are
+    not `:available_to` the user.
+
+  - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/536)
+    documentation for field-list more closely matches reality
+
+  - [#536](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/543)
+    i18n has been silenced.  It's messages can be made to reappear on
+    the log via `HOBO_VERBOSE_TRANSLATIONS`.
+
+  - [#555](https://hobo.lighthouseapp.com/projects/8324-hobo/tickets/555)
+    Specifying ignore_index :foo will ignore the index named 'foo' on the model
+    when generating migrations - handy for indexes that can't be generated
+    automatically (with a prefix length on MySQL, for instance) or existing
+    indexes in legacy tables.
+
+See also the [git log](http://github.com/tablatom/hobo/commits/v0.9.100)

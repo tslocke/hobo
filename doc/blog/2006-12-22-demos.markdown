@@ -1,0 +1,102 @@
+--- 
+wordpress_id: 16
+author_login: admin
+layout: page
+comments: 
+- author: Jason Lambert &raquo; Blog Archive &raquo; Hobo - the web app builder for Rails
+  date: Fri Jan 05 12:25:51 +0000 2007
+  id: 67
+  content: |
+    <p>[...] Check out Hobo, rails scaffolding on steriods. Also check out the screencasts available. [...]</p>
+
+  date_gmt: Fri Jan 05 12:25:51 +0000 2007
+  author_email: ""
+  author_url: http://www.jasonlambert.com/blog/hobo-the-web-app-builder-for-rails/
+- author: "IT&aring;&iquest;&laquo;&eacute;&curren;\xC2\x90&#8212;&#8212;&aring;\xC2\x8F&lsquo;&ccedil;\xC5\xBD&deg;,&aring;&circ;&dagger;&auml;&ordm;&laquo;,&aring;&hellip;&sup3;&aelig;&sup3;&uml;&auml;&ordm;&rsquo;&egrave;\xC2\x81&rdquo;&ccedil;&frac12;&lsquo; &raquo; Blog Archive &raquo; 2007-01-06"
+  date: Sat Jan 06 12:39:47 +0000 2007
+  id: 77
+  content: "<p>[...] &auml;&cedil;&euro;&auml;&cedil;&ordf; todo&iuml;&frac14;\xC2\x8Dlist &ccedil;&scaron;&bdquo; &auml;&frac34;&lsaquo;&aring;&shy;\xC2\x90 &auml;&frac12;&bull;&aelig;&mdash;&para;&auml;&frac12;&iquest;&ccedil;&rdquo;&uml;googles-gwt SHJS HTML &ccedil;&uml;&lsaquo;&aring;&ordm;\xC2\x8F&auml;&raquo;&pound;&ccedil;&nbsp;\xC2\x81&egrave;&iquest;&rsaquo;&egrave;&iexcl;&OElig;&ccedil;\xC2\x9D&euro;&egrave;&permil;&sup2; Feedzeo&aelig;&tilde;&macr;&auml;&cedil;&euro;&auml;&cedil;&ordf;RSS/RDF/Atom Feed&egrave;\xC2\x81&scaron;&aring;\xC2\x90&circ;&aring;&trade;&uml;&auml;&cedil;\xC5\xBD&eacute;&tilde;&hellip;&egrave;&macr;&raquo;&aring;&trade;&uml; [...]</p>\n"
+  date_gmt: Sat Jan 06 12:39:47 +0000 2007
+  author_email: ""
+  author_url: http://www.javaliker.com/?p=217
+- author: links for 2007-01-04 | blog.forret.com
+  date: Sun Jan 07 17:34:34 +0000 2007
+  id: 83
+  content: |
+    <p>[...] The Hobo Blog &Acirc;&raquo; Demos POD Demo POD is a simple classified adverts application, created using Hobo and Rails in just five minutes. Watch the Creating Pod screencast (10 minutes) Download Pod: zip (tags: ruby rails rad library webapp builder amazing)   These icons link to social bookmarking sites where readers can share and discover new web pages. [...]</p>
+
+  date_gmt: Sun Jan 07 17:34:34 +0000 2007
+  author_email: ""
+  author_url: http://blog.forret.com/2007/01/links-for-2007-01-04/
+- author: Webmaster 38 &raquo; Blog Archive &raquo; Hobo-extension to Ruby on Rails at ajax scripts compound
+  date: Fri Jan 04 02:08:28 +0000 2008
+  id: 20231
+  content: |
+    <p>[...] DEMO - Download                Leave a Reply [...]</p>
+
+  date_gmt: Fri Jan 04 02:08:28 +0000 2008
+  author_email: ""
+  author_url: http://www.38z.net.ru/?p=663
+- author: Rails Admins Plugins Review
+  date: Thu Feb 14 11:59:00 +0000 2008
+  id: 25329
+  content: |
+    <p>[...] Sample Projects: http://hobocentral.net/blog/demos/ [...]</p>
+
+  date_gmt: Thu Feb 14 11:59:00 +0000 2008
+  author_email: ""
+  author_url: http://www.joesniff.co.uk/critique/rails-admins-plugins-review.html
+author: Tom
+title: Demos
+published: true
+tags: []
+
+date: 2006-12-22 12:07:13 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobotek.net/blog/demo/
+author_url: http://www.hobocentral.net
+status: publish
+---
+Download complete Hobo demo applications, and watch them being created in the screencasts. All the demos require Rails 1.2
+
+The demos are standard Rails apps. To run them
+
+* Download and unpack the demo archive
+
+* Create the database, e.g.
+
+    `$ mysqladmin create pod_development`
+
+  (look in config/database.yml for the name of the database you need to create)
+
+* To create the required tables, open a terminal in the demo's main directory, and:
+
+    `$ rake db:migrate`
+
+* Run the development server
+
+    `$ ruby script/server`
+
+* Point your browser at http://localhost:3000
+
+### POD Demo
+
+POD is a simple classified advertising application, created using Hobo and Rails in just five minutes.
+
+  * You can watch the the development of POD via the [screencasts](/screencasts.php) page
+
+Downloads:
+
+  * Pod Demo - Introduction to Hobo: [zip](/demos/pod-default.zip)
+  * Pod Demo - Page Customisation: [zip](/demos/pod-tabla.zip)
+  * Pod Demo - Replacing the Theme: [zip](/demos/pod-stylevantage.zip)
+
+(Note that the third demo (stylevantage) is massively incomplete and broken in many places. It is included just for information purposes)
+
+### To-Do List Demo
+
+No screencast, but some discussion of the permissions in [this post](/blog/2006/12/27/to-do-list-demo/)
+
+  * Download ToDo: [zip](/demos/todo.zip)

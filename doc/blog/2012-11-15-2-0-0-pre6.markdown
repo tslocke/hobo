@@ -1,0 +1,53 @@
+--- 
+wordpress_id: 458
+author_login: bryanlarsen
+layout: post
+comments: []
+
+author: Bryan Larsen
+title: 2.0.0.pre6
+published: true
+tags: []
+
+date: 2012-11-15 15:25:12 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=458
+author_url: http://bryan.larsen.st
+status: publish
+---
+I'm pleased to announce the availability of Hobo 2.0.0.pre6.
+
+There are two changes that may affect your existing code.
+
+## hobo-jquery-ui optional
+
+As of 2.0.0.pre6, hobo-jquery-ui is now optional.  I'll explain in a subsequent blog post how you can take advantage of this, but most of you will want to continue to use hobo-jquery-ui in your applications.
+
+The hobo themes no longer list hobo-jquery-ui as an explicit dependency, so you must ensure that your Gemfile contains `gem "hobo_jquery_ui"`
+
+## content vs content-body
+
+In previous versions of Hobo, the page tag only defined the `content` parameter.  Generated pages created the `content-header`, `content-body` and `aside` parameters inside of page's content parameter.
+
+Now `content`, `content-header`, `content-body` and `aside` are all defined by the page tag of the theme you are using.
+
+This is unlikely to affect you unless you are using the `hobo_bootstrap` theme.   If you are using `hobo_bootstrap`, please ensure that you are using at least version 2.0.0.pre6 of `hobo_bootstrap`.
+
+## minor changes
+
+`live-search` was reorganized to make it easier for themes to adjust
+the look and feel.  You can take advantage of this change by
+installing the new [hobo\_bootstrap\_ui](http://cookbook.hobocentral.net/api_plugins/hobo_bootstrap_ui).
+
+## bug fixes
+
+- routing.  This most likely exhibited as links not having a target in 2.0.0.pre5.
+- click-editor
+- name-one
+- nested input-many
+- IE8 & Safari/iOS fixes
+- documentation
+
+For more detail, see the github code history and closed issues list.

@@ -1,4 +1,5 @@
-## What is Hobo?
+What is Hobo?
+{.document-title}
 
 Hobo is a collection of open-source gems/plugins for Ruby on Rails
 that help you build anything from throwaway prototypes and internal

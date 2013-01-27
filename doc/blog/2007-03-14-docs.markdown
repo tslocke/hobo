@@ -1,0 +1,32 @@
+--- 
+wordpress_id: 35
+author_login: admin
+layout: page
+comments: []
+
+author: Tom
+title: Docs
+published: true
+tags: []
+
+date: 2007-03-14 22:08:25 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://sandbox.hobotek.net/blog/docs/
+author_url: http://www.hobocentral.net
+status: publish
+---
+ * [A Concise Introduction to DRYML](/blog/docs/a-concise-introduction-to-dryml/)
+
+# The Hobo Tutorial
+
+**Stop Press!** The new, improved and up-to-date (Hobo 0.7.1) tutorial is now available!
+
+ * [Hobo Tutorial](/tutorial)
+
+# beta.hobocentral.net
+
+Not only that, but the source-code to [beta.hobocentral.net](http://beta.hobocentral.net) is available! The idea is that this source-code will heavily commented in order to act as a form of documentation. At the moment there's not a huge amount there, but the model layer has a few nuggets of knowledge in the comments. Also note that a lot of the functionality can be found in `vendor/plugins` as reusable Hobo bundles. More coming!
+
+`svn checkout svn://hobocentral.net/hobo/trunk/hobocentral`

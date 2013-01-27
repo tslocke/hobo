@@ -1,0 +1,44 @@
+--- 
+wordpress_id: 17
+author_login: admin
+layout: page
+comments: []
+
+author: Tom
+title: Status
+published: true
+tags: []
+
+date: 2006-12-22 12:23:14 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobotek.net/blog/status/
+author_url: http://www.hobocentral.net
+status: publish
+---
+*Hobo is currently beta quality. Although Hobo is in active use in production applications, please be aware that if you choose to deploy a Hobo/Rails application on the Internet you do so at your own risk.*
+
+*Also note that at this stage we reserve the right to make breaking changes to the API.*
+
+**Current version: 0.8.3 **
+
+## Known Issues
+
+Aspects of Hobo we need to work on:
+
+(of course there's much more to be worked on than mentioned here -- if you come across anything you think should be included in this heads-up, please let us know in the forums)
+
+### Active Record Support
+
+Hobo does not currently support `has_one` and `has_and_belongs_to_many`. Of course it's all just Rails so you're free to use those features in your application, but you will probably run into problems if you try to use Hobo's various features in conjunction with those kinds of associations. `has_one` is definitely on the to-do list. `has_and_belongs_to_many` is not -- use `has_many :through` instead, it's much better. If you think we're wrong about this, let us know in the forums! You won't be the first, but so far we're sticking to our guns.
+
+### DRYML Syntax and Naming
+
+With the 0.6 and 0.7 releases we've now done our big cleanup of DRYML syntax and naming. However you can still expect small changes from time to time that will require you to update your apps.
+
+### DRYML Performance
+
+Because DRYML promotes a very high level of code re-use in the views, a DRYML page tends to include far more method calls than a typical ERB template. On big pages this can be a significant performance issue.
+
+Tag calls are currently slower than they need to be because at this stage we're optimising for code clarity rather than performance. At some point we will start tuning this code to run faster, or...

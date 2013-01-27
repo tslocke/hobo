@@ -1,0 +1,261 @@
+--- 
+wordpress_id: 171
+author_login: admin
+layout: post
+comments: 
+- author: Daniel Lucraft
+  date: Sat Aug 25 16:46:49 +0000 2007
+  id: 9620
+  content: |
+    <p>string<em>or</em>nil._?.length</p>
+    
+    <p>Cute. Suggestion: </p>
+    
+    <pre><code>class SafeNil
+      def method_missing(*args, &amp;b)
+        nil.send(*args, &amp;b) rescue SafeNil.new
+      end
+    end
+    </code></pre>
+    
+    <p>Then</p>
+    
+    <p>string<em>or</em>nil._?.length * 4</p>
+    
+    <p>I call mine null:</p>
+    
+    <p>class Object
+      def null
+        n = Object.new
+        def null.method_missing(name, *args)
+          null
+        end
+        n
+      end
+    end</p>
+    
+    <p>(string<em>or</em>nil||null).length * 4</p>
+    
+    <p>best,
+    Dan</p>
+
+  date_gmt: Sat Aug 25 16:46:49 +0000 2007
+  author_email: dan@fluentradical.com
+  author_url: http://www.daniellucraft.com/blog
+- author: "Null Objects : Nuclear-Powered Nutcracker"
+  date: Sat Aug 25 16:58:38 +0000 2007
+  id: 9621
+  content: |
+    <p>[...] Tom Locke and I have similar proclivities. He says: [...]</p>
+
+  date_gmt: Sat Aug 25 16:58:38 +0000 2007
+  author_email: ""
+  author_url: http://www.daniellucraft.com/blog/2007/08/null-objects/
+- author: Tom
+  date: Sat Aug 25 17:11:38 +0000 2007
+  id: 9623
+  content: |
+    <p>Nice extra trick Daniel. For my money I think I'd rather not have those SafeNil objects floating around my app who knows where.</p>
+    
+    <p>The usage pattern is that you <em>always</em> call a method directly on the <code>._?</code>. If you follow that, the SafeNil object is never seen.</p>
+
+  date_gmt: Sat Aug 25 17:11:38 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Daniel Lucraft
+  date: Sat Aug 25 17:23:24 +0000 2007
+  id: 9626
+  content: |
+    <p>You're right, and my suggested change is wrong, because you need the resulting object to evaluate as false in case it is used as a condition. </p>
+    
+    <p>AFAIK there's no way to make an arbitrary object evaluate to false in Ruby. Maybe that would be an interesting Ruby 1.9 extension:</p>
+    
+    <p>class A
+        include Falseness
+      end</p>
+    
+    <p>then instances of A would evaluate to false in 'if' statements.</p>
+
+  date_gmt: Sat Aug 25 17:23:24 +0000 2007
+  author_email: dan@fluentradical.com
+  author_url: http://www.daniellucraft.com/blog
+- author: Tom
+  date: Sat Aug 25 17:55:40 +0000 2007
+  id: 9631
+  content: |
+    <p>Interesting idea. I think Python has user-defined 'truthness' along these lines.</p>
+
+  date_gmt: Sat Aug 25 17:55:40 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Ryan Allen
+  date: Mon Sep 10 01:13:45 +0000 2007
+  id: 10388
+  content: |
+    <p>Good in loose views for missing methods? I dunno. SafeNil makes me nervous...</p>
+
+  date_gmt: Mon Sep 10 01:13:45 +0000 2007
+  author_email: ryan@yeahnah.org
+  author_url: http://yeahnah.org
+- author: steve d
+  date: Sat Sep 15 17:26:02 +0000 2007
+  id: 10637
+  content: |
+    <p>Awesome!  very useful!</p>
+
+  date_gmt: Sat Sep 15 17:26:02 +0000 2007
+  author_email: ""
+  author_url: http://coderrr.wordpress.com
+- author: steve d
+  date: Sat Sep 15 18:26:28 +0000 2007
+  id: 10638
+  content: |
+    <p>2000% speed increase if you define SafeNil this way:</p>
+    
+    <pre><code>class SafeNil
+      def method_missing(method, *args, &amp;b)
+        return nil  unless nil.respond_to? method
+        nil.send(method, *args, &amp;b) rescue nil
+      end
+    end
+    </code></pre>
+    
+    <p>Only problem with this way would be if you define method<em>missing on nil to route method calls to it, because then respond</em>to? wouldn't be accurate</p>
+
+  date_gmt: Sat Sep 15 18:26:28 +0000 2007
+  author_email: ""
+  author_url: http://coderrr.wordpress.com
+- author: The Ternary Destroyer &laquo; coderrr
+  date: Sat Sep 15 18:30:45 +0000 2007
+  id: 10639
+  content: |
+    <p>[...] The Ternary&nbsp;Destroyer Filed under: Uncategorized &#8212; coderrr @ 6:59 pm   I just ran across this Hobo blog post which describes an awesome way to get rid of a lot of use cases for the ternary operator. [...]</p>
+
+  date_gmt: Sat Sep 15 18:30:45 +0000 2007
+  author_email: ""
+  author_url: http://coderrr.wordpress.com/2007/09/15/the-ternary-destroyer/
+- author: Coda Hale
+  date: Tue Oct 02 17:45:02 +0000 2007
+  id: 11840
+  content: |
+    <p>Why not just use single-line conditionals?</p>
+    
+    <pre><code>x = string_or_nil.length unless string_or_nil.nil?
+    x #=> nil
+    </code></pre>
+    
+    <p>Or, if you're looking for compound conditions:</p>
+    
+    <pre><code>if (not string_or_nil.nil?) &amp;&amp; (string_or_nil.length == 4)
+    </code></pre>
+    
+    <p>This seems like a fair bit of cleverness to avoid making your guard conditions explicit -- which seems to me like it could make maintenance more of a pain than it already is.</p>
+    
+    <p>Also, unlike the ternary operator, this doesn't allow you to specify a fallback value without using <code>||</code> or some other comparison. Why not this:</p>
+    
+    <pre><code>x = (string_or_nil &amp;&amp; string_or_nil.length) || 6
+    </code></pre>
+    
+    <p>Other than that, cool Ruby trick.</p>
+
+  date_gmt: Tue Oct 02 17:45:02 +0000 2007
+  author_email: coda.hale@gmail.com
+  author_url: http://blog.codahale.com
+- author: Tom
+  date: Tue Oct 02 18:10:12 +0000 2007
+  id: 11842
+  content: |
+    <p>Coda -- all of your examples have one thing in commen that this operator was specifically intended to avoid. <code>string_or_nil</code> occurs twice.</p>
+    
+    <p>The places where I use _? are where I don't have the value in a local variable, and I don't want to assign it to one just because I have an operation to perform "only if the value is not nil". e.g.</p>
+    
+    <pre><code>if Foo.expensive_method_call._?.closed?
+      ...
+    </code></pre>
+    
+    <p>I see this pattern all the time in my code and I really enjoy not having to make the code more verbose. To me this reads like a spec, once you've internalised the simple _? operator.</p>
+
+  date_gmt: Tue Oct 02 18:10:12 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Tyler Rick
+  date: Fri Oct 12 11:08:08 +0000 2007
+  id: 12453
+  content: |
+    <p>This is awesome! I've been wanting something like this for ages.</p>
+    
+    <p>I hope you don't mind, I've added it to the quality_extensions gem on RubyForge. (<a href="http://quality-ext.rubyforge.org/rdoc/classes/NilClass.html" rel="nofollow">rdoc</a> <a href="http://quality-ext.rubyforge.org/src/lib/quality_extensions/safe_nil.rb" rel="nofollow">source</a>)</p>
+    
+    <p>Hopefully we can get this included in Facets too so an even wider group of people can enjoy it!</p>
+
+  date_gmt: Fri Oct 12 11:08:08 +0000 2007
+  author_email: hobocentral.net@tylerrick.com
+  author_url: ""
+- author: trapdoor1 &raquo; Object.too_clever_by_half? rescue nil
+  date: Sat Apr 05 13:07:38 +0000 2008
+  id: 30751
+  content: |
+    <p>[...] Monkey-patching proposals have abounded in the Ruby community recently - including, but not limited to Object#andand, Object#<em>? and SafeNil and Object#method</em>. [...]</p>
+
+  date_gmt: Sat Apr 05 13:07:38 +0000 2008
+  author_email: ""
+  author_url: http://blog.trapdoor1.net/2008/04/05/objecttoo_clever_by_half-rescue-nil/
+- author: "Aaron Feng : Learning from io"
+  date: Thu Sep 25 03:18:13 +0000 2008
+  id: 48522
+  content: |
+    <p>[...] The above code is taken from this post The post didn't mention io, but I assumed it is inspired by it. In ruby you can't just use the "?" for your method name, therefore, _ is prepended before "?".Now you can do following without checking the parent object: offer.<em>?.price.</em>?.formatted_amount [...]</p>
+
+  date_gmt: Thu Sep 25 03:18:13 +0000 2008
+  author_email: ""
+  author_url: http://aaronfeng.com/articles/2008/09/24/learning-from-io
+- author: Try() as you might | Lambda @ Copa
+  date: Sun Jan 11 12:43:18 +0000 2009
+  id: 51577
+  content: |
+    <p>[...] I came across a few other alternatives that were entertaining the idea of using method_missing, but let's [...]</p>
+
+  date_gmt: Sun Jan 11 12:43:18 +0000 2009
+  author_email: ""
+  author_url: http://blog.lawrencepit.com/2009/01/11/try-as-you-might/
+- author: Proxy Servers &raquo; Checking for nil strings in Rails view
+  date: Sun Aug 05 17:32:41 +0000 2012
+  id: 52436
+  content: |
+    <p>[...] is a suggestion here which I am inclined to try out. It basically allows a statement like [...]</p>
+
+  date_gmt: Sun Aug 05 17:32:41 +0000 2012
+  author_email: ""
+  author_url: http://proxy-servers.eu/checking-for-nil-strings-in-rails-view/
+author: Tom
+title: Quiz
+published: true
+tags: []
+
+date: 2007-08-25 12:37:06 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/08/25/quiz/
+author_url: http://www.hobocentral.net
+status: publish
+---
+This neat hack just popped into my head -- something I've wanted for ages. But what is it for?
+
+        class Object
+          def _?()
+            self
+          end
+        end
+
+        class NilClass
+          def _?()
+            SafeNil.new
+          end
+        end
+
+        class SafeNil
+          def method_missing(*args, &b)
+            nil.send(*args, &b) rescue nil
+          end
+        end

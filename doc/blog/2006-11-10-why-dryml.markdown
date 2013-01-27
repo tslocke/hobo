@@ -1,0 +1,99 @@
+--- 
+wordpress_id: 6
+author_login: admin
+layout: post
+comments: 
+- author: ""
+  date: Sat Jan 06 22:34:26 +0000 2007
+  id: 79
+  content: |
+    <p>Type your comment here.</p>
+
+  date_gmt: Sat Jan 06 22:34:26 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: Christian
+  date: Sat Jan 27 00:07:11 +0000 2007
+  id: 205
+  content: |
+    <p>Hey, nice stuff! I always did like those JSP tag libraries alot more than those pesky scriptlets :) I'm just worrying - since these templates aren't actually compiled (or are they?) how big an impact does all this have on performance?</p>
+
+  date_gmt: Sat Jan 27 00:07:11 +0000 2007
+  author_email: ""
+  author_url: ""
+- author: Hobo Framework for Ruby on Rails at Funcoder | Your Geek Blogger / Podcaster
+  date: Wed May 02 07:38:23 +0000 2007
+  id: 2374
+  content: |
+    <p>[...] The DRYML (Don&#8217;t repeat yourself markup language) looks very interesting but I need to work in this a bit more to get a feel of it. [...]</p>
+
+  date_gmt: Wed May 02 07:38:23 +0000 2007
+  author_email: ""
+  author_url: http://www.funcoder.com/2007/05/01/hobo-framework-for-ruby-on-rails/
+author: Tom
+title: Why DRYML?
+excerpt: |
+  DRYML: The Dont-Repeat-Yourself Markup Language. In case you hadn't guessed, we're intending to bring a higher level of re-use to Rails' views.
+  
+  Why? Rails already has a bunch of mechanisms for re-use within views. Namely: layouts, partials and helpers. Each serves a different purpose, and yet, IMHO, there's still a gap. I find that small fragments of mark-up tend to crop up over and over in my views. Yes I could extract them into paritals or helpers, but I find myself disinclined to do so.
+  
+
+published: true
+tags: []
+
+date: 2006-11-10 16:30:55 +00:00
+categories: 
+- Motivation
+author_email: tom@hobocentral.net
+wordpress_url: http://hobotek.net/blog/?p=6
+author_url: http://www.hobocentral.net
+status: publish
+---
+DRYML: The Dont-Repeat-Yourself Markup Language. In case you hadn't guessed, we're intending to bring a higher level of re-use to Rails' views.
+
+Why? Rails already has a bunch of mechanisms for re-use within views. Namely: layouts, partials and helpers. Each serves a different purpose, and yet, IMHO, there's still a gap. I find that small fragments of mark-up tend to crop up over and over in my views. Yes I could extract them into paritals or helpers, but I find myself disinclined to do so.
+
+<a id="more"></a><a id="more-6"></a>
+
+Helpers are good for small bits of dynamic content, but not so convenient for re-use of HTML fragments - I don't really want to embed loads of HTML in strings in Ruby source. Nor do I want to make excessive use of the `tag` helper. I want to put mark-up in mark-up files.
+
+So partials would be appropriate. But each partial needs it's own file, which again discourages me from making heavy use of them.
+
+Finally, and prefixed with a big ol' IMHO -- dang are those ERB scriptlets ever ugly! If you ever needed to call a helper passing in HTML mark-up in the parameters, that's HTML within Ruby within HTML -- not pretty. Hey, it works right? This is not a criticism of ERB. The syntax used (`<%= ... %>`) is like that for a reason. ERB doesn't need fixing. DRYML supports ERB scriptlets, but allows you to hide them away behind nice clean custom tags, leaving you with beautiful clean templates [swoon] where you can see what's going on at a glance. 
+
+Defining a tag essentially just creates a new helper method for you, and a use of that tag is nothing more than a call to that helper. This is just syntax. Witness:
+
+#### hello_world.dryml
+
+    <def tag="hello">Hello World!</def>
+
+    <p>Here it is: <hello/></p>
+  
+    <p>And here it is again: <%= hello %></p>
+
+Groovy baby :-)
+
+(check out the [Hello World](/blog/2006/11/10/hello-world-2/) post to see how to get set up so you can try this)
+
+And just as you can call a tag from Ruby instead of mark-up, you can define them in Ruby if you wish. You can do so in your helpers. Try this
+
+#### app/helpers/application_helper.rb
+
+    module ApplicationHelper
+
+      include Hobo::DefineTags
+
+      def_tag :from_ruby do
+        "As easy as that eh?"
+      end
+
+    end
+
+That will give you a `<from_ruby/>` tag in all of your DRYML templates. If your tag contains more code than mark-up, it's cleaner to define it in a module like this.
+
+You could even define the tag in a helper module and call it from an ERB scriptlet, but that would be kinda strange... Hey -- knock yourself out, it's all good :-)
+
+I'm trying not to get ahead of myself because there's a [Quick Guide to DRYML](/blog/2006/11/10/guide-to-dryml/) coming right up. I just want to show you that this is just a thin layer on top of your regular Rails template. They're just purdier is all. 
+
+Actually there's a lot more under the hood in DRYML -- it's not just syntax. We'll get there.
+

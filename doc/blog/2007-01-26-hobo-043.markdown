@@ -1,0 +1,154 @@
+--- 
+wordpress_id: 31
+author_login: admin
+layout: post
+comments: 
+- author: James McKee
+  date: Fri Jan 26 15:49:59 +0000 2007
+  id: 200
+  content: |
+    <p>Amazing work, I have it working under Suse, and it is simply an amazing peice of work.</p>
+    
+    <p>Thanks!</p>
+
+  date_gmt: Fri Jan 26 15:49:59 +0000 2007
+  author_email: james.mckee.jr@gmail.com
+  author_url: http://punk-coder.com
+- author: BillSaysThis
+  date: Fri Jan 26 18:19:27 +0000 2007
+  id: 202
+  content: |
+    <p>Any expectation that you'll update the docs soon to catch up with the latest changes?</p>
+
+  date_gmt: Fri Jan 26 18:19:27 +0000 2007
+  author_email: blazar@gmail.com
+  author_url: http://billsaysthis.com
+- author: UnTalDouglas
+  date: Fri Jan 26 20:17:00 +0000 2007
+  id: 203
+  content: |
+    <p>Que Barbaro !</p>
+    
+    <p>How Excellent !</p>
+    
+    <p>Thanks !</p>
+
+  date_gmt: Fri Jan 26 20:17:00 +0000 2007
+  author_email: douglasag@yahoo.com
+  author_url: http://www.tecnoforo.com
+- author: shaggy
+  date: Sat Jan 27 01:16:47 +0000 2007
+  id: 206
+  content: |
+    <p>Hello,
+    I am very interested in this project and want to contribute but I'm mostly a html css guy. Let me know if I can help out.</p>
+    
+    <p>thanks,</p>
+
+  date_gmt: Sat Jan 27 01:16:47 +0000 2007
+  author_email: scott@romack.net
+  author_url: http://www.romack.net
+- author: Blake
+  date: Thu Feb 01 19:33:34 +0000 2007
+  id: 237
+  content: |
+    <p>Just noticed that on the "Download &amp; Getting Started" page it's still listing 0.4.2 as the current version...</p>
+
+  date_gmt: Thu Feb 01 19:33:34 +0000 2007
+  author_email: shadoi@dre.gs
+  author_url: http://dre.gs
+- author: Tom
+  date: Sun Feb 04 21:36:27 +0000 2007
+  id: 259
+  content: |
+    <p>Thanks Blake - fixed</p>
+
+  date_gmt: Sun Feb 04 21:36:27 +0000 2007
+  author_email: tom@hobocentral.net
+  author_url: http://www.hobocentral.net
+- author: Fernando Gonzalez
+  date: Sat Feb 10 22:38:00 +0000 2007
+  id: 329
+  content: |
+    <p>Thanks for this rails complements/addons.</p>
+    
+    <p>I found that the Forums/Mailing List is empty. I think that is necesary to implement this now. An temporary option could be to generate a google groups o similar. This option is selected by AjaxScaffold by example.</p>
+    
+    <p>Thanks in advance</p>
+
+  date_gmt: Sat Feb 10 22:38:00 +0000 2007
+  author_email: fgonzalez@diariodecadiz.com
+  author_url: ""
+- author: Carl
+  date: Sun Feb 11 02:53:06 +0000 2007
+  id: 331
+  content: |
+    <p>I just did the Pod demo, and it worked perfectly. Smashing job, as some outside of the states say.  For what it's worth, I did run into this warning on a new project:</p>
+    
+    <p><code>./script/../config/boot.rb:29:Warning: require_gem is obsolete.  Use gem instead.
+    </code></p>
+    
+    <p>I am using Locomotive on a Mac and Rails version 1.2.1.</p>
+
+  date_gmt: Sun Feb 11 02:53:06 +0000 2007
+  author_email: hobocentral@betterbilling.net
+  author_url: http://carlbtanner.net
+- author: Ed
+  date: Tue Feb 13 05:05:38 +0000 2007
+  id: 366
+  content: |
+    <p>Carl,</p>
+    
+    <p>While require_gem was deprecated in gem version 0.9.0, the bin stubs are still using it. To get rid of the warnings printed by rake or other bin stubs simply run 'gem pristine --all'.</p>
+
+  date_gmt: Tue Feb 13 05:05:38 +0000 2007
+  author_email: ""
+  author_url: ""
+author: Tom
+title: Hobo 0.4.3
+excerpt: |
+  May we present, for your pleasure, Hobo version 0.4.3
+  
+    * [hobo-0.4.3.gem](/gems/hobo-0.4.3.gem)
+  
+    * [Change Log](/gems/CHANGES.txt)
+  
+
+published: true
+tags: []
+
+date: 2007-01-26 14:09:24 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/2007/01/26/hobo-043/
+author_url: http://www.hobocentral.net
+status: publish
+---
+May we present, for your pleasure, Hobo version 0.4.3
+
+  * [hobo-0.4.3.gem](/gems/hobo-0.4.3.gem)
+
+  * [Change Log](/gems/CHANGES.txt)
+
+<a id="more"></a><a id="more-31"></a>
+
+Let's see... what to tell you about the new stuff? There's a nice little DSL for integration tests. Most of the goodness is already there with Rails (See [Jamis Buck's blog post](http://weblog.jamisbuck.org/2006/3/9/integration-testing-in-rails-1-1)). I've just added a few convenient methods for testing basic stuff like creating and viewing objects. Here's a snippet from a test of the POD demo:
+
+	def test_user_creating
+  	  fred = fred_session
+      new_ad = fred.creates_and_visits(Advert, 
+		                               :title => "my car",
+		                               :body => "is a nice car",
+		                               :category => cars)
+      fred.sees new_ad.title
+      fred.sees new_ad.body
+    
+      fred.cant_create(User, :username => "Jim")
+      fred.cant_create(Category,
+                       :name => "small furry creatures")
+    end
+
+Neat eh?
+
+Enjoy.

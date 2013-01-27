@@ -1,0 +1,30 @@
+--- 
+wordpress_id: 419
+author_login: bryanlarsen
+layout: post
+comments: []
+
+author: Bryan Larsen
+title: 2.0.0.pre3
+published: true
+tags: []
+
+date: 2012-09-27 01:47:03 +00:00
+categories: 
+- General
+author_email: bryan@larsen.st
+wordpress_url: http://hobocentral.net/blog/?p=419
+author_url: http://bryan.larsen.st
+status: publish
+---
+I've released 2.0.0.pre3.   This is a minor release -- the major reason for the release is to synchronize with hobo_bootstrap, which had a problem with its 2.0.0.pre2 release.  It contains one fix to ajax parts in multipart forms.
+
+In the last blog post I forgot to mention one change that occured in 2.0.0.pre2:
+
+The generator no longer adds rails-dev-tweaks to your Gemfile, instead it adds quiet_assets. It also adds
+
+    config.watchable_dirs[File.join(config.root, 'app/view')] = ['dryml']
+
+to your config/environments/development.rb
+
+I recommend making those changes to any Rails 3.2 app, whether it&rsquo;s running 2.0.0.pre3 or not.

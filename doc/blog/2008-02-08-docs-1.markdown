@@ -1,0 +1,20 @@
+--- 
+wordpress_id: 192
+author_login: admin
+layout: page
+comments: []
+
+author: Tom
+title: Docs 1
+published: true
+tags: []
+
+date: 2008-02-08 11:42:14 +00:00
+categories: 
+- General
+author_email: tom@hobocentral.net
+wordpress_url: http://hobocentral.net/blog/docs/docs-1/
+author_url: http://www.hobocentral.net
+status: publish
+---
+# This is a page
