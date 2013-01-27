@@ -19,4 +19,4 @@ status: publish
 ---
 All documentation on the cookbook has now been updated for Hobo 2.0.  There are a couple of new chapters that I should write before calling the documentation complete, but we've reached a very important milestone gating the final release of Hobo 2.0.0.
 
-If you wish to assist in making the release of Hobo 2.0.0 a smashing success, check out our Trello boards: [Documentation](https://trello.com/b/cAdugfam) and [Cookbook](KivdCrbH)
+If you wish to assist in making the release of Hobo 2.0.0 a smashing success, check out our Trello boards: [Documentation](https://trello.com/b/cAdugfam) and [Cookbook](https://trello.com/b/KivdCrbH)
