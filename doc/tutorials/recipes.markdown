@@ -13,7 +13,6 @@
 
 [Add a new recipe or tutorial](https://github.com/Hobo/hobodoc/new/master/doc/tutorials)
 
-* [Dynamic Ajax select menus](dynamic_ajax_select_menus) by ignacio
 * [Mobile & iPad friendly sortable-collections](1804-mobile-ipad-friendly-sortable-collections) by Henry Baragar
 * [Use your own hobo fork](1803-use-your-own-hobo-fork) by kredmer
 * [Appcelerator Titanium (Mobile App) and Hobo](1802-appcelerator-titanium-mobile-app-and-hobo) by mdkarp
