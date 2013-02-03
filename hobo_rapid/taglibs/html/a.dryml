@@ -71,7 +71,7 @@ This is desired behaviour; `<a>` usually means 'go somewhere else' after all.   
 
 The standard AJAX attributes are supported.
 
-* action:  If "new", triggers the special behaviour listed above.  Otherwise, contains the action to be performed on the context.   If neither `action` nor `method` are specified, the action will be "index" or "show", as appropriate.
+* action:  If "new", triggers the special behaviour listed above.  Otherwise, contains the action to be performed on the context.   If `action` is not specified specified, the action will be "index" or "show", as appropriate.
 
 * to:  Use this item as the target instead of the current context.
 
@@ -87,12 +87,12 @@ The standard AJAX attributes are supported.
 
 * force: overrides the permission check if `action` is "new"
 
-* method: "get", "put", "post" or "delete".  "get" is the default
+* method: "get", "put", "post" or "delete".  "get" is the default.  This parameter assumes jquey-rails is being used, and simply sets data-method as well as rel="nofollow".
 
 * only-path, protocol, host, subdomain, domain, tld-length, port, anchor, trailing-slash: In smart mode, passed through to Rails' polymorphic_url.   For more information, see the Rails documentation for url_for.
 
 -->
-<def tag="a" attrs="action, to, params, query-params, href, format, subsite, force"><%=
+<def tag="a" attrs="action, to, params, query-params, href, format, subsite, force, method"><%=
   content = parameters.default
 
   ajax_attrs, attributes = attributes.partition_hash(HoboRapidHelper::AJAX_ATTRS)
@@ -120,6 +120,12 @@ The standard AJAX attributes are supported.
     params = url_options.merge(params || {})
 
     target = to || this
+
+    if method!="get"
+      # assume jquery-rails
+      attributes['data-method']=method
+      attributes['rel']='nofollow'
+    end
 
     if target.nil?
       Dryml.last_if = false
