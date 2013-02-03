@@ -379,6 +379,7 @@ module Hobo
         if self.class.name == "#{controller.camelize}Controller" && action == "index"
           params['action'] = 'index'
           self.action_name = 'index'
+	  self.this = find_or_paginate(model, {})
           index
         else
           render :template => "#{controller}/#{action}"
