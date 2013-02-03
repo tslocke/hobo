@@ -2,6 +2,8 @@
 
 unset HOBODEV
 
+my_dir=`pwd`
+
 cd ..
 gems=`rake gems[build,force] | grep File: | cut -f 4 -d ' '`
 cd integration_tests
@@ -13,6 +15,13 @@ source rvm --force gemset empty hobo-smoke
 source rvm gemset use hobo-smoke
 
 gem install --no-rdoc --no-ri $full_gems
+
+cd ../../hobo_bootstrap
+gem install --no-rdoc --no-ri `gem build hobo_bootstrap.gemspec | grep File: | cut -f 4 -d ' '`
+cd ../hobo_bootstrap_ui
+gem install --no-rdoc --no-ri `gem build hobo_bootstrap_ui.gemspec | grep File: | cut -f 4 -d ' '`
+
+cd $my_dir
 
 # invite only
 rm -rf smoke
