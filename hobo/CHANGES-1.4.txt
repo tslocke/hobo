@@ -908,6 +908,10 @@ environment no longer automatically imports ActionView::Helpers.
 All application helpers are now available in the template
 environment.
 
+### MarkdownString
+
+ MarkdownString will now use Kramdown, RDiscount or Maruku in preference to Bluecloth if they are availble in your bundle.
+
 ## Attribute Whitelist
 {.todo}
 
