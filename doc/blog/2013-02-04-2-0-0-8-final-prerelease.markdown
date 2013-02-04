@@ -1,14 +1,8 @@
 --- 
-author_login: bryanlarsen
 layout: post
 author: Bryan Larsen
-title: 2.0.0.pre8: final prerelease
-published: true
-tags: []
-
+title: "2.0.0.pre8: final prerelease"
 date: 2013-02-04 12:00:00 +00:00
-categories: 
-- General
 author_email: bryan@larsen.st
 ---
 I'm proud to announce the release of Hobo 2.0.0.pre8.  We're planning on releasing this as 2.0.0 final in a week or so if no significant issues are found, so please test this release against your applications.
