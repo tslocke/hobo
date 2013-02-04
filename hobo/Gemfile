@@ -1,9 +1,15 @@
 source "http://rubygems.org"
 
 gem 'rubydoctest', :git => 'git://github.com/bryanlarsen/rubydoctest.git'
-gem 'rails', '3.2.8'
+gem 'rails', '3.2.11'
 gemspec :path => "../dryml"
 gemspec :path => "../hobo_support"
 gemspec :path => "../hobo_fields"
 gemspec
 gem 'will_paginate', :git => 'git://github.com/Hobo/will_paginate.git'
+platform :ruby do
+  gem 'sqlite3'
+end
+platform :jruby do
+  gem 'activerecord-jdbcsqlite3-adapter'
+end
