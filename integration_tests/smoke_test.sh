@@ -84,6 +84,36 @@ echo SUCCESS
 
 cd ..
 
+# clean theme
+rm -rf smoke
+hobo new smoke --setup --front-theme=clean
+cd smoke
+
+rails g hobo:resource thing name:string body:text
+echo "m" > response.txt
+echo "" >> response.txt
+rails g hobo:migration < response.txt
+
+rails s -p 3003 &
+pid=$!
+sleep 45
+
+set -e
+
+wget http://localhost:3003/
+grep "Things" index.html
+grep "Smoke" index.html
+grep "Congratulations" index.html
+
+set +e
+
+kill $pid || true
+sleep 1
+kill -9 $pid || true
+echo SUCCESS
+
+cd ..
+
 # admin subsite
 rm -rf smoke
 hobo new smoke --setup --add-admin-subsite
