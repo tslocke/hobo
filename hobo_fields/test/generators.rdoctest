@@ -54,7 +54,5 @@ doctest: db file exists
 => true
 
 doctest: Alpha::Beta class exists
->> Alpha::Beta.connection.schema_cache.clear!
->> Alpha::Beta.reset_column_information
 >> Alpha::Beta
-=> Alpha::Beta(id: integer, one: string, two: integer)
+# will error if class doesn't exist
