@@ -26,7 +26,7 @@ module Dryml::Parser
     end
 
     def has_rhs?
-      @value != true
+      !defined?(@value)
     end
 
 
