@@ -60,9 +60,7 @@ hobo new smoke --setup
 cd smoke
 
 rails g hobo:resource thing name:string body:text
-echo "m" > response.txt
-echo "" >> response.txt
-rails g hobo:migration < response.txt
+rails g hobo:migration -m -n
 
 rails s -p 3003 &
 pid=$!
@@ -90,9 +88,7 @@ hobo new smoke --setup --front-theme=clean
 cd smoke
 
 rails g hobo:resource thing name:string body:text
-echo "m" > response.txt
-echo "" >> response.txt
-rails g hobo:migration < response.txt
+rails g hobo:migration -m -n
 
 rails s -p 3003 &
 pid=$!
