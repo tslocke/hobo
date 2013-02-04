@@ -15,6 +15,19 @@ task :test do |t|
   exit($?.exitstatus)
 end
 
+desc "Run tests and doctests for all components."
+task :test_jruby do |t|
+  puts 'You probably want to set the HOBODEV variable before running rake test_all' if ENV['HOBODEV'].nil?
+  system("cd dryml ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo_fields ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo_fields ; #{RUBY} -S bundle exec rake test:unit") &&
+    system("cd hobo_support ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test:doctest") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test:irt") &&
+    system("cd hobo ; #{RUBY} -S bundle exec rake test")
+  exit($?.exitstatus)
+end
+
 desc "Run the integration tests"
 task :test_integration do |t|
   system("cd integration_tests/agility; #{RUBY} -S rake test:integration")

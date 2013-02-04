@@ -75,8 +75,7 @@ Let's set up a few models for our testing:
 Generate a migration and run it:
 {.hidden}
 
-    >> File.open("m.txt", "w") {|f| f.write("m\n\n")}
-    >> system("rails g hobo:migration < m.txt")
+    >> system("rails g hobo:migration -m -n")
     >> ActionDispatch::Reloader.cleanup!
     >> ActionDispatch::Reloader.prepare!
     >> Person.connection.clear_cache!
