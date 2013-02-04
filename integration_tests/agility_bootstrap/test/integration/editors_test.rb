@@ -30,6 +30,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
     text_value ||= value
     assert find("#{selector} .in-place-edit").has_no_text?(text_value)
     find("#{selector} .in-place-edit").click
+    sleep 1
     find("#{selector} input[type=text],#{selector} textarea").set(value)
     find("h2.heading").click # just to get a blur
     assert find("#{selector} .in-place-edit").has_text?(text_value)
@@ -44,7 +45,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
 
 
   test "editors" do
-    Capybara.current_driver = :webkit
+    Capybara.current_driver = :selenium_chrome
     Capybara.default_wait_time = 5
     visit root_path
 
@@ -95,7 +96,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
       assert find(".i-field .controls .in-place-edit").has_text?("192")
 
       find(".i-field .controls .in-place-edit").click
-      # selenium crashes on this line
+      sleep 1
       find(".i-field .controls input[type=text]").set('17')
       find("h2.heading").click # just to get a blur
       assert find(".i-field .controls .in-place-edit").has_text?('17')

@@ -35,7 +35,7 @@ class SearchTest < ActionDispatch::IntegrationTest
   end
 
   test "search" do
-    Capybara.current_driver = :selenium
+    Capybara.current_driver = :selenium_chrome
     visit root_path
 
     # log in as Administrator

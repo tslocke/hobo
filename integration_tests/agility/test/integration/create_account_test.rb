@@ -131,6 +131,7 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     click_link "First Story"
 
     find("ul.tasks li:nth-child(1) a.task-link").click    # arg, real CSS doesn't have :first!
+    sleep 1
     find("div.task-users select").select("Second User")
     click_button "Save Task"
     assert has_content?("Assigned users: Test User, Second User")

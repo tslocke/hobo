@@ -34,7 +34,7 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
   end
 
   test "nested has_many" do
-    Capybara.current_driver = :selenium
+    Capybara.current_driver = :selenium_chrome
     visit root_path
 
     # log in as Administrator
