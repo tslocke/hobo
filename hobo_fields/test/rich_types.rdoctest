@@ -132,8 +132,7 @@ Provides validation of correct email address format.
 
 
 ### `HoboFields::Types::MarkdownString`
-
-`HoboFields::Types::MarkdownString` provides a `to_html` that renders markdown syntax into html. It requires the bluecloth gem.
+`HoboFields::Types::MarkdownString` provides a `to_html` that renders markdown syntax into html. It looks for RDiscount, Kramdown, Maruku or BlueCloth in that order.
 
         >> markdown = HoboFields::Types::MarkdownString.new %(
           This is a heading
@@ -141,16 +140,17 @@ Provides validation of correct email address format.
 
           And text can be *emphasised*
           )
-        >> markdown.to_html
+        >> markdown.to_html.strip
         => "<h1>This is a heading</h1>\n\n<p>And text can be <em>emphasised</em></p>"
         >> markdown.to_html.html_safe?
         => true
 
-        # some unsafe html fragements are removed by `to_html`,
-        # but there's no guarantees that it is well-formed
+        # unsafe html behaviour depends on the parser used.
         >> markdown = HoboFields::Types::MarkdownString.new("</div>>>p1<script>p2")
         >> markdown.to_html
-        => "<p></div>>>p1</p>"
+        => "<p>&lt;/div&gt;»p1</p>\n"
+        # Bluecloth would return
+        # => "<p></div>>>p1</p>"
         >> markdown.to_html.html_safe?
         => true
 
@@ -387,9 +387,9 @@ Translations only work with named EnumString's.  The recommended way of naming t
 
         # no safety treatments are done by `to_html`.
         # even if `markdown.to_html` is actually unsafe, it is marked as html_safe.
-        >> markdown = HoboFields::Types::RawMarkdownString.new("</div>>>p1<script>p2")
-        >> markdown.to_html
-        => "<p></div>>>p1<script>p2</p>"
+        >> markdown = HoboFields::Types::RawMarkdownString.new("<script>foo</script>")
+        >> markdown.to_html.strip
+        => "<script>foo</script>"
         >> markdown.to_html.html_safe?
         => true
 

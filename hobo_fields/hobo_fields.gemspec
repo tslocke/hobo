@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency('hobo_support', ["= #{version}"])
   s.add_development_dependency('rubydoctest', [">= 0"])
   s.add_development_dependency('RedCloth', [">= 0"]) # for testing rich types
-  s.add_development_dependency('bluecloth', [">= 0"])  # for testing rich types
+  s.add_development_dependency('kramdown', [">= 0"])  # for testing rich types
 
   s.executables = ["hobofields"]
   s.files = `git ls-files -x #{name}/* -z`.split("\0")
