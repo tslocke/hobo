@@ -146,11 +146,11 @@ Provides validation of correct email address format.
         => true
 
         # unsafe html behaviour depends on the parser used.
-        >> markdown = HoboFields::Types::MarkdownString.new("</div>>>p1<script>p2")
+        >> markdown = HoboFields::Types::MarkdownString.new("</div>p1<script>p2")
         >> markdown.to_html
-        => "<p>&lt;/div&gt;»p1</p>\n"
+        => "<p>&lt;/div&gt;p1</p>\n"
         # Bluecloth would return
-        # => "<p></div>>>p1</p>"
+        # => "<p></div>p1</p>"
         >> markdown.to_html.html_safe?
         => true
 
