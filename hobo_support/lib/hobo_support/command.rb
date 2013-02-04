@@ -119,13 +119,13 @@ extend Generators::HoboSupport::ThorShell
 )
               case setup_wizard
               when :setup
-                file.puts %(
+                file.puts %Q/
 say 'Running Setup...'
 Bundler.with_clean_env do
   run "bundle install"
 end
-exec 'rails g hobo:setup_wizard --skip-wizard #{ARGV * ' '} '
-)
+generate 'hobo:setup_wizard', '#{(['--skip-wizard']+ARGV).join("', '")}'
+/
               when :wizard
                 file.puts %(
 say_title "Hobo Setup Wizard"
@@ -135,7 +135,7 @@ You can run it later with `hobo g setup_wizard` from the application root dir.)"
   Bundler.with_clean_env do
     run "bundle install"
   end
-  exec 'rails g hobo:setup_wizard --no-main-title'
+  generate 'hobo:setup_wizard', '--no-main-title'
 else
   say "Please, remember to run `hobo g setup_wizard` from the application root dir, in order to complete the Setup.", :yellow
 end
