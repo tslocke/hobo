@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source "$HOME/.rvm/scripts/rvm" 
+
 unset HOBODEV
 
 my_dir=`pwd`
@@ -9,10 +11,10 @@ gems=`rake gems[build,force] | grep File: | cut -f 4 -d ' '`
 cd integration_tests
 full_gems=`for f in $gems ; do find .. -name $f ; done`
 
-source rvm gemset create hobo-smoke
-source rvm gemset use hobo-smoke
-source rvm --force gemset empty hobo-smoke
-source rvm gemset use hobo-smoke
+rvm gemset create hobo-smoke
+rvm gemset use hobo-smoke
+rvm --force gemset empty hobo-smoke
+rvm gemset use hobo-smoke
 
 gem install --no-rdoc --no-ri $full_gems
 
