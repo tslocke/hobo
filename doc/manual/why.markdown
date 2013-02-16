@@ -1,4 +1,4 @@
-Why is Hobo better than X?
+Why Hobo?
 {.document-title}
 
 When choosing a technology stack, you have a large number of alternatives to choose from.  We believe Ruby on Rails and Hobo are appropriate for most projects.   What are Hobo's advantages over it's competitors?
@@ -11,4 +11,4 @@ When choosing a technology stack, you have a large number of alternatives to cho
 
 * [Beginners and Advanced Users](/manual/who)
 
-* [Security][/manual/security)
+* [Security](/manual/security)
