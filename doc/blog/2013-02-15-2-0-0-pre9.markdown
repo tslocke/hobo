@@ -1,0 +1,15 @@
+--- 
+layout: post
+author: Bryan Larsen
+title: "2.0.0.pre8: final prerelease"
+date: 2013-02-15 12:00:00 +00:00
+author_email: bryan@larsen.st
+---
+I was really hoping to release Hobo 2.0.0 this week, but we did fix a couple of very minor bugs in the interim.  It's remotely possible that one of the bug fixes may impact your applications, so I've decided to release a Hobo 2.0.0.pre9 first.  I expect 2.0.0 to follow in a couple of days.
+
+Please test 2.0.0.pre9 against your application.  It would also be helpful if you could try your application with config.hobo.dont_emit_deprecated_routes set to both `true` and `false`.  This should not have any impact on your application except for differences in named routes.  If there are other differences, please bring them to our attention; it indicates a probable bug.
+
+## Changes
+
+- the overlap between `accept_invitation` and `accept_invitation_from_email` was confusing `object_url`.
+- small change to DRYML to silence a warning about undefined attributes
