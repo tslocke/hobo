@@ -126,19 +126,11 @@ module HoboRouteHelper
         base_url = url = polymorphic_path(poly, params)
         # validate URL, since polymorphic URL may return a URL for a
         # different method
-        # use starts_with because recognize path may return new_for_owner, for example
         if Rails.application.config.action_controller.relative_url_root
           base_url = url.gsub(/^#{Rails.application.config.action_controller.relative_url_root}/, "")
         end
         recognized_params = Rails.application.routes.recognize_path(base_url, {:method => options[:method]})
-        if recognized_params[:action] == action.to_s
-          url
-        else
-          # we get here if the action name is modified: do_signup, etc.
-          recognized_params[:action] = action
-          url2 = url_for(recognized_params)
-          url==url2 ? url : nil
-        end
+	url
       rescue NoMethodError => e  # raised if polymorphic_url fails
         nil
       rescue ArgumentError => e  # raised from polymorphic_url
