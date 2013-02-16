@@ -264,7 +264,7 @@ You can nest `param` declarations inside other tags that have `param` on them. F
 {.dryml}
 
 Here the `<body>` tag is a `param`, and so are the two `<div>` tags inside it. The `<page>` tag can be called either like this:
-    
+
     <page>
       <body:> ... page content goes here ... </body:>
     </page>
