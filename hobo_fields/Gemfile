@@ -1,8 +1,10 @@
 source "http://rubygems.org"
 
 gem 'rubydoctest', :git => 'git://github.com/bryanlarsen/rubydoctest.git'
-gem 'rails', '3.2.12'
+gem 'rails'
 gem 'yard'
+gem 'protected_attributes'
+
 gemspec :path => "../hobo_support"
 gemspec
 platform :ruby do
