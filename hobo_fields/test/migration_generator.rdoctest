@@ -445,7 +445,7 @@ The migration generator respects the `set_table_name` declaration, although as b
 
     >>
      class Advert
-       set_table_name "ads"
+       self.table_name="ads"
        fields do
          title :string, :default => "Untitled"
          body :text
@@ -459,7 +459,7 @@ The migration generator respects the `set_table_name` declaration, although as b
 
 Set the table name back to what it should be and confirm we're in sync:
 
-    >> class Advert; set_table_name "adverts"; end
+    >> class Advert; self.table_name="adverts"; end
     >> Generators::Hobo::Migration::Migrator.run
     => ["", ""]
 
@@ -626,7 +626,7 @@ HoboFields has some support for legacy keys.
          name :string, :default => "No Name"
          body :text
        end
-       set_primary_key "advert_id"
+       self.primary_key="advert_id"
      end
     >> up, down = Generators::Hobo::Migration::Migrator.run(:adverts => {:id => :advert_id})
     >> up
