@@ -23,11 +23,11 @@ doctest: module content matches
 
 
 doctest: test file exists
->> File.exist? 'test/unit/alpha/beta_test.rb'
+>> File.exist? 'test/models/alpha/beta_test.rb'
 => true
 
 doctest: test content matches
->> File.read 'test/unit/alpha/beta_test.rb'
+>> File.read 'test/models/alpha/beta_test.rb'
 =>
 require 'test_helper'
 
