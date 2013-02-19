@@ -99,7 +99,6 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     find(".statuses li:first .delete-button").click
     page.driver.browser.switch_to.alert.accept
     visit "/story_statuses/index4" # Index4 delete-buttons have Ajax disabled (in-place="&false")
-    sleep 6000
     assert_equal 1, all(".statuses li").length
 
     find(".statuses li:first .delete-button").click
