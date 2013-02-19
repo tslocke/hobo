@@ -128,7 +128,7 @@ module HoboRouteHelper
         poly = [obj]
       end
 
-      poly = [options[:subsite]] + poly if options[:subsite]
+      poly = [options[:subsite]] + poly if !options[:subsite].blank?
 
       begin
         base_url = url = polymorphic_path(poly, params)
