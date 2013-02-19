@@ -99,7 +99,15 @@ module HoboRouteHelper
                  when 'put';    :update
                  when 'post';   :create
                  when 'delete'; :destroy
-                 else; obj.is_a?(Class) || obj.respond_to?(:length) ? :index : :show
+                 else if obj.is_a?(Class) || obj.respond_to?(:length)
+                        :index
+                      else
+                        if obj.try.new_record?
+                          return nil
+                        else
+                          :show
+                        end
+                      end
                  end
 
       params[:action] = action unless action.in?(IMPLICIT_ACTIONS)
@@ -130,7 +138,7 @@ module HoboRouteHelper
           base_url = url.gsub(/^#{Rails.application.config.action_controller.relative_url_root}/, "")
         end
         recognized_params = Rails.application.routes.recognize_path(base_url, {:method => options[:method]})
-	url
+        url
       rescue NoMethodError => e  # raised if polymorphic_url fails
         nil
       rescue ArgumentError => e  # raised from polymorphic_url
