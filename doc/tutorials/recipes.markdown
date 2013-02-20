@@ -8,6 +8,7 @@
 * [Dynamic Ajax Select](dynamic_ajax_select_menus)
 * [The Caching Tags](caching)
 * [Using Hobo 2.0 without jQuery-UI](http://hobocentral.net/blog/2012/12/21/using-hobo-2-0-without-jquery-ui/)
+* [Upgrading a Hobo 1.0 app to 2.0](upgrade)
 
 # User Contributed Recipes
 
