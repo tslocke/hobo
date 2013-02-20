@@ -1,0 +1,11 @@
+--- 
+layout: post
+author: Bryan Larsen
+title: "2.0.0.pre9"
+date: 2013-02-20 12:00:00 +00:00
+author_email: bryan@larsen.st
+---
+Sure enough, the bug fix in 2.0.0.pre9 had a regression: some of the cancel links were broken.  So here's a 2.0.0.pre10.   I definitely hope to have 2.0.0 final available soon.
+
+We've also added a new tutorial [upgrading a Hobo 1.0 app to Hobo 2.0](/tutorials/upgrade).
+
