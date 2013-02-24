@@ -210,9 +210,9 @@ module Generators
           return [] unless controller < ::Hobo::Controller::UserBase
           prefix = records == "users" ? "" : "#{record}_"
           [
-          link("match '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
+          link("get '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
           link("get '#{prefix}logout(.:format)' => '#{records}#logout', :as => '#{record}_logout'",  'logout'),
-          link("match '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
+          link("get '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
           ].compact
         end
 
