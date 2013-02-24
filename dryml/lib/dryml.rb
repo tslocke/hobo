@@ -80,7 +80,7 @@ module Dryml
 
   def imports_for_view(view)
     imports = []
-    imports << Sprockets::Helpers::RailsHelper if defined?(Sprockets) && defined?(Rails)
+    imports << Sprockets::Rails::Helper if defined?(Sprockets) && defined?(Rails)
     imports << ActionView::Helpers if defined?(ActionView)
     imports + view.controller.class.modules_for_helpers(view.controller.class.all_helpers_from_path(view.controller.class.helpers_path))
   end
