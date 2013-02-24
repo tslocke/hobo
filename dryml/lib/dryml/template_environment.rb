@@ -43,6 +43,12 @@ module Dryml
           view.instance_variables.each do |iv|
             instance_variable_set(iv, view.instance_variable_get(iv))
           end
+
+          # Rails 4 hack.  Our method_missing hack doesn't get these because they're already (imporperly) defined.  Not sure why
+          self.assets_prefix = view.assets_prefix
+          self.assets_environment = view.assets_environment
+          self.assets_manifest = view.assets_manifest
+          self.digest_assets = view.digest_assets
         end
       end
     end
