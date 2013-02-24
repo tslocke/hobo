@@ -74,3 +74,14 @@ may use `try` to call a Rails 2.3 function that doesn't exist on Rails
     => 0
     >> nil._?.to_i
     => nil
+
+### ActiveSupport's try
+
+`try` and `_?` were added to HoboSupport before `try` was added to ActiveSupport.  Unfortunately, the try in ActiveSupport is different.   It behaves in a fashion similar to HoboSupport's `_?`, but has a different signature:
+
+    >> nil.try(:foo)
+    => nil
+    >> nil.try {|p| "(not available"}
+    >> "(not available)"
+    >> "foo".try(:reverse)
+    >> "oof"

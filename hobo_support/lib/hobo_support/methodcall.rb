@@ -16,7 +16,7 @@ module HoboSupport
       CallIfAvailable.new(this)
     else
       # activesupport 2.3 style try
-      this.send(*args, &block)
+      this.send(:active_support_try, *args, &block)
     end
   end
 
@@ -45,6 +45,8 @@ class Object
   def _?()
     self
   end
+
+  alias_method :active_support_try, :try
 
   def try(*args, &block)
     HoboSupport.hobo_try(self, *args, &block)
