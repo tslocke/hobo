@@ -14,9 +14,10 @@ module ActiveRecord
       end
     end if false # DISABLED Getting Rails 3.1 working
 
-  module SpawnMethods
+ class Relation
+  module DeprecatedMethods
 
-    def apply_finder_options_with_scope(options)
+    def apply_finder_options_with_scope(options, silence_deprecation = false)
       scopes = []
       Array.wrap(options.delete(:scope)).each do |s|
         if s.is_a?(Hash)
@@ -25,11 +26,11 @@ module ActiveRecord
           scopes << [s]
         end
       end
-      relation = apply_finder_options_without_scope(options)
+      relation = apply_finder_options_without_scope(options, silence_deprecation)
       return relation if scopes.empty?
       scopes.inject(relation) {|r, s| r.send *s }
     end
     alias_method_chain :apply_finder_options, :scope
-
   end
+ end
 end
