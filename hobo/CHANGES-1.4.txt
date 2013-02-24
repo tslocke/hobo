@@ -318,6 +318,10 @@ The old behaviour is still available in `<field-list-v1>`.
 HoboSupport's patches to Chronic have been removed because they are not
 supported in Ruby 2.0.0.
 
+## rapid_summary tags removed
+
+The rapid\_summary tags have been moved out of core Hobo into their own plugin, https://github.com/Hobo/hobo_summary, which is not yet in a working state
+
 ## Helper rearrangement
 {.todo}
 
@@ -340,6 +344,42 @@ config.hobo.include_deprecated_helper.
 ## Rails 3.2 required
 
 Hobo 2.0 currently requires Rails 3.2 for operation.
+
+## Editors
+{.todo}
+
+Editors are no longer special-cased, they now use the standard DRYML
+part mechanism.
+
+There are two types of editors: `<click-editor>` and `<live-editor>`.
+click-editor is the click-to-edit type of control similar to what
+Rapid currently uses for a string, and live-editor always renders the
+input, and is similar to what Rapid currently uses for Boolean's and
+enum-strings.
+
+Please refer to the documentation for `click-editor` and `live-editor`
+for more details.
+
+`<editor>` is now a polymorphic input that uses either `<click-editor>` or
+`<live-editor>`.
+
+TBD: Right now live-editor and click-editor use `<formlet>`.  The
+major advantage of formlet is that it is safe to use inside of a form.
+I can't think of any good use cases for that behaviour, but it does
+seem like something people might do by accident.
+
+The alternative is to use `<form>`.   Since this implementation of
+editor starts with an input and switches to a view via Javascript,
+using a form would allow reasonable javascript-disabled behaviour.
+
+## Attribute Whitelist
+{.todo}
+
+Rails 3.2.3 and later changed the default for config.whitelist_attributes to true, so any newly generated Hobo apps will have this feature turned on.  Hobo heavily depends on mass attribute assignation, so this may cause inconveniences.
+
+Mass assignment protection is redundant in Hobo: your primary protection should come through the edit_permitted? function.   If all of your models have properly defined edit_permitted? then it is safe to turn off config.whitelist_attributes.
+
+If you choose not to turn off config.whitelist_attributes, any fields that are not in your attr_accessible declaration will not be available in forms.   Hobo's generators will now assist in the creation of attr_accessible declarations.
 
 ## Enhancements
 
@@ -825,33 +865,6 @@ Because this is a respond_to block any formats you do not render will fall throu
 `<form>` has gained a new option, before-unload, which adds an
 onbeforeunload helper to the page.
 
-## Editors
-{.todo}
-
-Editors are no longer special-cased, they now use the standard DRYML
-part mechanism.
-
-There are two types of editors: `<click-editor>` and `<live-editor>`.
-click-editor is the click-to-edit type of control similar to what
-Rapid currently uses for a string, and live-editor always renders the
-input, and is similar to what Rapid currently uses for Boolean's and
-enum-strings.
-
-Please refer to the documentation for `click-editor` and `live-editor`
-for more details.
-
-`<editor>` is now a polymorphic input that uses either `<click-editor>` or
-`<live-editor>`.
-
-TBD: Right now live-editor and click-editor use `<formlet>`.  The
-major advantage of formlet is that it is safe to use inside of a form.
-I can't think of any good use cases for that behaviour, but it does
-seem like something people might do by accident.
-
-The alternative is to use `<form>`.   Since this implementation of
-editor starts with an input and switches to a view via Javascript,
-using a form would allow reasonable javascript-disabled behaviour.
-
 ## Changes behind the scenes
 
 ### reloading of part context
@@ -915,15 +928,6 @@ environment.
 ### MarkdownString
 
  MarkdownString will now use Kramdown, RDiscount or Maruku in preference to Bluecloth if they are availble in your bundle.
-
-## Attribute Whitelist
-{.todo}
-
-Rails 3.2.3 and later changed the default for config.whitelist_attributes to true, so any newly generated Hobo apps will have this feature turned on.  Hobo heavily depends on mass attribute assignation, so this may cause inconveniences.
-
-Mass assignment protection is redundant in Hobo: your primary protection should come through the edit_permitted? function.   If all of your models have properly defined edit_permitted? then it is safe to turn off config.whitelist_attributes.
-
-If you choose not to turn off config.whitelist_attributes, any fields that are not in your attr_accessible declaration will not be available in forms.   Hobo's generators will now assist in the creation of attr_accessible declarations.
 
 # jQuery rewrite
 
