@@ -295,7 +295,7 @@ receive the following benefits:
 
 - code reduction in Hobo
 
-## `remote-method-button` and `update-button` broken
+## `remote-method-button` and `update-button` AJAX functionality removed
 {.nomove}
 
 `remote-method-button`, `update-button` and similar buttons such as
@@ -305,14 +305,18 @@ with the much more flexible forms.
 
 For backwards compatibility, most of these buttons have been updated
 to 2.0. However, the little used `remote-method-button` and
-`update-button` have not been converted to the 2.0 form.
+`update-button` have not been converted to support Hobo 2.0 AJAX.
 
 ## default field-list changed
 {.nomove}
 
 The default for `<field-list>` has changed to `<feckless-fieldset>`.
-The old behaviour is still available in `<field-list-v1>`.   Please
-provide feedback: we are open to reversion before final release.
+The old behaviour is still available in `<field-list-v1>`.
+
+## Chronic patches removed.
+
+HoboSupport's patches to Chronic have been removed because they are not
+supported in Ruby 2.0.0.
 
 ## Helper rearrangement
 {.todo}
