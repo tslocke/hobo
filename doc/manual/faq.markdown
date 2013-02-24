@@ -19,7 +19,6 @@
 - [Why doesn't Hobo throw an error for an undefined parameter?](faq/undefined-parameter)
 - [Why can't I mix parameter and non-parameter tags?](faq/parameter-vs-nonparameter)
 - [Is DRYML able to be used in Rails without Hobo?](faq/dryml-without-hobo)
-- [What dryml view files are available for overriding?](faq/dryml-overriding)
 - [How come Hobo doesn't display an input for my `has_one`?](faq/has-one)
 - [How do I get rid of `WARN  Could not determine content-length of response body. Set content-length of the response or set Response#chunked = true`](faq/content-length-warning)
 - [My changes to application.dryml are being ignored.](faq/application-dryml-reload)
