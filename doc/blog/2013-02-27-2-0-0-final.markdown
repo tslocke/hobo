@@ -1,0 +1,54 @@
+--- 
+layout: post
+author: Bryan Larsen
+title: "Hobo 2.0.0 released!"
+date: 2013-02-27 12:00:00 +00:00
+author_email: bryan@larsen.st
+---
+We're proud to announce the release of Hobo 2.0.0.
+
+## Major New Features
+
+* All Javascript code has been completely rewritten.  prototype.js is no longer required or supported.  We now depend on jQuery and either jQuery-UI or Bootstrap.
+
+* Theming support has been extensively updated.  New themes are much easier to write, and multiple themes per application are supported.
+
+* The default theme has been changed to a Bootstrap based theme.
+
+* Support added for the techniques mentioned in this blog post:  [How Basecamp Next got to be so damn fast without using much client-side UI](http://37signals.com/svn/posts/3112-how-basecamp-next-got-to-be-so-damn-fast-without-using-much-client-side-ui) including two mechanisms for pushState based AJAX and two mechanisms for intelligent hierarchical fragment caching.
+
+* several additional tags have gained AJAX support.  This includes, but is not limited to `<a>`, `<filter-menu>` and `<page-nav>`.
+
+* all tags now use the standard Hobo AJAX support mechanism, which used to be known as Hobo form AJAX.  The editor tags in particular have changed substantially.
+
+* new tags: nested-cache, swept-cache, live-editor, click-editor, formlet, hot-input, feckless-fieldset, accordion, accordion-collection, autocomplete, combobox, datepicker, dialog-box, tabs and more.
+
+* plugins are now based on the Rails asset pipeline.  Available plugins include `hobo_jquery_ui`, `hobo_boostrap_ui`, `hobo_paperclip`, `hobo_omniauth`, `hobo_data_tables`, `hobo_tokeninput`, `hobo_simple_color`, `hobo_tree_table`, `hobo_mapstraction`.  Rails, jQuery and Bootstrap plugins can also generally be easily used.
+
+* Rails 3.2 is required, 3.2.12 or greater is strongly recommended.
+
+* many other fixes and updates.   See [CHANGES](http://hobocentral.net/manual/changes20) for more detailed information.
+
+## Installation
+
+* [Download and Installation Instructions](/manual/download)
+
+* [Upgrade Instructions](/manual/changes20#updating-a-hobo-13-application)
+
+* [Upgrade Tutorial](/tutorials/upgrade)
+
+## Regressions
+
+See [CHANGES](http://hobocentral.net/manual/changes20#changes-from-hobo-13--hobo-jquery-13)
+
+## Changes from Hobo 2.0.0.pre10
+
+HoboSupport's patches to Chronic have been removed due to incompatibility with Ruby 2.0.0.
+
+## Supported Rubies
+
+Hobo 2.0.0 has been tested against 1.8.7-p371, 1.9.3-p374, 2.0.0-p0 and JRuby 1.7.3.
+
+## Rails 4 Support
+
+[Work has started on Rails 4.0 support for Hobo](https://github.com/hobo/hobo/tree/rails4).   No other major features are planned for the next release of Hobo, so we do not expect it to lag too far behind the release of Rails 4.0.
