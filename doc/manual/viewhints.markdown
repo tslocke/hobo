@@ -52,7 +52,7 @@ With this declaration, the user's show-page will be given an aside section (side
 
 The view-hints API is used internally by Hobo Rapid. You may not ever need to use it yourself. For completeness it is documented here.
 
-The view-hints for any model can be access using the `view_hints` method:
+The view-hints for any model can be accessed using the `view_hints` method:
 
     MyModel.view_hints
 {.ruby}
