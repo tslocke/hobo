@@ -80,6 +80,7 @@ Shorthand for `reject` when you need to reject on a single method call.
 ## `Enumerable#drop_while`
 
 * `enum.drop_while { |element| block }`
+* `enum.drop_while! { |element| block }`
 
 Passes each element in turn to the block until the block returns false. Returns the remaining elements in a new array.
 
