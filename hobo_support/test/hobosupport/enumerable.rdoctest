@@ -14,6 +14,12 @@ E.g. The length of the first word that starts with a capital letter
     >> %w(my name is Fred).map_and_find { |s| s.length if s =~ /^[A-Z]/ }
     => 4
 
+Usage with the `not_found` argument
+
+    %w(my name is not available).map_and_find('Foo') { |s| s.length if s =~ /^[A-Z]/ }
+    => "Foo" 
+
+
 ## `Enumerable#map_with_index`
 
 * `enum.map_with_index { |element, index| block }`
@@ -92,7 +98,7 @@ There is also a destructive version for arrays
 
 * `enum.take_while { |element| block }`
 
-Passes each element in turn to the block until the block returns false. Returns a new with the elements for which the block returned true
+Passes each element in turn to the block until the block returns false. Returns a new array with the elements for which the block returned true.
 
     >> %w(this is a nice example).take_while { |s| s.length > 1 }
     => ["this", "is"]
