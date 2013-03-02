@@ -68,7 +68,7 @@ So for example, to specify that you must be logged in to create a record:
 It's also common to compare the `acting_user` with associations on your model, for example, say your model has an owner:
 
     belongs_to :owner, :class_name => "User"
-{.ruby}   
+{.ruby}
 
 You can assert that only the owner can make changes like this:
 
