@@ -4,7 +4,7 @@
     >> $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), '../../../hobo_support/lib')
     >> require 'hobo_support'
 
-## safe_join
+## `safe_join`
 
 Version of Array#join that preserves html\_safe:
 
@@ -26,7 +26,6 @@ Version of Array#join that preserves html\_safe:
 
     >> ["<a>".html_safe, "<b>".html_safe].safe_join.html_safe?
     => true
-
 
     >> ["<a>", "<b>"].safe_join("<br>")
     => "&lt;a&gt;&lt;br&gt;&lt;b&gt;"
