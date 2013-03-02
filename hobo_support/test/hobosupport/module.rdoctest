@@ -41,7 +41,7 @@ When a module is included in a class, it gets a callback on the `included` metho
     => "MY NAME IS C"
 
 
-## `Module#interiting_cattr_reader`
+## `Module#inheriting_cattr_reader`
 
 Declares a reader for an instance variable on the class. The attribute is looked up on the superclass if not defined on the receiving class. In other words, the superclass defines a default that subclasses can override. The declaration can also give a default, as shown here.
 
@@ -52,7 +52,7 @@ Declares a reader for an instance variable on the class. The attribute is looked
 
      class B < A; end
 
-`B` has the same nickname as its superclass `A`
+`B` has the same nickname as its superclass `A`.
 
     >> A.nickname
     => "Andy"
