@@ -44,7 +44,7 @@ We have the "." operator to call methods on objects. These extensions introduce 
     >> nil._?.length
     => nil
 
-When the receiver is nil, any method with any arguments will return nil.  You can use Ruby's || idiom to provide a different value when nil.
+When the receiver is nil, any method with any arguments will return nil.  You can use Ruby's `||` idiom to provide a different value when nil.
 
     >> expires = nil
     >> expires._?.to_s( :default ) || "never"
@@ -52,7 +52,7 @@ When the receiver is nil, any method with any arguments will return nil.  You ca
 
 Note that `_?` should *always* be followed by a method call.  It is not intended to store the intermediate result.  Don't do this!
 
-intermediate = nil._?
+    >> intermediate = nil._?
 
 ### `Object#try`
 
@@ -81,7 +81,7 @@ may use `try` to call a Rails 2.3 function that doesn't exist on Rails
 
     >> nil.try(:foo)
     => nil
-    >> nil.try {|p| "(not available"}
+    >> nil.try {|p| "(not available)"}
     >> "(not available)"
     >> "foo".try(:reverse)
     >> "oof"
