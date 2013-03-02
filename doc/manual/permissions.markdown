@@ -89,7 +89,7 @@ There is a downside to that method -- the `owner` association will be fetched fr
 
 When deciding if an update is permitted (i.e. in the `update_permitted?` method), it will often be important to know what exactly has changed. In a previous version of Hobo we had to jump through a lot of hoops to make this information available. No longer -- Active Record now tracks all changes made to an object. For example, say you wish to find out about changes to an attribute `status`. The following methods (among others) are available:
 
- - `status_changed?` - returns true iff the attribute has been changed
+ - `status_changed?` - returns true if the attribute has been changed
  - `status_was` - returns the old value of the attribute
  
 Note that these methods are only available on attributes, not on associations. However, as a convenience Hobo models add `*_changed?` for all `belongs_to` associations.
