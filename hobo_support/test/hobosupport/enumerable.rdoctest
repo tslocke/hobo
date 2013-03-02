@@ -16,7 +16,7 @@ E.g. The length of the first word that starts with a capital letter
 
 Usage with the `not_found` argument
 
-    %w(my name is not available).map_and_find('Foo') { |s| s.length if s =~ /^[A-Z]/ }
+    >> %w(my name is not available).map_and_find('Foo') { |s| s.length if s =~ /^[A-Z]/ }
     => "Foo" 
 
 
