@@ -34,7 +34,7 @@ To remove the automatic relationship, you can pass nil:
 
 {.ruby}
 
-The a collection of the user's recipes will be added to the main content of `users/show`.
+The collection of the user's recipes will be added to the main content of `users/show`.
 
 You can declare additional child relationships. The order is significant, with the first in the list being the "primary collection". For example:
 
