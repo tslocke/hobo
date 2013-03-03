@@ -268,7 +268,7 @@ Here the `<body>` tag is a `param`, and so are the two `<div>` tags inside it. T
     <page>
       <body:> ... page content goes here ... </body:>
     </page>
-{.dryml}    
+{.dryml}
 
 Or like this:
 
