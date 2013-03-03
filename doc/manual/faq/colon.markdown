@@ -11,7 +11,7 @@ similar to how `<br/>` inserts a break in your HTML.
 With a trailing colon, this parameterizes the enclosing tag.
 
     <page>
-      <content-body:>This will appear in the middle of your page</content-body>
+      <content-body:>This will appear in the middle of your page</content-body:>
     </page>
 
 `content-body` is not a tag in RAPID, it's a parameter to `<page>`.
