@@ -53,4 +53,4 @@ On top of these extensions to the three MVC layers, Hobo provides some bits and 
 
 * [Ruby extensions](/manual/hobo_support) :: Hobo&#8217;s answer to Active Support - a grab bag of useful Ruby extensions to make your coding a little easier.
 
-Hopefully this overview gives you a feel for what Hobo is all about. There&#8217;s nothing like trying it though, so move on to the <a href='/docs/two-minutes'>two minute Hobo app</a> or one of the other <a href='/docs'>tutorials</a>.
+Hopefully this overview gives you a feel for what Hobo is all about. There&#8217;s nothing like trying it though, so move on to the <a href='/tutorials/two-minutes'>two minute Hobo app</a> or one of the other <a href='/tutorials/recipes'>tutorials</a>.
