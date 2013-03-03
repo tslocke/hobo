@@ -349,7 +349,7 @@ Now we'll create the page. Let's assume we're using a `<page>` tag along the lin
 
 When you see a tag like `<view:title/>`, you don't get any prizes for guessing what will be displayed. In terms of what actually happens, you can read this as "change the context to be the `title` attribute of the current context, then call the `<view`> tag". You might like to think of that change to the context as `this = this.title` (although in fact `this` is not assignable). But really you just think of it as "view the title". Of what? Of whatever is in context, in this case the blog post.
 
-Be careful with the two different uses of colon in DRYML. A trailing colon as in `<foo:>` indicates a parameter tag, whereas a colon joining two names as in `<view:title/>` indicates a change of context.
+Be careful with the two different uses of colon in DRYML. A trailing colon as in `<foo:>` indicates a parameter tag, whereas a colon joining two names as in `<view:title/>` indicates the `<view>` call with the change of context.
 
 When the tag ends, the context is set back to what it was. In the case of `<view/>` which is a self-closing tag familiar from XML, that happens immediately. The `<l:author>` tag is more interesting. We set the context to be the author, so that the link goes to the right place. Inside the `<l:author>` that context remains in place so we just need `<view:name/>` in order to display the author's name.
 
