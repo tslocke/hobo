@@ -1,6 +1,6 @@
 # How do I pass back an extra field from a form?
 
-You can customize the fields in a form by setting the fields attribute in the field-list parameter.  Suppose we want our form to contain two fields, bar which exists in the database, and foo which does.   Hobo handles bar automatically, but we have to add extra code for foo.   There are two good options.   The first is to add it in the view:
+You can customize the fields in a form by setting the fields attribute in the field-list parameter.  Suppose we want our form to contain two fields, bar which exists in the database, and foo which does not.   Hobo handles bar automatically, but we have to add extra code for foo.   There are two good options.   The first is to add it in the view:
 
      <extend tag="form" for="MyModel">
        <old-form merge>
