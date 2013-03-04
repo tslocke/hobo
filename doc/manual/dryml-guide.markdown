@@ -406,7 +406,7 @@ Sometimes you want to drill down through several fields at a time. Both the `fie
 
 When you change the context using `field="my-field"` (or the `<tag:my-field>` shorthand), the previous context is available as `this_parent`, and the name of the field is available as `this_field`. If you set the context using `with="..."`, these values are not available. That means the following apparently identical tag calls are not quite the same:
 
-    <my-btag with="&@post.title"/>
+    <my-tag with="&@post.title"/>
 
 is not quite the same as:
 
@@ -433,7 +433,7 @@ collection.
     <repeat:foos>
       <td><%= this_field %></td>
       <td><view /></td>
-    </repeat>
+    </repeat:foos>
 
 ## Forms
 
