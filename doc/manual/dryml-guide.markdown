@@ -1182,7 +1182,7 @@ Once or twice in the previous examples, we have extended our card tag definition
 
 There's a bit of repetition there -- `<%= h this.to_s %>` was already present in the original definition. All we really wanted to do was wrap the existing heading in an `<a>`. In this case there wasn't much markup to repeat, so it wasn't a big deal, but in other cases there might be much more.
     
-We can't use `<prepend-heading:><a></prepend-heading:>` and `<append-heading:></a></append-heading:>` because that's not well formed markup (and is very messy besides). Instead, DRYML has a specific feature for this situation. The <`param-content`> tag is a special tag that brings back the default content for a parameter. Here's how it works:
+We can't use `<prepend-heading:><a></prepend-heading:>` and `<append-heading:></a></append-heading:>` because that's not well formed markup (and is very messy besides). Instead, DRYML has a specific feature for this situation. The `<param-content>` tag is a special tag that brings back the default content for a parameter. Here's how it works:
 
     <card>
       <heading:><a href="#{object_url this}"><param-content for="heading"/></a></heading:>
