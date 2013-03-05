@@ -770,7 +770,7 @@ To achieve that on one page, we could call the `<page>` tag like this:
       <append-heading:> -- The Hobo Blog</append-heading:>
       <body:>
         ...
-      </body>
+      </body:>
     </page>
 {.dryml}
 
@@ -779,7 +779,7 @@ Or we could go a step further and create a new page tag that added that suffix a
     <def tag="blog-page">
       <page>
         <append-heading:> -- The Hobo Blog</append-heading:>
-        <body: param></body>
+        <body: param></body:>
       </page>
     </def>
 {.dryml}
