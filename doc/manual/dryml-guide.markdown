@@ -1149,7 +1149,7 @@ If, for a given call, no type-specific definition is available for `this.class`,
 
 ## Specifying the type explicitly
 
-Sometimes it is useful to give the type explicitly for the call explicitly (i.e., to override the use of `this.class`). The `for-type` attribute (on the call) provides this facility. For example, you might want to implement one type-specific definition in terms of another:
+Sometimes it is useful to give the type for the call explicitly (i.e., to override the use of `this.class`). The `for-type` attribute (on the call) provides this facility. For example, you might want to implement one type-specific definition in terms of another:
 
     <def tag="card" for="SpecialProduct">
       <card for-type="Product"><append-price:> (Today Only!)</append-price:></card>
