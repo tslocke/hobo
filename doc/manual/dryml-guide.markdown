@@ -1218,7 +1218,7 @@ To use DRYML terminology, what we've done there is *replaced* the entire heading
     </card>
 {.dryml}
     
-To summarise, to wrap content inside a parameter, use <`param-content/`>. To wrap an entire parameter, including the parameterised tag itself (the `<h3>` in our examples), use the `replace` and `restore` attributes.
+To summarise, to wrap content inside a parameter, use `<param-content/>`. To wrap an entire parameter, including the parameterised tag itself (the `<h3>` in our examples), use the `replace` and `restore` attributes.
     
 
 # Local variables and scoped variables.
@@ -1256,10 +1256,10 @@ As an example of their use, let's define a simple tag for rendering navigation l
 
 On our pages, we'd like to simply call, say:
 
-    `<main-nav current="Home">`
+    <main-nav current="Home">
 {.dryml}
 
-And we'd like it to be easy to define our own <`main-nav`> tag in our applications:
+And we'd like it to be easy to define our own `<main-nav>` tag in our applications:
 
     <def tag="main-nav">
       <navigation merge-attrs>
