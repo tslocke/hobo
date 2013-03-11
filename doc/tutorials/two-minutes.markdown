@@ -2,6 +2,9 @@
 
 To build a Hobo 2.0 app you need to have a working Rails setup. If you can
 create a Rails app and have it connect to a database, you're all set.
+
+*On Linux, Rails requires a working Javascript runtime.   Perhaps the easiest way to get this is to install node.js.   `sudo apt-get install nodejs` if you're running Ubuntu or Debian.*
+
 You need at least version 3.2.5 of Rails:
 
 	$ rails -v
