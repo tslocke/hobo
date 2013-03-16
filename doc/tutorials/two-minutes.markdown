@@ -3,16 +3,15 @@
 To build a Hobo 2.0 app you need to have a working Rails setup. If you can
 create a Rails app and have it connect to a database, you're all set.
 
-*On Linux, Rails requires a working Javascript runtime.   Perhaps the easiest way to get this is to install node.js.   `sudo apt-get install nodejs` if you're running Ubuntu or Debian.*
-
 You need at least version 3.2.5 of Rails:
 
 	$ rails -v
 
-First install Hobo (currently we need to specify --pre, since Hobo
-2.0.0 is not the official release yet):
+## Windows && OS X
 
-	$ gem install hobo --pre
+First install Hobo.
+
+	$ gem install hobo
 
 	$ hobo -v
 
@@ -21,7 +20,41 @@ Now create an app! We've only got two minutes so we'll create an ultra-useful Th
 	$ hobo new thingybob --setup
 
 (The `--setup` option tells hobo to use the defaults rather than
-asking questions about your application.)
+asking questions about your application.   After you play with
+Hobo a bit so that you understand the questions, you will probably
+want to omit the `--setup`)
+
+Now skip the "Linux" section and move on to the "common" section.
+
+## Linux
+
+First install Hobo.
+
+	$ gem install hobo
+
+	$ hobo -v
+
+Now create an app! We've only got two minutes so we'll create an ultra-useful Thing Manager.
+
+	$ hobo new thingybob
+
+It will ask you `Do you want to start the Setup Wizard now?`.  Answer "n".  We need to fix up the Rails Gemfile, and then we'll start the Setup Wizard.
+
+Using your editor of choice, edit the file `Gemfile`.   There is a line that looks like this:
+
+     # gem 'therubyracer', :platforms => :ruby
+
+Remove the `#` from the beginning of the line to uncomment it.  Then run:
+
+     $ bundle
+     $ hobo generate setup_wizard --wizard=false
+
+(The `--wizard=false` option tells hobo to use the defaults rather than
+asking questions about your application.   After you play with
+Hobo a bit so that you understand the questions, you will probably
+want to omit the `--wizard=false`)
+
+# Common
 
 There will be lots of output produced as Hobo runs the rails command
 and runs the setup generator. This process may take a while, depending
