@@ -106,7 +106,9 @@ We now need to do three things to add the ajax behaviour and tie it all together
  - Add a formlet capable of updating the 'part'
 
  - Add some JavaScript to the country select onchange event to trigger the formlet
- 
+
+
+The updated code:
 
     <extend tag="form" for="Project">
       <old-form merge>
