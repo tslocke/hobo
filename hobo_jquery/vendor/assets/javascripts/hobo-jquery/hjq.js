@@ -236,7 +236,6 @@
                 }
             }
 
-            result.context = this;
             result.type = o.type || 'GET';
             result.data = {};
             /* These are now the defaults, so we don't need to send
