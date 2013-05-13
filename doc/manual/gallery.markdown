@@ -30,7 +30,7 @@ Created by Jerrold Thompson, padhouses.com promotes the classification and circu
 
 ### [![Cupetition](/assets/screenshots/cupetition.png) Cupetition](http://cupetition.com/)
 
-Cupetition is a site for sports lovers that let's you manage championships online. "Invite your friends, book your games and reach the best scores". Cupetition's creator Tiago Franco says "In my opinion Hobo provides a good development setup out-of-the-box, with the essentials of any modern application. At its current stage it can be used not just for rapid prototyping, but also for production ready applications."</p>
+Cupetition is a site for sports lovers that let's you manage championships online. "Invite your friends, book your games and reach the best scores". Cupetition's creator Tiago Franco says "In my opinion Hobo provides a good development setup out-of-the-box, with the essentials of any modern application. At its current stage it can be used not just for rapid prototyping, but also for production ready applications."
 
 ### [![IslandiaCar](/assets/screenshots/islandiacar.png) IslandiaCar](http://www.islandiacar.com/)
 
