@@ -31,7 +31,7 @@ module Hobo
       unless opts[:skip_gem]
         gem_with_comments("jquery-ui-themes", "~> 0.0.4")
         Bundler.with_clean_env do
-          run "bundle install"
+          run "bundle update"
         end
       end
 
