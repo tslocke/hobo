@@ -10,10 +10,6 @@ The standard mechanism for installing Hobo is to use gem:
 
     gem install hobo
 
-Hobo 2.0.0 is not yet released in final form.  The code is finished, but the documentation is not yet complete.   So we recommend installing it instead:
-
-    gem install hobo --pre
-
 This command will also install the Hobo prerequisites [Hobo
 Support](/manual/hobo_support), [Hobo Fields](/manual/hobo_fields) and
 [Dryml](/manual/dryml) as well as [Mislav's
