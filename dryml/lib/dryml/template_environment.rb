@@ -166,12 +166,11 @@ module Dryml
           object = this
         end
       end
-
       id = if (!object.is_a?(ActiveRecord::Relation) && typed_id = object.try.typed_id)
-             typed_id
-           elsif object == @this
-             "this"
-           end
+          typed_id
+        else
+          "this"
+        end
       attribute ? "#{id}:#{attribute}" : id
   end
 

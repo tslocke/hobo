@@ -180,11 +180,13 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
 
     # add project members
     fill_in "project_membership[user]", :with => "Second User"
-    find("a:contains('Second User')").click
-    find("form.project-membership input[type=text]").native.send_key(:enter)
+    sleep 0.5
+    click_on 'Second User'
+    page.execute_script("$('form.project-membership').submit()")
     assert find("ul.memberships").has_text?("Second User")
-
-    find("input.delete-project-membership-button").click
+    within "ul.memberships" do
+      click_on "X"
+    end
     page.driver.browser.switch_to.alert.accept
     assert find("ul.memberships").has_no_text?("Second User")
   end
