@@ -70,6 +70,7 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
 
     find("#form2").fill_in("story_status_name", :with => "foo2")
     find("#form2").click_button("new")
+    sleep 0.5
     assert find(".statuses table tbody tr:nth-child(2) .story-status-name").has_text?("foo2")
     wait_for_updates_to_finish
 
@@ -112,6 +113,7 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     assert_not_equal "README", find(".report-file-name-field .controls").text
     attach_file("project[report]", File.join(::Rails.root, "README"))
     click_button "upload new report"
+    sleep 0.5
     assert find(".report-file-name-field .controls").has_content?("README")
 
     # these should be set by show2's custom-scripts
@@ -119,12 +121,14 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     assert find(".callbacks").has_text?("callbacks: before success complete")
 
     find(".story.odd").fill_in("story_title", :with => "s1")
-    find(".story.odd input.story-title").native.send_key(:return)
+    page.execute_script("$('.story.odd form').submit()")
+    sleep 0.5
     assert find(".story.odd .view.story-title").has_content?("s1")
     assert find(".story.odd .ixz").has_content?("1")
 
     find(".story.even").fill_in("story_title", :with => "s2")
-    find(".story.even input.story-title").native.send_key(:return)
+    page.execute_script("$('.story.even form').submit()")
+    sleep 0.5
     assert find(".story.even .view.story-title").has_content?("s2")
     assert find(".story.even .ixz").has_content?("2")
 
