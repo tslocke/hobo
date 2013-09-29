@@ -122,6 +122,40 @@ if(!RegExp.escape) {
             return false; //prevent bubbling
         },
 
+        updateNames: function() {
+            var top = $(this);
+            var attrs = top.data('rapid')['input-many'];
+
+            var n = top.children("li:not(.input-many-template):not(.empty):first");
+            for(var i = 0; n.length > 0; i++, n = n.next()) {
+                var name_updater = methods.getNameUpdater.call(top, i, attrs['prefix']);
+                n.find("*").each(function() {
+                    name_updater.call(this);
+                });
+                name_updater.call(n.get(0));
+            }
+        },
+
+        // show/hide +/- buttons
+        updateVisibility: function() {
+            var top = $(this);
+            var attrs = top.data('rapid')['input-many'];
+
+            var buttonsDivs = top.children("li:not(.input-many-template):not(.empty)").children("div.buttons");
+            for (var i = 0; i < buttonsDivs.length; i++) {
+                if (i < (attrs['minimum'] || 0))
+                    $(buttonsDivs[i]).children("button.remove-item").addClass("hidden");
+                else
+                    $(buttonsDivs[i]).children("button.remove-item").removeClass("hidden");
+                if (i < buttonsDivs.length - 1)
+                    $(buttonsDivs[i]).children("button.add-item").addClass("hidden");
+                else
+                    $(buttonsDivs[i]).children("button.add-item").removeClass("hidden");
+            }
+
+            return top;
+        },
+
         // given this==the input-many, returns a lambda that updates the name, for & id for an element
         getNameUpdater: function(new_index, name_prefix) {
             var id_prefix = name_prefix.replace(/\[/g, "_").replace(/\]/g, "");
