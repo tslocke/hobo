@@ -38,7 +38,7 @@ if(!RegExp.escape) {
             clone.find(".remove-item:not([disabled])").not(clone.find(".input-many .remove-item")).click(methods.removeOne);
             clone.find(".add-item:not([disabled])").not(clone.find(".input-many .add-item")).click(methods.addOne);
 
-            // update id & name
+            // update id, name & for
             clone.find("*").each(function() {
                 name_updater.call(this);
             });
@@ -122,7 +122,7 @@ if(!RegExp.escape) {
             return false; //prevent bubbling
         },
 
-        // given this==the input-many, returns a lambda that updates the name & id for an element
+        // given this==the input-many, returns a lambda that updates the name, for & id for an element
         getNameUpdater: function(new_index, name_prefix) {
             var id_prefix = name_prefix.replace(/\[/g, "_").replace(/\]/g, "");
             var name_re = RegExp("^" + RegExp.escape(name_prefix)+ "\[\-?[0-9]+\]");
@@ -135,6 +135,10 @@ if(!RegExp.escape) {
             return function() {
                 if(this.name) {
                     this.name = this.name.replace(name_re, name_sub);
+                }
+                if ($(this).attr('for')) {
+                    var new_for = $(this).attr('for').replace(id_re, id_sub);
+                    $(this).attr('for', new_for);
                 }
                 if (id_prefix==this.id.slice(0, id_prefix.length)) {
                     this.id = this.id.replace(id_re, id_sub);
