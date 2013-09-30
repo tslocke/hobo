@@ -38,27 +38,14 @@ if(!RegExp.escape) {
             clone.find(".remove-item:not([disabled])").not(clone.find(".input-many .remove-item")).click(methods.removeOne);
             clone.find(".add-item:not([disabled])").not(clone.find(".input-many .add-item")).click(methods.addOne);
 
-            // update id, name & for
-            clone.find("*").each(function() {
-                name_updater.call(this);
-            });
-            name_updater.call(clone.get(0));
-
             // do the add with anim
             clone.css("display", "none").insertAfter(me).hjq('show', attrs['show']);
 
+            top.hjq_input_many('updateNames');
+            top.hjq_input_many('updateVisibility');
+
             // initialize subelements
             me.next().hjq();
-
-            // visibility
-            if(me.hasClass("empty")) {
-                me.addClass("hidden");
-                me.find("input.empty-input").attr("disabled", true);
-            } else {
-                // now that we've added an element after us, we should only have a '-' button
-                me.children("div.buttons").children("button.remove-item").removeClass("hidden");
-                me.children("div.buttons").children("button.add-item").addClass("hidden");
-            }
 
             me.hjq('createFunction', attrs.add_hook).call(me.get(0));
             clone.trigger('rapid:add');
@@ -84,38 +71,11 @@ if(!RegExp.escape) {
                 return false;
             }
 
-            // rename everybody from me onwards
-            var i=methods.getIndex.call(me.get(0))
-            var n=me.next();
-            for(; n.length>0; i+=1, n=n.next()) {
-                var name_updater = methods.getNameUpdater.call(top, i, attrs['prefix']);
-                n.find("*").each(function() {
-                    name_updater.call(this);
-                });
-                name_updater.call(n.get(0));
-            }
-
-            // adjust +/- buttons on the button element as appropriate
-            var last=top.children("li:last");
-            if(last.get(0)==me.get(0)) {
-                last = last.prev();
-            }
-
-            if(last.hasClass("empty")) {
-                last.removeClass("hidden");
-                last.find("input.empty-input").removeAttr("disabled");
-            } else {
-                // if we've reached the minimum, we don't want to add the '-' button
-                if(top.children().length-3 <= (attrs['minimum']||0)) {
-                    last.children("div.buttons").children("button.remove-item").addClass("hidden");
-                } else {
-                    last.children("div.buttons").children("button.remove-item").removeClass("hidden");
-                }
-                last.children("div.buttons").children("button.add-item").removeClass("hidden");
-            }
-
             // remove with animation
             me.hjq('hideAndRemove', attrs['hide']);
+
+            top.hjq_input_many('updateNames');
+            top.hjq_input_many('updateVisibility');
 
             top.trigger('rapid:change');
 
@@ -136,7 +96,7 @@ if(!RegExp.escape) {
             }
         },
 
-        // show/hide +/- buttons
+        // show/hide +/- buttons and empty
         updateVisibility: function() {
             var top = $(this);
             var attrs = top.data('rapid')['input-many'];
@@ -151,6 +111,15 @@ if(!RegExp.escape) {
                     $(buttonsDivs[i]).children("button.add-item").addClass("hidden");
                 else
                     $(buttonsDivs[i]).children("button.add-item").removeClass("hidden");
+            }
+
+            var empty = top.children("li.empty");
+            if (buttonsDivs.length == 0) {
+                empty.removeClass("hidden");
+                empty.find("input.empty-input").removeAttr("disabled");
+            } else {
+                empty.addClass("hidden");
+                empty.find("input.empty-input").attr("disabled", true);
             }
 
             return top;
