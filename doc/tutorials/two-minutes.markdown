@@ -1,6 +1,6 @@
 # Hobo in Two Minutes
 
-## Prerequisited
+## Prerequisites
 
 Before installing Hobo, you must have
 [Ruby](http://www.ruby-lang.org/en/) and
