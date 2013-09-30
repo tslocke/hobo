@@ -1,11 +1,24 @@
 # Hobo in Two Minutes
 
+## Prerequisited
+
 Before installing Hobo, you must have
 [Ruby](http://www.ruby-lang.org/en/) and
 [RubyGems](http://docs.rubygems.org/). You will also need the "git" command.
 
 Installing Hobo 2.0 will auto install Rails 3.2. Be careful not to install Rails 4, it's currently not compatible.
 
+For example, these are the steps you would need in Ubuntu 12.04:
+
+```
+    sudo apt-get update
+    sudo apt-get install -y ruby1.9.3 rubygems nodejs libsqlite3-dev git
+    export GEM_HOME=$HOME/.gem
+    echo "export GEM_HOME=$HOME/.gem" >> .bashrc
+    gem install hobo
+    PATH="$HOME/.gem/bin:$PATH"
+    echo 'PATH="$HOME/.gem/bin:$PATH"' >> .bashrc
+```
 
 ## Install Hobo and create your first app
 
