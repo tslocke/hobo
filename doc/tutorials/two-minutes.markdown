@@ -1,21 +1,17 @@
 # Hobo in Two Minutes
 
-To build a Hobo 2.0 app you need to have a working Rails setup. If you can
-create a Rails app and have it connect to a database, you're all set.
+Before installing Hobo, you must have
+[Ruby](http://www.ruby-lang.org/en/) and
+[RubyGems](http://docs.rubygems.org/). You will also need the "git" command.
 
-You need at least version 3.2.5 of Rails:
+Installing Hobo 2.0 will auto install Rails 3.2. Be careful not to install Rails 4, it's currently not compatible.
 
-	$ rails -v
 
-## Windows && OS X
-
-First install Hobo.
+## Install Hobo and create your first app
 
 	$ gem install hobo
 
 	$ hobo -v
-
-Now create an app! We've only got two minutes so we'll create an ultra-useful Thing Manager.
 
 	$ hobo new thingybob --setup
 
@@ -24,37 +20,8 @@ asking questions about your application.   After you play with
 Hobo a bit so that you understand the questions, you will probably
 want to omit the `--setup`)
 
-Now skip the "Linux" section and move on to the "common" section.
 
-## Linux
-
-First install Hobo.
-
-	$ gem install hobo
-
-	$ hobo -v
-
-Now create an app! We've only got two minutes so we'll create an ultra-useful Thing Manager.
-
-	$ hobo new thingybob
-
-It will ask you `Do you want to start the Setup Wizard now?`.  Answer "n".  We need to fix up the Rails Gemfile, and then we'll start the Setup Wizard.
-
-Using your editor of choice, edit the file `Gemfile`.   There is a line that looks like this:
-
-     # gem 'therubyracer', :platforms => :ruby
-
-Remove the `#` from the beginning of the line to uncomment it.  Then run:
-
-     $ bundle
-     $ hobo generate setup_wizard --wizard=false
-
-(The `--wizard=false` option tells hobo to use the defaults rather than
-asking questions about your application.   After you play with
-Hobo a bit so that you understand the questions, you will probably
-want to omit the `--wizard=false`)
-
-# Common
+## Add a resource and start the app
 
 There will be lots of output produced as Hobo runs the rails command
 and runs the setup generator. This process may take a while, depending
@@ -80,3 +47,10 @@ And there is your app! You should be able to
 * Search for things
 
 That's it. Why not try another of the tutorials on your left.
+
+Note: If you wish to download the gems directly, you can get them from
+[RubyGems.org](http://rubygems.org).
+
+The source code for Hobo is available at [github:Hobo/hobo](http://github.com/Hobo/hobo) and additional sources are available in the [github Hobo organization](https://github.com/Hobo)
+
+
