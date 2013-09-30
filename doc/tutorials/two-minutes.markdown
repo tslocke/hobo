@@ -10,22 +10,19 @@ Installing Hobo 2.0 will auto install Rails 3.2. Be careful not to install Rails
 
 For example, these are the steps you would need in Ubuntu 12.04:
 
-```
-    sudo apt-get update
-    sudo apt-get install -y ruby1.9.3 rubygems nodejs libsqlite3-dev git
-    export GEM_HOME=$HOME/.gem
-    echo "export GEM_HOME=$HOME/.gem" >> .bashrc
-    PATH="$HOME/.gem/bin:$PATH"
-    echo 'PATH="$HOME/.gem/bin:$PATH"' >> .bashrc
-```
+
+        sudo apt-get update
+        sudo apt-get install -y ruby1.9.3 rubygems nodejs libsqlite3-dev git
+        export GEM_HOME=$HOME/.gem
+        echo "export GEM_HOME=$HOME/.gem" >> .bashrc
+        PATH="$HOME/.gem/bin:$PATH"
+        echo 'PATH="$HOME/.gem/bin:$PATH"' >> .bashrc
+
 
 ## Install Hobo and create your first app
 
-	$ gem install hobo
-
-	$ hobo -v
-
-	$ hobo new thingybob --setup
+	gem install hobo
+	hobo new thingybob --setup
 
 (The `--setup` option tells hobo to use the defaults rather than
 asking questions about your application.   After you play with
@@ -39,14 +36,14 @@ There will be lots of output produced as Hobo runs the rails command
 and runs the setup generator. This process may take a while, depending
 on your internet connection and computer speed.
 
-	$ cd thingybob
-	$ hobo g resource thing name:string body:text
-	$ hobo g migration
+	cd thingybob
+	hobo g resource thing name:string body:text
+	hobo g migration
 
 	...Respond to the prompt with 'm'
 	...then press enter to chose the default filename
 
-	$ rails s
+	rails s
 
 And browse to
 
