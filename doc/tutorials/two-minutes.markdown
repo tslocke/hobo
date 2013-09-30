@@ -15,7 +15,6 @@ For example, these are the steps you would need in Ubuntu 12.04:
     sudo apt-get install -y ruby1.9.3 rubygems nodejs libsqlite3-dev git
     export GEM_HOME=$HOME/.gem
     echo "export GEM_HOME=$HOME/.gem" >> .bashrc
-    gem install hobo
     PATH="$HOME/.gem/bin:$PATH"
     echo 'PATH="$HOME/.gem/bin:$PATH"' >> .bashrc
 ```
