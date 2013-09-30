@@ -330,7 +330,9 @@ If your block takes a parameter (aka has an arity of 1), Hobo will open up a res
       format.pdf { render foo }
     end
 
-Note that this is a respond_to block, not a respond_with block.
+Note that this is a respond_to block, not a respond_with block. 
+
+If you add a parameter but you don't add at least one `format.xxx` you will probably get "Completed 406 Not Acceptable" errors.
 
 The hobo action will only render or redirect if you do not render or redirect before the action or inside the block.
 
