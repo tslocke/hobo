@@ -278,7 +278,7 @@ module Hobo
               r.klass >= self &&
               !r.options[:conditions] &&
               !r.options[:scope] &&
-              r.foreign_key == refl.foreign_key
+              r.foreign_key.to_s == refl.foreign_key.to_s
           end
         end
       end
