@@ -168,7 +168,7 @@ module HoboRapidHelper
                      end
 
         unless method == "get"
-          page_path = if (request.post? || request.put? || request.delete?) && params[:page_path]
+          page_path = if params[:page_path]
                         params[:page_path]
                       else
                         request.fullpath
