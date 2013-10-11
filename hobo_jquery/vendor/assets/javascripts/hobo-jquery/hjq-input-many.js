@@ -24,7 +24,7 @@ if(!RegExp.escape) {
             var me = $(this).parent().parent();
             var top = me.parent();
             var template = top.children("li.input-many-template");
-            var clone = template.clone(true).removeClass("input-many-template");
+            var clone = template.clone().removeClass("input-many-template");
             var attrs = top.data('rapid')['input-many'];
 
             // length-2 because ignore the template li and the empty li
