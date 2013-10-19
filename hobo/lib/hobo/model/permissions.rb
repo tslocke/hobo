@@ -255,6 +255,7 @@ module Hobo
 
 
       def attribute_protected?(attribute)
+        return false if attribute.nil?
         attribute = attribute.to_s
 
         return true if self.class.send(:attributes_protected_by_default).include? attribute
