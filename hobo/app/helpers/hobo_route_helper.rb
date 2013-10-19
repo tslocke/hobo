@@ -161,22 +161,16 @@ module HoboRouteHelper
       "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
     end
 
-
     def recognize_page_path
-      # round tripping params through the router will remove
-      # unnecessary params
       if params[:page_path]
         url = params[:page_path]
         method = "GET"
+        Rails.application.routes.recognize_path(url, :method => method)
       else
-        url = url_for(params)
-        method = request.method
+        # We used to use "url_for(params)", but with Rails 4 stopped working
+        # It seems that we can send back the params directly
+        params
       end
-      if ENV['RAILS_RELATIVE_URL_ROOT']
-        url.gsub!(/^#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
-        url.gsub!(/^https?:\/\/.*?#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
-      end
-      Rails.application.routes.recognize_path(url, :method => method)
     end
 
     def url_for_page_path(options={})
