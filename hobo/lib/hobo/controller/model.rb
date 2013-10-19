@@ -692,7 +692,7 @@ module Hobo
       if params[:render]
         hobo_ajax_response || render(:nothing => true)
       else
-        respond_with(self.this, :location => destination_after_submit(this, true, options))
+        redirect_to destination_after_submit(this, true, options)
       end
     end
 
