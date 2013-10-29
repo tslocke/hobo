@@ -341,7 +341,7 @@ module Hobo
         hash = args.extract_options!
         db_sort_field = (hash[field] || hash[field.to_sym] || (field if field.in?(args) || field.to_sym.in?(args))).to_s
 
-        if db_sort_field
+        unless db_sort_field.empty?
           if db_sort_field == field && field.match(/\./)
             fields = field.split(".", 2)
             db_sort_field = "#{fields[0].pluralize}.#{fields[1]}"
