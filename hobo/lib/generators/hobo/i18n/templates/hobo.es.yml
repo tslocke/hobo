@@ -175,6 +175,7 @@ es:
     table_plus:
       search: "Buscar"
       submit_label: "Ir"
+      clear_label: "Limpiar"
 
     live_search:
       label: "Buscar"

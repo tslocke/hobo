@@ -172,6 +172,7 @@ ru:
     table_plus:
       search: "Поиск"
       submit_label: "Искать"
+      clear_label: "Очистить"
 
     live_search:
       label: "Найти"
