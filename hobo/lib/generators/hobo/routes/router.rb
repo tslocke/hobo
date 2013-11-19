@@ -214,6 +214,7 @@ module Generators
           link("get '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
           link("get '#{prefix}logout(.:format)' => '#{records}#logout', :as => '#{record}_logout'",  'logout'),
           link("get '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
+          link("post '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password_post'",  'forgot_password'),
           ].compact
         end
 
