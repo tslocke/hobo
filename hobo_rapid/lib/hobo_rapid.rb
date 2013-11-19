@@ -9,6 +9,7 @@ module HoboRapid
 
   EDIT_LINK_BASE = "https://github.com/Hobo/hobodoc/edit/master/hobo_rapid"
 
+  require 'hobo_rapid/previous_uri_filter'
   require 'hobo_rapid/railtie' if defined?(Rails)
 
   class Engine < ::Rails::Engine
