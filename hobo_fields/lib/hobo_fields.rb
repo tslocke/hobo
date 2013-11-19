@@ -92,6 +92,25 @@ module HoboFields
 
 end
 
-require 'hobo_fields/railtie'
+require 'hobo_fields/extensions/active_record/attribute_methods'
+require 'hobo_fields/extensions/active_record/fields_declaration'
+require 'hobo_fields/field_declaration_dsl'
+require 'hobo_fields/model'
+require 'hobo_fields/sanitize_html'
+require 'hobo_fields/model/field_spec'
+require 'hobo_fields/model/index_spec'
+require 'hobo_fields/types/email_address'
+require 'hobo_fields/types/enum_string'
+require 'hobo_fields/types/html_string'
+require 'hobo_fields/types/lifecycle_state'
+require 'hobo_fields/types/markdown_string'
+require 'hobo_fields/types/password_string'
+require 'hobo_fields/types/raw_html_string'
+require 'hobo_fields/types/raw_markdown_string'
+require 'hobo_fields/types/serialized_object'
+require 'hobo_fields/types/text'
+require 'hobo_fields/types/textile_string'
+
+require 'hobo_fields/railtie' if defined?(Rails)
 
 
