@@ -2,10 +2,8 @@ module Dryml
   class Railtie < Rails::Railtie
 
     ActiveSupport.on_load(:before_initialize) do |app|
-      require 'dryml'
-      require 'dryml/template'
-      require 'dryml/dryml_generator'
       require 'dryml/railtie/page_tag_resolver'
+      require 'dryml/railtie/template_handler'
     end
 
     ActiveSupport.on_load(:action_controller) do

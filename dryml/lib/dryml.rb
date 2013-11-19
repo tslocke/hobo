@@ -245,4 +245,25 @@ private
 
 end
 
-require 'dryml/railtie' if Object.const_defined?(:Rails)
+require 'dryml/dryml_builder'
+require 'dryml/dryml_doc'
+require 'dryml/dryml_generator'
+require 'dryml/helper'
+require 'dryml/parser'
+require 'dryml/part_context'
+require 'dryml/scoped_variables'
+require 'dryml/tag_parameters'
+require 'dryml/taglib'
+require 'dryml/template'
+require 'dryml/template_environment'
+require 'dryml/extensions/action_controller/dryml_methods'
+require 'dryml/parser/attribute'
+require 'dryml/parser/base_parser'
+require 'dryml/parser/document'
+require 'dryml/parser/element'
+require 'dryml/parser/elements'
+require 'dryml/parser/source'
+require 'dryml/parser/text'
+require 'dryml/parser/tree_parser'
+
+require 'dryml/railtie' if defined?(Rails)
