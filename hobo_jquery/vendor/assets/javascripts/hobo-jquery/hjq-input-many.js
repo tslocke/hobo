@@ -103,7 +103,7 @@ if(!RegExp.escape) {
 
             var buttonsDivs = top.children("li:not(.input-many-template):not(.empty)").children("div.buttons");
             for (var i = 0; i < buttonsDivs.length; i++) {
-                if (i < (attrs['minimum'] || 0))
+                if (buttonsDivs.length - 1 < (attrs['minimum'] || 0))
                     $(buttonsDivs[i]).children("button.remove-item").addClass("hidden");
                 else
                     $(buttonsDivs[i]).children("button.remove-item").removeClass("hidden");

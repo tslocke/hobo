@@ -16,3 +16,5 @@ breaks something somewhere.
 # Running
 
 `rake test:integration`
+
+`ruby -I test test/integration/ajax_form_test.rb`

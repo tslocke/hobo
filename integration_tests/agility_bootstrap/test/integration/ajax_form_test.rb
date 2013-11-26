@@ -49,10 +49,10 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     Capybara.current_driver = :selenium_chrome
     Capybara.default_wait_time = 10
     visit root_path
-    
+
     # Resize the window so Bootstrap shows Login button
     Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
-    
+
     # log in as Administrator
     click_link "Login"
     fill_in "login", :with => "admin@example.com"
@@ -72,8 +72,9 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     # wait_for_updates_to_finish  # we don't need this every time, but if we don't throw it in occasionally, things do stop working
 
     find("#form2").fill_in("story_status_name", :with => "foo2")
+    sleep 0.25
     find("#form2").click_button("new")
-    sleep 0.5
+    sleep 0.25
     assert find(".statuses table tbody tr:nth-child(2) .story-status-name").has_text?("foo2")
     wait_for_updates_to_finish
 

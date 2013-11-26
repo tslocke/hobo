@@ -37,6 +37,9 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
     Capybara.current_driver = :selenium_chrome
     visit root_path
 
+    # Resize the window so Bootstrap shows Login button
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
+
     # log in as Administrator
     click_link "Log out" rescue Capybara::ElementNotFound
     click_link "Login"
