@@ -33,40 +33,4 @@
   <%- end -%>
 <%- end -%>
 
-<% unless Rails.configuration.hobo.dont_emit_deprecated_routes %>
-
-# These are the Hobo 1.3 style routes.   They've been included for backwards
-# compatibility reasons because the names of some named routes have been changed.
-# Please update your views to use the new named route names and then disable this
-# section by setting config.hobo.dont_emit_deprecated_routes = true.  blah blah
-
- <% puts "Warning: deprecated routes emitted into config/hobo_routes.rb.   These will be removed in Hobo 2.1.   Disable this warning by setting config.hobo.dont_emit_deprecated_routes = true." unless subsites.blank? %>
- <% for subsite in subsites -%>
-  <%- if subsite -%>
-
-  <%= "namespace :#{subsite} do" %>
-  <%- end -%>
-  <%- for controller in controllers_for(subsite) -%>
-    <%- router = router_for(subsite, controller)
-        groups = %w[ index_action lifecycle owner web_method show_action reorder resource ] -%>
-
-    <%- for group in groups -%>
-    <%- gr = "#{group}_routes"
-        routes = gr == 'lifecycle_routes' ? router.send(gr.to_sym, subsite) : router.send(gr.to_sym) -%>
-    <%- unless routes.empty? -%>
-
-  <%= "  " if subsite %><%= "# DEPRECATED #{gr.humanize} for controller #{controller.controller_path}" %>
-    <%- end -%>
-      <%- for route in routes -%>
-  <%= "  " if subsite %><%= route %>
-      <%- end -%>
-    <%- end -%>
-  <%- end -%>
-  <%- if subsite -%>
-
-  end
-  <%- end -%>
- <%- end -%>
-
-<%- end -%>
 end
