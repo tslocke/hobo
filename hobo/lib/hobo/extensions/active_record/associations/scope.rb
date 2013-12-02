@@ -31,6 +31,6 @@ module ActiveRecord
       scopes.inject(relation) {|r, s| r.send *s }
     end
     alias_method_chain :apply_finder_options, :scope
-  end
+  end if false # DISABLED Getting Rails 4.0 working
  end
 end
