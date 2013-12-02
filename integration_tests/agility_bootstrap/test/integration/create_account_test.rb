@@ -40,6 +40,7 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
   test "create account" do
     Capybara.current_driver = :selenium_chrome
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # create administrator
     fill_in "user_name", :with => "Admin User"

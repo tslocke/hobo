@@ -7,6 +7,8 @@ class StoryStatus < ActiveRecord::Base
     timestamps
   end
 
+  attr_accessible :name
+
   validate :name_must_be_valid
 
   def name_must_be_valid

@@ -15,7 +15,7 @@ end
 
 class AjaxFormTest < ActionDispatch::IntegrationTest
   include Capybara::DSL
-  include Factory::Syntax::Methods
+  include FactoryGirl::Syntax::Methods
 
   self.use_transactional_fixtures = false
 
@@ -67,8 +67,10 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     assert has_content?("0 failed.")
 
     find("#form1").fill_in("story_status_name", :with => "foo1")
+    assert_not page.has_content? 'foo1'
     find("#form1").click_button("new")
-    assert find(".statuses table tbody tr:first .story-status-name").has_text?("foo1")
+    #assert page.has_content? 'foo1'
+    assert find(".statuses table tbody tr:nth-child(1) .story-status-name").has_text?("foo1")
     # wait_for_updates_to_finish  # we don't need this every time, but if we don't throw it in occasionally, things do stop working
 
     find("#form2").fill_in("story_status_name", :with => "foo2")
@@ -88,25 +90,25 @@ class AjaxFormTest < ActionDispatch::IntegrationTest
     assert find(".statuses table tbody tr:nth-child(4) .story-status-name").has_text?("foo4")
     wait_for_updates_to_finish
 
-    find(".statuses table tr:first .delete-button").click
+    find(".statuses table tbody tr:nth-child(1) .delete-button").click
     page.driver.browser.switch_to.alert.accept
     assert has_no_content?("foo1")   # waits for ajax to finish
     assert_equal 3, all(".statuses table tbody tr").length
 
     visit "/story_statuses/index3"
-    find(".statuses li:first .delete-button").click
+    find(".statuses li:nth-child(1) .delete-button").click
     page.driver.browser.switch_to.alert.accept
     assert has_no_content?("foo2")   # waits for ajax to finish
     assert_equal 2, all(".statuses li").length
     assert has_content?("There are 2 Story statuses")
 
     visit "/story_statuses/index4"
-    find(".statuses li:first .delete-button").click
+    find(".statuses li:nth-child(1) .delete-button").click
     page.driver.browser.switch_to.alert.accept
     visit "/story_statuses/index4" # Index4 delete-buttons have Ajax disabled (in-place="&false")
     assert_equal 1, all(".statuses li").length
 
-    find(".statuses li:first .delete-button").click
+    find(".statuses li:nth-child(1) .delete-button").click
     page.driver.browser.switch_to.alert.accept
     visit "/story_statuses/index4" # Index4 delete-buttons have Ajax disabled (in-place="&false")
     assert has_no_content?("foo4")   # waits for ajax to finish

@@ -11,7 +11,7 @@ class StoryStatusesController < ApplicationController
   def create
     hobo_create do
       if valid? && request.xhr?
-        self.this = StoryStatus.all.paginate
+        self.this = StoryStatus.all.paginate(:page => params[:page], :per_page => 20)
         hobo_ajax_response
       else
         create_response(:new)
@@ -22,7 +22,7 @@ class StoryStatusesController < ApplicationController
   def destroy
     hobo_destroy do
       if request.xhr?
-        self.this = StoryStatus.all.paginate
+        self.this = StoryStatus.all.paginate(:page => params[:page], :per_page => 20)
         hobo_ajax_response || render(:nothing => true)
       else
         destroy_response
