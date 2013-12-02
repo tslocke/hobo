@@ -20,7 +20,7 @@
 
             if(form.attr('enctype') == 'multipart/form-data') {
                 if(form.ajaxSubmit) {
-                    options = $.extend(options, {preamble: "<textarea>", postamble: '</textarea>', fix_quotes: true, content_type: 'text/html'});
+                    options = $.extend(options, {preamble: "<textarea>", postamble: '</textarea>', content_type: 'text/html'});
                     var roptions = form.hjq('buildRequestData', options);
 
                     if(!roptions) return false;
