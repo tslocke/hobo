@@ -151,7 +151,7 @@ module HoboRouteHelper
 
     # Login url for a given user record or user class
     def forgot_password_url(user_class=Hobo::Model::UserBase.default_user_model)
-      send("#{user_class.name.underscore}_forgot_password_url") rescue nil
+      send("#{user_class.name.underscore}_forgot_password_path") rescue nil
     end
 
 
@@ -163,7 +163,7 @@ module HoboRouteHelper
 
     # Sign-up url for a given user record or user class
     def signup_url(user_class=Hobo::Model::UserBase.default_user_model)
-      send("signup_#{user_class.name.underscore.pluralize}_url") rescue nil
+      send("signup_#{user_class.name.underscore.pluralize}_path") rescue nil
     end
 
 
