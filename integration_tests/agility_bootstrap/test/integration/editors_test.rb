@@ -49,6 +49,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
     Capybara.current_driver = :selenium_chrome
     Capybara.default_wait_time = 5
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # log in as Administrator
     click_link "Log out" rescue Capybara::ElementNotFound

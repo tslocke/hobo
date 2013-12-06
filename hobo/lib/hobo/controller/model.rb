@@ -774,12 +774,12 @@ module Hobo
 
       begin
         finder = finder.send(options[:query_scope], params[options[:param]])
-        items = finder.find(:all).select { |r| r.viewable_by?(current_user) }
+        items = finder.all.select { |r| r.viewable_by?(current_user) }
       rescue TypeError  # must be a list of methods instead
         items = []
         options[:query_scope].each do |qscope|
           finder2 = finder.send(qscope, params[options[:param]])
-          items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
+          items += finder2.all.select { |r| r.viewable_by?(current_user) }
         end
       end
       if request.xhr?

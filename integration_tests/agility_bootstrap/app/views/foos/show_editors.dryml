@@ -12,6 +12,6 @@
       </div>
       <submit label="reload editors"/>
     </form>
-    <%= link_to( "exit editors", this, :id => "exit" ) %>
+    <a class="btn">exit editors</a>
   </content-body:>
 </show-page>

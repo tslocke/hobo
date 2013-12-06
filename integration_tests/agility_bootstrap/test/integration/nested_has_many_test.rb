@@ -52,12 +52,12 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
 
     # second story has no tasks but minimal="1", so should have empty task
     assert_equal find("#project_stories_1_tasks_0_description").value, ""
-    assert find("#project_stories_1_tasks_0_add").visible?
-    assert !find("#project_stories_1_tasks_0_remove").visible?
+    assert page.has_selector?('#project_stories_1_tasks_0_add', visible: true)
+    assert page.has_selector?('#project_stories_1_tasks_0_remove', visible: false)
 
     # first story only has a single task
-    assert find("#project_stories_0_tasks_0_add").visible?
-    assert !find("#project_stories_0_tasks_0_remove").visible?
+    assert page.has_selector?('#project_stories_0_tasks_0_add', visible: true)
+    assert page.has_selector?('#project_stories_0_tasks_0_remove', visible: false)
 
     # verify button customized
     assert find("#project_stories_0_remove").has_text?("Remove Story")
@@ -69,7 +69,7 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
     click_button "project_stories_0_tasks_0_add"
     assert has_field?("project_stories_0_tasks_1_description") #wait
     fill_in "project_stories_0_tasks_1_description", :with => "Second task for first story"
-    assert !find("#project_stories_0_tasks_0_add").visible?
+    assert page.has_selector?('#project_stories_0_tasks_0_add', visible: false)
     assert find("#project_stories_0_tasks_0_remove").visible?
     assert find("#project_stories_0_tasks_1_add").visible?
     assert find("#project_stories_0_tasks_1_remove").visible?
@@ -78,14 +78,14 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
     click_button "project_stories_0_tasks_1_add"
     assert has_field?("project_stories_0_tasks_2_description") #wait
     fill_in "project_stories_0_tasks_2_description", :with => "Third task for first story"
-    assert !find("#project_stories_0_tasks_1_add").visible?
+    assert page.has_selector?('#project_stories_0_tasks_1_add', visible: false)
     assert find("#project_stories_0_tasks_1_remove").visible?
     assert find("#project_stories_0_tasks_2_add").visible?
     assert find("#project_stories_0_tasks_2_remove").visible?
 
     # verify save
     click_button "Save"
-    assert find(".table-plus tr:first-child td.tasks-count-view span").has_text?("3")
+    assert find(".table-plus tbody tr:nth-child(1) td.tasks-count-view span").has_text?("3")
     visit "/projects/#{@project.id}/nested_has_many_test"
 
     # verify remove inner
@@ -93,7 +93,7 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
     assert has_no_field?("project_stories_0_tasks_2_description") #wait
     sleep 1.0
     assert_equal find("#project_stories_0_tasks_1_description").value, "Third task for first story"
-    assert !find("#project_stories_0_tasks_0_add").visible?
+    assert page.has_selector?('#project_stories_0_tasks_0_add', visible: false)
     assert find("#project_stories_0_tasks_0_remove").visible?
     assert find("#project_stories_0_tasks_1_add").visible?
     assert find("#project_stories_0_tasks_1_remove").visible?
@@ -103,16 +103,16 @@ class NestedHasManyTest < ActionDispatch::IntegrationTest
     sleep 1.0
     assert_equal find("#project_stories_0_tasks_0_description").value, "Third task for first story"
     assert find("#project_stories_0_tasks_0_add").visible?
-    assert !find("#project_stories_0_tasks_0_remove").visible?
+    assert page.has_selector?('#project_stories_0_tasks_0_remove', visible: false)
 
     # verify add outer
     click_button "project_stories_1_add"
     assert has_field?("project_stories_2_tasks_0_description") #wait
     assert_equal find("#project_stories_2_tasks_0_description").value, ""
     assert find("#project_stories_2_tasks_0_add").visible?
-    assert !find("#project_stories_2_tasks_0_remove").visible?
+    assert page.has_selector?('#project_stories_2_tasks_0_remove', visible: false)
     click_button "project_stories_2_tasks_0_add"
-    assert !find("#project_stories_2_tasks_0_add").visible?
+    assert page.has_selector?('#project_stories_2_tasks_0_add', visible: false)
     assert find("#project_stories_2_tasks_0_remove").visible?
     assert find("#project_stories_2_tasks_1_add").visible?
     assert find("#project_stories_2_tasks_1_remove").visible?

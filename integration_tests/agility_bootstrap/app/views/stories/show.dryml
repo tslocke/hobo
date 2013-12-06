@@ -1,8 +1,10 @@
 <show-page>
   <field-list: tag="editor"/>
-  <after-collection:>
+  <collection: replace>
+    
     <do:tasks>
+      <sortable-collection/>
       <create-button fields="&{'description' => 'from create-button'}" label="create-button-test"/>
     </do:tasks>
-  </after-collection:>
+  </collection:>
 </show-page>

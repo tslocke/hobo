@@ -37,6 +37,7 @@ class DialosgTest < ActionDispatch::IntegrationTest
   test "dialog" do
     Capybara.current_driver = :selenium_chrome
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # log in as Administrator
     click_link "Log out" rescue Capybara::ElementNotFound
@@ -54,6 +55,6 @@ class DialosgTest < ActionDispatch::IntegrationTest
     click_button "Submit"
     wait_for_updates_to_finish
 
-    assert find("#stories tr:eq(2) td:first").has_content?("Another Story")
+    assert find("#stories tbody tr.even td.this-view").has_content?("Another Story")
   end
 end

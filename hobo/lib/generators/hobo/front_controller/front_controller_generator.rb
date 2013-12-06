@@ -44,6 +44,7 @@ module Hobo
     def add_routes
       return unless options[:add_routes]
       route "get 'search' => '#{file_path}#search', :as => 'site_search'"
+      route "post 'search' => '#{file_path}#search', :as => 'site_search_post'"
       route "get '#{options[:user_resource_name]}s/:id/activate_from_email/:key' => '#{options[:user_resource_name]}s#activate', :as => 'activate_from_email'"
       route "get '#{options[:user_resource_name]}s/:id/accept_invitation_from_email/:key' => '#{options[:user_resource_name]}s#accept_invitation', :as => 'accept_invitation_from_email'"
       route "get '#{options[:user_resource_name]}s/:id/reset_password_from_email/:key' => '#{options[:user_resource_name]}s#reset_password', :as => 'reset_password_from_email'"

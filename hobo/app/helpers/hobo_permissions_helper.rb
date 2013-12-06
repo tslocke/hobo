@@ -38,7 +38,7 @@ module HoboPermissionsHelper
 
     def can_edit?(*args)
       object, field = if args.empty?
-                        if this.respond_to?(:editable_by?) && !this_field_reflection
+                        if !this.respond_to?(:to_a) && this.respond_to?(:editable_by?) && !this_field_reflection
                           [this, nil]
                         elsif this_parent && this_field
                           [this_parent, this_field]

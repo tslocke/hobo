@@ -37,6 +37,7 @@ class SearchTest < ActionDispatch::IntegrationTest
   test "search" do
     Capybara.current_driver = :selenium_chrome
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # log in as Administrator
     click_link "Log out" rescue Capybara::ElementNotFound

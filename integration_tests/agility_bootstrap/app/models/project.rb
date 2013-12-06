@@ -27,7 +27,7 @@ class Project < ActiveRecord::Base
   has_many :contributor_memberships, :class_name => "ProjectMembership", :scope => :contributor
   has_many :contributors, :through => :contributor_memberships, :source => :user
 
-  attr_accessible :name, :report
+  attr_accessible :name, :report, :stories
 
   # permission helper
   def accepts_changes_from?(user)

@@ -48,7 +48,11 @@ module HoboRapidHelper
 
     # returns the number of items in the collection.  See LH #889
     def collection_count
-      this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+      if this.respond_to?(:to_a)
+        this.try.count
+      else
+        this.try.to_int || this.try.total_entries || (this.try.loaded? && this.try.length) || this.try.count || this.try.length
+      end
     end
 
     def through_collection_names(object=this)

@@ -4,7 +4,7 @@ module Generators
       class Router
 
         # specify that an id CANNOT be null - needed to disambiguate /models from /models/[nil]
-        ID_REQUIREMENT = "{ :id => %r([^#{ActionController::Routing::SEPARATORS.join}]+) }"
+        ID_REQUIREMENT = "{ :id => %r([^#{ActionDispatch::Routing::SEPARATORS.join}]+) }"
 
         attr_reader :subsite, :controller, :model, :record, :records
 

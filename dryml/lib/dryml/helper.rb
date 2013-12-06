@@ -21,7 +21,7 @@ module Dryml::Helper
       res = []
       empty = true
       scope.new_scope(:repeat_collection => enum, :even_odd => 'odd', :repeat_item => nil) do
-        if enum.respond_to?(:each_pair)
+        if !enum.respond_to?(:to_a) && enum.respond_to?(:each_pair)
           enum.each_pair do |key, value|
             scope.repeat_item = value
             empty = false;
@@ -58,7 +58,7 @@ module Dryml::Helper
 
 
     def last_item?
-      if scope.repeat_collection.respond_to? :each_pair
+      if !scope.repeat_collection.respond_to?(:to_a) && scope.repeat_collection.respond_to?(:each_pair)
         this == scope.repeat_collection.last.try.last
       else
         this == scope.repeat_collection.last

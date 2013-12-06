@@ -14,7 +14,7 @@ class Story < ActiveRecord::Base
 
   has_many :tasks, :dependent => :destroy, :accessible => true
 
-  attr_accessible :title, :body, :color, :tasks
+  attr_accessible :title, :body, :color, :tasks, :status, :status_id
 
   children :tasks
 
