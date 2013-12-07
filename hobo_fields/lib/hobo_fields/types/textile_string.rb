@@ -1,5 +1,3 @@
-require 'redcloth'
-
 module HoboFields
   module Types
     class TextileString < HoboFields::Types::Text
@@ -7,6 +5,8 @@ module HoboFields
       include SanitizeHtml
 
       def to_html(xmldoctype = true)
+        require 'redcloth'
+
         if blank?
           ""
         else
