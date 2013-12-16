@@ -9,7 +9,7 @@ module HoboFields
           Kramdown::Document
         when defined?(Maruku)
           Maruku
-        else
+        when defined?(Markdown)
           Markdown
         end
 

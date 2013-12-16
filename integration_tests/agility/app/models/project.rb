@@ -15,7 +15,7 @@ class Project < ActiveRecord::Base
 
   has_attached_file :report
 
-  has_many :stories, :dependent => :destroy, :accessible => true, :inverse_of => :project
+  has_many :stories, :dependent => :destroy, :inverse_of => :project#, :accessible => true
 
   children :stories, :memberships
 

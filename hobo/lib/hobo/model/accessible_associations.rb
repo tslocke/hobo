@@ -11,7 +11,7 @@ module Hobo
         array.map! do |record_hash_or_string|
           finder = association.member_class
           conditions = association.proxy_association.reflection.options[:conditions]
-          finder = finder.all :conditions => conditions unless conditions == [[]] || conditions == [[],[]]
+          finder = finder.where(conditions) unless conditions == [[]] || conditions == [[],[]]
           find_or_create_and_update(owner, association_name, finder, record_hash_or_string) do |id|
             # The block is required to either locate find an existing record in the collection, or build a new one
             if id
@@ -105,7 +105,6 @@ module Hobo
 
       def self.has_many_with_accessible(name, options={}, &block)
         has_many_without_accessible(name, options, &block)
-
         if options[:accessible]
           class_eval %{
             def #{name}_with_accessible=(array_or_hash)

@@ -16,7 +16,7 @@ class Task < ActiveRecord::Base
 
   default_scope {order(:position)}
 
-  attr_accessible :description
+  attr_accessible :description, :users, :story, :story_id, :position
 
   # --- Permissions --- #
 
