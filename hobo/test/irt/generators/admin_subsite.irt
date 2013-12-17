@@ -3,3 +3,9 @@ invoke 'hobo:admin_subsite', %w[ -q ]
 desc "Admin Subsite files exist"
 files_exist? %w( app/controllers/admin/admin_site_controller.rb app/controllers/admin/users_controller.rb app/helpers/admin/users_helper.rb app/views/taglibs/admin_site.dryml )
 test_value_eql? true
+
+desc "Admin::UsersController matches"
+file_include? "app/controllers/admin/users_controller.rb",
+             'class Admin::UsersController < Admin::AdminSiteController',
+             'hobo_model_controller'
+test_value_eql? true

@@ -23,7 +23,8 @@ module HoboCacheHelper
       key_attrs["#{qp}"] = params[qp] || ""
     end
 
-    ActiveSupport::Cache.expand_cache_key(url_for(key_attrs).split('://').last, namespace)
+    key = ActiveSupport::Cache.expand_cache_key(url_for(key_attrs).split('://').last, namespace)
+    Digest::MD5.hexdigest(key)
   end
 
   def item_cache(*args, &block)

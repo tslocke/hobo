@@ -341,7 +341,7 @@ module Hobo
         hash = args.extract_options!
         db_sort_field = (hash[field] || hash[field.to_sym] || (field if field.in?(args) || field.to_sym.in?(args))).to_s
 
-        if db_sort_field
+        unless db_sort_field.blank?
           if db_sort_field == field && field.match(/\./)
             fields = field.split(".", 2)
             db_sort_field = "#{fields[0].pluralize}.#{fields[1]}"
@@ -692,7 +692,7 @@ module Hobo
       if params[:render]
         hobo_ajax_response || render(:nothing => true)
       else
-        respond_with(self.this, :location => destination_after_submit(this, true, options))
+        redirect_to destination_after_submit(this, true, options)
       end
     end
 
@@ -774,12 +774,12 @@ module Hobo
 
       begin
         finder = finder.send(options[:query_scope], params[options[:param]])
-        items = finder.find(:all).select { |r| r.viewable_by?(current_user) }
+        items = finder.select { |r| r.viewable_by?(current_user) }
       rescue TypeError  # must be a list of methods instead
         items = []
         options[:query_scope].each do |qscope|
           finder2 = finder.send(qscope, params[options[:param]])
-          items += finder2.find(:all).select { |r| r.viewable_by?(current_user) }
+          items += finder2.all.select { |r| r.viewable_by?(current_user) }
         end
       end
       if request.xhr?

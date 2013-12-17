@@ -2,9 +2,7 @@ module Hobo
   module Model
     module Scopes
 
-      ::ActiveRecord::Associations::Builder::BelongsTo.valid_options << :scope
-      ::ActiveRecord::Associations::Builder::HasMany.valid_options << :scope
-      ::ActiveRecord::Associations::Builder::HasOne.valid_options << :scope
+      ::ActiveRecord::Associations::Builder::Association.valid_options << :scope
 
       def self.included_in_class(klass)
         klass.class_eval do

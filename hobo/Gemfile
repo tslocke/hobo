@@ -6,7 +6,7 @@ gemspec :path => "../dryml"
 gemspec :path => "../hobo_support"
 gemspec :path => "../hobo_fields"
 gemspec
-gem 'will_paginate', :git => 'git://github.com/Hobo/will_paginate.git'
+gem 'hobo_will_paginate'
 platform :ruby do
   gem 'sqlite3'
 end

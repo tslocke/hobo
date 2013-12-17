@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.12'
+gem 'rails', '4.0.2'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -51,7 +51,7 @@ gem "jquery-ui-themes", "~> 0.0.4"
 gem "hobo_bootstrap", :path => "../../../hobo_bootstrap"
 gem "hobo_bootstrap_ui", :path => "../../../hobo_bootstrap_ui"
 
-gem "will_paginate", :git => "git://github.com/Hobo/will_paginate.git"
+gem "hobo_will_paginate"#, :git => "git://github.com/Hobo/will_paginate.git"
 
 gem "kramdown"
 gem "RedCloth"
@@ -64,19 +64,21 @@ group :development, :test do
 #  gem 'capybara-webkit', :git => 'git://github.com/thoughtbot/capybara-webkit.git'
 #  gem 'capybara-webkit', :git => 'https://github.com/josephbridgwaterrowe/capybara-webkit.git', :branch => 'patch-1'
   gem 'database_cleaner'
+  gem 'selenium-webdriver'
+  gem 'better_errors'
+  gem "binding_of_caller"
 end
 
 gem "jquery-rails"
 
 #gem "hobo-jquery", :git => "git://github.com/bryanlarsen/hobo-jquery.git", :branch => "no-prototype"
 
-gem 'paperclip',     '~> 2.7'
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'sass-rails',   '~> 4.0.0'
+  gem 'coffee-rails', '~> 4.0.0'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 #  gem 'therubyracer', :platforms => :ruby
@@ -94,4 +96,7 @@ gem "hobo_tokeninput", :git => "git://github.com/Hobo/hobo_tokeninput"
 # gem "quiet_assets"
 
 gem 'acts_as_list'
+gem 'paperclip', '3.5.2'
 gem 'hobo_paperclip', :git => 'git://github.com/Hobo/hobo_paperclip'
+
+gem "protected_attributes"

@@ -24,7 +24,7 @@ For situations where there are too many target records to practically include in
   options ||= begin
     conditions = ActiveRecord::Associations::BelongsToAssociation.new(this_parent, this_field_reflection).options[:conditions]
     order = this_field_reflection.klass.default_order
-    this_field_reflection.klass.all(:conditions => conditions, :limit => limit, :order => order).select {|x| can_view?(x)}
+    this_field_reflection.klass.where(conditions).limit(limit).order(order).select {|x| can_view?(x)}
   end
 
   id_method = this_field_reflection.options[:primary_key] || this_field_reflection.klass.primary_key

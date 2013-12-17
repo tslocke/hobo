@@ -8,7 +8,7 @@ NOTE: put screenshots in /doc/vendor/assets/images/screenshots
 
 Beanbag is an online educational resource offering a sophisticated web portal to connect tutors, parents, teachers and students together in a simple and easy to use service. The site makes use of much of the power of the social networking, location and multimedia features of the modern web to ensure that the right match up is made between parents and tutors in a wide range of disciplines.
 
-### [![Art$Work](/assets/screenshots/artswork.png) Art$Work](http://artworksohio.com)
+### [![Art$Work](/assets/screenshots/artswork.png) Art$Work](http://artsworkohio.com)
 
 Art$Work is an online, searchable database of arts and cultural employment opportunities in Ohio. It is a free and efficient way for job seekers to connect with a wide range of Ohio’s arts and cultural employers.The Ohio Arts Council created Art$Work with job seekers in mind to be simple, quick and free. Job seekers just choose their job search criteria and hit “Search.” Our database will deliver job descriptions and employer contact information for the positions that meet your criteria.
 
@@ -30,7 +30,7 @@ Created by Jerrold Thompson, padhouses.com promotes the classification and circu
 
 ### [![Cupetition](/assets/screenshots/cupetition.png) Cupetition](http://cupetition.com/)
 
-Cupetition is a site for sports lovers that let's you manage championships online. "Invite your friends, book your games and reach the best scores". Cupetition's creator Tiago Franco says "In my opinion Hobo provides a good development setup out-of-the-box, with the essentials of any modern application. At its current stage it can be used not just for rapid prototyping, but also for production ready applications."</p>
+Cupetition is a site for sports lovers that let's you manage championships online. "Invite your friends, book your games and reach the best scores". Cupetition's creator Tiago Franco says "In my opinion Hobo provides a good development setup out-of-the-box, with the essentials of any modern application. At its current stage it can be used not just for rapid prototyping, but also for production ready applications."
 
 ### [![IslandiaCar](/assets/screenshots/islandiacar.png) IslandiaCar](http://www.islandiacar.com/)
 

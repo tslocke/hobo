@@ -38,6 +38,8 @@ class Foo < ActiveRecord::Base
 
   validate :v_must_be_true
 
+  attr_accessible :bool1, :bool2, :t, :f, :dec, :s, :tt, :d, :dt, :hh, :tl, :md, :es, :v, :i
+
   def v_must_be_true
     errors[:base] << "v must be true" unless v==true
   end

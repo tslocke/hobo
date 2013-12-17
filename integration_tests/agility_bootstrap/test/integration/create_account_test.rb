@@ -40,6 +40,7 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
   test "create account" do
     Capybara.current_driver = :selenium_chrome
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # create administrator
     fill_in "user_name", :with => "Admin User"
@@ -91,10 +92,10 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
     assert has_content?("The Task was created successfully")
 
     # test sortable-collection
-    find("ul.tasks li:last .ordering-handle").drag_to(find("ul.tasks li:first .ordering-handle"))
+    find("ul.tasks li:nth-child(2) .ordering-handle").drag_to(find("ul.tasks li:nth-child(1) .ordering-handle"))
     sleep 1
     visit page.current_path
-    assert find("ul.tasks li:first .description").has_text?("Second Task")
+    assert find("ul.tasks li:nth-child(1) .description").has_text?("Second Task")
 
     # create Second User
     click_link "Log out"
@@ -180,12 +181,14 @@ class CreateAccountTest < ActionDispatch::IntegrationTest
 
     # add project members
     fill_in "project_membership[user]", :with => "Second User"
-    find("a:contains('Second User')").click
-    find("form.project-membership input[type=text]").native.send_key(:enter)
+    sleep 0.5
+    click_on 'Second User'
+    page.execute_script("$('form.project-membership').submit()")
     assert find("ul.memberships").has_text?("Second User")
-
-    find("input.delete-project-membership-button").click
+    within "ul.memberships" do
+      click_on "X"
+    end
     page.driver.browser.switch_to.alert.accept
-    assert find("ul.memberships").has_no_text?("Second User")
+    assert has_no_content?("Second User")
   end
 end

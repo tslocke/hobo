@@ -13,7 +13,7 @@
   <table-plus with="&@stories" fields="this, tasks.count, status">
     <prepend-header:>
       <div class="filter">
-        Display by status: <filter-menu param-name="status" options="&StoryStatus.all"/>
+        Display by status: <filter-menu param-name="status" options="&StoryStatus.all.map{|s|[s.to_s, s.id]}"/>
       </div>
     </prepend-header:>
     <empty-message:>No stories match your criteria</empty-message:>

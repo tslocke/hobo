@@ -4,7 +4,7 @@ module Generators
       class Router
 
         # specify that an id CANNOT be null - needed to disambiguate /models from /models/[nil]
-        ID_REQUIREMENT = "{ :id => %r([^#{ActionController::Routing::SEPARATORS.join}]+) }"
+        ID_REQUIREMENT = "{ :id => %r([^#{ActionDispatch::Routing::SEPARATORS.join}]+) }"
 
         attr_reader :subsite, :controller, :model, :record, :records
 
@@ -210,9 +210,11 @@ module Generators
           return [] unless controller < ::Hobo::Controller::UserBase
           prefix = records == "users" ? "" : "#{record}_"
           [
-          link("match '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
+          link("post '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login_post'",  'login'),
+          link("get '#{prefix}login(.:format)' => '#{records}#login', :as => '#{record}_login'",  'login'),
           link("get '#{prefix}logout(.:format)' => '#{records}#logout', :as => '#{record}_logout'",  'logout'),
-          link("match '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
+          link("get '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password'",  'forgot_password'),
+          link("post '#{prefix}forgot_password(.:format)' => '#{records}#forgot_password', :as => '#{record}_forgot_password_post'",  'forgot_password'),
           ].compact
         end
 

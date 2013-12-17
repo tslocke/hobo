@@ -1,13 +1,8 @@
 module HoboRouteHelper
+  include Rails.application.routes.url_helpers
   extend HoboHelperBase
     def object_url(obj, *args)
       new_ = object_url_new(obj, *args)
-
-      unless Rails.configuration.hobo.dont_emit_deprecated_routes
-        old_ = object_url_old(obj, *args)
-        debugger if old_ != new_
-        Rails.logger.debug "new style url #{new_} does not match old style url #{old_}. obj: #{obj.inspect}.  args: #{args.inspect}.  backtrace: #{caller.inspect}" if old_ != new_
-      end
       new_
     end
 
@@ -30,64 +25,6 @@ module HoboRouteHelper
     end
 
     IMPLICIT_ACTIONS = [:index, :show, :create, :update, :destroy]
-
-    def object_url_old(obj, *args)
-      params = args.extract_options!
-      action = args.first._?.to_sym
-      options, params = params.partition_hash([:subsite, :method, :format])
-      options[:subsite] ||= self.subsite
-      subsite, method = options.get :subsite, :method
-
-      if obj.respond_to?(:member_class) && obj.respond_to?(:origin) && obj.origin
-        # Asking for URL of a collection, e.g. category/1/adverts or category/1/adverts/new
-
-        refl = obj.origin.class.reverse_reflection(obj.origin_attribute)
-        owner_name = refl.name.to_s
-        owner_name = owner_name.singularize if refl.macro == :has_many
-        if action == :new
-          action_path = "#{obj.origin_attribute}/new"
-          action = :"new_for_#{owner_name}"
-        elsif action.nil?
-          action_path = obj.origin_attribute
-          if method.to_s == 'post'
-            action = :"create_for_#{owner_name}"
-          else
-            action = :"index_for_#{owner_name}"
-          end
-        end
-        klass = obj.member_class
-        obj = obj.origin
-      else
-        action ||= case options[:method].to_s
-                   when 'put';    :update
-                   when 'post';   :create
-                   when 'delete'; :destroy
-                   else; obj.is_a?(Class) ? :index : :show
-                   end
-
-        if options[:method].to_s == 'post' && obj.try.new_record?
-          # Asking for url to post new record to
-          obj = obj.class
-        end
-
-        klass = if obj.is_a?(Class)
-                  obj
-                elsif obj.respond_to?(:member_class)
-                  obj.member_class # We get here if we're passed a scoped class
-                else
-                  obj.class
-                end
-      end
-
-      if Hobo::Routes.linkable?(klass, action, options)
-
-        url = base_url_for(obj, subsite, action)
-        url += "/#{action_path || action}" unless action.in?(IMPLICIT_ACTIONS)
-
-        params = make_params(params)
-        params.blank? ? url : "#{url}?#{params}"
-      end
-    end
 
     def object_url_new(obj, *args)
       options = args.extract_options!
@@ -161,26 +98,20 @@ module HoboRouteHelper
       "#{base_url}#{'/' + subsite unless subsite.blank?}/#{path}"
     end
 
-
     def recognize_page_path
-      # round tripping params through the router will remove
-      # unnecessary params
       if params[:page_path]
         url = params[:page_path]
         method = "GET"
+        Rails.application.routes.recognize_path(url, :method => method)
       else
-        url = url_for(params)
-        method = request.method
+        # We used to use "url_for(params)", but with Rails 4 stopped working
+        # It seems that we can send back the params directly
+        params
       end
-      if ENV['RAILS_RELATIVE_URL_ROOT']
-        url.gsub!(/^#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
-        url.gsub!(/^https?:\/\/.*?#{ENV['RAILS_RELATIVE_URL_ROOT']}/, "")
-      end
-      Rails.application.routes.recognize_path(url, :method => method)
     end
 
     def url_for_page_path(options={})
-      url_for recognize_page_path.merge(options)
+      url_for recognize_page_path.merge(options).merge({:only_path => true})
     end
 
     def controller_action_from_page_path
@@ -220,19 +151,19 @@ module HoboRouteHelper
 
     # Login url for a given user record or user class
     def forgot_password_url(user_class=Hobo::Model::UserBase.default_user_model)
-      send("#{user_class.name.underscore}_forgot_password_url") rescue nil
+      send("#{user_class.name.underscore}_forgot_password_path") rescue nil
     end
 
 
     # Login url for a given user record or user class
     def login_url(user_class=Hobo::Model::UserBase.default_user_model)
-      send("#{user_class.name.underscore}_login_url") rescue nil
+      send("#{user_class.name.underscore}_login_path") rescue nil
     end
 
 
     # Sign-up url for a given user record or user class
     def signup_url(user_class=Hobo::Model::UserBase.default_user_model)
-      send("signup_#{user_class.name.underscore.pluralize}_url") rescue nil
+      send("signup_#{user_class.name.underscore.pluralize}_path") rescue nil
     end
 
 
@@ -245,7 +176,7 @@ module HoboRouteHelper
           else
             user_or_class.class
           end
-      send("#{c.name.underscore}_logout_url") rescue nil
+      send("#{c.name.underscore}_logout_path") rescue nil
     end
 
     def new_for_current_user(model_or_assoc=nil)

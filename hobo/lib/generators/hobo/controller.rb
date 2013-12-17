@@ -15,7 +15,10 @@ module Generators
       def generate_controller
         if class_path.length == 1 and
           subsite = class_path.first and
-          File.exist?(File.join('app/controllers', class_path, "#{subsite}_site_controller.rb"))
+	  (
+	    options[:subsite_controller_is_being_created] or 
+            File.exist?(File.join('app/controllers', class_path, "#{subsite}_site_controller.rb"))
+          )
           @subsite = subsite.camelize
         end
         template 'controller.rb.erb', File.join('app/controllers',"#{file_path}_controller.rb")

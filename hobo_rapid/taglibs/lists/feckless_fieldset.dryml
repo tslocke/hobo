@@ -1,4 +1,4 @@
-<!-- This tag is very similar `<field-list-v1>`.  However, instead of rendering a table, it renders what [Anatoli Papirovski calls "perfect form markup"](http://web.archive.org/web/20090922234755/http://fecklessmind.com/2009/01/23/how-to-reliable-css-forms/)
+<!-- This tag is very similar `<field-list-v1>`.  However, instead of rendering a table, it renders what [Anatoli Papirovski calls "perfect form markup"](http://web.archive.org/web/20090215003125/http://fecklessmind.com/2009/01/23/how-to-reliable-css-forms/)
 
 It takes the same attributes & parameters as `<field-list-v1>`, with the addition of a `legend` parameter and a `required` attribute.
 

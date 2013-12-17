@@ -19,7 +19,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
     class Foo < ActiveRecord::Base
       fields do
       end
-      set_primary_key "foo_id"
+      self.primary_key="foo_id"
     end
    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
    >> Foo.primary_key
@@ -29,7 +29,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
    doctest: rename from custom primary_key
    >>
     class Foo < ActiveRecord::Base
-      set_primary_key "id"
+      self.primary_key="id"
     end
     puts "\n\e[45m Please enter 'id' (no quotes) at the next prompt \e[0m"
    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)
@@ -41,7 +41,7 @@ And requires also that you enter the right choice when prompted. OK we're ready 
    doctest: rename to custom primary_key
    >>
     class Foo < ActiveRecord::Base
-      set_primary_key "foo_id"
+      self.primary_key="foo_id"
     end
     puts "\n\e[45m Please enter 'drop id' (no quotes) at the next prompt \e[0m"
    >> Rails::Generators.invoke 'hobo:migration', %w(-n -m)

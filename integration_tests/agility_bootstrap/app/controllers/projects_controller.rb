@@ -14,7 +14,7 @@ class ProjectsController < ApplicationController
     @project = find_instance
     @stories =
       @project.stories.apply_scopes(:search    => [params[:search], :title],
-                                    :status_is => params[:status],
+                                    :status_is => params[:status].blank? ? nil : params[:status].to_i,
                                     :order_by  => parse_sort_param(:title, :status))
   end
 

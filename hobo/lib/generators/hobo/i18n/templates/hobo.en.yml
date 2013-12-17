@@ -114,7 +114,7 @@ en:
       update:
         no_attribute_error: "No update specified in params"
         success: "Changes to the %{model} were saved"
-        error: "There was a problem with that change.\\n%{errors}"
+        error: "There was a problem with that change.\n%{errors}"
       destroy:
         success: "The %{model} was deleted"
       signup:
@@ -167,6 +167,7 @@ en:
     table_plus:
       search: "Search"
       submit_label: "Go"
+      clear_label: "Clear"
 
     live_search:
       label: "Search"

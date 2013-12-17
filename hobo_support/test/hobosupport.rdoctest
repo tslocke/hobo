@@ -63,6 +63,13 @@ Note that `_?` should *always* be followed by a method call.  It is not intended
     >> :foo.try.reverse
     => nil
 
+HoboSupport's try was added to HoboSupport before similar functionality was added to ActiveSupport with a different signature.  The ActiveSupport form also works:
+
+    >> "foo".try(:reverse)
+    => "oof"
+    >> :foo.try(:reverse)
+    => nil
+
 ### What's the difference?
 
 Use `_?` when you want to call a method but you know the receiver may be nil.

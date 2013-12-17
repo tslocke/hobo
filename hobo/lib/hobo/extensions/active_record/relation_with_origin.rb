@@ -24,13 +24,15 @@ module ActiveRecord
   module Associations
     class CollectionProxy
 
-      def scoped_with_origin
-        relation = scoped_without_origin.clone
-        relation.origin = proxy_association.owner
-        relation.origin_attribute = proxy_association.reflection.name
-        relation
-      end
-      alias_method_chain :scoped, :origin
+      # FIXME Ralis4:  really hoping that we can replace this with
+      # something based on https://github.com/rails/rails/issues/5717
+      # def scoped_with_origin
+      #   relation = scoped_without_origin.clone
+      #   relation.origin = proxy_association.owner
+      #   relation.origin_attribute = proxy_association.reflection.name
+      #   relation
+      # end
+      # alias_method_chain :scoped, :origin
 
       def method_missing_with_origin(method, *args, &block)
         res = method_missing_without_origin(method, *args, &block)

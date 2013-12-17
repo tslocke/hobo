@@ -1,7 +1,8 @@
 Agility::Application.routes.draw do
   root :to => 'front#index'
 
-  match 'search' => 'front#search', :as => 'site_search'
+  get 'search' => 'front#search', :as => 'site_search'
+  post 'search' => 'front#search', :as => 'site_search_post'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

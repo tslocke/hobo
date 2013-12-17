@@ -7,8 +7,8 @@ module Hobo
         klass.class_eval do
           extend ClassMethods
 
-          alias_method_chain :create, :hobo_permission_check
-          alias_method_chain :update, :hobo_permission_check
+          alias_method_chain :create_record, :hobo_permission_check
+          alias_method_chain :update_record, :hobo_permission_check
           alias_method_chain :destroy, :hobo_permission_check
           class << self
             alias_method_chain :has_many, :hobo_permission_check
@@ -132,18 +132,18 @@ module Hobo
         acting_user && !(self.class.has_lifecycle? && lifecycle.active_step)
       end
 
-      def create_with_hobo_permission_check(*args, &b)
+      def create_record_with_hobo_permission_check(*args, &b)
         if permission_check_required?
           create_permitted? or raise PermissionDeniedError, "#{self.class.name}#create"
         end
-        create_without_hobo_permission_check(*args, &b)
+        create_record_without_hobo_permission_check(*args, &b)
       end
 
-      def update_with_hobo_permission_check(*args)
+      def update_record_with_hobo_permission_check(*args)
         if permission_check_required?
           update_permitted? or raise PermissionDeniedError, "#{self.class.name}#update"
         end
-        update_without_hobo_permission_check(*args)
+        update_record_without_hobo_permission_check(*args)
       end
 
       def destroy_with_hobo_permission_check
@@ -255,6 +255,7 @@ module Hobo
 
 
       def attribute_protected?(attribute)
+        return false if attribute.nil?
         attribute = attribute.to_s
 
         return true if self.class.send(:attributes_protected_by_default).include? attribute

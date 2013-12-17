@@ -33,7 +33,8 @@ class EditorsTest < ActionDispatch::IntegrationTest
     sleep 1
     find("#{selector} input[type=text],#{selector} textarea").set(value)
     find("h2.heading").click # just to get a blur
-    assert find("#{selector} .in-place-edit").has_text?(text_value)
+    sleep 0.5
+    assert page.find("#{selector} .in-place-edit").has_text?(text_value)
     @verify_list << { :selector => selector, :value => text_value }
   end
 
@@ -48,6 +49,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
     Capybara.current_driver = :selenium_chrome
     Capybara.default_wait_time = 5
     visit root_path
+    Capybara.current_session.driver.browser.manage.window.resize_to(1024,700)
 
     # log in as Administrator
     click_link "Log out" rescue Capybara::ElementNotFound
@@ -92,7 +94,7 @@ class EditorsTest < ActionDispatch::IntegrationTest
     else
       find("#bug305i input.foo-i").set("192")
       click_button "reload editors"
-
+      sleep 0.5
       assert find(".i-field .controls .in-place-edit").has_text?("192")
 
       find(".i-field .controls .in-place-edit").click

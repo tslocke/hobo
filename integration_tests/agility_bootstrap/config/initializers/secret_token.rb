@@ -5,3 +5,4 @@
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
 Agility::Application.config.secret_token = '2b52f50f9588312e7f54c1da19e86baf2d6c8ee9be0003836ce903bb193ad6035ed38c6c90d923c61057c788d9e64d500655de0242c7e2115939f3afe1e2980f'
+Agility::Application.config.secret_key_base = '2b52f50f9588312e7f54c1da19e86baf2d6c8ee9be0003836ce903bb193ad6035ed38c6c90d923c61057c788d9e64d500655de0242c7e2115939f3afe1e2980f'

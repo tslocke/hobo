@@ -89,7 +89,7 @@
 
       # Generate the HMAC keyed message digest. Uses SHA1 by default.
       def generate_digest(data, session)
-        secret = self.class.secret || Rails.application.config.secret_token
+        secret = self.class.secret || Rails.application.config.secret_key_base || Rails.application.config.secret_token
         key = secret.respond_to?(:call) ? secret.call(session) : secret
         OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new(self.class.digest), key, data)
       end

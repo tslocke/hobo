@@ -3,7 +3,7 @@ module HoboFields
   module Types
     class Text < String
 
-      COLUMN_TYPE = :text
+      COLUMN_TYPE = :text unless defined? COLUMN_TYPE
 
       def to_html(xmldoctype = true)
         ERB::Util.html_escape(self).gsub("\n", "<br#{xmldoctype ? ' /' : ''}>\n").html_safe
