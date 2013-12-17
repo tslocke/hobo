@@ -21,12 +21,6 @@ GIT
       hobo (> 1.4.0.pre5)
 
 GIT
-  remote: git://github.com/Hobo/will_paginate.git
-  revision: e2bfe0a07c9fd1c6d7bf914e25db5182697ae7c2
-  specs:
-    will_paginate (3.0.4.hobo)
-
-GIT
   remote: git://github.com/jnicklas/capybara.git
   revision: a4399a57f755bbf5634e4e49319cc52b818c1215
   specs:
@@ -146,6 +140,7 @@ GEM
       railties (>= 3.0.0)
     ffi (1.9.3)
     hike (1.2.3)
+    hobo_will_paginate (2.1.0)
     httparty (0.12.0)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -231,6 +226,7 @@ GEM
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     websocket (1.0.7)
+    will_paginate (3.0.5)
     will_paginate-bootstrap (0.2.5)
       will_paginate (>= 3.0.3)
     xpath (2.0.0)
@@ -257,6 +253,7 @@ DEPENDENCIES
   hobo_paperclip!
   hobo_simple_color!
   hobo_tokeninput!
+  hobo_will_paginate
   jquery-rails
   jquery-ui-themes (~> 0.0.4)
   kramdown
@@ -268,4 +265,3 @@ DEPENDENCIES
   shoulda
   sqlite3
   uglifier (>= 1.0.3)
-  will_paginate!

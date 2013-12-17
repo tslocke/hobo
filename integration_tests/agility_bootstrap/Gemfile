@@ -51,7 +51,7 @@ gem "jquery-ui-themes", "~> 0.0.4"
 gem "hobo_bootstrap", :path => "../../../hobo_bootstrap"
 gem "hobo_bootstrap_ui", :path => "../../../hobo_bootstrap_ui"
 
-gem "will_paginate", :git => "git://github.com/Hobo/will_paginate.git"
+gem "hobo_will_paginate"#, :git => "git://github.com/Hobo/will_paginate.git"
 
 gem "kramdown"
 gem "RedCloth"

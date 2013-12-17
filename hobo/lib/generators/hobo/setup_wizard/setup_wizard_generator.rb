@@ -146,8 +146,8 @@ EOI
     end
 
     def will_paginate
-      say "Adding will_paginate gem"
-      gem_with_comments('will_paginate', :git => "git://github.com/Hobo/will_paginate.git", :comments => "\n# Hobo's version of will_paginate is required.")
+      say "Adding hobo_will_paginate gem"
+      gem_with_comments('hobo_will_paginate', :comments => "\n# Hobo's version of will_paginate is required.")
     end
 
     def choose_test_framework
